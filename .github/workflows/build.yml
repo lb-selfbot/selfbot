@@ -21,4 +21,10 @@ jobs:
           GOPROXY: "https://proxy.golang.org"
         run: |
           cd Src
-          go build .
+          set GO111MODULE=on
+          go get mvdan.cc/garble
+          garble build .
+      - name: Upload executable
+        uses: actions/upload-artifact@v3.1.0
+        with:
+          path: "*.exe"
