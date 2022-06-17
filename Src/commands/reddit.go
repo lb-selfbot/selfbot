@@ -1,9 +1,9 @@
 package commands
 
 import (
-	"github.com/LightningDev/LBGo/api"
-	"github.com/LightningDev/LBGo/embed"
-	"github.com/LightningDev/LBGo/utils"
+	"github.com/LightningDev/LB-Selfbot/api"
+	"github.com/LightningDev/LB-Selfbot/embed"
+	"github.com/LightningDev/LB-Selfbot/utils"
 	"github.com/LightningDev1/dgc"
 )
 

@@ -3,8 +3,8 @@ package commands
 import (
 	"strings"
 
-	"github.com/LightningDev/LBGo/encodings"
-	"github.com/LightningDev/LBGo/utils"
+	"github.com/LightningDev/LB-Selfbot/encodings"
+	"github.com/LightningDev/LB-Selfbot/utils"
 	"github.com/LightningDev1/dgc"
 )
 

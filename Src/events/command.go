@@ -3,7 +3,7 @@ package events
 import (
 	"github.com/LightningDev1/dgc"
 
-	"github.com/LightningDev/LBGo/utils"
+	"github.com/LightningDev/LB-Selfbot/utils"
 )
 
 func (e Events) OnCommand(ctx *dgc.Ctx) {

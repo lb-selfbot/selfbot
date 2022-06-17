@@ -3,8 +3,8 @@ package commands
 import (
 	"fmt"
 
-	"github.com/LightningDev/LBGo/embed"
-	"github.com/LightningDev/LBGo/http"
+	"github.com/LightningDev/LB-Selfbot/embed"
+	"github.com/LightningDev/LB-Selfbot/http"
 	"github.com/LightningDev1/dgc"
 )
 

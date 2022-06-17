@@ -7,11 +7,11 @@ import (
 	"strings"
 	"time"
 
-	"github.com/LightningDev/LBGo/config"
-	"github.com/LightningDev/LBGo/embed"
-	"github.com/LightningDev/LBGo/http"
-	"github.com/LightningDev/LBGo/json"
-	"github.com/LightningDev/LBGo/utils"
+	"github.com/LightningDev/LB-Selfbot/config"
+	"github.com/LightningDev/LB-Selfbot/embed"
+	"github.com/LightningDev/LB-Selfbot/http"
+	"github.com/LightningDev/LB-Selfbot/json"
+	"github.com/LightningDev/LB-Selfbot/utils"
 	"github.com/LightningDev1/dgc"
 	"github.com/LightningDev1/discordgo"
 )

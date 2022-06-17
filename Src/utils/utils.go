@@ -19,9 +19,9 @@ import (
 	"golang.org/x/sys/windows"
 	"golang.org/x/text/unicode/norm"
 
-	"github.com/LightningDev/LBGo/error_handling"
-	"github.com/LightningDev/LBGo/http"
-	"github.com/LightningDev/LBGo/ipc"
+	"github.com/LightningDev/LB-Selfbot/error_handling"
+	"github.com/LightningDev/LB-Selfbot/http"
+	"github.com/LightningDev/LB-Selfbot/ipc"
 	"github.com/LightningDev1/dgc"
 	"github.com/LightningDev1/discordgo"
 	"github.com/PuerkitoBio/goquery"
@@ -438,10 +438,10 @@ func GetArguments(ctx *dgc.Ctx) (map[string]string, bool) {
 }
 
 func JsonEscape(i string) string {
-    b, err := json.Marshal(i)
-    if err != nil {
-        panic(err)
-    }
-    // Trim the beginning and trailing " character
-    return string(b[1:len(b)-1])
+	b, err := json.Marshal(i)
+	if err != nil {
+		panic(err)
+	}
+	// Trim the beginning and trailing " character
+	return string(b[1 : len(b)-1])
 }
