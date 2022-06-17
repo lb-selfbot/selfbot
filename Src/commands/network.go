@@ -18,12 +18,12 @@ import (
 	"github.com/LightningDev/LBGo/http"
 	"github.com/LightningDev/LBGo/json"
 	"github.com/LightningDev/LBGo/utils"
+	"github.com/LightningDev1/dgc"
 	"github.com/kkdai/youtube/v2"
-	"github.com/lus/dgc"
 	googlesearch "github.com/rocketlaunchr/google-search"
 )
 
-type NetworkCommands struct {}
+type NetworkCommands struct{}
 
 func (t NetworkCommands) RegisterCommands(router *dgc.Router) {
 	router.RegisterCmd(&dgc.Command{

@@ -7,7 +7,7 @@ import (
 	"github.com/LightningDev/LBGo/constants"
 	"github.com/LightningDev/LBGo/encodings"
 	"github.com/LightningDev/LBGo/utils"
-	"github.com/lus/dgc"
+	"github.com/LightningDev1/dgc"
 )
 
 type TrollingCommands struct{}

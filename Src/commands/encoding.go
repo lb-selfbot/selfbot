@@ -5,10 +5,10 @@ import (
 
 	"github.com/LightningDev/LBGo/encodings"
 	"github.com/LightningDev/LBGo/utils"
-	"github.com/lus/dgc"
+	"github.com/LightningDev1/dgc"
 )
 
-type EncodingCommands struct {}
+type EncodingCommands struct{}
 
 func (t EncodingCommands) RegisterCommands(router *dgc.Router) {
 	router.RegisterCmd(&dgc.Command{

@@ -5,11 +5,11 @@ import (
 	"time"
 
 	"github.com/LightningDev/LBGo/utils"
+	"github.com/LightningDev1/dgc"
 	"github.com/common-nighthawk/go-figure"
-	"github.com/lus/dgc"
 )
 
-type TextCommands struct {}
+type TextCommands struct{}
 
 func (t TextCommands) RegisterCommands(router *dgc.Router) {
 	router.RegisterCmd(&dgc.Command{

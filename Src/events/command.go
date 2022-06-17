@@ -1,7 +1,7 @@
 package events
 
 import (
-	"github.com/lus/dgc"
+	"github.com/LightningDev1/dgc"
 
 	"github.com/LightningDev/LBGo/utils"
 )

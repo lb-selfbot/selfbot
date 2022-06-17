@@ -1,17 +1,17 @@
 package commands
 
-import "github.com/lus/dgc"
+import "github.com/LightningDev1/dgc"
 
 type Commands struct {
-	TextCommands TextCommands
-	EncodingCommands EncodingCommands
+	TextCommands      TextCommands
+	EncodingCommands  EncodingCommands
 	CodeblockCommands CodeblockCommands
-	CryptoCommands CryptoCommands
-	FunCommands FunCommands
-	TrollingCommands TrollingCommands
-	NetworkCommands NetworkCommands
-	SpotifyCommands SpotifyCommands
-	RedditCommands RedditCommands
+	CryptoCommands    CryptoCommands
+	FunCommands       FunCommands
+	TrollingCommands  TrollingCommands
+	NetworkCommands   NetworkCommands
+	SpotifyCommands   SpotifyCommands
+	RedditCommands    RedditCommands
 }
 
 func (c Commands) RegisterCommands(router *dgc.Router) {

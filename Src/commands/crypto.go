@@ -3,12 +3,12 @@ package commands
 import (
 	"fmt"
 
-	"github.com/LightningDev/LBGo/http"
 	"github.com/LightningDev/LBGo/embed"
-	"github.com/lus/dgc"
+	"github.com/LightningDev/LBGo/http"
+	"github.com/LightningDev1/dgc"
 )
 
-type CryptoCommands struct {}
+type CryptoCommands struct{}
 
 func (t CryptoCommands) RegisterCommands(router *dgc.Router) {
 	cryptoCommands := [][]string{

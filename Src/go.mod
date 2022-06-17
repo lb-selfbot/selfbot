@@ -5,11 +5,9 @@ go 1.17
 require (
 	github.com/PuerkitoBio/goquery v1.8.0
 	github.com/brianvoe/gofakeit/v6 v6.16.0
-	github.com/bwmarrin/discordgo v0.25.0
 	github.com/darkwyrm/b85 v0.0.0-20210908110113-bdd55eedeb3c
 	github.com/deadshot465/owoify-go v1.0.1
 	github.com/go-ping/ping v1.1.0
-	github.com/lus/dgc v1.1.0
 	github.com/mr-tron/base58 v1.2.0
 	github.com/multiformats/go-base32 v0.0.4
 	github.com/multiformats/go-base36 v0.1.0
@@ -18,6 +16,8 @@ require (
 )
 
 require (
+	github.com/LightningDev1/dgc v1.1.2 // indirect
+	github.com/LightningDev1/discordgo v0.25.2 // indirect
 	github.com/StackExchange/wmi v1.2.1 // indirect
 	github.com/andybalholm/brotli v1.0.4 // indirect
 	github.com/andybalholm/cascadia v1.3.1 // indirect
@@ -55,5 +55,5 @@ require (
 	github.com/karrick/tparse/v2 v2.8.2 // indirect
 	github.com/zekroTJA/timedmap v1.4.0 // indirect
 	golang.org/x/crypto v0.0.0-20220525230936-793ad666bf5e
-	golang.org/x/sys v0.0.0-20220608164250-635b8c9b7f68
+	golang.org/x/sys v0.0.0-20220615213510-4f61da869c0c
 )

@@ -11,11 +11,11 @@ import (
 	"github.com/LightningDev/LBGo/http"
 	"github.com/LightningDev/LBGo/json"
 	"github.com/LightningDev/LBGo/utils"
+	"github.com/LightningDev1/dgc"
+	"github.com/LightningDev1/discordgo"
 	"github.com/PuerkitoBio/goquery"
 	"github.com/brianvoe/gofakeit/v6"
-	"github.com/bwmarrin/discordgo"
 	owoify_go "github.com/deadshot465/owoify-go"
-	"github.com/lus/dgc"
 )
 
 type FunCommands struct{}

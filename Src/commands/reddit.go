@@ -4,7 +4,7 @@ import (
 	"github.com/LightningDev/LBGo/api"
 	"github.com/LightningDev/LBGo/embed"
 	"github.com/LightningDev/LBGo/utils"
-	"github.com/lus/dgc"
+	"github.com/LightningDev1/dgc"
 )
 
 type RedditCommands struct{}

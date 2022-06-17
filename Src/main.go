@@ -8,9 +8,9 @@ import (
 
 	"syscall"
 
-	"github.com/bwmarrin/discordgo"
+	"github.com/LightningDev1/dgc"
+	"github.com/LightningDev1/discordgo"
 	"github.com/jpillora/overseer"
-	"github.com/lus/dgc"
 
 	"github.com/LightningDev/LBGo/commands"
 	"github.com/LightningDev/LBGo/events"

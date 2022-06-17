@@ -22,9 +22,9 @@ import (
 	"github.com/LightningDev/LBGo/error_handling"
 	"github.com/LightningDev/LBGo/http"
 	"github.com/LightningDev/LBGo/ipc"
+	"github.com/LightningDev1/dgc"
+	"github.com/LightningDev1/discordgo"
 	"github.com/PuerkitoBio/goquery"
-	"github.com/bwmarrin/discordgo"
-	"github.com/lus/dgc"
 )
 
 var LowercaseAlphabet string = "abcdefghijklmnopqrstuvwxyz"

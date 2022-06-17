@@ -3,7 +3,7 @@ package error_handling
 import (
 	"fmt"
 
-	"github.com/lus/dgc"
+	"github.com/LightningDev1/dgc"
 )
 
 type CommandError int64

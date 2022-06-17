@@ -12,8 +12,8 @@ import (
 	"github.com/LightningDev/LBGo/http"
 	"github.com/LightningDev/LBGo/json"
 	"github.com/LightningDev/LBGo/utils"
-	"github.com/bwmarrin/discordgo"
-	"github.com/lus/dgc"
+	"github.com/LightningDev1/dgc"
+	"github.com/LightningDev1/discordgo"
 )
 
 type SpotifyCommands struct{}

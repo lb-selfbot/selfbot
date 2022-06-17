@@ -1,7 +1,7 @@
 package commands
 
 import (
-	"github.com/lus/dgc"
+	"github.com/LightningDev1/dgc"
 )
 
 type CodeblockCommands struct{}

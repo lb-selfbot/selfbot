@@ -7,8 +7,8 @@ import (
 
 	"github.com/LightningDev/LBGo/config"
 	"github.com/LightningDev/LBGo/constants"
-	"github.com/bwmarrin/discordgo"
-	"github.com/lus/dgc"
+	"github.com/LightningDev1/dgc"
+	"github.com/LightningDev1/discordgo"
 )
 
 // https://github.com/Clinet/discordgo-embed
