@@ -1,4 +1,4 @@
-module github.com/LightningDev/LBGo
+module github.com/LightningDev/LB-Selfbot
 
 go 1.17
 
