@@ -3,6 +3,7 @@ package commands
 import (
 	"fmt"
 	"net/url"
+	"strconv"
 	"strings"
 	"time"
 
@@ -53,6 +54,12 @@ func (t SpotifyCommands) RegisterCommands(router *dgc.Router) {
 		Description: "Current playing song info",
 		Usage:       "[p]splaying",
 		Handler:     t.splaying,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "svolume",
+		Description: "Change Spotify volume",
+		Usage:       "[p]svolume <volume>",
+		Handler:     t.svolume,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "spresence",
@@ -207,6 +214,21 @@ func (t SpotifyCommands) splaying(ctx *dgc.Ctx) {
 			AddField("URL", song.GetPath("external_urls", "spotify").MustString("Unknown")).
 			SetImage(song.GetPath("album", "images").GetIndex(0).Get("url").MustString("")).
 			Send(ctx)
+	}
+}
+
+func (t SpotifyCommands) svolume(ctx *dgc.Ctx) {
+	if bearerToken := t.GetBearerToken(); bearerToken == "" {
+		ctx.RespondText("Could not find a Spotify connection. Please connect your Spotify account to your Discord.")
+	} else {
+		volumeStr := utils.Arguments["<volume>"]
+		volume, err := strconv.Atoi(volumeStr)
+		if err != nil || volume < 0 || volume > 100 {
+			ctx.RespondText("Volume must be between 0 and 100.")
+			return
+		}
+		res, err := http.Put("https://api.spotify.com/v1/me/player/volume?volume_percent="+volumeStr, map[string]string{"Authorization": bearerToken})
+		t.HandleRequest(ctx, res, err, fmt.Sprintf("Successfully set volume to: %s.", volumeStr))
 	}
 }
 
