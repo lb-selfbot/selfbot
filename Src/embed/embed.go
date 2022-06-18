@@ -409,5 +409,8 @@ func (e *Embed) Send(ctx *dgc.Ctx) *discordgo.Message {
 	for _, text := range e.ToString() {
 		message, _ = ctx.Session.ChannelMessageSend(ctx.Event.ChannelID, text)
 	}
+	if e.Image != nil && e.Image.URL != "" {
+		ctx.Session.ChannelMessageSend(ctx.Event.ChannelID, e.Image.URL)
+	}
 	return message
 }

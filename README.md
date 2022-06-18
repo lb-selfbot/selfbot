@@ -14,7 +14,7 @@
 - Administration Commands:        0%
 - Util Commands:                  0%
 - Spotify Commands:             100%
-- Game Commands:                  0%
+- Game Commands:                100%
 - Activity Commands:              0%
 - Animation Commands:             0%
 - Config Commands:                0%
@@ -25,7 +25,7 @@
 - Custom Commands:                0%
 - Help Command:                   0%
 - Event Listeners:                5%
-- IPC:                           70%
-- encoding/json to simplejson:   10%
+- IPC:                           75%
+- encoding/json to simplejson:   40%
 - Better argument handling:     100%
-- Remove usage of ctx.Arguments:  5%
+- Remove usage of ctx.Arguments: 40%

@@ -63,9 +63,13 @@ func (t CodeblockCommands) RegisterCommands(router *dgc.Router) {
 			Name:        element[1],
 			Description: "Sends a codeblock with language " + element[0],
 			Usage:       "[p]" + element[1] + " <text>",
-			Handler: func(ctx *dgc.Ctx) {
-				ctx.RespondText("```" + element[2] + "\n" + ctx.Arguments.Raw() + "\n```")
-			},
+			Handler:     t.generateFunc(element),
 		})
+	}
+}
+
+func (t CodeblockCommands) generateFunc(element []string) func(ctx *dgc.Ctx) {
+	return func(ctx *dgc.Ctx) {
+		ctx.RespondText("```" + element[2] + "\n" + ctx.Arguments.Raw() + "\n```")
 	}
 }
