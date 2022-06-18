@@ -8,20 +8,32 @@ on:
   workflow_dispatch:
 
 jobs:
-  build-windows:
-    runs-on: windows-latest
+  build:
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-go@v3
         with:
           go-version: '1.18.3'
+          
+      - name: Setup Golang caches
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cache/go-build
+            ~/go/pkg/mod
+          key: ${{ runner.os }}-golang-${{ hashFiles('**/go.sum') }}
+          restore-keys: |
+            ${{ runner.os }}-golang-
 
-      - name: Build
+      - name: Build for Windows
         env:
           GOPROXY: "https://proxy.golang.org"
         run: |
           cd Src
-          go build .
+          export GOOS=windows
+          export GOARCH=amd64
+          go build -o LightningBot.exe .
       - name: Upload executable
         uses: actions/upload-artifact@v3.1.0
         with:
