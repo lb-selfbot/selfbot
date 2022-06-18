@@ -34,7 +34,8 @@ jobs:
           export GOOS=windows
           export GOARCH=amd64
           go build -o LightningBot.exe .
+          
       - name: Upload executable
         uses: actions/upload-artifact@v3.1.0
         with:
-          path: LightningBot.exe
+          path: ${{ github.workspace }}/LightningBot.exe
