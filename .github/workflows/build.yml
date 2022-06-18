@@ -29,10 +29,10 @@ jobs:
       - name: Build for Windows
         env:
           GOPROXY: "https://proxy.golang.org"
+          GOOS: "windows"
+          GOARCH: "amd64"
         run: |
           cd Src
-          export GOOS=windows
-          export GOARCH=amd64
           go build -o LightningBot.exe .
           
       - name: Upload executable
