@@ -33,9 +33,30 @@ jobs:
           GOARCH: "amd64"
         run: |
           cd Src
-          go build -o ${{ github.workspace }}/LightningBot.exe
+          go build -o ${{ github.workspace }}/LightningBot-windows.exe
           
-      - name: Upload executable
+      - name: Build for Linux
+        env:
+          GOPROXY: "https://proxy.golang.org"
+          GOOS: "linux"
+          GOARCH: "amd64"
+        run: |
+          cd Src
+          go build -o ${{ github.workspace }}/LightningBot-linux
+          
+      - name: Build for MacOS
+        env:
+          GOPROXY: "https://proxy.golang.org"
+          GOOS: "darwin"
+          GOARCH: "amd64"
+        run: |
+          cd Src
+          go build -o ${{ github.workspace }}/LightningBot-macos
+          
+      - name: Upload builds
         uses: actions/upload-artifact@v3.1.0
         with:
-          path: ${{ github.workspace }}/LightningBot.exe
+          path: |
+            ${{ github.workspace }}/LightningBot.exe
+            ${{ github.workspace }}/LightningBot-linux
+            ${{ github.workspace }}/LightningBot-macos
