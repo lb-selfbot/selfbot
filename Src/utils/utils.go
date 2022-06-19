@@ -209,11 +209,8 @@ func TryGetUserFromUserMention(session *discordgo.Session, mention *dgc.Argument
 }
 
 func TryGetNameFromUserMention(session *discordgo.Session, mention *dgc.Argument) (string, bool) {
-	if mention.AsUserMentionID() == "" {
-		return mention.Raw(), false
-	}
-	user, err := session.User(mention.AsUserMentionID())
-	if err != nil {
+	user, success := TryGetUserFromUserMention(session, mention)
+	if !success {
 		return "", false
 	}
 	return fmt.Sprintf("%s#%s", user.Username, user.Discriminator), true
