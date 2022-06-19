@@ -1,6 +1,7 @@
 package ipc
 
 import (
+	"encoding/json"
 	"net"
 	"os"
 )
@@ -35,4 +36,14 @@ type IPC struct {
 	writeFile *os.File
 	OnRead    func(string)
 	OpCodes   OpCodes
+}
+
+func SendNotification(text string) {
+	jsonBytes, _ := json.Marshal(JsonEvent{
+		Op: Ipc.OpCodes.NOTIFICATION,
+		Data: JsonEventData{
+			Text: text,
+		},
+	})
+	Ipc.Write(string(jsonBytes))
 }

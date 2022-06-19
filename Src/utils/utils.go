@@ -29,15 +29,6 @@ var LowercaseAlphabet string = "abcdefghijklmnopqrstuvwxyz"
 
 var Arguments map[string]string = make(map[string]string)
 
-func SendNotification(text string) {
-	jsonBytes, _ := json.Marshal(ipc.JsonEvent{
-		Op: ipc.Ipc.OpCodes.NOTIFICATION,
-		Data: ipc.JsonEventData{
-			Text: text,
-		},
-	})
-	ipc.Ipc.Write(string(jsonBytes))
-}
 
 func ReverseString(s string) string {
 	rns := []rune(s)
@@ -330,45 +321,6 @@ func OpenURL(url string) {
 	} else {
 		exec.Command("xdg-open", url).Start()
 	}
-}
-
-func GetPublicIP() string {
-	ip, err := http.Get("https://ipinfo.io/ip")
-	if err != nil {
-		return "Error"
-	}
-	return ip
-}
-
-func GetLocalIP() string {
-	conn, err := net.Dial("udp", "8.8.8.8:80")
-	if err != nil {
-		return "Error"
-	}
-	defer conn.Close()
-	localAddr := conn.LocalAddr().(*net.UDPAddr)
-	return localAddr.IP.String()
-}
-
-func GetMacAddress() string {
-	currentIP := GetLocalIP()
-	interfaces, _ := net.Interfaces()
-	for _, interf := range interfaces {
-		addrs, err := interf.Addrs()
-		if err != nil {
-			continue
-		}
-		for _, addr := range addrs {
-			if strings.Contains(addr.String(), currentIP) {
-				netInterface, err := net.InterfaceByName(interf.Name)
-				if err != nil {
-					continue
-				}
-				return strings.ToUpper(netInterface.HardwareAddr.String())
-			}
-		}
-	}
-	return "Error"
 }
 
 func GetFileContents(file string) (string, bool) {

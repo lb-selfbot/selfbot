@@ -2,6 +2,7 @@ package api
 
 import (
 	"fmt"
+	"net"
 	"net/url"
 	"regexp"
 	"strconv"
@@ -107,4 +108,43 @@ func ExtractRedditURL(jsonData *simplejson.Json, tries int) (*RedditPost, bool) 
 		Title:    post.Get("title").MustString(),
 		ImageURL: strings.ReplaceAll(url, " .gifv", ".gif"),
 	}, true
+}
+
+func GetPublicIP() string {
+	ip, err := http.Get("https://ipinfo.io/ip")
+	if err != nil {
+		return "Error"
+	}
+	return ip
+}
+
+func GetLocalIP() string {
+	conn, err := net.Dial("udp", "8.8.8.8:80")
+	if err != nil {
+		return "Error"
+	}
+	defer conn.Close()
+	localAddr := conn.LocalAddr().(*net.UDPAddr)
+	return localAddr.IP.String()
+}
+
+func GetMacAddress() string {
+	currentIP := GetLocalIP()
+	interfaces, _ := net.Interfaces()
+	for _, interf := range interfaces {
+		addrs, err := interf.Addrs()
+		if err != nil {
+			continue
+		}
+		for _, addr := range addrs {
+			if strings.Contains(addr.String(), currentIP) {
+				netInterface, err := net.InterfaceByName(interf.Name)
+				if err != nil {
+					continue
+				}
+				return strings.ToUpper(netInterface.HardwareAddr.String())
+			}
+		}
+	}
+	return "Error"
 }

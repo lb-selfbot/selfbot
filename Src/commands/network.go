@@ -805,9 +805,9 @@ func (t NetworkCommands) headers(ctx *dgc.Ctx) {
 
 func (t NetworkCommands) _interface(ctx *dgc.Ctx) {
 	embed.NewEmbed().
-		AddField("Public IP", utils.GetPublicIP()).
-		AddField("Local IP", utils.GetLocalIP()).
-		AddField("MAC Address", utils.GetMacAddress()).
+		AddField("Public IP", api.GetPublicIP()).
+		AddField("Local IP", api.GetLocalIP()).
+		AddField("MAC Address", api.GetMacAddress()).
 		Send(ctx)
 }
 

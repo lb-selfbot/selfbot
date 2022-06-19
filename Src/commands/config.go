@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/LightningDev1/LB-Selfbot/config"
+	"github.com/LightningDev1/LB-Selfbot/ipc"
 	"github.com/LightningDev1/LB-Selfbot/utils"
 	"github.com/LightningDev1/dgc"
 	"github.com/LightningDev1/discordgo"
@@ -126,7 +127,7 @@ func (c ConfigCommands) notificationtype(ctx *dgc.Ctx) {
 }
 
 func (c ConfigCommands) examplenotification(ctx *dgc.Ctx) {
-	utils.SendNotification("This is an example notification.")
+	ipc.SendNotification("This is an example notification.")
 }
 
 func (c ConfigCommands) nitrosniper(ctx *dgc.Ctx) {
