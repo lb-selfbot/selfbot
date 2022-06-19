@@ -584,7 +584,7 @@ func (t FunCommands) slot(ctx *dgc.Ctx) {
 }
 
 func (t FunCommands) tts(ctx *dgc.Ctx) {
-	ttsFile, err := utils.TTS(ctx.Arguments.Raw(), "en")
+	ttsFile, err := api.TTS(ctx.Arguments.Raw(), "en")
 	if err != nil {
 		ctx.RespondText("An error has occurred.")
 		return
