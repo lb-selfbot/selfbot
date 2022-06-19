@@ -17,7 +17,6 @@ import (
 
 	"golang.org/x/text/unicode/norm"
 
-	"github.com/LightningDev/LB-Selfbot/utils"
 	"github.com/LightningDev1/LB-Selfbot/error_handling"
 	"github.com/LightningDev1/LB-Selfbot/http"
 	"github.com/LightningDev1/LB-Selfbot/ipc"
@@ -150,7 +149,7 @@ func RemoveWords(text string, amount int) string {
 }
 
 func EncodingCommand(ctx *dgc.Ctx, encodeFunc func(string, bool) string) {
-	encodeOrDecode := utils.Arguments["<encode/decode>"]
+	encodeOrDecode := Arguments["<encode/decode>"]
 	text := RemoveWords(ctx.Arguments.Raw(), 1)
 	if encodeOrDecode == "encode" {
 		ctx.RespondText(encodeFunc(text, false))
