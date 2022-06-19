@@ -9,10 +9,10 @@ import (
 	"strings"
 	"time"
 
-	"github.com/LightningDev/LB-Selfbot/config"
-	"github.com/LightningDev/LB-Selfbot/http"
-	"github.com/LightningDev/LB-Selfbot/json"
-	"github.com/LightningDev/LB-Selfbot/utils"
+	"github.com/LightningDev1/LB-Selfbot/config"
+	"github.com/LightningDev1/LB-Selfbot/http"
+	"github.com/LightningDev1/LB-Selfbot/json"
+	"github.com/LightningDev1/LB-Selfbot/utils"
 	"github.com/bitly/go-simplejson"
 	"github.com/go-ping/ping"
 )

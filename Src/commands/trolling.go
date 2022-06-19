@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/LightningDev/LB-Selfbot/constants"
-	"github.com/LightningDev/LB-Selfbot/encodings"
-	"github.com/LightningDev/LB-Selfbot/utils"
+	"github.com/LightningDev1/LB-Selfbot/constants"
+	"github.com/LightningDev1/LB-Selfbot/encodings"
+	"github.com/LightningDev1/LB-Selfbot/utils"
 	"github.com/LightningDev1/dgc"
 )
 

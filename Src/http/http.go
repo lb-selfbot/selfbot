@@ -1,7 +1,7 @@
 package http
 
 import (
-	"github.com/LightningDev/LB-Selfbot/json"
+	"github.com/LightningDev1/LB-Selfbot/json"
 	"github.com/bitly/go-simplejson"
 	"github.com/valyala/fasthttp"
 )

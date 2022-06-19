@@ -12,10 +12,10 @@ import (
 	"github.com/LightningDev1/discordgo"
 	"github.com/jpillora/overseer"
 
-	"github.com/LightningDev/LB-Selfbot/commands"
-	"github.com/LightningDev/LB-Selfbot/events"
-	"github.com/LightningDev/LB-Selfbot/ipc"
-	"github.com/LightningDev/LB-Selfbot/utils"
+	"github.com/LightningDev1/LB-Selfbot/commands"
+	"github.com/LightningDev1/LB-Selfbot/events"
+	"github.com/LightningDev1/LB-Selfbot/ipc"
+	"github.com/LightningDev1/LB-Selfbot/utils"
 )
 
 func main() {

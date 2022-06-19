@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/LightningDev/LB-Selfbot/config"
-	"github.com/LightningDev/LB-Selfbot/constants"
+	"github.com/LightningDev1/LB-Selfbot/config"
+	"github.com/LightningDev1/LB-Selfbot/constants"
 	"github.com/LightningDev1/dgc"
 	"github.com/LightningDev1/discordgo"
 )

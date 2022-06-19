@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/LightningDev/LB-Selfbot/utils"
+	"github.com/LightningDev1/LB-Selfbot/utils"
 )
 
 type Config struct {

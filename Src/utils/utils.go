@@ -17,9 +17,9 @@ import (
 
 	"golang.org/x/text/unicode/norm"
 
-	"github.com/LightningDev/LB-Selfbot/error_handling"
-	"github.com/LightningDev/LB-Selfbot/http"
-	"github.com/LightningDev/LB-Selfbot/ipc"
+	"github.com/LightningDev1/LB-Selfbot/error_handling"
+	"github.com/LightningDev1/LB-Selfbot/http"
+	"github.com/LightningDev1/LB-Selfbot/ipc"
 	"github.com/LightningDev1/dgc"
 	"github.com/LightningDev1/discordgo"
 	"github.com/PuerkitoBio/goquery"

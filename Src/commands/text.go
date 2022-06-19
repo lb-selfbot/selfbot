@@ -4,7 +4,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/LightningDev/LB-Selfbot/utils"
+	"github.com/LightningDev1/LB-Selfbot/utils"
 	"github.com/LightningDev1/dgc"
 	"github.com/common-nighthawk/go-figure"
 )

@@ -5,9 +5,9 @@ import (
 	"net/url"
 	"strings"
 
-	"github.com/LightningDev/LB-Selfbot/embed"
-	"github.com/LightningDev/LB-Selfbot/http"
-	"github.com/LightningDev/LB-Selfbot/utils"
+	"github.com/LightningDev1/LB-Selfbot/embed"
+	"github.com/LightningDev1/LB-Selfbot/http"
+	"github.com/LightningDev1/LB-Selfbot/utils"
 	"github.com/LightningDev1/dgc"
 )
 
