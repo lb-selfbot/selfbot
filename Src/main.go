@@ -39,8 +39,8 @@ func selfbot_main(overseer.State) {
 		case ipc.Ipc.OpCodes.EXIT:
 			os.Exit(0)
 		case ipc.Ipc.OpCodes.RESTART:
-			// How tf
-			os.Exit(0)
+			// Restart?
+			syscall.Exec(os.Args[0], os.Args, os.Environ())
 		}
 	}
 
