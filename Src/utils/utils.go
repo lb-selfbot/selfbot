@@ -160,11 +160,6 @@ func EncodingCommand(ctx *dgc.Ctx, encodeFunc func(string, bool) string) {
 	}
 }
 
-func HashCommand(ctx *dgc.Ctx, hashFunc func(string) string) {
-	text := ctx.Arguments.Raw()
-	ctx.RespondText(hashFunc(text))
-}
-
 func GetMainFolder() string {
 	if runtime.GOOS == "windows" {
 		return fmt.Sprintf("%s\\LightningBot", WindowsGetDocumentsFolder())

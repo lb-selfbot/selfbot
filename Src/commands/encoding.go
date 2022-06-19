@@ -208,57 +208,57 @@ func (t EncodingCommands) morsecode(ctx *dgc.Ctx) {
 }
 
 func (t EncodingCommands) md5(ctx *dgc.Ctx) {
-	utils.HashCommand(ctx, encodings.Md5)
+	ctx.RespondText(encodings.Md5(ctx.Arguments.Raw()))
 }
 
 func (t EncodingCommands) sha1(ctx *dgc.Ctx) {
-	utils.HashCommand(ctx, encodings.Sha1)
+	ctx.RespondText(encodings.Sha1(ctx.Arguments.Raw()))
 }
 
 func (t EncodingCommands) sha224(ctx *dgc.Ctx) {
-	utils.HashCommand(ctx, encodings.Sha224)
+	ctx.RespondText(encodings.Sha224(ctx.Arguments.Raw()))
 }
 
 func (t EncodingCommands) sha256(ctx *dgc.Ctx) {
-	utils.HashCommand(ctx, encodings.Sha256)
+	ctx.RespondText(encodings.Sha256(ctx.Arguments.Raw()))
 }
 
 func (t EncodingCommands) sha384(ctx *dgc.Ctx) {
-	utils.HashCommand(ctx, encodings.Sha384)
+	ctx.RespondText(encodings.Sha384(ctx.Arguments.Raw()))
 }
 
 func (t EncodingCommands) sha512(ctx *dgc.Ctx) {
-	utils.HashCommand(ctx, encodings.Sha512)
+	ctx.RespondText(encodings.Sha512(ctx.Arguments.Raw()))
 }
 
 func (t EncodingCommands) blake2b(ctx *dgc.Ctx) {
-	utils.HashCommand(ctx, encodings.Blake2b)
+	ctx.RespondText(encodings.Blake2b(ctx.Arguments.Raw()))
 }
 
 func (t EncodingCommands) blake2s(ctx *dgc.Ctx) {
-	utils.HashCommand(ctx, encodings.Blake2s)
+	ctx.RespondText(encodings.Blake2s(ctx.Arguments.Raw()))
 }
 
 func (t EncodingCommands) adler32(ctx *dgc.Ctx) {
-	utils.HashCommand(ctx, encodings.Adler32)
+	ctx.RespondText(encodings.Adler32(ctx.Arguments.Raw()))
 }
 
 func (t EncodingCommands) crc32(ctx *dgc.Ctx) {
-	utils.HashCommand(ctx, encodings.Crc32)
+	ctx.RespondText(encodings.Crc32(ctx.Arguments.Raw()))
 }
 
 func (t EncodingCommands) crc64(ctx *dgc.Ctx) {
-	utils.HashCommand(ctx, encodings.Crc64)
+	ctx.RespondText(encodings.Crc64(ctx.Arguments.Raw()))
 }
 
 func (t EncodingCommands) fnv32(ctx *dgc.Ctx) {
-	utils.HashCommand(ctx, encodings.Fnv32)
+	ctx.RespondText(encodings.Fnv32(ctx.Arguments.Raw()))
 }
 
 func (t EncodingCommands) fnv64(ctx *dgc.Ctx) {
-	utils.HashCommand(ctx, encodings.Fnv64)
+	ctx.RespondText(encodings.Fnv64(ctx.Arguments.Raw()))
 }
 
 func (t EncodingCommands) fnv128(ctx *dgc.Ctx) {
-	utils.HashCommand(ctx, encodings.Fnv128)
+	ctx.RespondText(encodings.Fnv128(ctx.Arguments.Raw()))
 }
