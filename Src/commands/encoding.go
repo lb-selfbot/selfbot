@@ -163,48 +163,60 @@ func (t EncodingCommands) RegisterCommands(router *dgc.Router) {
 	})
 }
 
+func EncodingCommand(ctx *dgc.Ctx, encodeFunc func(string, bool) string) {
+	encodeOrDecode := utils.Arguments["<encode/decode>"]
+	text := utils.RemoveWords(ctx.Arguments.Raw(), 1)
+	if encodeOrDecode == "encode" {
+		ctx.RespondText(encodeFunc(text, false))
+	} else if encodeOrDecode == "decode" {
+		ctx.RespondText(encodeFunc(text, true))
+	} else {
+		ctx.RespondText("Invalid option for <encode/decode>: " + encodeOrDecode)
+	}
+}
+
 func (t EncodingCommands) rot13(ctx *dgc.Ctx) {
 	ctx.RespondText(strings.Map(encodings.Rot13, ctx.Arguments.Raw()))
 }
 
 func (t EncodingCommands) hex(ctx *dgc.Ctx) {
-	utils.EncodingCommand(ctx, encodings.Hex)
+	EncodingCommand(ctx, encodings.Hex)
 }
 
 func (t EncodingCommands) binary(ctx *dgc.Ctx) {
-	utils.EncodingCommand(ctx, encodings.Binary)
+	EncodingCommand(ctx, encodings.Binary)
 }
 
 func (t EncodingCommands) base32(ctx *dgc.Ctx) {
-	utils.EncodingCommand(ctx, encodings.Base32)
+	EncodingCommand(ctx, encodings.Base32)
 }
 
 func (t EncodingCommands) base36(ctx *dgc.Ctx) {
-	utils.EncodingCommand(ctx, encodings.Base36)
+	EncodingCommand(ctx, encodings.Base36)
 }
 
 func (t EncodingCommands) base58(ctx *dgc.Ctx) {
-	utils.EncodingCommand(ctx, encodings.Base58)
+	EncodingCommand(ctx, encodings.Base58)
 }
 
 func (t EncodingCommands) base64(ctx *dgc.Ctx) {
-	utils.EncodingCommand(ctx, encodings.Base64)
+	EncodingCommand(ctx, encodings.Base64)
 }
 
 func (t EncodingCommands) base64url(ctx *dgc.Ctx) {
-	utils.EncodingCommand(ctx, encodings.Base64Url)
+	EncodingCommand(ctx, encodings.Base64Url)
 }
 
 func (t EncodingCommands) ascii85(ctx *dgc.Ctx) {
-	utils.EncodingCommand(ctx, encodings.Ascii85)
+	EncodingCommand(ctx, encodings.Ascii85)
 }
 
 func (t EncodingCommands) base85(ctx *dgc.Ctx) {
-	utils.EncodingCommand(ctx, encodings.Base85)
+	EncodingCommand(ctx, encodings.Base85)
 }
 
 func (t EncodingCommands) morsecode(ctx *dgc.Ctx) {
-	utils.EncodingCommand(ctx, encodings.MorseCode)
+	EncodingCommand(ctx, encodings.MorseCode)
 }
 
 func (t EncodingCommands) md5(ctx *dgc.Ctx) {

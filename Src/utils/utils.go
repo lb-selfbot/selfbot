@@ -1,7 +1,6 @@
 package utils
 
 import (
-	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"math/rand"
@@ -19,7 +18,6 @@ import (
 
 	"github.com/LightningDev1/LB-Selfbot/error_handling"
 	"github.com/LightningDev1/LB-Selfbot/http"
-	"github.com/LightningDev1/LB-Selfbot/ipc"
 	"github.com/LightningDev1/dgc"
 	"github.com/LightningDev1/discordgo"
 	"github.com/PuerkitoBio/goquery"
@@ -28,7 +26,6 @@ import (
 var LowercaseAlphabet string = "abcdefghijklmnopqrstuvwxyz"
 
 var Arguments map[string]string = make(map[string]string)
-
 
 func ReverseString(s string) string {
 	rns := []rune(s)
@@ -137,18 +134,6 @@ func RemoveWords(text string, amount int) string {
 		return ""
 	}
 	return strings.Join(words[amount:], " ")
-}
-
-func EncodingCommand(ctx *dgc.Ctx, encodeFunc func(string, bool) string) {
-	encodeOrDecode := Arguments["<encode/decode>"]
-	text := RemoveWords(ctx.Arguments.Raw(), 1)
-	if encodeOrDecode == "encode" {
-		ctx.RespondText(encodeFunc(text, false))
-	} else if encodeOrDecode == "decode" {
-		ctx.RespondText(encodeFunc(text, true))
-	} else {
-		ctx.RespondText("Invalid option for <encode/decode>: " + encodeOrDecode)
-	}
 }
 
 func GetMainFolder() string {
