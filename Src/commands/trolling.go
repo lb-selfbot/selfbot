@@ -100,18 +100,15 @@ func (t TrollingCommands) trollnitro(ctx *dgc.Ctx) {
 }
 
 func (t TrollingCommands) hiddeninvite(ctx *dgc.Ctx) {
-	invite := ctx.Arguments.Get(0)
 	text := utils.RemoveWords(ctx.Arguments.Raw(), 1)
-	ctx.RespondText(fmt.Sprintf("%s %s %s", text, constants.InvisibleText, invite))
+	ctx.RespondText(fmt.Sprintf("%s %s %s", text, constants.InvisibleText, utils.Arguments["<invite>"]))
 }
 
 func (t TrollingCommands) hiddenping(ctx *dgc.Ctx) {
-	user := ctx.Arguments.Get(0)
 	text := utils.RemoveWords(ctx.Arguments.Raw(), 1)
-	ctx.RespondText(fmt.Sprintf("%s %s %s", text, constants.InvisibleText, user))
+	ctx.RespondText(fmt.Sprintf("%s %s %s", text, constants.InvisibleText, utils.Arguments["<user>"]))
 }
 
 func (t TrollingCommands) hiddeneveryone(ctx *dgc.Ctx) {
-	text := ctx.Arguments.Raw()
-	ctx.RespondText(fmt.Sprintf("%s %s @everyone", text, constants.InvisibleText))
+	ctx.RespondText(fmt.Sprintf("%s %s @everyone", ctx.Arguments.Raw(), constants.InvisibleText))
 }

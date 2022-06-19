@@ -834,7 +834,7 @@ func (t FunCommands) poll(ctx *dgc.Ctx) {
 }
 
 func (t FunCommands) numberfact(ctx *dgc.Ctx) {
-	number := ctx.Arguments.Get(0).Raw()
+	number := utils.Arguments["<number>"]
 	fact, err := http.Get(fmt.Sprintf("http://numbersapi.com/%s", number))
 	if err != nil {
 		ctx.RespondText("An error has occurred.")
@@ -901,7 +901,7 @@ func (t FunCommands) kanyewest(ctx *dgc.Ctx) {
 }
 
 func (t FunCommands) rps(ctx *dgc.Ctx) {
-	choice := ctx.Arguments.Get(0).Raw()
+	choice := utils.Arguments["<rock/paper/scissors>"]
 	if choice != "rock" && choice != "paper" && choice != "scissors" {
 		ctx.RespondText("You can only choose rock, paper or scissors.")
 		return
@@ -1034,7 +1034,7 @@ func (t FunCommands) apod(ctx *dgc.Ctx) {
 }
 
 func (t FunCommands) httpcat(ctx *dgc.Ctx) {
-	statuscode := ctx.Arguments.Get(0).Raw()
+	statuscode := utils.Arguments["<statuscode>"]
 	embed.NewEmbed().
 		SetImage(fmt.Sprintf("https://http.cat/%s.jpg", statuscode)).
 		Send(ctx)

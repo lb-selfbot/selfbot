@@ -26,6 +26,6 @@
 - Help Command:                   0%
 - Event Listeners:                5%
 - IPC:                           75%
-- encoding/json to simplejson:   40%
+- encoding/json to simplejson:  100%
 - Better argument handling:     100%
 - Remove usage of ctx.Arguments: 40%

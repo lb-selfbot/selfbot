@@ -263,7 +263,7 @@ func (t NetworkCommands) ping(ctx *dgc.Ctx) {
 }
 
 func (t NetworkCommands) pingweb(ctx *dgc.Ctx) {
-	host := ctx.Arguments.Get(0).Raw()
+	host := utils.Arguments["<host>"]
 	time, err := api.Ping(host)
 	emb := embed.NewEmbed()
 	if err != nil {
@@ -376,12 +376,12 @@ func (t NetworkCommands) weather(ctx *dgc.Ctx) {
 }
 
 func (t NetworkCommands) hypesquad(ctx *dgc.Ctx) {
-	house := ctx.Arguments.Get(0).Raw()
+	house := utils.Arguments["<bravery/brilliance/balance>"]
 	house = strings.Replace(house, "bravery", "1", -1)
 	house = strings.Replace(house, "brilliance", "2", -1)
 	house = strings.Replace(house, "balance", "3", -1)
 	if house != "1" && house != "2" && house != "3" {
-		error_handling.OnError(ctx, error_handling.InvalidArgument, "<house>")
+		error_handling.OnError(ctx, error_handling.InvalidArgument, "<bravery/brilliance/balance>")
 		return
 	}
 	api.SetHypesquad(house)
@@ -401,7 +401,7 @@ func (t NetworkCommands) tinyurl(ctx *dgc.Ctx) {
 }
 
 func (t NetworkCommands) ipinfo(ctx *dgc.Ctx) {
-	ip := ctx.Arguments.Get(0).Raw()
+	ip := utils.Arguments["<ip>"]
 	ipinfo, err := http.GetJson(fmt.Sprintf("http://ipinfo.io/%s/json", ip))
 	if err != nil {
 		ctx.RespondText("An error has occurred.")
@@ -471,7 +471,7 @@ func (t NetworkCommands) lvbypass(ctx *dgc.Ctx) {
 }
 
 func (t NetworkCommands) portscan(ctx *dgc.Ctx) {
-	host := ctx.Arguments.Get(0).Raw()
+	host := utils.Arguments["<host>"]
 	ports := map[string]int{
 		"FTP":            21,
 		"SSH":            22,
@@ -500,7 +500,7 @@ func (t NetworkCommands) portscan(ctx *dgc.Ctx) {
 }
 
 func (t NetworkCommands) theme(ctx *dgc.Ctx) {
-	theme := strings.ToLower(ctx.Arguments.Get(0).Raw())
+	theme := strings.ToLower(utils.Arguments["<light/dark>"])
 	if theme != "light" && theme != "dark" {
 		error_handling.OnError(ctx, error_handling.InvalidArgument, "<light/dark> must be either \"light\" or \"dark\"")
 		return
@@ -524,7 +524,7 @@ func (t NetworkCommands) hastebin(ctx *dgc.Ctx) {
 }
 
 func (t NetworkCommands) checktoken(ctx *dgc.Ctx) {
-	token := ctx.Arguments.Get(0).Raw()
+	token := utils.Arguments["<token>"]
 	response, statusCode, err := http.GetJsonStatusCode("https://discord.com/api/v10/users/@me", http.GetDiscordHeaders(token))
 	if err != nil {
 		ctx.RespondText("An error has occurred.")
@@ -556,14 +556,14 @@ func (t NetworkCommands) checktoken(ctx *dgc.Ctx) {
 }
 
 func (t NetworkCommands) delwebhook(ctx *dgc.Ctx) {
-	http.Delete(ctx.Arguments.Get(0).Raw())
+	http.Delete(utils.Arguments["<webhook url>"])
 	embed.NewEmbed().
 		SetDescription("Successfully deleted webhook.").
 		Send(ctx)
 }
 
 func (t NetworkCommands) compact(ctx *dgc.Ctx) {
-	toggle := strings.ToLower(ctx.Arguments.Get(0).Raw())
+	toggle := strings.ToLower(utils.Arguments["<on/off>"])
 	if toggle != "on" && toggle != "off" {
 		error_handling.OnError(ctx, error_handling.InvalidArgument, "<on/off> must be either \"on\" or \"off\"")
 		return
@@ -579,7 +579,7 @@ func (t NetworkCommands) compact(ctx *dgc.Ctx) {
 }
 
 func (t NetworkCommands) devmode(ctx *dgc.Ctx) {
-	toggle := strings.ToLower(ctx.Arguments.Get(0).Raw())
+	toggle := strings.ToLower(utils.Arguments["<on/off>"])
 	if toggle != "on" && toggle != "off" {
 		error_handling.OnError(ctx, error_handling.InvalidArgument, "<on/off> must be either \"on\" or \"off\"")
 		return
@@ -595,7 +595,7 @@ func (t NetworkCommands) devmode(ctx *dgc.Ctx) {
 }
 
 func (t NetworkCommands) resolve(ctx *dgc.Ctx) {
-	domain := ctx.Arguments.Get(0).Raw()
+	domain := utils.Arguments["<domain>"]
 	response, err := http.GetJson(fmt.Sprintf("https://json.geoiplookup.io/%s", domain))
 	if err != nil {
 		ctx.RespondText("An error has occurred.")
@@ -612,7 +612,7 @@ func (t NetworkCommands) resolve(ctx *dgc.Ctx) {
 }
 
 func (t NetworkCommands) reversedns(ctx *dgc.Ctx) {
-	ip := ctx.Arguments.Get(0).Raw()
+	ip := utils.Arguments["<ip>"]
 	response, err := http.GetJson(fmt.Sprintf("https://api.domaintools.com/v1/%s/host-domains/", ip))
 	if err != nil {
 		ctx.RespondText("An error has occurred.")
@@ -630,7 +630,7 @@ func (t NetworkCommands) reversedns(ctx *dgc.Ctx) {
 }
 
 func (t NetworkCommands) reversemac(ctx *dgc.Ctx) {
-	mac := ctx.Arguments.Get(0).Raw()
+	mac := utils.Arguments["<mac>"]
 	response, err := http.Get(fmt.Sprintf("https://api.macvendors.com/%s", mac))
 	if err != nil {
 		ctx.RespondText("An error has occurred.")
@@ -791,7 +791,7 @@ func (t NetworkCommands) randomcountry(ctx *dgc.Ctx) {
 }
 
 func (t NetworkCommands) headers(ctx *dgc.Ctx) {
-	url := ctx.Arguments.Get(0).Raw()
+	url := utils.Arguments["<url>"]
 	headers, err := http.GetHeadersString(url)
 	if err != nil {
 		ctx.RespondText("An error has occurred.")
@@ -812,7 +812,7 @@ func (t NetworkCommands) _interface(ctx *dgc.Ctx) {
 }
 
 func (t NetworkCommands) revimage(ctx *dgc.Ctx) {
-	imageUrl := ctx.Arguments.Get(0).Raw()
+	imageUrl := utils.Arguments["<image url>"]
 	embed.NewEmbed().
 		AddField("Reverse Image Search URL", fmt.Sprintf("https://www.google.com/searchbyimage?image_url=%s", imageUrl)).
 		Send(ctx)
@@ -830,7 +830,7 @@ func (t NetworkCommands) pastebin(ctx *dgc.Ctx) {
 }
 
 func (t NetworkCommands) pastefile(ctx *dgc.Ctx) {
-	filePath := ctx.Arguments.Get(0).Raw()
+	filePath := utils.Arguments["<filepath>"]
 	if content, success := utils.GetFileContents(filePath); success {
 		paste, err := api.CreatePaste(content)
 		if err != nil {
