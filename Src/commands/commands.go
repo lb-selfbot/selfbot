@@ -13,6 +13,7 @@ type Commands struct {
 	SpotifyCommands   SpotifyCommands
 	RedditCommands    RedditCommands
 	GameCommands      GameCommands
+	NSFWCommands      NSFWCommands
 }
 
 func (c Commands) RegisterCommands(router *dgc.Router) {
@@ -26,4 +27,5 @@ func (c Commands) RegisterCommands(router *dgc.Router) {
 	c.SpotifyCommands.RegisterCommands(router)
 	c.RedditCommands.RegisterCommands(router)
 	c.GameCommands.RegisterCommands(router)
+	c.NSFWCommands.RegisterCommands(router)
 }
