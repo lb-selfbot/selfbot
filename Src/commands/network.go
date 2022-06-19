@@ -463,12 +463,12 @@ func (t NetworkCommands) youtubedl(ctx *dgc.Ctx) {
 }
 
 func (t NetworkCommands) lvbypass(ctx *dgc.Ctx) {
-	result, err := http.PostJson("https://api.bypass.vip/", fmt.Sprintf("{\"url\": \"%s\"}", ctx.Arguments.Raw()), map[string]string{"Content-Type": "application/json"})
+	result, err := http.PostSimpleJson("https://api.bypass.vip/", fmt.Sprintf("{\"url\": \"%s\"}", ctx.Arguments.Raw()), map[string]string{"Content-Type": "application/json"})
 	if err != nil {
 		ctx.RespondText("An error has occurred.")
 		return
 	}
-	ctx.RespondText(fmt.Sprintf("Bypassed Link: %s", result["destination"]))
+	ctx.RespondText(fmt.Sprintf("Bypassed Link: %s", result.Get("destination").MustString()))
 }
 
 func (t NetworkCommands) portscan(ctx *dgc.Ctx) {
@@ -518,12 +518,12 @@ func (t NetworkCommands) theme(ctx *dgc.Ctx) {
 
 func (t NetworkCommands) hastebin(ctx *dgc.Ctx) {
 	text := ctx.Arguments.Raw()
-	result, err := http.PostJson("https://www.toptal.com/developers/hastebin/documents", text)
+	result, err := http.PostSimpleJson("https://www.toptal.com/developers/hastebin/documents", text)
 	if err != nil {
 		ctx.RespondText("An error has occurred.")
 		return
 	}
-	ctx.RespondText(fmt.Sprintf("https://hastebin.com/%s", result["key"]))
+	ctx.RespondText(fmt.Sprintf("https://hastebin.com/%s", result.Get("key").MustString()))
 }
 
 func (t NetworkCommands) checktoken(ctx *dgc.Ctx) {

@@ -103,15 +103,6 @@ func Post(url string, data string, headersList ...map[string]string) (string, er
 	return string(resp.Body()), nil
 }
 
-func PostJson(url string, data string, headersList ...map[string]string) (map[string]interface{}, error) {
-	headersList = append(headersList, map[string]string{"Content-Type": "application/json"})
-	result, err := Post(url, data, headersList...)
-	if err != nil {
-		return nil, err
-	}
-	return json.UnmarshalJson(result)
-}
-
 func PostSimpleJson(url string, data string, headersList ...map[string]string) (*simplejson.Json, error) {
 	headersList = append(headersList, map[string]string{"Content-Type": "application/json"})
 	result, err := Post(url, data, headersList...)
