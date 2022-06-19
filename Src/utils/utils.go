@@ -169,10 +169,6 @@ func GetMainFolder() string {
 	}
 }
 
-func SeedRandom() {
-	rand.Seed(time.Now().UnixNano())
-}
-
 func RandomNumber(min, max int) int {
 	return rand.Intn(max-min) + min
 }

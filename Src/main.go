@@ -3,8 +3,10 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"math/rand"
 	"os"
 	"os/signal"
+	"time"
 
 	"syscall"
 
@@ -27,7 +29,7 @@ func main() {
 
 func selfbot_main(overseer.State) {
 	fmt.Println("LightningBot v4.0.0 Alpha")
-	utils.SeedRandom()
+	rand.Seed(time.Now().UnixNano())
 	ipc.Ipc.Init()
 	ipc.Ipc.OnRead = func(s string) {
 		fmt.Println(s)
