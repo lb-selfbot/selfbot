@@ -81,7 +81,7 @@ func (t SpotifyCommands) GetBearerToken() string {
 		return ""
 	}
 	discordHeaders := http.GetDiscordHeaders(cfg.Account.Discord.Token)
-	connections, err := http.GetSimpleJson("https://discord.com/api/v8/users/@me/connections", discordHeaders)
+	connections, err := http.GetJson("https://discord.com/api/v8/users/@me/connections", discordHeaders)
 	if err != nil {
 		return ""
 	}
@@ -89,14 +89,14 @@ func (t SpotifyCommands) GetBearerToken() string {
 		connection := connectionInterface.(map[string]interface{})
 		if connType := connection["type"]; connType != nil && connType.(string) == "spotify" {
 			bearerToken := fmt.Sprintf("Bearer %s", connection["access_token"].(string))
-			res, err := http.GetSimpleJson("https://api.spotify.com/v1/search?q=Despacito&type=track", map[string]string{"Authorization": bearerToken})
+			res, err := http.GetJson("https://api.spotify.com/v1/search?q=Despacito&type=track", map[string]string{"Authorization": bearerToken})
 			if err != nil {
 				return ""
 			}
 			if _, success := res.GetPath("tracks", "items").GetIndex(0).Get("external_urls").CheckGet("spotify"); success {
 				return bearerToken
 			}
-			res, err = http.GetSimpleJson(fmt.Sprintf("https://discord.com/api/v8/users/@me/connections/spotify/%s/access-token", connection["name"].(string)), discordHeaders)
+			res, err = http.GetJson(fmt.Sprintf("https://discord.com/api/v8/users/@me/connections/spotify/%s/access-token", connection["name"].(string)), discordHeaders)
 			if err != nil {
 				return ""
 			}
@@ -168,7 +168,7 @@ func (t SpotifyCommands) splay(ctx *dgc.Ctx) {
 		ctx.RespondText("Could not find a Spotify connection. Please connect your Spotify account to your Discord.")
 	} else {
 		headers := map[string]string{"Authorization": bearerToken}
-		searchResponse, err := http.GetSimpleJson(fmt.Sprintf("https://api.spotify.com/v1/search?q=%s&type=track", url.QueryEscape(songName)), headers)
+		searchResponse, err := http.GetJson(fmt.Sprintf("https://api.spotify.com/v1/search?q=%s&type=track", url.QueryEscape(songName)), headers)
 		if err != nil {
 			ctx.RespondText("An error has occurred.")
 			return
@@ -195,7 +195,7 @@ func (t SpotifyCommands) splaying(ctx *dgc.Ctx) {
 	if bearerToken := t.GetBearerToken(); bearerToken == "" {
 		ctx.RespondText("Could not find a Spotify connection. Please connect your Spotify account to your Discord.")
 	} else {
-		response, err := http.GetSimpleJson("https://api.spotify.com/v1/me/player/currently-playing", map[string]string{"Authorization": bearerToken})
+		response, err := http.GetJson("https://api.spotify.com/v1/me/player/currently-playing", map[string]string{"Authorization": bearerToken})
 		song, success := response.CheckGet("item")
 		if err != nil || !success {
 			ctx.RespondText("A Spotify error occured: No song currently playing")
@@ -240,7 +240,7 @@ func (t SpotifyCommands) spresence(ctx *dgc.Ctx) {
 		})
 		return
 	}
-	imageID := utils.JsonEscape(utils.Arguments["[\"image_id\"]"])
+	imageID := json.Escape(utils.Arguments["[\"image_id\"]"])
 	if imageID == "" {
 		imageID = "ab67616d0000b2735755e164993798e0c9ef7d7a"
 	}
@@ -278,9 +278,9 @@ func (t SpotifyCommands) spresence(ctx *dgc.Ctx) {
 	}`,
 		time.Now().Unix()-4140000,
 		time.Now().Unix()-3880000,
-		utils.JsonEscape(utils.Arguments["[\"artist\"]"]),
-		utils.JsonEscape(utils.Arguments["[\"song\"]"]),
-		utils.JsonEscape(utils.Arguments["[\"album\"]"]),
+		json.Escape(utils.Arguments["[\"artist\"]"]),
+		json.Escape(utils.Arguments["[\"song\"]"]),
+		json.Escape(utils.Arguments["[\"album\"]"]),
 		imageID,
 	)
 	ctx.Session.SendWsData(data)
@@ -291,7 +291,7 @@ func (t SpotifyCommands) simageid(ctx *dgc.Ctx) {
 		ctx.RespondText("Could not find a Spotify connection. Please connect your Spotify account to your Discord.")
 	} else {
 		headers := map[string]string{"Authorization": bearerToken}
-		searchResponse, err := http.GetSimpleJson(fmt.Sprintf("https://api.spotify.com/v1/search?q=%s&type=track", url.QueryEscape(utils.Arguments["<song name>"])), headers)
+		searchResponse, err := http.GetJson(fmt.Sprintf("https://api.spotify.com/v1/search?q=%s&type=track", url.QueryEscape(utils.Arguments["<song name>"])), headers)
 		if err != nil {
 			ctx.RespondText("A Spotify error occured: No song found")
 			return

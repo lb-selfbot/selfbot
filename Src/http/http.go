@@ -31,15 +31,7 @@ func Get(url string, headersList ...map[string]string) (string, error) {
 	return string(bytes), err
 }
 
-func GetJson(url string, headersList ...map[string]string) (map[string]interface{}, error) {
-	bytes, _, err := GetBytes(url, headersList...)
-	if err != nil {
-		return nil, err
-	}
-	return json.UnmarshalJson(string(bytes))
-}
-
-func GetSimpleJson(url string, headersList ...map[string]string) (*simplejson.Json, error) {
+func GetJson(url string, headersList ...map[string]string) (*simplejson.Json, error) {
 	bytes, _, err := GetBytes(url, headersList...)
 	if err != nil {
 		return nil, err
@@ -47,21 +39,12 @@ func GetSimpleJson(url string, headersList ...map[string]string) (*simplejson.Js
 	return json.SimpleUnmarshal(string(bytes))
 }
 
-func GetSimpleJsonStatusCode(url string, headersList ...map[string]string) (*simplejson.Json, int, error) {
+func GetJsonStatusCode(url string, headersList ...map[string]string) (*simplejson.Json, int, error) {
 	bytes, statusCode, err := GetBytes(url, headersList...)
 	if err != nil {
 		return nil, -1, err
 	}
 	jsonData, err := json.SimpleUnmarshal(string(bytes))
-	return jsonData, statusCode, err
-}
-
-func GetJsonStatusCode(url string, headersList ...map[string]string) (map[string]interface{}, int, error) {
-	bytes, statusCode, err := GetBytes(url, headersList...)
-	if err != nil {
-		return nil, -1, err
-	}
-	jsonData, err := json.UnmarshalJson(string(bytes))
 	return jsonData, statusCode, err
 }
 
@@ -103,7 +86,7 @@ func Post(url string, data string, headersList ...map[string]string) (string, er
 	return string(resp.Body()), nil
 }
 
-func PostSimpleJson(url string, data string, headersList ...map[string]string) (*simplejson.Json, error) {
+func PostJson(url string, data string, headersList ...map[string]string) (*simplejson.Json, error) {
 	headersList = append(headersList, map[string]string{"Content-Type": "application/json"})
 	result, err := Post(url, data, headersList...)
 	if err != nil {

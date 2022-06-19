@@ -165,12 +165,6 @@ func HashCommand(ctx *dgc.Ctx, hashFunc func(string) string) {
 	ctx.RespondText(hashFunc(text))
 }
 
-func UnmarshalJson(jsonString string) (map[string]interface{}, error) {
-	var jsonMap map[string]interface{}
-	err := json.Unmarshal([]byte(jsonString), &jsonMap)
-	return jsonMap, err
-}
-
 func GetMainFolder() string {
 	if runtime.GOOS == "windows" {
 		return fmt.Sprintf("%s\\LightningBot", WindowsGetDocumentsFolder())
@@ -275,7 +269,7 @@ func GetImageUrlFromJson(url string, jsonQuery string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	return json[jsonQuery].(string), nil
+	return json.Get(jsonQuery).MustString(), nil
 }
 
 func SliceContains(s []string, e string) bool {
@@ -420,13 +414,4 @@ func GetArguments(ctx *dgc.Ctx) (map[string]string, bool) {
 		}
 	}
 	return arguments, true
-}
-
-func JsonEscape(i string) string {
-	b, err := json.Marshal(i)
-	if err != nil {
-		panic(err)
-	}
-	// Trim the beginning and trailing " character
-	return string(b[1 : len(b)-1])
 }

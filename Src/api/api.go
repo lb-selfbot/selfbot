@@ -1,7 +1,6 @@
 package api
 
 import (
-	_json "encoding/json"
 	"fmt"
 	"net/url"
 	"regexp"
@@ -11,22 +10,17 @@ import (
 
 	"github.com/LightningDev1/LB-Selfbot/config"
 	"github.com/LightningDev1/LB-Selfbot/http"
-	"github.com/LightningDev1/LB-Selfbot/json"
 	"github.com/LightningDev1/LB-Selfbot/utils"
 	"github.com/bitly/go-simplejson"
 	"github.com/go-ping/ping"
 )
 
 func CreatePaste(text string) (string, error) {
-	rawPaste, err := http.Post("https://paste.lightning-bot.com/documents", text)
+	paste, err := http.PostJson("https://paste.lightning-bot.com/documents", text)
 	if err != nil {
 		return "", err
 	}
-	paste, err := json.UnmarshalJson(rawPaste)
-	if err != nil {
-		return "", err
-	}
-	return "https://paste.lightning-bot.com/" + paste["key"].(string), nil
+	return "https://paste.lightning-bot.com/" + paste.Get("key").MustString(), nil
 }
 
 func Ping(host string) (time.Duration, error) {
@@ -45,15 +39,11 @@ func Ping(host string) (time.Duration, error) {
 }
 
 func WikipediaSearch(query string) (string, error) {
-	rawSearch, err := http.Get(fmt.Sprintf("https://en.wikipedia.org/w/api.php?action=query&prop=extracts&explaintext=&titles=%s&format=json", url.QueryEscape(query)))
+	search, err := http.GetJson(fmt.Sprintf("https://en.wikipedia.org/w/api.php?action=query&prop=extracts&explaintext=&titles=%s&format=json", url.QueryEscape(query)))
 	if err != nil {
 		return "", err
 	}
-	search, err := json.UnmarshalJson(rawSearch)
-	if err != nil {
-		return "", err
-	}
-	pages := search["query"].(map[string]interface{})["pages"].(map[string]interface{})
+	pages := search.GetPath("query", "pages").MustMap()
 	for _, page := range pages {
 		page := page.(map[string]interface{})
 		if page["missing"] != nil {
@@ -66,14 +56,12 @@ func WikipediaSearch(query string) (string, error) {
 
 func SetHypesquad(hypesquad string) {
 	hypesquadInt, _ := strconv.Atoi(hypesquad)
-	jsonData, _ := _json.Marshal((map[string]interface{}{
-		"house_id": hypesquadInt,
-	}))
+	jsonData := fmt.Sprintf(`{"hypesquad": %d}`, hypesquadInt)
 	cfg, err := config.GetConfig()
 	if err != nil {
 		return
 	}
-	http.Post("https://discord.com/api/v10/hypesquad/online", string(jsonData), http.GetDiscordHeaders(cfg.Account.Discord.Token))
+	http.Post("https://discord.com/api/v10/hypesquad/online", jsonData, http.GetDiscordHeaders(cfg.Account.Discord.Token))
 }
 
 type RedditPost struct {
@@ -83,7 +71,7 @@ type RedditPost struct {
 
 func GetImageFromSubreddit(subreddit string) (*RedditPost, bool) {
 	sortBy := []string{"best", "new", "top", "hot"}[utils.RandomNumber(0, 3)]
-	rawSearch, statusCode, err := http.GetSimpleJsonStatusCode(fmt.Sprintf("https://www.reddit.com/r/%s/%s.json?limit=20", subreddit, sortBy), map[string]string{
+	rawSearch, statusCode, err := http.GetJsonStatusCode(fmt.Sprintf("https://www.reddit.com/r/%s/%s.json?limit=20", subreddit, sortBy), map[string]string{
 		"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Safari/537.36 Edg/96.0.1054.62",
 	})
 	if err != nil {

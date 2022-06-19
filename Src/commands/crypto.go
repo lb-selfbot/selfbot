@@ -69,7 +69,7 @@ func (t CryptoCommands) RegisterCommands(router *dgc.Router) {
 
 func (t CryptoCommands) generateFunc(element []string) func(ctx *dgc.Ctx) {
 	return func(ctx *dgc.Ctx) {
-		json, err := http.GetSimpleJson("https://min-api.cryptocompare.com/data/price?fsym=" + element[1] + "&tsyms=USD,EUR")
+		json, err := http.GetJson("https://min-api.cryptocompare.com/data/price?fsym=" + element[1] + "&tsyms=USD,EUR")
 		if err != nil {
 			ctx.RespondText("An error has occurred.")
 		}

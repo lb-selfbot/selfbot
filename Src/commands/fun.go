@@ -501,7 +501,7 @@ func (t FunCommands) insult(ctx *dgc.Ctx) {
 		ctx.RespondText("An error has occurred.")
 	}
 	embed.NewEmbed().
-		AddField("Insult", insult["roast"].(string)).
+		AddField("Insult", insult.Get("roast").MustString()).
 		Send(ctx)
 }
 
@@ -512,7 +512,7 @@ func (t FunCommands) dadjoke(ctx *dgc.Ctx) {
 		return
 	}
 	embed.NewEmbed().
-		AddField("Dad Joke", joke["joke"].(string)).
+		AddField("Dad Joke", joke.Get("joke").MustString()).
 		Send(ctx)
 }
 
@@ -523,7 +523,7 @@ func (t FunCommands) yomomma(ctx *dgc.Ctx) {
 		return
 	}
 	embed.NewEmbed().
-		AddField("Yo Momma Joke", joke["joke"].(string)).
+		AddField("Yo Momma Joke", joke.Get("joke").MustString()).
 		Send(ctx)
 }
 
@@ -599,7 +599,7 @@ func (t FunCommands) advice(ctx *dgc.Ctx) {
 		return
 	}
 	embed.NewEmbed().
-		AddField("Advice", advice["slip"].(map[string]interface{})["advice"].(string)).
+		AddField("Advice", advice.GetPath("slip", "advice").MustString()).
 		Send(ctx)
 }
 
@@ -610,7 +610,7 @@ func (t FunCommands) catfact(ctx *dgc.Ctx) {
 		return
 	}
 	embed.NewEmbed().
-		AddField("Cat Fact", fact["fact"].(string)).
+		AddField("Cat Fact", fact.Get("fact").MustString()).
 		Send(ctx)
 }
 
@@ -621,7 +621,7 @@ func (t FunCommands) dogfact(ctx *dgc.Ctx) {
 		return
 	}
 	embed.NewEmbed().
-		AddField("Dog Fact", fact["fact"].(string)).
+		AddField("Dog Fact", fact.Get("fact").MustString()).
 		Send(ctx)
 }
 
@@ -632,7 +632,7 @@ func (t FunCommands) pandafact(ctx *dgc.Ctx) {
 		return
 	}
 	embed.NewEmbed().
-		AddField("Panda Fact", fact["fact"].(string)).
+		AddField("Panda Fact", fact.Get("fact").MustString()).
 		Send(ctx)
 }
 
@@ -643,7 +643,7 @@ func (t FunCommands) foxfact(ctx *dgc.Ctx) {
 		return
 	}
 	embed.NewEmbed().
-		AddField("Fox Fact", fact["fact"].(string)).
+		AddField("Fox Fact", fact.Get("fact").MustString()).
 		Send(ctx)
 }
 
@@ -654,7 +654,7 @@ func (t FunCommands) koalafact(ctx *dgc.Ctx) {
 		return
 	}
 	embed.NewEmbed().
-		AddField("Koala Fact", fact["fact"].(string)).
+		AddField("Koala Fact", fact.Get("fact").MustString()).
 		Send(ctx)
 }
 
@@ -665,7 +665,7 @@ func (t FunCommands) birdfact(ctx *dgc.Ctx) {
 		return
 	}
 	embed.NewEmbed().
-		AddField("Bird Fact", fact["fact"].(string)).
+		AddField("Bird Fact", fact.Get("fact").MustString()).
 		Send(ctx)
 }
 
@@ -676,7 +676,7 @@ func (t FunCommands) redpandafact(ctx *dgc.Ctx) {
 		return
 	}
 	embed.NewEmbed().
-		AddField("Red Panda Fact", fact["fact"].(string)).
+		AddField("Red Panda Fact", fact.Get("fact").MustString()).
 		Send(ctx)
 }
 
@@ -687,7 +687,7 @@ func (t FunCommands) whalefact(ctx *dgc.Ctx) {
 		return
 	}
 	embed.NewEmbed().
-		AddField("Whale Fact", fact["fact"].(string)).
+		AddField("Whale Fact", fact.Get("fact").MustString()).
 		Send(ctx)
 }
 
@@ -698,7 +698,7 @@ func (t FunCommands) kangaroofact(ctx *dgc.Ctx) {
 		return
 	}
 	embed.NewEmbed().
-		AddField("Kangaroo Fact", fact["fact"].(string)).
+		AddField("Kangaroo Fact", fact.Get("fact").MustString()).
 		Send(ctx)
 }
 
@@ -709,7 +709,7 @@ func (t FunCommands) bunnyfact(ctx *dgc.Ctx) {
 		return
 	}
 	embed.NewEmbed().
-		AddField("Bunny Fact", fact["fact"].(string)).
+		AddField("Bunny Fact", fact.Get("fact").MustString()).
 		Send(ctx)
 }
 
@@ -720,7 +720,7 @@ func (t FunCommands) lionfact(ctx *dgc.Ctx) {
 		return
 	}
 	embed.NewEmbed().
-		AddField("Lion Fact", fact["fact"].(string)).
+		AddField("Lion Fact", fact.Get("fact").MustString()).
 		Send(ctx)
 }
 
@@ -731,7 +731,7 @@ func (t FunCommands) frogfact(ctx *dgc.Ctx) {
 		return
 	}
 	embed.NewEmbed().
-		AddField("Frog Fact", fact["fact"].(string)).
+		AddField("Frog Fact", fact.Get("fact").MustString()).
 		Send(ctx)
 }
 
@@ -742,7 +742,7 @@ func (t FunCommands) duckfact(ctx *dgc.Ctx) {
 		return
 	}
 	embed.NewEmbed().
-		AddField("Duck Fact", fact["fact"].(string)).
+		AddField("Duck Fact", fact.Get("fact").MustString()).
 		Send(ctx)
 }
 
@@ -753,7 +753,7 @@ func (t FunCommands) penguinfact(ctx *dgc.Ctx) {
 		return
 	}
 	embed.NewEmbed().
-		AddField("Penguin Fact", fact["fact"].(string)).
+		AddField("Penguin Fact", fact.Get("fact").MustString()).
 		Send(ctx)
 }
 
@@ -761,21 +761,21 @@ func (t FunCommands) trivia(ctx *dgc.Ctx) {
 	rawJson, err1 := http.Get("https://opentdb.com/api.php?amount=1")
 	rawJson = strings.Replace(rawJson, "&quot;", "\"", -1)
 	rawJson = strings.Replace(rawJson, "&#039;", "'", -1)
-	trivia, err2 := json.UnmarshalJson(rawJson)
+	trivia, err2 := json.SimpleUnmarshal(rawJson)
 	if err1 != nil || err2 != nil {
 		ctx.RespondText("An error has occurred.")
 		return
 	}
-	trivia = trivia["results"].([]map[string]interface{})[0]
-	answers := trivia["incorrect_answers"].([]string)
-	answers = append(answers, trivia["correct_answer"].(string))
+	trivia = trivia.Get("results").GetIndex(0)
+	answers := trivia.Get("incorrect_answers").MustStringArray()
+	answers = append(answers, trivia.Get("correct_answer").MustString())
 	answers = utils.Shuffle(answers)
 	embed.NewEmbed().
-		AddField("Question", trivia["question"].(string)).
-		AddField("Category", trivia["category"].(string)).
-		AddField("Difficulty", utils.Capitalize(trivia["difficulty"].(string))).
+		AddField("Question", trivia.Get("question").MustString()).
+		AddField("Category", trivia.Get("category").MustString()).
+		AddField("Difficulty", utils.Capitalize(trivia.Get("difficulty").MustString())).
 		AddField("Answers", strings.Join(answers, ", ")).
-		AddField("Correct Answer", fmt.Sprintf("||%s||", trivia["correct_answer"].(string))).
+		AddField("Correct Answer", fmt.Sprintf("||%s||", trivia.Get("correct_answer").MustString())).
 		Send(ctx)
 }
 
@@ -852,15 +852,14 @@ func (t FunCommands) joke(ctx *dgc.Ctx) {
 		ctx.RespondText("An error has occurred.")
 		return
 	}
-	jokeType := joke["type"].(string)
 	embed := embed.NewEmbed()
-	if jokeType == "twopart" {
-		embed.AddField("Setup", joke["setup"].(string)).
-			AddField("Delivery", joke["delivery"].(string))
+	if joke.Get("type").MustString() == "twopart" {
+		embed.AddField("Setup", joke.Get("setup").MustString()).
+			AddField("Delivery", joke.Get("delivery").MustString())
 	} else {
-		embed.AddField("Joke", joke["joke"].(string))
+		embed.AddField("Joke", joke.Get("joke").MustString())
 	}
-	embed.AddField("Category", joke["category"].(string)).Send(ctx)
+	embed.AddField("Category", joke.Get("category").MustString()).Send(ctx)
 }
 
 func (t FunCommands) fml(ctx *dgc.Ctx) {
@@ -886,7 +885,7 @@ func (t FunCommands) tronald(ctx *dgc.Ctx) {
 		return
 	}
 	embed.NewEmbed().
-		AddField("Tronald Dump Quote", tronald["value"].(string)).
+		AddField("Tronald Dump Quote", tronald.Get("value").MustString()).
 		Send(ctx)
 }
 
@@ -897,7 +896,7 @@ func (t FunCommands) kanyewest(ctx *dgc.Ctx) {
 		return
 	}
 	embed.NewEmbed().
-		AddField("Kanye West Quote", kanyewest["quote"].(string)).
+		AddField("Kanye West Quote", kanyewest.Get("quote").MustString()).
 		Send(ctx)
 }
 
@@ -991,7 +990,7 @@ func (t FunCommands) chucknorris(ctx *dgc.Ctx) {
 		return
 	}
 	embed.NewEmbed().
-		AddField("Chuck Norris Joke", joke["value"].(string)).
+		AddField("Chuck Norris Joke", joke.Get("value").MustString()).
 		Send(ctx)
 }
 
@@ -1001,12 +1000,13 @@ func (t FunCommands) iss(ctx *dgc.Ctx) {
 		ctx.RespondText("An error has occurred.")
 		return
 	}
-	position := iss["iss_position"].(map[string]interface{})
+	latitude := iss.GetPath("iss_position", "latitude").MustString()
+	longitude := iss.GetPath("iss_position", "longitude").MustString()
 	embed.NewEmbed().
 		SetAuthor("International Space Station Info").
-		AddField("Latitude", position["latitude"].(string)).
-		AddField("Longitude", position["longitude"].(string)).
-		AddField("Google Maps URL", fmt.Sprintf("https://maps.google.com/?q=%s,%s", position["latitude"], position["longitude"])).
+		AddField("Latitude", latitude).
+		AddField("Longitude", longitude).
+		AddField("Google Maps URL", fmt.Sprintf("https://maps.google.com/?q=%s,%s", latitude, longitude)).
 		Send(ctx)
 }
 
@@ -1016,20 +1016,20 @@ func (t FunCommands) apod(ctx *dgc.Ctx) {
 		ctx.RespondText("An error has occurred.")
 		return
 	}
-	copyright := apod["copyright"].(string)
+	copyright := apod.Get("copyright").MustString()
 	if copyright == "" {
 		copyright = "NASA"
 	}
-	explanation, err := api.CreatePaste(apod["explanation"].(string))
+	explanation, err := api.CreatePaste(apod.Get("explanation").MustString())
 	if err != nil {
 		explanation = "An error has occurred."
 	}
 	embed.NewEmbed().
-		SetImage(apod["url"].(string)).
+		SetImage(apod.Get("url").MustString()).
 		SetAuthor(fmt.Sprintf("Astronomy Picture of the Day - ©️%s", copyright)).
-		AddField("Title", apod["title"].(string)).
+		AddField("Title", apod.Get("title").MustString()).
 		AddField("Explanation", explanation).
-		AddField("Date", apod["date"].(string)).
+		AddField("Date", apod.Get("date").MustString()).
 		Send(ctx)
 }
 
@@ -1067,8 +1067,8 @@ func (t FunCommands) quote(ctx *dgc.Ctx) {
 		return
 	}
 	embed.NewEmbed().
-		AddField("Quote", quote["content"].(string)).
-		AddField("Author", quote["author"].(string)).
+		AddField("Quote", quote.Get("content").MustString()).
+		AddField("Author", quote.Get("author").MustString()).
 		Send(ctx)
 }
 
@@ -1156,6 +1156,6 @@ func (t FunCommands) randomquestion(ctx *dgc.Ctx) {
 		return
 	}
 	embed.NewEmbed().
-		AddField("Question", question["why"].(string)).
+		AddField("Question", question.Get("why").MustString()).
 		Send(ctx)
 }

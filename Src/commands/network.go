@@ -2,7 +2,6 @@ package commands
 
 import (
 	"context"
-	_json "encoding/json"
 	"fmt"
 	"io"
 	"math"
@@ -320,19 +319,19 @@ func (t NetworkCommands) urbandictionary(ctx *dgc.Ctx) {
 		ctx.RespondText("An error has occurred.")
 		return
 	}
-	list := results["list"].([]interface{})
-	if len(list) == 0 {
+	list := results.Get("list")
+	if len(list.MustArray()) == 0 {
 		ctx.RespondText("No results found.")
 		return
 	}
-	result := list[0].(map[string]interface{})
+	result := list.GetIndex(0)
 	embed.NewEmbed().
 		AddField("Word", word).
-		AddField("Definition", result["definition"].(string)).
-		AddField("Permalink", result["permalink"].(string)).
-		AddField("Thumbs Up", fmt.Sprint(result["thumbs_up"].(float64))).
-		AddField("Thumbs Down", fmt.Sprint(result["thumbs_down"].(float64))).
-		AddField("Author", result["author"].(string)).
+		AddField("Definition", result.Get("definition").MustString()).
+		AddField("Permalink", result.Get("permalink").MustString()).
+		AddField("Thumbs Up", fmt.Sprint(result.Get("thumbs_up").MustFloat64())).
+		AddField("Thumbs Down", fmt.Sprint(result.Get("thumbs_down").MustFloat64())).
+		AddField("Author", result.Get("author").MustString()).
 		Send(ctx)
 }
 
@@ -356,23 +355,23 @@ func (t NetworkCommands) weather(ctx *dgc.Ctx) {
 		ctx.RespondText("An error has occurred.")
 		return
 	}
-	if fmt.Sprint(weather["cod"]) == "404" {
+	if fmt.Sprint(weather.Get("cod").MustInt()) == "404" {
 		ctx.RespondText("No results found.")
 		return
 	}
 	embed.NewEmbed().
-		SetDescription(fmt.Sprintf("Weather in %s, %s", weather["name"].(string), weather["sys"].(map[string]interface{})["country"].(string))).
-		AddField("Description", utils.Capitalize(weather["weather"].([]interface{})[0].(map[string]interface{})["description"].(string))).
-		AddField("Temperature", fmt.Sprintf("%.2f °C", math.Round(weather["main"].(map[string]interface{})["temp"].(float64)-273.15))).
-		AddField("Feels Like", fmt.Sprintf("%.2f °C", math.Round(weather["main"].(map[string]interface{})["feels_like"].(float64)-273.15))).
-		AddField("Min. Temperature", fmt.Sprintf("%.2f °C", math.Round(weather["main"].(map[string]interface{})["temp_min"].(float64)-273.15))).
-		AddField("Max. Temperature", fmt.Sprintf("%.2f °C", math.Round(weather["main"].(map[string]interface{})["temp_max"].(float64)-273.15))).
-		AddField("Pressure", fmt.Sprintf("%.2f hPa", weather["main"].(map[string]interface{})["pressure"].(float64))).
-		AddField("Humidity", fmt.Sprintf("%.2f %%", weather["main"].(map[string]interface{})["humidity"].(float64))).
-		AddField("Visibility", fmt.Sprintf("%.2f m", weather["visibility"].(float64))).
-		AddField("Wind Speed", fmt.Sprintf("%.2f Km/h", math.Round(weather["wind"].(map[string]interface{})["speed"].(float64)*3.6))).
-		AddField("Wind Gust", fmt.Sprintf("%.2f Km/h", math.Round(weather["wind"].(map[string]interface{})["gust"].(float64)*3.6))).
-		AddField("Wind Direction", fmt.Sprintf("%.2f°", weather["wind"].(map[string]interface{})["deg"].(float64))).
+		SetDescription(fmt.Sprintf("Weather in %s, %s", weather.Get("name").MustString(), weather.GetPath("sys", "country").MustString())).
+		AddField("Description", utils.Capitalize(weather.Get("weather").GetIndex(0).Get("description").MustString())).
+		AddField("Temperature", fmt.Sprintf("%.2f °C", math.Round(weather.GetPath("main", "temp").MustFloat64()-273.15))).
+		AddField("Feels Like", fmt.Sprintf("%.2f °C", math.Round(weather.GetPath("main", "feels_like").MustFloat64()-273.15))).
+		AddField("Min. Temperature", fmt.Sprintf("%.2f °C", math.Round(weather.GetPath("main", "temp_min").MustFloat64()-273.15))).
+		AddField("Max. Temperature", fmt.Sprintf("%.2f °C", math.Round(weather.GetPath("main", "temp_max").MustFloat64()-273.15))).
+		AddField("Pressure", fmt.Sprintf("%.2f hPa", weather.GetPath("main", "pressure").MustFloat64())).
+		AddField("Humidity", fmt.Sprintf("%.2f %%", weather.GetPath("main", "humidity").MustFloat64())).
+		AddField("Visibility", fmt.Sprintf("%.2f m", weather.Get("visibility").MustFloat64())).
+		AddField("Wind Speed", fmt.Sprintf("%.2f Km/h", math.Round(weather.GetPath("wind", "speed").MustFloat64()*3.6))).
+		AddField("Wind Gust", fmt.Sprintf("%.2f Km/h", math.Round(weather.GetPath("wind", "gust").MustFloat64()*3.6))).
+		AddField("Wind Direction", fmt.Sprintf("%.2f°", weather.GetPath("wind", "deg").MustFloat64())).
 		Send(ctx)
 }
 
@@ -408,17 +407,17 @@ func (t NetworkCommands) ipinfo(ctx *dgc.Ctx) {
 		ctx.RespondText("An error has occurred.")
 		return
 	}
-	if fmt.Sprint(ipinfo["status"]) == "404" {
+	if ipinfo.Get("hostname").MustInt(0) == 404 {
 		ctx.RespondText("No results found.")
 		return
 	}
 	embed.NewEmbed().
 		AddField("IP", ip).
-		AddField("Hostname", fmt.Sprint(ipinfo["hostname"])).
-		AddField("City", fmt.Sprint(ipinfo["city"])).
-		AddField("Region", fmt.Sprint(ipinfo["region"])).
-		AddField("Country", fmt.Sprint(ipinfo["country"])).
-		AddField("Location", fmt.Sprint(ipinfo["loc"])).
+		AddField("Hostname", ipinfo.Get("hostname").MustString()).
+		AddField("City", ipinfo.Get("city").MustString()).
+		AddField("Region", ipinfo.Get("region").MustString()).
+		AddField("Country", ipinfo.Get("country").MustString()).
+		AddField("Location", ipinfo.Get("loc").MustString()).
 		Send(ctx)
 }
 
@@ -463,7 +462,7 @@ func (t NetworkCommands) youtubedl(ctx *dgc.Ctx) {
 }
 
 func (t NetworkCommands) lvbypass(ctx *dgc.Ctx) {
-	result, err := http.PostSimpleJson("https://api.bypass.vip/", fmt.Sprintf("{\"url\": \"%s\"}", ctx.Arguments.Raw()), map[string]string{"Content-Type": "application/json"})
+	result, err := http.PostJson("https://api.bypass.vip/", fmt.Sprintf("{\"url\": \"%s\"}", ctx.Arguments.Raw()), map[string]string{"Content-Type": "application/json"})
 	if err != nil {
 		ctx.RespondText("An error has occurred.")
 		return
@@ -506,9 +505,7 @@ func (t NetworkCommands) theme(ctx *dgc.Ctx) {
 		error_handling.OnError(ctx, error_handling.InvalidArgument, "<light/dark> must be either \"light\" or \"dark\"")
 		return
 	}
-	jsonData, _ := _json.Marshal((map[string]interface{}{
-		"theme": theme,
-	}))
+	jsonData := fmt.Sprintf(`{"theme": "%s"}`, theme)
 	cfg, err := config.GetConfig()
 	if err != nil {
 		return
@@ -518,7 +515,7 @@ func (t NetworkCommands) theme(ctx *dgc.Ctx) {
 
 func (t NetworkCommands) hastebin(ctx *dgc.Ctx) {
 	text := ctx.Arguments.Raw()
-	result, err := http.PostSimpleJson("https://www.toptal.com/developers/hastebin/documents", text)
+	result, err := http.PostJson("https://www.toptal.com/developers/hastebin/documents", text)
 	if err != nil {
 		ctx.RespondText("An error has occurred.")
 		return
@@ -541,20 +538,20 @@ func (t NetworkCommands) checktoken(ctx *dgc.Ctx) {
 	}
 	embed.NewEmbed().
 		AddField("Status", "Valid Token").
-		AddField("Username", fmt.Sprintf("%s#%s", response["username"], response["discriminator"])).
-		AddField("ID", fmt.Sprintf("%s", response["id"])).
-		AddField("Public Flags", fmt.Sprintf("%.f", response["public_flags"])).
-		AddField("Flags", fmt.Sprintf("%.f", response["flags"])).
-		AddField("Purchased Flags", fmt.Sprintf("%.f", response["purchased_flags"])).
-		AddField("Banner", fmt.Sprintf("%s", response["banner"])).
-		AddField("Banner Color", fmt.Sprintf("%s", response["banner_color"])).
-		AddField("Bio", fmt.Sprintf("%s", response["bio"])).
-		AddField("Locale", fmt.Sprintf("%s", response["locale"])).
-		AddField("NSFW Allowed", utils.FormatBool(response["nsfw_allowed"].(bool))).
-		AddField("2FA Enabled", utils.FormatBool(response["mfa_enabled"].(bool))).
-		AddField("Email", fmt.Sprintf("%s", response["email"])).
-		AddField("Verified", utils.FormatBool(response["verified"].(bool))).
-		AddField("Phone", fmt.Sprintf("%s", response["phone"])).
+		AddField("Username", fmt.Sprintf("%s#%s", response.Get("username").MustString(), response.Get("discriminator").MustString())).
+		AddField("ID", response.Get("id").MustString()).
+		AddField("Public Flags", fmt.Sprintf("%.f", response.Get("public_flags").MustFloat64())).
+		AddField("Flags", fmt.Sprintf("%.f", response.Get("flags").MustFloat64())).
+		AddField("Purchased Flags", fmt.Sprintf("%.f", response.Get("purchased_flags").MustFloat64())).
+		AddField("Banner", response.Get("banner").MustString()).
+		AddField("Banner Color", response.Get("banner_color").MustString()).
+		AddField("Bio", response.Get("bio").MustString()).
+		AddField("Locale", response.Get("locale").MustString()).
+		AddField("NSFW Allowed", utils.FormatBool(response.Get("nsfw_allowed").MustBool())).
+		AddField("2FA Enabled", utils.FormatBool(response.Get("mfa_enabled").MustBool())).
+		AddField("Email", response.Get("email").MustString()).
+		AddField("Verified", utils.FormatBool(response.Get("verified").MustBool())).
+		AddField("Phone", response.Get("phone").MustString()).
 		Send(ctx)
 }
 
@@ -571,14 +568,14 @@ func (t NetworkCommands) compact(ctx *dgc.Ctx) {
 		error_handling.OnError(ctx, error_handling.InvalidArgument, "<on/off> must be either \"on\" or \"off\"")
 		return
 	}
-	jsonData, _ := _json.Marshal((map[string]interface{}{
-		"message_display_compact": toggle == "on",
-	}))
+	toggle = strings.ReplaceAll(toggle, "on", "true")
+	toggle = strings.ReplaceAll(toggle, "off", "false")
+	jsonData := fmt.Sprintf(`{"message_display_compact": %s}`, toggle)
 	cfg, err := config.GetConfig()
 	if err != nil {
 		return
 	}
-	http.Patch("https://discord.com/api/v10/users/@me/settings", string(jsonData), http.GetDiscordHeaders(cfg.Account.Discord.Token))
+	http.Patch("https://discord.com/api/v10/users/@me/settings", jsonData, http.GetDiscordHeaders(cfg.Account.Discord.Token))
 }
 
 func (t NetworkCommands) devmode(ctx *dgc.Ctx) {
@@ -587,14 +584,14 @@ func (t NetworkCommands) devmode(ctx *dgc.Ctx) {
 		error_handling.OnError(ctx, error_handling.InvalidArgument, "<on/off> must be either \"on\" or \"off\"")
 		return
 	}
-	jsonData, _ := _json.Marshal((map[string]interface{}{
-		"developer_mode": toggle == "on",
-	}))
+	toggle = strings.ReplaceAll(toggle, "on", "true")
+	toggle = strings.ReplaceAll(toggle, "off", "false")
+	jsonData := fmt.Sprintf(`{"developer_mode": %s}`, toggle)
 	cfg, err := config.GetConfig()
 	if err != nil {
 		return
 	}
-	http.Patch("https://discord.com/api/v10/users/@me/settings", string(jsonData), http.GetDiscordHeaders(cfg.Account.Discord.Token))
+	http.Patch("https://discord.com/api/v10/users/@me/settings", jsonData, http.GetDiscordHeaders(cfg.Account.Discord.Token))
 }
 
 func (t NetworkCommands) resolve(ctx *dgc.Ctx) {
@@ -604,14 +601,13 @@ func (t NetworkCommands) resolve(ctx *dgc.Ctx) {
 		ctx.RespondText("An error has occurred.")
 		return
 	}
-	ip := response["ip"]
-	if ip == nil {
+	if response.Get("ip").MustString() == "" {
 		embed.NewEmbed().SetDescription("Invalid domain.").Send(ctx)
 		return
 	}
 	embed.NewEmbed().
 		AddField("Domain", domain).
-		AddField("IP", ip.(string)).
+		AddField("IP", response.Get("ip").MustString()).
 		Send(ctx)
 }
 
@@ -622,15 +618,11 @@ func (t NetworkCommands) reversedns(ctx *dgc.Ctx) {
 		ctx.RespondText("An error has occurred.")
 		return
 	}
-	if response["error"] != nil {
+	if response.Get("error").MustArray() != nil {
 		embed.NewEmbed().SetDescription("Invalid IP Address.").Send(ctx)
 		return
 	}
-	domainsInterface := response["response"].(map[string]interface{})["ip_addresses"].(map[string]interface{})["domain_names"].([]interface{})
-	domains := []string{}
-	for _, domain := range domainsInterface {
-		domains = append(domains, domain.(string))
-	}
+	domains := response.GetPath("response", "ip_addresses", "domain_names").MustStringArray()
 	embed.NewEmbed().
 		AddField("IP Address", ip).
 		AddField("Domains", strings.Join(domains, ", ")).
@@ -684,7 +676,7 @@ func (t NetworkCommands) stackoverflow(ctx *dgc.Ctx) {
 
 func (t NetworkCommands) covid(ctx *dgc.Ctx) {
 	country := ctx.Arguments.Raw()
-	covid, err := http.GetSimpleJson(fmt.Sprintf("https://coronavirus-19-api.herokuapp.com/countries/%s", country))
+	covid, err := http.GetJson(fmt.Sprintf("https://coronavirus-19-api.herokuapp.com/countries/%s", country))
 	if err != nil {
 		ctx.RespondText("Country not found.")
 		return
@@ -712,8 +704,10 @@ func (t NetworkCommands) discordstatus(ctx *dgc.Ctx) {
 		return
 	}
 	emb := embed.NewEmbed()
-	for _, component := range status["components"].([]map[string]interface{}) {
-		emb.AddField(component["name"].(string), component["status"].(string))
+	components := status.Get("components")
+	for i := 0; i < len(components.MustArray()); i++ {
+		component := components.GetIndex(i)
+		emb.AddField(component.Get("name").MustString(), component.Get("status").MustString())
 	}
 	emb.Send(ctx)
 }
@@ -755,7 +749,7 @@ func (t NetworkCommands) searchcountry(ctx *dgc.Ctx) {
 		AddField("Region", country.Get("region").MustString()).
 		AddField("Subregion", country.Get("subregion").MustString()).
 		AddField("Population", fmt.Sprint(country.Get("population").MustInt())).
-		AddField("Latitude/Longitude", fmt.Sprintf("%s, %s", country.Get("latlng").MustArray()[0].(_json.Number).String(), country.Get("latlng").MustArray()[0].(_json.Number).String())).
+		AddField("Latitude/Longitude", fmt.Sprintf("%f, %f", country.Get("latlng").GetIndex(0).MustFloat64(), country.Get("latlng").GetIndex(1).MustFloat64())).
 		AddField("Timezone", strings.Join(country.Get("timezones").MustStringArray(), ", ")).
 		AddField("Currency", strings.Join(currencies, ", ")).
 		AddField("Language", strings.Join(languages, ", ")).
@@ -789,7 +783,7 @@ func (t NetworkCommands) randomcountry(ctx *dgc.Ctx) {
 		AddField("Region", country.Get("region").MustString()).
 		AddField("Subregion", country.Get("subregion").MustString()).
 		AddField("Population", fmt.Sprint(country.Get("population").MustInt())).
-		AddField("Latitude/Longitude", fmt.Sprintf("%s, %s", country.Get("latlng").MustArray()[0].(_json.Number).String(), country.Get("latlng").MustArray()[0].(_json.Number).String())).
+		AddField("Latitude/Longitude", fmt.Sprintf("%f, %f", country.Get("latlng").GetIndex(0).MustFloat64(), country.Get("latlng").GetIndex(1).MustFloat64())).
 		AddField("Timezone", strings.Join(country.Get("timezones").MustStringArray(), ", ")).
 		AddField("Currency", strings.Join(currencies, ", ")).
 		AddField("Language", strings.Join(languages, ", ")).
