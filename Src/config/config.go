@@ -87,6 +87,15 @@ type Config struct {
 	}
 }
 
+func (c Config) Save() error {
+	configFile, err := os.OpenFile(fmt.Sprintf("%s\\Config\\config.json", utils.GetMainFolder()), os.O_WRONLY, 0644)
+	if err != nil {
+		return err
+	}
+	defer configFile.Close()
+	return json.NewEncoder(configFile).Encode(c)
+}
+
 func GetConfig() (Config, error) {
 	var config Config
 	configFile, err := os.Open(fmt.Sprintf("%s\\Config\\config.json", utils.GetMainFolder()))

@@ -13,6 +13,7 @@ import (
 	"github.com/jpillora/overseer"
 
 	"github.com/LightningDev1/LB-Selfbot/commands"
+	"github.com/LightningDev1/LB-Selfbot/config"
 	"github.com/LightningDev1/LB-Selfbot/events"
 	"github.com/LightningDev1/LB-Selfbot/ipc"
 	"github.com/LightningDev1/LB-Selfbot/utils"
@@ -27,7 +28,7 @@ func main() {
 func selfbot_main(overseer.State) {
 	fmt.Println("LightningBot v4.0.0 Alpha")
 	utils.SeedRandom()
-	//ipc.Ipc.Init()
+	ipc.Ipc.Init()
 	ipc.Ipc.OnRead = func(s string) {
 		fmt.Println(s)
 		event := ipc.JsonEvent{}
@@ -41,20 +42,20 @@ func selfbot_main(overseer.State) {
 		}
 	}
 
-	events := events.Events{}
-
-	// Open a simple Discord session
-	token := "NzMzOTMzNzk5ODU5MDI4MDA4.YffMNA.UvWJVM3wEgtIGWpfwxhyO_D_PN8"
-	session, err := discordgo.New(token)
+	cfg, err := config.GetConfig()
 	if err != nil {
 		panic(err)
 	}
 
-	// Create a dgc router
+	events := events.Events{}
+
+	session, err := discordgo.New(cfg.Account.Discord.Token)
+	if err != nil {
+		panic(err)
+	}
+
 	router := dgc.Create(&dgc.Router{
-		Prefixes: []string{
-			"!",
-		},
+		Prefixes:         []string{cfg.Selfbot.CommandPrefix},
 		IgnorePrefixCase: true,
 		BotsAllowed:      false,
 		SelfBot:          true,

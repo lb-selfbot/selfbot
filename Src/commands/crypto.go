@@ -69,14 +69,14 @@ func (t CryptoCommands) RegisterCommands(router *dgc.Router) {
 
 func (t CryptoCommands) generateFunc(element []string) func(ctx *dgc.Ctx) {
 	return func(ctx *dgc.Ctx) {
-		json, err := http.GetJson("https://min-api.cryptocompare.com/data/price?fsym=" + element[1] + "&tsyms=USD,EUR")
+		json, err := http.GetSimpleJson("https://min-api.cryptocompare.com/data/price?fsym=" + element[1] + "&tsyms=USD,EUR")
 		if err != nil {
 			ctx.RespondText("An error has occurred.")
 		}
-		usd := json["USD"].(float64)
-		eur := json["EUR"].(float64)
+		usd := json.Get("USD").MustFloat64()
+		eur := json.Get("EUR").MustFloat64()
 		embed.NewEmbed().
-			SetDescription(fmt.Sprintf("USD: %.2f$\nEUR: %.2f€", usd, eur)).
+			SetDescription(fmt.Sprintf("USD: %.3f$\nEUR: %.3f€", usd, eur)).
 			SetAuthor(element[2], fmt.Sprintf("https://s2.coinmarketcap.com/static/img/coins/200x200/%s.png", element[3])).
 			Send(ctx)
 	}
