@@ -33,7 +33,7 @@ jobs:
           GOARCH: "amd64"
         run: |
           cd Src
-          go build -o ${{ github.workspace }}/LightningBot-windows.exe
+          go build -ldflags "-s -w" -o ${{ github.workspace }}/LightningBot-windows.exe
           
       - name: Build for Linux
         env:
@@ -42,7 +42,7 @@ jobs:
           GOARCH: "amd64"
         run: |
           cd Src
-          go build -o ${{ github.workspace }}/LightningBot-linux
+          go build -ldflags "-s -w" -o ${{ github.workspace }}/LightningBot-linux
           
       - name: Build for MacOS
         env:
@@ -51,7 +51,7 @@ jobs:
           GOARCH: "amd64"
         run: |
           cd Src
-          go build -o ${{ github.workspace }}/LightningBot-macos
+          go build -ldflags "-s -w" -o ${{ github.workspace }}/LightningBot-macos
           
       - name: Upload builds
         uses: actions/upload-artifact@v3.1.0
