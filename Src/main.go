@@ -17,7 +17,6 @@ import (
 
 	"github.com/LightningDev1/LB-Selfbot/commands"
 	"github.com/LightningDev1/LB-Selfbot/config"
-	"github.com/LightningDev1/LB-Selfbot/encryption"
 	"github.com/LightningDev1/LB-Selfbot/events"
 	"github.com/LightningDev1/LB-Selfbot/ipc"
 	"github.com/LightningDev1/LB-Selfbot/utils"
