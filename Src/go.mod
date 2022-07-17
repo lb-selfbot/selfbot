@@ -37,6 +37,7 @@ require (
 	github.com/kennygrant/sanitize v1.2.4 // indirect
 	github.com/kkdai/youtube/v2 v2.7.15 // indirect
 	github.com/klauspost/compress v1.15.6 // indirect
+	github.com/rgamba/evtwebsocket v0.0.0-20181029234908-48b8cd9f8616 // indirect
 	github.com/saintfish/chardet v0.0.0-20120816061221-3af4cd4741ca // indirect
 	github.com/temoto/robotstxt v1.1.1 // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect

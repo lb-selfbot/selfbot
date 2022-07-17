@@ -96,6 +96,8 @@ github.com/multiformats/go-base36 v0.1.0 h1:JR6TyF7JjGd3m6FbLU2cOxhC0Li8z8dLNGQ8
 github.com/multiformats/go-base36 v0.1.0/go.mod h1:kFGE83c6s80PklsHO9sRn2NCoffoRdUUOENyW/Vv6sM=
 github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZbAQM=
 github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
+github.com/rgamba/evtwebsocket v0.0.0-20181029234908-48b8cd9f8616 h1:CLOrtba3mh42XMLPr+g89SxpQ7PcdsCQEICO655IsxI=
+github.com/rgamba/evtwebsocket v0.0.0-20181029234908-48b8cd9f8616/go.mod h1:fpClUynpFcOmPLy6rXe0pEIoDamYH5s5I0SrbDbF4gk=
 github.com/rocketlaunchr/google-search v1.1.4 h1:11tA5CoeUjoNnvdyUMGwyuxzihbBRDhoEFXlMmPm0k4=
 github.com/rocketlaunchr/google-search v1.1.4/go.mod h1:6WRqswVvv6PJtvGCB1sEVxt726NolmA0QTl6xSEXel0=
 github.com/rogpeppe/go-internal v1.6.1/go.mod h1:xXDCJY+GAPziupqXw64V24skbSoqbTEfhy4qGm1nDQc=

@@ -13,9 +13,11 @@ import (
 	"github.com/LightningDev1/dgc"
 	"github.com/LightningDev1/discordgo"
 	"github.com/jpillora/overseer"
+	"github.com/rgamba/evtwebsocket"
 
 	"github.com/LightningDev1/LB-Selfbot/commands"
 	"github.com/LightningDev1/LB-Selfbot/config"
+	"github.com/LightningDev1/LB-Selfbot/encryption"
 	"github.com/LightningDev1/LB-Selfbot/events"
 	"github.com/LightningDev1/LB-Selfbot/ipc"
 	"github.com/LightningDev1/LB-Selfbot/utils"
@@ -28,9 +30,41 @@ func main() {
 }
 
 func selfbot_main(overseer.State) {
+	conn := evtwebsocket.Conn{
+		// Fires when the connection is established
+		OnConnected: func(w *evtwebsocket.Conn) {
+			fmt.Println("Connected!")
+		},
+		// Fires when a new message arrives from the server
+		OnMessage: func(msg []byte, w *evtwebsocket.Conn) {
+			fmt.Printf("New message: %s\n", msg)
+		},
+		// Fires when an error occurs and connection is closed
+		OnError: func(err error) {
+			fmt.Printf("Error: %s\n", err.Error())
+			os.Exit(1)
+		},
+		// Ping interval in secs (optional)
+		PingIntervalSecs: 5,
+		// Ping message to send (optional)
+		PingMsg: []byte("PING"),
+	}
+
+	err := conn.Dial("ws://127.0.0.1:8000/api/v3/ws/website", "")
+	if err != nil {
+		fmt.Println(err)
+	}
+	conn.Send(evtwebsocket.Msg{
+		Body: []byte("Message body"),
+		Callback: func(resp []byte, w *evtwebsocket.Conn) {
+			// This function executes when the server responds
+			fmt.Printf("Got response: %s\n", resp)
+		},
+	})
+
 	fmt.Println("LightningBot v4.0.0 Alpha")
 	rand.Seed(time.Now().UnixNano())
-	ipc.Ipc.Init()
+	//ipc.Ipc.Init()
 	ipc.Ipc.OnRead = func(s string) {
 		fmt.Println(s)
 		event := ipc.JsonEvent{}
