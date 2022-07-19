@@ -38,7 +38,7 @@ func pad(text []byte, blocksize int) []byte {
 	return text
 }
 
-func unpad(text []byte, blocksize int) []byte {
+func unpad(text []byte) []byte {
 	// Get the padding
 	padding := int(text[len(text)-1])
 
@@ -122,5 +122,5 @@ func (e Encryption) Decrypt(text []byte) ([]byte, error) {
 	mode.CryptBlocks(plaintext, ciphertext)
 
 	// Return the decrypted text
-	return unpad(plaintext, block.BlockSize()), nil
+	return unpad(plaintext), nil
 }
