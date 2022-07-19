@@ -26,7 +26,7 @@ type WsMessage struct {
 	Data WsData `json:"data,omitempty"`
 }
 
-func Init() error {
+func Init(username, password string) error {
 	Encryption = &encryption.Encryption{
 		Key: "?aZV:3EQ_;'_B%g#q*Eg2#RQU.jCTo`qE%a>6RFRn-KXW`'.GA`38Zf+%+4]7qJF2UBDha1OoFEoC9rP",
 	}
@@ -34,7 +34,7 @@ func Init() error {
 	pingMsgEncrypted, _ := Encryption.Encrypt(pingMsg)
 	Conn = &evtwebsocket.Conn{
 		OnConnected: func(*evtwebsocket.Conn) {
-			Auth("Lightning", "Fatos_1984")
+			Auth(username, password)
 			fmt.Println("Connected!")
 		},
 		OnMessage: func(msg []byte, _ *evtwebsocket.Conn) {

@@ -29,7 +29,12 @@ func main() {
 }
 
 func selfbot_main(overseer.State) {
-	err := websocket.Init()
+	cfg, err := config.GetConfig()
+	if err != nil {
+		panic(err)
+	}
+
+	err = websocket.Init(cfg.Account.LightningBot.Username, cfg.Account.LightningBot.Password)
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -47,11 +52,6 @@ func selfbot_main(overseer.State) {
 		case ipc.Ipc.OpCodes.RESTART:
 			utils.Restart()
 		}
-	}
-
-	cfg, err := config.GetConfig()
-	if err != nil {
-		panic(err)
 	}
 
 	events := events.Events{}
