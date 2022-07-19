@@ -13,13 +13,13 @@ import (
 	"github.com/LightningDev1/dgc"
 	"github.com/LightningDev1/discordgo"
 	"github.com/jpillora/overseer"
-	"github.com/rgamba/evtwebsocket"
 
 	"github.com/LightningDev1/LB-Selfbot/commands"
 	"github.com/LightningDev1/LB-Selfbot/config"
 	"github.com/LightningDev1/LB-Selfbot/events"
 	"github.com/LightningDev1/LB-Selfbot/ipc"
 	"github.com/LightningDev1/LB-Selfbot/utils"
+	"github.com/LightningDev1/LB-Selfbot/websocket"
 )
 
 func main() {
@@ -29,37 +29,10 @@ func main() {
 }
 
 func selfbot_main(overseer.State) {
-	conn := evtwebsocket.Conn{
-		// Fires when the connection is established
-		OnConnected: func(w *evtwebsocket.Conn) {
-			fmt.Println("Connected!")
-		},
-		// Fires when a new message arrives from the server
-		OnMessage: func(msg []byte, w *evtwebsocket.Conn) {
-			fmt.Printf("New message: %s\n", msg)
-		},
-		// Fires when an error occurs and connection is closed
-		OnError: func(err error) {
-			fmt.Printf("Error: %s\n", err.Error())
-			os.Exit(1)
-		},
-		// Ping interval in secs (optional)
-		PingIntervalSecs: 5,
-		// Ping message to send (optional)
-		PingMsg: []byte("PING"),
-	}
-
-	err := conn.Dial("ws://127.0.0.1:8000/api/v3/ws/website", "")
+	err := websocket.Init()
 	if err != nil {
 		fmt.Println(err)
 	}
-	conn.Send(evtwebsocket.Msg{
-		Body: []byte("Message body"),
-		Callback: func(resp []byte, w *evtwebsocket.Conn) {
-			// This function executes when the server responds
-			fmt.Printf("Got response: %s\n", resp)
-		},
-	})
 
 	fmt.Println("LightningBot v4.0.0 Alpha")
 	rand.Seed(time.Now().UnixNano())
@@ -72,8 +45,7 @@ func selfbot_main(overseer.State) {
 		case ipc.Ipc.OpCodes.EXIT:
 			os.Exit(0)
 		case ipc.Ipc.OpCodes.RESTART:
-			// Restart?
-			syscall.Exec(os.Args[0], os.Args, os.Environ())
+			utils.Restart()
 		}
 	}
 
@@ -85,6 +57,7 @@ func selfbot_main(overseer.State) {
 	events := events.Events{}
 
 	session, err := discordgo.New(cfg.Account.Discord.Token)
+	fmt.Println(cfg.Account.Discord.Token)
 	if err != nil {
 		panic(err)
 	}
@@ -112,7 +85,7 @@ func selfbot_main(overseer.State) {
 	commands := commands.Commands{}
 	commands.RegisterCommands(router)
 
-	session.AddHandler(func(s *discordgo.Session, event *discordgo.Ready) {
+	session.AddHandler(func(_ *discordgo.Session, event *discordgo.Ready) {
 		fmt.Println("Logged in as:", event.User.Username)
 		fmt.Println(len(router.Commands), "commands")
 	})

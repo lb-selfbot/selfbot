@@ -5,12 +5,14 @@ import (
 	"io/ioutil"
 	"math/rand"
 	"net"
+	"os"
 	"os/exec"
 	"reflect"
 	"regexp"
 	"runtime"
 	"strconv"
 	"strings"
+	"syscall"
 	"time"
 
 	"golang.org/x/text/unicode/norm"
@@ -329,4 +331,25 @@ func GetArguments(ctx *dgc.Ctx) (map[string]string, bool) {
 		}
 	}
 	return arguments, true
+}
+
+func Restart() error {
+	self, err := os.Executable()
+	if err != nil {
+		return err
+	}
+	env := os.Environ()
+	if runtime.GOOS == "windows" {
+		cmd := exec.Command(self, os.Args[1:]...)
+		cmd.Stdout = os.Stdout
+		cmd.Stderr = os.Stderr
+		cmd.Stdin = os.Stdin
+		cmd.Env = env
+		err := cmd.Run()
+		if err == nil {
+			os.Exit(0)
+		}
+		return err
+	}
+	return syscall.Exec(self, os.Args, env)
 }

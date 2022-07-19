@@ -48,11 +48,11 @@ func unpad(text []byte, blocksize int) []byte {
 	return text
 }
 
-func (e Encryption) Encrypt(text string) (string, error) {
+func (e Encryption) Encrypt(text []byte) ([]byte, error) {
 	// Generate a random salt
 	salt, err := randomBytes(32)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
 	// Hash the key with the salt
@@ -61,7 +61,7 @@ func (e Encryption) Encrypt(text string) (string, error) {
 	// Generate a random IV
 	iv, err := randomBytes(16)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
 	// Create the cipher
@@ -71,7 +71,7 @@ func (e Encryption) Encrypt(text string) (string, error) {
 	}
 
 	// Pad the text
-	paddedText := pad([]byte(text), block.BlockSize())
+	paddedText := pad(text, block.BlockSize())
 
 	// Create the cipher
 	ciphertext := make([]byte, len(paddedText))
@@ -81,28 +81,28 @@ func (e Encryption) Encrypt(text string) (string, error) {
 	mode.CryptBlocks(ciphertext, paddedText)
 
 	// Return the encrypted text
-	return fmt.Sprintf(
+	return []byte(fmt.Sprintf(
 		"%s:%s:%s",
 		base64.StdEncoding.EncodeToString(salt),
 		base64.StdEncoding.EncodeToString(iv),
 		base64.StdEncoding.EncodeToString(ciphertext),
-	), nil
+	)), nil
 }
 
-func (e Encryption) Decrypt(text string) (string, error) {
+func (e Encryption) Decrypt(text []byte) ([]byte, error) {
 	// Split the text into the salt, IV, and ciphertext
-	splitText := strings.Split(text, ":")
+	splitText := strings.Split(string(text), ":")
 	salt, err := base64.StdEncoding.DecodeString(splitText[0])
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 	iv, err := base64.StdEncoding.DecodeString(splitText[1])
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 	ciphertext, err := base64.StdEncoding.DecodeString(splitText[2])
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
 	// Hash the key with the salt
@@ -122,5 +122,5 @@ func (e Encryption) Decrypt(text string) (string, error) {
 	mode.CryptBlocks(plaintext, ciphertext)
 
 	// Return the decrypted text
-	return string(unpad(plaintext, block.BlockSize())), nil
+	return unpad(plaintext, block.BlockSize()), nil
 }
