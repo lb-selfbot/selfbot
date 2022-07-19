@@ -9,6 +9,7 @@ type Commands struct {
 	CryptoCommands    CryptoCommands
 	FunCommands       FunCommands
 	TrollingCommands  TrollingCommands
+	ImageCommands     ImageCommands
 	NetworkCommands   NetworkCommands
 	SpotifyCommands   SpotifyCommands
 	RedditCommands    RedditCommands
@@ -24,6 +25,7 @@ func (c Commands) RegisterCommands(router *dgc.Router) {
 	c.CryptoCommands.RegisterCommands(router)
 	c.FunCommands.RegisterCommands(router)
 	c.TrollingCommands.RegisterCommands(router)
+	c.ImageCommands.RegisterCommands(router)
 	c.NetworkCommands.RegisterCommands(router)
 	c.SpotifyCommands.RegisterCommands(router)
 	c.RedditCommands.RegisterCommands(router)
