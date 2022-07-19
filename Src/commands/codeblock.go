@@ -6,7 +6,7 @@ import (
 
 type CodeblockCommands struct{}
 
-func (t CodeblockCommands) RegisterCommands(router *dgc.Router) {
+func (c CodeblockCommands) RegisterCommands(router *dgc.Router) {
 	codeBlockCommands := [][]string{
 		{"Python", "python", "py"},
 		{"Ruby", "ruby", "ruby"},
@@ -63,12 +63,15 @@ func (t CodeblockCommands) RegisterCommands(router *dgc.Router) {
 			Name:        element[1],
 			Description: "Sends a codeblock with language " + element[0],
 			Usage:       "[p]" + element[1] + " <text>",
-			Handler:     t.generateFunc(element),
+			Handler:     c.generateFunc(element),
 		})
 	}
 }
 
-func (t CodeblockCommands) generateFunc(element []string) func(ctx *dgc.Ctx) {
+func (CodeblockCommands) generateFunc(element []string) func(ctx *dgc.Ctx) {
+	// This makes sure that the function is not overwritten by the next command.
+	// If you put the function in the RegisterCommands function, the element
+	// variable will always be the last element in the command array.
 	return func(ctx *dgc.Ctx) {
 		ctx.RespondText("```" + element[2] + "\n" + ctx.Arguments.Raw() + "\n```")
 	}

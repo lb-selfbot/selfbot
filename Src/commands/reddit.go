@@ -9,14 +9,14 @@ import (
 
 type RedditCommands struct{}
 
-func (t RedditCommands) RegisterCommands(router *dgc.Router) {
+func (r RedditCommands) RegisterCommands(router *dgc.Router) {
 	router.RegisterCmd(&dgc.Command{
 		Name:        "subreddit",
 		Description: "Get a random post from a subreddit",
 		Usage:       "[p]subreddit <subreddit>",
-		Handler:     t.subreddit,
+		Handler:     r.subreddit,
 	})
-	redditCommands := []string{
+	subReddits := []string{
 		"mildlyinteresting",
 		"thatsinsane",
 		"funny",
@@ -34,24 +34,31 @@ func (t RedditCommands) RegisterCommands(router *dgc.Router) {
 		"nextfuckinglevel",
 		"foodporn",
 	}
-	for _, subreddit := range redditCommands {
+	for _, subreddit := range subReddits {
 		router.RegisterCmd(&dgc.Command{
 			Name:        subreddit,
 			Description: "Get a random post from r/" + subreddit,
 			Usage:       "[p]" + subreddit,
-			Handler: func(ctx *dgc.Ctx) {
-				post, success := api.GetImageFromSubreddit(subreddit)
-				if !success {
-					ctx.RespondText("That subreddit is invalid.")
-					return
-				}
-				embed.NewEmbed().
-					AddField("Subreddit", subreddit).
-					AddField("Title", post.Title).
-					AddField("URL", post.ImageURL).
-					Send(ctx)
-			},
+			Handler:     r.generateFunc(subreddit),
 		})
+	}
+}
+
+func (RedditCommands) generateFunc(subreddit string) func(ctx *dgc.Ctx) {
+	// This makes sure that the function is not overwritten by the next command.
+	// If you put the function in the RegisterCommands function, the element
+	// variable will always be the last element in the command array.
+	return func(ctx *dgc.Ctx) {
+		post, success := api.GetImageFromSubreddit(subreddit)
+		if !success {
+			ctx.RespondText("That subreddit is invalid.")
+			return
+		}
+		embed.NewEmbed().
+			AddField("Subreddit", subreddit).
+			AddField("Title", post.Title).
+			AddField("URL", post.ImageURL).
+			Send(ctx)
 	}
 }
 

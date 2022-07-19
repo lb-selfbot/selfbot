@@ -68,6 +68,9 @@ func (t CryptoCommands) RegisterCommands(router *dgc.Router) {
 }
 
 func (t CryptoCommands) generateFunc(element []string) func(ctx *dgc.Ctx) {
+	// This makes sure that the function is not overwritten by the next command.
+	// If you put the function in the RegisterCommands function, the element
+	// variable will always be the last element in the command array.
 	return func(ctx *dgc.Ctx) {
 		json, err := http.GetJson("https://min-api.cryptocompare.com/data/price?fsym=" + element[1] + "&tsyms=USD,EUR")
 		if err != nil {
