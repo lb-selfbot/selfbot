@@ -62,7 +62,7 @@ func (RedditCommands) generateFunc(subreddit string) func(ctx *dgc.Ctx) {
 	}
 }
 
-func (t RedditCommands) subreddit(ctx *dgc.Ctx) {
+func (RedditCommands) subreddit(ctx *dgc.Ctx) {
 	subreddit := utils.Arguments["<subreddit>"]
 	post, success := api.GetImageFromSubreddit(subreddit)
 	if !success {

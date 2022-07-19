@@ -74,19 +74,19 @@ func (t TrollingCommands) RegisterCommands(router *dgc.Router) {
 	// forcedisconnect
 }
 
-func (t TrollingCommands) purgehack(ctx *dgc.Ctx) {
+func (TrollingCommands) purgehack(ctx *dgc.Ctx) {
 	ctx.RespondText("ﾠ" + strings.Repeat("\n", 1998) + "ﾠ")
 }
 
-func (t TrollingCommands) ghostping(ctx *dgc.Ctx) {
+func (TrollingCommands) ghostping(ctx *dgc.Ctx) {
 	// noop
 }
 
-func (t TrollingCommands) gprole(ctx *dgc.Ctx) {
+func (TrollingCommands) gprole(ctx *dgc.Ctx) {
 	// noop
 }
 
-func (t TrollingCommands) token(ctx *dgc.Ctx) {
+func (TrollingCommands) token(ctx *dgc.Ctx) {
 	user, success := utils.TryGetUserFromUserMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
 		ctx.RespondText("Could not find user.")
@@ -95,20 +95,20 @@ func (t TrollingCommands) token(ctx *dgc.Ctx) {
 	ctx.RespondText(encodings.Base64(user.ID, false))
 }
 
-func (t TrollingCommands) trollnitro(ctx *dgc.Ctx) {
+func (TrollingCommands) trollnitro(ctx *dgc.Ctx) {
 	ctx.RespondText(fmt.Sprintf("dıscord.gift/%s %s https://media.discordapp.net/attachments/759817334121824297/763209007170453544/xedy9ugkqo621.png", utils.RandomString(16), constants.InvisibleText))
 }
 
-func (t TrollingCommands) hiddeninvite(ctx *dgc.Ctx) {
+func (TrollingCommands) hiddeninvite(ctx *dgc.Ctx) {
 	text := utils.RemoveWords(ctx.Arguments.Raw(), 1)
 	ctx.RespondText(fmt.Sprintf("%s %s %s", text, constants.InvisibleText, utils.Arguments["<invite>"]))
 }
 
-func (t TrollingCommands) hiddenping(ctx *dgc.Ctx) {
+func (TrollingCommands) hiddenping(ctx *dgc.Ctx) {
 	text := utils.RemoveWords(ctx.Arguments.Raw(), 1)
 	ctx.RespondText(fmt.Sprintf("%s %s %s", text, constants.InvisibleText, utils.Arguments["<user>"]))
 }
 
-func (t TrollingCommands) hiddeneveryone(ctx *dgc.Ctx) {
+func (TrollingCommands) hiddeneveryone(ctx *dgc.Ctx) {
 	ctx.RespondText(fmt.Sprintf("%s %s @everyone", ctx.Arguments.Raw(), constants.InvisibleText))
 }

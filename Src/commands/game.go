@@ -14,88 +14,88 @@ import (
 
 type GameCommands struct{}
 
-func (t GameCommands) RegisterCommands(router *dgc.Router) {
+func (g GameCommands) RegisterCommands(router *dgc.Router) {
 	router.RegisterCmd(&dgc.Command{
 		Name:        "mcuuid",
 		Description: "Get the minecraft uuid of a player",
 		Usage:       "[p]mcuuid <username>",
-		Handler:     t.mcuuid,
+		Handler:     g.mcuuid,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "mcnamehistory",
 		Description: "Get the minecraft name history of a player",
 		Usage:       "[p]mcnamehistory <uuid>",
-		Handler:     t.mcnamehistory,
+		Handler:     g.mcnamehistory,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "fnmap",
 		Description: "Get the current Fortnite map",
 		Usage:       "[p]fnmap",
-		Handler:     t.fnmap,
+		Handler:     g.fnmap,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "fnmappois",
 		Description: "Get the current Fortnite map with POIs",
 		Usage:       "[p]fnmappois",
-		Handler:     t.fnmappois,
+		Handler:     g.fnmappois,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "fnrandomplaylist",
 		Description: "Get a random Fortnite playlist",
 		Usage:       "[p]fnrandomplaylist",
-		Handler:     t.fnrandomplaylist,
+		Handler:     g.fnrandomplaylist,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "fnrandombanner",
 		Description: "Get a random Fortnite banner",
 		Usage:       "[p]fnrandombanner",
-		Handler:     t.fnrandombanner,
+		Handler:     g.fnrandombanner,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "fnstats",
 		Description: "Get a player's Fortnite stats",
 		Usage:       "[p]fnstats <username>",
-		Handler:     t.fnstats,
+		Handler:     g.fnstats,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "fncreatorcode",
 		Description: "Get info about a Fortnite creator code",
 		Usage:       "[p]fncreatorcode <code>",
-		Handler:     t.fncreatorcode,
+		Handler:     g.fncreatorcode,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "fnrandomcosmetic",
 		Description: "Get a random Fortnite cosmetic",
 		Usage:       "[p]fnrandomcosmetic",
-		Handler:     t.fnrandomcosmetic,
+		Handler:     g.fnrandomcosmetic,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "alstatus",
 		Description: "Get the Apex legends status",
 		Usage:       "[p]alstatus",
-		Handler:     t.alstatus,
+		Handler:     g.alstatus,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "alnews",
 		Description: "Get the latest Apex legends news",
 		Usage:       "[p]alnews",
-		Handler:     t.alnews,
+		Handler:     g.alnews,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "alstats",
 		Description: "Get a player's Apex legends stats",
 		Usage:       "[p]alstats <platform> <username>",
-		Handler:     t.alstats,
+		Handler:     g.alstats,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "gtastatus",
 		Description: "Get the current GTA status",
 		Usage:       "[p]gtastatus",
-		Handler:     t.gtastatus,
+		Handler:     g.gtastatus,
 	})
 }
 
-func (t GameCommands) mcuuid(ctx *dgc.Ctx) {
+func (GameCommands) mcuuid(ctx *dgc.Ctx) {
 	username := utils.Arguments["<username>"]
 	res, err := http.PostJson(
 		"https://api.mojang.com/profiles/minecraft",
@@ -115,7 +115,7 @@ func (t GameCommands) mcuuid(ctx *dgc.Ctx) {
 		Send(ctx)
 }
 
-func (t GameCommands) mcnamehistory(ctx *dgc.Ctx) {
+func (GameCommands) mcnamehistory(ctx *dgc.Ctx) {
 	uuid := utils.Arguments["<uuid>"]
 	res, err := http.GetJson(fmt.Sprintf("https://api.mojang.com/user/profiles/%s/names", url.QueryEscape(uuid)))
 	if err != nil {
@@ -136,7 +136,7 @@ func (t GameCommands) mcnamehistory(ctx *dgc.Ctx) {
 		Send(ctx)
 }
 
-func (t GameCommands) fnmap(ctx *dgc.Ctx) {
+func (GameCommands) fnmap(ctx *dgc.Ctx) {
 	res, err := http.GetJson("https://fortnite-api.com/v1/map")
 	if err != nil {
 		ctx.RespondText("An error has occurred.")
@@ -148,7 +148,7 @@ func (t GameCommands) fnmap(ctx *dgc.Ctx) {
 		Send(ctx)
 }
 
-func (t GameCommands) fnmappois(ctx *dgc.Ctx) {
+func (GameCommands) fnmappois(ctx *dgc.Ctx) {
 	res, err := http.GetJson("https://fortnite-api.com/v1/map")
 	if err != nil {
 		ctx.RespondText("An error has occurred.")
@@ -160,7 +160,7 @@ func (t GameCommands) fnmappois(ctx *dgc.Ctx) {
 		Send(ctx)
 }
 
-func (t GameCommands) fnrandomplaylist(ctx *dgc.Ctx) {
+func (GameCommands) fnrandomplaylist(ctx *dgc.Ctx) {
 	playlists, err := http.GetJson("https://fortnite-api.com/v1/playlists")
 	if err != nil {
 		ctx.RespondText("An error has occurred.")
@@ -178,7 +178,7 @@ func (t GameCommands) fnrandomplaylist(ctx *dgc.Ctx) {
 		Send(ctx)
 }
 
-func (t GameCommands) fnrandombanner(ctx *dgc.Ctx) {
+func (GameCommands) fnrandombanner(ctx *dgc.Ctx) {
 	banners, err := http.GetJson("https://fortnite-api.com/v1/banners")
 	if err != nil {
 		ctx.RespondText("An error has occurred.")
@@ -196,7 +196,7 @@ func (t GameCommands) fnrandombanner(ctx *dgc.Ctx) {
 		Send(ctx)
 }
 
-func (t GameCommands) fnstats(ctx *dgc.Ctx) {
+func (GameCommands) fnstats(ctx *dgc.Ctx) {
 	username := utils.Arguments["<username>"]
 	user, err := http.GetJson(
 		fmt.Sprintf("https://fortnite-api.com/v1/stats/br/v2?name=%s", url.QueryEscape(username)),
@@ -226,7 +226,7 @@ func (t GameCommands) fnstats(ctx *dgc.Ctx) {
 		Send(ctx)
 }
 
-func (t GameCommands) fncreatorcode(ctx *dgc.Ctx) {
+func (GameCommands) fncreatorcode(ctx *dgc.Ctx) {
 	code := utils.Arguments["<code>"]
 	res, err := http.GetJson(fmt.Sprintf("https://fortnite-api.com/v2/creatorcode/search?name=%s", url.QueryEscape(code)))
 	if err != nil {
@@ -247,7 +247,7 @@ func (t GameCommands) fncreatorcode(ctx *dgc.Ctx) {
 		Send(ctx)
 }
 
-func (t GameCommands) fnrandomcosmetic(ctx *dgc.Ctx) {
+func (GameCommands) fnrandomcosmetic(ctx *dgc.Ctx) {
 	cosmetics, err := http.GetJson("https://fortnite-api.com/v2/cosmetics/br")
 	if err != nil {
 		ctx.RespondText("An error has occurred.")
@@ -270,7 +270,7 @@ func (t GameCommands) fnrandomcosmetic(ctx *dgc.Ctx) {
 		Send(ctx)
 }
 
-func (t GameCommands) alstatus(ctx *dgc.Ctx) {
+func (GameCommands) alstatus(ctx *dgc.Ctx) {
 	status, err := http.GetJson("https://api.mozambiquehe.re/servers?auth=IgUq5IRUFvvFxdXbrgmy")
 	if err != nil {
 		ctx.RespondText("An error has occurred.")
@@ -288,7 +288,7 @@ func (t GameCommands) alstatus(ctx *dgc.Ctx) {
 		Send(ctx)
 }
 
-func (t GameCommands) alnews(ctx *dgc.Ctx) {
+func (GameCommands) alnews(ctx *dgc.Ctx) {
 	newsList, err := http.GetJson("https://api.mozambiquehe.re/news?lang=en-us&auth=IgUq5IRUFvvFxdXbrgmy")
 	if err != nil {
 		ctx.RespondText("An error has occurred.")
@@ -305,7 +305,7 @@ func (t GameCommands) alnews(ctx *dgc.Ctx) {
 	emb.Send(ctx)
 }
 
-func (t GameCommands) alstats(ctx *dgc.Ctx) {
+func (GameCommands) alstats(ctx *dgc.Ctx) {
 	platform := utils.Arguments["<platform>"]
 	if platform != "ps4" && platform != "xbox" && platform != "pc" {
 		ctx.RespondText("Invalid platform.")
@@ -346,7 +346,7 @@ func (t GameCommands) alstats(ctx *dgc.Ctx) {
 		Send(ctx)
 }
 
-func (t GameCommands) gtastatus(ctx *dgc.Ctx) {
+func (GameCommands) gtastatus(ctx *dgc.Ctx) {
 	status, err := http.GetJson("https://support.rockstargames.com/services/status.json")
 	if err != nil {
 		ctx.RespondText("An error has occurred.")

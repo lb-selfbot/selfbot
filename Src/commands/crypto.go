@@ -10,7 +10,7 @@ import (
 
 type CryptoCommands struct{}
 
-func (t CryptoCommands) RegisterCommands(router *dgc.Router) {
+func (c CryptoCommands) RegisterCommands(router *dgc.Router) {
 	cryptoCommands := [][]string{
 		{"btc", "BTC", "Bitcoin", "1"},
 		{"eth", "ETH", "Ethereum", "1027"},
@@ -62,12 +62,12 @@ func (t CryptoCommands) RegisterCommands(router *dgc.Router) {
 			Name:        element[0],
 			Description: "Sends the current " + element[2] + " price in USD and Euro",
 			Usage:       "[p]" + element[0],
-			Handler:     t.generateFunc(element),
+			Handler:     c.generateFunc(element),
 		})
 	}
 }
 
-func (t CryptoCommands) generateFunc(element []string) func(ctx *dgc.Ctx) {
+func (CryptoCommands) generateFunc(element []string) func(ctx *dgc.Ctx) {
 	// This makes sure that the function is not overwritten by the next command.
 	// If you put the function in the RegisterCommands function, the element
 	// variable will always be the last element in the command array.

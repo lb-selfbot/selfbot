@@ -24,226 +24,226 @@ import (
 
 type NetworkCommands struct{}
 
-func (t NetworkCommands) RegisterCommands(router *dgc.Router) {
+func (n NetworkCommands) RegisterCommands(router *dgc.Router) {
 	router.RegisterCmd(&dgc.Command{
 		Name:        "ping",
 		Description: "Check the latency of the bot",
 		Usage:       "[p]ping",
-		Handler:     t.ping,
+		Handler:     n.ping,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "pingweb",
 		Description: "Check the latency to a website",
 		Usage:       "[p]pingweb <host>",
-		Handler:     t.pingweb,
+		Handler:     n.pingweb,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "googlesearch",
 		Description: "Search someting on Google",
 		Usage:       "[p]googlesearch <query>",
-		Handler:     t.googlesearch,
+		Handler:     n.googlesearch,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "youtubesearch",
 		Description: "Search someting on Youtube",
 		Usage:       "[p]youtubesearch <query>",
-		Handler:     t.youtubesearch,
+		Handler:     n.youtubesearch,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "urbandictionary",
 		Description: "Search someting on the Urban Dictionary",
 		Usage:       "[p]urbandictionary <word>",
-		Handler:     t.urbandictionary,
+		Handler:     n.urbandictionary,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "wikipedia",
 		Description: "Search someting on Wikipedia",
 		Usage:       "[p]wikipedia <query>",
-		Handler:     t.wikipedia,
+		Handler:     n.wikipedia,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "weather",
 		Description: "Check the weather in a city",
 		Usage:       "[p]weather <city>",
-		Handler:     t.weather,
+		Handler:     n.weather,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "hypesquad",
 		Description: "Change your Hypesquad House",
 		Usage:       "[p]hypesquad <bravery/brilliance/balance>",
-		Handler:     t.hypesquad,
+		Handler:     n.hypesquad,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "tinyurl",
 		Description: "Shorten a URL with TinyURL",
 		Usage:       "[p]tinyurl <url>",
-		Handler:     t.tinyurl,
+		Handler:     n.tinyurl,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "ipinfo",
 		Description: "Get info about an IP Address",
 		Usage:       "[p]ipinfo <ip>",
-		Handler:     t.ipinfo,
+		Handler:     n.ipinfo,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "youtubedl",
 		Description: "Download a YouTube video to the desktop",
 		Usage:       "[p]youtubedl <query>",
-		Handler:     t.youtubedl,
+		Handler:     n.youtubedl,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "lvbypass",
 		Description: "Bypass a Linkvertise link",
 		Usage:       "[p]lvbypass <url>",
-		Handler:     t.lvbypass,
+		Handler:     n.lvbypass,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "portscan",
 		Description: "Scan a host for open ports",
 		Usage:       "[p]portscan <host>",
-		Handler:     t.portscan,
+		Handler:     n.portscan,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "theme",
 		Description: "Change your Discord theme",
 		Usage:       "[p]theme <light/dark>",
-		Handler:     t.theme,
+		Handler:     n.theme,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "hastebin",
 		Description: "Upload text to Hastebin",
 		Usage:       "[p]hastebin <text>",
-		Handler:     t.hastebin,
+		Handler:     n.hastebin,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "checktoken",
 		Description: "Check if a Discord token is valid",
 		Usage:       "[p]checktoken <token>",
-		Handler:     t.checktoken,
+		Handler:     n.checktoken,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "delwebhook",
 		Description: "Delete a webook",
 		Usage:       "[p]delwebhook <webhook url>",
-		Handler:     t.delwebhook,
+		Handler:     n.delwebhook,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "compact",
 		Description: "Toggle Discord compact mode",
 		Usage:       "[p]compact <on/off>",
-		Handler:     t.compact,
+		Handler:     n.compact,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "devmode",
 		Description: "Toggle Discord developer mode",
 		Usage:       "[p]devmode <on/off>",
-		Handler:     t.devmode,
+		Handler:     n.devmode,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "resolve",
 		Description: "Get a domain's IP address",
 		Usage:       "[p]resolve <domain>",
-		Handler:     t.resolve,
+		Handler:     n.resolve,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "reversedns",
 		Description: "Find all domains hosted on an IP address",
 		Usage:       "[p]reversedns <ip>",
-		Handler:     t.reversedns,
+		Handler:     n.reversedns,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "reversemac",
 		Description: "Find the vender of a MAC address",
 		Usage:       "[p]reversemac <mac>",
-		Handler:     t.reversemac,
+		Handler:     n.reversemac,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "amazon",
 		Description: "Search products on Amazon",
 		Usage:       "[p]amazon <query>",
-		Handler:     t.amazon,
+		Handler:     n.amazon,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "steam",
 		Description: "Search games on Steam",
 		Usage:       "[p]steam <query>",
-		Handler:     t.steam,
+		Handler:     n.steam,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "github",
 		Description: "Search repos on GitHub",
 		Usage:       "[p]github <query>",
-		Handler:     t.github,
+		Handler:     n.github,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "stackoverflow",
 		Description: "Search answers on Stack Overflow",
 		Usage:       "[p]stackoverflow <query>",
-		Handler:     t.stackoverflow,
+		Handler:     n.stackoverflow,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "covid",
 		Description: "See COVID-19 statistics for a country",
 		Usage:       "[p]covid <country>",
-		Handler:     t.covid,
+		Handler:     n.covid,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "discordstatus",
 		Description: "Check the Discord status",
 		Usage:       "[p]discordstatus",
-		Handler:     t.discordstatus,
+		Handler:     n.discordstatus,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "open",
 		Description: "Open a URL in the browser",
 		Usage:       "[p]open <url>",
-		Handler:     t.open,
+		Handler:     n.open,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "searchcountry",
 		Description: "Get info about a country",
 		Usage:       "[p]searchcountry <country>",
-		Handler:     t.searchcountry,
+		Handler:     n.searchcountry,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "randomcountry",
 		Description: "Get info about a random country",
 		Usage:       "[p]randomcountry <country>",
-		Handler:     t.randomcountry,
+		Handler:     n.randomcountry,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "headers",
 		Description: "Get URL response headers",
 		Usage:       "[p]headers <url>",
-		Handler:     t.headers,
+		Handler:     n.headers,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "interface",
 		Description: "See your public/local ip and MAC address",
 		Usage:       "[p]interface",
-		Handler:     t._interface,
+		Handler:     n._interface,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "revimage",
 		Description: "Reverse image search",
 		Usage:       "[p]revimage <image url>",
-		Handler:     t.revimage,
+		Handler:     n.revimage,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "paste",
 		Description: "Create a paste",
 		Usage:       "[p]pastebin <text>",
-		Handler:     t.pastebin,
+		Handler:     n.pastebin,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "pastefile",
 		Description: "Create a paste from a file",
 		Usage:       "[p]pastefile <filepath>",
-		Handler:     t.pastefile,
+		Handler:     n.pastefile,
 	})
 }
 
-func (t NetworkCommands) ping(ctx *dgc.Ctx) {
+func (NetworkCommands) ping(ctx *dgc.Ctx) {
 	emb := embed.NewEmbed()
 	time, err := api.Ping("lightning-bot.com")
 	if err != nil {
@@ -262,7 +262,7 @@ func (t NetworkCommands) ping(ctx *dgc.Ctx) {
 		Send(ctx)
 }
 
-func (t NetworkCommands) pingweb(ctx *dgc.Ctx) {
+func (NetworkCommands) pingweb(ctx *dgc.Ctx) {
 	host := utils.Arguments["<host>"]
 	time, err := api.Ping(host)
 	emb := embed.NewEmbed()
@@ -274,7 +274,7 @@ func (t NetworkCommands) pingweb(ctx *dgc.Ctx) {
 	emb.Send(ctx)
 }
 
-func (t NetworkCommands) googlesearch(ctx *dgc.Ctx) {
+func (NetworkCommands) googlesearch(ctx *dgc.Ctx) {
 	query := ctx.Arguments.Raw()
 	results, err := googlesearch.Search(context.TODO(), query)
 	if err != nil {
@@ -291,7 +291,7 @@ func (t NetworkCommands) googlesearch(ctx *dgc.Ctx) {
 	emb.Send(ctx)
 }
 
-func (t NetworkCommands) youtubesearch(ctx *dgc.Ctx) {
+func (NetworkCommands) youtubesearch(ctx *dgc.Ctx) {
 	query := ctx.Arguments.Raw()
 	results, err := googlesearch.Search(context.TODO(), query+" site:youtube.com")
 	if err != nil {
@@ -312,7 +312,7 @@ func (t NetworkCommands) youtubesearch(ctx *dgc.Ctx) {
 	emb.Send(ctx)
 }
 
-func (t NetworkCommands) urbandictionary(ctx *dgc.Ctx) {
+func (NetworkCommands) urbandictionary(ctx *dgc.Ctx) {
 	word := ctx.Arguments.Raw()
 	results, err := http.GetJson(fmt.Sprintf("https://api.urbandictionary.com/v0/define?term=%s", url.QueryEscape(word)))
 	if err != nil {
@@ -335,7 +335,7 @@ func (t NetworkCommands) urbandictionary(ctx *dgc.Ctx) {
 		Send(ctx)
 }
 
-func (t NetworkCommands) wikipedia(ctx *dgc.Ctx) {
+func (NetworkCommands) wikipedia(ctx *dgc.Ctx) {
 	query := ctx.Arguments.Raw()
 	article, err := api.WikipediaSearch(query)
 	if err != nil {
@@ -348,7 +348,7 @@ func (t NetworkCommands) wikipedia(ctx *dgc.Ctx) {
 		Send(ctx)
 }
 
-func (t NetworkCommands) weather(ctx *dgc.Ctx) {
+func (NetworkCommands) weather(ctx *dgc.Ctx) {
 	city := ctx.Arguments.Raw()
 	weather, err := http.GetJson(fmt.Sprintf("http://api.openweathermap.org/data/2.5/weather?appid=533d00f29739edba54c5fb2b1a8262b3&q=%s", city))
 	if err != nil {
@@ -375,7 +375,7 @@ func (t NetworkCommands) weather(ctx *dgc.Ctx) {
 		Send(ctx)
 }
 
-func (t NetworkCommands) hypesquad(ctx *dgc.Ctx) {
+func (NetworkCommands) hypesquad(ctx *dgc.Ctx) {
 	house := utils.Arguments["<bravery/brilliance/balance>"]
 	house = strings.Replace(house, "bravery", "1", -1)
 	house = strings.Replace(house, "brilliance", "2", -1)
@@ -387,7 +387,7 @@ func (t NetworkCommands) hypesquad(ctx *dgc.Ctx) {
 	api.SetHypesquad(house)
 }
 
-func (t NetworkCommands) tinyurl(ctx *dgc.Ctx) {
+func (NetworkCommands) tinyurl(ctx *dgc.Ctx) {
 	url := ctx.Arguments.Raw()
 	tinyurl, err := http.Get(fmt.Sprintf("http://tinyurl.com/api-create.php?url=%s", url))
 	if err != nil {
@@ -400,7 +400,7 @@ func (t NetworkCommands) tinyurl(ctx *dgc.Ctx) {
 		Send(ctx)
 }
 
-func (t NetworkCommands) ipinfo(ctx *dgc.Ctx) {
+func (NetworkCommands) ipinfo(ctx *dgc.Ctx) {
 	ip := utils.Arguments["<ip>"]
 	ipinfo, err := http.GetJson(fmt.Sprintf("http://ipinfo.io/%s/json", ip))
 	if err != nil {
@@ -421,7 +421,7 @@ func (t NetworkCommands) ipinfo(ctx *dgc.Ctx) {
 		Send(ctx)
 }
 
-func (t NetworkCommands) youtubedl(ctx *dgc.Ctx) {
+func (NetworkCommands) youtubedl(ctx *dgc.Ctx) {
 	results, err := googlesearch.Search(context.TODO(), fmt.Sprintf("%s site:youtube.com", ctx.Arguments.Raw()))
 	if err != nil {
 		fmt.Println("An error has occurred.")
@@ -461,7 +461,7 @@ func (t NetworkCommands) youtubedl(ctx *dgc.Ctx) {
 	}
 }
 
-func (t NetworkCommands) lvbypass(ctx *dgc.Ctx) {
+func (NetworkCommands) lvbypass(ctx *dgc.Ctx) {
 	result, err := http.PostJson("https://api.bypass.vip/", fmt.Sprintf("{\"url\": \"%s\"}", ctx.Arguments.Raw()), map[string]string{"Content-Type": "application/json"})
 	if err != nil {
 		ctx.RespondText("An error has occurred.")
@@ -470,7 +470,7 @@ func (t NetworkCommands) lvbypass(ctx *dgc.Ctx) {
 	ctx.RespondText(fmt.Sprintf("Bypassed Link: %s", result.Get("destination").MustString()))
 }
 
-func (t NetworkCommands) portscan(ctx *dgc.Ctx) {
+func (NetworkCommands) portscan(ctx *dgc.Ctx) {
 	host := utils.Arguments["<host>"]
 	ports := map[string]int{
 		"FTP":            21,
@@ -499,7 +499,7 @@ func (t NetworkCommands) portscan(ctx *dgc.Ctx) {
 	emb.Send(ctx)
 }
 
-func (t NetworkCommands) theme(ctx *dgc.Ctx) {
+func (NetworkCommands) theme(ctx *dgc.Ctx) {
 	theme := strings.ToLower(utils.Arguments["<light/dark>"])
 	if theme != "light" && theme != "dark" {
 		error_handling.OnError(ctx, error_handling.InvalidArgument, "<light/dark> must be either \"light\" or \"dark\"")
@@ -513,7 +513,7 @@ func (t NetworkCommands) theme(ctx *dgc.Ctx) {
 	http.Patch("https://discord.com/api/v10/users/@me/settings", string(jsonData), http.GetDiscordHeaders(cfg.Account.Discord.Token))
 }
 
-func (t NetworkCommands) hastebin(ctx *dgc.Ctx) {
+func (NetworkCommands) hastebin(ctx *dgc.Ctx) {
 	text := ctx.Arguments.Raw()
 	result, err := http.PostJson("https://www.toptal.com/developers/hastebin/documents", text)
 	if err != nil {
@@ -523,7 +523,7 @@ func (t NetworkCommands) hastebin(ctx *dgc.Ctx) {
 	ctx.RespondText(fmt.Sprintf("https://hastebin.com/%s", result.Get("key").MustString()))
 }
 
-func (t NetworkCommands) checktoken(ctx *dgc.Ctx) {
+func (NetworkCommands) checktoken(ctx *dgc.Ctx) {
 	token := utils.Arguments["<token>"]
 	response, statusCode, err := http.GetJsonStatusCode("https://discord.com/api/v10/users/@me", http.GetDiscordHeaders(token))
 	if err != nil {
@@ -555,14 +555,14 @@ func (t NetworkCommands) checktoken(ctx *dgc.Ctx) {
 		Send(ctx)
 }
 
-func (t NetworkCommands) delwebhook(ctx *dgc.Ctx) {
+func (NetworkCommands) delwebhook(ctx *dgc.Ctx) {
 	http.Delete(utils.Arguments["<webhook url>"])
 	embed.NewEmbed().
 		SetDescription("Successfully deleted webhook.").
 		Send(ctx)
 }
 
-func (t NetworkCommands) compact(ctx *dgc.Ctx) {
+func (NetworkCommands) compact(ctx *dgc.Ctx) {
 	toggle := strings.ToLower(utils.Arguments["<on/off>"])
 	if toggle != "on" && toggle != "off" {
 		error_handling.OnError(ctx, error_handling.InvalidArgument, "<on/off> must be either \"on\" or \"off\"")
@@ -578,7 +578,7 @@ func (t NetworkCommands) compact(ctx *dgc.Ctx) {
 	http.Patch("https://discord.com/api/v10/users/@me/settings", jsonData, http.GetDiscordHeaders(cfg.Account.Discord.Token))
 }
 
-func (t NetworkCommands) devmode(ctx *dgc.Ctx) {
+func (NetworkCommands) devmode(ctx *dgc.Ctx) {
 	toggle := strings.ToLower(utils.Arguments["<on/off>"])
 	if toggle != "on" && toggle != "off" {
 		error_handling.OnError(ctx, error_handling.InvalidArgument, "<on/off> must be either \"on\" or \"off\"")
@@ -594,7 +594,7 @@ func (t NetworkCommands) devmode(ctx *dgc.Ctx) {
 	http.Patch("https://discord.com/api/v10/users/@me/settings", jsonData, http.GetDiscordHeaders(cfg.Account.Discord.Token))
 }
 
-func (t NetworkCommands) resolve(ctx *dgc.Ctx) {
+func (NetworkCommands) resolve(ctx *dgc.Ctx) {
 	domain := utils.Arguments["<domain>"]
 	response, err := http.GetJson(fmt.Sprintf("https://json.geoiplookup.io/%s", domain))
 	if err != nil {
@@ -611,7 +611,7 @@ func (t NetworkCommands) resolve(ctx *dgc.Ctx) {
 		Send(ctx)
 }
 
-func (t NetworkCommands) reversedns(ctx *dgc.Ctx) {
+func (NetworkCommands) reversedns(ctx *dgc.Ctx) {
 	ip := utils.Arguments["<ip>"]
 	response, err := http.GetJson(fmt.Sprintf("https://api.domaintools.com/v1/%s/host-domains/", ip))
 	if err != nil {
@@ -629,7 +629,7 @@ func (t NetworkCommands) reversedns(ctx *dgc.Ctx) {
 		Send(ctx)
 }
 
-func (t NetworkCommands) reversemac(ctx *dgc.Ctx) {
+func (NetworkCommands) reversemac(ctx *dgc.Ctx) {
 	mac := utils.Arguments["<mac>"]
 	response, err := http.Get(fmt.Sprintf("https://api.macvendors.com/%s", mac))
 	if err != nil {
@@ -646,35 +646,35 @@ func (t NetworkCommands) reversemac(ctx *dgc.Ctx) {
 		Send(ctx)
 }
 
-func (t NetworkCommands) amazon(ctx *dgc.Ctx) {
+func (NetworkCommands) amazon(ctx *dgc.Ctx) {
 	query := ctx.Arguments.Raw()
 	embed.NewEmbed().
 		AddField("Amazon Search", fmt.Sprintf("https://www.amazon.com/s?k=%s", url.QueryEscape(query))).
 		Send(ctx)
 }
 
-func (t NetworkCommands) steam(ctx *dgc.Ctx) {
+func (NetworkCommands) steam(ctx *dgc.Ctx) {
 	query := ctx.Arguments.Raw()
 	embed.NewEmbed().
 		AddField("Amazon Search", fmt.Sprintf("https://store.steampowered.com/search/?term=%s", url.QueryEscape(query))).
 		Send(ctx)
 }
 
-func (t NetworkCommands) github(ctx *dgc.Ctx) {
+func (NetworkCommands) github(ctx *dgc.Ctx) {
 	query := ctx.Arguments.Raw()
 	embed.NewEmbed().
 		AddField("Amazon Search", fmt.Sprintf("https://github.com/search?q=%s", url.QueryEscape(query))).
 		Send(ctx)
 }
 
-func (t NetworkCommands) stackoverflow(ctx *dgc.Ctx) {
+func (NetworkCommands) stackoverflow(ctx *dgc.Ctx) {
 	query := ctx.Arguments.Raw()
 	embed.NewEmbed().
 		AddField("Amazon Search", fmt.Sprintf("https://stackoverflow.com/search?q=%s", url.QueryEscape(query))).
 		Send(ctx)
 }
 
-func (t NetworkCommands) covid(ctx *dgc.Ctx) {
+func (NetworkCommands) covid(ctx *dgc.Ctx) {
 	country := ctx.Arguments.Raw()
 	covid, err := http.GetJson(fmt.Sprintf("https://coronavirus-19-api.herokuapp.com/countries/%s", country))
 	if err != nil {
@@ -697,7 +697,7 @@ func (t NetworkCommands) covid(ctx *dgc.Ctx) {
 		Send(ctx)
 }
 
-func (t NetworkCommands) discordstatus(ctx *dgc.Ctx) {
+func (NetworkCommands) discordstatus(ctx *dgc.Ctx) {
 	status, err := http.GetJson("https://srhpyqt94yxb.statuspage.io/api/v2/components.json")
 	if err != nil {
 		ctx.RespondText("An error has occurred.")
@@ -712,11 +712,11 @@ func (t NetworkCommands) discordstatus(ctx *dgc.Ctx) {
 	emb.Send(ctx)
 }
 
-func (t NetworkCommands) open(ctx *dgc.Ctx) {
+func (NetworkCommands) open(ctx *dgc.Ctx) {
 	utils.OpenURL(ctx.Arguments.Raw())
 }
 
-func (t NetworkCommands) searchcountry(ctx *dgc.Ctx) {
+func (NetworkCommands) searchcountry(ctx *dgc.Ctx) {
 	response, err := http.Get(fmt.Sprintf("https://restcountries.com/v3.1/name/%s?fullText=true", ctx.Arguments.Raw()))
 	countryList, err2 := json.SimpleUnmarshal(response)
 	if err != nil || err2 != nil {
@@ -756,7 +756,7 @@ func (t NetworkCommands) searchcountry(ctx *dgc.Ctx) {
 		Send(ctx)
 }
 
-func (t NetworkCommands) randomcountry(ctx *dgc.Ctx) {
+func (NetworkCommands) randomcountry(ctx *dgc.Ctx) {
 	response, err := http.Get("https://restcountries.com/v3.1/all")
 	countryList, err2 := json.SimpleUnmarshal(response)
 	if err != nil || err2 != nil {
@@ -790,7 +790,7 @@ func (t NetworkCommands) randomcountry(ctx *dgc.Ctx) {
 		Send(ctx)
 }
 
-func (t NetworkCommands) headers(ctx *dgc.Ctx) {
+func (NetworkCommands) headers(ctx *dgc.Ctx) {
 	url := utils.Arguments["<url>"]
 	headers, err := http.GetHeadersString(url)
 	if err != nil {
@@ -803,7 +803,7 @@ func (t NetworkCommands) headers(ctx *dgc.Ctx) {
 		Send(ctx)
 }
 
-func (t NetworkCommands) _interface(ctx *dgc.Ctx) {
+func (NetworkCommands) _interface(ctx *dgc.Ctx) {
 	embed.NewEmbed().
 		AddField("Public IP", api.GetPublicIP()).
 		AddField("Local IP", api.GetLocalIP()).
@@ -811,14 +811,14 @@ func (t NetworkCommands) _interface(ctx *dgc.Ctx) {
 		Send(ctx)
 }
 
-func (t NetworkCommands) revimage(ctx *dgc.Ctx) {
+func (NetworkCommands) revimage(ctx *dgc.Ctx) {
 	imageUrl := utils.Arguments["<image url>"]
 	embed.NewEmbed().
 		AddField("Reverse Image Search URL", fmt.Sprintf("https://www.google.com/searchbyimage?image_url=%s", imageUrl)).
 		Send(ctx)
 }
 
-func (t NetworkCommands) pastebin(ctx *dgc.Ctx) {
+func (NetworkCommands) pastebin(ctx *dgc.Ctx) {
 	paste, err := api.CreatePaste(ctx.Arguments.Raw())
 	if err != nil {
 		ctx.RespondText("An error has occurred.")
@@ -829,7 +829,7 @@ func (t NetworkCommands) pastebin(ctx *dgc.Ctx) {
 		Send(ctx)
 }
 
-func (t NetworkCommands) pastefile(ctx *dgc.Ctx) {
+func (NetworkCommands) pastefile(ctx *dgc.Ctx) {
 	filePath := utils.Arguments["<filepath>"]
 	if content, success := utils.GetFileContents(filePath); success {
 		paste, err := api.CreatePaste(content)

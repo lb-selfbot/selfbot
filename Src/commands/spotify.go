@@ -18,64 +18,64 @@ import (
 
 type SpotifyCommands struct{}
 
-func (t SpotifyCommands) RegisterCommands(router *dgc.Router) {
+func (s SpotifyCommands) RegisterCommands(router *dgc.Router) {
 	router.RegisterCmd(&dgc.Command{
 		Name:        "spause",
 		Description: "Pause Spotify Music",
 		Usage:       "[p]spause",
-		Handler:     t.spause,
+		Handler:     s.spause,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "sresume",
 		Description: "Resume Spotify Music",
 		Usage:       "[p]sresume",
-		Handler:     t.sresume,
+		Handler:     s.sresume,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "sprevious",
 		Description: "Play the previous song",
 		Usage:       "[p]sprevious",
-		Handler:     t.sprevious,
+		Handler:     s.sprevious,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "snext",
 		Description: "Play the next song",
 		Usage:       "[p]snext",
-		Handler:     t.snext,
+		Handler:     s.snext,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "splay",
 		Description: "Play a song on Spotify",
 		Usage:       "[p]splay <song name>",
-		Handler:     t.splay,
+		Handler:     s.splay,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "splaying",
 		Description: "Current playing song info",
 		Usage:       "[p]splaying",
-		Handler:     t.splaying,
+		Handler:     s.splaying,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "svolume",
 		Description: "Change Spotify volume",
 		Usage:       "[p]svolume <volume>",
-		Handler:     t.svolume,
+		Handler:     s.svolume,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "spresence",
 		Description: "Set a fake Spotify presence (use simageid command for image id)",
 		Usage:       "[p]spresence <on/off> [\"artist\"] [\"song\"] [\"album\"] [image id]",
-		Handler:     t.spresence,
+		Handler:     s.spresence,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "simageid",
 		Description: "Get an image id for the spresence command",
 		Usage:       "[p]simageid <song name>",
-		Handler:     t.simageid,
+		Handler:     s.simageid,
 	})
 }
 
-func (t SpotifyCommands) GetBearerToken() string {
+func (s SpotifyCommands) GetBearerToken() string {
 	cfg, err := config.GetConfig()
 	if err != nil {
 		return ""
@@ -106,7 +106,7 @@ func (t SpotifyCommands) GetBearerToken() string {
 	return ""
 }
 
-func (t SpotifyCommands) HandleRequest(ctx *dgc.Ctx, response string, err error, onSuccess string) {
+func (s SpotifyCommands) HandleRequest(ctx *dgc.Ctx, response string, err error, onSuccess string) {
 	if err != nil {
 		ctx.RespondText("An error has occurred.")
 		return
@@ -126,45 +126,45 @@ func (t SpotifyCommands) HandleRequest(ctx *dgc.Ctx, response string, err error,
 	ctx.RespondText(onSuccess)
 }
 
-func (t SpotifyCommands) spause(ctx *dgc.Ctx) {
-	if bearerToken := t.GetBearerToken(); bearerToken == "" {
+func (s SpotifyCommands) spause(ctx *dgc.Ctx) {
+	if bearerToken := s.GetBearerToken(); bearerToken == "" {
 		ctx.RespondText("Could not find a Spotify connection. Please connect your Spotify account to your Discord.")
 	} else {
 		response, err := http.Put("https://api.spotify.com/v1/me/player/pause", map[string]string{"Authorization": bearerToken})
-		t.HandleRequest(ctx, response, err, "Successfully paused music.")
+		s.HandleRequest(ctx, response, err, "Successfully paused music.")
 	}
 }
 
-func (t SpotifyCommands) sresume(ctx *dgc.Ctx) {
-	if bearerToken := t.GetBearerToken(); bearerToken == "" {
+func (s SpotifyCommands) sresume(ctx *dgc.Ctx) {
+	if bearerToken := s.GetBearerToken(); bearerToken == "" {
 		ctx.RespondText("Could not find a Spotify connection. Please connect your Spotify account to your Discord.")
 	} else {
 		response, err := http.Put("https://api.spotify.com/v1/me/player/play", map[string]string{"Authorization": bearerToken})
-		t.HandleRequest(ctx, response, err, "Successfully resumed music.")
+		s.HandleRequest(ctx, response, err, "Successfully resumed music.")
 	}
 }
 
-func (t SpotifyCommands) sprevious(ctx *dgc.Ctx) {
-	if bearerToken := t.GetBearerToken(); bearerToken == "" {
+func (s SpotifyCommands) sprevious(ctx *dgc.Ctx) {
+	if bearerToken := s.GetBearerToken(); bearerToken == "" {
 		ctx.RespondText("Could not find a Spotify connection. Please connect your Spotify account to your Discord.")
 	} else {
 		response, err := http.Post("https://api.spotify.com/v1/me/player/previous", "", map[string]string{"Authorization": bearerToken})
-		t.HandleRequest(ctx, response, err, "Successfully playing previous song.")
+		s.HandleRequest(ctx, response, err, "Successfully playing previous song.")
 	}
 }
 
-func (t SpotifyCommands) snext(ctx *dgc.Ctx) {
-	if bearerToken := t.GetBearerToken(); bearerToken == "" {
+func (s SpotifyCommands) snext(ctx *dgc.Ctx) {
+	if bearerToken := s.GetBearerToken(); bearerToken == "" {
 		ctx.RespondText("Could not find a Spotify connection. Please connect your Spotify account to your Discord.")
 	} else {
 		response, err := http.Post("https://api.spotify.com/v1/me/player/next", "", map[string]string{"Authorization": bearerToken})
-		t.HandleRequest(ctx, response, err, "Successfully playing next song.")
+		s.HandleRequest(ctx, response, err, "Successfully playing next song.")
 	}
 }
 
-func (t SpotifyCommands) splay(ctx *dgc.Ctx) {
+func (s SpotifyCommands) splay(ctx *dgc.Ctx) {
 	songName := ctx.Arguments.Raw()
-	if bearerToken := t.GetBearerToken(); bearerToken == "" {
+	if bearerToken := s.GetBearerToken(); bearerToken == "" {
 		ctx.RespondText("Could not find a Spotify connection. Please connect your Spotify account to your Discord.")
 	} else {
 		headers := map[string]string{"Authorization": bearerToken}
@@ -187,12 +187,12 @@ func (t SpotifyCommands) splay(ctx *dgc.Ctx) {
 		}
 		http.Post(fmt.Sprintf("https://api.spotify.com/v1/me/player/queue?uri=%s", url.QueryEscape(songUrl)), "", headers)
 		response, err := http.Post("https://api.spotify.com/v1/me/player/next", "", headers)
-		t.HandleRequest(ctx, response, err, fmt.Sprintf("Successfully playing %s - %s.", strings.Join(songArtists, ", "), songName))
+		s.HandleRequest(ctx, response, err, fmt.Sprintf("Successfully playing %s - %s.", strings.Join(songArtists, ", "), songName))
 	}
 }
 
-func (t SpotifyCommands) splaying(ctx *dgc.Ctx) {
-	if bearerToken := t.GetBearerToken(); bearerToken == "" {
+func (s SpotifyCommands) splaying(ctx *dgc.Ctx) {
+	if bearerToken := s.GetBearerToken(); bearerToken == "" {
 		ctx.RespondText("Could not find a Spotify connection. Please connect your Spotify account to your Discord.")
 	} else {
 		response, err := http.GetJson("https://api.spotify.com/v1/me/player/currently-playing", map[string]string{"Authorization": bearerToken})
@@ -217,8 +217,8 @@ func (t SpotifyCommands) splaying(ctx *dgc.Ctx) {
 	}
 }
 
-func (t SpotifyCommands) svolume(ctx *dgc.Ctx) {
-	if bearerToken := t.GetBearerToken(); bearerToken == "" {
+func (s SpotifyCommands) svolume(ctx *dgc.Ctx) {
+	if bearerToken := s.GetBearerToken(); bearerToken == "" {
 		ctx.RespondText("Could not find a Spotify connection. Please connect your Spotify account to your Discord.")
 	} else {
 		volumeStr := utils.Arguments["<volume>"]
@@ -228,11 +228,11 @@ func (t SpotifyCommands) svolume(ctx *dgc.Ctx) {
 			return
 		}
 		res, err := http.Put("https://api.spotify.com/v1/me/player/volume?volume_percent="+volumeStr, map[string]string{"Authorization": bearerToken})
-		t.HandleRequest(ctx, res, err, fmt.Sprintf("Successfully set volume to: %s.", volumeStr))
+		s.HandleRequest(ctx, res, err, fmt.Sprintf("Successfully set volume to: %s.", volumeStr))
 	}
 }
 
-func (t SpotifyCommands) spresence(ctx *dgc.Ctx) {
+func (s SpotifyCommands) spresence(ctx *dgc.Ctx) {
 	toggle := strings.ToLower(utils.Arguments["<on/off>"]) == "on"
 	if !toggle {
 		ctx.Session.UpdateStatusComplex(discordgo.UpdateStatusData{
@@ -286,8 +286,8 @@ func (t SpotifyCommands) spresence(ctx *dgc.Ctx) {
 	ctx.Session.SendWsData(data)
 }
 
-func (t SpotifyCommands) simageid(ctx *dgc.Ctx) {
-	if bearerToken := t.GetBearerToken(); bearerToken == "" {
+func (s SpotifyCommands) simageid(ctx *dgc.Ctx) {
+	if bearerToken := s.GetBearerToken(); bearerToken == "" {
 		ctx.RespondText("Could not find a Spotify connection. Please connect your Spotify account to your Discord.")
 	} else {
 		headers := map[string]string{"Authorization": bearerToken}

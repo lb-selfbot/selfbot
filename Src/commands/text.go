@@ -158,15 +158,15 @@ func (t TextCommands) RegisterCommands(router *dgc.Router) {
 	})
 }
 
-func (t TextCommands) empty(ctx *dgc.Ctx) {
+func (TextCommands) empty(ctx *dgc.Ctx) {
 	ctx.RespondText("_ _")
 }
 
-func (t TextCommands) reverse(ctx *dgc.Ctx) {
+func (TextCommands) reverse(ctx *dgc.Ctx) {
 	ctx.RespondText(utils.ReverseString(ctx.Arguments.Raw()))
 }
 
-func (t TextCommands) alphabet(ctx *dgc.Ctx) {
+func (TextCommands) alphabet(ctx *dgc.Ctx) {
 	message, _ := ctx.Session.ChannelMessageSend(ctx.Event.ChannelID, "a")
 	chars := []rune(utils.LowercaseAlphabet)
 	for i := 1; i < len(chars); i++ {
@@ -176,28 +176,28 @@ func (t TextCommands) alphabet(ctx *dgc.Ctx) {
 	}
 }
 
-func (t TextCommands) ascii(ctx *dgc.Ctx) {
+func (TextCommands) ascii(ctx *dgc.Ctx) {
 	ascii := figure.NewFigure(ctx.Arguments.Raw(), "", false).String()
 	ctx.RespondText("```" + ascii + "```")
 }
 
-func (t TextCommands) bold(ctx *dgc.Ctx) {
+func (TextCommands) bold(ctx *dgc.Ctx) {
 	ctx.RespondText("**" + ctx.Arguments.Raw() + "**")
 }
 
-func (t TextCommands) strike(ctx *dgc.Ctx) {
+func (TextCommands) strike(ctx *dgc.Ctx) {
 	ctx.RespondText("~~" + ctx.Arguments.Raw() + "~~")
 }
 
-func (t TextCommands) italic(ctx *dgc.Ctx) {
+func (TextCommands) italic(ctx *dgc.Ctx) {
 	ctx.RespondText("*" + ctx.Arguments.Raw() + "*")
 }
 
-func (t TextCommands) spoiler(ctx *dgc.Ctx) {
+func (TextCommands) spoiler(ctx *dgc.Ctx) {
 	ctx.RespondText("||" + ctx.Arguments.Raw() + "||")
 }
 
-func (t TextCommands) lspoiler(ctx *dgc.Ctx) {
+func (TextCommands) lspoiler(ctx *dgc.Ctx) {
 	finalString := ""
 	chars := []rune(ctx.Arguments.Raw())
 	for i := 0; i < len(chars); i++ {
@@ -207,7 +207,7 @@ func (t TextCommands) lspoiler(ctx *dgc.Ctx) {
 	ctx.RespondText(finalString)
 }
 
-func (t TextCommands) leet(ctx *dgc.Ctx) {
+func (TextCommands) leet(ctx *dgc.Ctx) {
 	text := ctx.Arguments.Raw()
 	leetChars := [][]string{
 		{"a", "4"},
@@ -233,7 +233,7 @@ func (t TextCommands) leet(ctx *dgc.Ctx) {
 	ctx.RespondText(text)
 }
 
-func (t TextCommands) devowel(ctx *dgc.Ctx) {
+func (TextCommands) devowel(ctx *dgc.Ctx) {
 	text := ctx.Arguments.Raw()
 	vowels := []string{"a", "A", "e", "E", "i", "I", "o", "O", "u", "U"}
 	for _, element := range vowels {
@@ -242,7 +242,7 @@ func (t TextCommands) devowel(ctx *dgc.Ctx) {
 	ctx.RespondText(text)
 }
 
-func (t TextCommands) edit(ctx *dgc.Ctx) {
+func (TextCommands) edit(ctx *dgc.Ctx) {
 	fullText := ctx.Arguments.Raw()
 	currentText := string(fullText[0])
 	message, err := ctx.Session.ChannelMessageSend(ctx.Event.ChannelID, currentText)
@@ -257,7 +257,7 @@ func (t TextCommands) edit(ctx *dgc.Ctx) {
 	}
 }
 
-func (t TextCommands) emojify(ctx *dgc.Ctx) {
+func (TextCommands) emojify(ctx *dgc.Ctx) {
 	text := strings.ToLower(ctx.Arguments.Raw())
 	emojiChars := [][]string{
 		{"a", "🇦"},
@@ -294,23 +294,23 @@ func (t TextCommands) emojify(ctx *dgc.Ctx) {
 	ctx.RespondText(text)
 }
 
-func (t TextCommands) shrug(ctx *dgc.Ctx) {
+func (TextCommands) shrug(ctx *dgc.Ctx) {
 	ctx.RespondText("¯\\_(ツ)_/¯")
 }
 
-func (t TextCommands) lenny(ctx *dgc.Ctx) {
+func (TextCommands) lenny(ctx *dgc.Ctx) {
 	ctx.RespondText("( ͡° ͜ʖ ͡°)")
 }
 
-func (t TextCommands) tableflip(ctx *dgc.Ctx) {
+func (TextCommands) tableflip(ctx *dgc.Ctx) {
 	ctx.RespondText("(╯°□°）╯︵ ┻━┻")
 }
 
-func (t TextCommands) unflip(ctx *dgc.Ctx) {
+func (TextCommands) unflip(ctx *dgc.Ctx) {
 	ctx.RespondText("┬─┬ ノ( ゜-゜ノ)")
 }
 
-func (t TextCommands) clap(ctx *dgc.Ctx) {
+func (TextCommands) clap(ctx *dgc.Ctx) {
 	text := ctx.Arguments.Raw()
 	clapChars := [][]string{
 		{" ", "👏"},
@@ -322,7 +322,7 @@ func (t TextCommands) clap(ctx *dgc.Ctx) {
 	ctx.RespondText(text)
 }
 
-func (t TextCommands) zalgo(ctx *dgc.Ctx) {
+func (TextCommands) zalgo(ctx *dgc.Ctx) {
 	text := strings.ToLower(ctx.Arguments.Raw())
 	zalgoChars := [][]string{
 		{"a", "a̷̧̡̡̨͉͍̫͖͊̆̂"},
@@ -359,27 +359,27 @@ func (t TextCommands) zalgo(ctx *dgc.Ctx) {
 	ctx.RespondText(text)
 }
 
-func (t TextCommands) unzalgo(ctx *dgc.Ctx) {
+func (TextCommands) unzalgo(ctx *dgc.Ctx) {
 	text := utils.FilterAlphaNumeric(ctx.Arguments.Raw())
 	ctx.RespondText(text)
 }
 
-func (t TextCommands) upper(ctx *dgc.Ctx) {
+func (TextCommands) upper(ctx *dgc.Ctx) {
 	text := strings.ToUpper(ctx.Arguments.Raw())
 	ctx.RespondText(text)
 }
 
-func (t TextCommands) lower(ctx *dgc.Ctx) {
+func (TextCommands) lower(ctx *dgc.Ctx) {
 	text := strings.ToLower(ctx.Arguments.Raw())
 	ctx.RespondText(text)
 }
 
-func (t TextCommands) fliptext(ctx *dgc.Ctx) {
+func (TextCommands) fliptext(ctx *dgc.Ctx) {
 	text := utils.FlipText(ctx.Arguments.Raw(), false)
 	ctx.RespondText(text)
 }
 
-func (t TextCommands) unfliptext(ctx *dgc.Ctx) {
+func (TextCommands) unfliptext(ctx *dgc.Ctx) {
 	text := utils.FlipText(ctx.Arguments.Raw(), true)
 	ctx.RespondText(text)
 }

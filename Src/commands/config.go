@@ -42,13 +42,13 @@ func (c ConfigCommands) RegisterCommands(router *dgc.Router) {
 	})
 }
 
-func (c ConfigCommands) commandprefix(ctx *dgc.Ctx) {
+func (ConfigCommands) commandprefix(ctx *dgc.Ctx) {
 	cfg, _ := config.GetConfig()
 	cfg.Selfbot.CommandPrefix = utils.Arguments["<prefix>"]
 	cfg.Save()
 }
 
-func (c ConfigCommands) commandmode(ctx *dgc.Ctx) {
+func (ConfigCommands) commandmode(ctx *dgc.Ctx) {
 	cfg, _ := config.GetConfig()
 	mode := utils.Capitalize(utils.Arguments["<codeblock/text/urlembed>"])
 	if mode != "Codeblock" && mode != "Text" && mode != "Urlembed" {
@@ -59,19 +59,19 @@ func (c ConfigCommands) commandmode(ctx *dgc.Ctx) {
 	cfg.Save()
 }
 
-func (c ConfigCommands) title(ctx *dgc.Ctx) {
+func (ConfigCommands) title(ctx *dgc.Ctx) {
 	cfg, _ := config.GetConfig()
 	cfg.Selfbot.Title = ctx.Arguments.Raw()
 	cfg.Save()
 }
 
-func (c ConfigCommands) footer(ctx *dgc.Ctx) {
+func (ConfigCommands) footer(ctx *dgc.Ctx) {
 	cfg, _ := config.GetConfig()
 	cfg.Selfbot.Footer = ctx.Arguments.Raw()
 	cfg.Save()
 }
 
-func (c ConfigCommands) delresponses(ctx *dgc.Ctx) {
+func (ConfigCommands) delresponses(ctx *dgc.Ctx) {
 	cfg, _ := config.GetConfig()
 	toggle := strings.ToLower(utils.Arguments["<on/off>"])
 	if toggle != "on" && toggle != "off" {
@@ -82,7 +82,7 @@ func (c ConfigCommands) delresponses(ctx *dgc.Ctx) {
 	cfg.Save()
 }
 
-func (c ConfigCommands) delresponsesdelay(ctx *dgc.Ctx) {
+func (ConfigCommands) delresponsesdelay(ctx *dgc.Ctx) {
 	cfg, _ := config.GetConfig()
 	delay, err := strconv.Atoi(utils.Arguments["<seconds>"])
 	if err != nil {
@@ -93,7 +93,7 @@ func (c ConfigCommands) delresponsesdelay(ctx *dgc.Ctx) {
 	cfg.Save()
 }
 
-func (c ConfigCommands) delcommands(ctx *dgc.Ctx) {
+func (ConfigCommands) delcommands(ctx *dgc.Ctx) {
 	cfg, _ := config.GetConfig()
 	toggle := strings.ToLower(utils.Arguments["<on/off>"])
 	if toggle != "on" && toggle != "off" {
@@ -104,7 +104,7 @@ func (c ConfigCommands) delcommands(ctx *dgc.Ctx) {
 	cfg.Save()
 }
 
-func (c ConfigCommands) notifications(ctx *dgc.Ctx) {
+func (ConfigCommands) notifications(ctx *dgc.Ctx) {
 	cfg, _ := config.GetConfig()
 	toggle := strings.ToLower(utils.Arguments["<on/off>"])
 	if toggle != "on" && toggle != "off" {
@@ -115,7 +115,7 @@ func (c ConfigCommands) notifications(ctx *dgc.Ctx) {
 	cfg.Save()
 }
 
-func (c ConfigCommands) notificationtype(ctx *dgc.Ctx) {
+func (ConfigCommands) notificationtype(ctx *dgc.Ctx) {
 	cfg, _ := config.GetConfig()
 	notificationType := utils.Capitalize(utils.Arguments["<default/custom>"])
 	if notificationType != "Default" && notificationType != "Custom" {
@@ -126,11 +126,11 @@ func (c ConfigCommands) notificationtype(ctx *dgc.Ctx) {
 	cfg.Save()
 }
 
-func (c ConfigCommands) examplenotification(ctx *dgc.Ctx) {
+func (ConfigCommands) examplenotification(ctx *dgc.Ctx) {
 	ipc.SendNotification("This is an example notification.")
 }
 
-func (c ConfigCommands) nitrosniper(ctx *dgc.Ctx) {
+func (ConfigCommands) nitrosniper(ctx *dgc.Ctx) {
 	cfg, _ := config.GetConfig()
 	toggle := strings.ToLower(utils.Arguments["<on/off>"])
 	if toggle != "on" && toggle != "off" {
@@ -141,7 +141,7 @@ func (c ConfigCommands) nitrosniper(ctx *dgc.Ctx) {
 	cfg.Save()
 }
 
-func (c ConfigCommands) giveawaysniper(ctx *dgc.Ctx) {
+func (ConfigCommands) giveawaysniper(ctx *dgc.Ctx) {
 	cfg, _ := config.GetConfig()
 	toggle := strings.ToLower(utils.Arguments["<on/off>"])
 	if toggle != "on" && toggle != "off" {
@@ -152,7 +152,7 @@ func (c ConfigCommands) giveawaysniper(ctx *dgc.Ctx) {
 	cfg.Save()
 }
 
-func (c ConfigCommands) gsnipersleep(ctx *dgc.Ctx) {
+func (ConfigCommands) gsnipersleep(ctx *dgc.Ctx) {
 	cfg, _ := config.GetConfig()
 	delay, err := strconv.Atoi(utils.Arguments["<seconds>"])
 	if err != nil {
@@ -163,7 +163,7 @@ func (c ConfigCommands) gsnipersleep(ctx *dgc.Ctx) {
 	cfg.Save()
 }
 
-func (c ConfigCommands) setupwebhooks(ctx *dgc.Ctx) {
+func (ConfigCommands) setupwebhooks(ctx *dgc.Ctx) {
 	serverID := ctx.Event.GuildID
 	if utils.Arguments["[server id]"] != "" {
 		serverID = utils.Arguments["[server id]"]
@@ -205,7 +205,7 @@ func (c ConfigCommands) setupwebhooks(ctx *dgc.Ctx) {
 	cfg.Save()
 }
 
-func (c ConfigCommands) wall(ctx *dgc.Ctx) {
+func (ConfigCommands) wall(ctx *dgc.Ctx) {
 	cfg, _ := config.GetConfig()
 	cfg.Webhooks.NitroSniper = utils.Arguments["<webhook url>"]
 	cfg.Webhooks.GiveawaySniper = utils.Arguments["<webhook url>"]
