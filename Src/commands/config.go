@@ -40,6 +40,120 @@ func (c ConfigCommands) RegisterCommands(router *dgc.Router) {
 		Usage:       "[p]footer <footer>",
 		Handler:     c.footer,
 	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "delresponses",
+		Description: "Set if the bot should delete responses to commands",
+		Usage:       "[p]delresponses <on/off>",
+		Handler:     c.delresponses,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "delresponsesdelay",
+		Description: "Set the delay before deleting responses",
+		Usage:       "[p]delresponsesdelay <seconds>",
+		Handler:     c.delresponsesdelay,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "delcommands",
+		Description: "Set if the bot should delete commands",
+		Usage:       "[p]delcommands <on/off>",
+		Handler:     c.delcommands,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "notifications",
+		Description: "Turn toast notifications on or off",
+		Usage:       "[p]notifications <on/off>",
+		Handler:     c.notifications,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "notificationtype",
+		Description: "Change the notification type",
+		Usage:       "[p]notificationtype <default/custom>",
+		Handler:     c.notificationtype,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "examplenotification",
+		Description: "Show an example notification",
+		Usage:       "[p]examplenotification",
+		Handler:     c.examplenotification,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "nitrosniper",
+		Description: "Turn the nitro sniper on or off",
+		Usage:       "[p]nitrosniper <on/off>",
+		Handler:     c.nitrosniper,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "giveawaysniper",
+		Description: "Turn the giveaway sniper on or off",
+		Usage:       "[p]giveawaysniper <on/off>",
+		Handler:     c.giveawaysniper,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "gsnipersleep",
+		Description: "Set the delay before the bot enters a giveaway",
+		Usage:       "[p]gsnipersleep <on/off>",
+		Handler:     c.gsnipersleep,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "setupwebhooks",
+		Description: "Automatically set up all webhooks",
+		Usage:       "[p]setupwebhooks [server id]",
+		Handler:     c.setupwebhooks,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "wall",
+		Description: "Set all webhooks at once",
+		Usage:       "[p]wall <webhook url>",
+		Handler:     c.wall,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "wnitro",
+		Description: "Set the nitro sniper webhook",
+		Usage:       "[p]wnitro <webhook url>",
+		Handler:     c.wnitro,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "wgiveaway",
+		Description: "Set the giveaway sniper webhook",
+		Usage:       "[p]wgiveaway <webhook url>",
+		Handler:     c.wgiveaway,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "wprivnote",
+		Description: "Set the privnote sniper webhook",
+		Usage:       "[p]wprivnote <webhook url>",
+		Handler:     c.wprivnote,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "wselfbotdetection",
+		Description: "Set the selfbot detection webhook",
+		Usage:       "[p]wselfbotdetection <webhook url>",
+		Handler:     c.wselfbotdetection,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "wstaffdetection",
+		Description: "Set the staff detection webhook",
+		Usage:       "[p]wstaffdetection <webhook url>",
+		Handler:     c.wstaffdetection,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "wnotifiers",
+		Description: "Set the notifiers webhook",
+		Usage:       "[p]wnotifiers <webhook url>",
+		Handler:     c.wnotifiers,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "wpingdetection",
+		Description: "Set the ping detection webhook",
+		Usage:       "[p]wpingdetection <webhook url>",
+		Handler:     c.wpingdetection,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "wmisc",
+		Description: "Set the misc webhook",
+		Usage:       "[p]wmisc <webhook url>",
+		Handler:     c.wmisc,
+	})
 }
 
 func (ConfigCommands) commandprefix(ctx *dgc.Ctx) {
@@ -214,6 +328,54 @@ func (ConfigCommands) wall(ctx *dgc.Ctx) {
 	cfg.Webhooks.StaffDetection = utils.Arguments["<webhook url>"]
 	cfg.Webhooks.Notifiers = utils.Arguments["<webhook url>"]
 	cfg.Webhooks.PingDetection = utils.Arguments["<webhook url>"]
+	cfg.Webhooks.Misc = utils.Arguments["<webhook url>"]
+	cfg.Save()
+}
+
+func (ConfigCommands) wnitro(ctx *dgc.Ctx) {
+	cfg, _ := config.GetConfig()
+	cfg.Webhooks.NitroSniper = utils.Arguments["<webhook url>"]
+	cfg.Save()
+}
+
+func (ConfigCommands) wgiveaway(ctx *dgc.Ctx) {
+	cfg, _ := config.GetConfig()
+	cfg.Webhooks.GiveawaySniper = utils.Arguments["<webhook url>"]
+	cfg.Save()
+}
+
+func (ConfigCommands) wprivnote(ctx *dgc.Ctx) {
+	cfg, _ := config.GetConfig()
+	cfg.Webhooks.PrivnoteSniper = utils.Arguments["<webhook url>"]
+	cfg.Save()
+}
+
+func (ConfigCommands) wselfbotdetection(ctx *dgc.Ctx) {
+	cfg, _ := config.GetConfig()
+	cfg.Webhooks.SelfbotDetection = utils.Arguments["<webhook url>"]
+	cfg.Save()
+}
+
+func (ConfigCommands) wstaffdetection(ctx *dgc.Ctx) {
+	cfg, _ := config.GetConfig()
+	cfg.Webhooks.StaffDetection = utils.Arguments["<webhook url>"]
+	cfg.Save()
+}
+
+func (ConfigCommands) wnotifiers(ctx *dgc.Ctx) {
+	cfg, _ := config.GetConfig()
+	cfg.Webhooks.Notifiers = utils.Arguments["<webhook url>"]
+	cfg.Save()
+}
+
+func (ConfigCommands) wpingdetection(ctx *dgc.Ctx) {
+	cfg, _ := config.GetConfig()
+	cfg.Webhooks.PingDetection = utils.Arguments["<webhook url>"]
+	cfg.Save()
+}
+
+func (ConfigCommands) wmisc(ctx *dgc.Ctx) {
+	cfg, _ := config.GetConfig()
 	cfg.Webhooks.Misc = utils.Arguments["<webhook url>"]
 	cfg.Save()
 }
