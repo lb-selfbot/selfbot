@@ -33,6 +33,7 @@ require (
 	github.com/gocolly/colly/v2 v2.0.1 // indirect
 	github.com/golang/protobuf v1.3.1 // indirect
 	github.com/google/uuid v1.3.0 // indirect
+	github.com/hugolgst/rich-go v0.0.0-20210925091458-d59fb695d9c0 // indirect
 	github.com/jpillora/s3 v1.1.4 // indirect
 	github.com/kennygrant/sanitize v1.2.4 // indirect
 	github.com/kkdai/youtube/v2 v2.7.15 // indirect
@@ -49,6 +50,7 @@ require (
 	golang.org/x/time v0.0.0-20201208040808-7e3f01d25324 // indirect
 	golang.org/x/tools v0.1.11-0.20220509190205-b87ceec0dd4d // indirect
 	google.golang.org/appengine v1.6.1 // indirect
+	gopkg.in/natefinch/npipe.v2 v2.0.0-20160621034901-c1b8fa8bdcce // indirect
 	mvdan.cc/garble v0.7.0 // indirect
 )
 

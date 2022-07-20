@@ -12,10 +12,11 @@ type Commands struct {
 	ImageCommands     ImageCommands
 	NetworkCommands   NetworkCommands
 	SpotifyCommands   SpotifyCommands
-	RedditCommands    RedditCommands
 	GameCommands      GameCommands
-	NSFWCommands      NSFWCommands
 	ConfigCommands    ConfigCommands
+	RPCCommands       RPCCommands
+	NSFWCommands      NSFWCommands
+	RedditCommands    RedditCommands
 }
 
 func (c Commands) RegisterCommands(router *dgc.Router) {
@@ -28,8 +29,9 @@ func (c Commands) RegisterCommands(router *dgc.Router) {
 	c.ImageCommands.RegisterCommands(router)
 	c.NetworkCommands.RegisterCommands(router)
 	c.SpotifyCommands.RegisterCommands(router)
-	c.RedditCommands.RegisterCommands(router)
 	c.GameCommands.RegisterCommands(router)
-	c.NSFWCommands.RegisterCommands(router)
 	c.ConfigCommands.RegisterCommands(router)
+	c.RPCCommands.RegisterCommands(router)
+	c.NSFWCommands.RegisterCommands(router)
+	c.RedditCommands.RegisterCommands(router)
 }

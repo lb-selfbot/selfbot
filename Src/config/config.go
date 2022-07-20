@@ -8,6 +8,23 @@ import (
 	"github.com/LightningDev1/LB-Selfbot/utils"
 )
 
+type RPCData struct {
+	Enabled    bool   `json:"Enabled"`
+	ClientID   string `json:"ClientID"`
+	State      string `json:"State"`
+	Details    string `json:"Details"`
+	Time       bool   `json:"Time"`
+	LargeImage string `json:"LargeImage"`
+	LargeText  string `json:"LargeText"`
+	SmallImage string `json:"SmallImage"`
+	SmallText  string `json:"SmallText"`
+	Invitable  bool   `json:"Invitable"`
+	Buttons    []struct {
+		Label string `json:"Label"`
+		URL   string `json:"URL"`
+	} `json:"Buttons"`
+}
+
 type Config struct {
 	Account struct {
 		LightningBot struct {
@@ -57,22 +74,8 @@ type Config struct {
 		MessageDeleteDetection   bool `json:"MessageDeleteDetection"`
 		BanNotifier              bool `json:"BanNotifier"`
 	} `json:"Events"`
-	RPC struct {
-		Enabled    bool   `json:"Enabled"`
-		ClientID   string `json:"ClientID"`
-		State      string `json:"State"`
-		Details    string `json:"Details"`
-		Time       bool   `json:"Time"`
-		LargeImage string `json:"LargeImage"`
-		LargeText  string `json:"LargeText"`
-		SmallImage string `json:"SmallImage"`
-		SmallText  string `json:"SmallText"`
-		Buttons    []struct {
-			Label string `json:"Label"`
-			URL   string `json:"URL"`
-		} `json:"Buttons"`
-	} `json:"RPC"`
-	UI struct {
+	RPC RPCData `json:"RPC"`
+	UI  struct {
 		Theme            string `json:"Theme"`
 		HideToSystemTray bool   `json:"HideToSystemTray"`
 	} `json:"UI"`
