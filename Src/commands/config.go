@@ -154,6 +154,72 @@ func (c ConfigCommands) RegisterCommands(router *dgc.Router) {
 		Usage:       "[p]wmisc <webhook url>",
 		Handler:     c.wmisc,
 	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "staffdetection",
+		Description: "Turn staff detection on or off",
+		Usage:       "[p]staffdetection <on/off>",
+		Handler:     c.staffdetection,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "pingdetection",
+		Description: "Turn ping detection on or off",
+		Usage:       "[p]pingdetection <on/off>",
+		Handler:     c.pingdetection,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "ticketnotifier",
+		Description: "Turn ticket notifier on or off",
+		Usage:       "[p]ticketnotifier <on/off>",
+		Handler:     c.ticketnotifier,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "selfbotdetection",
+		Description: "Turn selfbot detection on or off",
+		Usage:       "[p]selfbotdetection <on/off>",
+		Handler:     c.selfbotdetection,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "dmtypingdetection",
+		Description: "Turn DM typing detection on or off",
+		Usage:       "[p]dmtypingdetection <on/off>",
+		Handler:     c.dmtypingdetection,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "dmdetection",
+		Description: "Turn DM message detection on or off",
+		Usage:       "[p]dmdetection <on/off>",
+		Handler:     c.dmdetection,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "dmeditdetection",
+		Description: "Turn DM edit detection on or off",
+		Usage:       "[p]dmeditdetection <on/off>",
+		Handler:     c.dmeditdetection,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "dmdeletedetection",
+		Description: "Turn DM delete detection on or off",
+		Usage:       "[p]dmdeletedetection <on/off>",
+		Handler:     c.dmdeletedetection,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "messagedeletedetection",
+		Description: "Turn message delete detection on or off",
+		Usage:       "[p]messagedeletedetection <on/off>",
+		Handler:     c.messagedeletedetection,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "uitheme",
+		Description: "Change the UI theme",
+		Usage:       "[p]uitheme <light/dark>",
+		Handler:     c.uitheme,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "hidetosystray",
+		Description: "Turn hide to system tray on or off",
+		Usage:       "[p]hidetosystray <on/off>",
+		Handler:     c.hidetosystray,
+	})
 }
 
 func (ConfigCommands) commandprefix(ctx *dgc.Ctx) {
@@ -377,5 +443,126 @@ func (ConfigCommands) wpingdetection(ctx *dgc.Ctx) {
 func (ConfigCommands) wmisc(ctx *dgc.Ctx) {
 	cfg, _ := config.GetConfig()
 	cfg.Webhooks.Misc = utils.Arguments["<webhook url>"]
+	cfg.Save()
+}
+
+func (ConfigCommands) staffdetection(ctx *dgc.Ctx) {
+	toggle := strings.ToLower(utils.Arguments["<on/off>"])
+	if toggle != "on" && toggle != "off" {
+		ctx.RespondText("Invalid value. Use `on` or `off`.")
+		return
+	}
+	cfg, _ := config.GetConfig()
+	cfg.Events.DiscordStaffDetection = toggle == "on"
+	cfg.Save()
+}
+
+func (ConfigCommands) pingdetection(ctx *dgc.Ctx) {
+	toggle := strings.ToLower(utils.Arguments["<on/off>"])
+	if toggle != "on" && toggle != "off" {
+		ctx.RespondText("Invalid value. Use `on` or `off`.")
+		return
+	}
+	cfg, _ := config.GetConfig()
+	cfg.Events.GhostPingDetection = toggle == "on"
+	cfg.Save()
+}
+
+func (ConfigCommands) ticketnotifier(ctx *dgc.Ctx) {
+	toggle := strings.ToLower(utils.Arguments["<on/off>"])
+	if toggle != "on" && toggle != "off" {
+		ctx.RespondText("Invalid value. Use `on` or `off`.")
+		return
+	}
+	cfg, _ := config.GetConfig()
+	cfg.Events.TicketDetection = toggle == "on"
+	cfg.Save()
+}
+
+func (ConfigCommands) selfbotdetection(ctx *dgc.Ctx) {
+	toggle := strings.ToLower(utils.Arguments["<on/off>"])
+	if toggle != "on" && toggle != "off" {
+		ctx.RespondText("Invalid value. Use `on` or `off`.")
+		return
+	}
+	cfg, _ := config.GetConfig()
+	cfg.Events.SelfbotDetection = toggle == "on"
+	cfg.Save()
+}
+
+func (ConfigCommands) dmtypingdetection(ctx *dgc.Ctx) {
+	toggle := strings.ToLower(utils.Arguments["<on/off>"])
+	if toggle != "on" && toggle != "off" {
+		ctx.RespondText("Invalid value. Use `on` or `off`.")
+		return
+	}
+	cfg, _ := config.GetConfig()
+	cfg.Events.DMTypingDetection = toggle == "on"
+	cfg.Save()
+}
+
+func (ConfigCommands) dmdetection(ctx *dgc.Ctx) {
+	toggle := strings.ToLower(utils.Arguments["<on/off>"])
+	if toggle != "on" && toggle != "off" {
+		ctx.RespondText("Invalid value. Use `on` or `off`.")
+		return
+	}
+	cfg, _ := config.GetConfig()
+	cfg.Events.DMMessageDetection = toggle == "on"
+	cfg.Save()
+}
+
+func (ConfigCommands) dmdeletedetection(ctx *dgc.Ctx) {
+	toggle := strings.ToLower(utils.Arguments["<on/off>"])
+	if toggle != "on" && toggle != "off" {
+		ctx.RespondText("Invalid value. Use `on` or `off`.")
+		return
+	}
+	cfg, _ := config.GetConfig()
+	cfg.Events.DMMessageDeleteDetection = toggle == "on"
+	cfg.Save()
+}
+
+func (ConfigCommands) dmeditdetection(ctx *dgc.Ctx) {
+	toggle := strings.ToLower(utils.Arguments["<on/off>"])
+	if toggle != "on" && toggle != "off" {
+		ctx.RespondText("Invalid value. Use `on` or `off`.")
+		return
+	}
+	cfg, _ := config.GetConfig()
+	cfg.Events.DMMessageEditDetection = toggle == "on"
+	cfg.Save()
+}
+
+func (ConfigCommands) messagedeletedetection(ctx *dgc.Ctx) {
+	toggle := strings.ToLower(utils.Arguments["<on/off>"])
+	if toggle != "on" && toggle != "off" {
+		ctx.RespondText("Invalid value. Use `on` or `off`.")
+		return
+	}
+	cfg, _ := config.GetConfig()
+	cfg.Events.MessageDeleteDetection = toggle == "on"
+	cfg.Save()
+}
+
+func (ConfigCommands) uitheme(ctx *dgc.Ctx) {
+	theme := strings.ToLower(utils.Arguments["<light/dark>"])
+	if theme != "light" && theme != "dark" {
+		ctx.RespondText("Invalid value. Use `light` or `dark`.")
+		return
+	}
+	cfg, _ := config.GetConfig()
+	cfg.UI.Theme = utils.Capitalize(theme)
+	cfg.Save()
+}
+
+func (ConfigCommands) hidetosystray(ctx *dgc.Ctx) {
+	toggle := strings.ToLower(utils.Arguments["<on/off>"])
+	if toggle != "on" && toggle != "off" {
+		ctx.RespondText("Invalid value. Use `on` or `off`.")
+		return
+	}
+	cfg, _ := config.GetConfig()
+	cfg.UI.HideToSystemTray = toggle == "on"
 	cfg.Save()
 }
