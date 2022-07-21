@@ -6,6 +6,8 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/electricbubble/go-toast"
+
 	"github.com/LightningDev1/LB-Selfbot/config"
 	"github.com/LightningDev1/LB-Selfbot/ipc"
 	"github.com/LightningDev1/LB-Selfbot/utils"
@@ -307,6 +309,12 @@ func (ConfigCommands) notificationtype(ctx *dgc.Ctx) {
 }
 
 func (ConfigCommands) examplenotification(ctx *dgc.Ctx) {
+	_ = toast.Push("test message",
+		toast.WithTitle("app title"),
+		toast.WithMessage("test message 2"),
+		toast.WithAudio(toast.LoopingAlarm4),
+		toast.WithProtocolAction("Open Maps", "bingmaps:?q=sushi"),
+	)
 	ipc.SendNotification("This is an example notification.")
 }
 

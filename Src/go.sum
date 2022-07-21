@@ -46,6 +46,8 @@ github.com/dop251/goja v0.0.0-20220516123900-4418d4575a41 h1:yRPjAkkuR/E/tsVG7Qm
 github.com/dop251/goja v0.0.0-20220516123900-4418d4575a41/go.mod h1:TQJQ+ZNyFVvUtUEtCZxBhfWiH7RJqR3EivNmvD6Waik=
 github.com/dop251/goja_nodejs v0.0.0-20210225215109-d91c329300e7/go.mod h1:hn7BA7c8pLvoGndExHudxTDKZ84Pyvv+90pbBjbTz0Y=
 github.com/dop251/goja_nodejs v0.0.0-20211022123610-8dd9abb0616d/go.mod h1:DngW8aVqWbuLRMHItjPUyqdj+HWPvnQe8V8y1nDpIbM=
+github.com/electricbubble/go-toast v0.3.0 h1:e/PtFkpYNdLANI/utTXzoYQuMYG/N8oHT0Rwal4z/sI=
+github.com/electricbubble/go-toast v0.3.0/go.mod h1:6k4ufXmV/AS32EugdLeIXa+2jv6oYbWzv2+UZhB49FI=
 github.com/go-ole/go-ole v1.2.4/go.mod h1:XCwSNxSkXRo4vlyPy93sltvi/qJq0jqQhjqQNIwKuxM=
 github.com/go-ole/go-ole v1.2.5/go.mod h1:pprOEPIfldk/42T2oK7lQ4v4JSDwmV0As9GaiUsvbm0=
 github.com/go-ole/go-ole v1.2.6 h1:/Fpf6oFPoeFik9ty7siob0G6Ke8QvQEuVcuChpwXzpY=

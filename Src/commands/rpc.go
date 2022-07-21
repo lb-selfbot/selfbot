@@ -7,6 +7,7 @@ import (
 	"github.com/hugolgst/rich-go/client"
 
 	"github.com/LightningDev1/LB-Selfbot/config"
+	"github.com/LightningDev1/LB-Selfbot/constants"
 	"github.com/LightningDev1/LB-Selfbot/utils"
 	"github.com/LightningDev1/dgc"
 )
@@ -110,12 +111,12 @@ func (r RPCCommands) RegisterCommands(router *dgc.Router) {
 			if config.RPC.Enabled {
 				client.Login(config.RPC.ClientID)
 				client.SetActivity(client.Activity{
-					State:      config.RPC.State,
-					Details:    config.RPC.Details,
+					State:      strings.ReplaceAll(config.RPC.State, "$VERSION", constants.VersionString),
+					Details:    strings.ReplaceAll(config.RPC.Details, "$VERSION", constants.VersionString),
 					LargeImage: config.RPC.LargeImage,
-					LargeText:  config.RPC.LargeText,
+					LargeText:  strings.ReplaceAll(config.RPC.LargeText, "$VERSION", constants.VersionString),
 					SmallImage: config.RPC.SmallImage,
-					SmallText:  config.RPC.SmallText,
+					SmallText:  strings.ReplaceAll(config.RPC.SmallText, "$VERSION", constants.VersionString),
 					Buttons:    r.getButtons(config.RPC),
 					Timestamps: r.getTimestamps(config.RPC.Time, startTime),
 					Party:      r.getParty(config.RPC),
@@ -133,7 +134,7 @@ func (RPCCommands) getButtons(rpcData config.RPCData) []*client.Button {
 	var buttonsToReturn []*client.Button
 	for _, button := range rpcData.Buttons {
 		buttonsToReturn = append(buttonsToReturn, &client.Button{
-			Label: button.Label,
+			Label: strings.ReplaceAll(button.Label, "$VERSION", constants.VersionString),
 			Url:   button.URL,
 		})
 	}
