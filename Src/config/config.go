@@ -8,21 +8,23 @@ import (
 	"github.com/LightningDev1/LB-Selfbot/utils"
 )
 
+type RPCButton struct {
+	Label string `json:"Label"`
+	URL   string `json:"URL"`
+}
+
 type RPCData struct {
-	Enabled    bool   `json:"Enabled"`
-	ClientID   string `json:"ClientID"`
-	State      string `json:"State"`
-	Details    string `json:"Details"`
-	Time       bool   `json:"Time"`
-	LargeImage string `json:"LargeImage"`
-	LargeText  string `json:"LargeText"`
-	SmallImage string `json:"SmallImage"`
-	SmallText  string `json:"SmallText"`
-	Invitable  bool   `json:"Invitable"`
-	Buttons    []struct {
-		Label string `json:"Label"`
-		URL   string `json:"URL"`
-	} `json:"Buttons"`
+	Enabled    bool        `json:"Enabled"`
+	ClientID   string      `json:"ClientID"`
+	State      string      `json:"State"`
+	Details    string      `json:"Details"`
+	Time       bool        `json:"Time"`
+	LargeImage string      `json:"LargeImage"`
+	LargeText  string      `json:"LargeText"`
+	SmallImage string      `json:"SmallImage"`
+	SmallText  string      `json:"SmallText"`
+	Invitable  bool        `json:"Invitable"`
+	Buttons    []RPCButton `json:"Buttons"`
 }
 
 type Config struct {

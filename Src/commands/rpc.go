@@ -1,24 +1,104 @@
 package commands
 
 import (
+	"strings"
 	"time"
 
 	"github.com/hugolgst/rich-go/client"
 
 	"github.com/LightningDev1/LB-Selfbot/config"
+	"github.com/LightningDev1/LB-Selfbot/utils"
 	"github.com/LightningDev1/dgc"
 )
 
 type RPCCommands struct{}
 
 func (r RPCCommands) RegisterCommands(router *dgc.Router) {
-	/*router.RegisterCmd(&dgc.Command{
-		Name:        "tweet",
-		Description: "Tweet a message",
-		Usage:       "[p]tweet <username> <text>",
-		Handler:     i.tweet,
-	})*/
-	
+	router.RegisterCmd(&dgc.Command{
+		Name:        "rpc",
+		Description: "Turn Rich Presence on or off",
+		Usage:       "[p]rpc <on/off>",
+		Handler:     r.rpc,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "rpcid",
+		Description: "Set the RPC client id",
+		Usage:       "[p]rpcid <client id>",
+		Handler:     r.rpcid,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "rpcstate",
+		Description: "Set the RPC state",
+		Usage:       "[p]rpcstate <text>",
+		Handler:     r.rpcstate,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "rpcdetails",
+		Description: "Set the RPC details",
+		Usage:       "[p]rpcdetails <text>",
+		Handler:     r.rpcdetails,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "rpctime",
+		Description: "Set RPC time on or off",
+		Usage:       "[p]rpctime <on/off>",
+		Handler:     r.rpctime,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "rpcinvitable",
+		Description: "Set if RPC is invitable",
+		Usage:       "[p]rpcinvitable <on/off>",
+		Handler:     r.rpcinvitable,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "rpclargeimage",
+		Description: "Set the RPC large image",
+		Usage:       "[p]rpclargeimage <image name>",
+		Handler:     r.rpclargeimage,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "rpclargetext",
+		Description: "Set the RPC large image text",
+		Usage:       "[p]rpclargetext <text>",
+		Handler:     r.rpclargetext,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "rpcsmallimage",
+		Description: "Set the RPC small image",
+		Usage:       "[p]rpcsmallimage <image name>",
+		Handler:     r.rpcsmallimage,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "rpcsmalltext",
+		Description: "Set the RPC small image text",
+		Usage:       "[p]rpcsmalltext <text>",
+		Handler:     r.rpcsmalltext,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "rpcbutton1text",
+		Description: "Set the RPC first button text",
+		Usage:       "[p]rpcbutton1text <text>",
+		Handler:     r.rpcbutton1text,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "rpcbutton1url",
+		Description: "Set the RPC first button url",
+		Usage:       "[p]rpcbutton1url <url>",
+		Handler:     r.rpcbutton1url,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "rpcbutton2text",
+		Description: "Set the RPC second button text",
+		Usage:       "[p]rpcbutton2text <text>",
+		Handler:     r.rpcbutton2text,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "rpcbutton2url",
+		Description: "Set the RPC second button url",
+		Usage:       "[p]rpcbutton2url <url>",
+		Handler:     r.rpcbutton2url,
+	})
+
 	go func() {
 		startTime := time.Now()
 		for {
@@ -89,4 +169,121 @@ func (RPCCommands) getSecrets(rpcData config.RPCData) *client.Secrets {
 		}
 	}
 	return nil
+}
+
+func (RPCCommands) rpc(ctx *dgc.Ctx) {
+	toggle := strings.ToLower(utils.Arguments["<on/off>"])
+	if toggle != "on" && toggle != "off" {
+		ctx.RespondText("Invalid value. Use `on` or `off`.")
+		return
+	}
+	cfg, _ := config.GetConfig()
+	cfg.RPC.Enabled = toggle == "on"
+	cfg.Save()
+}
+
+func (RPCCommands) rpcid(ctx *dgc.Ctx) {
+	cfg, _ := config.GetConfig()
+	cfg.RPC.ClientID = utils.Arguments["<client id>"]
+	cfg.Save()
+}
+
+func (RPCCommands) rpcstate(ctx *dgc.Ctx) {
+	cfg, _ := config.GetConfig()
+	cfg.RPC.State = utils.Arguments["<text>"]
+	cfg.Save()
+}
+
+func (RPCCommands) rpcdetails(ctx *dgc.Ctx) {
+	cfg, _ := config.GetConfig()
+	cfg.RPC.Details = utils.Arguments["<text>"]
+	cfg.Save()
+}
+
+func (RPCCommands) rpctime(ctx *dgc.Ctx) {
+	toggle := strings.ToLower(utils.Arguments["<on/off>"])
+	if toggle != "on" && toggle != "off" {
+		ctx.RespondText("Invalid value. Use `on` or `off`.")
+		return
+	}
+	cfg, _ := config.GetConfig()
+	cfg.RPC.Time = toggle == "on"
+	cfg.Save()
+}
+
+func (RPCCommands) rpcinvitable(ctx *dgc.Ctx) {
+	toggle := strings.ToLower(utils.Arguments["<on/off>"])
+	if toggle != "on" && toggle != "off" {
+		ctx.RespondText("Invalid value. Use `on` or `off`.")
+		return
+	}
+	cfg, _ := config.GetConfig()
+	cfg.RPC.Invitable = toggle == "on"
+	cfg.Save()
+}
+
+func (RPCCommands) rpclargeimage(ctx *dgc.Ctx) {
+	cfg, _ := config.GetConfig()
+	cfg.RPC.LargeImage = utils.Arguments["<image name>"]
+	cfg.Save()
+}
+
+func (RPCCommands) rpclargetext(ctx *dgc.Ctx) {
+	cfg, _ := config.GetConfig()
+	cfg.RPC.LargeText = utils.Arguments["<text>"]
+	cfg.Save()
+}
+
+func (RPCCommands) rpcsmallimage(ctx *dgc.Ctx) {
+	cfg, _ := config.GetConfig()
+	cfg.RPC.LargeImage = utils.Arguments["<image name>"]
+	cfg.Save()
+}
+
+func (RPCCommands) rpcsmalltext(ctx *dgc.Ctx) {
+	cfg, _ := config.GetConfig()
+	cfg.RPC.LargeText = utils.Arguments["<text>"]
+	cfg.Save()
+}
+
+func (RPCCommands) rpcbutton1text(ctx *dgc.Ctx) {
+	cfg, _ := config.GetConfig()
+	if len(cfg.RPC.Buttons) < 1 {
+		cfg.RPC.Buttons[0] = config.RPCButton{}
+	}
+	cfg.RPC.Buttons[0].Label = utils.Arguments["<text>"]
+	cfg.Save()
+}
+
+func (RPCCommands) rpcbutton1url(ctx *dgc.Ctx) {
+	cfg, _ := config.GetConfig()
+	if len(cfg.RPC.Buttons) < 1 {
+		cfg.RPC.Buttons[0] = config.RPCButton{}
+	}
+	cfg.RPC.Buttons[0].URL = utils.Arguments["<url>"]
+	cfg.Save()
+}
+
+func (RPCCommands) rpcbutton2text(ctx *dgc.Ctx) {
+	cfg, _ := config.GetConfig()
+	if len(cfg.RPC.Buttons) < 1 {
+		cfg.RPC.Buttons[0] = config.RPCButton{}
+	}
+	if len(cfg.RPC.Buttons) < 2 {
+		cfg.RPC.Buttons[1] = config.RPCButton{}
+	}
+	cfg.RPC.Buttons[1].Label = utils.Arguments["<text>"]
+	cfg.Save()
+}
+
+func (RPCCommands) rpcbutton2url(ctx *dgc.Ctx) {
+	cfg, _ := config.GetConfig()
+	if len(cfg.RPC.Buttons) < 1 {
+		cfg.RPC.Buttons[0] = config.RPCButton{}
+	}
+	if len(cfg.RPC.Buttons) < 2 {
+		cfg.RPC.Buttons[1] = config.RPCButton{}
+	}
+	cfg.RPC.Buttons[1].URL = utils.Arguments["<url>"]
+	cfg.Save()
 }
