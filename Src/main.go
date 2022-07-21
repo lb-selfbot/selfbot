@@ -57,7 +57,6 @@ func selfbot_main(overseer.State) {
 	events := events.Events{}
 
 	session, err := discordgo.New(cfg.Account.Discord.Token)
-	fmt.Println(cfg.Account.Discord.Token)
 	if err != nil {
 		panic(err)
 	}
