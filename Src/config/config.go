@@ -93,16 +93,23 @@ type Config struct {
 }
 
 func (c Config) Save() error {
-	configFile, err := os.OpenFile(fmt.Sprintf("%s\\Config\\config.json", utils.GetMainFolder()), os.O_WRONLY, 0644)
+	configFile, err := os.Create(fmt.Sprintf("%s\\Config\\config.json", utils.GetMainFolder()))
 	if err != nil {
 		return err
 	}
 	defer configFile.Close()
-	return json.NewEncoder(configFile).Encode(c)
+	configBytes, err := json.MarshalIndent(c, "", "  ")
+	if err != nil {
+		return err
+	}
+	_, err = configFile.Write(configBytes)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
-func GetConfig() (Config, error) {
-	var config Config
+func GetConfig() (config Config, err error) {
 	configFile, err := os.Open(fmt.Sprintf("%s\\Config\\config.json", utils.GetMainFolder()))
 	if err != nil {
 		return config, err
