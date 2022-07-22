@@ -122,6 +122,8 @@ func (r RPCCommands) RegisterCommands(router *dgc.Router) {
 					Party:      r.getParty(config.RPC),
 					Secrets:    r.getSecrets(config.RPC),
 				})
+			} else {
+				client.Logout()
 			}
 		}
 	}()

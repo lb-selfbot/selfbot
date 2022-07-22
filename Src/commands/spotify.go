@@ -14,6 +14,7 @@ import (
 	"github.com/LightningDev1/LB-Selfbot/utils"
 	"github.com/LightningDev1/dgc"
 	"github.com/LightningDev1/discordgo"
+	"github.com/bitly/go-simplejson"
 )
 
 type SpotifyCommands struct{}
@@ -97,6 +98,12 @@ func (s SpotifyCommands) RegisterCommands(router *dgc.Router) {
 		Usage:       "[p]sseek <seconds>",
 		Handler:     s.sseek,
 	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "sbearertoken",
+		Description: "Get your Spotify bearer token used for the API",
+		Usage:       "[p]sbearertoken",
+		Handler:     s.sbearertoken,
+	})
 }
 
 func (s SpotifyCommands) GetBearerToken() string {
@@ -130,6 +137,19 @@ func (s SpotifyCommands) GetBearerToken() string {
 	return ""
 }
 
+func (s SpotifyCommands) checkRequest(ctx *dgc.Ctx, response *simplejson.Json, err error) bool {
+	if err != nil {
+		ctx.RespondText("An error has occurred.")
+		return false
+	}
+	errorReason := response.GetPath("error", "reason").MustString()
+	if errorReason == "NO_ACTIVE_DEVICE" {
+		ctx.RespondText("A Spotify error occured: `No active device found`")
+		return false
+	}
+	return true
+}
+
 func (s SpotifyCommands) HandleRequest(ctx *dgc.Ctx, response string, err error, onSuccess string) {
 	if err != nil {
 		ctx.RespondText("An error has occurred.")
@@ -137,13 +157,7 @@ func (s SpotifyCommands) HandleRequest(ctx *dgc.Ctx, response string, err error,
 	}
 	if response != "" {
 		responseJson, err := json.SimpleUnmarshal(response)
-		if err != nil {
-			ctx.RespondText("An error has occurred.")
-			return
-		}
-		errorReason := responseJson.GetPath("error", "reason").MustString()
-		if errorReason == "NO_ACTIVE_DEVICE" {
-			ctx.RespondText("A Spotify error occured: `No active device found`")
+		if !s.checkRequest(ctx, responseJson, err) {
 			return
 		}
 	}
@@ -288,7 +302,7 @@ func (s SpotifyCommands) spresence(ctx *dgc.Ctx) {
 	toggle := strings.ToLower(utils.Arguments["<on/off>"]) == "on"
 	if !toggle {
 		ctx.Session.UpdateStatusComplex(discordgo.UpdateStatusData{
-			Activities: []*discordgo.Activity{},
+			//Activities: []*discordgo.Activity{},
 		})
 		return
 	}
@@ -343,7 +357,7 @@ func (s SpotifyCommands) simageid(ctx *dgc.Ctx) {
 		ctx.RespondText("Could not find a Spotify connection. Please connect your Spotify account to your Discord.")
 	} else {
 		headers := map[string]string{"Authorization": bearerToken}
-		searchResponse, err := http.GetJson(fmt.Sprintf("https://api.spotify.com/v1/search?q=%s&type=track", url.QueryEscape(utils.Arguments["<song name>"])), headers)
+		searchResponse, err := http.GetJson(fmt.Sprintf("https://api.spotify.com/v1/search?q=%s&type=track", url.QueryEscape(utils.RemoveWords(ctx.Arguments.Raw(), 1))), headers)
 		if err != nil {
 			ctx.RespondText("A Spotify error occured: No song found")
 			return
@@ -406,5 +420,21 @@ func (s SpotifyCommands) sseek(ctx *dgc.Ctx) {
 		}
 		res, err := http.Put(fmt.Sprintf("https://api.spotify.com/v1/me/player/seek?position_ms=%d", seconds*1000), map[string]string{"Authorization": bearerToken})
 		s.HandleRequest(ctx, res, err, fmt.Sprintf("Sucessfully seeked song to %d seconds.", seconds))
+	}
+}
+
+func (s SpotifyCommands) sbearertoken(ctx *dgc.Ctx) {
+	if bearerToken := s.GetBearerToken(); bearerToken == "" {
+		ctx.RespondText("Could not find a Spotify connection. Please connect your Spotify account to your Discord.")
+	} else {
+		jsonData, err := http.GetJson("https://api.spotify.com/v1/me", map[string]string{"Authorization": bearerToken})
+		if !s.checkRequest(ctx, jsonData, err) {
+			return
+		}
+
+		embed.NewEmbed().
+			AddField("Spotify Account", jsonData.Get("display_name").MustString()).
+			AddField("Bearer Token", bearerToken).
+			Send(ctx)
 	}
 }

@@ -117,6 +117,15 @@ func Patch(url string, data string, headersList ...map[string]string) (string, e
 	return string(resp.Body()), nil
 }
 
+func PatchJson(url string, data string, headersList ...map[string]string) (*simplejson.Json, error) {
+	headersList = append(headersList, map[string]string{"Content-Type": "application/json"})
+	result, err := Patch(url, data, headersList...)
+	if err != nil {
+		return nil, err
+	}
+	return json.SimpleUnmarshal(result)
+}
+
 func Put(url string, headersList ...map[string]string) (string, error) {
 	req := fasthttp.AcquireRequest()
 	resp := fasthttp.AcquireResponse()

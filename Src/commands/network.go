@@ -11,7 +11,6 @@ import (
 	"strings"
 
 	"github.com/LightningDev1/LB-Selfbot/api"
-	"github.com/LightningDev1/LB-Selfbot/config"
 	"github.com/LightningDev1/LB-Selfbot/embed"
 	"github.com/LightningDev1/LB-Selfbot/error_handling"
 	"github.com/LightningDev1/LB-Selfbot/http"
@@ -505,12 +504,7 @@ func (NetworkCommands) theme(ctx *dgc.Ctx) {
 		error_handling.OnError(ctx, error_handling.InvalidArgument, "<light/dark> must be either \"light\" or \"dark\"")
 		return
 	}
-	jsonData := fmt.Sprintf(`{"theme": "%s"}`, theme)
-	cfg, err := config.GetConfig()
-	if err != nil {
-		return
-	}
-	http.Patch("https://discord.com/api/v10/users/@me/settings", string(jsonData), http.GetDiscordHeaders(cfg.Account.Discord.Token))
+	api.ChangeSettings(map[string]interface{}{"theme": theme})
 }
 
 func (NetworkCommands) hastebin(ctx *dgc.Ctx) {
@@ -568,14 +562,7 @@ func (NetworkCommands) compact(ctx *dgc.Ctx) {
 		error_handling.OnError(ctx, error_handling.InvalidArgument, "<on/off> must be either \"on\" or \"off\"")
 		return
 	}
-	toggle = strings.ReplaceAll(toggle, "on", "true")
-	toggle = strings.ReplaceAll(toggle, "off", "false")
-	jsonData := fmt.Sprintf(`{"message_display_compact": %s}`, toggle)
-	cfg, err := config.GetConfig()
-	if err != nil {
-		return
-	}
-	http.Patch("https://discord.com/api/v10/users/@me/settings", jsonData, http.GetDiscordHeaders(cfg.Account.Discord.Token))
+	api.ChangeSettings(map[string]interface{}{"message_display_compact": toggle == "on"})
 }
 
 func (NetworkCommands) devmode(ctx *dgc.Ctx) {
@@ -584,14 +571,7 @@ func (NetworkCommands) devmode(ctx *dgc.Ctx) {
 		error_handling.OnError(ctx, error_handling.InvalidArgument, "<on/off> must be either \"on\" or \"off\"")
 		return
 	}
-	toggle = strings.ReplaceAll(toggle, "on", "true")
-	toggle = strings.ReplaceAll(toggle, "off", "false")
-	jsonData := fmt.Sprintf(`{"developer_mode": %s}`, toggle)
-	cfg, err := config.GetConfig()
-	if err != nil {
-		return
-	}
-	http.Patch("https://discord.com/api/v10/users/@me/settings", jsonData, http.GetDiscordHeaders(cfg.Account.Discord.Token))
+	api.ChangeSettings(map[string]interface{}{"developer_mode": toggle == "on"})
 }
 
 func (NetworkCommands) resolve(ctx *dgc.Ctx) {
