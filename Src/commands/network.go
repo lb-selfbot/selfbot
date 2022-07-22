@@ -504,7 +504,7 @@ func (NetworkCommands) theme(ctx *dgc.Ctx) {
 		error_handling.OnError(ctx, error_handling.InvalidArgument, "<light/dark> must be either \"light\" or \"dark\"")
 		return
 	}
-	api.ChangeSettings(map[string]interface{}{"theme": theme})
+	api.ChangeSettings(map[string]interface{}{"theme": theme}, true)
 }
 
 func (NetworkCommands) hastebin(ctx *dgc.Ctx) {
@@ -562,7 +562,7 @@ func (NetworkCommands) compact(ctx *dgc.Ctx) {
 		error_handling.OnError(ctx, error_handling.InvalidArgument, "<on/off> must be either \"on\" or \"off\"")
 		return
 	}
-	api.ChangeSettings(map[string]interface{}{"message_display_compact": toggle == "on"})
+	api.ChangeSettings(map[string]interface{}{"message_display_compact": toggle == "on"}, true)
 }
 
 func (NetworkCommands) devmode(ctx *dgc.Ctx) {
@@ -571,7 +571,7 @@ func (NetworkCommands) devmode(ctx *dgc.Ctx) {
 		error_handling.OnError(ctx, error_handling.InvalidArgument, "<on/off> must be either \"on\" or \"off\"")
 		return
 	}
-	api.ChangeSettings(map[string]interface{}{"developer_mode": toggle == "on"})
+	api.ChangeSettings(map[string]interface{}{"developer_mode": toggle == "on"}, true)
 }
 
 func (NetworkCommands) resolve(ctx *dgc.Ctx) {

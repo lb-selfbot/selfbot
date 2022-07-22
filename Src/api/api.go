@@ -156,7 +156,7 @@ func TTS(text string, language string) ([]byte, error) {
 	return tts, err
 }
 
-func ChangeSettings(settings map[string]interface{}) (*simplejson.Json, error) {
+func ChangeSettings(settings map[string]interface{}, settingsPath bool) (*simplejson.Json, error) {
 	cfg, err := config.GetConfig()
 	if err != nil {
 		return nil, err
@@ -165,5 +165,11 @@ func ChangeSettings(settings map[string]interface{}) (*simplejson.Json, error) {
 	if err != nil {
 		return nil, err
 	}
-	return http.PatchJson("https://discord.com/api/v10/users/@me/settings", string(jsonBytes), http.GetDiscordHeaders(cfg.Account.Discord.Token))
+	url := ""
+	if settingsPath {
+		url = "https://discord.com/api/v10/users/@me/settings"
+	} else {
+		url = "https://discord.com/api/v10/users/@me"
+	}
+	return http.PatchJson(url, string(jsonBytes), http.GetDiscordHeaders(cfg.Account.Discord.Token))
 }

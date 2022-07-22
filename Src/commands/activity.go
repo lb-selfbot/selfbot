@@ -49,6 +49,24 @@ func (a *ActivityCommands) RegisterCommands(router *dgc.Router) {
 		Handler:     a.customstatus,
 	})
 	router.RegisterCmd(&dgc.Command{
+		Name:        "clearcustomstatus",
+		Description: "Clear your custom status",
+		Usage:       "[p]clearcustomstatus",
+		Handler:     a.clearcustomstatus,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "aboutme",
+		Description: "Change your About Me text",
+		Usage:       "[p]aboutme <text>",
+		Handler:     a.aboutme,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "clearaboutme",
+		Description: "Clear your About Me text",
+		Usage:       "[p]clearaboutme",
+		Handler:     a.clearaboutme,
+	})
+	router.RegisterCmd(&dgc.Command{
 		Name:        "listening",
 		Description: "Set your activity to listening",
 		Usage:       "[p]listening <text>",
@@ -188,9 +206,9 @@ func (a *ActivityCommands) RegisterCommands(router *dgc.Router) {
 func (a *ActivityCommands) setActivity(activityType, text string) {
 	switch activityType {
 	case "status":
-		api.ChangeSettings(map[string]interface{}{"status": text})
+		api.ChangeSettings(map[string]interface{}{"status": text}, true)
 	case "customstatus":
-		api.ChangeSettings(map[string]interface{}{"custom_status": map[string]string{"text": text}})
+		api.ChangeSettings(map[string]interface{}{"custom_status": map[string]string{"text": text}}, true)
 	case "listening":
 		a.Session.UpdateStatusComplex(discordgo.UpdateStatusData{
 			Game: &discordgo.Activity{
@@ -260,6 +278,19 @@ func (a *ActivityCommands) invisible(ctx *dgc.Ctx) {
 func (a *ActivityCommands) customstatus(ctx *dgc.Ctx) {
 	a.Session = ctx.Session
 	a.setActivity("customstatus", ctx.Arguments.Raw())
+}
+
+func (a *ActivityCommands) clearcustomstatus(ctx *dgc.Ctx) {
+	a.Session = ctx.Session
+	a.setActivity("customstatus", "")
+}
+
+func (a *ActivityCommands) aboutme(ctx *dgc.Ctx) {
+	api.ChangeSettings(map[string]interface{}{"bio": ctx.Arguments.Raw()}, false)
+}
+
+func (a *ActivityCommands) clearaboutme(ctx *dgc.Ctx) {
+	api.ChangeSettings(map[string]interface{}{"bio": ""}, false)
 }
 
 func (a *ActivityCommands) listening(ctx *dgc.Ctx) {
