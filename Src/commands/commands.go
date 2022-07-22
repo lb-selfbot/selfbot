@@ -3,22 +3,23 @@ package commands
 import "github.com/LightningDev1/dgc"
 
 type Commands struct {
-	TextCommands      TextCommands
-	EncodingCommands  EncodingCommands
-	CodeblockCommands CodeblockCommands
-	CryptoCommands    CryptoCommands
-	FunCommands       FunCommands
-	TrollingCommands  TrollingCommands
-	ImageCommands     ImageCommands
-	NetworkCommands   NetworkCommands
-	SpotifyCommands   SpotifyCommands
-	GameCommands      GameCommands
-	ActivityCommands  ActivityCommands
-	AnimationCommands AnimationCommands
-	ConfigCommands    ConfigCommands
-	RPCCommands       RPCCommands
-	NSFWCommands      NSFWCommands
-	RedditCommands    RedditCommands
+	TextCommands       TextCommands
+	EncodingCommands   EncodingCommands
+	CodeblockCommands  CodeblockCommands
+	CryptoCommands     CryptoCommands
+	FunCommands        FunCommands
+	TrollingCommands   TrollingCommands
+	ImageCommands      ImageCommands
+	NetworkCommands    NetworkCommands
+	ModerationCommands ModerationCommands
+	SpotifyCommands    SpotifyCommands
+	GameCommands       GameCommands
+	ActivityCommands   ActivityCommands
+	AnimationCommands  AnimationCommands
+	ConfigCommands     ConfigCommands
+	RPCCommands        RPCCommands
+	NSFWCommands       NSFWCommands
+	RedditCommands     RedditCommands
 }
 
 func (c Commands) RegisterCommands(router *dgc.Router) {
@@ -30,6 +31,7 @@ func (c Commands) RegisterCommands(router *dgc.Router) {
 	c.TrollingCommands.RegisterCommands(router)
 	c.ImageCommands.RegisterCommands(router)
 	c.NetworkCommands.RegisterCommands(router)
+	c.ModerationCommands.RegisterCommands(router)
 	c.SpotifyCommands.RegisterCommands(router)
 	c.GameCommands.RegisterCommands(router)
 	c.ActivityCommands.RegisterCommands(router)

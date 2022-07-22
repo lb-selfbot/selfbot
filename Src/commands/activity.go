@@ -150,6 +150,12 @@ func (a *ActivityCommands) RegisterCommands(router *dgc.Router) {
 		Usage:       "[p]cycleactivity <stream url> <text>",
 		Handler:     a.cycleactivity,
 	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "timestatus",
+		Description: "Set current time as custom status",
+		Usage:       "[p]timestatus",
+		Handler:     a.timestatus,
+	})
 
 	statuses := []string{"online", "dnd", "idle", "invisible"}
 	activityTypes := []string{"listening", "watching", "playing", "streaming", "competing"}
@@ -170,6 +176,8 @@ func (a *ActivityCommands) RegisterCommands(router *dgc.Router) {
 				a.setActivity("status", statuses[current%len(statuses)])
 			case "activitytype":
 				a.setActivity(activityTypes[current%len(activityTypes)], a.CycleText[0])
+			case "timestatus":
+				a.setActivity("customstatus", "Current Time: "+time.Now().Format("15:04:05"))
 			default:
 				a.setActivity(a.CycleMode, a.CycleText[current%len(a.CycleText)])
 			}
@@ -312,10 +320,10 @@ func (ActivityCommands) rickrollactivity(ctx *dgc.Ctx) {
 func (ActivityCommands) youtubeactivity(ctx *dgc.Ctx) {
 	ctx.Session.UpdateStatusComplex(discordgo.UpdateStatusData{
 		Game: &discordgo.Activity{
-			Name:  "YouTube",
+			Name:    "YouTube",
 			Details: ctx.Arguments.Raw(),
-			Type:  discordgo.ActivityTypeWatching,
-			Flags: 0,
+			Type:    discordgo.ActivityTypeWatching,
+			Flags:   0,
 			Assets: &discordgo.Assets{
 				LargeImageID: "spotify:ab67706c0000bebb7d1c495e63620a99f3cbcbf5",
 				LargeText:    "YouTube",
@@ -327,10 +335,10 @@ func (ActivityCommands) youtubeactivity(ctx *dgc.Ctx) {
 func (ActivityCommands) twitchactivity(ctx *dgc.Ctx) {
 	ctx.Session.UpdateStatusComplex(discordgo.UpdateStatusData{
 		Game: &discordgo.Activity{
-			Name:  "Twitch",
+			Name:    "Twitch",
 			Details: ctx.Arguments.Raw(),
-			Type:  discordgo.ActivityTypeWatching,
-			Flags: 0,
+			Type:    discordgo.ActivityTypeWatching,
+			Flags:   0,
 			Assets: &discordgo.Assets{
 				LargeImageID: "spotify:ab67706c0000bebb4081b043d43093915cb73114",
 				LargeText:    "Twitch",
@@ -407,4 +415,10 @@ func (a *ActivityCommands) cycleactivity(ctx *dgc.Ctx) {
 	a.CycleMode = "activitytype"
 	a.StreamingURL = utils.Arguments["<stream url>"]
 	a.CycleText = []string{utils.RemoveWords(ctx.Arguments.Raw(), 1)}
+}
+
+func (a *ActivityCommands) timestatus(ctx *dgc.Ctx) {
+	a.Session = ctx.Session
+	a.CycleOn = true
+	a.CycleMode = "timestatus"
 }
