@@ -6,6 +6,8 @@ github.com/LightningDev1/discordgo v0.25.1 h1:CqzxuvAHL8cxzcC1K5JOxspHq+V4r6QALm
 github.com/LightningDev1/discordgo v0.25.1/go.mod h1:/sj0UZSQqKnG4ROObIc5wPhefiPHyVTkzXWOQtZkS0M=
 github.com/LightningDev1/discordgo v0.25.2 h1:uQSqbs1w68emGWdjayf9pnfz9DBjUWvptwlVTzMPdME=
 github.com/LightningDev1/discordgo v0.25.2/go.mod h1:/sj0UZSQqKnG4ROObIc5wPhefiPHyVTkzXWOQtZkS0M=
+github.com/LightningDev1/discordgo v0.25.3 h1:bjI+kUDbna3qHhjTu3flyPmUsmzaPstd3jaGk4Nj5VI=
+github.com/LightningDev1/discordgo v0.25.3/go.mod h1:o5+TO2hnn3CCdDZ4ULnu0AJF6DqwLmop3GfwP87bZGA=
 github.com/Microsoft/go-winio v0.5.2 h1:a9IhgEQBCUEk6QCdml9CiJGhAws+YwffDHEMp1VMrpA=
 github.com/Microsoft/go-winio v0.5.2/go.mod h1:WpS1mjBmmwHBEWmogvA2mj8546UReBk4v8QkMxJ6pZY=
 github.com/PuerkitoBio/goquery v1.5.0/go.mod h1:qD2PgZ9lccMbQlc7eEOjaeRlFQON7xY8kdmcsrnKqMg=
@@ -41,6 +43,8 @@ github.com/deadshot465/owoify-go v1.0.1 h1:pQmIiQxkKfMPZCjntoIjxFYhY/p6XojloFIpt
 github.com/deadshot465/owoify-go v1.0.1/go.mod h1:ZwqgtKjAG/8ZJTR4z708O9uwYSk4VpfwSFhE0JRyu2o=
 github.com/dlclark/regexp2 v1.4.1-0.20201116162257-a2a8dda75c91 h1:Izz0+t1Z5nI16/II7vuEo/nHjodOg0p7+OiDpjX5t1E=
 github.com/dlclark/regexp2 v1.4.1-0.20201116162257-a2a8dda75c91/go.mod h1:2pZnwuY/m+8K6iRw6wQdMtk+rH5tNGR1i55kozfMjCc=
+github.com/dlclark/regexp2 v1.7.0 h1:7lJfhqlPssTb1WQx4yvTHN0uElPEv52sbaECrAQxjAo=
+github.com/dlclark/regexp2 v1.7.0/go.mod h1:DHkYz0B9wPfa6wondMfaivmHpzrQ3v9q8cnmRbL6yW8=
 github.com/dop251/goja v0.0.0-20211022113120-dc8c55024d06/go.mod h1:R9ET47fwRVRPZnOGvHxxhuZcbrMCuiqOz3Rlrh4KSnk=
 github.com/dop251/goja v0.0.0-20220516123900-4418d4575a41 h1:yRPjAkkuR/E/tsVG7QmhzEeEtD3P2yllxsT1/ftURb0=
 github.com/dop251/goja v0.0.0-20220516123900-4418d4575a41/go.mod h1:TQJQ+ZNyFVvUtUEtCZxBhfWiH7RJqR3EivNmvD6Waik=
@@ -86,6 +90,8 @@ github.com/kkdai/youtube/v2 v2.7.15/go.mod h1:DGn3HVjQNxJ7esqLphd9fusKoWVOTYE3Xy
 github.com/klauspost/compress v1.15.0/go.mod h1:/3/Vjq9QcHkK5uEr5lBEmyoZ1iFhe47etQ6QUkpK6sk=
 github.com/klauspost/compress v1.15.6 h1:6D9PcO8QWu0JyaQ2zUMmu16T1T+zjjEpP91guRsvDfY=
 github.com/klauspost/compress v1.15.6/go.mod h1:PhcZ0MbTNciWF3rruxRgKxI5NkcHHrHUDtV4Yw2GlzU=
+github.com/klauspost/compress v1.15.9 h1:wKRjX6JRtDdrE9qwa4b/Cip7ACOshUI4smpCQanqjSY=
+github.com/klauspost/compress v1.15.9/go.mod h1:PhcZ0MbTNciWF3rruxRgKxI5NkcHHrHUDtV4Yw2GlzU=
 github.com/kr/pretty v0.1.0/go.mod h1:dAy3ld7l9f0ibDNOQOHHMYYIIbhfbHSm3C4ZsoJORNo=
 github.com/kr/pretty v0.2.1/go.mod h1:ipq/a2n7PKx3OHsz4KJII5eveXtPO4qwEXGdVfWzfnI=
 github.com/kr/pretty v0.3.0/go.mod h1:640gp4NfQd8pI5XOwp5fnNeVWj67G7CFk/SaSQn7NBk=

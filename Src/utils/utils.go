@@ -193,6 +193,27 @@ func TryGetNameFromUserMention(session *discordgo.Session, mention *dgc.Argument
 	return fmt.Sprintf("%s#%s", user.Username, user.Discriminator), true
 }
 
+func TryGetChannelFromMention(ctx *dgc.Ctx, mention *dgc.Argument) (*discordgo.Channel, bool) {
+	if mention.AsChannelMentionID() == "" {
+		return nil, false
+	}
+	channel, err := ctx.Session.Channel(mention.AsChannelMentionID())
+	if err != nil {
+		return nil, false
+	}
+	return channel, true
+}
+
+func SnowflakeToTime(snowflake string) time.Time {
+	// parse snowflake to int64
+	snowflakeInt, err := strconv.ParseInt(snowflake, 10, 64)
+	if err != nil {
+		return time.Time{}
+	}
+	// convert int64 to time
+	return time.Unix(((snowflakeInt >> 22) + 1420070400000) / 1000, 0)
+}
+
 func GetElementById(html string, id string) string {
 	doc, err := goquery.NewDocumentFromReader(strings.NewReader(html))
 	if err != nil {

@@ -17,7 +17,7 @@ require (
 
 require (
 	github.com/LightningDev1/dgc v1.1.2 // indirect
-	github.com/LightningDev1/discordgo v0.25.2 // indirect
+	github.com/LightningDev1/discordgo v0.25.3 // indirect
 	github.com/StackExchange/wmi v1.2.1 // indirect
 	github.com/andybalholm/brotli v1.0.4 // indirect
 	github.com/andybalholm/cascadia v1.3.1 // indirect
@@ -25,7 +25,7 @@ require (
 	github.com/antchfx/xmlquery v1.0.0 // indirect
 	github.com/antchfx/xpath v1.0.0 // indirect
 	github.com/bitly/go-simplejson v0.5.0 // indirect
-	github.com/dlclark/regexp2 v1.4.1-0.20201116162257-a2a8dda75c91 // indirect
+	github.com/dlclark/regexp2 v1.7.0 // indirect
 	github.com/dop251/goja v0.0.0-20220516123900-4418d4575a41 // indirect
 	github.com/electricbubble/go-toast v0.3.0 // indirect
 	github.com/go-ole/go-ole v1.2.6 // indirect
@@ -38,7 +38,7 @@ require (
 	github.com/jpillora/s3 v1.1.4 // indirect
 	github.com/kennygrant/sanitize v1.2.4 // indirect
 	github.com/kkdai/youtube/v2 v2.7.15 // indirect
-	github.com/klauspost/compress v1.15.6 // indirect
+	github.com/klauspost/compress v1.15.9 // indirect
 	github.com/rgamba/evtwebsocket v0.0.0-20181029234908-48b8cd9f8616 // indirect
 	github.com/saintfish/chardet v0.0.0-20120816061221-3af4cd4741ca // indirect
 	github.com/temoto/robotstxt v1.1.1 // indirect
