@@ -121,6 +121,12 @@ func (a *ActivityCommands) RegisterCommands(router *dgc.Router) {
 		Handler:     a.twitchactivity,
 	})
 	router.RegisterCmd(&dgc.Command{
+		Name:        "discordactivity",
+		Description: "Set a Discord activity",
+		Usage:       "[p]discordactivity <text>",
+		Handler:     a.discordactivity,
+	})
+	router.RegisterCmd(&dgc.Command{
 		Name:        "cyclestatus",
 		Description: "Cycle between statuses",
 		Usage:       "[p]cyclestatus",
@@ -373,6 +379,21 @@ func (ActivityCommands) twitchactivity(ctx *dgc.Ctx) {
 			Assets: &discordgo.Assets{
 				LargeImageID: "spotify:ab67706c0000bebb4081b043d43093915cb73114",
 				LargeText:    "Twitch",
+			},
+		},
+	})
+}
+
+func (ActivityCommands) discordactivity(ctx *dgc.Ctx) {
+	ctx.Session.UpdateStatusComplex(discordgo.UpdateStatusData{
+		Game: &discordgo.Activity{
+			Name:    "Discord",
+			Details: "Discord",
+			State:   ctx.Arguments.Raw(),
+			Type:    discordgo.ActivityTypeWatching,
+			Flags:   0,
+			Assets: &discordgo.Assets{
+				LargeImageID: "spotify:ab67616d0000b273db20400815ca2a9481bd255e",
 			},
 		},
 	})
