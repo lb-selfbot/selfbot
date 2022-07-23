@@ -431,7 +431,7 @@ func (FunCommands) eightball(ctx *dgc.Ctx) {
 		"Outlook not so good",
 		"Very doubtful",
 	}
-	answer := utils.RandomChoice(possibleAnswers).(string)
+	answer := utils.RandomChoice(possibleAnswers)
 	embed.NewEmbed().
 		AddField("Question", question).
 		AddField("Answer", answer).
@@ -439,7 +439,7 @@ func (FunCommands) eightball(ctx *dgc.Ctx) {
 }
 
 func (FunCommands) howgay(ctx *dgc.Ctx) {
-	user, _ := utils.TryGetNameFromUserMention(ctx.Session, ctx.Arguments.Get(0))
+	user, _ := utils.TryGetUsernameFromMention(ctx.Session, ctx.Arguments.Get(0))
 	embed.NewEmbed().
 		AddField("User", user).
 		AddField("Gay Percentage", utils.RandomPercentage()).
@@ -447,7 +447,7 @@ func (FunCommands) howgay(ctx *dgc.Ctx) {
 }
 
 func (FunCommands) howsimp(ctx *dgc.Ctx) {
-	user, _ := utils.TryGetNameFromUserMention(ctx.Session, ctx.Arguments.Get(0))
+	user, _ := utils.TryGetUsernameFromMention(ctx.Session, ctx.Arguments.Get(0))
 	embed.NewEmbed().
 		AddField("User", user).
 		AddField("Simp Percentage", utils.RandomPercentage()).
@@ -461,7 +461,7 @@ func (FunCommands) penis(ctx *dgc.Ctx) {
 		penis += "="
 	}
 	penis += "D"
-	user, _ := utils.TryGetNameFromUserMention(ctx.Session, ctx.Arguments.Get(0))
+	user, _ := utils.TryGetUsernameFromMention(ctx.Session, ctx.Arguments.Get(0))
 	embed.NewEmbed().
 		AddField("User", user).
 		AddField("Penis", penis).
@@ -470,7 +470,7 @@ func (FunCommands) penis(ctx *dgc.Ctx) {
 }
 
 func (FunCommands) ego(ctx *dgc.Ctx) {
-	user, _ := utils.TryGetNameFromUserMention(ctx.Session, ctx.Arguments.Get(0))
+	user, _ := utils.TryGetUsernameFromMention(ctx.Session, ctx.Arguments.Get(0))
 	embed.NewEmbed().
 		AddField("User", user).
 		AddField("Ego", utils.RandomPercentage()).
@@ -478,7 +478,7 @@ func (FunCommands) ego(ctx *dgc.Ctx) {
 }
 
 func (FunCommands) hack(ctx *dgc.Ctx) {
-	user, _ := utils.TryGetNameFromUserMention(ctx.Session, ctx.Arguments.Get(0))
+	user, _ := utils.TryGetUsernameFromMention(ctx.Session, ctx.Arguments.Get(0))
 	cc := gofakeit.CreditCard()
 	embed.NewEmbed().
 		AddField("User", user).
@@ -495,7 +495,7 @@ func (FunCommands) hack(ctx *dgc.Ctx) {
 }
 
 func (FunCommands) insult(ctx *dgc.Ctx) {
-	user, _ := utils.TryGetNameFromUserMention(ctx.Session, ctx.Arguments.Get(0))
+	user, _ := utils.TryGetUsernameFromMention(ctx.Session, ctx.Arguments.Get(0))
 	insult, err := http.GetJson(fmt.Sprintf("https://lightning-bot.com/api/v2/selfbot/roast?mention=%s", user))
 	if err != nil {
 		ctx.RespondText("An error has occurred.")
@@ -555,9 +555,9 @@ func (FunCommands) topic(ctx *dgc.Ctx) {
 func (FunCommands) slot(ctx *dgc.Ctx) {
 	slots := strings.Split("🍎🍊🍐🍋🍉🍇🍓🍒", "")
 	getSlot := func() (string, string) {
-		left := utils.RandomChoice(slots).(string)
-		mid := utils.RandomChoice(slots).(string)
-		right := utils.RandomChoice(slots).(string)
+		left := utils.RandomChoice(slots)
+		mid := utils.RandomChoice(slots)
+		right := utils.RandomChoice(slots)
 		text := "No matches, you lost!"
 		if left == mid && mid == right {
 			text = "3 in a row, you win!"
@@ -794,7 +794,7 @@ func (FunCommands) randomemoji(ctx *dgc.Ctx) {
 		ctx.RespondText("An error has occurred.")
 		return
 	}
-	emoji := utils.RandomChoice(emojis).(discordgo.Emoji)
+	emoji := utils.RandomChoice(emojis)
 	ctx.RespondText(emoji.MessageFormat())
 }
 
@@ -813,12 +813,12 @@ func (FunCommands) randomchannel(ctx *dgc.Ctx) {
 			channels = append(channels[index:], channels[index+1:]...)
 		}
 	}
-	channel := utils.RandomChoice(channels).(discordgo.Channel)
+	channel := utils.RandomChoice(channels)
 	ctx.RespondText(channel.Mention())
 }
 
 func (FunCommands) choose(ctx *dgc.Ctx) {
-	choice := utils.RandomChoice(strings.Split(ctx.Arguments.Raw(), " ")).(string)
+	choice := utils.RandomChoice(strings.Split(ctx.Arguments.Raw(), " "))
 	embed.NewEmbed().
 		SetDescription(fmt.Sprintf("I choose: %s", choice)).
 		Send(ctx)
@@ -908,15 +908,15 @@ func (FunCommands) rps(ctx *dgc.Ctx) {
 	}
 	embed.NewEmbed().
 		AddField("Your choice", choice).
-		AddField("Bot's choice", utils.RandomChoice([]string{"rock", "paper", "scissors"}).(string)).
+		AddField("Bot's choice", utils.RandomChoice([]string{"rock", "paper", "scissors"})).
 		Send(ctx)
 }
 
 func (FunCommands) covidtest(ctx *dgc.Ctx) {
-	user, _ := utils.TryGetNameFromUserMention(ctx.Session, ctx.Arguments.Get(0))
+	user, _ := utils.TryGetUsernameFromMention(ctx.Session, ctx.Arguments.Get(0))
 	embed.NewEmbed().
 		AddField("User", user).
-		AddField("Result", utils.RandomChoice([]string{"Positive", "Negative"}).(string)).
+		AddField("Result", utils.RandomChoice([]string{"Positive", "Negative"})).
 		Send(ctx)
 }
 
@@ -1054,7 +1054,7 @@ func (FunCommands) riddle(ctx *dgc.Ctx) {
 	riddles := doc.Find("#gencont").Find("p").Map(func(i int, s *goquery.Selection) string {
 		return s.Text()
 	})
-	riddle := strings.Replace(utils.RandomChoice(riddles).(string), "SHOW", "", -1)
+	riddle := strings.Replace(utils.RandomChoice(riddles), "SHOW", "", -1)
 	embed.NewEmbed().
 		AddField("Riddle", riddle).
 		Send(ctx)
@@ -1104,7 +1104,7 @@ func (FunCommands) rickroll(ctx *dgc.Ctx) {
 }
 
 func (FunCommands) impersonate(ctx *dgc.Ctx) {
-	user, success := utils.TryGetUserFromUserMention(ctx.Session, ctx.Arguments.Get(0))
+	user, success := utils.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
 		ctx.RespondText("Could not find user.")
 		return
@@ -1133,7 +1133,7 @@ func (FunCommands) impersonate(ctx *dgc.Ctx) {
 }
 
 func (FunCommands) coinflip(ctx *dgc.Ctx) {
-	choice := utils.RandomChoice([]string{"Heads!", "Tails!"}).(string)
+	choice := utils.RandomChoice([]string{"Heads!", "Tails!"})
 	images := map[string]string{
 		"Heads!": "https://www.ssaurel.com/blog/wp-content/uploads/2017/01/heads.png",
 		"Tails!": "https://www.ssaurel.com/blog/wp-content/uploads/2017/01/tails.png",

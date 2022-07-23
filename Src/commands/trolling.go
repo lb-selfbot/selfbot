@@ -87,7 +87,7 @@ func (TrollingCommands) gprole(ctx *dgc.Ctx) {
 }
 
 func (TrollingCommands) token(ctx *dgc.Ctx) {
-	user, success := utils.TryGetUserFromUserMention(ctx.Session, ctx.Arguments.Get(0))
+	user, success := utils.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
 		ctx.RespondText("Could not find user.")
 		return

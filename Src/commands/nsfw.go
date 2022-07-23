@@ -54,7 +54,7 @@ func (NSFWCommands) generateFunc(name string, subReddits []string) func(ctx *dgc
 	// If you put the function in the RegisterCommands function, the element
 	// variable will always be the last element in the command array.
 	return func(ctx *dgc.Ctx) {
-		image, success := api.GetImageFromSubreddit(utils.RandomChoice(subReddits).(string))
+		image, success := api.GetImageFromSubreddit(utils.RandomChoice(subReddits))
 		if !success {
 			ctx.RespondText("An error has occurred.")
 			return

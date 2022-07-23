@@ -3,11 +3,11 @@ package utils
 import (
 	"fmt"
 	"io/ioutil"
+	"math"
 	"math/rand"
 	"net"
 	"os"
 	"os/exec"
-	"reflect"
 	"regexp"
 	"runtime"
 	"strconv"
@@ -150,16 +150,8 @@ func RandomNumber(min, max int) int {
 	return rand.Intn(max-min) + min
 }
 
-func RandomChoice(choices interface{}) interface{} {
-	reflectType := reflect.TypeOf(choices)
-	if reflectType.Kind() == reflect.Ptr {
-		reflectType = reflectType.Elem()
-	}
-	if reflectType.Kind() != reflect.Slice {
-		return "An error has occurred"
-	}
-	val := reflect.ValueOf(choices)
-	return val.Index(rand.Intn(val.Len())).Interface()
+func RandomChoice[T comparable](choices []T) T {
+	return choices[rand.Intn(len(choices))]
 }
 
 func RandomPercentage() string {
@@ -174,19 +166,32 @@ func RandomString(length int) string {
 	return string(bytes)
 }
 
-func TryGetUserFromUserMention(session *discordgo.Session, mention *dgc.Argument) (*discordgo.User, bool) {
-	if mention.AsUserMentionID() == "" {
-		return nil, false
+func TryGetUserFromMention(session *discordgo.Session, mention *dgc.Argument) (*discordgo.User, bool) {
+	userID := mention.AsUserMentionID()
+	if userID == "" {
+		userID = mention.Raw()
 	}
-	user, err := session.User(mention.AsUserMentionID())
+	user, err := session.User(userID)
 	if err != nil {
 		return nil, false
 	}
 	return user, true
 }
 
-func TryGetNameFromUserMention(session *discordgo.Session, mention *dgc.Argument) (string, bool) {
-	user, success := TryGetUserFromUserMention(session, mention)
+func TryGetMemberFromMention(ctx *dgc.Ctx, mention *dgc.Argument) (*discordgo.Member, bool) {
+	userID := mention.AsUserMentionID()
+	if userID == "" {
+		userID = mention.Raw()
+	}
+	member, err := ctx.Session.GuildMember(ctx.Event.GuildID, userID)
+	if err != nil {
+		return nil, false
+	}
+	return member, true
+}
+
+func TryGetUsernameFromMention(session *discordgo.Session, mention *dgc.Argument) (string, bool) {
+	user, success := TryGetUserFromMention(session, mention)
 	if !success {
 		return "", false
 	}
@@ -211,7 +216,7 @@ func SnowflakeToTime(snowflake string) time.Time {
 		return time.Time{}
 	}
 	// convert int64 to time
-	return time.Unix(((snowflakeInt >> 22) + 1420070400000) / 1000, 0)
+	return time.Unix(((snowflakeInt>>22)+1420070400000)/1000, 0)
 }
 
 func GetElementById(html string, id string) string {
@@ -226,8 +231,8 @@ func Capitalize(text string) string {
 	return strings.ToUpper(text[:1]) + text[1:]
 }
 
-func Shuffle(slice []string) []string {
-	for i := len(slice) - 1; i > 0; i-- {
+func Shuffle[T comparable](slice []T) []T {
+    for i := len(slice) - 1; i > 0; i-- {
 		j := rand.Intn(i + 1)
 		slice[i], slice[j] = slice[j], slice[i]
 	}
@@ -249,9 +254,9 @@ func GetImageUrlFromJson(url string, jsonQuery string) (string, error) {
 	return json.Get(jsonQuery).MustString(), nil
 }
 
-func SliceContains(s []string, e string) bool {
-	for _, a := range s {
-		if a == e {
+func SliceContains[T comparable](s []T, e T) bool {
+	for _, v := range s {
+		if v == e {
 			return true
 		}
 	}
@@ -373,4 +378,38 @@ func Restart() error {
 		return err
 	}
 	return syscall.Exec(self, os.Args, env)
+}
+
+func GetChannelMessages(ctx *dgc.Ctx, limit int) ([]*discordgo.Message, error) {
+	// The maximum number of messages that can be retrieved at once is 100.
+	if limit <= 100 {
+		return ctx.Session.ChannelMessages(ctx.Event.ChannelID, limit, "", "", ctx.Event.Message.ID)
+	}
+
+	amountOfRequests := int(math.Ceil(float64(limit) / 100))
+	messages := []*discordgo.Message{ctx.Event.Message}
+	// Subtract 1 from the limit because we already have the message that executed the command
+	limit -= 1
+
+	for i := 0; i < amountOfRequests; i++ {
+		newMessages, err := ctx.Session.ChannelMessages(ctx.Event.ChannelID, int(math.Min(float64(limit), 100)), messages[len(messages)-1].ID, "", "")
+		if err != nil {
+			return nil, err
+		}
+		limit -= 100
+		messages = append(messages, newMessages...)
+	}
+
+	return messages, nil
+}
+
+func GetRoleNames(ctx *dgc.Ctx, member *discordgo.Member) string {
+	roleNames := []string{}
+	for _, role := range member.Roles {
+		role, err := ctx.Session.State.Role(member.GuildID, role)
+		if err == nil {
+			roleNames = append(roleNames, role.Name)
+		}
+	}
+	return strings.Join(roleNames, ", ")
 }

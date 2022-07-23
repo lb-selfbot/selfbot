@@ -173,3 +173,21 @@ func ChangeSettings(settings map[string]interface{}, settingsPath bool) (*simple
 	}
 	return http.PatchJson(url, string(jsonBytes), http.GetDiscordHeaders(cfg.Account.Discord.Token))
 }
+
+func ReportMessage(guildID, channelID, messageID string, reason int) (*simplejson.Json, error) {
+	payload := map[string]interface{}{
+		"channel_id": channelID,
+		"guild_id":   guildID,
+		"message_id": messageID,
+		"reason":     reason,
+	}
+	jsonBytes, err := json.Marshal(payload)
+	if err != nil {
+		return nil, err
+	}
+	cfg, err := config.GetConfig()
+	if err != nil {
+		return nil, err
+	}
+	return http.PostJson("https://discord.com/api/v10/report", string(jsonBytes), http.GetDiscordHeaders(cfg.Account.Discord.Token))
+}
