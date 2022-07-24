@@ -93,7 +93,7 @@ type Config struct {
 }
 
 func (c Config) Save() error {
-	configFile, err := os.Create(fmt.Sprintf("%s\\Config\\config.json", utils.GetMainFolder()))
+	configFile, err := os.Create(fmt.Sprintf("%s\\Config\\config.json", utils.File.GetMainFolder()))
 	if err != nil {
 		return err
 	}
@@ -110,7 +110,7 @@ func (c Config) Save() error {
 }
 
 func GetConfig() (config Config, err error) {
-	configFile, err := os.Open(fmt.Sprintf("%s\\Config\\config.json", utils.GetMainFolder()))
+	configFile, err := os.Open(fmt.Sprintf("%s\\Config\\config.json", utils.File.GetMainFolder()))
 	if err != nil {
 		return config, err
 	}

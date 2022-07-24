@@ -442,7 +442,7 @@ func (FunCommands) howgay(ctx *dgc.Ctx) {
 	user, _ := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	embed.NewEmbed().
 		AddField("User", user.String()).
-		AddField("Gay Percentage", utils.RandomPercentage()).
+		AddField("Gay Percentage", utils.Random.Percentage()).
 		Send(ctx)
 }
 
@@ -450,12 +450,12 @@ func (FunCommands) howsimp(ctx *dgc.Ctx) {
 	user, _ := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	embed.NewEmbed().
 		AddField("User", user.String()).
-		AddField("Simp Percentage", utils.RandomPercentage()).
+		AddField("Simp Percentage", utils.Random.Percentage()).
 		Send(ctx)
 }
 
 func (FunCommands) penis(ctx *dgc.Ctx) {
-	penisLength := utils.RandomNumber(1, 20)
+	penisLength := utils.Random.Number(1, 20)
 	penis := "8"
 	for i := 0; i < penisLength; i++ {
 		penis += "="
@@ -473,7 +473,7 @@ func (FunCommands) ego(ctx *dgc.Ctx) {
 	user, _ := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	embed.NewEmbed().
 		AddField("User", user.String()).
-		AddField("Ego", utils.RandomPercentage()).
+		AddField("Ego", utils.Random.Percentage()).
 		Send(ctx)
 }
 
@@ -535,8 +535,8 @@ func (FunCommands) wouldyourather(ctx *dgc.Ctx) {
 	}
 	embed.NewEmbed().
 		SetDescription("Would you rather...").
-		AddField("A", utils.GetElementById(html, "#qa")).
-		AddField("B", utils.GetElementById(html, "#qb")).
+		AddField("A", utils.Misc.GetElementById(html, "#qa")).
+		AddField("B", utils.Misc.GetElementById(html, "#qb")).
 		Send(ctx)
 }
 
@@ -548,7 +548,7 @@ func (FunCommands) topic(ctx *dgc.Ctx) {
 	}
 	embed.NewEmbed().
 		SetDescription("Would you rather...").
-		AddField("Topic", utils.GetElementById(html, "#random")).
+		AddField("Topic", utils.Misc.GetElementById(html, "#random")).
 		Send(ctx)
 }
 
@@ -769,11 +769,11 @@ func (FunCommands) trivia(ctx *dgc.Ctx) {
 	trivia = trivia.Get("results").GetIndex(0)
 	answers := trivia.Get("incorrect_answers").MustStringArray()
 	answers = append(answers, trivia.Get("correct_answer").MustString())
-	answers = utils.Shuffle(answers)
+	answers = utils.RandomShuffle(answers)
 	embed.NewEmbed().
 		AddField("Question", trivia.Get("question").MustString()).
 		AddField("Category", trivia.Get("category").MustString()).
-		AddField("Difficulty", utils.Capitalize(trivia.Get("difficulty").MustString())).
+		AddField("Difficulty", utils.String.Capitalize(trivia.Get("difficulty").MustString())).
 		AddField("Answers", strings.Join(answers, ", ")).
 		AddField("Correct Answer", fmt.Sprintf("||%s||", trivia.Get("correct_answer").MustString())).
 		Send(ctx)
@@ -781,7 +781,7 @@ func (FunCommands) trivia(ctx *dgc.Ctx) {
 
 func (FunCommands) dice(ctx *dgc.Ctx) {
 	embed.NewEmbed().
-		SetDescription(fmt.Sprintf("You rolled: %d", utils.RandomNumber(1, 6))).
+		SetDescription(fmt.Sprintf("You rolled: %d", utils.Random.Number(1, 6))).
 		Send(ctx)
 }
 
@@ -921,7 +921,7 @@ func (FunCommands) covidtest(ctx *dgc.Ctx) {
 }
 
 func (FunCommands) hug(ctx *dgc.Ctx) {
-	url, err := utils.GetImageUrlFromJson("https://nekos.life/api/v2/img/hug", "url")
+	url, err := utils.Misc.GetImageUrlFromJson("https://nekos.life/api/v2/img/hug", "url")
 	if err != nil {
 		ctx.RespondText("An error has occurred.")
 		return
@@ -930,7 +930,7 @@ func (FunCommands) hug(ctx *dgc.Ctx) {
 }
 
 func (FunCommands) kiss(ctx *dgc.Ctx) {
-	url, err := utils.GetImageUrlFromJson("https://nekos.life/api/v2/img/kiss", "url")
+	url, err := utils.Misc.GetImageUrlFromJson("https://nekos.life/api/v2/img/kiss", "url")
 	if err != nil {
 		ctx.RespondText("An error has occurred.")
 		return
@@ -939,7 +939,7 @@ func (FunCommands) kiss(ctx *dgc.Ctx) {
 }
 
 func (FunCommands) slap(ctx *dgc.Ctx) {
-	url, err := utils.GetImageUrlFromJson("https://nekos.life/api/v2/img/slap", "url")
+	url, err := utils.Misc.GetImageUrlFromJson("https://nekos.life/api/v2/img/slap", "url")
 	if err != nil {
 		ctx.RespondText("An error has occurred.")
 		return
@@ -948,7 +948,7 @@ func (FunCommands) slap(ctx *dgc.Ctx) {
 }
 
 func (FunCommands) cuddle(ctx *dgc.Ctx) {
-	url, err := utils.GetImageUrlFromJson("https://nekos.life/api/v2/img/cuddle", "url")
+	url, err := utils.Misc.GetImageUrlFromJson("https://nekos.life/api/v2/img/cuddle", "url")
 	if err != nil {
 		ctx.RespondText("An error has occurred.")
 		return
@@ -957,7 +957,7 @@ func (FunCommands) cuddle(ctx *dgc.Ctx) {
 }
 
 func (FunCommands) pat(ctx *dgc.Ctx) {
-	url, err := utils.GetImageUrlFromJson("https://nekos.life/api/v2/img/pat", "url")
+	url, err := utils.Misc.GetImageUrlFromJson("https://nekos.life/api/v2/img/pat", "url")
 	if err != nil {
 		ctx.RespondText("An error has occurred.")
 		return
@@ -966,7 +966,7 @@ func (FunCommands) pat(ctx *dgc.Ctx) {
 }
 
 func (FunCommands) feed(ctx *dgc.Ctx) {
-	url, err := utils.GetImageUrlFromJson("https://nekos.life/api/v2/img/feed", "url")
+	url, err := utils.Misc.GetImageUrlFromJson("https://nekos.life/api/v2/img/feed", "url")
 	if err != nil {
 		ctx.RespondText("An error has occurred.")
 		return
@@ -975,7 +975,7 @@ func (FunCommands) feed(ctx *dgc.Ctx) {
 }
 
 func (FunCommands) wink(ctx *dgc.Ctx) {
-	url, err := utils.GetImageUrlFromJson("https://some-random-api.ml/animu/wink", "link")
+	url, err := utils.Misc.GetImageUrlFromJson("https://some-random-api.ml/animu/wink", "link")
 	if err != nil {
 		ctx.RespondText("An error has occurred.")
 		return
@@ -1109,7 +1109,7 @@ func (FunCommands) impersonate(ctx *dgc.Ctx) {
 		ctx.RespondText("Could not find user.")
 		return
 	}
-	text := utils.RemoveWords(ctx.Arguments.Raw(), 1)
+	text := utils.String.RemoveWords(ctx.Arguments.Raw(), 1)
 	webhooks, err := ctx.Session.ChannelWebhooks(ctx.Event.ChannelID)
 	if err != nil {
 		ctx.RespondText("You need the manage_webhooks permission to use this command.")

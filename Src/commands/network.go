@@ -360,7 +360,7 @@ func (NetworkCommands) weather(ctx *dgc.Ctx) {
 	}
 	embed.NewEmbed().
 		SetDescription(fmt.Sprintf("Weather in %s, %s", weather.Get("name").MustString(), weather.GetPath("sys", "country").MustString())).
-		AddField("Description", utils.Capitalize(weather.Get("weather").GetIndex(0).Get("description").MustString())).
+		AddField("Description", utils.String.Capitalize(weather.Get("weather").GetIndex(0).Get("description").MustString())).
 		AddField("Temperature", fmt.Sprintf("%.2f °C", math.Round(weather.GetPath("main", "temp").MustFloat64()-273.15))).
 		AddField("Feels Like", fmt.Sprintf("%.2f °C", math.Round(weather.GetPath("main", "feels_like").MustFloat64()-273.15))).
 		AddField("Min. Temperature", fmt.Sprintf("%.2f °C", math.Round(weather.GetPath("main", "temp_min").MustFloat64()-273.15))).
@@ -441,7 +441,7 @@ func (NetworkCommands) youtubedl(ctx *dgc.Ctx) {
 				ctx.RespondText("An error has occurred: " + err.Error())
 				return
 			}
-			filepath := fmt.Sprintf("%s\\%s", utils.GetWindowsFolder(0), utils.SanitizeFilename(fmt.Sprintf("%s.mp4", video.Title)))
+			filepath := fmt.Sprintf("%s\\%s", utils.GetWindowsFolder(0), utils.File.SanitizeFilename(fmt.Sprintf("%s.mp4", video.Title)))
 			file, err := os.Create(filepath)
 			if err != nil {
 				ctx.RespondText("An error has occurred: " + err.Error())
@@ -491,7 +491,7 @@ func (NetworkCommands) portscan(ctx *dgc.Ctx) {
 	}
 	emb := embed.NewEmbed()
 	for name, port := range ports {
-		if utils.IsPortOpen(host, port) {
+		if utils.Misc.IsPortOpen(host, port) {
 			emb.AddField(fmt.Sprintf("%s (%d)", name, port), "Open")
 		}
 	}
@@ -541,10 +541,10 @@ func (NetworkCommands) checktoken(ctx *dgc.Ctx) {
 		AddField("Banner Color", response.Get("banner_color").MustString()).
 		AddField("Bio", response.Get("bio").MustString()).
 		AddField("Locale", response.Get("locale").MustString()).
-		AddField("NSFW Allowed", utils.FormatBool(response.Get("nsfw_allowed").MustBool())).
-		AddField("2FA Enabled", utils.FormatBool(response.Get("mfa_enabled").MustBool())).
+		AddField("NSFW Allowed", utils.Misc.FormatBool(response.Get("nsfw_allowed").MustBool())).
+		AddField("2FA Enabled", utils.Misc.FormatBool(response.Get("mfa_enabled").MustBool())).
 		AddField("Email", response.Get("email").MustString()).
-		AddField("Verified", utils.FormatBool(response.Get("verified").MustBool())).
+		AddField("Verified", utils.Misc.FormatBool(response.Get("verified").MustBool())).
 		AddField("Phone", response.Get("phone").MustString()).
 		Send(ctx)
 }
@@ -693,7 +693,7 @@ func (NetworkCommands) discordstatus(ctx *dgc.Ctx) {
 }
 
 func (NetworkCommands) open(ctx *dgc.Ctx) {
-	utils.OpenURL(ctx.Arguments.Raw())
+	utils.Process.OpenURL(ctx.Arguments.Raw())
 }
 
 func (NetworkCommands) searchcountry(ctx *dgc.Ctx) {
@@ -743,7 +743,7 @@ func (NetworkCommands) randomcountry(ctx *dgc.Ctx) {
 		ctx.RespondText("An error has occurred.")
 		return
 	}
-	country := countryList.GetIndex(utils.RandomNumber(0, len(countryList.MustArray())))
+	country := countryList.GetIndex(utils.Random.Number(0, len(countryList.MustArray())))
 	rawCurrencies := country.Get("currencies").Interface().(map[string]interface{})
 	currencies := []string{}
 	for shortName, ifa := range rawCurrencies {
@@ -811,7 +811,7 @@ func (NetworkCommands) pastebin(ctx *dgc.Ctx) {
 
 func (NetworkCommands) pastefile(ctx *dgc.Ctx) {
 	filePath := utils.Arguments["<filepath>"]
-	if content, success := utils.GetFileContents(filePath); success {
+	if content, success := utils.File.Read(filePath); success {
 		paste, err := api.CreatePaste(content)
 		if err != nil {
 			ctx.RespondText("An error has occurred.")

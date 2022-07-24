@@ -275,7 +275,7 @@ func (s SpotifyCommands) splaying(ctx *dgc.Ctx) {
 			AddField("Title", song.Get("name").MustString()).
 			AddField("Artist", strings.Join(songArtists, ", ")).
 			AddField("Release Date", song.GetPath("album", "release_date").MustString("Unknown")).
-			AddField("Explicit", utils.FormatBool(song.Get("explicit").MustBool(false))).
+			AddField("Explicit", utils.Misc.FormatBool(song.Get("explicit").MustBool(false))).
 			AddField("Duration", fmt.Sprintf("%d:%02d", int(song.Get("duration_ms").MustInt(0))/1000/60, int(song.Get("duration_ms").MustInt(0))/1000%60)).
 			AddField("URL", song.GetPath("external_urls", "spotify").MustString("Unknown")).
 			SetImage(song.GetPath("album", "images").GetIndex(0).Get("url").MustString("")).
@@ -357,7 +357,7 @@ func (s SpotifyCommands) simageid(ctx *dgc.Ctx) {
 		ctx.RespondText("Could not find a Spotify connection. Please connect your Spotify account to your Discord.")
 	} else {
 		headers := map[string]string{"Authorization": bearerToken}
-		searchResponse, err := http.GetJson(fmt.Sprintf("https://api.spotify.com/v1/search?q=%s&type=track", url.QueryEscape(utils.RemoveWords(ctx.Arguments.Raw(), 1))), headers)
+		searchResponse, err := http.GetJson(fmt.Sprintf("https://api.spotify.com/v1/search?q=%s&type=track", url.QueryEscape(utils.String.RemoveWords(ctx.Arguments.Raw(), 1))), headers)
 		if err != nil {
 			ctx.RespondText("A Spotify error occured: No song found")
 			return

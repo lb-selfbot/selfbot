@@ -108,7 +108,7 @@ func (i ImageCommands) RegisterCommands(router *dgc.Router) {
 func (ImageCommands) tweet(ctx *dgc.Ctx) {
 	jsonResult, err := http.GetJson(fmt.Sprintf(
 		"https://nekobot.xyz/api/imagegen?type=tweet&text=%s&username=%s",
-		url.QueryEscape(utils.RemoveWords(ctx.Arguments.Raw(), 1)),
+		url.QueryEscape(utils.String.RemoveWords(ctx.Arguments.Raw(), 1)),
 		url.QueryEscape(utils.Arguments["<username>"]),
 	))
 	if err != nil {
@@ -140,13 +140,13 @@ func (ImageCommands) ytcomment(ctx *dgc.Ctx) {
 	ctx.RespondText(fmt.Sprintf(
 		"https://some-random-api.ml/canvas/youtube-comment?avatar=%s&comment=%s&username=%s",
 		url.QueryEscape(user.AvatarURL("")),
-		url.QueryEscape(utils.RemoveWords(ctx.Arguments.Raw(), 1)),
+		url.QueryEscape(utils.String.RemoveWords(ctx.Arguments.Raw(), 1)),
 		url.QueryEscape(user.Username),
 	))
 }
 
 func (ImageCommands) pokemon(ctx *dgc.Ctx) {
-	ctx.RespondText(fmt.Sprintf("https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/%d.png", utils.RandomNumber(1, 898)))
+	ctx.RespondText(fmt.Sprintf("https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/%d.png", utils.Random.Number(1, 898)))
 }
 
 func (ImageCommands) wasted(ctx *dgc.Ctx) {

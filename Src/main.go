@@ -50,7 +50,7 @@ func selfbot_main(overseer.State) {
 		case ipc.Ipc.OpCodes.EXIT:
 			os.Exit(0)
 		case ipc.Ipc.OpCodes.RESTART:
-			utils.Restart()
+			utils.Process.Restart()
 		}
 	}
 

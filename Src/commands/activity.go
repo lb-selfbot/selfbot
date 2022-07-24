@@ -317,7 +317,7 @@ func (a *ActivityCommands) playing(ctx *dgc.Ctx) {
 func (a *ActivityCommands) streaming(ctx *dgc.Ctx) {
 	a.Session = ctx.Session
 	a.StreamingURL = utils.Arguments["<url>"]
-	a.setActivity("streaming", utils.RemoveWords(ctx.Arguments.Raw(), 1))
+	a.setActivity("streaming", utils.String.RemoveWords(ctx.Arguments.Raw(), 1))
 }
 
 func (a *ActivityCommands) competing(ctx *dgc.Ctx) {
@@ -466,7 +466,7 @@ func (a *ActivityCommands) cycleactivity(ctx *dgc.Ctx) {
 	a.CycleOn = true
 	a.CycleMode = "activitytype"
 	a.StreamingURL = utils.Arguments["<stream url>"]
-	a.CycleText = []string{utils.RemoveWords(ctx.Arguments.Raw(), 1)}
+	a.CycleText = []string{utils.String.RemoveWords(ctx.Arguments.Raw(), 1)}
 }
 
 func (a *ActivityCommands) timestatus(ctx *dgc.Ctx) {

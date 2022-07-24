@@ -232,7 +232,7 @@ func (ConfigCommands) commandprefix(ctx *dgc.Ctx) {
 
 func (ConfigCommands) commandmode(ctx *dgc.Ctx) {
 	cfg, _ := config.GetConfig()
-	mode := utils.Capitalize(utils.Arguments["<codeblock/text/urlembed>"])
+	mode := utils.String.Capitalize(utils.Arguments["<codeblock/text/urlembed>"])
 	if mode != "Codeblock" && mode != "Text" && mode != "Urlembed" {
 		ctx.RespondText("Invalid command mode.")
 		return
@@ -299,7 +299,7 @@ func (ConfigCommands) notifications(ctx *dgc.Ctx) {
 
 func (ConfigCommands) notificationtype(ctx *dgc.Ctx) {
 	cfg, _ := config.GetConfig()
-	notificationType := utils.Capitalize(utils.Arguments["<default/custom>"])
+	notificationType := utils.String.Capitalize(utils.Arguments["<default/custom>"])
 	if notificationType != "Default" && notificationType != "Custom" {
 		ctx.RespondText("Invalid command mode.")
 		return
@@ -560,7 +560,7 @@ func (ConfigCommands) uitheme(ctx *dgc.Ctx) {
 		return
 	}
 	cfg, _ := config.GetConfig()
-	cfg.UI.Theme = utils.Capitalize(theme)
+	cfg.UI.Theme = utils.String.Capitalize(theme)
 	cfg.Save()
 }
 

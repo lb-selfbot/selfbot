@@ -163,7 +163,7 @@ func (TextCommands) empty(ctx *dgc.Ctx) {
 }
 
 func (TextCommands) reverse(ctx *dgc.Ctx) {
-	ctx.RespondText(utils.ReverseString(ctx.Arguments.Raw()))
+	ctx.RespondText(utils.String.Reverse(ctx.Arguments.Raw()))
 }
 
 func (TextCommands) alphabet(ctx *dgc.Ctx) {
@@ -360,7 +360,7 @@ func (TextCommands) zalgo(ctx *dgc.Ctx) {
 }
 
 func (TextCommands) unzalgo(ctx *dgc.Ctx) {
-	text := utils.FilterAlphaNumeric(ctx.Arguments.Raw())
+	text := utils.String.FilterAlphaNumeric(ctx.Arguments.Raw())
 	ctx.RespondText(text)
 }
 
@@ -375,11 +375,11 @@ func (TextCommands) lower(ctx *dgc.Ctx) {
 }
 
 func (TextCommands) fliptext(ctx *dgc.Ctx) {
-	text := utils.FlipText(ctx.Arguments.Raw(), false)
+	text := utils.String.Flip(ctx.Arguments.Raw(), false)
 	ctx.RespondText(text)
 }
 
 func (TextCommands) unfliptext(ctx *dgc.Ctx) {
-	text := utils.FlipText(ctx.Arguments.Raw(), true)
+	text := utils.String.Flip(ctx.Arguments.Raw(), true)
 	ctx.RespondText(text)
 }

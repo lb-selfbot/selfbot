@@ -60,7 +60,7 @@ func (NSFWCommands) generateFunc(name string, subReddits []string) func(ctx *dgc
 			return
 		}
 		embed.NewEmbed().
-			SetDescription(utils.Capitalize(name)).
+			SetDescription(utils.String.Capitalize(name)).
 			SetImage(image.ImageURL).
 			Send(ctx)
 	}

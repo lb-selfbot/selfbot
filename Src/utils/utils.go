@@ -115,7 +115,7 @@ func (DiscordUtils) GetArguments(ctx *dgc.Ctx) (map[string]string, bool) {
 			content = strings.Replace(content, arguments[arg], "", -1)
 		} else {
 			arguments[arg] = raw
-			content = RemoveWords(content, 1)
+			content = String.RemoveWords(content, 1)
 		}
 
 		if arguments[arg] == "" && isRequired {
@@ -194,7 +194,9 @@ func (DiscordUtils) GetBoosters(guild *discordgo.Guild) []*discordgo.Member {
 
 var Discord *DiscordUtils = &DiscordUtils{}
 
-func ReverseString(s string) string {
+type StringUtils struct{}
+
+func (StringUtils) Reverse(s string) string {
 	rns := []rune(s)
 	for i, j := 0, len(rns)-1; i < j; i, j = i+1, j-1 {
 		rns[i], rns[j] = rns[j], rns[i]
@@ -202,7 +204,7 @@ func ReverseString(s string) string {
 	return string(rns)
 }
 
-func FilterAlphaNumeric(str string) string {
+func (StringUtils) FilterAlphaNumeric(str string) string {
 	s := []byte(str)
 	j := 0
 	for _, b := range s {
@@ -217,7 +219,7 @@ func FilterAlphaNumeric(str string) string {
 	return string(s[:j])
 }
 
-func FlipText(text string, unflip bool) string {
+func (StringUtils) Flip(text string, unflip bool) string {
 	flipChars := [][]string{
 		{"a", "ɐ"},
 		{"b", "q"},
@@ -292,10 +294,10 @@ func FlipText(text string, unflip bool) string {
 			text = strings.ReplaceAll(text, element[0], element[1])
 		}
 	}
-	return ReverseString(text)
+	return String.Reverse(text)
 }
 
-func RemoveWords(text string, amount int) string {
+func (StringUtils) RemoveWords(text string, amount int) string {
 	words := strings.Split(text, " ")
 	if amount > len(words) {
 		return ""
@@ -303,48 +305,37 @@ func RemoveWords(text string, amount int) string {
 	return strings.Join(words[amount:], " ")
 }
 
-func GetMainFolder() string {
-	if runtime.GOOS == "windows" {
-		return fmt.Sprintf("%s\\LightningBot", WindowsGetDocumentsFolder())
-	} else {
-		// TODO: Linux support
-		return "/.config/discordgo/"
-	}
+func (StringUtils) Capitalize(text string) string {
+	return strings.ToUpper(text[:1]) + text[1:]
 }
 
-func RandomNumber(min, max int) int {
+var String *StringUtils = &StringUtils{}
+
+type RandomUtils struct{}
+
+func (RandomUtils) Number(min, max int) int {
 	return rand.Intn(max-min) + min
 }
 
-func RandomChoice[T comparable](choices []T) T {
-	return choices[rand.Intn(len(choices))]
+func (RandomUtils) Percentage() string {
+	return fmt.Sprintf("%d%%", Random.Number(0, 100))
 }
 
-func RandomPercentage() string {
-	return fmt.Sprintf("%d%%", RandomNumber(0, 100))
-}
-
-func RandomString(length int) string {
+func (RandomUtils) String(length int) string {
 	bytes := make([]byte, length)
 	for i := 0; i < length; i++ {
-		bytes[i] = byte(RandomNumber(65, 90))
+		bytes[i] = byte(Random.Number(65, 90))
 	}
 	return string(bytes)
 }
 
-func GetElementById(html string, id string) string {
-	doc, err := goquery.NewDocumentFromReader(strings.NewReader(html))
-	if err != nil {
-		return ""
-	}
-	return doc.Find(id).Text()
+// Golang prevents you from using a generic function on a
+// normal struct so these have to be outside RandomUtils
+func RandomChoice[T comparable](choices []T) T {
+	return choices[rand.Intn(len(choices))]
 }
 
-func Capitalize(text string) string {
-	return strings.ToUpper(text[:1]) + text[1:]
-}
-
-func Shuffle[T comparable](slice []T) []T {
+func RandomShuffle[T comparable](slice []T) []T {
 	for i := len(slice) - 1; i > 0; i-- {
 		j := rand.Intn(i + 1)
 		slice[i], slice[j] = slice[j], slice[i]
@@ -352,24 +343,11 @@ func Shuffle[T comparable](slice []T) []T {
 	return slice
 }
 
-func GetImageUrlFromJson(url string, jsonQuery string) (string, error) {
-	json, err := http.GetJson(url)
-	if err != nil {
-		return "", err
-	}
-	return json.Get(jsonQuery).MustString(), nil
-}
+var Random *RandomUtils = &RandomUtils{}
 
-func SliceContains[T comparable](s []T, e T) bool {
-	for _, v := range s {
-		if v == e {
-			return true
-		}
-	}
-	return false
-}
+type FileUtils struct{}
 
-func SanitizeFilename(filename string) string {
+func (FileUtils) SanitizeFilename(filename string) string {
 	blacklist := []string{"\\", "/", ":", "*", "?", "\"", "<", ">", "|", "\x00"}
 	reserved := []string{
 		"CON", "PRN", "AUX", "NUL", "COM1", "COM2", "COM3", "COM4", "COM5",
@@ -404,25 +382,28 @@ func SanitizeFilename(filename string) string {
 	return filename
 }
 
-func IsPortOpen(hostname string, port int) bool {
-	address := hostname + ":" + strconv.Itoa(port)
-	conn, err := net.DialTimeout("tcp", address, 100*time.Millisecond)
-
+func (FileUtils) Read(file string) (string, bool) {
+	fileContents, err := ioutil.ReadFile(file)
 	if err != nil {
-		return false
+		return "", false
 	}
-	defer conn.Close()
-	return true
+	return string(fileContents), true
 }
 
-func FormatBool(b bool) string {
-	if b {
-		return "Yes"
+func (FileUtils) GetMainFolder() string {
+	if runtime.GOOS == "windows" {
+		return fmt.Sprintf("%s\\LightningBot", WindowsGetDocumentsFolder())
+	} else {
+		// TODO: Linux support
+		return "/.config/discordgo/"
 	}
-	return "No"
 }
 
-func OpenURL(url string) {
+var File *FileUtils = &FileUtils{}
+
+type ProcessUtils struct{}
+
+func (ProcessUtils) OpenURL(url string) {
 	if runtime.GOOS == "windows" {
 		exec.Command("explorer", url).Start()
 	} else if runtime.GOOS == "darwin" {
@@ -432,15 +413,7 @@ func OpenURL(url string) {
 	}
 }
 
-func GetFileContents(file string) (string, bool) {
-	fileContents, err := ioutil.ReadFile(file)
-	if err != nil {
-		return "", false
-	}
-	return string(fileContents), true
-}
-
-func Restart() error {
+func (ProcessUtils) Restart() error {
 	self, err := os.Executable()
 	if err != nil {
 		return err
@@ -461,10 +434,60 @@ func Restart() error {
 	return syscall.Exec(self, os.Args, env)
 }
 
+var Process *ProcessUtils = &ProcessUtils{}
+
+type MiscUtils struct{}
+
+func (MiscUtils) GetElementById(html string, id string) string {
+	doc, err := goquery.NewDocumentFromReader(strings.NewReader(html))
+	if err != nil {
+		return ""
+	}
+	return doc.Find(id).Text()
+}
+
+func (MiscUtils) GetImageUrlFromJson(url string, jsonQuery string) (string, error) {
+	json, err := http.GetJson(url)
+	if err != nil {
+		return "", err
+	}
+	return json.Get(jsonQuery).MustString(), nil
+}
+
+func (MiscUtils) IsPortOpen(hostname string, port int) bool {
+	address := hostname + ":" + strconv.Itoa(port)
+	conn, err := net.DialTimeout("tcp", address, 100*time.Millisecond)
+
+	if err != nil {
+		return false
+	}
+	defer conn.Close()
+	return true
+}
+
+func (MiscUtils) FormatBool(b bool) string {
+	if b {
+		return "Yes"
+	}
+	return "No"
+}
+
 // If a is not empty, returns a. If a is empty, returns b.
-func Or(a, b string) string {
+func (MiscUtils) Or(a, b string) string {
 	if a != "" {
 		return a
 	}
 	return b
+}
+
+var Misc *MiscUtils = &MiscUtils{}
+
+// Golang generics limitation
+func SliceContains[T comparable](s []T, e T) bool {
+	for _, v := range s {
+		if v == e {
+			return true
+		}
+	}
+	return false
 }

@@ -122,7 +122,7 @@ func (ModerationCommands) channelinfo(ctx *dgc.Ctx) {
 		AddField("ID", channel.ID).
 		AddField("Topic", channel.Topic).
 		AddField("Category ID", channel.ParentID).
-		AddField("Is NSFW", utils.FormatBool(channel.NSFW)).
+		AddField("Is NSFW", utils.Misc.FormatBool(channel.NSFW)).
 		AddField("Created At", utils.Discord.SnowflakeToTime(channel.ID).Format(time.RFC1123)).
 		AddField("Slowmode Delay", fmt.Sprint(channel.RateLimitPerUser)+" seconds").
 		AddField("Position", fmt.Sprint(channel.Position)).
@@ -880,7 +880,7 @@ func (ModerationCommands) serverowner(ctx *dgc.Ctx) {
 		return
 	}
 
-	guild, err := utils.Discord.GetGuild(ctx.Session, utils.Or(utils.Arguments["[server id]"], ctx.Event.GuildID))
+	guild, err := utils.Discord.GetGuild(ctx.Session, utils.Misc.Or(utils.Arguments["[server id]"], ctx.Event.GuildID))
 	if err != nil {
 		ctx.RespondText("Error getting server: " + err.Error())
 		return
@@ -901,7 +901,7 @@ func (ModerationCommands) servericon(ctx *dgc.Ctx) {
 		return
 	}
 
-	guild, err := utils.Discord.GetGuild(ctx.Session, utils.Or(utils.Arguments["[server id]"], ctx.Event.GuildID))
+	guild, err := utils.Discord.GetGuild(ctx.Session, utils.Misc.Or(utils.Arguments["[server id]"], ctx.Event.GuildID))
 	if err != nil {
 		ctx.RespondText("Error getting server: " + err.Error())
 		return
@@ -921,7 +921,7 @@ func (ModerationCommands) serverbanner(ctx *dgc.Ctx) {
 		return
 	}
 
-	guild, err := utils.Discord.GetGuild(ctx.Session, utils.Or(utils.Arguments["[server id]"], ctx.Event.GuildID))
+	guild, err := utils.Discord.GetGuild(ctx.Session, utils.Misc.Or(utils.Arguments["[server id]"], ctx.Event.GuildID))
 	if err != nil {
 		ctx.RespondText("Error getting server: " + err.Error())
 		return
@@ -941,7 +941,7 @@ func (ModerationCommands) serverboosters(ctx *dgc.Ctx) {
 		return
 	}
 
-	guild, err := utils.Discord.GetGuild(ctx.Session, utils.Or(utils.Arguments["[server id]"], ctx.Event.GuildID))
+	guild, err := utils.Discord.GetGuild(ctx.Session, utils.Misc.Or(utils.Arguments["[server id]"], ctx.Event.GuildID))
 	if err != nil {
 		ctx.RespondText("Error getting server: " + err.Error())
 		return
@@ -969,7 +969,7 @@ func (ModerationCommands) serverboostlevel(ctx *dgc.Ctx) {
 		return
 	}
 
-	guild, err := utils.Discord.GetGuild(ctx.Session, utils.Or(utils.Arguments["[server id]"], ctx.Event.GuildID))
+	guild, err := utils.Discord.GetGuild(ctx.Session, utils.Misc.Or(utils.Arguments["[server id]"], ctx.Event.GuildID))
 	if err != nil {
 		ctx.RespondText("Error getting server: " + err.Error())
 		return
@@ -1034,7 +1034,7 @@ func (ModerationCommands) serverinfo(ctx *dgc.Ctx) {
 		return
 	}
 
-	guild, err := utils.Discord.GetGuild(ctx.Session, utils.Or(utils.Arguments["[server id]"], ctx.Event.GuildID))
+	guild, err := utils.Discord.GetGuild(ctx.Session, utils.Misc.Or(utils.Arguments["[server id]"], ctx.Event.GuildID))
 	if err != nil {
 		ctx.RespondText("Error getting server: " + err.Error())
 		return

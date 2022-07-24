@@ -165,7 +165,7 @@ func (e EncodingCommands) RegisterCommands(router *dgc.Router) {
 
 func EncodingCommand(ctx *dgc.Ctx, encodeFunc func(string, bool) string) {
 	encodeOrDecode := utils.Arguments["<encode/decode>"]
-	text := utils.RemoveWords(ctx.Arguments.Raw(), 1)
+	text := utils.String.RemoveWords(ctx.Arguments.Raw(), 1)
 	if encodeOrDecode == "encode" {
 		ctx.RespondText(encodeFunc(text, false))
 	} else if encodeOrDecode == "decode" {

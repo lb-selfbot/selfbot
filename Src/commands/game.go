@@ -166,7 +166,7 @@ func (GameCommands) fnrandomplaylist(ctx *dgc.Ctx) {
 		ctx.RespondText("An error has occurred.")
 		return
 	}
-	playlist := playlists.Get("data").GetIndex(utils.RandomNumber(0, len(playlists.Get("data").MustArray())-1))
+	playlist := playlists.Get("data").GetIndex(utils.Random.Number(0, len(playlists.Get("data").MustArray())-1))
 	embed.NewEmbed().
 		SetDescription("Random Fortnite Playlist").
 		AddField("ID", playlist.Get("id").MustString("None")).
@@ -184,7 +184,7 @@ func (GameCommands) fnrandombanner(ctx *dgc.Ctx) {
 		ctx.RespondText("An error has occurred.")
 		return
 	}
-	banner := banners.Get("data").GetIndex(utils.RandomNumber(0, len(banners.Get("data").MustArray())-1))
+	banner := banners.Get("data").GetIndex(utils.Random.Number(0, len(banners.Get("data").MustArray())-1))
 	embed.NewEmbed().
 		SetDescription("Random Fortnite Banner").
 		SetImage(banner.GetPath("images", "icon").MustString()).
@@ -243,7 +243,7 @@ func (GameCommands) fncreatorcode(ctx *dgc.Ctx) {
 		AddField("Account Name", res.GetPath("account", "name").MustString("None")).
 		AddField("ID", res.GetPath("account", "id").MustString("None")).
 		AddField("Status", res.GetPath("status").MustString("None")).
-		AddField("Verified", utils.FormatBool(res.GetPath("verified").MustBool())).
+		AddField("Verified", utils.Misc.FormatBool(res.GetPath("verified").MustBool())).
 		Send(ctx)
 }
 
@@ -253,7 +253,7 @@ func (GameCommands) fnrandomcosmetic(ctx *dgc.Ctx) {
 		ctx.RespondText("An error has occurred.")
 		return
 	}
-	cosmetic := cosmetics.Get("data").GetIndex(utils.RandomNumber(0, len(cosmetics.Get("data").MustArray())-1))
+	cosmetic := cosmetics.Get("data").GetIndex(utils.Random.Number(0, len(cosmetics.Get("data").MustArray())-1))
 	image := cosmetic.GetPath("images", "featured").MustString()
 	if image == "" {
 		image = cosmetic.GetPath("images", "icon").MustString()

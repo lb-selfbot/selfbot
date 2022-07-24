@@ -96,16 +96,16 @@ func (TrollingCommands) token(ctx *dgc.Ctx) {
 }
 
 func (TrollingCommands) trollnitro(ctx *dgc.Ctx) {
-	ctx.RespondText(fmt.Sprintf("dıscord.gift/%s %s https://media.discordapp.net/attachments/759817334121824297/763209007170453544/xedy9ugkqo621.png", utils.RandomString(16), constants.InvisibleText))
+	ctx.RespondText(fmt.Sprintf("dıscord.gift/%s %s https://media.discordapp.net/attachments/759817334121824297/763209007170453544/xedy9ugkqo621.png", utils.Random.String(16), constants.InvisibleText))
 }
 
 func (TrollingCommands) hiddeninvite(ctx *dgc.Ctx) {
-	text := utils.RemoveWords(ctx.Arguments.Raw(), 1)
+	text := utils.String.RemoveWords(ctx.Arguments.Raw(), 1)
 	ctx.RespondText(fmt.Sprintf("%s %s %s", text, constants.InvisibleText, utils.Arguments["<invite>"]))
 }
 
 func (TrollingCommands) hiddenping(ctx *dgc.Ctx) {
-	text := utils.RemoveWords(ctx.Arguments.Raw(), 1)
+	text := utils.String.RemoveWords(ctx.Arguments.Raw(), 1)
 	ctx.RespondText(fmt.Sprintf("%s %s %s", text, constants.InvisibleText, utils.Arguments["<user>"]))
 }
 

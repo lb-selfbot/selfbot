@@ -47,7 +47,7 @@ func Init(username, password string) error {
 			case "EXIT":
 				os.Exit(0)
 			case "RESTART":
-				utils.Restart()
+				utils.Process.Restart()
 			default:
 				fmt.Println(wsMessage)
 			}
