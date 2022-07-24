@@ -75,7 +75,7 @@ func selfbot_main(overseer.State) {
 	router.RegisterMiddleware(func(following dgc.ExecutionHandler) dgc.ExecutionHandler {
 		return func(ctx *dgc.Ctx) {
 			events.OnCommand(ctx)
-			arguments, success := utils.GetArguments(ctx)
+			arguments, success := utils.Discord.GetArguments(ctx)
 			utils.Arguments = arguments
 			if success {
 				following(ctx)

@@ -28,7 +28,171 @@ var LowercaseAlphabet string = "abcdefghijklmnopqrstuvwxyz"
 
 var Arguments map[string]string = make(map[string]string)
 
-var InviteRegex *regexp.Regexp = regexp.MustCompile("(?:https?://)?discord(?:(?:app)?\\.com/invite|\\.gg)/?[a-zA-Z0-9]+/?")
+var InviteRegex *regexp.Regexp = regexp.MustCompile(`(?:https?://)?discord(?:(?:app)?\.com/invite|\.gg)/?[a-zA-Z0-9]+/?`)
+
+type DiscordUtils struct{}
+
+func (DiscordUtils) TryGetUserFromMention(session *discordgo.Session, mention *dgc.Argument) (*discordgo.User, bool) {
+	userID := mention.AsUserMentionID()
+	if userID == "" {
+		userID = mention.Raw()
+	}
+	user, err := session.User(userID)
+	if err != nil {
+		return nil, false
+	}
+	return user, true
+}
+
+func (DiscordUtils) TryGetMemberFromMention(ctx *dgc.Ctx, mention *dgc.Argument) (*discordgo.Member, bool) {
+	userID := mention.AsUserMentionID()
+	if userID == "" {
+		userID = mention.Raw()
+	}
+	member, err := ctx.Session.GuildMember(ctx.Event.GuildID, userID)
+	if err != nil {
+		return nil, false
+	}
+	return member, true
+}
+
+func (d *DiscordUtils) TryGetUsernameFromMention(session *discordgo.Session, mention *dgc.Argument) (string, bool) {
+	user, success := d.TryGetUserFromMention(session, mention)
+	if !success {
+		return "", false
+	}
+	return fmt.Sprintf("%s#%s", user.Username, user.Discriminator), true
+}
+
+func (DiscordUtils) TryGetChannelFromMention(ctx *dgc.Ctx, mention *dgc.Argument) (*discordgo.Channel, bool) {
+	if mention.AsChannelMentionID() == "" {
+		return nil, false
+	}
+	channel, err := ctx.Session.Channel(mention.AsChannelMentionID())
+	if err != nil {
+		return nil, false
+	}
+	return channel, true
+}
+
+func (DiscordUtils) SnowflakeToTime(snowflake string) time.Time {
+	// parse snowflake to int64
+	snowflakeInt, err := strconv.ParseInt(snowflake, 10, 64)
+	if err != nil {
+		return time.Time{}
+	}
+	// convert int64 to time
+	return time.Unix(((snowflakeInt>>22)+1420070400000)/1000, 0)
+}
+
+func (DiscordUtils) ParseInvite(invite string) string {
+	inviteRegexMatch := string(InviteRegex.Find([]byte(invite)))
+	if inviteRegexMatch != "" {
+		splitInvite := strings.Split(inviteRegexMatch, "/")
+		return splitInvite[len(splitInvite)-1]
+	}
+	return invite
+}
+
+func (DiscordUtils) CheckIfInServer(ctx *dgc.Ctx) bool {
+	if ctx.Event.GuildID == "" {
+		error_handling.OnError(ctx, error_handling.ServerOnlyCommand, ctx.Command.Name)
+	}
+	return ctx.Event.GuildID != ""
+}
+
+func (DiscordUtils) GetArguments(ctx *dgc.Ctx) (map[string]string, bool) {
+	rawArguments := strings.Replace(ctx.Command.Usage, fmt.Sprintf("[p]%s", ctx.Command.Name), "", -1)
+	commandArguments := regexp.MustCompile(`(<(.*?)>|\[(.*?)\])`).FindAllString(rawArguments, -1)
+	arguments := map[string]string{}
+	content := ctx.Event.Message.Content
+	for index, arg := range commandArguments {
+		raw := ctx.Arguments.Get(index).Raw()
+		isRequired := strings.Contains(arg, "<") && strings.Contains(arg, ">")
+
+		if strings.Contains(arg, "\"") && strings.Count(raw, "\"") >= 2 {
+			arguments[arg] = regexp.MustCompile("\"(.*?)\"").FindString(content)
+			content = strings.Replace(content, arguments[arg], "", -1)
+		} else {
+			arguments[arg] = raw
+			content = RemoveWords(content, 1)
+		}
+
+		if arguments[arg] == "" && isRequired {
+			error_handling.OnError(ctx, error_handling.MissingRequiredArgument, arg)
+			return map[string]string{}, false
+		}
+	}
+	return arguments, true
+}
+
+func (DiscordUtils) GetChannelMessages(ctx *dgc.Ctx, limit int) ([]*discordgo.Message, error) {
+	// The maximum number of messages that can be retrieved at once is 100.
+	if limit <= 100 {
+		return ctx.Session.ChannelMessages(ctx.Event.ChannelID, limit, "", "", ctx.Event.Message.ID)
+	}
+
+	amountOfRequests := int(math.Ceil(float64(limit) / 100))
+	messages := []*discordgo.Message{ctx.Event.Message}
+	// Subtract 1 from the limit because we already have the message that executed the command
+	limit -= 1
+
+	for i := 0; i < amountOfRequests; i++ {
+		newMessages, err := ctx.Session.ChannelMessages(ctx.Event.ChannelID, int(math.Min(float64(limit), 100)), messages[len(messages)-1].ID, "", "")
+		if err != nil {
+			return nil, err
+		}
+		limit -= 100
+		messages = append(messages, newMessages...)
+	}
+
+	return messages, nil
+}
+
+func (DiscordUtils) GetRoleNames(ctx *dgc.Ctx, member *discordgo.Member) string {
+	roleNames := []string{}
+	for _, role := range member.Roles {
+		role, err := ctx.Session.State.Role(member.GuildID, role)
+		if err == nil {
+			roleNames = append(roleNames, role.Name)
+		}
+	}
+	return strings.Join(roleNames, ", ")
+}
+
+func (DiscordUtils) GetGuild(session *discordgo.Session, guildID string) (guild *discordgo.Guild, err error) {
+	guild, err = session.State.Guild(guildID)
+	if err != nil {
+		guild, err = session.Guild(guildID)
+		if err != nil {
+			return nil, err
+		}
+	}
+	return guild, nil
+}
+
+func (DiscordUtils) GetMember(session *discordgo.Session, guildID, userID string) (member *discordgo.Member, err error) {
+	member, err = session.State.Member(guildID, userID)
+	if err != nil {
+		member, err = session.GuildMember(guildID, userID)
+		if err != nil {
+			return nil, err
+		}
+	}
+	return member, nil
+}
+
+func (DiscordUtils) GetBoosters(guild *discordgo.Guild) []*discordgo.Member {
+	boostedMembers := []*discordgo.Member{}
+	for _, member := range guild.Members {
+		if member.PremiumSince != nil {
+			boostedMembers = append(boostedMembers, member)
+		}
+	}
+	return boostedMembers
+}
+
+var Discord *DiscordUtils = &DiscordUtils{}
 
 func ReverseString(s string) string {
 	rns := []rune(s)
@@ -168,68 +332,6 @@ func RandomString(length int) string {
 	return string(bytes)
 }
 
-func TryGetUserFromMention(session *discordgo.Session, mention *dgc.Argument) (*discordgo.User, bool) {
-	userID := mention.AsUserMentionID()
-	if userID == "" {
-		userID = mention.Raw()
-	}
-	user, err := session.User(userID)
-	if err != nil {
-		return nil, false
-	}
-	return user, true
-}
-
-func TryGetMemberFromMention(ctx *dgc.Ctx, mention *dgc.Argument) (*discordgo.Member, bool) {
-	userID := mention.AsUserMentionID()
-	if userID == "" {
-		userID = mention.Raw()
-	}
-	member, err := ctx.Session.GuildMember(ctx.Event.GuildID, userID)
-	if err != nil {
-		return nil, false
-	}
-	return member, true
-}
-
-func TryGetUsernameFromMention(session *discordgo.Session, mention *dgc.Argument) (string, bool) {
-	user, success := TryGetUserFromMention(session, mention)
-	if !success {
-		return "", false
-	}
-	return fmt.Sprintf("%s#%s", user.Username, user.Discriminator), true
-}
-
-func TryGetChannelFromMention(ctx *dgc.Ctx, mention *dgc.Argument) (*discordgo.Channel, bool) {
-	if mention.AsChannelMentionID() == "" {
-		return nil, false
-	}
-	channel, err := ctx.Session.Channel(mention.AsChannelMentionID())
-	if err != nil {
-		return nil, false
-	}
-	return channel, true
-}
-
-func SnowflakeToTime(snowflake string) time.Time {
-	// parse snowflake to int64
-	snowflakeInt, err := strconv.ParseInt(snowflake, 10, 64)
-	if err != nil {
-		return time.Time{}
-	}
-	// convert int64 to time
-	return time.Unix(((snowflakeInt>>22)+1420070400000)/1000, 0)
-}
-
-func ParseInvite(invite string) string {
-	inviteRegexMatch := string(InviteRegex.Find([]byte(invite)))
-	if inviteRegexMatch != "" {
-		splitInvite := strings.Split(inviteRegexMatch, "/")
-		return splitInvite[len(splitInvite)-1]
-	}
-	return invite
-}
-
 func GetElementById(html string, id string) string {
 	doc, err := goquery.NewDocumentFromReader(strings.NewReader(html))
 	if err != nil {
@@ -248,13 +350,6 @@ func Shuffle[T comparable](slice []T) []T {
 		slice[i], slice[j] = slice[j], slice[i]
 	}
 	return slice
-}
-
-func CheckIfInServer(ctx *dgc.Ctx) bool {
-	if ctx.Event.GuildID == "" {
-		error_handling.OnError(ctx, error_handling.ServerOnlyCommand, ctx.Command.Name)
-	}
-	return ctx.Event.GuildID != ""
 }
 
 func GetImageUrlFromJson(url string, jsonQuery string) (string, error) {
@@ -345,31 +440,6 @@ func GetFileContents(file string) (string, bool) {
 	return string(fileContents), true
 }
 
-func GetArguments(ctx *dgc.Ctx) (map[string]string, bool) {
-	rawArguments := strings.Replace(ctx.Command.Usage, fmt.Sprintf("[p]%s", ctx.Command.Name), "", -1)
-	commandArguments := regexp.MustCompile(`(<(.*?)>|\[(.*?)\])`).FindAllString(rawArguments, -1)
-	arguments := map[string]string{}
-	content := ctx.Event.Message.Content
-	for index, arg := range commandArguments {
-		raw := ctx.Arguments.Get(index).Raw()
-		isRequired := strings.Contains(arg, "<") && strings.Contains(arg, ">")
-
-		if strings.Contains(arg, "\"") && strings.Count(raw, "\"") >= 2 {
-			arguments[arg] = regexp.MustCompile("\"(.*?)\"").FindString(content)
-			content = strings.Replace(content, arguments[arg], "", -1)
-		} else {
-			arguments[arg] = raw
-			content = RemoveWords(content, 1)
-		}
-
-		if arguments[arg] == "" && isRequired {
-			error_handling.OnError(ctx, error_handling.MissingRequiredArgument, arg)
-			return map[string]string{}, false
-		}
-	}
-	return arguments, true
-}
-
 func Restart() error {
 	self, err := os.Executable()
 	if err != nil {
@@ -389,72 +459,6 @@ func Restart() error {
 		return err
 	}
 	return syscall.Exec(self, os.Args, env)
-}
-
-func GetChannelMessages(ctx *dgc.Ctx, limit int) ([]*discordgo.Message, error) {
-	// The maximum number of messages that can be retrieved at once is 100.
-	if limit <= 100 {
-		return ctx.Session.ChannelMessages(ctx.Event.ChannelID, limit, "", "", ctx.Event.Message.ID)
-	}
-
-	amountOfRequests := int(math.Ceil(float64(limit) / 100))
-	messages := []*discordgo.Message{ctx.Event.Message}
-	// Subtract 1 from the limit because we already have the message that executed the command
-	limit -= 1
-
-	for i := 0; i < amountOfRequests; i++ {
-		newMessages, err := ctx.Session.ChannelMessages(ctx.Event.ChannelID, int(math.Min(float64(limit), 100)), messages[len(messages)-1].ID, "", "")
-		if err != nil {
-			return nil, err
-		}
-		limit -= 100
-		messages = append(messages, newMessages...)
-	}
-
-	return messages, nil
-}
-
-func GetRoleNames(ctx *dgc.Ctx, member *discordgo.Member) string {
-	roleNames := []string{}
-	for _, role := range member.Roles {
-		role, err := ctx.Session.State.Role(member.GuildID, role)
-		if err == nil {
-			roleNames = append(roleNames, role.Name)
-		}
-	}
-	return strings.Join(roleNames, ", ")
-}
-
-func GetGuild(session *discordgo.Session, guildID string) (guild *discordgo.Guild, err error) {
-	guild, err = session.State.Guild(guildID)
-	if err != nil {
-		guild, err = session.Guild(guildID)
-		if err != nil {
-			return nil, err
-		}
-	}
-	return guild, nil
-}
-
-func GetMember(session *discordgo.Session, guildID, userID string) (member *discordgo.Member, err error) {
-	member, err = session.State.Member(guildID, userID)
-	if err != nil {
-		member, err = session.GuildMember(guildID, userID)
-		if err != nil {
-			return nil, err
-		}
-	}
-	return member, nil
-}
-
-func GetBoosters(guild *discordgo.Guild) []*discordgo.Member {
-	boostedMembers := []*discordgo.Member{}
-	for _, member := range guild.Members {
-		if member.PremiumSince != nil {
-			boostedMembers = append(boostedMembers, member)
-		}
-	}
-	return boostedMembers
 }
 
 // If a is not empty, returns a. If a is empty, returns b.

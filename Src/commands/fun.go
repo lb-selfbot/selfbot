@@ -439,17 +439,17 @@ func (FunCommands) eightball(ctx *dgc.Ctx) {
 }
 
 func (FunCommands) howgay(ctx *dgc.Ctx) {
-	user, _ := utils.TryGetUsernameFromMention(ctx.Session, ctx.Arguments.Get(0))
+	user, _ := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	embed.NewEmbed().
-		AddField("User", user).
+		AddField("User", user.String()).
 		AddField("Gay Percentage", utils.RandomPercentage()).
 		Send(ctx)
 }
 
 func (FunCommands) howsimp(ctx *dgc.Ctx) {
-	user, _ := utils.TryGetUsernameFromMention(ctx.Session, ctx.Arguments.Get(0))
+	user, _ := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	embed.NewEmbed().
-		AddField("User", user).
+		AddField("User", user.String()).
 		AddField("Simp Percentage", utils.RandomPercentage()).
 		Send(ctx)
 }
@@ -461,27 +461,27 @@ func (FunCommands) penis(ctx *dgc.Ctx) {
 		penis += "="
 	}
 	penis += "D"
-	user, _ := utils.TryGetUsernameFromMention(ctx.Session, ctx.Arguments.Get(0))
+	user, _ := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	embed.NewEmbed().
-		AddField("User", user).
+		AddField("User", user.String()).
 		AddField("Penis", penis).
 		AddField("Penis Length", fmt.Sprintf("%d cm", penisLength)).
 		Send(ctx)
 }
 
 func (FunCommands) ego(ctx *dgc.Ctx) {
-	user, _ := utils.TryGetUsernameFromMention(ctx.Session, ctx.Arguments.Get(0))
+	user, _ := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	embed.NewEmbed().
-		AddField("User", user).
+		AddField("User", user.String()).
 		AddField("Ego", utils.RandomPercentage()).
 		Send(ctx)
 }
 
 func (FunCommands) hack(ctx *dgc.Ctx) {
-	user, _ := utils.TryGetUsernameFromMention(ctx.Session, ctx.Arguments.Get(0))
+	user, _ := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	cc := gofakeit.CreditCard()
 	embed.NewEmbed().
-		AddField("User", user).
+		AddField("User", user.String()).
 		AddField("Real Name", gofakeit.Name()).
 		AddField("Email", gofakeit.Email()).
 		AddField("Phone", gofakeit.PhoneFormatted()).
@@ -495,8 +495,8 @@ func (FunCommands) hack(ctx *dgc.Ctx) {
 }
 
 func (FunCommands) insult(ctx *dgc.Ctx) {
-	user, _ := utils.TryGetUsernameFromMention(ctx.Session, ctx.Arguments.Get(0))
-	insult, err := http.GetJson(fmt.Sprintf("https://lightning-bot.com/api/v2/selfbot/roast?mention=%s", user))
+	user, _ := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
+	insult, err := http.GetJson(fmt.Sprintf("https://lightning-bot.com/api/v2/selfbot/roast?mention=%s", user.String()))
 	if err != nil {
 		ctx.RespondText("An error has occurred.")
 	}
@@ -786,7 +786,7 @@ func (FunCommands) dice(ctx *dgc.Ctx) {
 }
 
 func (FunCommands) randomemoji(ctx *dgc.Ctx) {
-	if !utils.CheckIfInServer(ctx) {
+	if !utils.Discord.CheckIfInServer(ctx) {
 		return
 	}
 	emojis, err := ctx.Session.GuildEmojis(ctx.Event.GuildID)
@@ -799,7 +799,7 @@ func (FunCommands) randomemoji(ctx *dgc.Ctx) {
 }
 
 func (FunCommands) randomchannel(ctx *dgc.Ctx) {
-	if !utils.CheckIfInServer(ctx) {
+	if !utils.Discord.CheckIfInServer(ctx) {
 		return
 	}
 	channels, err := ctx.Session.GuildChannels(ctx.Event.GuildID)
@@ -913,9 +913,9 @@ func (FunCommands) rps(ctx *dgc.Ctx) {
 }
 
 func (FunCommands) covidtest(ctx *dgc.Ctx) {
-	user, _ := utils.TryGetUsernameFromMention(ctx.Session, ctx.Arguments.Get(0))
+	user, _ := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	embed.NewEmbed().
-		AddField("User", user).
+		AddField("User", user.String()).
 		AddField("Result", utils.RandomChoice([]string{"Positive", "Negative"})).
 		Send(ctx)
 }
@@ -1104,7 +1104,7 @@ func (FunCommands) rickroll(ctx *dgc.Ctx) {
 }
 
 func (FunCommands) impersonate(ctx *dgc.Ctx) {
-	user, success := utils.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
+	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
 		ctx.RespondText("Could not find user.")
 		return

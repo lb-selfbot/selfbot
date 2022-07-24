@@ -133,7 +133,7 @@ func (ImageCommands) meme(ctx *dgc.Ctx) {
 }
 
 func (ImageCommands) ytcomment(ctx *dgc.Ctx) {
-	user, success := utils.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
+	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
 		user = ctx.Event.Author
 	}
@@ -150,7 +150,7 @@ func (ImageCommands) pokemon(ctx *dgc.Ctx) {
 }
 
 func (ImageCommands) wasted(ctx *dgc.Ctx) {
-	user, success := utils.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
+	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
 		user = ctx.Event.Author
 	}
@@ -158,7 +158,7 @@ func (ImageCommands) wasted(ctx *dgc.Ctx) {
 }
 
 func (ImageCommands) triggered(ctx *dgc.Ctx) {
-	user, success := utils.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
+	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
 		user = ctx.Event.Author
 	}
@@ -166,7 +166,7 @@ func (ImageCommands) triggered(ctx *dgc.Ctx) {
 }
 
 func (ImageCommands) glass(ctx *dgc.Ctx) {
-	user, success := utils.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
+	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
 		user = ctx.Event.Author
 	}
@@ -174,7 +174,7 @@ func (ImageCommands) glass(ctx *dgc.Ctx) {
 }
 
 func (ImageCommands) greyscale(ctx *dgc.Ctx) {
-	user, success := utils.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
+	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
 		user = ctx.Event.Author
 	}
@@ -182,7 +182,7 @@ func (ImageCommands) greyscale(ctx *dgc.Ctx) {
 }
 
 func (ImageCommands) invert(ctx *dgc.Ctx) {
-	user, success := utils.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
+	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
 		user = ctx.Event.Author
 	}
@@ -190,7 +190,7 @@ func (ImageCommands) invert(ctx *dgc.Ctx) {
 }
 
 func (ImageCommands) invertgreyscale(ctx *dgc.Ctx) {
-	user, success := utils.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
+	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
 		user = ctx.Event.Author
 	}
@@ -198,7 +198,7 @@ func (ImageCommands) invertgreyscale(ctx *dgc.Ctx) {
 }
 
 func (ImageCommands) brightness(ctx *dgc.Ctx) {
-	user, success := utils.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
+	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
 		user = ctx.Event.Author
 	}
@@ -206,7 +206,7 @@ func (ImageCommands) brightness(ctx *dgc.Ctx) {
 }
 
 func (ImageCommands) red(ctx *dgc.Ctx) {
-	user, success := utils.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
+	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
 		user = ctx.Event.Author
 	}
@@ -214,7 +214,7 @@ func (ImageCommands) red(ctx *dgc.Ctx) {
 }
 
 func (ImageCommands) green(ctx *dgc.Ctx) {
-	user, success := utils.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
+	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
 		user = ctx.Event.Author
 	}
@@ -222,7 +222,7 @@ func (ImageCommands) green(ctx *dgc.Ctx) {
 }
 
 func (ImageCommands) blue(ctx *dgc.Ctx) {
-	user, success := utils.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
+	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
 		user = ctx.Event.Author
 	}
@@ -230,7 +230,7 @@ func (ImageCommands) blue(ctx *dgc.Ctx) {
 }
 
 func (ImageCommands) pixelate(ctx *dgc.Ctx) {
-	user, success := utils.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
+	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
 		user = ctx.Event.Author
 	}

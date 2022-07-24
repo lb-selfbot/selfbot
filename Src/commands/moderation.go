@@ -111,7 +111,7 @@ func (m ModerationCommands) RegisterCommands(router *dgc.Router) {
 // Channel Control
 
 func (ModerationCommands) channelinfo(ctx *dgc.Ctx) {
-	channel, success := utils.TryGetChannelFromMention(ctx, ctx.Arguments.Get(0))
+	channel, success := utils.Discord.TryGetChannelFromMention(ctx, ctx.Arguments.Get(0))
 	if !success {
 		ctx.RespondText("Could not find channel")
 		return
@@ -123,7 +123,7 @@ func (ModerationCommands) channelinfo(ctx *dgc.Ctx) {
 		AddField("Topic", channel.Topic).
 		AddField("Category ID", channel.ParentID).
 		AddField("Is NSFW", utils.FormatBool(channel.NSFW)).
-		AddField("Created At", utils.SnowflakeToTime(channel.ID).Format(time.RFC1123)).
+		AddField("Created At", utils.Discord.SnowflakeToTime(channel.ID).Format(time.RFC1123)).
 		AddField("Slowmode Delay", fmt.Sprint(channel.RateLimitPerUser)+" seconds").
 		AddField("Position", fmt.Sprint(channel.Position)).
 		AddField("Last Message ID", channel.LastMessageID).
@@ -131,7 +131,7 @@ func (ModerationCommands) channelinfo(ctx *dgc.Ctx) {
 }
 
 func (ModerationCommands) textchannel(ctx *dgc.Ctx) {
-	if !utils.CheckIfInServer(ctx) {
+	if !utils.Discord.CheckIfInServer(ctx) {
 		return
 	}
 	channel, err := ctx.Session.GuildChannelCreate(ctx.Event.GuildID, ctx.Arguments.Raw(), discordgo.ChannelTypeGuildText)
@@ -146,7 +146,7 @@ func (ModerationCommands) textchannel(ctx *dgc.Ctx) {
 }
 
 func (ModerationCommands) voicechannel(ctx *dgc.Ctx) {
-	if !utils.CheckIfInServer(ctx) {
+	if !utils.Discord.CheckIfInServer(ctx) {
 		return
 	}
 	channel, err := ctx.Session.GuildChannelCreate(ctx.Event.GuildID, ctx.Arguments.Raw(), discordgo.ChannelTypeGuildVoice)
@@ -161,7 +161,7 @@ func (ModerationCommands) voicechannel(ctx *dgc.Ctx) {
 }
 
 func (ModerationCommands) stagechannel(ctx *dgc.Ctx) {
-	if !utils.CheckIfInServer(ctx) {
+	if !utils.Discord.CheckIfInServer(ctx) {
 		return
 	}
 	channel, err := ctx.Session.GuildChannelCreate(ctx.Event.GuildID, ctx.Arguments.Raw(), discordgo.ChannelTypeGuildStageVoice)
@@ -176,7 +176,7 @@ func (ModerationCommands) stagechannel(ctx *dgc.Ctx) {
 }
 
 func (ModerationCommands) newschannel(ctx *dgc.Ctx) {
-	if !utils.CheckIfInServer(ctx) {
+	if !utils.Discord.CheckIfInServer(ctx) {
 		return
 	}
 	channel, err := ctx.Session.GuildChannelCreate(ctx.Event.GuildID, ctx.Arguments.Raw(), discordgo.ChannelTypeGuildNews)
@@ -191,7 +191,7 @@ func (ModerationCommands) newschannel(ctx *dgc.Ctx) {
 }
 
 func (ModerationCommands) thread(ctx *dgc.Ctx) {
-	if !utils.CheckIfInServer(ctx) {
+	if !utils.Discord.CheckIfInServer(ctx) {
 		return
 	}
 	ctx.Session.ThreadStart(ctx.Event.ChannelID, ctx.Arguments.Raw(), discordgo.ChannelTypeGuildPublicThread, 0)
@@ -207,7 +207,7 @@ func (ModerationCommands) thread(ctx *dgc.Ctx) {
 }
 
 func (ModerationCommands) renamechannel(ctx *dgc.Ctx) {
-	channel, success := utils.TryGetChannelFromMention(ctx, ctx.Arguments.Get(0))
+	channel, success := utils.Discord.TryGetChannelFromMention(ctx, ctx.Arguments.Get(0))
 	if !success {
 		ctx.RespondText("Could not find channel")
 		return
@@ -226,7 +226,7 @@ func (ModerationCommands) renamechannel(ctx *dgc.Ctx) {
 }
 
 func (ModerationCommands) deletechannel(ctx *dgc.Ctx) {
-	channel, success := utils.TryGetChannelFromMention(ctx, ctx.Arguments.Get(0))
+	channel, success := utils.Discord.TryGetChannelFromMention(ctx, ctx.Arguments.Get(0))
 	if !success {
 		ctx.RespondText("Could not find channel")
 		return
@@ -244,7 +244,7 @@ func (ModerationCommands) deletechannel(ctx *dgc.Ctx) {
 }
 
 func (ModerationCommands) slowmode(ctx *dgc.Ctx) {
-	channel, success := utils.TryGetChannelFromMention(ctx, ctx.Arguments.Get(0))
+	channel, success := utils.Discord.TryGetChannelFromMention(ctx, ctx.Arguments.Get(0))
 	if !success {
 		ctx.RespondText("Could not find channel")
 		return
@@ -271,7 +271,7 @@ func (ModerationCommands) slowmode(ctx *dgc.Ctx) {
 }
 
 func (ModerationCommands) removeslowmode(ctx *dgc.Ctx) {
-	channel, success := utils.TryGetChannelFromMention(ctx, ctx.Arguments.Get(0))
+	channel, success := utils.Discord.TryGetChannelFromMention(ctx, ctx.Arguments.Get(0))
 	if !success {
 		ctx.RespondText("Could not find channel")
 		return
@@ -292,7 +292,7 @@ func (ModerationCommands) removeslowmode(ctx *dgc.Ctx) {
 }
 
 func (ModerationCommands) lockchannel(ctx *dgc.Ctx) {
-	channel, success := utils.TryGetChannelFromMention(ctx, ctx.Arguments.Get(0))
+	channel, success := utils.Discord.TryGetChannelFromMention(ctx, ctx.Arguments.Get(0))
 	if !success {
 		ctx.RespondText("Could not find channel")
 		return
@@ -317,7 +317,7 @@ func (ModerationCommands) lockchannel(ctx *dgc.Ctx) {
 }
 
 func (ModerationCommands) unlockchannel(ctx *dgc.Ctx) {
-	channel, success := utils.TryGetChannelFromMention(ctx, ctx.Arguments.Get(0))
+	channel, success := utils.Discord.TryGetChannelFromMention(ctx, ctx.Arguments.Get(0))
 	if !success {
 		ctx.RespondText("Could not find channel")
 		return
@@ -350,7 +350,7 @@ func (ModerationCommands) unlockchannel(ctx *dgc.Ctx) {
 }
 
 func (ModerationCommands) category(ctx *dgc.Ctx) {
-	if !utils.CheckIfInServer(ctx) {
+	if !utils.Discord.CheckIfInServer(ctx) {
 		return
 	}
 	channel, err := ctx.Session.GuildChannelCreate(ctx.Event.GuildID, ctx.Arguments.Raw(), discordgo.ChannelTypeGuildCategory)
@@ -365,7 +365,7 @@ func (ModerationCommands) category(ctx *dgc.Ctx) {
 }
 
 func (ModerationCommands) deletecategory(ctx *dgc.Ctx) {
-	channel, success := utils.TryGetChannelFromMention(ctx, ctx.Arguments.Get(0))
+	channel, success := utils.Discord.TryGetChannelFromMention(ctx, ctx.Arguments.Get(0))
 	if !success {
 		ctx.RespondText("Could not find category")
 		return
@@ -388,7 +388,7 @@ func (ModerationCommands) purge(ctx *dgc.Ctx) {
 		return
 	}
 
-	messages, err := utils.GetChannelMessages(ctx, amount)
+	messages, err := utils.Discord.GetChannelMessages(ctx, amount)
 	if err != nil {
 		ctx.RespondText("Error getting messages: " + err.Error())
 		return
@@ -400,7 +400,7 @@ func (ModerationCommands) purge(ctx *dgc.Ctx) {
 }
 
 func (ModerationCommands) nuke(ctx *dgc.Ctx) {
-	channel, success := utils.TryGetChannelFromMention(ctx, ctx.Arguments.Get(0))
+	channel, success := utils.Discord.TryGetChannelFromMention(ctx, ctx.Arguments.Get(0))
 	if !success {
 		ctx.RespondText("Could not find channel")
 		return
@@ -439,7 +439,7 @@ func (ModerationCommands) nuke(ctx *dgc.Ctx) {
 // Member Control
 
 func (ModerationCommands) userinfo(ctx *dgc.Ctx) {
-	user, success := utils.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
+	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
 		ctx.RespondText("Could not find user")
 		return
@@ -452,13 +452,13 @@ func (ModerationCommands) userinfo(ctx *dgc.Ctx) {
 		AddField("Banner", user.BannerURL("")).
 		AddField("Banner Color", fmt.Sprintf("#%x", user.AccentColor)).
 		AddField("Is Bot", strconv.FormatBool(user.Bot)).
-		AddField("Created At", utils.SnowflakeToTime(user.ID).Format(time.RFC1123)).
+		AddField("Created At", utils.Discord.SnowflakeToTime(user.ID).Format(time.RFC1123)).
 		AddField("Flags", fmt.Sprint(user.Flags))
 	if member != nil {
 		embed.AddField("Nickname", member.Nick)
 		embed.AddField("Joined Server At", member.JoinedAt.Format(time.RFC1123))
 		embed.AddField("Role Amount", fmt.Sprint(len(member.Roles)))
-		embed.AddField("Roles", utils.GetRoleNames(ctx, member))
+		embed.AddField("Roles", utils.Discord.GetRoleNames(ctx, member))
 	}
 	embed.Send(ctx)
 }
@@ -508,10 +508,10 @@ func (ModerationCommands) report(ctx *dgc.Ctx) {
 }
 
 func (ModerationCommands) mute(ctx *dgc.Ctx) {
-	if !utils.CheckIfInServer(ctx) {
+	if !utils.Discord.CheckIfInServer(ctx) {
 		return
 	}
-	user, success := utils.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
+	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
 		ctx.RespondText("Could not find user")
 		return
@@ -584,11 +584,11 @@ func (ModerationCommands) mute(ctx *dgc.Ctx) {
 }
 
 func (ModerationCommands) unmute(ctx *dgc.Ctx) {
-	if !utils.CheckIfInServer(ctx) {
+	if !utils.Discord.CheckIfInServer(ctx) {
 		return
 	}
 
-	member, success := utils.TryGetMemberFromMention(ctx, ctx.Arguments.Get(0))
+	member, success := utils.Discord.TryGetMemberFromMention(ctx, ctx.Arguments.Get(0))
 	if !success {
 		ctx.RespondText("Could not find user")
 		return
@@ -630,11 +630,11 @@ func (ModerationCommands) unmute(ctx *dgc.Ctx) {
 }
 
 func (ModerationCommands) timeout(ctx *dgc.Ctx) {
-	if !utils.CheckIfInServer(ctx) {
+	if !utils.Discord.CheckIfInServer(ctx) {
 		return
 	}
 
-	member, success := utils.TryGetMemberFromMention(ctx, ctx.Arguments.Get(0))
+	member, success := utils.Discord.TryGetMemberFromMention(ctx, ctx.Arguments.Get(0))
 	if !success {
 		ctx.RespondText("Could not find user")
 		return
@@ -659,11 +659,11 @@ func (ModerationCommands) timeout(ctx *dgc.Ctx) {
 }
 
 func (ModerationCommands) removetimeout(ctx *dgc.Ctx) {
-	if !utils.CheckIfInServer(ctx) {
+	if !utils.Discord.CheckIfInServer(ctx) {
 		return
 	}
 
-	member, success := utils.TryGetMemberFromMention(ctx, ctx.Arguments.Get(0))
+	member, success := utils.Discord.TryGetMemberFromMention(ctx, ctx.Arguments.Get(0))
 	if !success {
 		ctx.RespondText("Could not find user")
 		return
@@ -681,11 +681,11 @@ func (ModerationCommands) removetimeout(ctx *dgc.Ctx) {
 }
 
 func (ModerationCommands) kick(ctx *dgc.Ctx) {
-	if !utils.CheckIfInServer(ctx) {
+	if !utils.Discord.CheckIfInServer(ctx) {
 		return
 	}
 
-	member, success := utils.TryGetMemberFromMention(ctx, ctx.Arguments.Get(0))
+	member, success := utils.Discord.TryGetMemberFromMention(ctx, ctx.Arguments.Get(0))
 	if !success {
 		ctx.RespondText("Could not find user")
 		return
@@ -703,11 +703,11 @@ func (ModerationCommands) kick(ctx *dgc.Ctx) {
 }
 
 func (ModerationCommands) ban(ctx *dgc.Ctx) { // hackban: same as ban
-	if !utils.CheckIfInServer(ctx) {
+	if !utils.Discord.CheckIfInServer(ctx) {
 		return
 	}
 
-	member, success := utils.TryGetMemberFromMention(ctx, ctx.Arguments.Get(0))
+	member, success := utils.Discord.TryGetMemberFromMention(ctx, ctx.Arguments.Get(0))
 	if !success {
 		ctx.RespondText("Could not find user")
 		return
@@ -725,11 +725,11 @@ func (ModerationCommands) ban(ctx *dgc.Ctx) { // hackban: same as ban
 }
 
 func (ModerationCommands) softban(ctx *dgc.Ctx) {
-	if !utils.CheckIfInServer(ctx) {
+	if !utils.Discord.CheckIfInServer(ctx) {
 		return
 	}
 
-	member, success := utils.TryGetMemberFromMention(ctx, ctx.Arguments.Get(0))
+	member, success := utils.Discord.TryGetMemberFromMention(ctx, ctx.Arguments.Get(0))
 	if !success {
 		ctx.RespondText("Could not find user")
 		return
@@ -752,7 +752,7 @@ func (ModerationCommands) softban(ctx *dgc.Ctx) {
 }
 
 func (ModerationCommands) unban(ctx *dgc.Ctx) {
-	if !utils.CheckIfInServer(ctx) {
+	if !utils.Discord.CheckIfInServer(ctx) {
 		return
 	}
 
@@ -819,7 +819,7 @@ func (ModerationCommands) copybans(ctx *dgc.Ctx) {
 // Nickname Control
 
 func (ModerationCommands) nick(ctx *dgc.Ctx) {
-	if !utils.CheckIfInServer(ctx) {
+	if !utils.Discord.CheckIfInServer(ctx) {
 		return
 	}
 	err := ctx.Session.GuildMemberNickname(ctx.Event.GuildID, ctx.Event.Author.ID, utils.Arguments["<text>"])
@@ -833,11 +833,11 @@ func (ModerationCommands) nick(ctx *dgc.Ctx) {
 }
 
 func (ModerationCommands) nickuser(ctx *dgc.Ctx) {
-	if !utils.CheckIfInServer(ctx) {
+	if !utils.Discord.CheckIfInServer(ctx) {
 		return
 	}
 
-	member, success := utils.TryGetMemberFromMention(ctx, ctx.Arguments.Get(0))
+	member, success := utils.Discord.TryGetMemberFromMention(ctx, ctx.Arguments.Get(0))
 	if !success {
 		ctx.RespondText("Could not find user")
 		return
@@ -854,11 +854,11 @@ func (ModerationCommands) nickuser(ctx *dgc.Ctx) {
 }
 
 func (ModerationCommands) clearnick(ctx *dgc.Ctx) {
-	if !utils.CheckIfInServer(ctx) {
+	if !utils.Discord.CheckIfInServer(ctx) {
 		return
 	}
 
-	member, success := utils.TryGetMemberFromMention(ctx, ctx.Arguments.Get(0))
+	member, success := utils.Discord.TryGetMemberFromMention(ctx, ctx.Arguments.Get(0))
 	if !success {
 		member = ctx.Event.Member
 	}
@@ -876,16 +876,16 @@ func (ModerationCommands) clearnick(ctx *dgc.Ctx) {
 // Server Control
 
 func (ModerationCommands) serverowner(ctx *dgc.Ctx) {
-	if !utils.CheckIfInServer(ctx) {
+	if !utils.Discord.CheckIfInServer(ctx) {
 		return
 	}
 
-	guild, err := utils.GetGuild(ctx.Session, utils.Or(utils.Arguments["[server id]"], ctx.Event.GuildID))
+	guild, err := utils.Discord.GetGuild(ctx.Session, utils.Or(utils.Arguments["[server id]"], ctx.Event.GuildID))
 	if err != nil {
 		ctx.RespondText("Error getting server: " + err.Error())
 		return
 	}
-	owner, err := utils.GetMember(ctx.Session, guild.ID, guild.OwnerID)
+	owner, err := utils.Discord.GetMember(ctx.Session, guild.ID, guild.OwnerID)
 	if err != nil {
 		ctx.RespondText("Error getting server owner: " + err.Error())
 		return
@@ -897,11 +897,11 @@ func (ModerationCommands) serverowner(ctx *dgc.Ctx) {
 }
 
 func (ModerationCommands) servericon(ctx *dgc.Ctx) {
-	if !utils.CheckIfInServer(ctx) {
+	if !utils.Discord.CheckIfInServer(ctx) {
 		return
 	}
 
-	guild, err := utils.GetGuild(ctx.Session, utils.Or(utils.Arguments["[server id]"], ctx.Event.GuildID))
+	guild, err := utils.Discord.GetGuild(ctx.Session, utils.Or(utils.Arguments["[server id]"], ctx.Event.GuildID))
 	if err != nil {
 		ctx.RespondText("Error getting server: " + err.Error())
 		return
@@ -917,11 +917,11 @@ func (ModerationCommands) servericon(ctx *dgc.Ctx) {
 }
 
 func (ModerationCommands) serverbanner(ctx *dgc.Ctx) {
-	if !utils.CheckIfInServer(ctx) {
+	if !utils.Discord.CheckIfInServer(ctx) {
 		return
 	}
 
-	guild, err := utils.GetGuild(ctx.Session, utils.Or(utils.Arguments["[server id]"], ctx.Event.GuildID))
+	guild, err := utils.Discord.GetGuild(ctx.Session, utils.Or(utils.Arguments["[server id]"], ctx.Event.GuildID))
 	if err != nil {
 		ctx.RespondText("Error getting server: " + err.Error())
 		return
@@ -937,17 +937,17 @@ func (ModerationCommands) serverbanner(ctx *dgc.Ctx) {
 }
 
 func (ModerationCommands) serverboosters(ctx *dgc.Ctx) {
-	if !utils.CheckIfInServer(ctx) {
+	if !utils.Discord.CheckIfInServer(ctx) {
 		return
 	}
 
-	guild, err := utils.GetGuild(ctx.Session, utils.Or(utils.Arguments["[server id]"], ctx.Event.GuildID))
+	guild, err := utils.Discord.GetGuild(ctx.Session, utils.Or(utils.Arguments["[server id]"], ctx.Event.GuildID))
 	if err != nil {
 		ctx.RespondText("Error getting server: " + err.Error())
 		return
 	}
 
-	boosters := utils.GetBoosters(guild)
+	boosters := utils.Discord.GetBoosters(guild)
 	boostersString := ""
 
 	for _, booster := range boosters {
@@ -965,11 +965,11 @@ func (ModerationCommands) serverboosters(ctx *dgc.Ctx) {
 }
 
 func (ModerationCommands) serverboostlevel(ctx *dgc.Ctx) {
-	if !utils.CheckIfInServer(ctx) {
+	if !utils.Discord.CheckIfInServer(ctx) {
 		return
 	}
 
-	guild, err := utils.GetGuild(ctx.Session, utils.Or(utils.Arguments["[server id]"], ctx.Event.GuildID))
+	guild, err := utils.Discord.GetGuild(ctx.Session, utils.Or(utils.Arguments["[server id]"], ctx.Event.GuildID))
 	if err != nil {
 		ctx.RespondText("Error getting server: " + err.Error())
 		return
@@ -982,7 +982,7 @@ func (ModerationCommands) serverboostlevel(ctx *dgc.Ctx) {
 }
 
 func (ModerationCommands) setservername(ctx *dgc.Ctx) {
-	if !utils.CheckIfInServer(ctx) {
+	if !utils.Discord.CheckIfInServer(ctx) {
 		return
 	}
 	guild, err := ctx.Session.GuildEdit(ctx.Event.GuildID, discordgo.GuildParams{
@@ -998,7 +998,7 @@ func (ModerationCommands) setservername(ctx *dgc.Ctx) {
 }
 
 func (ModerationCommands) setservericon(ctx *dgc.Ctx) {
-	if !utils.CheckIfInServer(ctx) {
+	if !utils.Discord.CheckIfInServer(ctx) {
 		return
 	}
 	_, err := ctx.Session.GuildEdit(ctx.Event.GuildID, discordgo.GuildParams{
@@ -1014,7 +1014,7 @@ func (ModerationCommands) setservericon(ctx *dgc.Ctx) {
 }
 
 func (ModerationCommands) setserverbanner(ctx *dgc.Ctx) {
-	if !utils.CheckIfInServer(ctx) {
+	if !utils.Discord.CheckIfInServer(ctx) {
 		return
 	}
 	_, err := ctx.Session.GuildEdit(ctx.Event.GuildID, discordgo.GuildParams{
@@ -1030,17 +1030,17 @@ func (ModerationCommands) setserverbanner(ctx *dgc.Ctx) {
 }
 
 func (ModerationCommands) serverinfo(ctx *dgc.Ctx) {
-	if !utils.CheckIfInServer(ctx) {
+	if !utils.Discord.CheckIfInServer(ctx) {
 		return
 	}
 
-	guild, err := utils.GetGuild(ctx.Session, utils.Or(utils.Arguments["[server id]"], ctx.Event.GuildID))
+	guild, err := utils.Discord.GetGuild(ctx.Session, utils.Or(utils.Arguments["[server id]"], ctx.Event.GuildID))
 	if err != nil {
 		ctx.RespondText("Error getting server: " + err.Error())
 		return
 	}
 
-	owner, err := utils.GetMember(ctx.Session, guild.ID, guild.OwnerID)
+	owner, err := utils.Discord.GetMember(ctx.Session, guild.ID, guild.OwnerID)
 	ownerMention := "Error"
 	if err == nil {
 		ownerMention = owner.User.String()
@@ -1050,7 +1050,7 @@ func (ModerationCommands) serverinfo(ctx *dgc.Ctx) {
 		SetDescription(fmt.Sprintf("Server Info - %s", guild.Name)).
 		AddField("ID", guild.ID).
 		AddField("Owner", ownerMention).
-		AddField("Created At", utils.SnowflakeToTime(guild.ID).Format(time.RFC1123)).
+		AddField("Created At", utils.Discord.SnowflakeToTime(guild.ID).Format(time.RFC1123)).
 		AddField("Verification Level", verificationLevels[int(guild.VerificationLevel)]).
 		AddField("Boost Level", boostLevels[int(guild.PremiumTier)]).
 		AddField("Amount of boosts", fmt.Sprint(guild.PremiumSubscriptionCount)).
@@ -1067,21 +1067,21 @@ func (ModerationCommands) serverinfo(ctx *dgc.Ctx) {
 // Invite Control
 
 func (ModerationCommands) invite(ctx *dgc.Ctx) {
-	channel, success := utils.TryGetChannelFromMention(ctx, ctx.Arguments.Get(0))
+	channel, success := utils.Discord.TryGetChannelFromMention(ctx, ctx.Arguments.Get(0))
 	if !success {
 		ctx.RespondText("Could not find channel")
 		return
 	}
 
-	ageInt, err := strconv.Atoi(utils.Arguments["[age]"])
-	if err != nil && utils.Arguments["[age]"] != "" {
-		ctx.RespondText("Argument [age] must be a number.")
+	ageInt, err := strconv.Atoi(utils.Arguments["[maxage]"])
+	if err != nil && utils.Arguments["[maxage]"] != "" {
+		ctx.RespondText("Argument [maxage] must be a number.")
 		return
 	}
 
-	usesInt, err := strconv.Atoi(utils.Arguments["[uses]"])
-	if err != nil && utils.Arguments["[uses]"] != "" {
-		ctx.RespondText("Argument [age] must be a number.")
+	usesInt, err := strconv.Atoi(utils.Arguments["[maxuses]"])
+	if err != nil && utils.Arguments["[maxuses]"] != "" {
+		ctx.RespondText("Argument [maxuses] must be a number.")
 		return
 	}
 
@@ -1105,7 +1105,7 @@ func (ModerationCommands) invite(ctx *dgc.Ctx) {
 }
 
 func (ModerationCommands) inviteinfo(ctx *dgc.Ctx) {
-	parsedInvite := utils.ParseInvite(utils.Arguments["<invite>"])
+	parsedInvite := utils.Discord.ParseInvite(utils.Arguments["<invite>"])
 	invite, err := ctx.Session.InviteWithCounts(parsedInvite)
 	if err != nil {
 		ctx.RespondText("Error getting invite: " + err.Error())
@@ -1140,6 +1140,7 @@ func (ModerationCommands) inviteinfo(ctx *dgc.Ctx) {
 /*
 Invite Control
 
+.friendinvite
 .delinvite <invite_id> » Delete invite
 .invitelist       » List all invites
 .invitechannel <channel_id> » Channel invites
