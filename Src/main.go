@@ -84,7 +84,7 @@ func selfbot_main(overseer.State) {
 	})
 
 	commands := commands.Commands{}
-	commands.RegisterCommands(router)
+	commands.RegisterCommands(router, session)
 
 	session.AddHandler(func(_ *discordgo.Session, event *discordgo.Ready) {
 		fmt.Println("Logged in as:", event.User.Username)
