@@ -14,6 +14,23 @@ import (
 	"github.com/LightningDev1/discordgo"
 )
 
+var (
+	verificationLevels = map[int]string{
+		0: "None",
+		1: "Low",
+		2: "Medium",
+		3: "High",
+		4: "Highest",
+	}
+
+	boostLevels = map[int]string{
+		0: "None",
+		1: "Level 1",
+		2: "Level 2",
+		3: "Level 3",
+	}
+)
+
 type ModerationCommands struct{}
 
 func (m ModerationCommands) RegisterCommands(router *dgc.Router) {
@@ -76,6 +93,18 @@ func (m ModerationCommands) RegisterCommands(router *dgc.Router) {
 		Description: "Remove a timeout",
 		Usage:       "[p]removetimeout <user>",
 		Handler:     m.removetimeout,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "serverinfo",
+		Description: "Get info about a server",
+		Usage:       "[p]serverinfo [server id]",
+		Handler:     m.serverinfo,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "inviteinfo",
+		Description: "Get info about an invite",
+		Usage:       "[p]inviteinfo <invite>",
+		Handler:     m.inviteinfo,
 	})
 }
 
@@ -673,7 +702,7 @@ func (ModerationCommands) kick(ctx *dgc.Ctx) {
 		Send(ctx)
 }
 
-func (ModerationCommands) ban(ctx *dgc.Ctx) {
+func (ModerationCommands) ban(ctx *dgc.Ctx) { // hackban: same as ban
 	if !utils.CheckIfInServer(ctx) {
 		return
 	}
@@ -737,3 +766,403 @@ func (ModerationCommands) unban(ctx *dgc.Ctx) {
 		SetDescription("Successfully softbanned user!").
 		Send(ctx)
 }
+
+func (ModerationCommands) banlist(ctx *dgc.Ctx) {
+	guildID := utils.Arguments["[server id]"]
+	if guildID == "" {
+		guildID = ctx.Event.GuildID
+	}
+	if guildID == "" {
+		ctx.RespondText("Error: No server ID specified!")
+		return
+	}
+	banList, err := ctx.Session.GuildBans(ctx.Event.GuildID, 1000, "", "")
+	if err != nil {
+		ctx.RespondText("Error getting ban list: " + err.Error())
+		return
+	}
+	banListString := ""
+	for i, ban := range banList {
+		// Max 40
+		if i >= 40 {
+			break
+		}
+		banListString += fmt.Sprintf("%s - %s\n", ban.User.Username, ban.User.ID)
+	}
+	embed.NewEmbed().
+		AddField("Banned Amount", fmt.Sprint(len(banList))).
+		AddField("Ban List", banListString).
+		Send(ctx)
+}
+
+func (ModerationCommands) copybans(ctx *dgc.Ctx) {
+	sourceServerID := utils.Arguments["<source server id>"]
+	destinationServerID := utils.Arguments["<destination server id>"]
+	if destinationServerID == "" {
+		destinationServerID = ctx.Event.GuildID
+	}
+	banList, err := ctx.Session.GuildBans(sourceServerID, 1000, "", "")
+	if err != nil {
+		ctx.RespondText("Error copying bans: " + err.Error())
+		return
+	}
+
+	for _, ban := range banList {
+		err := ctx.Session.GuildBanCreateWithReason(destinationServerID, ban.User.ID, ban.Reason, 0)
+		if err != nil {
+			ctx.RespondText("Error copying bans: " + err.Error())
+			return
+		}
+	}
+}
+
+// Nickname Control
+
+func (ModerationCommands) nick(ctx *dgc.Ctx) {
+	if !utils.CheckIfInServer(ctx) {
+		return
+	}
+	err := ctx.Session.GuildMemberNickname(ctx.Event.GuildID, ctx.Event.Author.ID, utils.Arguments["<text>"])
+	if err != nil {
+		ctx.RespondText("Error changing nickname: " + err.Error())
+		return
+	}
+	embed.NewEmbed().
+		SetDescription("Successfully changed nickname!").
+		Send(ctx)
+}
+
+func (ModerationCommands) nickuser(ctx *dgc.Ctx) {
+	if !utils.CheckIfInServer(ctx) {
+		return
+	}
+
+	member, success := utils.TryGetMemberFromMention(ctx, ctx.Arguments.Get(0))
+	if !success {
+		ctx.RespondText("Could not find user")
+		return
+	}
+
+	err := ctx.Session.GuildMemberNickname(ctx.Event.GuildID, member.User.ID, utils.Arguments["<text>"])
+	if err != nil {
+		ctx.RespondText("Error changing nickname: " + err.Error())
+		return
+	}
+	embed.NewEmbed().
+		SetDescription("Successfully changed nickname!").
+		Send(ctx)
+}
+
+func (ModerationCommands) clearnick(ctx *dgc.Ctx) {
+	if !utils.CheckIfInServer(ctx) {
+		return
+	}
+
+	member, success := utils.TryGetMemberFromMention(ctx, ctx.Arguments.Get(0))
+	if !success {
+		member = ctx.Event.Member
+	}
+
+	err := ctx.Session.GuildMemberNickname(ctx.Event.GuildID, member.User.ID, "")
+	if err != nil {
+		ctx.RespondText("Error changing nickname: " + err.Error())
+		return
+	}
+	embed.NewEmbed().
+		SetDescription("Successfully changed nickname!").
+		Send(ctx)
+}
+
+// Server Control
+
+func (ModerationCommands) serverowner(ctx *dgc.Ctx) {
+	if !utils.CheckIfInServer(ctx) {
+		return
+	}
+
+	guild, err := utils.GetGuild(ctx.Session, utils.Or(utils.Arguments["[server id]"], ctx.Event.GuildID))
+	if err != nil {
+		ctx.RespondText("Error getting server: " + err.Error())
+		return
+	}
+	owner, err := utils.GetMember(ctx.Session, guild.ID, guild.OwnerID)
+	if err != nil {
+		ctx.RespondText("Error getting server owner: " + err.Error())
+		return
+	}
+	embed.NewEmbed().
+		SetDescription(guild.Name).
+		AddField("Owner", owner.Mention()).
+		Send(ctx)
+}
+
+func (ModerationCommands) servericon(ctx *dgc.Ctx) {
+	if !utils.CheckIfInServer(ctx) {
+		return
+	}
+
+	guild, err := utils.GetGuild(ctx.Session, utils.Or(utils.Arguments["[server id]"], ctx.Event.GuildID))
+	if err != nil {
+		ctx.RespondText("Error getting server: " + err.Error())
+		return
+	}
+
+	embed := embed.NewEmbed().
+		SetDescription(fmt.Sprintf("Server Icon - %s", guild.Name)).
+		SetImage(guild.IconURL())
+	if guild.Icon == "" {
+		embed.AddField("Error", "Server has no icon")
+	}
+	embed.Send(ctx)
+}
+
+func (ModerationCommands) serverbanner(ctx *dgc.Ctx) {
+	if !utils.CheckIfInServer(ctx) {
+		return
+	}
+
+	guild, err := utils.GetGuild(ctx.Session, utils.Or(utils.Arguments["[server id]"], ctx.Event.GuildID))
+	if err != nil {
+		ctx.RespondText("Error getting server: " + err.Error())
+		return
+	}
+
+	embed := embed.NewEmbed().
+		SetDescription(fmt.Sprintf("Server Banner - %s", guild.Name)).
+		SetImage(guild.BannerURL())
+	if guild.Banner == "" {
+		embed.AddField("Error", "Server has no banner!")
+	}
+	embed.Send(ctx)
+}
+
+func (ModerationCommands) serverboosters(ctx *dgc.Ctx) {
+	if !utils.CheckIfInServer(ctx) {
+		return
+	}
+
+	guild, err := utils.GetGuild(ctx.Session, utils.Or(utils.Arguments["[server id]"], ctx.Event.GuildID))
+	if err != nil {
+		ctx.RespondText("Error getting server: " + err.Error())
+		return
+	}
+
+	boosters := utils.GetBoosters(guild)
+	boostersString := ""
+
+	for _, booster := range boosters {
+		boostersString += fmt.Sprintf("%s - %s\n", booster.User.String(), booster.User.ID)
+	}
+
+	if boostersString == "" {
+		boostersString = "No boosters"
+	}
+
+	embed.NewEmbed().
+		SetDescription(fmt.Sprintf("Server Boosters - %s", guild.Name)).
+		AddField("Boosters", boostersString).
+		Send(ctx)
+}
+
+func (ModerationCommands) serverboostlevel(ctx *dgc.Ctx) {
+	if !utils.CheckIfInServer(ctx) {
+		return
+	}
+
+	guild, err := utils.GetGuild(ctx.Session, utils.Or(utils.Arguments["[server id]"], ctx.Event.GuildID))
+	if err != nil {
+		ctx.RespondText("Error getting server: " + err.Error())
+		return
+	}
+
+	embed.NewEmbed().
+		SetDescription(fmt.Sprintf("Server Boost Level - %s", guild.Name)).
+		AddField("Boost Level", boostLevels[int(guild.PremiumTier)]).
+		Send(ctx)
+}
+
+func (ModerationCommands) setservername(ctx *dgc.Ctx) {
+	if !utils.CheckIfInServer(ctx) {
+		return
+	}
+	guild, err := ctx.Session.GuildEdit(ctx.Event.GuildID, discordgo.GuildParams{
+		Name: utils.Arguments["<text>"],
+	})
+	if err != nil {
+		ctx.RespondText("Error changing server name: " + err.Error())
+		return
+	}
+	embed.NewEmbed().
+		SetDescription(fmt.Sprintf("Successfully changed server name to %s!", guild.Name)).
+		Send(ctx)
+}
+
+func (ModerationCommands) setservericon(ctx *dgc.Ctx) {
+	if !utils.CheckIfInServer(ctx) {
+		return
+	}
+	_, err := ctx.Session.GuildEdit(ctx.Event.GuildID, discordgo.GuildParams{
+		Icon: utils.Arguments["<url>"],
+	})
+	if err != nil {
+		ctx.RespondText("Error changing server icon: " + err.Error())
+		return
+	}
+	embed.NewEmbed().
+		SetDescription("Successfully changed server icon!").
+		Send(ctx)
+}
+
+func (ModerationCommands) setserverbanner(ctx *dgc.Ctx) {
+	if !utils.CheckIfInServer(ctx) {
+		return
+	}
+	_, err := ctx.Session.GuildEdit(ctx.Event.GuildID, discordgo.GuildParams{
+		Banner: utils.Arguments["<url>"],
+	})
+	if err != nil {
+		ctx.RespondText("Error changing server icon: " + err.Error())
+		return
+	}
+	embed.NewEmbed().
+		SetDescription("Successfully changed server icon!").
+		Send(ctx)
+}
+
+func (ModerationCommands) serverinfo(ctx *dgc.Ctx) {
+	if !utils.CheckIfInServer(ctx) {
+		return
+	}
+
+	guild, err := utils.GetGuild(ctx.Session, utils.Or(utils.Arguments["[server id]"], ctx.Event.GuildID))
+	if err != nil {
+		ctx.RespondText("Error getting server: " + err.Error())
+		return
+	}
+
+	owner, err := utils.GetMember(ctx.Session, guild.ID, guild.OwnerID)
+	ownerMention := "Error"
+	if err == nil {
+		ownerMention = owner.User.String()
+	}
+
+	embed := embed.NewEmbed().
+		SetDescription(fmt.Sprintf("Server Info - %s", guild.Name)).
+		AddField("ID", guild.ID).
+		AddField("Owner", ownerMention).
+		AddField("Created At", utils.SnowflakeToTime(guild.ID).Format(time.RFC1123)).
+		AddField("Verification Level", verificationLevels[int(guild.VerificationLevel)]).
+		AddField("Boost Level", boostLevels[int(guild.PremiumTier)]).
+		AddField("Amount of boosts", fmt.Sprint(guild.PremiumSubscriptionCount)).
+		AddField("Member Count", fmt.Sprint(guild.MemberCount)).
+		AddField("Channel Count", fmt.Sprint(len(guild.Channels))).
+		AddField("Role Count", fmt.Sprint(len(guild.Roles))).
+		AddField("Joined At", guild.JoinedAt.Format(time.RFC1123))
+	if guild.Icon != "" {
+		embed.SetImage(guild.IconURL())
+	}
+	embed.Send(ctx)
+}
+
+// Invite Control
+
+func (ModerationCommands) invite(ctx *dgc.Ctx) {
+	channel, success := utils.TryGetChannelFromMention(ctx, ctx.Arguments.Get(0))
+	if !success {
+		ctx.RespondText("Could not find channel")
+		return
+	}
+
+	ageInt, err := strconv.Atoi(utils.Arguments["[age]"])
+	if err != nil && utils.Arguments["[age]"] != "" {
+		ctx.RespondText("Argument [age] must be a number.")
+		return
+	}
+
+	usesInt, err := strconv.Atoi(utils.Arguments["[uses]"])
+	if err != nil && utils.Arguments["[uses]"] != "" {
+		ctx.RespondText("Argument [age] must be a number.")
+		return
+	}
+
+	invite, err := ctx.Session.ChannelInviteCreate(channel.ID, discordgo.Invite{
+		MaxAge:    ageInt,
+		MaxUses:   usesInt,
+		Temporary: false,
+		Unique:    true,
+	})
+	if err != nil {
+		ctx.RespondText("Error creating invite: " + err.Error())
+		return
+	}
+
+	embed.NewEmbed().
+		SetDescription(fmt.Sprintf("Created invite: https://discord.gg/%s", invite.Code)).
+		AddField("Max Age", fmt.Sprint(invite.MaxAge)).
+		AddField("Max Uses", fmt.Sprint(invite.MaxUses)).
+		AddField("Channel", invite.Channel.Name).
+		Send(ctx)
+}
+
+func (ModerationCommands) inviteinfo(ctx *dgc.Ctx) {
+	parsedInvite := utils.ParseInvite(utils.Arguments["<invite>"])
+	invite, err := ctx.Session.InviteWithCounts(parsedInvite)
+	if err != nil {
+		ctx.RespondText("Error getting invite: " + err.Error())
+		return
+	}
+
+	embed := embed.NewEmbed().SetDescription(fmt.Sprintf("Invite Info - %s", invite.Code))
+
+	if invite.Guild != nil {
+		embed.AddField("Server", invite.Guild.Name)
+		if invite.Guild.Icon != "" {
+			embed.SetImage(invite.Guild.IconURL())
+		}
+	}
+	if invite.Channel != nil {
+		embed.AddField("Channel", invite.Channel.Name)
+	}
+	if invite.Inviter != nil {
+		embed.AddField("Inviter", invite.Inviter.String())
+	}
+	if invite.ExpiresAt != nil {
+		embed.AddField("Expires At", invite.ExpiresAt.Format(time.RFC1123))
+	}
+	embed.AddField("Max Age", fmt.Sprint(invite.MaxAge)).
+		AddField("Uses", fmt.Sprint(invite.Uses)).
+		AddField("Max Uses", fmt.Sprint(invite.MaxUses)).
+		AddField("Member Count", fmt.Sprint(invite.ApproximateMemberCount)).
+		AddField("Online Member Count", fmt.Sprint(invite.ApproximatePresenceCount)).
+		Send(ctx)
+}
+
+/*
+Invite Control
+
+.delinvite <invite_id> » Delete invite
+.invitelist       » List all invites
+.invitechannel <channel_id> » Channel invites
+.inviteguild      » Invites of a guild
+.inviteuser <user_id> » Invites of a user
+
+Role Control
+
+.roleinfo <@role> » Information
+.giverole <@member> <role_id> » Give a role
+.giveallroles <@member> » Give all roles
+.allroles         » Give all roles
+.removeallroles <@member> » Remove all roles
+.removerole <@member> <role_id> » Remove a role
+.createrole <role_name> » Create a role
+.renamerole <role_id> <name> » Rename a role
+.renameroles <name> » Rename all roles
+.deleterole <role_id> » Delete a role
+
+Ignore Control
+
+.ignore <@user>   » Ignore user DMs
+.unignore <@user> » Unignore user DMs
+.ignorelist       » List ignored users
+.ignorelistclear  » Clear ignore list
+*/

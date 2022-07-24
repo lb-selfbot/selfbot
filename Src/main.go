@@ -61,6 +61,8 @@ func selfbot_main(overseer.State) {
 		panic(err)
 	}
 
+	session.StateEnabled = true
+
 	router := dgc.Create(&dgc.Router{
 		Prefixes:         []string{cfg.Selfbot.CommandPrefix},
 		IgnorePrefixCase: true,

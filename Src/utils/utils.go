@@ -28,6 +28,8 @@ var LowercaseAlphabet string = "abcdefghijklmnopqrstuvwxyz"
 
 var Arguments map[string]string = make(map[string]string)
 
+var InviteRegex *regexp.Regexp = regexp.MustCompile("(?:https?://)?discord(?:(?:app)?\\.com/invite|\\.gg)/?[a-zA-Z0-9]+/?")
+
 func ReverseString(s string) string {
 	rns := []rune(s)
 	for i, j := 0, len(rns)-1; i < j; i, j = i+1, j-1 {
@@ -219,6 +221,15 @@ func SnowflakeToTime(snowflake string) time.Time {
 	return time.Unix(((snowflakeInt>>22)+1420070400000)/1000, 0)
 }
 
+func ParseInvite(invite string) string {
+	inviteRegexMatch := string(InviteRegex.Find([]byte(invite)))
+	if inviteRegexMatch != "" {
+		splitInvite := strings.Split(inviteRegexMatch, "/")
+		return splitInvite[len(splitInvite)-1]
+	}
+	return invite
+}
+
 func GetElementById(html string, id string) string {
 	doc, err := goquery.NewDocumentFromReader(strings.NewReader(html))
 	if err != nil {
@@ -232,7 +243,7 @@ func Capitalize(text string) string {
 }
 
 func Shuffle[T comparable](slice []T) []T {
-    for i := len(slice) - 1; i > 0; i-- {
+	for i := len(slice) - 1; i > 0; i-- {
 		j := rand.Intn(i + 1)
 		slice[i], slice[j] = slice[j], slice[i]
 	}
@@ -412,4 +423,44 @@ func GetRoleNames(ctx *dgc.Ctx, member *discordgo.Member) string {
 		}
 	}
 	return strings.Join(roleNames, ", ")
+}
+
+func GetGuild(session *discordgo.Session, guildID string) (guild *discordgo.Guild, err error) {
+	guild, err = session.State.Guild(guildID)
+	if err != nil {
+		guild, err = session.Guild(guildID)
+		if err != nil {
+			return nil, err
+		}
+	}
+	return guild, nil
+}
+
+func GetMember(session *discordgo.Session, guildID, userID string) (member *discordgo.Member, err error) {
+	member, err = session.State.Member(guildID, userID)
+	if err != nil {
+		member, err = session.GuildMember(guildID, userID)
+		if err != nil {
+			return nil, err
+		}
+	}
+	return member, nil
+}
+
+func GetBoosters(guild *discordgo.Guild) []*discordgo.Member {
+	boostedMembers := []*discordgo.Member{}
+	for _, member := range guild.Members {
+		if member.PremiumSince != nil {
+			boostedMembers = append(boostedMembers, member)
+		}
+	}
+	return boostedMembers
+}
+
+// If a is not empty, returns a. If a is empty, returns b.
+func Or(a, b string) string {
+	if a != "" {
+		return a
+	}
+	return b
 }
