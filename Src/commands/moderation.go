@@ -130,6 +130,12 @@ func (m ModerationCommands) RegisterCommands(router *dgc.Router) {
 		Usage:       "[p]userinvites <user> [server id]",
 		Handler:     m.userinvites,
 	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "roleinfo",
+		Description: "Get info about a role",
+		Usage:       "[p]roleinfo <role>",
+		Handler:     m.roleinfo,
+	})
 }
 
 // Channel Control
@@ -587,7 +593,7 @@ func (ModerationCommands) mute(ctx *dgc.Ctx) {
 	}
 
 	for _, channel := range channels {
-		if channel.Type == discordgo.ChannelTypeGuildText {
+		if channel.Type == 1 {
 			err = ctx.Session.ChannelPermissionSet(channel.ID, role.ID, discordgo.PermissionOverwriteTypeRole, 0, discordgo.PermissionSendMessages)
 			if err != nil {
 				ctx.RespondText("Error muting user: " + err.Error())
@@ -1290,13 +1296,35 @@ func (ModerationCommands) roleinfo(ctx *dgc.Ctx) {
 		ctx.RespondText("Could not find role")
 		return
 	}
-
+	// get all members in guild and check if they have the role
+	members, err := ctx.Session.LazyRequestMembers(ctx.Event.GuildID, 1000, true)
+	if err != nil {
+		ctx.RespondText("Error getting members: " + err.Error())
+		return
+	}
+	memberCount := 0
+	for _, member := range members {
+		if utils.SliceContains(member.Roles, role.ID) {
+			memberCount++
+		}
+	}
+	createdAt := utils.Discord.SnowflakeToTime(role.ID)
+	embed.NewEmbed().
+		SetDescription(fmt.Sprintf("Role Info (%s)", role.Name)).
+		AddField("ID", role.ID).
+		AddField("Color", fmt.Sprintf("#%x", role.Color)).
+		AddField("Created at", utils.Discord.GetTimestamp(&createdAt, "Error")).
+		AddField("Position", fmt.Sprint(role.Position)).
+		AddField("Is Hoist", utils.Misc.FormatBool(role.Hoist)).
+		AddField("Is Mentionable", utils.Misc.FormatBool(role.Mentionable)).
+		AddField("Members With Role", fmt.Sprint(memberCount)).
+		AddField("Permissions", utils.Discord.FormatPermissions(role.Permissions)).
+		Send(ctx)
 }
 
 /*
 Role Control
 
-.roleinfo <@role> » Information
 .giverole <@member> <role_id> » Give a role
 .removerole <@member> <role_id> » Remove a role
 .createrole <role_name> » Create a role
