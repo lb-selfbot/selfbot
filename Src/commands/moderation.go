@@ -1285,9 +1285,9 @@ func (m *ModerationCommands) userinvites(ctx *dgc.Ctx) {
 }
 
 func (ModerationCommands) roleinfo(ctx *dgc.Ctx) {
-	channel, success := utils.Discord.TryGetRoleFromMention(ctx, ctx.Arguments.Get(0))
+	role, success := utils.Discord.TryGetRoleFromMention(ctx, ctx.Arguments.Get(0))
 	if !success {
-		ctx.RespondText("Could not find channel")
+		ctx.RespondText("Could not find role")
 		return
 	}
 

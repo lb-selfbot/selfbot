@@ -33,11 +33,7 @@ var InviteRegex *regexp.Regexp = regexp.MustCompile(`(?:https?://)?discord(?:(?:
 type DiscordUtils struct{}
 
 func (DiscordUtils) TryGetUserFromMention(session *discordgo.Session, mention *dgc.Argument) (*discordgo.User, bool) {
-	userID := mention.AsUserMentionID()
-	if userID == "" {
-		userID = mention.Raw()
-	}
-	user, err := session.User(userID)
+	user, err := session.User(Misc.Or(mention.AsUserMentionID(), mention.Raw()))
 	if err != nil {
 		return nil, false
 	}
@@ -45,11 +41,7 @@ func (DiscordUtils) TryGetUserFromMention(session *discordgo.Session, mention *d
 }
 
 func (DiscordUtils) TryGetMemberFromMention(ctx *dgc.Ctx, mention *dgc.Argument) (*discordgo.Member, bool) {
-	userID := mention.AsUserMentionID()
-	if userID == "" {
-		userID = mention.Raw()
-	}
-	member, err := ctx.Session.GuildMember(ctx.Event.GuildID, userID)
+	member, err := ctx.Session.GuildMember(ctx.Event.GuildID, Misc.Or(mention.AsUserMentionID(), mention.Raw()))
 	if err != nil {
 		return nil, false
 	}
@@ -65,10 +57,15 @@ func (d *DiscordUtils) TryGetUsernameFromMention(session *discordgo.Session, men
 }
 
 func (DiscordUtils) TryGetChannelFromMention(ctx *dgc.Ctx, mention *dgc.Argument) (*discordgo.Channel, bool) {
-	if mention.AsChannelMentionID() == "" {
+	channel, err := ctx.Session.Channel(Misc.Or(mention.AsChannelMentionID(), mention.Raw()))
+	if err != nil {
 		return nil, false
 	}
-	channel, err := ctx.Session.Channel(mention.AsChannelMentionID())
+	return channel, true
+}
+
+func (DiscordUtils) TryGetRoleFromMention(ctx *dgc.Ctx, mention *dgc.Argument) (*discordgo.Channel, bool) {
+	channel, err := ctx.Session.Channel(Misc.Or(mention.AsRoleMentionID(), mention.Raw()))
 	if err != nil {
 		return nil, false
 	}
