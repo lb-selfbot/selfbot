@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/LightningDev1/LB-Selfbot/config"
+	"github.com/LightningDev1/LB-Selfbot/embed"
 	"github.com/LightningDev1/LB-Selfbot/utils"
 	"github.com/LightningDev1/dgc"
 	"github.com/LightningDev1/discordgo"
@@ -15,6 +16,12 @@ type SessionsCommands struct {
 }
 
 func (s *SessionsCommands) RegisterCommands(router *dgc.Router, mainSession *discordgo.Session) {
+	router.RegisterCmd(&dgc.Command{
+		Name:        "viewsessions",
+		Description: "View all your logged in sessions",
+		Usage:       "[p]viewsessions",
+		Handler:     s.viewsessions,
+	})
 
 	// The sessions are currently only sent in the READY event.
 	// The sessions API is not enabled yet outside of experiments,
@@ -22,7 +29,7 @@ func (s *SessionsCommands) RegisterCommands(router *dgc.Router, mainSession *dis
 
 	go func() {
 		for {
-			time.Sleep(time.Second * 30)
+			time.Sleep(time.Second * 60)
 			cfg, err := config.GetConfig()
 			if err != nil {
 				fmt.Println("Error getting config:", err)
@@ -32,6 +39,7 @@ func (s *SessionsCommands) RegisterCommands(router *dgc.Router, mainSession *dis
 				fmt.Println("Error creating session:", err)
 			}
 			session.AddHandler(func(_ *discordgo.Session, e *discordgo.Ready) {
+				time.Sleep(time.Second * 2)
 				session.Close()
 
 				tempSessions := make([]*discordgo.DiscordSession, 0)
@@ -56,7 +64,9 @@ func (s *SessionsCommands) RegisterCommands(router *dgc.Router, mainSession *dis
 }
 
 func (s *SessionsCommands) HandleSessions(oldSessions, newSessions []*discordgo.DiscordSession) {
-	fmt.Println("Sessions:", len(oldSessions), "->", len(newSessions))
+	if len(oldSessions) != len(newSessions) {
+		fmt.Println("Sessions:", len(oldSessions), "->", len(newSessions))
+	}
 
 	// oldSessions will be empty at the beginning, we don't want to
 	// detect new sessions if they were already connected before us
@@ -85,4 +95,15 @@ func (s *SessionsCommands) HandleSessions(oldSessions, newSessions []*discordgo.
 			fmt.Println("Session connected:", newSession.SessionID, " OS: ", newSession.ClientInfo.OS, " Browser: ", newSession.ClientInfo.Client)
 		}
 	}
+}
+
+func (s *SessionsCommands) viewsessions(ctx *dgc.Ctx) {
+	embed := embed.NewEmbed().SetDescription("Sessions")
+	for index, session := range s.Sessions {
+		embed.AddField(
+			fmt.Sprintf("Session %d", index+1),
+			fmt.Sprintf("Session ID: %s\nOS: %s\nClient: %s", session.SessionID, utils.String.Capitalize(session.ClientInfo.OS), utils.String.Capitalize(session.ClientInfo.Client)),
+		)
+	}
+	embed.Send(ctx)
 }

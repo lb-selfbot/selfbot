@@ -85,6 +85,13 @@ func (DiscordUtils) SnowflakeToTime(snowflake string) time.Time {
 	return time.Unix(((snowflakeInt>>22)+1420070400000)/1000, 0)
 }
 
+func (DiscordUtils) GetTimestamp(t *time.Time, defaultString string) string {
+	if t == nil {
+		return defaultString
+	}
+	return fmt.Sprintf("<t:%d>", t.Unix())
+}
+
 func (DiscordUtils) ParseInvite(invite string) string {
 	inviteRegexMatch := string(InviteRegex.Find([]byte(invite)))
 	if inviteRegexMatch != "" {

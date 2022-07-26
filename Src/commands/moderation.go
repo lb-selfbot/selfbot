@@ -101,10 +101,34 @@ func (m ModerationCommands) RegisterCommands(router *dgc.Router) {
 		Handler:     m.serverinfo,
 	})
 	router.RegisterCmd(&dgc.Command{
+		Name:        "friendinvite",
+		Description: "Create a friend invite",
+		Usage:       "[p]friendinvite",
+		Handler:     m.friendinvite,
+	})
+	router.RegisterCmd(&dgc.Command{
 		Name:        "inviteinfo",
 		Description: "Get info about an invite",
 		Usage:       "[p]inviteinfo <invite>",
 		Handler:     m.inviteinfo,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "serverinvites",
+		Description: "Get all invites in a server",
+		Usage:       "[p]serverinvites [server id]",
+		Handler:     m.serverinvites,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "channelinvites",
+		Description: "Get all invites in a channel",
+		Usage:       "[p]channelinvites [channel]",
+		Handler:     m.channelinvites,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "userinvites",
+		Description: "Get all invites created by a user",
+		Usage:       "[p]userinvites <user> [server id]",
+		Handler:     m.userinvites,
 	})
 }
 
@@ -1104,6 +1128,19 @@ func (ModerationCommands) invite(ctx *dgc.Ctx) {
 		Send(ctx)
 }
 
+func (ModerationCommands) friendinvite(ctx *dgc.Ctx) {
+	invite, err := ctx.Session.CreateFriendInvite("@me")
+	if err != nil {
+		ctx.RespondText("Error creating friend invite: " + err.Error())
+		return
+	}
+
+	embed.NewEmbed().
+		SetDescription("Successfully created friend invite!").
+		AddField("Invite", fmt.Sprintf("https://discord.gg/%s", invite.Code)).
+		Send(ctx)
+}
+
 func (ModerationCommands) inviteinfo(ctx *dgc.Ctx) {
 	parsedInvite := utils.Discord.ParseInvite(utils.Arguments["<invite>"])
 	invite, err := ctx.Session.InviteWithCounts(parsedInvite)
@@ -1137,33 +1174,132 @@ func (ModerationCommands) inviteinfo(ctx *dgc.Ctx) {
 		Send(ctx)
 }
 
+func (ModerationCommands) deleteinvite(ctx *dgc.Ctx) {
+	parsedInvite := utils.Discord.ParseInvite(utils.Arguments["<invite>"])
+	invite, err := ctx.Session.InviteWithCounts(parsedInvite)
+	if err != nil {
+		ctx.RespondText("Error getting invite: " + err.Error())
+		return
+	}
+
+	invite, err = ctx.Session.InviteDelete(invite.Code)
+	if err != nil {
+		ctx.RespondText("Error deleting invite: " + err.Error())
+		return
+	}
+
+	embed.NewEmbed().
+		SetDescription(fmt.Sprintf("Deleted invite: %s", invite.Code)).
+		Send(ctx)
+}
+
+func (m *ModerationCommands) serverinvites(ctx *dgc.Ctx) {
+	invites, err := ctx.Session.GuildInvites(utils.Misc.Or(utils.Arguments["[server id]"], ctx.Event.GuildID))
+	if err != nil {
+		ctx.RespondText("Error getting invites: " + err.Error())
+		return
+	}
+	invitesString := ""
+	for _, invite := range invites {
+		username := "Unknown"
+		if invite.Inviter != nil {
+			username = invite.Inviter.String()
+		}
+		invitesString += fmt.Sprintf(
+			"Link: https://discord.gg/%s - Expires At: %s - Created By: %s\n",
+			invite.Code,
+			utils.Discord.GetTimestamp(invite.ExpiresAt, "Never"),
+			username,
+		)
+	}
+	embed.NewEmbed().
+		SetDescription("Invite List").
+		AddField("Invites", invitesString).
+		Send(ctx)
+}
+
+func (m *ModerationCommands) channelinvites(ctx *dgc.Ctx) {
+	channel, success := utils.Discord.TryGetChannelFromMention(ctx, ctx.Arguments.Get(0))
+	channelID := ctx.Event.ChannelID
+	if success {
+		channelID = channel.ID
+	}
+	invites, err := ctx.Session.ChannelInvites(channelID)
+	if err != nil {
+		ctx.RespondText("Error getting invites: " + err.Error())
+		return
+	}
+	invitesString := ""
+	for _, invite := range invites {
+		username := "Unknown"
+		if invite.Inviter != nil {
+			username = invite.Inviter.String()
+		}
+		invitesString += fmt.Sprintf(
+			"Link: https://discord.gg/%s - Expires At: %s - Created By: %s\n",
+			invite.Code,
+			utils.Discord.GetTimestamp(invite.ExpiresAt, "Never"),
+			username,
+		)
+	}
+	embed.NewEmbed().
+		SetDescription("Invite List").
+		AddField("Invites", invitesString).
+		Send(ctx)
+}
+
+func (m *ModerationCommands) userinvites(ctx *dgc.Ctx) {
+	if !utils.Discord.CheckIfInServer(ctx) {
+		return
+	}
+
+	member, success := utils.Discord.TryGetMemberFromMention(ctx, ctx.Arguments.Get(0))
+	if !success {
+		ctx.RespondText("Could not find user")
+		return
+	}
+
+	invites, err := ctx.Session.GuildInvites(utils.Misc.Or(utils.Arguments["[server id]"], ctx.Event.GuildID))
+	if err != nil {
+		ctx.RespondText("Error getting invites: " + err.Error())
+		return
+	}
+	invitesString := ""
+	for _, invite := range invites {
+		if invite.Inviter == nil {
+			continue
+		}
+		if invite.Inviter.ID != member.User.ID {
+			continue
+		}
+		invitesString += fmt.Sprintf(
+			"Link: https://discord.gg/%s - Expires At: %s\n",
+			invite.Code,
+			utils.Discord.GetTimestamp(invite.ExpiresAt, "Never"),
+		)
+	}
+	embed.NewEmbed().
+		SetDescription(fmt.Sprintf("Invite List (%s)", member.User.String())).
+		AddField("Invites", invitesString).
+		Send(ctx)
+}
+
+func (ModerationCommands) roleinfo(ctx *dgc.Ctx) {
+	channel, success := utils.Discord.TryGetRoleFromMention(ctx, ctx.Arguments.Get(0))
+	if !success {
+		ctx.RespondText("Could not find channel")
+		return
+	}
+
+}
+
 /*
-Invite Control
-
-.friendinvite
-.delinvite <invite_id> » Delete invite
-.invitelist       » List all invites
-.invitechannel <channel_id> » Channel invites
-.inviteguild      » Invites of a guild
-.inviteuser <user_id> » Invites of a user
-
 Role Control
 
 .roleinfo <@role> » Information
 .giverole <@member> <role_id> » Give a role
-.giveallroles <@member> » Give all roles
-.allroles         » Give all roles
-.removeallroles <@member> » Remove all roles
 .removerole <@member> <role_id> » Remove a role
 .createrole <role_name> » Create a role
 .renamerole <role_id> <name> » Rename a role
-.renameroles <name> » Rename all roles
 .deleterole <role_id> » Delete a role
-
-Ignore Control
-
-.ignore <@user>   » Ignore user DMs
-.unignore <@user> » Unignore user DMs
-.ignorelist       » List ignored users
-.ignorelistclear  » Clear ignore list
 */
