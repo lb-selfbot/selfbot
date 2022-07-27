@@ -53,6 +53,60 @@ func (m ModerationCommands) RegisterCommands(router *dgc.Router) {
 		Handler:     m.voicechannel,
 	})
 	router.RegisterCmd(&dgc.Command{
+		Name:        "stagechannel",
+		Description: "Create a stage channel",
+		Usage:       "[p]stagechannel <name>",
+		Handler:     m.stagechannel,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "newschannel",
+		Description: "Create a news channel",
+		Usage:       "[p]newschannel <name>",
+		Handler:     m.newschannel,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "thread",
+		Description: "Create a thread",
+		Usage:       "[p]thread <name>",
+		Handler:     m.thread,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "category",
+		Description: "Create a category",
+		Usage:       "[p]category <name>",
+		Handler:     m.category,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "deletecategory",
+		Description: "Delete a category",
+		Usage:       "[p]deletecategory <category id>",
+		Handler:     m.deletecategory,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "renamechannel",
+		Description: "Rename a channel",
+		Usage:       "[p]renamechannel <channel> <name>",
+		Handler:     m.renamechannel,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "deletechannel",
+		Description: "Delete a channel",
+		Usage:       "[p]deletechannel <channel>",
+		Handler:     m.deletechannel,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "slowmode",
+		Description: "Change slowmode amount",
+		Usage:       "[p]slowmode <channel> <seconds>",
+		Handler:     m.slowmode,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "removeslowmode",
+		Description: "Remove clowmode",
+		Usage:       "[p]removeslowmode <channel>",
+		Handler:     m.removeslowmode,
+	})
+	router.RegisterCmd(&dgc.Command{
 		Name:        "lockchannel",
 		Description: "Lock a channel",
 		Usage:       "[p]lockchannel <channel>",
@@ -67,8 +121,14 @@ func (m ModerationCommands) RegisterCommands(router *dgc.Router) {
 	router.RegisterCmd(&dgc.Command{
 		Name:        "purge",
 		Description: "Delete messages in a channel",
-		Usage:       "[p]purge <amount>",
+		Usage:       "[p]purge <amount> [channel]",
 		Handler:     m.purge,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "nuke",
+		Description: "Nuke a channel",
+		Usage:       "[p]nuke [channel]",
+		Handler:     m.nuke,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "userinfo",
@@ -107,10 +167,136 @@ func (m ModerationCommands) RegisterCommands(router *dgc.Router) {
 		Handler:     m.removetimeout,
 	})
 	router.RegisterCmd(&dgc.Command{
+		Name:        "kick",
+		Description: "Kick a user",
+		Usage:       "[p]kick <user> [reason]",
+		Handler:     m.kick,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "ban",
+		Description: "Ban a user",
+		Usage:       "[p]ban <user> [reason]",
+		Handler:     m.ban,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "hackban",
+		Description: "Ban a user that's not in the server",
+		Usage:       "[p]hackban <user id> [reason]",
+		Handler:     m.ban,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "softban",
+		Description: "Ban and instantly unban a user",
+		Usage:       "[p]softban <user> [reason]",
+		Handler:     m.softban,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "unban",
+		Description: "Ban and instantly unban a user",
+		Usage:       "[p]unban <user id>",
+		Handler:     m.unban,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "banlist",
+		Description: "Get a list of banned users",
+		Usage:       "[p]banlist [server id]",
+		Handler:     m.banlist,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "copybans",
+		Description: "Copy bans from one server to another",
+		Usage:       "[p]copybans <source server id> [dest server id]",
+		Handler:     m.copybans,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "nick",
+		Description: "Change your nickname",
+		Usage:       "[p]nick <text>",
+		Handler:     m.nick,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "nickuser",
+		Description: "Change a users nickname",
+		Usage:       "[p]nick <user> <text>",
+		Handler:     m.nickuser,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "clearnick",
+		Description: "Clear a users nickname",
+		Usage:       "[p]clearnick [user]",
+		Handler:     m.clearnick,
+	})
+	router.RegisterCmd(&dgc.Command{
 		Name:        "serverinfo",
 		Description: "Get info about a server",
 		Usage:       "[p]serverinfo [server id]",
 		Handler:     m.serverinfo,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "serverowner",
+		Description: "Get a servers owner",
+		Usage:       "[p]serverowner [server id]",
+		Handler:     m.serverowner,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "servericon",
+		Description: "Get a servers icon",
+		Usage:       "[p]servericon [server id]",
+		Handler:     m.servericon,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "serverbanner",
+		Description: "Get a servers banner",
+		Usage:       "[p]serverbanner [server id]",
+		Handler:     m.serverbanner,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "serverboosters",
+		Description: "Get a list of server boosters",
+		Usage:       "[p]serverboosters [server id]",
+		Handler:     m.serverboosters,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "serverboostlevel",
+		Description: "Get a servers boost level",
+		Usage:       "[p]serverboostlevel [server id]",
+		Handler:     m.serverboostlevel,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "setservername",
+		Description: "Set a servers name",
+		Usage:       "[p]setservername <name>",
+		Handler:     m.setservername,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "setservericon",
+		Description: "Set a servers icon",
+		Usage:       "[p]setservericon <url>",
+		Handler:     m.setservericon,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "setserverbanner",
+		Description: "Set a servers banner",
+		Usage:       "[p]setserverbanner <url>",
+		Handler:     m.setserverbanner,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "lockserver",
+		Description: "Lock a server",
+		Usage:       "[p]lockserver [server id]",
+		Handler:     m.lockserver,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "unlockserver",
+		Description: "Unlock a server",
+		Usage:       "[p]unlockserver [server id]",
+		Handler:     m.unlockserver,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "invite",
+		Description: "Create an invite",
+		Usage:       "[p]invite [channel] [max age] [max uses]",
+		Handler:     m.invite,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "friendinvite",
@@ -123,6 +309,12 @@ func (m ModerationCommands) RegisterCommands(router *dgc.Router) {
 		Description: "Get info about an invite",
 		Usage:       "[p]inviteinfo <invite>",
 		Handler:     m.inviteinfo,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "deleteinvite",
+		Description: "Delete an invite",
+		Usage:       "[p]deleteinvite <invite>",
+		Handler:     m.deleteinvite,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "serverinvites",
@@ -147,6 +339,36 @@ func (m ModerationCommands) RegisterCommands(router *dgc.Router) {
 		Description: "Get info about a role",
 		Usage:       "[p]roleinfo <role>",
 		Handler:     m.roleinfo,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "giverole",
+		Description: "Give a role to a user",
+		Usage:       "[p]giverole <user> <role>",
+		Handler:     m.giverole,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "removerole",
+		Description: "Remove a role from a user",
+		Usage:       "[p]removerole <user> <role>",
+		Handler:     m.removerole,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "createrole",
+		Description: "Create a role",
+		Usage:       "[p]createrole <name>",
+		Handler:     m.createrole,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "deleterole",
+		Description: "Delete a role",
+		Usage:       "[p]deleterole <role>",
+		Handler:     m.deleterole,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "renamerole",
+		Description: "Rename a role",
+		Usage:       "[p]renamerole <role> <name>",
+		Handler:     m.renamerole,
 	})
 }
 
@@ -227,7 +449,7 @@ func (ModerationCommands) newschannel(ctx *dgc.Ctx) {
 		return
 	}
 	embed.NewEmbed().
-		SetDescription("Successfully created stage channel!").
+		SetDescription("Successfully created news channel!").
 		AddField("Channel", channel.Mention()).
 		Send(ctx)
 }
@@ -239,12 +461,44 @@ func (ModerationCommands) thread(ctx *dgc.Ctx) {
 	ctx.Session.ThreadStart(ctx.Event.ChannelID, ctx.Arguments.Raw(), discordgo.ChannelTypeGuildPublicThread, 0)
 	channel, err := ctx.Session.ThreadStart(ctx.Event.ChannelID, ctx.Arguments.Raw(), discordgo.ChannelTypeGuildPublicThread, 0)
 	if err != nil {
-		ctx.RespondText("Error creating channel: " + err.Error())
+		ctx.RespondText("Error creating thread: " + err.Error())
 		return
 	}
 	embed.NewEmbed().
 		SetDescription("Successfully created thread!").
 		AddField("Thread", channel.Mention()).
+		Send(ctx)
+}
+
+func (ModerationCommands) category(ctx *dgc.Ctx) {
+	if !utils.Discord.CheckIfInServer(ctx) {
+		return
+	}
+	channel, err := ctx.Session.GuildChannelCreate(ctx.Event.GuildID, ctx.Arguments.Raw(), discordgo.ChannelTypeGuildCategory)
+	if err != nil {
+		ctx.RespondText("Error creating category: " + err.Error())
+		return
+	}
+	embed.NewEmbed().
+		SetDescription("Successfully created category!").
+		AddField("Category", channel.Mention()).
+		Send(ctx)
+}
+
+func (ModerationCommands) deletecategory(ctx *dgc.Ctx) {
+	channel, success := utils.Discord.TryGetChannelFromMention(ctx, ctx.Arguments.Get(0))
+	if !success {
+		ctx.RespondText("Could not find category")
+		return
+	}
+	_, err := ctx.Session.ChannelDelete(channel.ID)
+	if err != nil {
+		ctx.RespondText("Error deleting category: " + err.Error())
+		return
+	}
+
+	embed.NewEmbed().
+		SetDescription("Successfully deleted category!").
 		Send(ctx)
 }
 
@@ -255,7 +509,7 @@ func (ModerationCommands) renamechannel(ctx *dgc.Ctx) {
 		return
 	}
 
-	_, err := ctx.Session.ChannelEdit(channel.ID, ctx.Arguments.Raw())
+	_, err := ctx.Session.ChannelEdit(channel.ID, utils.String.RemoveWords(ctx.Arguments.Raw(), 1))
 	if err != nil {
 		ctx.RespondText("Error renaming channel: " + err.Error())
 		return
@@ -387,98 +641,6 @@ func (ModerationCommands) unlockchannel(ctx *dgc.Ctx) {
 		Send(ctx)
 }
 
-func (ModerationCommands) lockserver(ctx *dgc.Ctx) {
-	guild, err := utils.Discord.GetGuild(ctx.Session, utils.Misc.Or(utils.Arguments["[server id]"], ctx.Event.GuildID))
-	if err != nil {
-		ctx.RespondText("Error getting server: " + err.Error())
-		return
-	}
-
-	for _, channel := range guild.Channels {
-		if channel.Type == discordgo.ChannelTypeGuildText {
-			_, err := ctx.Session.ChannelEditComplex(channel.ID, &discordgo.ChannelEdit{
-				PermissionOverwrites: []*discordgo.PermissionOverwrite{
-					{
-						ID:   guild.ID,
-						Type: discordgo.PermissionOverwriteTypeRole,
-						Deny: discordgo.PermissionSendMessages,
-					},
-				},
-			})
-			if err != nil {
-				ctx.RespondText("Error locking server: " + err.Error())
-				return
-			}
-		}
-	}
-
-	embed.NewEmbed().
-		SetDescription("Successfully locked server!").
-		Send(ctx)
-}
-
-func (ModerationCommands) unlockserver(ctx *dgc.Ctx) {
-	guild, err := utils.Discord.GetGuild(ctx.Session, utils.Misc.Or(utils.Arguments["[server id]"], ctx.Event.GuildID))
-	if err != nil {
-		ctx.RespondText("Error getting server: " + err.Error())
-		return
-	}
-
-	for _, channel := range guild.Channels {
-		if channel.Type == discordgo.ChannelTypeGuildText {
-			_, err := ctx.Session.ChannelEditComplex(channel.ID, &discordgo.ChannelEdit{
-				PermissionOverwrites: []*discordgo.PermissionOverwrite{
-					{
-						ID:   guild.ID,
-						Type: discordgo.PermissionOverwriteTypeRole,
-						Deny: 0,
-					},
-				},
-			})
-			if err != nil {
-				ctx.RespondText("Error locking server: " + err.Error())
-				return
-			}
-		}
-	}
-
-	embed.NewEmbed().
-		SetDescription("Successfully locked server!").
-		Send(ctx)
-}
-
-func (ModerationCommands) category(ctx *dgc.Ctx) {
-	if !utils.Discord.CheckIfInServer(ctx) {
-		return
-	}
-	channel, err := ctx.Session.GuildChannelCreate(ctx.Event.GuildID, ctx.Arguments.Raw(), discordgo.ChannelTypeGuildCategory)
-	if err != nil {
-		ctx.RespondText("Error creating category: " + err.Error())
-		return
-	}
-	embed.NewEmbed().
-		SetDescription("Successfully created category!").
-		AddField("Category", channel.Mention()).
-		Send(ctx)
-}
-
-func (ModerationCommands) deletecategory(ctx *dgc.Ctx) {
-	channel, success := utils.Discord.TryGetChannelFromMention(ctx, ctx.Arguments.Get(0))
-	if !success {
-		ctx.RespondText("Could not find category")
-		return
-	}
-	_, err := ctx.Session.ChannelDelete(channel.ID)
-	if err != nil {
-		ctx.RespondText("Error deleting category: " + err.Error())
-		return
-	}
-
-	embed.NewEmbed().
-		SetDescription("Successfully deleted category!").
-		Send(ctx)
-}
-
 func (ModerationCommands) purge(ctx *dgc.Ctx) {
 	amount, err := strconv.Atoi(utils.Arguments["<amount>"])
 	if err != nil {
@@ -486,22 +648,31 @@ func (ModerationCommands) purge(ctx *dgc.Ctx) {
 		return
 	}
 
-	messages, err := utils.Discord.GetChannelMessages(ctx, amount)
+	channel, success := utils.Discord.TryGetChannelFromMention(ctx, ctx.Arguments.Get(1))
+	channelID := ctx.Event.ChannelID
+	if success {
+		channelID = channel.ID
+	}
+
+	messages, err := utils.Discord.GetChannelMessages(ctx, channelID, amount)
 	if err != nil {
 		ctx.RespondText("Error getting messages: " + err.Error())
 		return
 	}
 
 	for _, message := range messages {
-		ctx.Session.ChannelMessageDelete(ctx.Event.ChannelID, message.ID)
+		ctx.Session.ChannelMessageDelete(channelID, message.ID)
 	}
 }
 
 func (ModerationCommands) nuke(ctx *dgc.Ctx) {
 	channel, success := utils.Discord.TryGetChannelFromMention(ctx, ctx.Arguments.Get(0))
 	if !success {
-		ctx.RespondText("Could not find channel")
-		return
+		channel, _ = ctx.Session.State.Channel(ctx.Event.ChannelID)
+		if channel == nil {
+			ctx.RespondText("Could not find channel")
+			return
+		}
 	}
 
 	_, err := ctx.Session.ChannelDelete(channel.ID)
@@ -526,6 +697,9 @@ func (ModerationCommands) nuke(ctx *dgc.Ctx) {
 		ctx.RespondText("Error creating channel: " + err.Error())
 		return
 	}
+	ctx.Session.ChannelEditComplex(channel.ID, &discordgo.ChannelEdit{
+		Position: channel.Position,
+	})
 
 	ctx.Event.ChannelID = channel.ID
 
@@ -795,18 +969,18 @@ func (ModerationCommands) kick(ctx *dgc.Ctx) {
 		Send(ctx)
 }
 
-func (ModerationCommands) ban(ctx *dgc.Ctx) { // hackban: same as ban
+func (ModerationCommands) ban(ctx *dgc.Ctx) {
 	if !utils.Discord.CheckIfInServer(ctx) {
 		return
 	}
 
 	member, success := utils.Discord.TryGetMemberFromMention(ctx, ctx.Arguments.Get(0))
-	if !success {
-		ctx.RespondText("Could not find user")
-		return
+	memberID := ctx.Arguments.Get(0).Raw()
+	if success {
+		memberID = member.User.ID
 	}
 
-	err := ctx.Session.GuildBanCreateWithReason(ctx.Event.GuildID, member.User.ID, utils.Arguments["[reason]"], 0)
+	err := ctx.Session.GuildBanCreateWithReason(ctx.Event.GuildID, memberID, utils.Arguments["[reason]"], 0)
 	if err != nil {
 		ctx.RespondText("Error banning user: " + err.Error())
 		return
@@ -890,9 +1064,13 @@ func (ModerationCommands) banlist(ctx *dgc.Ctx) {
 
 func (ModerationCommands) copybans(ctx *dgc.Ctx) {
 	sourceServerID := utils.Arguments["<source server id>"]
-	destinationServerID := utils.Arguments["<destination server id>"]
+	destinationServerID := utils.Arguments["[dest server id]"]
 	if destinationServerID == "" {
 		destinationServerID = ctx.Event.GuildID
+	}
+	if destinationServerID == "" {
+		ctx.RespondText("Error: No server ID specified!")
+		return
 	}
 	banList, err := ctx.Session.GuildBans(sourceServerID, 1000, "", "")
 	if err != nil {
@@ -915,7 +1093,7 @@ func (ModerationCommands) nick(ctx *dgc.Ctx) {
 	if !utils.Discord.CheckIfInServer(ctx) {
 		return
 	}
-	err := ctx.Session.GuildMemberNickname(ctx.Event.GuildID, ctx.Event.Author.ID, utils.Arguments["<text>"])
+	err := ctx.Session.GuildMemberNickname(ctx.Event.GuildID, ctx.Event.Author.ID, ctx.Arguments.Raw())
 	if err != nil {
 		ctx.RespondText("Error changing nickname: " + err.Error())
 		return
@@ -936,7 +1114,7 @@ func (ModerationCommands) nickuser(ctx *dgc.Ctx) {
 		return
 	}
 
-	err := ctx.Session.GuildMemberNickname(ctx.Event.GuildID, member.User.ID, utils.Arguments["<text>"])
+	err := ctx.Session.GuildMemberNickname(ctx.Event.GuildID, member.User.ID, utils.String.RemoveWords(ctx.Arguments.Raw(), 1))
 	if err != nil {
 		ctx.RespondText("Error changing nickname: " + err.Error())
 		return
@@ -967,6 +1145,41 @@ func (ModerationCommands) clearnick(ctx *dgc.Ctx) {
 }
 
 // Server Control
+
+func (ModerationCommands) serverinfo(ctx *dgc.Ctx) {
+	if !utils.Discord.CheckIfInServer(ctx) {
+		return
+	}
+
+	guild, err := utils.Discord.GetGuild(ctx.Session, utils.Misc.Or(utils.Arguments["[server id]"], ctx.Event.GuildID))
+	if err != nil {
+		ctx.RespondText("Error getting server: " + err.Error())
+		return
+	}
+
+	owner, err := utils.Discord.GetMember(ctx.Session, guild.ID, guild.OwnerID)
+	ownerMention := "Error"
+	if err == nil {
+		ownerMention = owner.User.String()
+	}
+
+	embed := embed.NewEmbed().
+		SetDescription(fmt.Sprintf("Server Info - %s", guild.Name)).
+		AddField("ID", guild.ID).
+		AddField("Owner", ownerMention).
+		AddField("Created At", utils.Discord.SnowflakeToTime(guild.ID).Format(time.RFC1123)).
+		AddField("Verification Level", verificationLevels[int(guild.VerificationLevel)]).
+		AddField("Boost Level", boostLevels[int(guild.PremiumTier)]).
+		AddField("Amount of boosts", fmt.Sprint(guild.PremiumSubscriptionCount)).
+		AddField("Member Count", fmt.Sprint(guild.MemberCount)).
+		AddField("Channel Count", fmt.Sprint(len(guild.Channels))).
+		AddField("Role Count", fmt.Sprint(len(guild.Roles))).
+		AddField("Joined At", guild.JoinedAt.Format(time.RFC1123))
+	if guild.Icon != "" {
+		embed.SetImage(guild.IconURL())
+	}
+	embed.Send(ctx)
+}
 
 func (ModerationCommands) serverowner(ctx *dgc.Ctx) {
 	if !utils.Discord.CheckIfInServer(ctx) {
@@ -1079,7 +1292,7 @@ func (ModerationCommands) setservername(ctx *dgc.Ctx) {
 		return
 	}
 	guild, err := ctx.Session.GuildEdit(ctx.Event.GuildID, discordgo.GuildParams{
-		Name: utils.Arguments["<text>"],
+		Name: ctx.Arguments.Raw(),
 	})
 	if err != nil {
 		ctx.RespondText("Error changing server name: " + err.Error())
@@ -1122,63 +1335,88 @@ func (ModerationCommands) setserverbanner(ctx *dgc.Ctx) {
 		Send(ctx)
 }
 
-func (ModerationCommands) serverinfo(ctx *dgc.Ctx) {
-	if !utils.Discord.CheckIfInServer(ctx) {
-		return
-	}
-
+func (ModerationCommands) lockserver(ctx *dgc.Ctx) {
 	guild, err := utils.Discord.GetGuild(ctx.Session, utils.Misc.Or(utils.Arguments["[server id]"], ctx.Event.GuildID))
 	if err != nil {
 		ctx.RespondText("Error getting server: " + err.Error())
 		return
 	}
 
-	owner, err := utils.Discord.GetMember(ctx.Session, guild.ID, guild.OwnerID)
-	ownerMention := "Error"
-	if err == nil {
-		ownerMention = owner.User.String()
+	for _, channel := range guild.Channels {
+		if channel.Type == discordgo.ChannelTypeGuildText {
+			_, err := ctx.Session.ChannelEditComplex(channel.ID, &discordgo.ChannelEdit{
+				PermissionOverwrites: []*discordgo.PermissionOverwrite{
+					{
+						ID:   guild.ID,
+						Type: discordgo.PermissionOverwriteTypeRole,
+						Deny: discordgo.PermissionSendMessages,
+					},
+				},
+			})
+			if err != nil {
+				ctx.RespondText("Error locking server: " + err.Error())
+				return
+			}
+		}
 	}
 
-	embed := embed.NewEmbed().
-		SetDescription(fmt.Sprintf("Server Info - %s", guild.Name)).
-		AddField("ID", guild.ID).
-		AddField("Owner", ownerMention).
-		AddField("Created At", utils.Discord.SnowflakeToTime(guild.ID).Format(time.RFC1123)).
-		AddField("Verification Level", verificationLevels[int(guild.VerificationLevel)]).
-		AddField("Boost Level", boostLevels[int(guild.PremiumTier)]).
-		AddField("Amount of boosts", fmt.Sprint(guild.PremiumSubscriptionCount)).
-		AddField("Member Count", fmt.Sprint(guild.MemberCount)).
-		AddField("Channel Count", fmt.Sprint(len(guild.Channels))).
-		AddField("Role Count", fmt.Sprint(len(guild.Roles))).
-		AddField("Joined At", guild.JoinedAt.Format(time.RFC1123))
-	if guild.Icon != "" {
-		embed.SetImage(guild.IconURL())
+	embed.NewEmbed().
+		SetDescription("Successfully locked server!").
+		Send(ctx)
+}
+
+func (ModerationCommands) unlockserver(ctx *dgc.Ctx) {
+	guild, err := utils.Discord.GetGuild(ctx.Session, utils.Misc.Or(utils.Arguments["[server id]"], ctx.Event.GuildID))
+	if err != nil {
+		ctx.RespondText("Error getting server: " + err.Error())
+		return
 	}
-	embed.Send(ctx)
+
+	for _, channel := range guild.Channels {
+		if channel.Type == discordgo.ChannelTypeGuildText {
+			_, err := ctx.Session.ChannelEditComplex(channel.ID, &discordgo.ChannelEdit{
+				PermissionOverwrites: []*discordgo.PermissionOverwrite{
+					{
+						ID:   guild.ID,
+						Type: discordgo.PermissionOverwriteTypeRole,
+						Deny: 0,
+					},
+				},
+			})
+			if err != nil {
+				ctx.RespondText("Error locking server: " + err.Error())
+				return
+			}
+		}
+	}
+
+	embed.NewEmbed().
+		SetDescription("Successfully locked server!").
+		Send(ctx)
 }
 
 // Invite Control
 
 func (ModerationCommands) invite(ctx *dgc.Ctx) {
 	channel, success := utils.Discord.TryGetChannelFromMention(ctx, ctx.Arguments.Get(0))
+	channelID := ctx.Event.ChannelID
 	if !success {
-		ctx.RespondText("Could not find channel")
+		channelID = channel.ID
+	}
+
+	ageInt, err := strconv.Atoi(utils.Arguments["[max age]"])
+	if err != nil && utils.Arguments["[max age]"] != "" {
+		ctx.RespondText("Argument [max age] must be a number.")
 		return
 	}
 
-	ageInt, err := strconv.Atoi(utils.Arguments["[maxage]"])
-	if err != nil && utils.Arguments["[maxage]"] != "" {
-		ctx.RespondText("Argument [maxage] must be a number.")
+	usesInt, err := strconv.Atoi(utils.Arguments["[max uses]"])
+	if err != nil && utils.Arguments["[max uses]"] != "" {
+		ctx.RespondText("Argument [max uses] must be a number.")
 		return
 	}
 
-	usesInt, err := strconv.Atoi(utils.Arguments["[maxuses]"])
-	if err != nil && utils.Arguments["[maxuses]"] != "" {
-		ctx.RespondText("Argument [maxuses] must be a number.")
-		return
-	}
-
-	invite, err := ctx.Session.ChannelInviteCreate(channel.ID, discordgo.Invite{
+	invite, err := ctx.Session.ChannelInviteCreate(channelID, discordgo.Invite{
 		MaxAge:    ageInt,
 		MaxUses:   usesInt,
 		Temporary: false,
@@ -1191,9 +1429,6 @@ func (ModerationCommands) invite(ctx *dgc.Ctx) {
 
 	embed.NewEmbed().
 		SetDescription(fmt.Sprintf("Created invite: https://discord.gg/%s", invite.Code)).
-		AddField("Max Age", fmt.Sprint(invite.MaxAge)).
-		AddField("Max Uses", fmt.Sprint(invite.MaxUses)).
-		AddField("Channel", invite.Channel.Name).
 		Send(ctx)
 }
 

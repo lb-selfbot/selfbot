@@ -134,10 +134,10 @@ func (DiscordUtils) GetArguments(ctx *dgc.Ctx) (map[string]string, bool) {
 	return arguments, true
 }
 
-func (DiscordUtils) GetChannelMessages(ctx *dgc.Ctx, limit int) ([]*discordgo.Message, error) {
+func (DiscordUtils) GetChannelMessages(ctx *dgc.Ctx, channelID string, limit int) ([]*discordgo.Message, error) {
 	// The maximum number of messages that can be retrieved at once is 100.
 	if limit <= 100 {
-		return ctx.Session.ChannelMessages(ctx.Event.ChannelID, limit, "", "", ctx.Event.Message.ID)
+		return ctx.Session.ChannelMessages(channelID, limit, "", "", ctx.Event.Message.ID)
 	}
 
 	amountOfRequests := int(math.Ceil(float64(limit) / 100))
@@ -146,11 +146,11 @@ func (DiscordUtils) GetChannelMessages(ctx *dgc.Ctx, limit int) ([]*discordgo.Me
 	limit -= 1
 
 	for i := 0; i < amountOfRequests; i++ {
-		newMessages, err := ctx.Session.ChannelMessages(ctx.Event.ChannelID, int(math.Min(float64(limit), 100)), messages[len(messages)-1].ID, "", "")
+		newMessages, err := ctx.Session.ChannelMessages(channelID, int(math.Min(float64(limit), 100)), messages[len(messages)-1].ID, "", "")
 		if err != nil {
 			return nil, err
 		}
-		limit -= 100
+		limit -= len(newMessages)
 		messages = append(messages, newMessages...)
 	}
 
