@@ -1367,7 +1367,6 @@ func (ModerationCommands) roleinfo(ctx *dgc.Ctx) {
 			memberCount++
 		}
 	}
-	fmt.Println("Lazy Request", len(members))
 	createdAt := utils.Discord.SnowflakeToTime(role.ID)
 	perms, _ := api.CreatePaste(utils.Discord.FormatPermissions(role.Name, role.ID, role.Permissions))
 	embed.NewEmbed().
