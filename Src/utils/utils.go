@@ -200,75 +200,76 @@ func (DiscordUtils) GetBoosters(guild *discordgo.Guild) []*discordgo.Member {
 	return boostedMembers
 }
 
-func (DiscordUtils) FormatPermissions(permissions int64) (permissionsString string) {
-	permissionsString = fmt.Sprintf(`Permission: add_reactions | Value: %s
-Permission: Administrator | Value: %s
-Permission: Attach Files | Value: %s
-Permission: Ban Members | Value: %s
-Permission: Change Nickname | Value: %s
+func (DiscordUtils) FormatPermissions(roleName, roleID string, permissions int64) string {
+	permissionsString := fmt.Sprintf(`Role: %s | ID: %s
+
+Permission: Add Reactions            | Value: %s
+Permission: Administrator            | Value: %s
+Permission: Attach Files             | Value: %s
+Permission: Ban Members              | Value: %s
+Permission: Change Nickname          | Value: %s
 Permission: Connect to Voice Channel | Value: %s
-Permission: Create Instant Invite | Value: %s
-Permission: Deafen Members | Value: %s
-Permission: Embed Links | Value: %s
-Permission: Use External Emojis | Value: %s
-Permission: Kick Members | Value: %s
-Permission: Manage Channels | Value: %s
-Permission: Manage Emojis | Value: %s
-Permission: Manage Server | Value: %s
-Permission: Manage Messages | Value: %s
-Permission: Manage Nicknames | Value: %s
-Permission: manage_Roles | Value: %s
-Permission: manage_webhooks | Value: %s
-Permission: mention_everyone | Value: %s
-Permission: Move Members | Value: %s
-Permission: Mute Members | Value: %s
-Permission: Priority Speaker | Value: %s
-Permission: read_message_history | Value: %s
-Permission: read_messages | Value: %s
-Permission: send_messages | Value: %s
-Permission: send_tts_messages | Value: %s
-Permission: Speak in Voice Channel | Value: %s
-Permission: Stream in Voice Channel | Value: %s
-Permission: use_external_emojis | Value: %s
-Permission: Use Voice Activation | Value: %s
-Permission: View Audit Logs | Value: %s
-Permission: view_channel | Value: %s
-Permission: view_guild_insights | Value: %s`,
-		permissions&discordgo.PermissionAddReactions != 0,
-		permissions&discordgo.PermissionAdministrator != 0,
-		permissions&discordgo.PermissionAttachFiles != 0,
-		permissions&discordgo.PermissionBanMembers != 0,
-		permissions&discordgo.PermissionChangeNickname != 0,
-		permissions&discordgo.PermissionVoiceConnect != 0,
-		permissions&discordgo.PermissionCreateInstantInvite != 0,
-		permissions&discordgo.PermissionVoiceDeafenMembers != 0,
-		permissions&discordgo.PermissionEmbedLinks != 0,
-		permissions&discordgo.PermissionUseExternalEmojis != 0,
-		permissions&discordgo.PermissionKickMembers != 0,
-		permissions&discordgo.PermissionManageChannels != 0,
-		permissions&discordgo.PermissionManageEmojis != 0,
-		permissions&discordgo.PermissionManageServer != 0,
-		permissions&discordgo.PermissionManageMessages != 0,
-		permissions&discordgo.PermissionManageNicknames != 0,
-		permissions&discordgo.PermissionManageRoles != 0,
-		permissions&discordgo.PermissionManageWebhooks != 0,
-		permissions&discordgo.PermissionMentionEveryone != 0,
-		permissions&discordgo.PermissionVoiceMoveMembers != 0,
-		permissions&discordgo.PermissionVoiceMuteMembers != 0,
-		permissions&discordgo.PermissionVoicePrioritySpeaker != 0,
-		permissions&discordgo.PermissionReadMessageHistory != 0,
-		permissions&discordgo.PermissionReadMessages != 0,
-		permissions&discordgo.PermissionSendMessages != 0,
-		permissions&discordgo.PermissionSendTTSMessages != 0,
-		permissions&discordgo.PermissionVoiceSpeak != 0,
-		permissions&discordgo.PermissionVoiceStreamVideo != 0,
-		permissions&discordgo.PermissionUseExternalEmojis != 0,
-		permissions&discordgo.PermissionVoiceUseVAD != 0,
-		permissions&discordgo.PermissionViewAuditLogs != 0,
-		permissions&discordgo.PermissionViewChannel != 0,
-		permissions&discordgo.PermissionViewGuildInsights != 0,
+Permission: Create Instant Invite    | Value: %s
+Permission: Deafen Members           | Value: %s
+Permission: Embed Links              | Value: %s
+Permission: Use External Emojis      | Value: %s
+Permission: Kick Members             | Value: %s
+Permission: Manage Channels          | Value: %s
+Permission: Manage Emojis            | Value: %s
+Permission: Manage Server            | Value: %s
+Permission: Manage Messages          | Value: %s
+Permission: Manage Nicknames         | Value: %s
+Permission: Manage Roles             | Value: %s
+Permission: Manage webhooks          | Value: %s
+Permission: Mention everyone         | Value: %s
+Permission: Move Members             | Value: %s
+Permission: Mute Members             | Value: %s
+Permission: Priority Speaker         | Value: %s
+Permission: Read Message History     | Value: %s
+Permission: View Channel             | Value: %s
+Permission: Send Messages            | Value: %s
+Permission: Send TTS messages        | Value: %s
+Permission: Speak in Voice Channel   | Value: %s
+Permission: Stream in Voice Channel  | Value: %s
+Permission: Use External Emojis      | Value: %s
+Permission: Use Voice Activation     | Value: %s
+Permission: View Audit Logs          | Value: %s
+Permission: View Guild Insights      | Value: %s`,
+		roleName, roleID,
+		Misc.FormatBool(permissions&discordgo.PermissionAddReactions != 0),
+		Misc.FormatBool(permissions&discordgo.PermissionAdministrator != 0),
+		Misc.FormatBool(permissions&discordgo.PermissionAttachFiles != 0),
+		Misc.FormatBool(permissions&discordgo.PermissionBanMembers != 0),
+		Misc.FormatBool(permissions&discordgo.PermissionChangeNickname != 0),
+		Misc.FormatBool(permissions&discordgo.PermissionVoiceConnect != 0),
+		Misc.FormatBool(permissions&discordgo.PermissionCreateInstantInvite != 0),
+		Misc.FormatBool(permissions&discordgo.PermissionVoiceDeafenMembers != 0),
+		Misc.FormatBool(permissions&discordgo.PermissionEmbedLinks != 0),
+		Misc.FormatBool(permissions&discordgo.PermissionUseExternalEmojis != 0),
+		Misc.FormatBool(permissions&discordgo.PermissionKickMembers != 0),
+		Misc.FormatBool(permissions&discordgo.PermissionManageChannels != 0),
+		Misc.FormatBool(permissions&discordgo.PermissionManageEmojis != 0),
+		Misc.FormatBool(permissions&discordgo.PermissionManageServer != 0),
+		Misc.FormatBool(permissions&discordgo.PermissionManageMessages != 0),
+		Misc.FormatBool(permissions&discordgo.PermissionManageNicknames != 0),
+		Misc.FormatBool(permissions&discordgo.PermissionManageRoles != 0),
+		Misc.FormatBool(permissions&discordgo.PermissionManageWebhooks != 0),
+		Misc.FormatBool(permissions&discordgo.PermissionMentionEveryone != 0),
+		Misc.FormatBool(permissions&discordgo.PermissionVoiceMoveMembers != 0),
+		Misc.FormatBool(permissions&discordgo.PermissionVoiceMuteMembers != 0),
+		Misc.FormatBool(permissions&discordgo.PermissionVoicePrioritySpeaker != 0),
+		Misc.FormatBool(permissions&discordgo.PermissionReadMessageHistory != 0),
+		Misc.FormatBool(permissions&discordgo.PermissionViewChannel != 0),
+		Misc.FormatBool(permissions&discordgo.PermissionSendMessages != 0),
+		Misc.FormatBool(permissions&discordgo.PermissionSendTTSMessages != 0),
+		Misc.FormatBool(permissions&discordgo.PermissionVoiceSpeak != 0),
+		Misc.FormatBool(permissions&discordgo.PermissionVoiceStreamVideo != 0),
+		Misc.FormatBool(permissions&discordgo.PermissionUseExternalEmojis != 0),
+		Misc.FormatBool(permissions&discordgo.PermissionVoiceUseVAD != 0),
+		Misc.FormatBool(permissions&discordgo.PermissionViewAuditLogs != 0),
+		Misc.FormatBool(permissions&discordgo.PermissionViewGuildInsights != 0),
 	)
-	return
+	return permissionsString
 }
 
 var Discord *DiscordUtils = &DiscordUtils{}

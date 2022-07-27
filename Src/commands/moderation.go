@@ -53,6 +53,18 @@ func (m ModerationCommands) RegisterCommands(router *dgc.Router) {
 		Handler:     m.voicechannel,
 	})
 	router.RegisterCmd(&dgc.Command{
+		Name:        "lockchannel",
+		Description: "Lock a channel",
+		Usage:       "[p]lockchannel <channel>",
+		Handler:     m.lockchannel,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "unlockchannel",
+		Description: "Unlock a channel",
+		Usage:       "[p]unlockchannel <channel>",
+		Handler:     m.unlockchannel,
+	})
+	router.RegisterCmd(&dgc.Command{
 		Name:        "purge",
 		Description: "Delete messages in a channel",
 		Usage:       "[p]purge <amount>",
@@ -331,6 +343,8 @@ func (ModerationCommands) lockchannel(ctx *dgc.Ctx) {
 	_, err := ctx.Session.ChannelEditComplex(channel.ID, &discordgo.ChannelEdit{
 		PermissionOverwrites: []*discordgo.PermissionOverwrite{
 			{
+				ID:   channel.GuildID,
+				Type: discordgo.PermissionOverwriteTypeRole,
 				Deny: discordgo.PermissionSendMessages,
 			},
 		},
@@ -352,30 +366,84 @@ func (ModerationCommands) unlockchannel(ctx *dgc.Ctx) {
 		ctx.RespondText("Could not find channel")
 		return
 	}
-	guild, err := ctx.Session.Guild(ctx.Event.GuildID)
-	if err != nil {
-		ctx.RespondText("Error locking channel: " + err.Error())
-	}
-	// TODO: @everyone
-	fmt.Println(guild.Roles[0])
 
-	_, err = ctx.Session.ChannelEditComplex(channel.ID, &discordgo.ChannelEdit{
+	_, err := ctx.Session.ChannelEditComplex(channel.ID, &discordgo.ChannelEdit{
 		PermissionOverwrites: []*discordgo.PermissionOverwrite{
 			{
-				ID:    guild.Roles[0].ID,
-				Type:  discordgo.PermissionOverwriteTypeRole,
-				Allow: discordgo.PermissionSendMessages,
+				ID:   channel.GuildID,
+				Type: discordgo.PermissionOverwriteTypeRole,
+				Deny: 0,
 			},
 		},
 	})
 	if err != nil {
-		ctx.RespondText("Error locking channel: " + err.Error())
+		ctx.RespondText("Error unlocking channel: " + err.Error())
 		return
 	}
 
 	embed.NewEmbed().
-		SetDescription("Successfully locked channel!").
+		SetDescription("Successfully unlocked channel!").
 		AddField("Channel", channel.Mention()).
+		Send(ctx)
+}
+
+func (ModerationCommands) lockserver(ctx *dgc.Ctx) {
+	guild, err := utils.Discord.GetGuild(ctx.Session, utils.Misc.Or(utils.Arguments["[server id]"], ctx.Event.GuildID))
+	if err != nil {
+		ctx.RespondText("Error getting server: " + err.Error())
+		return
+	}
+
+	for _, channel := range guild.Channels {
+		if channel.Type == discordgo.ChannelTypeGuildText {
+			_, err := ctx.Session.ChannelEditComplex(channel.ID, &discordgo.ChannelEdit{
+				PermissionOverwrites: []*discordgo.PermissionOverwrite{
+					{
+						ID:   guild.ID,
+						Type: discordgo.PermissionOverwriteTypeRole,
+						Deny: discordgo.PermissionSendMessages,
+					},
+				},
+			})
+			if err != nil {
+				ctx.RespondText("Error locking server: " + err.Error())
+				return
+			}
+		}
+	}
+
+	embed.NewEmbed().
+		SetDescription("Successfully locked server!").
+		Send(ctx)
+}
+
+func (ModerationCommands) unlockserver(ctx *dgc.Ctx) {
+	guild, err := utils.Discord.GetGuild(ctx.Session, utils.Misc.Or(utils.Arguments["[server id]"], ctx.Event.GuildID))
+	if err != nil {
+		ctx.RespondText("Error getting server: " + err.Error())
+		return
+	}
+
+	for _, channel := range guild.Channels {
+		if channel.Type == discordgo.ChannelTypeGuildText {
+			_, err := ctx.Session.ChannelEditComplex(channel.ID, &discordgo.ChannelEdit{
+				PermissionOverwrites: []*discordgo.PermissionOverwrite{
+					{
+						ID:   guild.ID,
+						Type: discordgo.PermissionOverwriteTypeRole,
+						Deny: 0,
+					},
+				},
+			})
+			if err != nil {
+				ctx.RespondText("Error locking server: " + err.Error())
+				return
+			}
+		}
+	}
+
+	embed.NewEmbed().
+		SetDescription("Successfully locked server!").
 		Send(ctx)
 }
 
@@ -581,12 +649,7 @@ func (ModerationCommands) mute(ctx *dgc.Ctx) {
 		return
 	}
 
-	role, err := ctx.Session.GuildRoleCreate(ctx.Event.GuildID)
-	if err != nil {
-		ctx.RespondText("Error muting user: " + err.Error())
-		return
-	}
-	role, err = ctx.Session.GuildRoleEdit(ctx.Event.GuildID, role.ID, "Muted", role.Color, role.Hoist, role.Permissions, false)
+	role, err := ctx.Session.GuildRoleCreate(ctx.Event.GuildID, "Muted", 0, false, 0, false)
 	if err != nil {
 		ctx.RespondText("Error muting user: " + err.Error())
 		return
@@ -1296,19 +1359,17 @@ func (ModerationCommands) roleinfo(ctx *dgc.Ctx) {
 		ctx.RespondText("Could not find role")
 		return
 	}
-	// get all members in guild and check if they have the role
-	members, err := ctx.Session.LazyRequestMembers(ctx.Event.GuildID, 1000, true)
-	if err != nil {
-		ctx.RespondText("Error getting members: " + err.Error())
-		return
-	}
+	// Get all members in guild and check if they have the role
+	members, _ := ctx.Session.LazyRequestMembers(ctx.Event.GuildID, 1000, true)
 	memberCount := 0
 	for _, member := range members {
 		if utils.SliceContains(member.Roles, role.ID) {
 			memberCount++
 		}
 	}
+	fmt.Println("Lazy Request", len(members))
 	createdAt := utils.Discord.SnowflakeToTime(role.ID)
+	perms, _ := api.CreatePaste(utils.Discord.FormatPermissions(role.Name, role.ID, role.Permissions))
 	embed.NewEmbed().
 		SetDescription(fmt.Sprintf("Role Info (%s)", role.Name)).
 		AddField("ID", role.ID).
@@ -1318,16 +1379,108 @@ func (ModerationCommands) roleinfo(ctx *dgc.Ctx) {
 		AddField("Is Hoist", utils.Misc.FormatBool(role.Hoist)).
 		AddField("Is Mentionable", utils.Misc.FormatBool(role.Mentionable)).
 		AddField("Members With Role", fmt.Sprint(memberCount)).
-		AddField("Permissions", utils.Discord.FormatPermissions(role.Permissions)).
+		AddField("Permissions", perms).
 		Send(ctx)
 }
 
-/*
-Role Control
+func (ModerationCommands) giverole(ctx *dgc.Ctx) {
+	if !utils.Discord.CheckIfInServer(ctx) {
+		return
+	}
+	member, success := utils.Discord.TryGetMemberFromMention(ctx, ctx.Arguments.Get(0))
+	if !success {
+		ctx.RespondText("Could not find user")
+		return
+	}
+	role, success := utils.Discord.TryGetRoleFromMention(ctx, ctx.Arguments.Get(1))
+	if !success {
+		ctx.RespondText("Could not find role")
+		return
+	}
 
-.giverole <@member> <role_id> » Give a role
-.removerole <@member> <role_id> » Remove a role
-.createrole <role_name> » Create a role
-.renamerole <role_id> <name> » Rename a role
-.deleterole <role_id> » Delete a role
-*/
+	err := ctx.Session.GuildMemberRoleAdd(ctx.Event.GuildID, member.User.ID, role.ID)
+	if err != nil {
+		ctx.RespondText("Error giving role: " + err.Error())
+		return
+	}
+	embed.NewEmbed().
+		SetDescription(fmt.Sprintf("Successfully gave role (%s) to (%s)", role.Name, member.User.String())).
+		Send(ctx)
+}
+
+func (ModerationCommands) removerole(ctx *dgc.Ctx) {
+	if !utils.Discord.CheckIfInServer(ctx) {
+		return
+	}
+	member, success := utils.Discord.TryGetMemberFromMention(ctx, ctx.Arguments.Get(0))
+	if !success {
+		ctx.RespondText("Could not find user")
+		return
+	}
+	role, success := utils.Discord.TryGetRoleFromMention(ctx, ctx.Arguments.Get(1))
+	if !success {
+		ctx.RespondText("Could not find role")
+		return
+	}
+
+	err := ctx.Session.GuildMemberRoleRemove(ctx.Event.GuildID, member.User.ID, role.ID)
+	if err != nil {
+		ctx.RespondText("Error removing role: " + err.Error())
+		return
+	}
+	embed.NewEmbed().
+		SetDescription(fmt.Sprintf("Successfully removed role (%s) from (%s)", role.Name, member.User.String())).
+		Send(ctx)
+}
+
+func (ModerationCommands) createrole(ctx *dgc.Ctx) {
+	if !utils.Discord.CheckIfInServer(ctx) {
+		return
+	}
+	role, err := ctx.Session.GuildRoleCreate(ctx.Event.GuildID, ctx.Arguments.Raw(), 0, false, 0, false)
+	if err != nil {
+		ctx.RespondText("Error creating role: " + err.Error())
+		return
+	}
+	embed.NewEmbed().
+		SetDescription(fmt.Sprintf("Successfully created role (%s)", role.Name)).
+		Send(ctx)
+}
+
+func (ModerationCommands) deleterole(ctx *dgc.Ctx) {
+	if !utils.Discord.CheckIfInServer(ctx) {
+		return
+	}
+	role, success := utils.Discord.TryGetRoleFromMention(ctx, ctx.Arguments.Get(0))
+	if !success {
+		ctx.RespondText("Could not find role")
+		return
+	}
+	err := ctx.Session.GuildRoleDelete(ctx.Event.GuildID, role.ID)
+	if err != nil {
+		ctx.RespondText("Error deleting role: " + err.Error())
+		return
+	}
+	embed.NewEmbed().
+		SetDescription(fmt.Sprintf("Successfully deleted role (%s)", role.Name)).
+		Send(ctx)
+}
+
+func (ModerationCommands) renamerole(ctx *dgc.Ctx) {
+	if !utils.Discord.CheckIfInServer(ctx) {
+		return
+	}
+	role, success := utils.Discord.TryGetRoleFromMention(ctx, ctx.Arguments.Get(0))
+	if !success {
+		ctx.RespondText("Could not find role")
+		return
+	}
+	role, err := ctx.Session.GuildRoleEdit(ctx.Event.GuildID, role.ID, utils.String.RemoveWords(ctx.Arguments.Raw(), 1), role.Color, role.Hoist, role.Permissions, role.Mentionable)
+	if err != nil {
+		ctx.RespondText("Error renaming role: " + err.Error())
+		return
+	}
+	embed.NewEmbed().
+		SetDescription(fmt.Sprintf("Successfully renamed role (%s)", role.Name)).
+		Send(ctx)
+}

@@ -106,6 +106,7 @@ func (r RPCCommands) RegisterCommands(router *dgc.Router) {
 			time.Sleep(time.Second * 5)
 			config, err := config.GetConfig()
 			if err != nil {
+				// TODO: log error
 				continue
 			}
 			if config.RPC.Enabled {

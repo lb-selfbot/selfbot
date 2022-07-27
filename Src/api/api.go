@@ -3,6 +3,7 @@ package api
 import (
 	"encoding/json"
 	"fmt"
+	"math/rand"
 	"net"
 	"net/url"
 	"regexp"
@@ -12,7 +13,6 @@ import (
 
 	"github.com/LightningDev1/LB-Selfbot/config"
 	"github.com/LightningDev1/LB-Selfbot/http"
-	"github.com/LightningDev1/LB-Selfbot/utils"
 	"github.com/bitly/go-simplejson"
 	"github.com/go-ping/ping"
 )
@@ -72,7 +72,7 @@ type RedditPost struct {
 }
 
 func GetImageFromSubreddit(subreddit string) (*RedditPost, bool) {
-	sortBy := []string{"best", "new", "top", "hot"}[utils.Random.Number(0, 3)]
+	sortBy := []string{"best", "new", "top", "hot"}[rand.Intn(4)]
 	rawSearch, statusCode, err := http.GetJsonStatusCode(fmt.Sprintf("https://www.reddit.com/r/%s/%s.json?limit=20", subreddit, sortBy), map[string]string{
 		"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Safari/537.36 Edg/96.0.1054.62",
 	})
@@ -91,7 +91,7 @@ func ExtractRedditURL(jsonData *simplejson.Json, tries int) (*RedditPost, bool) 
 	}
 	posts := jsonData.GetPath("data", "children")
 	amount := len(posts.MustArray())
-	post := posts.GetIndex(utils.Random.Number(0, amount-1)).Get("data")
+	post := posts.GetIndex(rand.Intn(amount - 1)).Get("data")
 	if regexp.MustCompile(`(\.jpg|\.png|\.gif|\.jpeg)`).MatchString(post.Get("url_overridden_by_dest").MustString()) {
 		return &RedditPost{
 			Title:    post.Get("title").MustString(),
