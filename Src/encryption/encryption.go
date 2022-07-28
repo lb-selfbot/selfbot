@@ -7,14 +7,11 @@ import (
 	"crypto/sha256"
 	"encoding/base64"
 	"fmt"
+	"io"
 	"strings"
 
 	"golang.org/x/crypto/pbkdf2"
 )
-
-type Encryption struct {
-	Key string
-}
 
 func randomBytes(n int) ([]byte, error) {
 	b := make([]byte, n)
@@ -48,7 +45,11 @@ func unpad(text []byte) []byte {
 	return text
 }
 
-func (e Encryption) Encrypt(text []byte) ([]byte, error) {
+type AESCBC struct {
+	Key string
+}
+
+func (a AESCBC) Encrypt(text []byte) ([]byte, error) {
 	// Generate a random salt
 	salt, err := randomBytes(32)
 	if err != nil {
@@ -56,7 +57,7 @@ func (e Encryption) Encrypt(text []byte) ([]byte, error) {
 	}
 
 	// Hash the key with the salt
-	key := pbkdf2.Key([]byte(e.Key), salt, 15000, 32, sha256.New)
+	key := pbkdf2.Key([]byte(a.Key), salt, 15000, 32, sha256.New)
 
 	// Generate a random IV
 	iv, err := randomBytes(16)
@@ -67,7 +68,7 @@ func (e Encryption) Encrypt(text []byte) ([]byte, error) {
 	// Create the cipher
 	block, err := aes.NewCipher(key)
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
 
 	// Pad the text
@@ -89,7 +90,7 @@ func (e Encryption) Encrypt(text []byte) ([]byte, error) {
 	)), nil
 }
 
-func (e Encryption) Decrypt(text []byte) ([]byte, error) {
+func (a AESCBC) Decrypt(text []byte) ([]byte, error) {
 	// Split the text into the salt, IV, and ciphertext
 	splitText := strings.Split(string(text), ":")
 	salt, err := base64.StdEncoding.DecodeString(splitText[0])
@@ -106,12 +107,12 @@ func (e Encryption) Decrypt(text []byte) ([]byte, error) {
 	}
 
 	// Hash the key with the salt
-	key := pbkdf2.Key([]byte(e.Key), salt, 15000, 32, sha256.New)
+	key := pbkdf2.Key([]byte(a.Key), salt, 15000, 32, sha256.New)
 
 	// Create the cipher
 	block, err := aes.NewCipher(key)
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
 
 	// Create the cipher
@@ -123,4 +124,68 @@ func (e Encryption) Decrypt(text []byte) ([]byte, error) {
 
 	// Return the decrypted text
 	return unpad(plaintext), nil
+}
+
+type AES struct {
+	Key string
+}
+
+func (a AES) Encrypt(text string, keyLen int) (string, error) {
+	// Generate a random salt
+	salt, err := randomBytes(16)
+	if err != nil {
+		return "", err
+	}
+
+	// Hash the key with the salt
+	key := pbkdf2.Key([]byte(a.Key), salt, 15000, keyLen, sha256.New)
+
+	block, err := aes.NewCipher(key)
+	if err != nil {
+		return "", err
+	}
+
+	byteMsg := []byte(text)
+
+	cipherText := make([]byte, aes.BlockSize+len(byteMsg))
+	iv := cipherText[:aes.BlockSize]
+	if _, err = io.ReadFull(rand.Reader, iv); err != nil {
+		return "", err
+	}
+
+	stream := cipher.NewCFBEncrypter(block, iv)
+	stream.XORKeyStream(cipherText[aes.BlockSize:], byteMsg)
+
+	return base64.StdEncoding.EncodeToString(salt) + "." + base64.StdEncoding.EncodeToString(cipherText), nil
+}
+
+func (a AES) Decrypt(text string, keyLen int) (string, error) {
+	split := strings.Split(text, ".")
+	salt, err := base64.StdEncoding.DecodeString(split[0])
+	if err != nil {
+		return "", err
+	}
+	byteMsg, err := base64.StdEncoding.DecodeString(split[1])
+	if err != nil {
+		return "", err
+	}
+
+	key := pbkdf2.Key([]byte(a.Key), salt, 15000, keyLen, sha256.New)
+
+	block, err := aes.NewCipher(key)
+	if err != nil {
+		return "", err
+	}
+
+	if len(byteMsg) < aes.BlockSize {
+		return "", fmt.Errorf("ciphertext too short")
+	}
+
+	iv := byteMsg[:aes.BlockSize]
+	byteMsg = byteMsg[aes.BlockSize:]
+
+	stream := cipher.NewCFBDecrypter(block, iv)
+	stream.XORKeyStream(byteMsg, byteMsg)
+
+	return string(byteMsg), nil
 }

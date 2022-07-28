@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"bytes"
 	"fmt"
 	"io/ioutil"
 	"math"
@@ -270,6 +271,15 @@ Permission: View Guild Insights      | Value: %s`,
 		Misc.FormatBool(permissions&discordgo.PermissionViewGuildInsights != 0),
 	)
 	return permissionsString
+}
+
+func (DiscordUtils) SendFileFromURL(ctx *dgc.Ctx, url string, fileName string) error {
+	bytes_, _, err := http.GetBytes(url)
+	if err != nil {
+		return err
+	}
+	_, err = ctx.Session.ChannelFileSend(ctx.Event.ChannelID, fileName, bytes.NewReader(bytes_))
+	return err
 }
 
 var Discord *DiscordUtils = &DiscordUtils{}

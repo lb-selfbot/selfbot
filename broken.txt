@@ -1,0 +1,95 @@
+
+
+@commands.command(help="Add a purple overlay on the users avatar", usage="<user>")
+async def purple(self, ctx, User: discord.User):
+    Embed = bot.DefaultEmbed().set_image(url=f"https://api.no-api-key.com/api/v2/purplify?image={User.avatar_url_as(format='png')}")
+    await bot.Helper.SendMessage(ctx, embed=Embed)
+
+@commands.command(help="Send an image of a bear", usage="")
+async def bear(self, ctx):
+    Embed = bot.DefaultEmbed().set_image(url=requests.get("https://no-api-key.com/api/v1/animals/bear").json()["image"])
+    await bot.Helper.SendMessage(ctx, embed=Embed)
+
+@commands.command(help="Make a crap meme", usage="<user>")
+async def crap(self, ctx, User: discord.User):
+    Image = bot.Helper.BytesToFile(requests.get(f"https://api.no-api-key.com/api/v2/crap?stepped={User.avatar_url_as(format='png')}").content, "image.png")
+    Embed = bot.DefaultEmbed().set_image(url="attachment://image.png")
+    await bot.Helper.SendMessage(ctx, embed=Embed, file=Image)
+
+@commands.command(help="Make a simpcard meme", usage="<user>")
+async def simpcard(self, ctx, User: discord.User):
+    Image = bot.Helper.BytesToFile(requests.get(f"https://api.no-api-key.com/api/v2/simpcard?image={User.avatar_url_as(format='png')}").content, "image.png")
+    Embed = bot.DefaultEmbed().set_image(url="attachment://image.png")
+    await bot.Helper.SendMessage(ctx, embed=Embed, file=Image)
+
+@commands.command(help="Make a delete meme", usage="<user>")
+async def delete2(self, ctx, User: discord.User):
+    Image = bot.Helper.BytesToFile(requests.get(f"https://api.no-api-key.com/api/v2/delete?image={User.avatar_url_as(format='png')}").content, "image.png")
+    Embed = bot.DefaultEmbed().set_image(url="attachment://image.png")
+    await bot.Helper.SendMessage(ctx, embed=Embed, file=Image)
+
+@commands.command(help="Darken the user's avatar", usage="<user>")
+async def darken(self, ctx, User: discord.User):
+    Image = bot.Helper.BytesToFile(requests.get(f"https://api.no-api-key.com/api/v2/darken?image={User.avatar_url_as(format='png')}").content, "image.png")
+    Embed = bot.DefaultEmbed().set_image(url="attachment://image.png")
+    await bot.Helper.SendMessage(ctx, embed=Embed, file=Image)
+
+@commands.command(help="Make User 1 kick User 2 in the balls", usage="<user1> <user2>")
+async def ballskick(self, ctx, User1: discord.User, User2: discord.User):
+    Image = bot.Helper.BytesToFile(requests.get(f"https://api.no-api-key.com/api/v2/kick?kicker={User1.avatar_url_as(format='png')}&kicked={User2.avatar_url_as(format='png')}").content, "image.png")
+    Embed = bot.DefaultEmbed().set_image(url="attachment://image.png")
+    await bot.Helper.SendMessage(ctx, embed=Embed, file=Image)
+
+@commands.command(help="Make User 1 punch User 2", usage="<user1> <user2>")
+async def punch(self, ctx, User1: discord.User, User2: discord.User):
+    Image = bot.Helper.BytesToFile(requests.get(f"https://api.no-api-key.com/api/v2/punch?punch={User1.avatar_url_as(format='png')}&punched={User2.avatar_url_as(format='png')}").content, "image.png")
+    Embed = bot.DefaultEmbed().set_image(url="attachment://image.png")
+    await bot.Helper.SendMessage(ctx, embed=Embed, file=Image)
+
+@commands.command(help="Shoot the user", usage="<user1> <user2>")
+async def shoot(self, ctx, User: discord.User):
+    Image = bot.Helper.BytesToFile(requests.get(f"https://api.no-api-key.com/api/v2/shoot?image={User.avatar_url_as(format='png')}").content, "image.png")
+    Embed = bot.DefaultEmbed().set_image(url="attachment://image.png")
+    await bot.Helper.SendMessage(ctx, embed=Embed, file=Image)
+
+@commands.command(help="Make a smrt/smart meme", usage="<user>")
+async def smrt(self, ctx, User: discord.User):
+    Image = bot.Helper.BytesToFile(requests.get(f"https://api.no-api-key.com/api/v2/smrt?image={User.avatar_url_as(format='png')}").content, "image.png")
+    Embed = bot.DefaultEmbed().set_image(url="attachment://image.png")
+    await bot.Helper.SendMessage(ctx, embed=Embed, file=Image)
+
+@commands.command(help="Make a timeout meme", usage="<user>")
+async def timeout(self, ctx, User: discord.User):
+    Image = bot.Helper.BytesToFile(requests.get(f"https://api.no-api-key.com/api/v2/timeout?image={User.avatar_url_as(format='png')}").content, "image.png")
+    Embed = bot.DefaultEmbed().set_image(url="attachment://image.png")
+    await bot.Helper.SendMessage(ctx, embed=Embed, file=Image)
+
+@commands.command(help="Throw the user in the garbage", usage="<user>")
+async def garbage(self, ctx, User: discord.User):
+    Image = bot.Helper.BytesToFile(requests.get(f"https://api.no-api-key.com/api/v2/trash?image={User.avatar_url_as(format='png')}").content, "image.png")
+    Embed = bot.DefaultEmbed().set_image(url="attachment://image.png")
+    await bot.Helper.SendMessage(ctx, embed=Embed, file=Image)
+
+@commands.command(help="Make a custom welcome card", usage="<user> <text>")
+async def welcomecard(self, ctx, User: discord.User, *, Text):
+    Image = bot.Helper.BytesToFile(requests.get(f"https://api.no-api-key.com/api/v2/welcome?username={urllib.parse.quote_plus(str(User))}&user_image={User.avatar_url_as(format='png')}&text_heading={Text}").content, "image.png")
+    Embed = bot.DefaultEmbed().set_image(url="attachment://image.png")
+    await bot.Helper.SendMessage(ctx, embed=Embed, file=Image)
+
+@commands.command(help="Make a custom goodbye card", usage="<user> <text>")
+async def goodbyecard(self, ctx, User: discord.User, *, Text):
+    Image = bot.Helper.BytesToFile(requests.get(f"https://api.no-api-key.com/api/v2/goodbye?username={urllib.parse.quote_plus(str(User))}&user_image={User.avatar_url_as(format='png')}&text_heading={Text}").content, "image.png")
+    Embed = bot.DefaultEmbed().set_image(url="attachment://image.png")
+    await bot.Helper.SendMessage(ctx, embed=Embed, file=Image)
+
+@commands.command(help="Put the user's avatr on a headstone", usage="<user>")
+async def rip(self, ctx, User: discord.User):
+    Image = bot.Helper.BytesToFile(requests.get(f"https://api.no-api-key.com/api/v2/rip?image={User.avatar_url_as(format='png')}").content, "image.png")
+    Embed = bot.DefaultEmbed().set_image(url="attachment://image.png")
+    await bot.Helper.SendMessage(ctx, embed=Embed, file=Image)
+
+@commands.command(help="Send a random image of a car", usage="")
+async def car(self, ctx):
+    Image = bot.Helper.BytesToFile(requests.get(requests.get("https://no-api-key.com/api/v1/car").json()["image"]).content, "image.png")
+    Embed = bot.DefaultEmbed().set_image(url="attachment://image.png")
+    await bot.Helper.SendMessage(ctx, embed=Embed, file=Image)

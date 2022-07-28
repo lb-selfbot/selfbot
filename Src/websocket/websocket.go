@@ -12,7 +12,7 @@ import (
 )
 
 var Conn *evtwebsocket.Conn
-var Encryption *encryption.Encryption
+var Encryption *encryption.AESCBC
 
 type WsData struct {
 	Username     string `json:"username,omitempty"`
@@ -27,13 +27,14 @@ type WsMessage struct {
 }
 
 func Init(username, password string) error {
-	Encryption = &encryption.Encryption{
+	Encryption = &encryption.AESCBC{
 		Key: "?aZV:3EQ_;'_B%g#q*Eg2#RQU.jCTo`qE%a>6RFRn-KXW`'.GA`38Zf+%+4]7qJF2UBDha1OoFEoC9rP",
 	}
 	pingMsg, _ := json.Marshal(WsMessage{Op: "PING"})
 	pingMsgEncrypted, _ := Encryption.Encrypt(pingMsg)
 	Conn = &evtwebsocket.Conn{
 		OnConnected: func(*evtwebsocket.Conn) {
+			fmt.Println(username, password)
 			Auth(username, password)
 			fmt.Println("Connected!")
 		},
@@ -65,9 +66,7 @@ func Init(username, password string) error {
 func Send(message WsMessage) {
 	jsonMessage, _ := json.Marshal(message)
 	encrypted, _ := Encryption.Encrypt(jsonMessage)
-	Conn.Send(evtwebsocket.Msg{
-		Body: encrypted,
-	})
+	Conn.Send(evtwebsocket.Msg{Body: encrypted})
 }
 
 func Auth(username, password string) {

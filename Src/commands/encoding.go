@@ -4,6 +4,7 @@ import (
 	"strings"
 
 	"github.com/LightningDev1/LB-Selfbot/encodings"
+	"github.com/LightningDev1/LB-Selfbot/encryption"
 	"github.com/LightningDev1/LB-Selfbot/utils"
 	"github.com/LightningDev1/dgc"
 )
@@ -161,6 +162,24 @@ func (e EncodingCommands) RegisterCommands(router *dgc.Router) {
 		Usage:       "[p]fnv128 <text>",
 		Handler:     e.fnv128,
 	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "aes128",
+		Description: "Encrypt or decrypt text using AES-128",
+		Usage:       "[p]aes128 <encrypt/decrypt> <\"key\"> <\"text\">",
+		Handler:     e.aes128,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "aes192",
+		Description: "Encrypt or decrypt text using AES-192",
+		Usage:       "[p]aes192 <encrypt/decrypt> <\"key\"> <\"text\">",
+		Handler:     e.aes192,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "aes256",
+		Description: "Encrypt or decrypt text using AES-256",
+		Usage:       "[p]aes256 <encrypt/decrypt> <\"key\"> <\"text\">",
+		Handler:     e.aes256,
+	})
 }
 
 func EncodingCommand(ctx *dgc.Ctx, encodeFunc func(string, bool) string) {
@@ -273,4 +292,76 @@ func (EncodingCommands) fnv64(ctx *dgc.Ctx) {
 
 func (EncodingCommands) fnv128(ctx *dgc.Ctx) {
 	ctx.RespondText(encodings.Fnv128(ctx.Arguments.Raw()))
+}
+
+func (EncodingCommands) aes128(ctx *dgc.Ctx) {
+	encryptOrDecrypt := utils.Arguments["<encrypt/decrypt>"]
+	key := utils.Arguments["<\"key\">"]
+	text := utils.Arguments["<\"text\">"]
+	if encryptOrDecrypt == "encrypt" {
+		encrypted, err := encryption.AES{Key: key}.Encrypt(text, 16)
+		if err != nil {
+			ctx.RespondText("An error has occurred: " + err.Error())
+			return
+		}
+		ctx.RespondText(encrypted)
+		
+	} else if encryptOrDecrypt == "decrypt" {
+		decrypted, err := encryption.AES{Key: key}.Decrypt(text, 16)
+		if err != nil {
+			ctx.RespondText("An error has occurred: " + err.Error())
+			return
+		}
+		ctx.RespondText(decrypted)		
+	} else {
+		ctx.RespondText("Invalid option for <encrypt/decrypt>: " + encryptOrDecrypt)
+	}
+}
+
+func (EncodingCommands) aes192(ctx *dgc.Ctx) {
+	encryptOrDecrypt := utils.Arguments["<encrypt/decrypt>"]
+	key := utils.Arguments["<\"key\">"]
+	text := utils.Arguments["<\"text\">"]
+	if encryptOrDecrypt == "encrypt" {
+		encrypted, err := encryption.AES{Key: key}.Encrypt(text, 24)
+		if err != nil {
+			ctx.RespondText("An error has occurred: " + err.Error())
+			return
+		}
+		ctx.RespondText(encrypted)
+		
+	} else if encryptOrDecrypt == "decrypt" {
+		decrypted, err := encryption.AES{Key: key}.Decrypt(text, 24)
+		if err != nil {
+			ctx.RespondText("An error has occurred: " + err.Error())
+			return
+		}
+		ctx.RespondText(decrypted)		
+	} else {
+		ctx.RespondText("Invalid option for <encrypt/decrypt>: " + encryptOrDecrypt)
+	}
+}
+
+func (EncodingCommands) aes256(ctx *dgc.Ctx) {
+	encryptOrDecrypt := utils.Arguments["<encrypt/decrypt>"]
+	key := utils.Arguments["<\"key\">"]
+	text := utils.Arguments["<\"text\">"]
+	if encryptOrDecrypt == "encrypt" {
+		encrypted, err := encryption.AES{Key: key}.Encrypt(text, 32)
+		if err != nil {
+			ctx.RespondText("An error has occurred: " + err.Error())
+			return
+		}
+		ctx.RespondText(encrypted)
+		
+	} else if encryptOrDecrypt == "decrypt" {
+		decrypted, err := encryption.AES{Key: key}.Decrypt(text, 32)
+		if err != nil {
+			ctx.RespondText("An error has occurred: " + err.Error())
+			return
+		}
+		ctx.RespondText(decrypted)		
+	} else {
+		ctx.RespondText("Invalid option for <encrypt/decrypt>: " + encryptOrDecrypt)
+	}
 }
