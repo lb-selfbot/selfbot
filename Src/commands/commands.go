@@ -15,6 +15,7 @@ type Commands struct {
 	ImageCommands      ImageCommands
 	NetworkCommands    NetworkCommands
 	ModerationCommands ModerationCommands
+	UtilityCommands    UtilityCommands
 	SpotifyCommands    SpotifyCommands
 	GameCommands       GameCommands
 	ActivityCommands   ActivityCommands
@@ -36,6 +37,7 @@ func (c Commands) RegisterCommands(router *dgc.Router, session *discordgo.Sessio
 	c.ImageCommands.RegisterCommands(router)
 	c.NetworkCommands.RegisterCommands(router)
 	c.ModerationCommands.RegisterCommands(router)
+	c.UtilityCommands.RegisterCommands(router)
 	c.SpotifyCommands.RegisterCommands(router)
 	c.GameCommands.RegisterCommands(router)
 	c.ActivityCommands.RegisterCommands(router)

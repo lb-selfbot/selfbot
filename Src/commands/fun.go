@@ -96,7 +96,7 @@ func (f FunCommands) RegisterCommands(router *dgc.Router) {
 	router.RegisterCmd(&dgc.Command{
 		Name:        "tts",
 		Description: "Send a Text-To-Speech message",
-		Usage:       "[p]tts <text>",
+		Usage:       "[p]tts <language> <text>",
 		Handler:     f.tts,
 	})
 	router.RegisterCmd(&dgc.Command{
@@ -584,9 +584,13 @@ func (FunCommands) slot(ctx *dgc.Ctx) {
 }
 
 func (FunCommands) tts(ctx *dgc.Ctx) {
-	ttsFile, err := api.TTS(ctx.Arguments.Raw(), "en")
+	ttsFile, err := api.TTS(utils.String.RemoveWords(ctx.Arguments.Raw(), 1), utils.Arguments["<language>"])
 	if err != nil {
 		ctx.RespondText("An error has occurred.")
+		return
+	}
+	if strings.Contains(string(ttsFile), "Bad Request") {
+		ctx.RespondText("Invalid language. Please use an ISO 639-1 language code. See https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes for more information.")
 		return
 	}
 	ctx.Session.ChannelFileSend(ctx.Event.ChannelID, "tts.mp3", bytes.NewReader(ttsFile))

@@ -1,583 +1,390 @@
-func (ImageCommands) gay(ctx *dgc.Ctx) {	
-//     Image = bot.AlexFlipNote.Filter(User.avatar_url_as(format='png'), "gay")	
-//     Embed = bot.DefaultEmbed().set_image(url="attachment://image.png")	
-//     await bot.Helper.SendMessage(ctx, embed=Embed, file=Image)
-}
-
-func (ImageCommands) distractedbf(ctx *dgc.Ctx) {	
-//     Embed = bot.DefaultEmbed().set_image(url=requests.get(f"https://nekobot.xyz/api/imagegen?type=ship&user1={UserOne.avatar_url_as(format='png')}&user2={UserTwo.avatar_url_as(format='png')}").json()["message"])	
-//     await bot.Helper.SendMessage(ctx, embed=Embed)
-}
-
-func (ImageCommands) captcha(ctx *dgc.Ctx) {	
-//     Embed = bot.DefaultEmbed().set_image(url=requests.get(f"https://nekobot.xyz/api/imagegen?type=captcha&url={User.avatar_url_as(format='png')}&username={Text}").json()["message"])	
-//     await bot.Helper.SendMessage(ctx, embed=Embed)
-}
-
-func (ImageCommands) whowouldwin(ctx *dgc.Ctx) {	
-//     Embed = bot.DefaultEmbed().set_image(url=requests.get(f"https://nekobot.xyz/api/imagegen?type=whowouldwin&user1={UserOne.avatar_url_as(format='png')}&user2={UserTwo.avatar_url_as(format='png')}").json()["message"])	
-//     await bot.Helper.SendMessage(ctx, embed=Embed)
-}
-
-func (ImageCommands) changemymind(ctx *dgc.Ctx) {	
-//     Embed = bot.DefaultEmbed().set_image(url=requests.get(f"https://nekobot.xyz/api/imagegen?type=changemymind&text={Text}").json()["message"])	
-//     await bot.Helper.SendMessage(ctx, embed=Embed)
-}
-
-func (ImageCommands) jpeg(ctx *dgc.Ctx) {	
-//     Embed = bot.DefaultEmbed().set_image(url=requests.get(f"https://nekobot.xyz/api/imagegen?type=jpeg&url={User.avatar_url_as(format='png')}").json()["message"])	
-//     await bot.Helper.SendMessage(ctx, embed=Embed)
-}
-
-func (ImageCommands) lolice(ctx *dgc.Ctx) {	
-//     Embed = bot.DefaultEmbed().set_image(url=requests.get(f"https://nekobot.xyz/api/imagegen?type=lolice&url={User.avatar_url_as(format='png')}").json()["message"])	
-//     await bot.Helper.SendMessage(ctx, embed=Embed)
-}
-
-func (ImageCommands) kannagen(ctx *dgc.Ctx) {	
-//     Embed = bot.DefaultEmbed().set_image(url=requests.get(f"https://nekobot.xyz/api/imagegen?type=kannagen&text={Text}").json()["message"])	
-//     await bot.Helper.SendMessage(ctx, embed=Embed)
-}
-
-func (ImageCommands) iphonex(ctx *dgc.Ctx) {	
-//     Embed = bot.DefaultEmbed().set_image(url=requests.get(f"https://nekobot.xyz/api/imagegen?type=iphonex&url={User.avatar_url_as(format='png')}").json()["message"])	
-//     await bot.Helper.SendMessage(ctx, embed=Embed)
-}
-
-func (ImageCommands) awooify(ctx *dgc.Ctx) {	
-//     Embed = bot.DefaultEmbed().set_image(url=requests.get(f"https://nekobot.xyz/api/imagegen?type=awooify&url={User.avatar_url_as(format='png')}").json()["message"])	
-//     await bot.Helper.SendMessage(ctx, embed=Embed)
-}
-
-func (ImageCommands) trap(ctx *dgc.Ctx) {	
-//     Embed = bot.DefaultEmbed().set_image(url=requests.get(f"https://nekobot.xyz/api/imagegen?type=trap&image={User.avatar_url_as(format='png')}&name={User.name}&author={ctx.author.name}").json()["message"])	
-//     await bot.Helper.SendMessage(ctx, embed=Embed)
-}
-
-func (ImageCommands) trumptweet(ctx *dgc.Ctx) {	
-//     Embed = bot.DefaultEmbed().set_image(url=requests.get(f"https://nekobot.xyz/api/imagegen?type=trumptweet&text={Text}").json()["message"])	
-//     await bot.Helper.SendMessage(ctx, embed=Embed)
-}
-
-func (ImageCommands) deepfry(ctx *dgc.Ctx) {	
-//     Embed = bot.DefaultEmbed().set_image(url=requests.get(f"https://nekobot.xyz/api/imagegen?type=deepfry&image={User.avatar_url_as(format='png')}").json()["message"])	
-//     await bot.Helper.SendMessage(ctx, embed=Embed)
-}
-
-func (ImageCommands) blurpify(ctx *dgc.Ctx) {	
-//     Embed = bot.DefaultEmbed().set_image(url=requests.get(f"https://nekobot.xyz/api/imagegen?type=blurpify&image={User.avatar_url_as(format='png')}").json()["message"])	
-//     await bot.Helper.SendMessage(ctx, embed=Embed)
-}
-
-func (ImageCommands) phcomment(ctx *dgc.Ctx) {	
-//     Embed = bot.DefaultEmbed().set_image(url=requests.get(f"https://nekobot.xyz/api/imagegen?type=phcomment&text={Text}&username={User.name}&image={User.avatar_url_as(format='png')}").json()["message"])	
-//     await bot.Helper.SendMessage(ctx, embed=Embed)
-}
-
-func (ImageCommands) fact(ctx *dgc.Ctx) {	
-//     Embed = bot.DefaultEmbed().set_image(url=requests.get(f"https://nekobot.xyz/api/imagegen?type=fact&text={Text}").json()["message"])	
-//     await bot.Helper.SendMessage(ctx, embed=Embed)
-}
-
-func (ImageCommands) trash(ctx *dgc.Ctx) {	
-//     Embed = bot.DefaultEmbed().set_image(url=requests.get(f"https://nekobot.xyz/api/imagegen?type=trash&url={User.avatar_url_as(format='png')}").json()["message"])	
-//     await bot.Helper.SendMessage(ctx, embed=Embed)
-}
-
-func (ImageCommands) stickbug(ctx *dgc.Ctx) {	
-//     Embed = bot.DefaultEmbed().set_image(url=requests.get(f"https://nekobot.xyz/api/imagegen?type=stickbug&url={User.avatar_url_as(format='png')}").json()["message"])	
-//     await bot.Helper.SendMessage(ctx, embed=Embed)
-}
-
-func (ImageCommands) gif(ctx *dgc.Ctx) {	
-//     if Argument:	
-//         Image = requests.get(f"https://api.giphy.com/v1/gifs/random?api_key=ldQeNHnpL3WcCxJE1uO8HTk17ICn8i34&q={Argument}&limit=1&offset=0&rating=R&lang=en").json()['data']["image_url"]	
-//     if not Argument:	
-//         Image = requests.get("https://api.giphy.com/v1/gifs/random?api_key=ldQeNHnpL3WcCxJE1uO8HTk17ICn8i34&tag=&rating=R&limit=1&lang=en&offset=0").json()["data"]["image_url"]	
-//     Embed = bot.DefaultEmbed().set_image(url=Image)	
-//     await bot.Helper.SendMessage(ctx, embed=Embed)
-}
-
-func (ImageCommands) communist(ctx *dgc.Ctx) {	
-//     Image = bot.AlexFlipNote.Filter(User.avatar_url_as(format='png'), "communist")	
-//     Embed = bot.DefaultEmbed().set_image(url="attachment://image.png")	
-//     await bot.Helper.SendMessage(ctx, embed=Embed, file=Image)
-}
-
-func (ImageCommands) snow(ctx *dgc.Ctx) {	
-//     Image = bot.AlexFlipNote.Filter(User.avatar_url_as(format='png'), "snow")	
-//     Embed = bot.DefaultEmbed().set_image(url="attachment://image.png")	
-//     await bot.Helper.SendMessage(ctx, embed=Embed, file=Image)
-}
-
-func (ImageCommands) hub(ctx *dgc.Ctx) {	
-//     Image = bot.AlexFlipNote.PornHub(TextOne, TextTwo)	
-//     Embed = bot.DefaultEmbed().set_image(url="attachment://image.png")	
-//     await bot.Helper.SendMessage(ctx, embed=Embed, file=Image)
-}
-
-func (ImageCommands) sadcat(ctx *dgc.Ctx) {	
-//     Embed = bot.DefaultEmbed().set_image(url= requests.get(f"https://api.alexflipnote.dev/sadcat").json()["file"])	
-//     await bot.Helper.SendMessage(ctx, embed=Embed)
-}
-
-func (ImageCommands) bird(ctx *dgc.Ctx) {	
-//     Embed = bot.DefaultEmbed().set_image(url= requests.get(f"https://api.alexflipnote.dev/birb").json()["file"])	
-//     await bot.Helper.SendMessage(ctx, embed=Embed)
-}
-
-func (ImageCommands) cat(ctx *dgc.Ctx) {	
-//     Embed = bot.DefaultEmbed().set_image(url= requests.get(f"https://api.alexflipnote.dev/sadcat").json()["file"])	
-//     await bot.Helper.SendMessage(ctx, embed=Embed)
-}
-
-func (ImageCommands) catgif(ctx *dgc.Ctx) {	
-//     Image = bot.Helper.BytesToFile(requests.get(f"https://cataas.com/cat/gif").content, "cat.gif")	
-//     Embed = bot.DefaultEmbed().set_image(url="attachment://cat.gif")	
-//     await bot.Helper.SendMessage(ctx, embed=Embed, file=Image)
-}
-
-func (ImageCommands) catsays(ctx *dgc.Ctx) {	
-//     Image = bot.Helper.BytesToFile(requests.get(f"https://cataas.com/cat/says/{urllib.parse.quote(Text)}").content, "cat.gif")	
-//     Embed = bot.DefaultEmbed().set_image(url="attachment://cat.gif")	
-//     await bot.Helper.SendMessage(ctx, embed=Embed, file=Image)
-}
-
-func (ImageCommands) dog(ctx *dgc.Ctx) {	
-//     Embed = bot.DefaultEmbed().set_image(url=requests.get("https://dog.ceo/api/breeds/image/random").json()['message'])	
-//     await bot.Helper.SendMessage(ctx, embed=Embed)
-}
-
-func (ImageCommands) panda(ctx *dgc.Ctx) {	
-//     Embed = bot.DefaultEmbed().set_image(url=requests.get("https://some-random-api.ml/img/panda").json()['link'])	
-//     await bot.Helper.SendMessage(ctx, embed=Embed)
-}
-
-func (ImageCommands) redpanda(ctx *dgc.Ctx) {	
-//     Embed = bot.DefaultEmbed().set_image(url=requests.get("https://some-random-api.ml/img/red_panda").json()['link'])	
-//     await bot.Helper.SendMessage(ctx, embed=Embed)
-}
-
-func (ImageCommands) koala(ctx *dgc.Ctx) {	
-//     Embed = bot.DefaultEmbed().set_image(url=requests.get("https://some-random-api.ml/img/koala").json()['link'])	
-//     await bot.Helper.SendMessage(ctx, embed=Embed)
-}
-
-func (ImageCommands) fox(ctx *dgc.Ctx) {	
-//     Embed = bot.DefaultEmbed().set_image(url=requests.get('https://randomfox.ca/floof/').json()['image'])	
-//     await bot.Helper.SendMessage(ctx, embed=Embed)
-}
-
-func (ImageCommands) shibe(ctx *dgc.Ctx) {	
-//     Embed = bot.DefaultEmbed().set_image(url=requests.get("http://shibe.online/api/shibes?count=1&urls=true&httpsUrls=true").json()[0])	
-//     await bot.Helper.SendMessage(ctx, embed=Embed)
-}
-
-func (ImageCommands) whale(ctx *dgc.Ctx) {	
-//     Embed = bot.DefaultEmbed().set_image(url=requests.get('https://api.animality.xyz/img/whale').json()['link'])	
-//     await bot.Helper.SendMessage(ctx, embed=Embed)
-}
-
-func (ImageCommands) kangaroo(ctx *dgc.Ctx) {	
-//     Embed = bot.DefaultEmbed().set_image(url=requests.get('https://api.animality.xyz/img/kangaroo').json()['link'])	
-//     await bot.Helper.SendMessage(ctx, embed=Embed)
-}
-
-func (ImageCommands) bunny(ctx *dgc.Ctx) {	
-//     Embed = bot.DefaultEmbed().set_image(url=requests.get('https://api.animality.xyz/img/bunny').json()['link'])	
-//     await bot.Helper.SendMessage(ctx, embed=Embed)
-}
-
-func (ImageCommands) lion(ctx *dgc.Ctx) {	
-//     Embed = bot.DefaultEmbed().set_image(url=requests.get('https://api.animality.xyz/img/lion').json()['link'])	
-//     await bot.Helper.SendMessage(ctx, embed=Embed)
-}
-
-func (ImageCommands) frog(ctx *dgc.Ctx) {	
-//     Embed = bot.DefaultEmbed().set_image(url=requests.get('https://api.animality.xyz/img/frog').json()['link'])	
-//     await bot.Helper.SendMessage(ctx, embed=Embed)
-}
-
-func (ImageCommands) duck(ctx *dgc.Ctx) {	
-//     Embed = bot.DefaultEmbed().set_image(url=requests.get('https://api.animality.xyz/img/duck').json()['link'])	
-//     await bot.Helper.SendMessage(ctx, embed=Embed)
-}
-
-func (ImageCommands) penguin(ctx *dgc.Ctx) {	
-//     Embed = bot.DefaultEmbed().set_image(url=requests.get('https://api.animality.xyz/img/penguin').json()['link'])	
-//     await bot.Helper.SendMessage(ctx, embed=Embed)
-}
-
-func (ImageCommands) balloon(ctx *dgc.Ctx) {	
-//     Image = bot.Helper.BytesToFile(requests.get(f"https://imgen.herokuapp.com/balloon", headers={"text": f"{TextOne},{TextTwo}"}).content, "image.png")	
-//     Embed = bot.DefaultEmbed().set_image(url="attachment://image.png")	
-//     await bot.Helper.SendMessage(ctx, embed=Embed, file=Image)
-}
-
-func (ImageCommands) abandon(ctx *dgc.Ctx) {	
-//     Image = bot.Helper.BytesToFile(requests.get(f"https://imgen.herokuapp.com/abandon", headers={"text": Text}).content, "image.png")	
-//     Embed = bot.DefaultEmbed().set_image(url="attachment://image.png")	
-//     await bot.Helper.SendMessage(ctx, embed=Embed, file=Image)
-}
-
-func (ImageCommands) aborted(ctx *dgc.Ctx) {	
-//     Image = bot.Helper.BytesToFile(requests.get(f"https://imgen.herokuapp.com/aborted", headers={"avatars": f"{User.avatar_url_as(format='png')}"}).content, "image.png")	
-//     Embed = bot.DefaultEmbed().set_image(url="attachment://image.png")	
-//     await bot.Helper.SendMessage(ctx, embed=Embed, file=Image)
-}
-
-func (ImageCommands) affect(ctx *dgc.Ctx) {	
-//     Image = bot.Helper.BytesToFile(requests.get(f"https://imgen.herokuapp.com/affect", headers={"avatars": f"{User.avatar_url_as(format='png')}"}).content, "image.png")	
-//     Embed = bot.DefaultEmbed().set_image(url="attachment://image.png")	
-//     await bot.Helper.SendMessage(ctx, embed=Embed, file=Image)
-}
-
-func (ImageCommands) airpods(ctx *dgc.Ctx) {	
-//     Image = bot.Helper.BytesToFile(requests.get(f"https://imgen.herokuapp.com/airpods", headers={"avatars": f"{User.avatar_url_as(format='png')}"}).content, "image.png")	
-//     Embed = bot.DefaultEmbed().set_image(url="attachment://image.png")	
-//     await bot.Helper.SendMessage(ctx, embed=Embed, file=Image)
-}
-
-func (ImageCommands) america(ctx *dgc.Ctx) {	
-//     Image = bot.Helper.BytesToFile(requests.get(f"https://imgen.herokuapp.com/america", headers={"avatars": f"{User.avatar_url_as(format='png')}"}).content, "image.png")	
-//     Embed = bot.DefaultEmbed().set_image(url="attachment://image.png")	
-//     await bot.Helper.SendMessage(ctx, embed=Embed, file=Image)
-}
-
-func (ImageCommands) armor(ctx *dgc.Ctx) {	
-//     Image = bot.Helper.BytesToFile(requests.get(f"https://imgen.herokuapp.com/armor", headers={"text": Text}).content, "image.png")	
-//     Embed = bot.DefaultEmbed().set_image(url="attachment://image.png")	
-//     await bot.Helper.SendMessage(ctx, embed=Embed, file=Image)
-}
-
-func (ImageCommands) bed(ctx *dgc.Ctx) {	
-//     Embed = bot.DefaultEmbed().set_image(url=requests.get(f"https://nekobot.xyz/api/imagegen?type=ship&user1={UserOne.avatar_url_as(format='png')}&user2={UserTwo.avatar_url_as(format='png')}").json()["message"])	
-//     await bot.Helper.SendMessage(ctx, embed=Embed)
-}
-
-func (ImageCommands) bongocat(ctx *dgc.Ctx) {	
-//     Image = bot.Helper.BytesToFile(requests.get(f"https://imgen.herokuapp.com/bongocat", headers={"avatars": f"{User.avatar_url_as(format='png')}"}).content, "image.png")	
-//     Embed = bot.DefaultEmbed().set_image(url="attachment://image.png")	
-//     await bot.Helper.SendMessage(ctx, embed=Embed, file=Image)
-}
-
-func (ImageCommands) boo(ctx *dgc.Ctx) {	
-//     Image = bot.Helper.BytesToFile(requests.get(f"https://imgen.herokuapp.com/boo", headers={"text": f"{TextOne},{TextTwo}"}).content, "image.png")	
-//     Embed = bot.DefaultEmbed().set_image(url="attachment://image.png")	
-//     await bot.Helper.SendMessage(ctx, embed=Embed, file=Image)
-}
-
-func (ImageCommands) bigbrain(ctx *dgc.Ctx) {	
-//     Image = bot.Helper.BytesToFile(requests.get(f"https://imgen.herokuapp.com/brain", headers={"text": f"{ItemOne},{ItemTwo},{ItemThree},{ItemFour}"}).content, "image.png")	
-//     Embed = bot.DefaultEmbed().set_image(url="attachment://image.png")	
-//     await bot.Helper.SendMessage(ctx, embed=Embed, file=Image)
-}
-
-func (ImageCommands) byemom(ctx *dgc.Ctx) {	
-//     Image = bot.Helper.BytesToFile(requests.get(f"https://imgen.herokuapp.com/byemom", headers={"avatars": f"{User.avatar_url_as(format='png')}", "text": Text, "usernames": User.name}).content, "image.png")	
-//     Embed = bot.DefaultEmbed().set_image(url="attachment://image.png")	
-//     await bot.Helper.SendMessage(ctx, embed=Embed, file=Image)
-}
-
-func (ImageCommands) cancer(ctx *dgc.Ctx) {	
-//     Image = bot.Helper.BytesToFile(requests.get(f"https://imgen.herokuapp.com/cancer", headers={"avatars": str(User.avatar_url_as(format='png'))}).content, "image.png")	
-//     Embed = bot.DefaultEmbed().set_image(url="attachment://image.png")	
-//     await bot.Helper.SendMessage(ctx, embed=Embed, file=Image)
-}
-
-func (ImageCommands) changemymind(ctx *dgc.Ctx) {	
-//     Embed = bot.DefaultEmbed().set_image(url=requests.get(f"https://nekobot.xyz/api/imagegen?type=changemymind&text={Text}").json()["message"])	
-//     await bot.Helper.SendMessage(ctx, embed=Embed)
-}
-
-func (ImageCommands) cheating(ctx *dgc.Ctx) {	
-//     Image = bot.Helper.BytesToFile(requests.get(f"https://imgen.herokuapp.com/cheating", headers={"text": f"{Text1},{Text2}"}).content, "image.png")	
-//     Embed = bot.DefaultEmbed().set_image(url="attachment://image.png")	
-//     await bot.Helper.SendMessage(ctx, embed=Embed, file=Image)
-}
-
-func (ImageCommands) citation(ctx *dgc.Ctx) {	
-//     Image = bot.Helper.BytesToFile(requests.get(f"https://imgen.herokuapp.com/citation", headers={"text": f"{Text1},{Text2},{Text3}"}).content, "image.png")	
-//     Embed = bot.DefaultEmbed().set_image(url="attachment://image.png")	
-//     await bot.Helper.SendMessage(ctx, embed=Embed, file=Image)
-}
-
-func (ImageCommands) communism(ctx *dgc.Ctx) {	
-//     Image = bot.Helper.BytesToFile(requests.get(f"https://imgen.herokuapp.com/communism", headers={"avatars": f"{User.avatar_url_as(format='png')}"}).content, "image.png")	
-//     Embed = bot.DefaultEmbed().set_image(url="attachment://image.png")	
-//     await bot.Helper.SendMessage(ctx, embed=Embed, file=Image)
-}
-
-func (ImageCommands) confusedcat(ctx *dgc.Ctx) {	
-//     Image = bot.Helper.BytesToFile(requests.get(f"https://imgen.herokuapp.com/confusedcat", headers={"text": f"{Text1},{Text2}"}).content, "image.png")	
-//     Embed = bot.DefaultEmbed().set_image(url="attachment://image.png")	
-//     await bot.Helper.SendMessage(ctx, embed=Embed, file=Image)
-}
-
-func (ImageCommands) corporate(ctx *dgc.Ctx) {	
-//     Image = bot.Helper.BytesToFile(requests.get(f"https://imgen.herokuapp.com/corporate", headers={"avatars": f"{User.avatar_url_as(format='png')}"}).content, "image.png")	
-//     Embed = bot.DefaultEmbed().set_image(url="attachment://image.png")	
-//     await bot.Helper.SendMessage(ctx, embed=Embed, file=Image)
-}
-
-func (ImageCommands) cry(ctx *dgc.Ctx) {	
-//     Image = bot.Helper.BytesToFile(requests.get(f"https://imgen.herokuapp.com/cry", headers={"text": Text}).content, "image.png")	
-//     Embed = bot.DefaultEmbed().set_image(url="attachment://image.png")	
-//     await bot.Helper.SendMessage(ctx, embed=Embed, file=Image)
-}
-
-func (ImageCommands) dab(ctx *dgc.Ctx) {	
-//     Image = bot.Helper.BytesToFile(requests.get(f"https://imgen.herokuapp.com/dab", headers={"avatars": f"{User.avatar_url_as(format='png')}"}).content, "image.png")	
-//     Embed = bot.DefaultEmbed().set_image(url="attachment://image.png")	
-//     await bot.Helper.SendMessage(ctx, embed=Embed, file=Image)
-}
-
-func (ImageCommands) dank(ctx *dgc.Ctx) {	
-//     Image = bot.Helper.BytesToFile(requests.get(f"https://imgen.herokuapp.com/dank", headers={"avatars": f"{User.avatar_url_as(format='png')}"}).content, "image.png")	
-//     Embed = bot.DefaultEmbed().set_image(url="attachment://image.png")	
-//     await bot.Helper.SendMessage(ctx, embed=Embed, file=Image)
-}
-
-func (ImageCommands) delete(ctx *dgc.Ctx) {	
-//     Image = bot.Helper.BytesToFile(requests.get(f"https://imgen.herokuapp.com/delete", headers={"avatars": f"{User.avatar_url_as(format='png')}"}).content, "image.png")	
-//     Embed = bot.DefaultEmbed().set_image(url="attachment://image.png")	
-//     await bot.Helper.SendMessage(ctx, embed=Embed, file=Image)
-}
-
-func (ImageCommands) disability(ctx *dgc.Ctx) {	
-//     Image = bot.Helper.BytesToFile(requests.get(f"https://imgen.herokuapp.com/disability", headers={"avatars": f"{User.avatar_url_as(format='png')}"}).content, "image.png")	
-//     Embed = bot.DefaultEmbed().set_image(url="attachment://image.png")	
-//     await bot.Helper.SendMessage(ctx, embed=Embed, file=Image)
-}
-
-func (ImageCommands) doglemon(ctx *dgc.Ctx) {	
-//     Image = bot.Helper.BytesToFile(requests.get(f"https://imgen.herokuapp.com/doglemon", headers={"text": f"{Text1},{Text2}"}).content, "image.png")	
-//     Embed = bot.DefaultEmbed().set_image(url="attachment://image.png")	
-//     await bot.Helper.SendMessage(ctx, embed=Embed, file=Image)
-}
-
-func (ImageCommands) door(ctx *dgc.Ctx) {	
-//     Image = bot.Helper.BytesToFile(requests.get(f"https://imgen.herokuapp.com/door", headers={"avatars": f"{User.avatar_url_as(format='png')}"}).content, "image.png")	
-//     Embed = bot.DefaultEmbed().set_image(url="attachment://image.png")	
-//     await bot.Helper.SendMessage(ctx, embed=Embed, file=Image)
-}
-
-func (ImageCommands) egg(ctx *dgc.Ctx) {	
-//     Image = bot.Helper.BytesToFile(requests.get(f"https://imgen.herokuapp.com/egg", headers={"avatars": f"{User.avatar_url_as(format='png')}"}).content, "image.png")	
-//     Embed = bot.DefaultEmbed().set_image(url="attachment://image.png")	
-//     await bot.Helper.SendMessage(ctx, embed=Embed, file=Image)
-}
-
-func (ImageCommands) excuseme(ctx *dgc.Ctx) {	
-//     Image = bot.Helper.BytesToFile(requests.get(f"https://imgen.herokuapp.com/excuseme", headers={"text": Text}).content, "image.png")	
-//     Embed = bot.DefaultEmbed().set_image(url="attachment://image.png")	
-//     await bot.Helper.SendMessage(ctx, embed=Embed, file=Image)
-}
-
-func (ImageCommands) expanddong(ctx *dgc.Ctx) {	
-//     Image = bot.Helper.BytesToFile(requests.get(f"https://imgen.herokuapp.com/expanddong", headers={"text": Text}).content, "image.png")	
-//     Embed = bot.DefaultEmbed().set_image(url="attachment://image.png")	
-//     await bot.Helper.SendMessage(ctx, embed=Embed, file=Image)
-}
-
-func (ImageCommands) expandingwwe(ctx *dgc.Ctx) {	
-//     Image = bot.Helper.BytesToFile(requests.get(f"https://imgen.herokuapp.com/expandingwwe", headers={"text": f"{Item1},{Item2},{Item3},{Item4},{Item5}"}).content, "image.png")	
-//     Embed = bot.DefaultEmbed().set_image(url="attachment://image.png")	
-//     await bot.Helper.SendMessage(ctx, embed=Embed, file=Image)
-}
-
-func (ImageCommands) recaptcha(ctx *dgc.Ctx) {	
-//     Image = bot.AlexFlipNote.Captcha(Text)	
-//     Embed = bot.DefaultEmbed().set_image(url="attachment://image.png")	
-//     await bot.Helper.SendMessage(ctx, embed=Embed, file=Image)
-}
-
-func (ImageCommands) qrcode(ctx *dgc.Ctx) {	
-//     Image = bot.Helper.BytesToFile(requests.get(f"https://www.qrcoder.co.uk/api/v1/?type=png&text={Text}&int=1&background=FFFFFF&foreground=000000&eo=000000&ei=000000&size=8&padding=2").content, "image.png")	
-//     Embed = bot.DefaultEmbed().set_image(url="attachment://image.png")	
-//     await bot.Helper.SendMessage(ctx, embed=Embed, file=Image)
-}
-
-func (ImageCommands) darkqrcode(ctx *dgc.Ctx) {	
-//     Image = bot.Helper.BytesToFile(requests.get(f"https://www.qrcoder.co.uk/api/v1/?type=png&text={Text}&int=1&background=000&foreground=FFFFFF&eo=FFFFFF&ei=FFFFFF&size=8&padding=2").content, "image.png")	
-//     Embed = bot.DefaultEmbed().set_image(url="attachment://image.png")	
-//     await bot.Helper.SendMessage(ctx, embed=Embed, file=Image)
-}
-
-func (ImageCommands) rule34(ctx *dgc.Ctx) {	
-//     await bot.Helper.SendMessage(ctx, embed=bot.DefaultEmbed().set_image(url=random.choice(requests.get("https://api.rule34.xxx/index.php?page=dapi&s=post&q=index&json=1").json())["file_url"]))
-}
-
-func (ImageCommands) achievement(ctx *dgc.Ctx) {	
-//     Image = bot.AlexFlipNote.CreateAchievement(Text)	
-//     Embed = bot.DefaultEmbed().set_image(url="attachment://image.png")	
-//     await bot.Helper.SendMessage(ctx, embed=Embed, file=Image)
-}
-
-func (ImageCommands) amiajoke(ctx *dgc.Ctx) {	
-//     Image = bot.AlexFlipNote.AmIAJoke(User.avatar_url)	
-//     Embed = bot.DefaultEmbed().set_image(url="attachment://image.png")	
-//     await bot.Helper.SendMessage(ctx, embed=Embed, file=Image)
-}
-
-func (ImageCommands) bad(ctx *dgc.Ctx) {	
-//     Image = bot.AlexFlipNote.Bad(User.avatar_url)	
-//     Embed = bot.DefaultEmbed().set_image(url="attachment://image.png")	
-//     await bot.Helper.SendMessage(ctx, embed=Embed, file=Image)
-}
-
-func (ImageCommands) calling(ctx *dgc.Ctx) {	
-//     Image = bot.AlexFlipNote.Calling(Text)	
-//     Embed = bot.DefaultEmbed().set_image(url="attachment://image.png")	
-//     await bot.Helper.SendMessage(ctx, embed=Embed, file=Image)
-}
-
-func (ImageCommands) didyoumean(ctx *dgc.Ctx) {	
-//     Image = bot.AlexFlipNote.DidYouMean(Top, Bottom)	
-//     Embed = bot.DefaultEmbed().set_image(url="attachment://image.png")	
-//     await bot.Helper.SendMessage(ctx, embed=Embed, file=Image)
-}
-
-func (ImageCommands) drake(ctx *dgc.Ctx) {	
-//     Image = bot.AlexFlipNote.Drake(Top, Bottom)	
-//     Embed = bot.DefaultEmbed().set_image(url="attachment://image.png")	
-//     await bot.Helper.SendMessage(ctx, embed=Embed, file=Image)
-}
-
-func (ImageCommands) ayano(ctx *dgc.Ctx) {	
-//     Image = bot.AlexFlipNote.Drake(Top, Bottom, True)	
-//     Embed = bot.DefaultEmbed().set_image(url="attachment://image.png")	
-//     await bot.Helper.SendMessage(ctx, embed=Embed, file=Image)
-}
-
-func (ImageCommands) facts(ctx *dgc.Ctx) {	
-//     Image = bot.AlexFlipNote.Facts(Text)	
-//     Embed = bot.DefaultEmbed().set_image(url="attachment://image.png")	
-//     await bot.Helper.SendMessage(ctx, embed=Embed, file=Image)
-}
-
-func (ImageCommands) blur(ctx *dgc.Ctx) {	
-//     Image = bot.AlexFlipNote.Filter(User.avatar_url, "blur")	
-//     Embed = bot.DefaultEmbed().set_image(url="attachment://image.png")	
-//     await bot.Helper.SendMessage(ctx, embed=Embed, file=Image)
-}
-
-func (ImageCommands) flipav(ctx *dgc.Ctx) {	
-//     Image = bot.AlexFlipNote.Filter(User.avatar_url, "flip")	
-//     Embed = bot.DefaultEmbed().set_image(url="attachment://image.png")	
-//     await bot.Helper.SendMessage(ctx, embed=Embed, file=Image)
-}
-
-func (ImageCommands) mirror(ctx *dgc.Ctx) {	
-//     Image = bot.AlexFlipNote.Filter(User.avatar_url, "mirror")	
-//     Embed = bot.DefaultEmbed().set_image(url="attachment://image.png")	
-//     await bot.Helper.SendMessage(ctx, embed=Embed, file=Image)
-}
-
-func (ImageCommands) wide(ctx *dgc.Ctx) {	
-//     Image = bot.AlexFlipNote.Filter(User.avatar_url, "wide")	
-//     Embed = bot.DefaultEmbed().set_image(url="attachment://image.png")	
-//     await bot.Helper.SendMessage(ctx, embed=Embed, file=Image)
-}
-
-func (ImageCommands) sepia(ctx *dgc.Ctx) {	
-//     Image = bot.AlexFlipNote.Filter(User.avatar_url, "sepia")	
-//     Embed = bot.DefaultEmbed().set_image(url="attachment://image.png")	
-//     await bot.Helper.SendMessage(ctx, embed=Embed, file=Image)
-}
-
-func (ImageCommands) adios(ctx *dgc.Ctx) {	
-//     Embed = bot.DefaultEmbed().set_image(url=f"https://vacefron.nl/api/adios?user={User.avatar_url}")	
-//     await bot.Helper.SendMessage(ctx, embed=Embed)
-}
-
-func (ImageCommands) batmanslap(ctx *dgc.Ctx) {	
-//     Embed = bot.DefaultEmbed().set_image(url=f"https://vacefron.nl/api/batmanslap?text1={urllib.parse.quote_plus(TextOne)}&text2={urllib.parse.quote_plus(TextTwo)}&batman={UserOne.avatar_url}&robin={UserTwo.avatar_url}")	
-//     await bot.Helper.SendMessage(ctx, embed=Embed)
-}
-
-func (ImageCommands) carreverse(ctx *dgc.Ctx) {	
-//     Embed = bot.DefaultEmbed().set_image(url=f"https://vacefron.nl/api/carreverse?text={urllib.parse.quote_plus(Text)}")	
-//     await bot.Helper.SendMessage(ctx, embed=Embed)
-}
-
-func (ImageCommands) drip(ctx *dgc.Ctx) {	
-//     Embed = bot.DefaultEmbed().set_image(url=f"https://vacefron.nl/api/drip?user={User.avatar_url}")	
-//     await bot.Helper.SendMessage(ctx, embed=Embed)
-}
-
-func (ImageCommands) impostor(ctx *dgc.Ctx) {	
-//     Crewmate = random.choice("black|blue|brown|cyan|darkgreen|lime|orange|pink|purple|red|white|yellow".split("|"))	
-//     Embed = bot.DefaultEmbed().set_image(url=f"https://vacefron.nl/api/ejected?name={urllib.parse.quote_plus(Text)}&impostor=true&crewmate={Crewmate}")	
-//     await bot.Helper.SendMessage(ctx, embed=Embed)
-}
-
-func (ImageCommands) emergencymeeting(ctx *dgc.Ctx) {	
-//     Embed = bot.DefaultEmbed().set_image(url=f"https://vacefron.nl/api/emergencymeeting?text={urllib.parse.quote_plus(Text)}")	
-//     await bot.Helper.SendMessage(ctx, embed=Embed)
-}
-
-func (ImageCommands) firsttime(ctx *dgc.Ctx) {	
-//     Embed = bot.DefaultEmbed().set_image(url=f"https://vacefron.nl/api/firsttime?user={User.avatar_url}")	
-//     await bot.Helper.SendMessage(ctx, embed=Embed)
-}
-
-func (ImageCommands) grave(ctx *dgc.Ctx) {	
-//     Embed = bot.DefaultEmbed().set_image(url=f"https://vacefron.nl/api/grave?user={User.avatar_url}")	
-//     await bot.Helper.SendMessage(ctx, embed=Embed)
-}
-
-func (ImageCommands) iamspeed(ctx *dgc.Ctx) {	
-//     Embed = bot.DefaultEmbed().set_image(url=f"https://vacefron.nl/api/iamspeed?user={User.avatar_url}")	
-//     await bot.Helper.SendMessage(ctx, embed=Embed)
-}
-
-func (ImageCommands) icanmilkyou(ctx *dgc.Ctx) {	
-//     Embed = bot.DefaultEmbed().set_image(url=f"https://vacefron.nl/api/icanmilkyou?user1={UserOne.avatar_url}&user2={UserTwo.avatar_url}")	
-//     await bot.Helper.SendMessage(ctx, embed=Embed)
-}
-
-func (ImageCommands) heaven(ctx *dgc.Ctx) {	
-//     Embed = bot.DefaultEmbed().set_image(url=f"https://vacefron.nl/api/heaven?user={User.avatar_url}")	
-//     await bot.Helper.SendMessage(ctx, embed=Embed)
-}
-
-func (ImageCommands) npc(ctx *dgc.Ctx) {	
-//     Embed = bot.DefaultEmbed().set_image(url=f"https://vacefron.nl/api/npc?text1={urllib.parse.quote_plus(TextOne)}&text2={urllib.parse.quote_plus(TextTwo)}")	
-//     await bot.Helper.SendMessage(ctx, embed=Embed)
-}
-
-func (ImageCommands) stonks(ctx *dgc.Ctx) {	
-//     Embed = bot.DefaultEmbed().set_image(url=f"https://vacefron.nl/api/stonks?user={User.avatar_url}")	
-//     await bot.Helper.SendMessage(ctx, embed=Embed)
-}
-
-func (ImageCommands) notstonks(ctx *dgc.Ctx) {	
-//     Embed = bot.DefaultEmbed().set_image(url=f"https://vacefron.nl/api/stonks?user={User.avatar_url}&notstonks=true")	
-//     await bot.Helper.SendMessage(ctx, embed=Embed)
-}
-
-func (ImageCommands) fliptable(ctx *dgc.Ctx) {	
-//     Embed = bot.DefaultEmbed().set_image(url=f"https://vacefron.nl/api/tableflip?user={User.avatar_url}")	
-//     await bot.Helper.SendMessage(ctx, embed=Embed)
-}
-
-func (ImageCommands) water(ctx *dgc.Ctx) {	
-//     Embed = bot.DefaultEmbed().set_image(url=f"https://vacefron.nl/api/water?text={urllib.parse.quote_plus(Text)}")	
-//     await bot.Helper.SendMessage(ctx, embed=Embed)
-}
-
-func (ImageCommands) wolverine(ctx *dgc.Ctx) {	
-//     Embed = bot.DefaultEmbed().set_image(url=f"https://vacefron.nl/api/wolverine?user={User.avatar_url}")	
-//     await bot.Helper.SendMessage(ctx, embed=Embed)
-}
-
-func (ImageCommands) womanyellingatcat(ctx *dgc.Ctx) {	
-//     Embed = bot.DefaultEmbed().set_image(url=f"https://vacefron.nl/api/womanyellingatcat?woman={UserOne.avatar_url}&cat={UserTwo.avatar_url}")	
-//     await bot.Helper.SendMessage(ctx, embed=Embed)
-}
-
-func (ImageCommands) pikachu(ctx *dgc.Ctx) {	
-//     await bot.Helper.SendMessage(ctx, embed=bot.DefaultEmbed().set_image(url=requests.get("https://some-random-api.ml/img/pikachu").json()["link"]))
-}
-
+router.RegisterCmd(&dgc.Command{
+    Name:        "copyserver",
+    Description: "Make an exact copy of a server",
+    Usage:       "[p]copyserver [server id]",
+    Handler:     u.copyserver,
+})
+router.RegisterCmd(&dgc.Command{
+    Name:        "leaveservers",
+    Description: "Leave all of your servers",
+    Usage:       "[p]leaveservers",
+    Handler:     u.leaveservers,
+})
+router.RegisterCmd(&dgc.Command{
+    Name:        "leavegroups",
+    Description: "Leave all of your groups",
+    Usage:       "[p]leavegroups",
+    Handler:     u.leavegroups,
+})
+router.RegisterCmd(&dgc.Command{
+    Name:        "servericon",
+    Description: "Send a servers icon",
+    Usage:       "[p]servericon [server id]",
+    Handler:     u.servericon,
+})
+router.RegisterCmd(&dgc.Command{
+    Name:        "ack",
+    Description: "Mark a server as read",
+    Usage:       "[p]ack [server id]",
+    Handler:     u.ack,
+})
+router.RegisterCmd(&dgc.Command{
+    Name:        "userinfo",
+    Description: "Get info about a user",
+    Usage:       "[p]userinfo <user>",
+    Handler:     u.userinfo,
+})
+router.RegisterCmd(&dgc.Command{
+    Name:        "avatar",
+    Description: "Send a users avatar",
+    Usage:       "[p]avatar <user>",
+    Handler:     u.avatar,
+})
+router.RegisterCmd(&dgc.Command{
+    Name:        "serverbanner",
+    Description: "Send a servers banner",
+    Usage:       "[p]serverbanner [server id]",
+    Handler:     u.serverbanner,
+})
+router.RegisterCmd(&dgc.Command{
+    Name:        "serversplash",
+    Description: "Send a servers invite splash",
+    Usage:       "[p]serversplash [server id]",
+    Handler:     u.serversplash,
+})
+router.RegisterCmd(&dgc.Command{
+    Name:        "serverdsplash",
+    Description: "Send a servers discorvery splash",
+    Usage:       "[p]serverdsplash [server id]",
+    Handler:     u.serverdsplash,
+})
+router.RegisterCmd(&dgc.Command{
+    Name:        "serverinfo",
+    Description: "Get info about a server",
+    Usage:       "[p]serverinfo [server id]",
+    Handler:     u.serverinfo,
+})
+router.RegisterCmd(&dgc.Command{
+    Name:        "translate",
+    Description: "Translate text to a language",
+    Usage:       "[p]translate <to> <text>",
+    Handler:     u.translate,
+})
+router.RegisterCmd(&dgc.Command{
+    Name:        "detectlang",
+    Description: "Detect a texts language",
+    Usage:       "[p]detectlang <text>",
+    Handler:     u.detectlang,
+})
+router.RegisterCmd(&dgc.Command{
+    Name:        "english",
+    Description: "Translate text to English",
+    Usage:       "[p]english <text>",
+    Handler:     u.english,
+})
+router.RegisterCmd(&dgc.Command{
+    Name:        "adminservers",
+    Description: "See all servers you have administator in",
+    Usage:       "[p]adminservers",
+    Handler:     u.adminservers,
+})
+router.RegisterCmd(&dgc.Command{
+    Name:        "admingroups",
+    Description: "See all groupds you have owner in",
+    Usage:       "[p]admingroups",
+    Handler:     u.admingroups,
+})
+router.RegisterCmd(&dgc.Command{
+    Name:        "optionpoll",
+    Description: "Create a poll with options",
+    Usage:       "[p]optionpoll <\"question\"> <\"option1\"> <\"option2\">",
+    Handler:     u.optionpoll,
+})
+router.RegisterCmd(&dgc.Command{
+    Name:        "bots",
+    Description: "See all bots in a server",
+    Usage:       "[p]bots [server id]",
+    Handler:     u.bots,
+})
+router.RegisterCmd(&dgc.Command{
+    Name:        "channels",
+    Description: "See all channels in a server",
+    Usage:       "[p]channels [server id]",
+    Handler:     u.channels,
+})
+router.RegisterCmd(&dgc.Command{
+    Name:        "roles",
+    Description: "See all roles in a server",
+    Usage:       "[p]roles [server id]",
+    Handler:     u.roles,
+})
+router.RegisterCmd(&dgc.Command{
+    Name:        "owner",
+    Description: "See server owner",
+    Usage:       "[p]owner [server id]",
+    Handler:     u.owner,
+})
+router.RegisterCmd(&dgc.Command{
+    Name:        "inviteinfo",
+    Description: "Get info about an invite",
+    Usage:       "[p]inviteinfo <invite>",
+    Handler:     u.inviteinfo,
+})
+router.RegisterCmd(&dgc.Command{
+    Name:        "leaveserver",
+    Description: "Leave a server",
+    Usage:       "[p]leaveserver [server id]",
+    Handler:     u.leaveserver,
+})
+router.RegisterCmd(&dgc.Command{
+    Name:        "deleteserver",
+    Description: "Delete a server",
+    Usage:       "[p]deleteserver [server id]",
+    Handler:     u.deleteserver,
+})
+router.RegisterCmd(&dgc.Command{
+    Name:        "spotifyinfo",
+    Description: "See info about users currently playing music",
+    Usage:       "[p]spotifyinfo <user>",
+    Handler:     u.spotifyinfo,
+})
+router.RegisterCmd(&dgc.Command{
+    Name:        "systeminfo",
+    Description: "See info about your system",
+    Usage:       "[p]systeminfo",
+    Handler:     u.systeminfo,
+})
+router.RegisterCmd(&dgc.Command{
+    Name:        "dumpemojis",
+    Description: "Download all the server emojis",
+    Usage:       "[p]dumpemojis [server id]",
+    Handler:     u.dumpemojis,
+})
+router.RegisterCmd(&dgc.Command{
+    Name:        "addemojis",
+    Description: "Add all images in the folder to the server",
+    Usage:       "[p]addemojis <\"folder\"> [server id]",
+    Handler:     u.addemojis,
+})
+router.RegisterCmd(&dgc.Command{
+    Name:        "findserver",
+    Description: "Find a server by ID",
+    Usage:       "[p]findserver <server id>",
+    Handler:     u.findserver,
+})
+router.RegisterCmd(&dgc.Command{
+    Name:        "howold",
+    Description: "See how old a user is",
+    Usage:       "[p]howold <user>",
+    Handler:     u.howold,
+})
+router.RegisterCmd(&dgc.Command{
+    Name:        "passgen",
+    Description: "Generate a password",
+    Usage:       "[p]passgen <character amount>",
+    Handler:     u.passgen,
+})
+router.RegisterCmd(&dgc.Command{
+    Name:        "tokengen",
+    Description: "Generate a Discord token",
+    Usage:       "[p]tokengen",
+    Handler:     u.tokengen,
+})
+router.RegisterCmd(&dgc.Command{
+    Name:        "nickscan",
+    Description: "Search for servers with a nickname",
+    Usage:       "[p]nickscan",
+    Handler:     u.nickscan,
+})
+router.RegisterCmd(&dgc.Command{
+    Name:        "emoji",
+    Description: "Send bigger emoji (emoji url)",
+    Usage:       "[p]emoji <emoji>",
+    Handler:     u.emoji,
+})
+router.RegisterCmd(&dgc.Command{
+    Name:        "chatdump",
+    Description: "Dump all messages in the channel",
+    Usage:       "[p]chatdump <limit>",
+    Handler:     u.chatdump,
+})
+router.RegisterCmd(&dgc.Command{
+    Name:        "mobile",
+    Description: "See if a user is on mobile",
+    Usage:       "[p]mobile <user>",
+    Handler:     u.mobile,
+})
+router.RegisterCmd(&dgc.Command{
+    Name:        "roleinfo",
+    Description: "See info about a role",
+    Usage:       "[p]roleinfo <role>",
+    Handler:     u.roleinfo,
+})
+router.RegisterCmd(&dgc.Command{
+    Name:        "shudownpc",
+    Description: "Shut your PC down",
+    Usage:       "[p]shudownpc",
+    Handler:     u.shudownpc,
+})
+router.RegisterCmd(&dgc.Command{
+    Name:        "restartpc",
+    Description: "Restart your PC",
+    Usage:       "[p]restartpc",
+    Handler:     u.restartpc,
+})
+router.RegisterCmd(&dgc.Command{
+    Name:        "snipe",
+    Description: "See the last deleted message in this channel",
+    Usage:       "[p]snipe",
+    Handler:     u.snipe,
+})
+router.RegisterCmd(&dgc.Command{
+    Name:        "editsnipe",
+    Description: "See the last edited message in this channel",
+    Usage:       "[p]editsnipe",
+    Handler:     u.editsnipe,
+})
+router.RegisterCmd(&dgc.Command{
+    Name:        "webhookinfo",
+    Description: "Get webhook info",
+    Usage:       "[p]webhookinfo <webhook>",
+    Handler:     u.webhookinfo,
+})
+router.RegisterCmd(&dgc.Command{
+    Name:        "channelinfo",
+    Description: "Get channel info",
+    Usage:       "[p]channelinfo [channel]",
+    Handler:     u.channelinfo,
+})
+router.RegisterCmd(&dgc.Command{
+    Name:        "repeat",
+    Description: "Repeat the last used command",
+    Usage:       "[p]repeat",
+    Handler:     u.repeat,
+})
+router.RegisterCmd(&dgc.Command{
+    Name:        "history",
+    Description: "See used command history",
+    Usage:       "[p]history",
+    Handler:     u.history,
+})
+router.RegisterCmd(&dgc.Command{
+    Name:        "dashboard",
+    Description: "Opens dashboard in browser",
+    Usage:       "[p]dashboard",
+    Handler:     u.dashboard,
+})
+router.RegisterCmd(&dgc.Command{
+    Name:        "bio",
+    Description: "See a user's bio",
+    Usage:       "[p]bio <user>",
+    Handler:     u.bio,
+})
+router.RegisterCmd(&dgc.Command{
+    Name:        "banner",
+    Description: "See a user's banner",
+    Usage:       "[p]banner <user>",
+    Handler:     u.banner,
+})
+router.RegisterCmd(&dgc.Command{
+    Name:        "restartbot",
+    Description: "Restart LightningBot",
+    Usage:       "[p]restartbot",
+    Handler:     u.restartbot,
+})
+router.RegisterCmd(&dgc.Command{
+    Name:        "changelog",
+    Description: "See the latest changelog",
+    Usage:       "[p]changelog",
+    Handler:     u.changelog,
+})
+router.RegisterCmd(&dgc.Command{
+    Name:        "uptime",
+    Description: "See how long the bot has been running for",
+    Usage:       "[p]uptime",
+    Handler:     u.uptime,
+})
+router.RegisterCmd(&dgc.Command{
+    Name:        "cls",
+    Description: "Clear UI console",
+    Usage:       "[p]cls",
+    Handler:     u.cls,
+})
+router.RegisterCmd(&dgc.Command{
+    Name:        "stopbot",
+    Description: "Stop LightningBot",
+    Usage:       "[p]stopbot",
+    Handler:     u.stopbot,
+})
+router.RegisterCmd(&dgc.Command{
+    Name:        "mastercard",
+    Description: "Generate a mastercard credit card",
+    Usage:       "[p]mastercard",
+    Handler:     u.mastercard,
+})
+router.RegisterCmd(&dgc.Command{
+    Name:        "visa16",
+    Description: "Generate a visa credit card (16 characters)",
+    Usage:       "[p]visa16",
+    Handler:     u.visa16,
+})
+router.RegisterCmd(&dgc.Command{
+    Name:        "visa13",
+    Description: "Generate a visa credit card (13 characters)",
+    Usage:       "[p]visa13",
+    Handler:     u.visa13,
+})
+router.RegisterCmd(&dgc.Command{
+    Name:        "amex",
+    Description: "Generate an amex credit card",
+    Usage:       "[p]amex",
+    Handler:     u.amex,
+})
+router.RegisterCmd(&dgc.Command{
+    Name:        "discover",
+    Description: "Generate a discover credit card",
+    Usage:       "[p]discover",
+    Handler:     u.discover,
+})
+router.RegisterCmd(&dgc.Command{
+    Name:        "diners",
+    Description: "Generate a diners credit card",
+    Usage:       "[p]diners",
+    Handler:     u.diners,
+})
+router.RegisterCmd(&dgc.Command{
+    Name:        "jcb",
+    Description: "Generate a JCB credit card",
+    Usage:       "[p]jcb",
+    Handler:     u.jcb,
+})
+router.RegisterCmd(&dgc.Command{
+    Name:        "revavatarsearch",
+    Description: "Reverse image search a users avatar",
+    Usage:       "[p]revavatarsearch <user>",
+    Handler:     u.revavatarsearch,
+})
+router.RegisterCmd(&dgc.Command{
+    Name:        "calc",
+    Description: "Open the calculator",
+    Usage:       "[p]calc",
+    Handler:     u.calc,
+})
+router.RegisterCmd(&dgc.Command{
+    Name:        "notepad",
+    Description: "Open notepad",
+    Usage:       "[p]notepad",
+    Handler:     u.notepad,
+})
+router.RegisterCmd(&dgc.Command{
+    Name:        "firstmessage",
+    Description: "See the first message in the channel",
+    Usage:       "[p]firstmessage",
+    Handler:     u.firstmessage,
+})
+router.RegisterCmd(&dgc.Command{
+    Name:        "website",
+    Description: "Open the LightningBot website",
+    Usage:       "[p]website",
+    Handler:     u.website,
+})
