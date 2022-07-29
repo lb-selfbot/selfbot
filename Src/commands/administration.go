@@ -31,9 +31,9 @@ var (
 	}
 )
 
-type ModerationCommands struct{}
+type AdministrationCommands struct{}
 
-func (m ModerationCommands) RegisterCommands(router *dgc.Router) {
+func (m AdministrationCommands) RegisterCommands(router *dgc.Router) {
 	router.RegisterCmd(&dgc.Command{
 		Name:        "channelinfo",
 		Description: "Get info about a channel",
@@ -217,7 +217,7 @@ func (m ModerationCommands) RegisterCommands(router *dgc.Router) {
 	router.RegisterCmd(&dgc.Command{
 		Name:        "nickuser",
 		Description: "Change a users nickname",
-		Usage:       "[p]nick <user> <text>",
+		Usage:       "[p]nickuser <user> <text>",
 		Handler:     m.nickuser,
 	})
 	router.RegisterCmd(&dgc.Command{
@@ -374,7 +374,7 @@ func (m ModerationCommands) RegisterCommands(router *dgc.Router) {
 
 // Channel Control
 
-func (ModerationCommands) channelinfo(ctx *dgc.Ctx) {
+func (AdministrationCommands) channelinfo(ctx *dgc.Ctx) {
 	channel, success := utils.Discord.TryGetChannelFromMention(ctx, ctx.Arguments.Get(0))
 	if !success {
 		ctx.RespondText("Could not find channel")
@@ -394,7 +394,7 @@ func (ModerationCommands) channelinfo(ctx *dgc.Ctx) {
 		Send(ctx)
 }
 
-func (ModerationCommands) textchannel(ctx *dgc.Ctx) {
+func (AdministrationCommands) textchannel(ctx *dgc.Ctx) {
 	if !utils.Discord.CheckIfInServer(ctx) {
 		return
 	}
@@ -409,7 +409,7 @@ func (ModerationCommands) textchannel(ctx *dgc.Ctx) {
 		Send(ctx)
 }
 
-func (ModerationCommands) voicechannel(ctx *dgc.Ctx) {
+func (AdministrationCommands) voicechannel(ctx *dgc.Ctx) {
 	if !utils.Discord.CheckIfInServer(ctx) {
 		return
 	}
@@ -424,7 +424,7 @@ func (ModerationCommands) voicechannel(ctx *dgc.Ctx) {
 		Send(ctx)
 }
 
-func (ModerationCommands) stagechannel(ctx *dgc.Ctx) {
+func (AdministrationCommands) stagechannel(ctx *dgc.Ctx) {
 	if !utils.Discord.CheckIfInServer(ctx) {
 		return
 	}
@@ -439,7 +439,7 @@ func (ModerationCommands) stagechannel(ctx *dgc.Ctx) {
 		Send(ctx)
 }
 
-func (ModerationCommands) newschannel(ctx *dgc.Ctx) {
+func (AdministrationCommands) newschannel(ctx *dgc.Ctx) {
 	if !utils.Discord.CheckIfInServer(ctx) {
 		return
 	}
@@ -454,7 +454,7 @@ func (ModerationCommands) newschannel(ctx *dgc.Ctx) {
 		Send(ctx)
 }
 
-func (ModerationCommands) thread(ctx *dgc.Ctx) {
+func (AdministrationCommands) thread(ctx *dgc.Ctx) {
 	if !utils.Discord.CheckIfInServer(ctx) {
 		return
 	}
@@ -470,7 +470,7 @@ func (ModerationCommands) thread(ctx *dgc.Ctx) {
 		Send(ctx)
 }
 
-func (ModerationCommands) category(ctx *dgc.Ctx) {
+func (AdministrationCommands) category(ctx *dgc.Ctx) {
 	if !utils.Discord.CheckIfInServer(ctx) {
 		return
 	}
@@ -485,7 +485,7 @@ func (ModerationCommands) category(ctx *dgc.Ctx) {
 		Send(ctx)
 }
 
-func (ModerationCommands) deletecategory(ctx *dgc.Ctx) {
+func (AdministrationCommands) deletecategory(ctx *dgc.Ctx) {
 	channel, success := utils.Discord.TryGetChannelFromMention(ctx, ctx.Arguments.Get(0))
 	if !success {
 		ctx.RespondText("Could not find category")
@@ -502,7 +502,7 @@ func (ModerationCommands) deletecategory(ctx *dgc.Ctx) {
 		Send(ctx)
 }
 
-func (ModerationCommands) renamechannel(ctx *dgc.Ctx) {
+func (AdministrationCommands) renamechannel(ctx *dgc.Ctx) {
 	channel, success := utils.Discord.TryGetChannelFromMention(ctx, ctx.Arguments.Get(0))
 	if !success {
 		ctx.RespondText("Could not find channel")
@@ -521,7 +521,7 @@ func (ModerationCommands) renamechannel(ctx *dgc.Ctx) {
 		Send(ctx)
 }
 
-func (ModerationCommands) deletechannel(ctx *dgc.Ctx) {
+func (AdministrationCommands) deletechannel(ctx *dgc.Ctx) {
 	channel, success := utils.Discord.TryGetChannelFromMention(ctx, ctx.Arguments.Get(0))
 	if !success {
 		ctx.RespondText("Could not find channel")
@@ -539,7 +539,7 @@ func (ModerationCommands) deletechannel(ctx *dgc.Ctx) {
 		Send(ctx)
 }
 
-func (ModerationCommands) slowmode(ctx *dgc.Ctx) {
+func (AdministrationCommands) slowmode(ctx *dgc.Ctx) {
 	channel, success := utils.Discord.TryGetChannelFromMention(ctx, ctx.Arguments.Get(0))
 	if !success {
 		ctx.RespondText("Could not find channel")
@@ -566,7 +566,7 @@ func (ModerationCommands) slowmode(ctx *dgc.Ctx) {
 		Send(ctx)
 }
 
-func (ModerationCommands) removeslowmode(ctx *dgc.Ctx) {
+func (AdministrationCommands) removeslowmode(ctx *dgc.Ctx) {
 	channel, success := utils.Discord.TryGetChannelFromMention(ctx, ctx.Arguments.Get(0))
 	if !success {
 		ctx.RespondText("Could not find channel")
@@ -587,7 +587,7 @@ func (ModerationCommands) removeslowmode(ctx *dgc.Ctx) {
 		Send(ctx)
 }
 
-func (ModerationCommands) lockchannel(ctx *dgc.Ctx) {
+func (AdministrationCommands) lockchannel(ctx *dgc.Ctx) {
 	channel, success := utils.Discord.TryGetChannelFromMention(ctx, ctx.Arguments.Get(0))
 	if !success {
 		ctx.RespondText("Could not find channel")
@@ -614,7 +614,7 @@ func (ModerationCommands) lockchannel(ctx *dgc.Ctx) {
 		Send(ctx)
 }
 
-func (ModerationCommands) unlockchannel(ctx *dgc.Ctx) {
+func (AdministrationCommands) unlockchannel(ctx *dgc.Ctx) {
 	channel, success := utils.Discord.TryGetChannelFromMention(ctx, ctx.Arguments.Get(0))
 	if !success {
 		ctx.RespondText("Could not find channel")
@@ -641,7 +641,7 @@ func (ModerationCommands) unlockchannel(ctx *dgc.Ctx) {
 		Send(ctx)
 }
 
-func (ModerationCommands) purge(ctx *dgc.Ctx) {
+func (AdministrationCommands) purge(ctx *dgc.Ctx) {
 	amount, err := strconv.Atoi(utils.Arguments["<amount>"])
 	if err != nil {
 		ctx.RespondText("Argument <amount> must be a number.")
@@ -665,7 +665,7 @@ func (ModerationCommands) purge(ctx *dgc.Ctx) {
 	}
 }
 
-func (ModerationCommands) nuke(ctx *dgc.Ctx) {
+func (AdministrationCommands) nuke(ctx *dgc.Ctx) {
 	channel, success := utils.Discord.TryGetChannelFromMention(ctx, ctx.Arguments.Get(0))
 	if !success {
 		channel, _ = ctx.Session.State.Channel(ctx.Event.ChannelID)
@@ -710,7 +710,7 @@ func (ModerationCommands) nuke(ctx *dgc.Ctx) {
 
 // Member Control
 
-func (ModerationCommands) userinfo(ctx *dgc.Ctx) {
+func (AdministrationCommands) userinfo(ctx *dgc.Ctx) {
 	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
 		ctx.RespondText("Could not find user")
@@ -735,7 +735,7 @@ func (ModerationCommands) userinfo(ctx *dgc.Ctx) {
 	embed.Send(ctx)
 }
 
-func (ModerationCommands) report(ctx *dgc.Ctx) {
+func (AdministrationCommands) report(ctx *dgc.Ctx) {
 	link := utils.Arguments["<message link>"]
 	reason := utils.Arguments["<reason>"]
 
@@ -779,7 +779,7 @@ func (ModerationCommands) report(ctx *dgc.Ctx) {
 		Send(ctx)
 }
 
-func (ModerationCommands) mute(ctx *dgc.Ctx) {
+func (AdministrationCommands) mute(ctx *dgc.Ctx) {
 	if !utils.Discord.CheckIfInServer(ctx) {
 		return
 	}
@@ -850,7 +850,7 @@ func (ModerationCommands) mute(ctx *dgc.Ctx) {
 		Send(ctx)
 }
 
-func (ModerationCommands) unmute(ctx *dgc.Ctx) {
+func (AdministrationCommands) unmute(ctx *dgc.Ctx) {
 	if !utils.Discord.CheckIfInServer(ctx) {
 		return
 	}
@@ -896,7 +896,7 @@ func (ModerationCommands) unmute(ctx *dgc.Ctx) {
 	ctx.RespondText("Error: No muted role found!")
 }
 
-func (ModerationCommands) timeout(ctx *dgc.Ctx) {
+func (AdministrationCommands) timeout(ctx *dgc.Ctx) {
 	if !utils.Discord.CheckIfInServer(ctx) {
 		return
 	}
@@ -925,7 +925,7 @@ func (ModerationCommands) timeout(ctx *dgc.Ctx) {
 		Send(ctx)
 }
 
-func (ModerationCommands) removetimeout(ctx *dgc.Ctx) {
+func (AdministrationCommands) removetimeout(ctx *dgc.Ctx) {
 	if !utils.Discord.CheckIfInServer(ctx) {
 		return
 	}
@@ -947,7 +947,7 @@ func (ModerationCommands) removetimeout(ctx *dgc.Ctx) {
 		Send(ctx)
 }
 
-func (ModerationCommands) kick(ctx *dgc.Ctx) {
+func (AdministrationCommands) kick(ctx *dgc.Ctx) {
 	if !utils.Discord.CheckIfInServer(ctx) {
 		return
 	}
@@ -969,7 +969,7 @@ func (ModerationCommands) kick(ctx *dgc.Ctx) {
 		Send(ctx)
 }
 
-func (ModerationCommands) ban(ctx *dgc.Ctx) {
+func (AdministrationCommands) ban(ctx *dgc.Ctx) {
 	if !utils.Discord.CheckIfInServer(ctx) {
 		return
 	}
@@ -991,7 +991,7 @@ func (ModerationCommands) ban(ctx *dgc.Ctx) {
 		Send(ctx)
 }
 
-func (ModerationCommands) softban(ctx *dgc.Ctx) {
+func (AdministrationCommands) softban(ctx *dgc.Ctx) {
 	if !utils.Discord.CheckIfInServer(ctx) {
 		return
 	}
@@ -1018,7 +1018,7 @@ func (ModerationCommands) softban(ctx *dgc.Ctx) {
 		Send(ctx)
 }
 
-func (ModerationCommands) unban(ctx *dgc.Ctx) {
+func (AdministrationCommands) unban(ctx *dgc.Ctx) {
 	if !utils.Discord.CheckIfInServer(ctx) {
 		return
 	}
@@ -1034,7 +1034,7 @@ func (ModerationCommands) unban(ctx *dgc.Ctx) {
 		Send(ctx)
 }
 
-func (ModerationCommands) banlist(ctx *dgc.Ctx) {
+func (AdministrationCommands) banlist(ctx *dgc.Ctx) {
 	guildID := utils.Arguments["[server id]"]
 	if guildID == "" {
 		guildID = ctx.Event.GuildID
@@ -1062,7 +1062,7 @@ func (ModerationCommands) banlist(ctx *dgc.Ctx) {
 		Send(ctx)
 }
 
-func (ModerationCommands) copybans(ctx *dgc.Ctx) {
+func (AdministrationCommands) copybans(ctx *dgc.Ctx) {
 	sourceServerID := utils.Arguments["<source server id>"]
 	destinationServerID := utils.Arguments["[dest server id]"]
 	if destinationServerID == "" {
@@ -1089,11 +1089,11 @@ func (ModerationCommands) copybans(ctx *dgc.Ctx) {
 
 // Nickname Control
 
-func (ModerationCommands) nick(ctx *dgc.Ctx) {
+func (AdministrationCommands) nick(ctx *dgc.Ctx) {
 	if !utils.Discord.CheckIfInServer(ctx) {
 		return
 	}
-	err := ctx.Session.GuildMemberNickname(ctx.Event.GuildID, ctx.Event.Author.ID, ctx.Arguments.Raw())
+	err := ctx.Session.GuildMemberNickname(ctx.Event.GuildID, "@me", ctx.Arguments.Raw())
 	if err != nil {
 		ctx.RespondText("Error changing nickname: " + err.Error())
 		return
@@ -1103,7 +1103,7 @@ func (ModerationCommands) nick(ctx *dgc.Ctx) {
 		Send(ctx)
 }
 
-func (ModerationCommands) nickuser(ctx *dgc.Ctx) {
+func (AdministrationCommands) nickuser(ctx *dgc.Ctx) {
 	if !utils.Discord.CheckIfInServer(ctx) {
 		return
 	}
@@ -1114,7 +1114,7 @@ func (ModerationCommands) nickuser(ctx *dgc.Ctx) {
 		return
 	}
 
-	err := ctx.Session.GuildMemberNickname(ctx.Event.GuildID, member.User.ID, utils.String.RemoveWords(ctx.Arguments.Raw(), 1))
+	err := ctx.Session.GuildMemberNickname(ctx.Event.GuildID, strings.ReplaceAll(member.User.ID, ctx.Event.Author.ID, "@me"), utils.String.RemoveWords(ctx.Arguments.Raw(), 1))
 	if err != nil {
 		ctx.RespondText("Error changing nickname: " + err.Error())
 		return
@@ -1124,17 +1124,17 @@ func (ModerationCommands) nickuser(ctx *dgc.Ctx) {
 		Send(ctx)
 }
 
-func (ModerationCommands) clearnick(ctx *dgc.Ctx) {
+func (AdministrationCommands) clearnick(ctx *dgc.Ctx) {
 	if !utils.Discord.CheckIfInServer(ctx) {
 		return
 	}
 
+	userID := "@me"
 	member, success := utils.Discord.TryGetMemberFromMention(ctx, ctx.Arguments.Get(0))
-	if !success {
-		member = ctx.Event.Member
+	if success {
+		userID = member.User.ID
 	}
-
-	err := ctx.Session.GuildMemberNickname(ctx.Event.GuildID, member.User.ID, "")
+	err := ctx.Session.GuildMemberNickname(ctx.Event.GuildID, userID, "")
 	if err != nil {
 		ctx.RespondText("Error changing nickname: " + err.Error())
 		return
@@ -1146,7 +1146,7 @@ func (ModerationCommands) clearnick(ctx *dgc.Ctx) {
 
 // Server Control
 
-func (ModerationCommands) serverinfo(ctx *dgc.Ctx) {
+func (AdministrationCommands) serverinfo(ctx *dgc.Ctx) {
 	if !utils.Discord.CheckIfInServer(ctx) {
 		return
 	}
@@ -1181,7 +1181,7 @@ func (ModerationCommands) serverinfo(ctx *dgc.Ctx) {
 	embed.Send(ctx)
 }
 
-func (ModerationCommands) serverowner(ctx *dgc.Ctx) {
+func (AdministrationCommands) serverowner(ctx *dgc.Ctx) {
 	if !utils.Discord.CheckIfInServer(ctx) {
 		return
 	}
@@ -1202,7 +1202,7 @@ func (ModerationCommands) serverowner(ctx *dgc.Ctx) {
 		Send(ctx)
 }
 
-func (ModerationCommands) servericon(ctx *dgc.Ctx) {
+func (AdministrationCommands) servericon(ctx *dgc.Ctx) {
 	if !utils.Discord.CheckIfInServer(ctx) {
 		return
 	}
@@ -1222,7 +1222,7 @@ func (ModerationCommands) servericon(ctx *dgc.Ctx) {
 	embed.Send(ctx)
 }
 
-func (ModerationCommands) serverbanner(ctx *dgc.Ctx) {
+func (AdministrationCommands) serverbanner(ctx *dgc.Ctx) {
 	if !utils.Discord.CheckIfInServer(ctx) {
 		return
 	}
@@ -1242,7 +1242,7 @@ func (ModerationCommands) serverbanner(ctx *dgc.Ctx) {
 	embed.Send(ctx)
 }
 
-func (ModerationCommands) serverboosters(ctx *dgc.Ctx) {
+func (AdministrationCommands) serverboosters(ctx *dgc.Ctx) {
 	if !utils.Discord.CheckIfInServer(ctx) {
 		return
 	}
@@ -1270,7 +1270,7 @@ func (ModerationCommands) serverboosters(ctx *dgc.Ctx) {
 		Send(ctx)
 }
 
-func (ModerationCommands) serverboostlevel(ctx *dgc.Ctx) {
+func (AdministrationCommands) serverboostlevel(ctx *dgc.Ctx) {
 	if !utils.Discord.CheckIfInServer(ctx) {
 		return
 	}
@@ -1287,7 +1287,7 @@ func (ModerationCommands) serverboostlevel(ctx *dgc.Ctx) {
 		Send(ctx)
 }
 
-func (ModerationCommands) setservername(ctx *dgc.Ctx) {
+func (AdministrationCommands) setservername(ctx *dgc.Ctx) {
 	if !utils.Discord.CheckIfInServer(ctx) {
 		return
 	}
@@ -1303,7 +1303,7 @@ func (ModerationCommands) setservername(ctx *dgc.Ctx) {
 		Send(ctx)
 }
 
-func (ModerationCommands) setservericon(ctx *dgc.Ctx) {
+func (AdministrationCommands) setservericon(ctx *dgc.Ctx) {
 	if !utils.Discord.CheckIfInServer(ctx) {
 		return
 	}
@@ -1319,7 +1319,7 @@ func (ModerationCommands) setservericon(ctx *dgc.Ctx) {
 		Send(ctx)
 }
 
-func (ModerationCommands) setserverbanner(ctx *dgc.Ctx) {
+func (AdministrationCommands) setserverbanner(ctx *dgc.Ctx) {
 	if !utils.Discord.CheckIfInServer(ctx) {
 		return
 	}
@@ -1335,7 +1335,7 @@ func (ModerationCommands) setserverbanner(ctx *dgc.Ctx) {
 		Send(ctx)
 }
 
-func (ModerationCommands) lockserver(ctx *dgc.Ctx) {
+func (AdministrationCommands) lockserver(ctx *dgc.Ctx) {
 	guild, err := utils.Discord.GetGuild(ctx.Session, utils.Misc.Or(utils.Arguments["[server id]"], ctx.Event.GuildID))
 	if err != nil {
 		ctx.RespondText("Error getting server: " + err.Error())
@@ -1365,7 +1365,7 @@ func (ModerationCommands) lockserver(ctx *dgc.Ctx) {
 		Send(ctx)
 }
 
-func (ModerationCommands) unlockserver(ctx *dgc.Ctx) {
+func (AdministrationCommands) unlockserver(ctx *dgc.Ctx) {
 	guild, err := utils.Discord.GetGuild(ctx.Session, utils.Misc.Or(utils.Arguments["[server id]"], ctx.Event.GuildID))
 	if err != nil {
 		ctx.RespondText("Error getting server: " + err.Error())
@@ -1397,7 +1397,7 @@ func (ModerationCommands) unlockserver(ctx *dgc.Ctx) {
 
 // Invite Control
 
-func (ModerationCommands) invite(ctx *dgc.Ctx) {
+func (AdministrationCommands) invite(ctx *dgc.Ctx) {
 	channel, success := utils.Discord.TryGetChannelFromMention(ctx, ctx.Arguments.Get(0))
 	channelID := ctx.Event.ChannelID
 	if !success {
@@ -1432,7 +1432,7 @@ func (ModerationCommands) invite(ctx *dgc.Ctx) {
 		Send(ctx)
 }
 
-func (ModerationCommands) friendinvite(ctx *dgc.Ctx) {
+func (AdministrationCommands) friendinvite(ctx *dgc.Ctx) {
 	invite, err := ctx.Session.CreateFriendInvite("@me")
 	if err != nil {
 		ctx.RespondText("Error creating friend invite: " + err.Error())
@@ -1445,7 +1445,7 @@ func (ModerationCommands) friendinvite(ctx *dgc.Ctx) {
 		Send(ctx)
 }
 
-func (ModerationCommands) inviteinfo(ctx *dgc.Ctx) {
+func (AdministrationCommands) inviteinfo(ctx *dgc.Ctx) {
 	parsedInvite := utils.Discord.ParseInvite(utils.Arguments["<invite>"])
 	invite, err := ctx.Session.InviteWithCounts(parsedInvite)
 	if err != nil {
@@ -1478,7 +1478,7 @@ func (ModerationCommands) inviteinfo(ctx *dgc.Ctx) {
 		Send(ctx)
 }
 
-func (ModerationCommands) deleteinvite(ctx *dgc.Ctx) {
+func (AdministrationCommands) deleteinvite(ctx *dgc.Ctx) {
 	parsedInvite := utils.Discord.ParseInvite(utils.Arguments["<invite>"])
 	invite, err := ctx.Session.InviteWithCounts(parsedInvite)
 	if err != nil {
@@ -1497,7 +1497,7 @@ func (ModerationCommands) deleteinvite(ctx *dgc.Ctx) {
 		Send(ctx)
 }
 
-func (m *ModerationCommands) serverinvites(ctx *dgc.Ctx) {
+func (m *AdministrationCommands) serverinvites(ctx *dgc.Ctx) {
 	invites, err := ctx.Session.GuildInvites(utils.Misc.Or(utils.Arguments["[server id]"], ctx.Event.GuildID))
 	if err != nil {
 		ctx.RespondText("Error getting invites: " + err.Error())
@@ -1522,7 +1522,7 @@ func (m *ModerationCommands) serverinvites(ctx *dgc.Ctx) {
 		Send(ctx)
 }
 
-func (m *ModerationCommands) channelinvites(ctx *dgc.Ctx) {
+func (m *AdministrationCommands) channelinvites(ctx *dgc.Ctx) {
 	channel, success := utils.Discord.TryGetChannelFromMention(ctx, ctx.Arguments.Get(0))
 	channelID := ctx.Event.ChannelID
 	if success {
@@ -1552,7 +1552,7 @@ func (m *ModerationCommands) channelinvites(ctx *dgc.Ctx) {
 		Send(ctx)
 }
 
-func (m *ModerationCommands) userinvites(ctx *dgc.Ctx) {
+func (m *AdministrationCommands) userinvites(ctx *dgc.Ctx) {
 	if !utils.Discord.CheckIfInServer(ctx) {
 		return
 	}
@@ -1588,7 +1588,7 @@ func (m *ModerationCommands) userinvites(ctx *dgc.Ctx) {
 		Send(ctx)
 }
 
-func (ModerationCommands) roleinfo(ctx *dgc.Ctx) {
+func (AdministrationCommands) roleinfo(ctx *dgc.Ctx) {
 	role, success := utils.Discord.TryGetRoleFromMention(ctx, ctx.Arguments.Get(0))
 	if !success {
 		ctx.RespondText("Could not find role")
@@ -1617,7 +1617,7 @@ func (ModerationCommands) roleinfo(ctx *dgc.Ctx) {
 		Send(ctx)
 }
 
-func (ModerationCommands) giverole(ctx *dgc.Ctx) {
+func (AdministrationCommands) giverole(ctx *dgc.Ctx) {
 	if !utils.Discord.CheckIfInServer(ctx) {
 		return
 	}
@@ -1642,7 +1642,7 @@ func (ModerationCommands) giverole(ctx *dgc.Ctx) {
 		Send(ctx)
 }
 
-func (ModerationCommands) removerole(ctx *dgc.Ctx) {
+func (AdministrationCommands) removerole(ctx *dgc.Ctx) {
 	if !utils.Discord.CheckIfInServer(ctx) {
 		return
 	}
@@ -1667,7 +1667,7 @@ func (ModerationCommands) removerole(ctx *dgc.Ctx) {
 		Send(ctx)
 }
 
-func (ModerationCommands) createrole(ctx *dgc.Ctx) {
+func (AdministrationCommands) createrole(ctx *dgc.Ctx) {
 	if !utils.Discord.CheckIfInServer(ctx) {
 		return
 	}
@@ -1681,7 +1681,7 @@ func (ModerationCommands) createrole(ctx *dgc.Ctx) {
 		Send(ctx)
 }
 
-func (ModerationCommands) deleterole(ctx *dgc.Ctx) {
+func (AdministrationCommands) deleterole(ctx *dgc.Ctx) {
 	if !utils.Discord.CheckIfInServer(ctx) {
 		return
 	}
@@ -1700,7 +1700,7 @@ func (ModerationCommands) deleterole(ctx *dgc.Ctx) {
 		Send(ctx)
 }
 
-func (ModerationCommands) renamerole(ctx *dgc.Ctx) {
+func (AdministrationCommands) renamerole(ctx *dgc.Ctx) {
 	if !utils.Discord.CheckIfInServer(ctx) {
 		return
 	}

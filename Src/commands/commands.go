@@ -6,25 +6,25 @@ import (
 )
 
 type Commands struct {
-	TextCommands       TextCommands
-	EncodingCommands   EncodingCommands
-	CodeblockCommands  CodeblockCommands
-	CryptoCommands     CryptoCommands
-	FunCommands        FunCommands
-	TrollingCommands   TrollingCommands
-	ImageCommands      ImageCommands
-	NetworkCommands    NetworkCommands
-	ModerationCommands ModerationCommands
-	UtilityCommands    UtilityCommands
-	SpotifyCommands    SpotifyCommands
-	GameCommands       GameCommands
-	ActivityCommands   ActivityCommands
-	AnimationCommands  AnimationCommands
-	ConfigCommands     ConfigCommands
-	RPCCommands        RPCCommands
-	SessionsCommands   SessionsCommands
-	NSFWCommands       NSFWCommands
-	RedditCommands     RedditCommands
+	TextCommands           TextCommands
+	EncodingCommands       EncodingCommands
+	CodeblockCommands      CodeblockCommands
+	CryptoCommands         CryptoCommands
+	FunCommands            FunCommands
+	TrollingCommands       TrollingCommands
+	ImageCommands          ImageCommands
+	NetworkCommands        NetworkCommands
+	AdministrationCommands AdministrationCommands
+	UtilityCommands        UtilityCommands
+	SpotifyCommands        SpotifyCommands
+	GameCommands           GameCommands
+	ActivityCommands       ActivityCommands
+	AnimationCommands      AnimationCommands
+	ConfigCommands         ConfigCommands
+	RPCCommands            RPCCommands
+	SessionsCommands       SessionsCommands
+	NSFWCommands           NSFWCommands
+	RedditCommands         RedditCommands
 }
 
 func (c Commands) RegisterCommands(router *dgc.Router, session *discordgo.Session) {
@@ -36,7 +36,7 @@ func (c Commands) RegisterCommands(router *dgc.Router, session *discordgo.Sessio
 	c.TrollingCommands.RegisterCommands(router)
 	c.ImageCommands.RegisterCommands(router)
 	c.NetworkCommands.RegisterCommands(router)
-	c.ModerationCommands.RegisterCommands(router)
+	c.AdministrationCommands.RegisterCommands(router)
 	c.UtilityCommands.RegisterCommands(router)
 	c.SpotifyCommands.RegisterCommands(router)
 	c.GameCommands.RegisterCommands(router)
