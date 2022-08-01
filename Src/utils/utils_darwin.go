@@ -2,7 +2,7 @@
 
 package utils
 
-// Should not be used on MacOS.
+// Should not be used on macOS.
 
 func GetWindowsFolder(folder int) string {
 	return ""

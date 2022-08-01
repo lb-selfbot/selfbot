@@ -102,7 +102,7 @@ func (GameCommands) mcuuid(ctx *dgc.Ctx) {
 		fmt.Sprintf(`["%s"]`, json.Escape(username)),
 	)
 	if err != nil {
-		ctx.RespondText("An error has occurred.")
+		_ = ctx.RespondText("An error has occurred.")
 		return
 	}
 	uuid := res.GetIndex(0).Get("id").MustString()
@@ -119,11 +119,11 @@ func (GameCommands) mcnamehistory(ctx *dgc.Ctx) {
 	uuid := utils.Arguments["<uuid>"]
 	res, err := http.GetJson(fmt.Sprintf("https://api.mojang.com/user/profiles/%s/names", url.QueryEscape(uuid)))
 	if err != nil {
-		ctx.RespondText("An error has occurred.")
+		_ = ctx.RespondText("An error has occurred.")
 		return
 	}
 	nameLen := len(res.MustArray())
-	names := []string{}
+	var names []string
 	for i := 0; i < nameLen; i++ {
 		names = append(names, res.GetIndex(i).Get("name").MustString())
 	}
@@ -139,7 +139,7 @@ func (GameCommands) mcnamehistory(ctx *dgc.Ctx) {
 func (GameCommands) fnmap(ctx *dgc.Ctx) {
 	res, err := http.GetJson("https://fortnite-api.com/v1/map")
 	if err != nil {
-		ctx.RespondText("An error has occurred.")
+		_ = ctx.RespondText("An error has occurred.")
 		return
 	}
 	embed.NewEmbed().
@@ -151,7 +151,7 @@ func (GameCommands) fnmap(ctx *dgc.Ctx) {
 func (GameCommands) fnmappois(ctx *dgc.Ctx) {
 	res, err := http.GetJson("https://fortnite-api.com/v1/map")
 	if err != nil {
-		ctx.RespondText("An error has occurred.")
+		_ = ctx.RespondText("An error has occurred.")
 		return
 	}
 	embed.NewEmbed().
@@ -163,7 +163,7 @@ func (GameCommands) fnmappois(ctx *dgc.Ctx) {
 func (GameCommands) fnrandomplaylist(ctx *dgc.Ctx) {
 	playlists, err := http.GetJson("https://fortnite-api.com/v1/playlists")
 	if err != nil {
-		ctx.RespondText("An error has occurred.")
+		_ = ctx.RespondText("An error has occurred.")
 		return
 	}
 	playlist := playlists.Get("data").GetIndex(utils.Random.Number(0, len(playlists.Get("data").MustArray())-1))
@@ -181,7 +181,7 @@ func (GameCommands) fnrandomplaylist(ctx *dgc.Ctx) {
 func (GameCommands) fnrandombanner(ctx *dgc.Ctx) {
 	banners, err := http.GetJson("https://fortnite-api.com/v1/banners")
 	if err != nil {
-		ctx.RespondText("An error has occurred.")
+		_ = ctx.RespondText("An error has occurred.")
 		return
 	}
 	banner := banners.Get("data").GetIndex(utils.Random.Number(0, len(banners.Get("data").MustArray())-1))
@@ -205,11 +205,11 @@ func (GameCommands) fnstats(ctx *dgc.Ctx) {
 		},
 	)
 	if err != nil {
-		ctx.RespondText("An error has occurred.")
+		_ = ctx.RespondText("An error has occurred.")
 		return
 	}
 	if user.Get("status").MustInt(-1) != 200 {
-		ctx.RespondText("Invalid username.")
+		_ = ctx.RespondText("Invalid username.")
 		return
 	}
 	user = user.GetPath("data")
@@ -230,11 +230,11 @@ func (GameCommands) fncreatorcode(ctx *dgc.Ctx) {
 	code := utils.Arguments["<code>"]
 	res, err := http.GetJson(fmt.Sprintf("https://fortnite-api.com/v2/creatorcode/search?name=%s", url.QueryEscape(code)))
 	if err != nil {
-		ctx.RespondText("An error has occurred.")
+		_ = ctx.RespondText("An error has occurred.")
 		return
 	}
 	if res.Get("status").MustInt(-1) != 200 {
-		ctx.RespondText("Invalid code.")
+		_ = ctx.RespondText("Invalid code.")
 		return
 	}
 	res = res.GetPath("data")
@@ -250,7 +250,7 @@ func (GameCommands) fncreatorcode(ctx *dgc.Ctx) {
 func (GameCommands) fnrandomcosmetic(ctx *dgc.Ctx) {
 	cosmetics, err := http.GetJson("https://fortnite-api.com/v2/cosmetics/br")
 	if err != nil {
-		ctx.RespondText("An error has occurred.")
+		_ = ctx.RespondText("An error has occurred.")
 		return
 	}
 	cosmetic := cosmetics.Get("data").GetIndex(utils.Random.Number(0, len(cosmetics.Get("data").MustArray())-1))
@@ -273,7 +273,7 @@ func (GameCommands) fnrandomcosmetic(ctx *dgc.Ctx) {
 func (GameCommands) alstatus(ctx *dgc.Ctx) {
 	status, err := http.GetJson("https://api.mozambiquehe.re/servers?auth=IgUq5IRUFvvFxdXbrgmy")
 	if err != nil {
-		ctx.RespondText("An error has occurred.")
+		_ = ctx.RespondText("An error has occurred.")
 		return
 	}
 	embed.NewEmbed().
@@ -291,7 +291,7 @@ func (GameCommands) alstatus(ctx *dgc.Ctx) {
 func (GameCommands) alnews(ctx *dgc.Ctx) {
 	newsList, err := http.GetJson("https://api.mozambiquehe.re/news?lang=en-us&auth=IgUq5IRUFvvFxdXbrgmy")
 	if err != nil {
-		ctx.RespondText("An error has occurred.")
+		_ = ctx.RespondText("An error has occurred.")
 		return
 	}
 	emb := embed.NewEmbed().SetDescription("Apex Legends News")
@@ -308,7 +308,7 @@ func (GameCommands) alnews(ctx *dgc.Ctx) {
 func (GameCommands) alstats(ctx *dgc.Ctx) {
 	platform := utils.Arguments["<platform>"]
 	if platform != "ps4" && platform != "xbox" && platform != "pc" {
-		ctx.RespondText("Invalid platform.")
+		_ = ctx.RespondText("Invalid platform.")
 		return
 	}
 	platform = strings.ReplaceAll(platform, "xbox", "x1")
@@ -320,11 +320,11 @@ func (GameCommands) alstats(ctx *dgc.Ctx) {
 		),
 	)
 	if err != nil {
-		ctx.RespondText("An error has occurred.")
+		_ = ctx.RespondText("An error has occurred.")
 		return
 	}
 	if stats.Get("Error").MustString() != "" {
-		ctx.RespondText(stats.Get("Error").MustString())
+		_ = ctx.RespondText(stats.Get("Error").MustString())
 		return
 	}
 	embed.NewEmbed().
@@ -349,7 +349,7 @@ func (GameCommands) alstats(ctx *dgc.Ctx) {
 func (GameCommands) gtastatus(ctx *dgc.Ctx) {
 	status, err := http.GetJson("https://support.rockstargames.com/services/status.json")
 	if err != nil {
-		ctx.RespondText("An error has occurred.")
+		_ = ctx.RespondText("An error has occurred.")
 		return
 	}
 	status = status.Get("statuses")

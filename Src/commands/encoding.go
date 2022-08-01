@@ -186,16 +186,16 @@ func EncodingCommand(ctx *dgc.Ctx, encodeFunc func(string, bool) string) {
 	encodeOrDecode := utils.Arguments["<encode/decode>"]
 	text := utils.String.RemoveWords(ctx.Arguments.Raw(), 1)
 	if encodeOrDecode == "encode" {
-		ctx.RespondText(encodeFunc(text, false))
+		_ = ctx.RespondText(encodeFunc(text, false))
 	} else if encodeOrDecode == "decode" {
-		ctx.RespondText(encodeFunc(text, true))
+		_ = ctx.RespondText(encodeFunc(text, true))
 	} else {
-		ctx.RespondText("Invalid option for <encode/decode>: " + encodeOrDecode)
+		_ = ctx.RespondText("Invalid option for <encode/decode>: " + encodeOrDecode)
 	}
 }
 
 func (EncodingCommands) rot13(ctx *dgc.Ctx) {
-	ctx.RespondText(strings.Map(encodings.Rot13, ctx.Arguments.Raw()))
+	_ = ctx.RespondText(strings.Map(encodings.Rot13, ctx.Arguments.Raw()))
 }
 
 func (EncodingCommands) hex(ctx *dgc.Ctx) {
@@ -239,59 +239,59 @@ func (EncodingCommands) morsecode(ctx *dgc.Ctx) {
 }
 
 func (EncodingCommands) md5(ctx *dgc.Ctx) {
-	ctx.RespondText(encodings.Md5(ctx.Arguments.Raw()))
+	_ = ctx.RespondText(encodings.Md5(ctx.Arguments.Raw()))
 }
 
 func (EncodingCommands) sha1(ctx *dgc.Ctx) {
-	ctx.RespondText(encodings.Sha1(ctx.Arguments.Raw()))
+	_ = ctx.RespondText(encodings.Sha1(ctx.Arguments.Raw()))
 }
 
 func (EncodingCommands) sha224(ctx *dgc.Ctx) {
-	ctx.RespondText(encodings.Sha224(ctx.Arguments.Raw()))
+	_ = ctx.RespondText(encodings.Sha224(ctx.Arguments.Raw()))
 }
 
 func (EncodingCommands) sha256(ctx *dgc.Ctx) {
-	ctx.RespondText(encodings.Sha256(ctx.Arguments.Raw()))
+	_ = ctx.RespondText(encodings.Sha256(ctx.Arguments.Raw()))
 }
 
 func (EncodingCommands) sha384(ctx *dgc.Ctx) {
-	ctx.RespondText(encodings.Sha384(ctx.Arguments.Raw()))
+	_ = ctx.RespondText(encodings.Sha384(ctx.Arguments.Raw()))
 }
 
 func (EncodingCommands) sha512(ctx *dgc.Ctx) {
-	ctx.RespondText(encodings.Sha512(ctx.Arguments.Raw()))
+	_ = ctx.RespondText(encodings.Sha512(ctx.Arguments.Raw()))
 }
 
 func (EncodingCommands) blake2b(ctx *dgc.Ctx) {
-	ctx.RespondText(encodings.Blake2b(ctx.Arguments.Raw()))
+	_ = ctx.RespondText(encodings.Blake2b(ctx.Arguments.Raw()))
 }
 
 func (EncodingCommands) blake2s(ctx *dgc.Ctx) {
-	ctx.RespondText(encodings.Blake2s(ctx.Arguments.Raw()))
+	_ = ctx.RespondText(encodings.Blake2s(ctx.Arguments.Raw()))
 }
 
 func (EncodingCommands) adler32(ctx *dgc.Ctx) {
-	ctx.RespondText(encodings.Adler32(ctx.Arguments.Raw()))
+	_ = ctx.RespondText(encodings.Adler32(ctx.Arguments.Raw()))
 }
 
 func (EncodingCommands) crc32(ctx *dgc.Ctx) {
-	ctx.RespondText(encodings.Crc32(ctx.Arguments.Raw()))
+	_ = ctx.RespondText(encodings.Crc32(ctx.Arguments.Raw()))
 }
 
 func (EncodingCommands) crc64(ctx *dgc.Ctx) {
-	ctx.RespondText(encodings.Crc64(ctx.Arguments.Raw()))
+	_ = ctx.RespondText(encodings.Crc64(ctx.Arguments.Raw()))
 }
 
 func (EncodingCommands) fnv32(ctx *dgc.Ctx) {
-	ctx.RespondText(encodings.Fnv32(ctx.Arguments.Raw()))
+	_ = ctx.RespondText(encodings.Fnv32(ctx.Arguments.Raw()))
 }
 
 func (EncodingCommands) fnv64(ctx *dgc.Ctx) {
-	ctx.RespondText(encodings.Fnv64(ctx.Arguments.Raw()))
+	_ = ctx.RespondText(encodings.Fnv64(ctx.Arguments.Raw()))
 }
 
 func (EncodingCommands) fnv128(ctx *dgc.Ctx) {
-	ctx.RespondText(encodings.Fnv128(ctx.Arguments.Raw()))
+	_ = ctx.RespondText(encodings.Fnv128(ctx.Arguments.Raw()))
 }
 
 func (EncodingCommands) aes128(ctx *dgc.Ctx) {
@@ -301,20 +301,20 @@ func (EncodingCommands) aes128(ctx *dgc.Ctx) {
 	if encryptOrDecrypt == "encrypt" {
 		encrypted, err := encryption.AES{Key: key}.Encrypt(text, 16)
 		if err != nil {
-			ctx.RespondText("An error has occurred: " + err.Error())
+			_ = ctx.RespondText("An error has occurred: " + err.Error())
 			return
 		}
-		ctx.RespondText(encrypted)
-		
+		_ = ctx.RespondText(encrypted)
+
 	} else if encryptOrDecrypt == "decrypt" {
 		decrypted, err := encryption.AES{Key: key}.Decrypt(text, 16)
 		if err != nil {
-			ctx.RespondText("An error has occurred: " + err.Error())
+			_ = ctx.RespondText("An error has occurred: " + err.Error())
 			return
 		}
-		ctx.RespondText(decrypted)		
+		_ = ctx.RespondText(decrypted)
 	} else {
-		ctx.RespondText("Invalid option for <encrypt/decrypt>: " + encryptOrDecrypt)
+		_ = ctx.RespondText("Invalid option for <encrypt/decrypt>: " + encryptOrDecrypt)
 	}
 }
 
@@ -325,20 +325,20 @@ func (EncodingCommands) aes192(ctx *dgc.Ctx) {
 	if encryptOrDecrypt == "encrypt" {
 		encrypted, err := encryption.AES{Key: key}.Encrypt(text, 24)
 		if err != nil {
-			ctx.RespondText("An error has occurred: " + err.Error())
+			_ = ctx.RespondText("An error has occurred: " + err.Error())
 			return
 		}
-		ctx.RespondText(encrypted)
-		
+		_ = ctx.RespondText(encrypted)
+
 	} else if encryptOrDecrypt == "decrypt" {
 		decrypted, err := encryption.AES{Key: key}.Decrypt(text, 24)
 		if err != nil {
-			ctx.RespondText("An error has occurred: " + err.Error())
+			_ = ctx.RespondText("An error has occurred: " + err.Error())
 			return
 		}
-		ctx.RespondText(decrypted)		
+		_ = ctx.RespondText(decrypted)
 	} else {
-		ctx.RespondText("Invalid option for <encrypt/decrypt>: " + encryptOrDecrypt)
+		_ = ctx.RespondText("Invalid option for <encrypt/decrypt>: " + encryptOrDecrypt)
 	}
 }
 
@@ -349,19 +349,19 @@ func (EncodingCommands) aes256(ctx *dgc.Ctx) {
 	if encryptOrDecrypt == "encrypt" {
 		encrypted, err := encryption.AES{Key: key}.Encrypt(text, 32)
 		if err != nil {
-			ctx.RespondText("An error has occurred: " + err.Error())
+			_ = ctx.RespondText("An error has occurred: " + err.Error())
 			return
 		}
-		ctx.RespondText(encrypted)
-		
+		_ = ctx.RespondText(encrypted)
+
 	} else if encryptOrDecrypt == "decrypt" {
 		decrypted, err := encryption.AES{Key: key}.Decrypt(text, 32)
 		if err != nil {
-			ctx.RespondText("An error has occurred: " + err.Error())
+			_ = ctx.RespondText("An error has occurred: " + err.Error())
 			return
 		}
-		ctx.RespondText(decrypted)		
+		_ = ctx.RespondText(decrypted)
 	} else {
-		ctx.RespondText("Invalid option for <encrypt/decrypt>: " + encryptOrDecrypt)
+		_ = ctx.RespondText("Invalid option for <encrypt/decrypt>: " + encryptOrDecrypt)
 	}
 }

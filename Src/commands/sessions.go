@@ -32,12 +32,14 @@ func (s *SessionsCommands) RegisterCommands(router *dgc.Router, mainSession *dis
 			time.Sleep(time.Second * 60)
 			cfg, err := config.GetConfig()
 			if err != nil {
-				fmt.Println("Error getting config:", err)
+				continue
 			}
 			session, err := discordgo.New(cfg.Account.Discord.Token)
 			if err != nil {
-				fmt.Println("Error creating session:", err)
+				continue
 			}
+			session.StateEnabled = false
+			session.ShouldSubscribeGuilds = false
 			session.AddHandler(func(_ *discordgo.Session, e *discordgo.Ready) {
 				time.Sleep(time.Second * 2)
 				session.Close()
@@ -57,7 +59,7 @@ func (s *SessionsCommands) RegisterCommands(router *dgc.Router, mainSession *dis
 				s.Sessions = tempSessions
 			})
 			if err = session.Open(); err != nil {
-				fmt.Println("Error opening session:", err)
+				continue
 			}
 		}
 	}()
@@ -74,12 +76,12 @@ func (s *SessionsCommands) HandleSessions(oldSessions, newSessions []*discordgo.
 		return
 	}
 
-	oldSessionIDs := []string{}
+	var oldSessionIDs []string
 	for _, oldSession := range oldSessions {
 		oldSessionIDs = append(oldSessionIDs, oldSession.SessionID)
 	}
 
-	newSessionIDs := []string{}
+	var newSessionIDs []string
 	for _, newSession := range newSessions {
 		newSessionIDs = append(newSessionIDs, newSession.SessionID)
 	}

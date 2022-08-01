@@ -40,7 +40,7 @@ func (c Commands) RegisterCommands(router *dgc.Router, session *discordgo.Sessio
 	c.UtilityCommands.RegisterCommands(router)
 	c.SpotifyCommands.RegisterCommands(router)
 	c.GameCommands.RegisterCommands(router)
-	c.ActivityCommands.RegisterCommands(router)
+	c.ActivityCommands.RegisterCommands(router, session)
 	c.AnimationCommands.RegisterCommands(router)
 	c.ConfigCommands.RegisterCommands(router)
 	c.RPCCommands.RegisterCommands(router)

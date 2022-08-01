@@ -1,6 +1,22 @@
 package commands
 
-import "github.com/LightningDev1/dgc"
+import (
+	"bytes"
+	"fmt"
+	"math"
+	"os"
+	"os/exec"
+	"runtime"
+	"strings"
+
+	"github.com/LightningDev1/LB-Selfbot/api"
+	"github.com/LightningDev1/LB-Selfbot/constants"
+	"github.com/LightningDev1/LB-Selfbot/embed"
+	"github.com/LightningDev1/LB-Selfbot/http"
+	"github.com/LightningDev1/LB-Selfbot/utils"
+	"github.com/LightningDev1/dgc"
+	"github.com/LightningDev1/discordgo"
+)
 
 type UtilityCommands struct{}
 
@@ -24,57 +40,21 @@ func (u UtilityCommands) RegisterCommands(router *dgc.Router) {
 		Handler:     u.leavegroups,
 	})
 	router.RegisterCmd(&dgc.Command{
-		Name:        "servericon",
-		Description: "Send a servers icon",
-		Usage:       "[p]servericon [server id]",
-		Handler:     u.servericon,
-	})
-	router.RegisterCmd(&dgc.Command{
 		Name:        "ack",
 		Description: "Mark a server as read",
 		Usage:       "[p]ack [server id]",
 		Handler:     u.ack,
 	})
 	router.RegisterCmd(&dgc.Command{
-		Name:        "userinfo",
-		Description: "Get info about a user",
-		Usage:       "[p]userinfo <user>",
-		Handler:     u.userinfo,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "avatar",
-		Description: "Send a users avatar",
-		Usage:       "[p]avatar <user>",
-		Handler:     u.avatar,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "serverbanner",
-		Description: "Send a servers banner",
-		Usage:       "[p]serverbanner [server id]",
-		Handler:     u.serverbanner,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "serversplash",
-		Description: "Send a servers invite splash",
-		Usage:       "[p]serversplash [server id]",
-		Handler:     u.serversplash,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "serverdsplash",
-		Description: "Send a servers discorvery splash",
-		Usage:       "[p]serverdsplash [server id]",
-		Handler:     u.serverdsplash,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "serverinfo",
-		Description: "Get info about a server",
-		Usage:       "[p]serverinfo [server id]",
-		Handler:     u.serverinfo,
+		Name:        "tts",
+		Description: "Send a Text-To-Speech message",
+		Usage:       "[p]tts <language> <text>",
+		Handler:     u.tts,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "translate",
 		Description: "Translate text to a language",
-		Usage:       "[p]translate <to> <text>",
+		Usage:       "[p]translate <language> <text>",
 		Handler:     u.translate,
 	})
 	router.RegisterCmd(&dgc.Command{
@@ -106,36 +86,6 @@ func (u UtilityCommands) RegisterCommands(router *dgc.Router) {
 		Description: "Create a poll with options",
 		Usage:       "[p]optionpoll <\"question\"> <\"option1\"> <\"option2\">",
 		Handler:     u.optionpoll,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "bots",
-		Description: "See all bots in a server",
-		Usage:       "[p]bots [server id]",
-		Handler:     u.bots,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "channels",
-		Description: "See all channels in a server",
-		Usage:       "[p]channels [server id]",
-		Handler:     u.channels,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "roles",
-		Description: "See all roles in a server",
-		Usage:       "[p]roles [server id]",
-		Handler:     u.roles,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "owner",
-		Description: "See server owner",
-		Usage:       "[p]owner [server id]",
-		Handler:     u.owner,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "inviteinfo",
-		Description: "Get info about an invite",
-		Usage:       "[p]inviteinfo <invite>",
-		Handler:     u.inviteinfo,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "leaveserver",
@@ -216,18 +166,6 @@ func (u UtilityCommands) RegisterCommands(router *dgc.Router) {
 		Handler:     u.chatdump,
 	})
 	router.RegisterCmd(&dgc.Command{
-		Name:        "mobile",
-		Description: "See if a user is on mobile",
-		Usage:       "[p]mobile <user>",
-		Handler:     u.mobile,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "roleinfo",
-		Description: "See info about a role",
-		Usage:       "[p]roleinfo <role>",
-		Handler:     u.roleinfo,
-	})
-	router.RegisterCmd(&dgc.Command{
 		Name:        "shudownpc",
 		Description: "Shut your PC down",
 		Usage:       "[p]shudownpc",
@@ -252,18 +190,6 @@ func (u UtilityCommands) RegisterCommands(router *dgc.Router) {
 		Handler:     u.editsnipe,
 	})
 	router.RegisterCmd(&dgc.Command{
-		Name:        "webhookinfo",
-		Description: "Get webhook info",
-		Usage:       "[p]webhookinfo <webhook>",
-		Handler:     u.webhookinfo,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "channelinfo",
-		Description: "Get channel info",
-		Usage:       "[p]channelinfo [channel]",
-		Handler:     u.channelinfo,
-	})
-	router.RegisterCmd(&dgc.Command{
 		Name:        "repeat",
 		Description: "Repeat the last used command",
 		Usage:       "[p]repeat",
@@ -276,28 +202,28 @@ func (u UtilityCommands) RegisterCommands(router *dgc.Router) {
 		Handler:     u.history,
 	})
 	router.RegisterCmd(&dgc.Command{
+		Name:        "website",
+		Description: "Open the LightningBot website",
+		Usage:       "[p]website",
+		Handler:     u.website,
+	})
+	router.RegisterCmd(&dgc.Command{
 		Name:        "dashboard",
 		Description: "Opens dashboard in browser",
 		Usage:       "[p]dashboard",
 		Handler:     u.dashboard,
 	})
 	router.RegisterCmd(&dgc.Command{
-		Name:        "bio",
-		Description: "See a user's bio",
-		Usage:       "[p]bio <user>",
-		Handler:     u.bio,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "banner",
-		Description: "See a user's banner",
-		Usage:       "[p]banner <user>",
-		Handler:     u.banner,
-	})
-	router.RegisterCmd(&dgc.Command{
 		Name:        "restartbot",
 		Description: "Restart LightningBot",
 		Usage:       "[p]restartbot",
 		Handler:     u.restartbot,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "stopbot",
+		Description: "Stop LightningBot",
+		Usage:       "[p]stopbot",
+		Handler:     u.stopbot,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "changelog",
@@ -316,12 +242,6 @@ func (u UtilityCommands) RegisterCommands(router *dgc.Router) {
 		Description: "Clear UI console",
 		Usage:       "[p]cls",
 		Handler:     u.cls,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "stopbot",
-		Description: "Stop LightningBot",
-		Usage:       "[p]stopbot",
-		Handler:     u.stopbot,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "mastercard",
@@ -386,36 +306,103 @@ func (u UtilityCommands) RegisterCommands(router *dgc.Router) {
 	router.RegisterCmd(&dgc.Command{
 		Name:        "firstmessage",
 		Description: "See the first message in the channel",
-		Usage:       "[p]firstmessage",
+		Usage:       "[p]firstmessage [channel]",
 		Handler:     u.firstmessage,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "website",
-		Description: "Open the LightningBot website",
-		Usage:       "[p]website",
-		Handler:     u.website,
 	})
 }
 
+func getChannelType(channelType discordgo.ChannelType) discordgo.ChannelType {
+	if channelType == discordgo.ChannelTypeGuildVoice || channelType == discordgo.ChannelTypeGuildStageVoice {
+		return discordgo.ChannelTypeGuildVoice
+	}
+	return discordgo.ChannelTypeGuildText
+}
+
 func (UtilityCommands) copyserver(ctx *dgc.Ctx) {
-	//     Server = Server or ctx.guild
-	//     Icon = Server.icon_url_as(format="png")
-	//     NewServer = await bot.create_guild(name=f'{Server.name} copy', icon=requests.get(Icon).content if Icon else None)
-	//     for Role in Server.roles:
-	//         if Role == Server.default_role: continue
-	//         NewRole = await NewServer.create_role(name=Role.name, permissions=Role.permissions, colour=Role.colour, hoist=Role.hoist, mentionable=Role.mentionable)
-	//         await NewRole.edit(position=Role.position)
-	//     for Channel in NewServer.channels:
-	//         await Channel.delete()
-	//     for Category in Server.categories:
-	//         NewCategory = await NewServer.create_category(Category.name, overwrites=Category.overwrites, position=Category.position)
-	//         for Channel in Category.channels:
-	//             if isinstance(Channel, discord.VoiceChannel):
-	//                 await NewCategory.create_voice_channel(Channel.name, permissions=Channel.permissions_synced, overwrites=Channel.overwrites, bitrate=min([Channel.bitrate, 96000]), user_limit=Channel.user_limit, rtc_region=Channel.rtc_region)
-	//             if isinstance(Channel, discord.TextChannel):
-	//                 await NewCategory.create_text_channel(Channel.name, permissions=Channel.permissions_synced, overwrites=Channel.overwrites, position=Channel.position, topic=Channel.topic, slowmode_delay=Channel.slowmode_delay, nsfw=Channel.nsfw)
-	//             if isinstance(Channel, discord.StageChannel):
-	//                 await NewCategory.create_stage_channel(Channel.name, permissions=Channel.permissions_synced, overwrites=Channel.overwrites, topic=Channel.topic, position=Channel.position)
+	guild, err := utils.Discord.GetGuild(ctx.Session, utils.Misc.Or(utils.Arguments["[server id]"], ctx.Event.GuildID))
+	if err != nil {
+		_ = ctx.RespondText("Error getting server: " + err.Error())
+		return
+	}
+	icon, _, _ := http.GetBytes(guild.IconURL())
+	newGuild, err := ctx.Session.GuildCreate(guild.Name+" Copy", icon)
+	if err != nil {
+		_ = ctx.RespondText("Error copying server: " + err.Error())
+		return
+	}
+	_, _ = ctx.Session.GuildEdit(newGuild.ID, discordgo.GuildParams{
+		VerificationLevel:           &guild.VerificationLevel,
+		DefaultMessageNotifications: int(guild.DefaultMessageNotifications),
+		AfkChannelID:                guild.AfkChannelID,
+		AfkTimeout:                  guild.AfkTimeout,
+	})
+
+	for _, role := range guild.Roles {
+		if role.ID == guild.ID || role.Managed {
+			continue
+		}
+		_, err := ctx.Session.GuildRoleCreate(newGuild.ID, role.Name, role.Color, role.Hoist, role.Permissions, role.Mentionable)
+		if err != nil {
+			_ = ctx.RespondText("Error copying server: " + err.Error())
+			return
+		}
+	}
+
+	newChannels, err := ctx.Session.GuildChannels(newGuild.ID)
+	if err != nil {
+		_ = ctx.RespondText("Error copying server: " + err.Error())
+		return
+	}
+
+	for _, channel := range newChannels {
+		_, err := ctx.Session.ChannelDelete(channel.ID)
+		if err != nil {
+			_ = ctx.RespondText("Error copying server: " + err.Error())
+			return
+		}
+	}
+
+	channels, err := ctx.Session.GuildChannels(guild.ID)
+	if err != nil {
+		_ = ctx.RespondText("Error copying server: " + err.Error())
+		return
+	}
+
+	categories, categoryChannels := utils.Discord.MapCategories(channels)
+
+	for _, category := range categories {
+		newCategory, err := ctx.Session.GuildChannelCreateComplex(newGuild.ID, discordgo.GuildChannelCreateData{
+			Name:                 category.Name,
+			Type:                 discordgo.ChannelTypeGuildCategory,
+			Position:             category.Position,
+			PermissionOverwrites: category.PermissionOverwrites,
+		})
+		if err != nil {
+			_ = ctx.RespondText("Error copying server: " + err.Error())
+			return
+		}
+		for _, channel := range categoryChannels[category.ID] {
+			_, err = ctx.Session.GuildChannelCreateComplex(newGuild.ID, discordgo.GuildChannelCreateData{
+				Name:                 channel.Name,
+				Type:                 getChannelType(channel.Type),
+				Topic:                channel.Topic,
+				Bitrate:              int(math.Min(float64(channel.Bitrate), 96000)),
+				UserLimit:            channel.UserLimit,
+				RateLimitPerUser:     channel.RateLimitPerUser,
+				Position:             channel.Position,
+				PermissionOverwrites: channel.PermissionOverwrites,
+				ParentID:             newCategory.ID,
+				NSFW:                 channel.NSFW,
+			})
+			if err != nil {
+				_ = ctx.RespondText("Error copying server: " + err.Error())
+				return
+			}
+		}
+	}
+	embed.NewEmbed().
+		SetDescription("Server copied successfully!").
+		Send(ctx)
 }
 
 func (UtilityCommands) leaveservers(ctx *dgc.Ctx) {
@@ -429,90 +416,62 @@ func (UtilityCommands) leavegroups(ctx *dgc.Ctx) {
 	//             await Channel.leave()
 }
 
-func (UtilityCommands) servericon(ctx *dgc.Ctx) {
-	//     Server = Server or ctx.guild
-	//     await bot.Helper.SendMessage(ctx, embed=bot.DefaultEmbed().set_image(url=Server.icon_url))
-}
-
 func (UtilityCommands) ack(ctx *dgc.Ctx) {
 	//     Server = Server or ctx.guild
 	//     await Server.ack()
 }
 
-func (UtilityCommands) userinfo(ctx *dgc.Ctx) {
-	//     try: User = ctx.guild.get_member(User.id) or User
-	//     except: pass
-	//     User = getattr(User, "user", User)
-	//     MutualFriends = MutualServers = None
-	//     if User != bot.user:
-	//         MutualFriends = ', '.join(Friend.mention for Friend in await User.mutual_friends())[:1024]
-	//         MutualServers = ', '.join(Server.name for Server in await User.mutual_guilds())[:1024]
-	//     if isinstance(User, discord.Member):
-	//         TopRole = User.top_role.name if User.top_role.name != "@everyone" else "N/A"
-	//         VoiceState = None if not User.voice else User.voice.channel
-	//     Embed = bot.DefaultEmbed().add_field(name='User ID', value=User.id).set_thumbnail(url=User.avatar_url).set_author(name=User, icon_url=User.avatar_url)
-	//     if isinstance(User, discord.Member):
-	//         Embed.add_field(name='Nick', value=User.nick).add_field(name='Status', value=User.status).add_field(name='In Voice', value=VoiceState)
-	//         Embed.add_field(name='Activity', value=User.activity).add_field(name='Highest Role', value=TopRole)
-	//     Embed.add_field(name='Account Created', value=User.created_at.__format__('%A, %d. %B %Y @ %H:%M:%S'))
-	//     if isinstance(User, discord.Member):
-	//         Embed.add_field(name='Join Date', value=User.joined_at.__format__('%A, %d. %B %Y @ %H:%M:%S'))
-	//     Embed.add_field(name='Mutual Friends', value=MutualFriends if MutualFriends else 'None').add_field(name='Mutual Servers', value=MutualServers if MutualServers else 'None')
-	//     await bot.Helper.SendMessage(ctx, embed=Embed)
-}
-
-func (UtilityCommands) avatar(ctx *dgc.Ctx) {
-	//     await bot.Helper.SendMessage(ctx, embed=bot.DefaultEmbed().set_image(url=User.avatar_url))
-}
-
-func (UtilityCommands) serverbanner(ctx *dgc.Ctx) {
-	//     Server = Server or ctx.guild
-	//     if not Server.banner_url: return await ctx.send("{0.name} does not have a banner!".format(Server))
-	//     await bot.Helper.SendMessage(ctx, embed=bot.DefaultEmbed().set_image(url=Server.banner_url))
-}
-
-func (UtilityCommands) serversplash(ctx *dgc.Ctx) {
-	//     Server = Server or ctx.guild
-	//     if not Server.splash_url: return await ctx.send("{0.name} does not have an invite splash!".format(Server))
-	//     await bot.Helper.SendMessage(ctx, embed=bot.DefaultEmbed().set_image(url=Server.splash_url))
-}
-
-func (UtilityCommands) serverdsplash(ctx *dgc.Ctx) {
-	//     Server = Server or ctx.guild
-	//     if not Server.discovery_splash_url: return await ctx.send("{0.name} does not have a discovery splash!".format(Server))
-	//     await bot.Helper.SendMessage(ctx, embed=bot.DefaultEmbed().set_image(url=Server.discovery_splash_url))
-}
-
-func (UtilityCommands) serverinfo(ctx *dgc.Ctx) {
-	//     Server = Server or ctx.guild
-	//     Embed = bot.DefaultEmbed().set_footer(text=f"{Server.name} | {Server.id}")
-	//     if Server.icon_url: Embed.set_thumbnail(url=Server.icon_url)
-	//     Embed.add_field(name='Name', value=Server.name).add_field(name='ID', value=str(Server.id))
-	//     Embed.add_field(name='Owner', value=Server.owner).add_field(name='Members', value=Server.member_count)
-	//     Embed.add_field(name='Online Members', value=len([x for x in Server.members if x.raw_status in ["online", "idle", "dnd"]]))
-	//     Embed.add_field(name='Text Channels', value=len(Server.text_channels)).add_field(name='Voice Channels', value=len(Server.voice_channels))
-	//     Embed.add_field(name='Verification Level', value=Server.verification_level).add_field(name='Highest role', value=Server.roles[-1].mention)
-	//     Embed.add_field(name='Number of roles', value=len(Server.roles)).add_field(name='Number of emojis', value=len(Server.emojis))
-	//     Embed.add_field(name='Boost Level', value=Server.premium_tier).add_field(name='Boost Count', value=Server.premium_subscription_count)
-	//     Embed.add_field(name='Created At', value=Server.created_at.__format__('%d %B, %Y'))
-	//     await bot.Helper.SendMessage(ctx, embed=Embed)
+func (UtilityCommands) tts(ctx *dgc.Ctx) {
+	ttsFile, err := api.TTS(utils.String.RemoveWords(ctx.Arguments.Raw(), 1), utils.Arguments["<language>"])
+	if err != nil {
+		_ = ctx.RespondText("An error has occurred.")
+		return
+	}
+	if strings.Contains(string(ttsFile), "Bad Request") {
+		_ = ctx.RespondText("Invalid language. Please use an ISO 639-1 language code. See https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes for more information.")
+		return
+	}
+	_, _ = ctx.Session.ChannelFileSend(ctx.Event.ChannelID, "tts.mp3", bytes.NewReader(ttsFile))
 }
 
 func (UtilityCommands) translate(ctx *dgc.Ctx) {
-	//     try: Translated = googletrans.Translator().translate(Text, To)
-	//     except: return await ctx.send("Invalid destination language!")
-	//     await bot.Helper.SendMessage(ctx, embed=bot.DefaultEmbed().add_field(name='From', value=Translated.src).add_field(name='To', value=Translated.dest).add_field(name='Original Text', value=Text).add_field(name='Translated Text', value=Translated.text))
+	translateResult := api.Translate(utils.String.RemoveWords(ctx.Arguments.Raw(), 1), utils.Arguments["<language>"])
+	if translateResult.Error != nil {
+		_ = ctx.RespondText("An error has occurred: " + translateResult.Error.Error())
+		return
+	}
+	embed.NewEmbed().
+		AddField("Source Language", utils.String.Capitalize(constants.Languages[translateResult.SourceLanguage])).
+		AddField("Destination Language", utils.String.Capitalize(constants.Languages[translateResult.DestinationLanguage])).
+		AddField("Original Text", translateResult.Original).
+		AddField("Translated Text", translateResult.Result).
+		Send(ctx)
 }
 
 func (UtilityCommands) detectlang(ctx *dgc.Ctx) {
-	//     try: Detected = googletrans.Translator().detect(Text)
-	//     except: return await ctx.send("Couldn't detect language!")
-	//     await bot.Helper.SendMessage(ctx, embed=bot.DefaultEmbed().add_field(name="Detected Language", value=googletrans.LANGUAGES.get(str(Detected.lang), Detected.lang)).add_field(name="Confidence", value=Detected.confidence).add_field(name="Text", value=Text))
+	translateResult := api.Translate(ctx.Arguments.Raw(), "en")
+	if translateResult.Error != nil {
+		_ = ctx.RespondText("An error has occurred: " + translateResult.Error.Error())
+		return
+	}
+	embed.NewEmbed().
+		AddField("Text", translateResult.Original).
+		AddField("Detected Language", utils.String.Capitalize(constants.Languages[translateResult.SourceLanguage])).
+		AddField("Confidence", fmt.Sprintf("%.2f", translateResult.Confidence)).
+		Send(ctx)
 }
 
 func (UtilityCommands) english(ctx *dgc.Ctx) {
-	//     Translated = googletrans.Translator().translate(Text, "en")
-	//     await bot.Helper.SendMessage(ctx, embed=bot.DefaultEmbed().add_field(name='From', value=Translated.src).add_field(name='To', value=Translated.dest).add_field(name='Original Text', value=Text).add_field(name='Translated Text', value=Translated.text))
+	translateResult := api.Translate(ctx.Arguments.Raw(), "en")
+	if translateResult.Error != nil {
+		_ = ctx.RespondText("An error has occurred: " + translateResult.Error.Error())
+		return
+	}
+	embed.NewEmbed().
+		AddField("Source Language", utils.String.Capitalize(constants.Languages[translateResult.SourceLanguage])).
+		AddField("Original Text", translateResult.Original).
+		AddField("Translated Text", translateResult.Result).
+		Send(ctx)
 }
 
 func (UtilityCommands) adminservers(ctx *dgc.Ctx) {
@@ -524,35 +483,15 @@ func (UtilityCommands) admingroups(ctx *dgc.Ctx) {
 }
 
 func (UtilityCommands) optionpoll(ctx *dgc.Ctx) {
-	//     Message = await bot.Helper.SendMessage(ctx, embed=bot.DefaultEmbed().add.add_field(name="👍", value=OptionOne).add_field(name="👎", value=OptionTwo))
-	//     for Reaction in ['👍', '👎']: await Message.add_reaction(Reaction)
-}
-
-func (UtilityCommands) bots(ctx *dgc.Ctx) {
-	//     Server = Server or ctx.guild
-	//     await bot.Helper.SendMessage(ctx, embed=bot.DefaultEmbed().add_field(name='Bots', value=', '.join(str(Bot) for Bot in Server.members if Bot.bot)))
-}
-
-func (UtilityCommands) channels(ctx *dgc.Ctx) {
-	//     Server = Server or ctx.guild
-	//     await bot.Helper.SendMessage(ctx, embed=bot.DefaultEmbed().add_field(name='Channels', value=', '.join(str(Channel) for Channel in Server.text_channels)))
-}
-
-func (UtilityCommands) roles(ctx *dgc.Ctx) {
-	//     Server = Server or ctx.guild
-	//     await bot.Helper.SendMessage(ctx, embed=bot.DefaultEmbed().add_field(name='Roles', value=', '.join(Role.mention for Role in Server.roles)))
-}
-
-func (UtilityCommands) owner(ctx *dgc.Ctx) {
-	//     Server = Server or ctx.guild
-	//     await bot.Helper.SendMessage(ctx, embed=bot.DefaultEmbed().add_field(name='Server Owner', value=getattr(Server.owner, "mention", "None")))
-}
-
-func (UtilityCommands) inviteinfo(ctx *dgc.Ctx) {
-	//     Embed = bot.DefaultEmbed().add_field(name="Total Members", value=Invite.approximate_member_count).add_field(name="Online Members", value=Invite.approximate_presence_count).add_field(name="Channel", value=Invite.channel) \
-	//         .add_field(name="Code", value=Invite.code).add_field(name="Created at", value=Invite.created_at.__format__('%A, %d. %B %Y @ %H:%M:%S')).add_field(name="Guild", value=Invite.guild).add_field(name="Inviter", value=Invite.inviter) \
-	//         .add_field(name="Max age", value=Invite.max_age).add_field(name="Max uses", value=Invite.max_uses).add_field(name="Revoked", value=Invite.revoked).add_field(name="Temporary", value=Invite.temporary).add_field(name="Uses", value=Invite.uses)
-	//     await bot.Helper.SendMessage(ctx, embed=Embed)
+	message := embed.NewEmbed().
+		SetDescription("Poll: "+utils.Arguments["<\"question\">"]).
+		AddField("👍", utils.Arguments["<\"option1\">"]).
+		AddField("👎", utils.Arguments["<\"option2\">"]).
+		Send(ctx)
+	if message != nil {
+		_ = ctx.Session.MessageReactionAdd(ctx.Event.ChannelID, message.ID, "👍")
+		_ = ctx.Session.MessageReactionAdd(ctx.Event.ChannelID, message.ID, "👎")
+	}
 }
 
 func (UtilityCommands) leaveserver(ctx *dgc.Ctx) {
@@ -642,22 +581,6 @@ func (UtilityCommands) chatdump(ctx *dgc.Ctx) {
 	//             f.write(f"[{M.created_at.strftime('%H:%M %p')}] Author: {M.author} | Server: {M.guild} | Attachments: {(', '.join(A for A in M.attachments) if M.attachments else 'None')} | Jump URL: {M.jump_url} | Content: {M.content}\n")
 }
 
-func (UtilityCommands) mobile(ctx *dgc.Ctx) {
-	//     await bot.Helper.SendMessage(ctx, embed=bot.DefaultEmbed().add_field(name="User", value=str(User)).add_field(name="Is On Mobile", value=User.is_on_mobile()))
-}
-
-func (UtilityCommands) roleinfo(ctx *dgc.Ctx) {
-	//     PermStr = f"""Permission: add_reactions | Value: {Role.permissions.add_reactions}\nPermission: administrator | Value: {Role.permissions.administrator}\nPermission: attach_files | Value: {Role.permissions.attach_files}
-	// Permission: ban_members | Value: {Role.permissions.ban_members}\nPermission: change_nickname | Value: {Role.permissions.change_nickname}\nPermission: connect | Value: {Role.permissions.connect}\nPermission: create_instant_invite | Value: {Role.permissions.create_instant_invite}
-	// Permission: deafen_members | Value: {Role.permissions.deafen_members}\nPermission: embed_links | Value: {Role.permissions.embed_links}\nPermission: external_emojis | Value: {Role.permissions.external_emojis}\nPermission: kick_members | Value: {Role.permissions.kick_members}\nPermission: manage_channels | Value: {Role.permissions.manage_channels}
-	// Permission: manage_emojis | Value: {Role.permissions.manage_emojis}\nPermission: manage_guild | Value: {Role.permissions.manage_guild}\nPermission: manage_messages | Value: {Role.permissions.manage_messages}\nPermission: manage_nicknames | Value: {Role.permissions.manage_nicknames}\nPermission: manage_permissions | Value: {Role.permissions.manage_permissions}
-	// Permission: manage_Roles | Value: {Role.permissions.manage_roles}\nPermission: manage_webhooks | Value: {Role.permissions.manage_webhooks}\nPermission: mention_everyone | Value: {Role.permissions.mention_everyone}\nPermission: move_members | Value: {Role.permissions.move_members}\nPermission: mute_members | Value: {Role.permissions.mute_members}
-	// Permission: priority_speaker | Value: {Role.permissions.priority_speaker}\nPermission: read_message_history | Value: {Role.permissions.read_message_history}\nPermission: read_messages | Value: {Role.permissions.read_messages}\nPermission: send_messages | Value: {Role.permissions.send_messages}\nPermission: send_tts_messages | Value: {Role.permissions.send_tts_messages}
-	// Permission: speak | Value: {Role.permissions.speak}\nPermission: stream | Value: {Role.permissions.stream}\nPermission: use_external_emojis | Value: {Role.permissions.use_external_emojis}\nPermission: use_voice_activation | Value: {Role.permissions.use_voice_activation}\nPermission: view_audit_log | Value: {Role.permissions.view_audit_log}\nPermission: view_channel | Value: {Role.permissions.view_channel}\nPermission: view_guild_insights | Value: {Role.permissions.view_guild_insights}"""
-	//     Embed = bot.DefaultEmbed().set_author(name=f"Name: {Role.name}"f"\nRole ID: {Role.id}").add_field(name="Users", value=len([x for x in Role.guild.members if Role in x.roles])).add_field(name="Mentionable", value=Role.mentionable).add_field(name="Hoist", value=Role.hoist).add_field(name="Position", value=Role.position).add_field(name="Managed", value=Role.managed).add_field(name="Color", value=str(Role.colour)).add_field(name='Creation Date', value="{} ({} days ago)".format(Role.created_at.strftime("%d %b %Y %H:%M"), (ctx.message.created_at - Role.created_at).days)).add_field(name='Permissions', value=bot.Api.CreatePaste(PermStr))
-	//     await bot.Helper.SendMessage(ctx, embed=Embed)
-}
-
 func (UtilityCommands) shudownpc(ctx *dgc.Ctx) {
 	//     os.system('shutdown -s -t 0')
 }
@@ -678,20 +601,6 @@ func (UtilityCommands) editsnipe(ctx *dgc.Ctx) {
 	//     else: return await ctx.send("No edited message found in this channel!")
 }
 
-func (UtilityCommands) webhookinfo(ctx *dgc.Ctx) {
-	//     try:WebhookInfo = requests.get(Webhook)
-	//     except:return await ctx.send("Invalid webhook URL!")
-	//     if WebhookInfo.status_code != 200: return await ctx.send("Invalid webhook URL!")
-	//     WebhookInfo = WebhookInfo.json(); Embed = bot.DefaultEmbed().add_field(name="Type", value=WebhookInfo["type"]).add_field(name="ID", value=WebhookInfo["id"]).add_field(name="Name", value=WebhookInfo["name"]).add_field(name="Avatar", value=WebhookInfo["avatar"]).add_field(name="Channel ID", value=WebhookInfo["channel_id"]).add_field(name="Server ID", value=WebhookInfo["guild_id"]).add_field(name="Application ID", value=WebhookInfo["application_id"]).add_field(name="Token", value=WebhookInfo["token"])
-	//     await bot.Helper.SendMessage(ctx, embed=Embed)
-}
-
-func (UtilityCommands) channelinfo(ctx *dgc.Ctx) {
-	//     Channel = Channel or ctx.channel
-	//     Embed = bot.DefaultEmbed().add_field(name="Name", value=Channel.name).add_field(name="ID", value=Channel.id).add_field(name="Topic", value=Channel.topic).add_field(name="Category", value=Channel.category).add_field(name="Is Announcements Channel", value=Channel.is_news()).add_field(name="Is NSFW Channel", value=Channel.is_nsfw()).add_field(name="Created At", value=Channel.created_at.__format__('%A, %d. %B %Y @ %H:%M:%S')).add_field(name="Slowmode Delay", value=Channel.slowmode_delay).add_field(name="Position", value=Channel.position).add_field(name="Last message ID", value=Channel.last_message_id)
-	//     await bot.Helper.SendMessage(ctx, embed=Embed)
-}
-
 func (UtilityCommands) repeat(ctx *dgc.Ctx) {
 	//     if not bot.EventListenerClass.LastUsedCommand: return await ctx.send("You haven't used any commands yet!")
 	//     await ctx.send(bot.EventListenerClass.LastUsedCommand)
@@ -701,25 +610,20 @@ func (UtilityCommands) history(ctx *dgc.Ctx) {
 	//     await bot.Helper.SendMessage(ctx, embed=bot.DefaultEmbed().add_field(name="User", value=str(User)).add_field(name="Is On Mobile", value=User.is_on_mobile()))
 }
 
+func (UtilityCommands) website(ctx *dgc.Ctx) {
+	_ = utils.Process.OpenURL("https://lightning-bot.com/")
+}
+
 func (UtilityCommands) dashboard(ctx *dgc.Ctx) {
-	//     webbrowser.open("https://lightning-bot.com/dashboard")
-}
-
-func (UtilityCommands) bio(ctx *dgc.Ctx) {
-	//     UserProfile = requests.get(f"https://discord.com/api/v9/users/{User.id}/profile", headers=_headers(bot.http.token, {'Content-Type': 'application/json'})).json()
-	//     Embed = bot.DefaultEmbed().add_field(name="User", value=str(User)).add_field(name="Bio", value=UserProfile.get("user", {}).get("bio", "None") or "None")
-	//     await bot.Helper.SendMessage(ctx, embed=Embed)
-}
-
-func (UtilityCommands) banner(ctx *dgc.Ctx) {
-	//     Server = Server or ctx.guild
-	//     if not Server.banner_url: return await ctx.send("{0.name} does not have a banner!".format(Server))
-	//     await bot.Helper.SendMessage(ctx, embed=bot.DefaultEmbed().set_image(url=Server.banner_url))
+	_ = utils.Process.OpenURL("https://lightning-bot.com/dashboard")
 }
 
 func (UtilityCommands) restartbot(ctx *dgc.Ctx) {
-	//     await ctx.message.delete()
-	//     os.execl(sys.executable, sys.executable, *sys.argv)
+	_ = utils.Process.Restart()
+}
+
+func (UtilityCommands) stopbot(ctx *dgc.Ctx) {
+	os.Exit(0)
 }
 
 func (UtilityCommands) changelog(ctx *dgc.Ctx) {
@@ -736,11 +640,6 @@ func (UtilityCommands) uptime(ctx *dgc.Ctx) {
 func (UtilityCommands) cls(ctx *dgc.Ctx) {
 	//     bot.LightningBot.CLS()
 	//     bot.LightningBot.PrintBanner()
-}
-
-func (UtilityCommands) stopbot(ctx *dgc.Ctx) {
-	//     await ctx.message.delete()
-	//     os._exit(0)
 }
 
 func (UtilityCommands) mastercard(ctx *dgc.Ctx) {
@@ -790,17 +689,41 @@ func (UtilityCommands) revavatarsearch(ctx *dgc.Ctx) {
 }
 
 func (UtilityCommands) calc(ctx *dgc.Ctx) {
-	//     subprocess.Popen('C:\\Windows\\System32\\calc.exe')
+	if runtime.GOOS != "windows" {
+		_ = ctx.RespondText("This command is only available on Windows")
+	}
+	_ = exec.Command("C:\\Windows\\System32\\calc.exe").Start()
 }
 
 func (UtilityCommands) notepad(ctx *dgc.Ctx) {
-	//     subprocess.Popen('C:\\Windows\\System32\\notepad.exe')
+	if runtime.GOOS != "windows" {
+		_ = ctx.RespondText("This command is only available on Windows")
+	}
+	_ = exec.Command("C:\\Windows\\System32\\notepad.exe").Start()
 }
 
 func (UtilityCommands) firstmessage(ctx *dgc.Ctx) {
-	//     await bot.Helper.SendMessage(ctx, embed=bot.DefaultEmbed().add_field(name="First Message", value=(await ctx.channel.history(limit=1, oldest_first=True).flatten())[0].jump_url))
-}
-
-func (UtilityCommands) website(ctx *dgc.Ctx) {
-	//     webbrowser.open("https://lightning-bot.com/")
+	channel, success := utils.Discord.TryGetChannelFromMention(ctx, ctx.Arguments.Get(0))
+	if !success {
+		channel, _ = ctx.Session.State.Channel(ctx.Event.ChannelID)
+		if channel == nil {
+			_ = ctx.RespondText("Could not find channel")
+			return
+		}
+	}
+	messages, err := ctx.Session.ChannelMessages(channel.ID, 1, "", "1", "")
+	if err != nil {
+		_ = ctx.RespondText("Error getting messages")
+		return
+	}
+	if len(messages) != 1 {
+		_ = ctx.RespondText("Error getting messages")
+		return
+	}
+	embed.NewEmbed().
+		SetDescription("First Message").
+		AddField("Author", messages[0].Author.String()).
+		AddField("Message", messages[0].Content).
+		AddField("Jump URL", fmt.Sprintf("https://discord.com/channels/%s/%s/%s", channel.GuildID, channel.ID, messages[0].ID)).
+		Send(ctx)
 }

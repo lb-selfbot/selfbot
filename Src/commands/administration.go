@@ -1,14 +1,17 @@
 package commands
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/url"
+	"sort"
 	"strconv"
 	"strings"
 	"time"
 
 	"github.com/LightningDev1/LB-Selfbot/api"
 	"github.com/LightningDev1/LB-Selfbot/embed"
+	"github.com/LightningDev1/LB-Selfbot/http"
 	"github.com/LightningDev1/LB-Selfbot/utils"
 	"github.com/LightningDev1/dgc"
 	"github.com/LightningDev1/discordgo"
@@ -131,10 +134,70 @@ func (m AdministrationCommands) RegisterCommands(router *dgc.Router) {
 		Handler:     m.nuke,
 	})
 	router.RegisterCmd(&dgc.Command{
+		Name:        "webhookinfo",
+		Description: "Get info about a webhook",
+		Usage:       "[p]webhookinfo <webhook url>",
+		Handler:     m.webhookinfo,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "webhooksend",
+		Description: "Send a webhook message",
+		Usage:       "[p]webhooksend <webhook url> <\"message\">",
+		Handler:     m.webhooksend,
+	})
+	router.RegisterCmd(&dgc.Command{
 		Name:        "userinfo",
 		Description: "Get info about a user",
 		Usage:       "[p]userinfo <user>",
 		Handler:     m.userinfo,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "userage",
+		Description: "See the age of a users account",
+		Usage:       "[p]userage <user>",
+		Handler:     m.userage,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "mutualfriends",
+		Description: "Get mutual friends with user",
+		Usage:       "[p]mutualfriends <user>",
+		Handler:     m.mutualfriends,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "mutualservers",
+		Description: "Get mutual servers with user",
+		Usage:       "[p]mutualservers <user>",
+		Handler:     m.mutualservers,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "mobile",
+		Description: "See if a user is on mobile",
+		Usage:       "[p]mobile <user>",
+		Handler:     m.mobile,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "web",
+		Description: "See if a user is on web",
+		Usage:       "[p]web <user>",
+		Handler:     m.web,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "desktop",
+		Description: "See if a user is on desktop",
+		Usage:       "[p]desktop <user>",
+		Handler:     m.desktop,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "avatar",
+		Description: "Get a users avatar",
+		Usage:       "[p]avatar <user>",
+		Handler:     m.avatar,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "banner",
+		Description: "Get a users banner",
+		Usage:       "[p]banner <user>",
+		Handler:     m.banner,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "report",
@@ -233,6 +296,12 @@ func (m AdministrationCommands) RegisterCommands(router *dgc.Router) {
 		Handler:     m.serverinfo,
 	})
 	router.RegisterCmd(&dgc.Command{
+		Name:        "serverage",
+		Description: "Get the age of a server",
+		Usage:       "[p]serverage [server id]",
+		Handler:     m.serverage,
+	})
+	router.RegisterCmd(&dgc.Command{
 		Name:        "serverowner",
 		Description: "Get a servers owner",
 		Usage:       "[p]serverowner [server id]",
@@ -249,6 +318,18 @@ func (m AdministrationCommands) RegisterCommands(router *dgc.Router) {
 		Description: "Get a servers banner",
 		Usage:       "[p]serverbanner [server id]",
 		Handler:     m.serverbanner,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "serversplash",
+		Description: "Get a servers invite splash",
+		Usage:       "[p]serversplash [server id]",
+		Handler:     m.serversplash,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "serverdsplash",
+		Description: "Get a servers discovery splash",
+		Usage:       "[p]serverdsplash [server id]",
+		Handler:     m.serverdsplash,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "serverboosters",
@@ -291,6 +372,30 @@ func (m AdministrationCommands) RegisterCommands(router *dgc.Router) {
 		Description: "Unlock a server",
 		Usage:       "[p]unlockserver [server id]",
 		Handler:     m.unlockserver,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "channels",
+		Description: "See all channels in a server",
+		Usage:       "[p]channels [server id]",
+		Handler:     m.channels,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "bots",
+		Description: "See all bots in a server",
+		Usage:       "[p]bots [server id]",
+		Handler:     m.bots,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "admins",
+		Description: "See all admins in a server",
+		Usage:       "[p]admins [server id]",
+		Handler:     m.admins,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "roles",
+		Description: "See all roles in a server",
+		Usage:       "[p]roles [server id]",
+		Handler:     m.roles,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "invite",
@@ -377,7 +482,7 @@ func (m AdministrationCommands) RegisterCommands(router *dgc.Router) {
 func (AdministrationCommands) channelinfo(ctx *dgc.Ctx) {
 	channel, success := utils.Discord.TryGetChannelFromMention(ctx, ctx.Arguments.Get(0))
 	if !success {
-		ctx.RespondText("Could not find channel")
+		_ = ctx.RespondText("Could not find channel")
 		return
 	}
 
@@ -400,7 +505,7 @@ func (AdministrationCommands) textchannel(ctx *dgc.Ctx) {
 	}
 	channel, err := ctx.Session.GuildChannelCreate(ctx.Event.GuildID, ctx.Arguments.Raw(), discordgo.ChannelTypeGuildText)
 	if err != nil {
-		ctx.RespondText("Error creating channel: " + err.Error())
+		_ = ctx.RespondText("Error creating channel: " + err.Error())
 		return
 	}
 	embed.NewEmbed().
@@ -415,7 +520,7 @@ func (AdministrationCommands) voicechannel(ctx *dgc.Ctx) {
 	}
 	channel, err := ctx.Session.GuildChannelCreate(ctx.Event.GuildID, ctx.Arguments.Raw(), discordgo.ChannelTypeGuildVoice)
 	if err != nil {
-		ctx.RespondText("Error creating channel: " + err.Error())
+		_ = ctx.RespondText("Error creating channel: " + err.Error())
 		return
 	}
 	embed.NewEmbed().
@@ -430,7 +535,7 @@ func (AdministrationCommands) stagechannel(ctx *dgc.Ctx) {
 	}
 	channel, err := ctx.Session.GuildChannelCreate(ctx.Event.GuildID, ctx.Arguments.Raw(), discordgo.ChannelTypeGuildStageVoice)
 	if err != nil {
-		ctx.RespondText("Error creating channel: " + err.Error())
+		_ = ctx.RespondText("Error creating channel: " + err.Error())
 		return
 	}
 	embed.NewEmbed().
@@ -445,7 +550,7 @@ func (AdministrationCommands) newschannel(ctx *dgc.Ctx) {
 	}
 	channel, err := ctx.Session.GuildChannelCreate(ctx.Event.GuildID, ctx.Arguments.Raw(), discordgo.ChannelTypeGuildNews)
 	if err != nil {
-		ctx.RespondText("Error creating channel: " + err.Error())
+		_ = ctx.RespondText("Error creating channel: " + err.Error())
 		return
 	}
 	embed.NewEmbed().
@@ -461,7 +566,7 @@ func (AdministrationCommands) thread(ctx *dgc.Ctx) {
 	ctx.Session.ThreadStart(ctx.Event.ChannelID, ctx.Arguments.Raw(), discordgo.ChannelTypeGuildPublicThread, 0)
 	channel, err := ctx.Session.ThreadStart(ctx.Event.ChannelID, ctx.Arguments.Raw(), discordgo.ChannelTypeGuildPublicThread, 0)
 	if err != nil {
-		ctx.RespondText("Error creating thread: " + err.Error())
+		_ = ctx.RespondText("Error creating thread: " + err.Error())
 		return
 	}
 	embed.NewEmbed().
@@ -476,7 +581,7 @@ func (AdministrationCommands) category(ctx *dgc.Ctx) {
 	}
 	channel, err := ctx.Session.GuildChannelCreate(ctx.Event.GuildID, ctx.Arguments.Raw(), discordgo.ChannelTypeGuildCategory)
 	if err != nil {
-		ctx.RespondText("Error creating category: " + err.Error())
+		_ = ctx.RespondText("Error creating category: " + err.Error())
 		return
 	}
 	embed.NewEmbed().
@@ -488,12 +593,12 @@ func (AdministrationCommands) category(ctx *dgc.Ctx) {
 func (AdministrationCommands) deletecategory(ctx *dgc.Ctx) {
 	channel, success := utils.Discord.TryGetChannelFromMention(ctx, ctx.Arguments.Get(0))
 	if !success {
-		ctx.RespondText("Could not find category")
+		_ = ctx.RespondText("Could not find category")
 		return
 	}
 	_, err := ctx.Session.ChannelDelete(channel.ID)
 	if err != nil {
-		ctx.RespondText("Error deleting category: " + err.Error())
+		_ = ctx.RespondText("Error deleting category: " + err.Error())
 		return
 	}
 
@@ -505,13 +610,13 @@ func (AdministrationCommands) deletecategory(ctx *dgc.Ctx) {
 func (AdministrationCommands) renamechannel(ctx *dgc.Ctx) {
 	channel, success := utils.Discord.TryGetChannelFromMention(ctx, ctx.Arguments.Get(0))
 	if !success {
-		ctx.RespondText("Could not find channel")
+		_ = ctx.RespondText("Could not find channel")
 		return
 	}
 
 	_, err := ctx.Session.ChannelEdit(channel.ID, utils.String.RemoveWords(ctx.Arguments.Raw(), 1))
 	if err != nil {
-		ctx.RespondText("Error renaming channel: " + err.Error())
+		_ = ctx.RespondText("Error renaming channel: " + err.Error())
 		return
 	}
 
@@ -524,13 +629,13 @@ func (AdministrationCommands) renamechannel(ctx *dgc.Ctx) {
 func (AdministrationCommands) deletechannel(ctx *dgc.Ctx) {
 	channel, success := utils.Discord.TryGetChannelFromMention(ctx, ctx.Arguments.Get(0))
 	if !success {
-		ctx.RespondText("Could not find channel")
+		_ = ctx.RespondText("Could not find channel")
 		return
 	}
 
 	_, err := ctx.Session.ChannelDelete(channel.ID)
 	if err != nil {
-		ctx.RespondText("Error deleting channel: " + err.Error())
+		_ = ctx.RespondText("Error deleting channel: " + err.Error())
 		return
 	}
 
@@ -542,13 +647,13 @@ func (AdministrationCommands) deletechannel(ctx *dgc.Ctx) {
 func (AdministrationCommands) slowmode(ctx *dgc.Ctx) {
 	channel, success := utils.Discord.TryGetChannelFromMention(ctx, ctx.Arguments.Get(0))
 	if !success {
-		ctx.RespondText("Could not find channel")
+		_ = ctx.RespondText("Could not find channel")
 		return
 	}
 
 	seconds, err := strconv.Atoi(utils.Arguments["<seconds>"])
 	if err != nil {
-		ctx.RespondText("Argument <seconds> must be a number.")
+		_ = ctx.RespondText("Argument <seconds> must be a number.")
 		return
 	}
 
@@ -556,7 +661,7 @@ func (AdministrationCommands) slowmode(ctx *dgc.Ctx) {
 		RateLimitPerUser: &seconds,
 	})
 	if err != nil {
-		ctx.RespondText("Error setting slowmode: " + err.Error())
+		_ = ctx.RespondText("Error setting slowmode: " + err.Error())
 		return
 	}
 
@@ -569,7 +674,7 @@ func (AdministrationCommands) slowmode(ctx *dgc.Ctx) {
 func (AdministrationCommands) removeslowmode(ctx *dgc.Ctx) {
 	channel, success := utils.Discord.TryGetChannelFromMention(ctx, ctx.Arguments.Get(0))
 	if !success {
-		ctx.RespondText("Could not find channel")
+		_ = ctx.RespondText("Could not find channel")
 		return
 	}
 
@@ -577,7 +682,7 @@ func (AdministrationCommands) removeslowmode(ctx *dgc.Ctx) {
 		RateLimitPerUser: nil,
 	})
 	if err != nil {
-		ctx.RespondText("Error removing slowmode: " + err.Error())
+		_ = ctx.RespondText("Error removing slowmode: " + err.Error())
 		return
 	}
 
@@ -590,7 +695,7 @@ func (AdministrationCommands) removeslowmode(ctx *dgc.Ctx) {
 func (AdministrationCommands) lockchannel(ctx *dgc.Ctx) {
 	channel, success := utils.Discord.TryGetChannelFromMention(ctx, ctx.Arguments.Get(0))
 	if !success {
-		ctx.RespondText("Could not find channel")
+		_ = ctx.RespondText("Could not find channel")
 		return
 	}
 
@@ -604,7 +709,7 @@ func (AdministrationCommands) lockchannel(ctx *dgc.Ctx) {
 		},
 	})
 	if err != nil {
-		ctx.RespondText("Error locking channel: " + err.Error())
+		_ = ctx.RespondText("Error locking channel: " + err.Error())
 		return
 	}
 
@@ -617,7 +722,7 @@ func (AdministrationCommands) lockchannel(ctx *dgc.Ctx) {
 func (AdministrationCommands) unlockchannel(ctx *dgc.Ctx) {
 	channel, success := utils.Discord.TryGetChannelFromMention(ctx, ctx.Arguments.Get(0))
 	if !success {
-		ctx.RespondText("Could not find channel")
+		_ = ctx.RespondText("Could not find channel")
 		return
 	}
 
@@ -631,7 +736,7 @@ func (AdministrationCommands) unlockchannel(ctx *dgc.Ctx) {
 		},
 	})
 	if err != nil {
-		ctx.RespondText("Error unlocking channel: " + err.Error())
+		_ = ctx.RespondText("Error unlocking channel: " + err.Error())
 		return
 	}
 
@@ -644,7 +749,7 @@ func (AdministrationCommands) unlockchannel(ctx *dgc.Ctx) {
 func (AdministrationCommands) purge(ctx *dgc.Ctx) {
 	amount, err := strconv.Atoi(utils.Arguments["<amount>"])
 	if err != nil {
-		ctx.RespondText("Argument <amount> must be a number.")
+		_ = ctx.RespondText("Argument <amount> must be a number.")
 		return
 	}
 
@@ -656,7 +761,7 @@ func (AdministrationCommands) purge(ctx *dgc.Ctx) {
 
 	messages, err := utils.Discord.GetChannelMessages(ctx, channelID, amount)
 	if err != nil {
-		ctx.RespondText("Error getting messages: " + err.Error())
+		_ = ctx.RespondText("Error getting messages: " + err.Error())
 		return
 	}
 
@@ -670,14 +775,14 @@ func (AdministrationCommands) nuke(ctx *dgc.Ctx) {
 	if !success {
 		channel, _ = ctx.Session.State.Channel(ctx.Event.ChannelID)
 		if channel == nil {
-			ctx.RespondText("Could not find channel")
+			_ = ctx.RespondText("Could not find channel")
 			return
 		}
 	}
 
 	_, err := ctx.Session.ChannelDelete(channel.ID)
 	if err != nil {
-		ctx.RespondText("Error deleting channel: " + err.Error())
+		_ = ctx.RespondText("Error deleting channel: " + err.Error())
 		return
 	}
 
@@ -694,7 +799,7 @@ func (AdministrationCommands) nuke(ctx *dgc.Ctx) {
 		NSFW:                 channel.NSFW,
 	})
 	if err != nil {
-		ctx.RespondText("Error creating channel: " + err.Error())
+		_ = ctx.RespondText("Error creating channel: " + err.Error())
 		return
 	}
 	ctx.Session.ChannelEditComplex(channel.ID, &discordgo.ChannelEdit{
@@ -708,12 +813,62 @@ func (AdministrationCommands) nuke(ctx *dgc.Ctx) {
 		Send(ctx)
 }
 
+// Webhook Control
+
+func (AdministrationCommands) webhookinfo(ctx *dgc.Ctx) {
+	url, err := url.Parse(utils.Arguments["<webhook url>"])
+	if err != nil {
+		_ = ctx.RespondText("Invalid webhook URL!")
+		return
+	}
+	if !strings.Contains(url.Host, "discord.com") {
+		_ = ctx.RespondText("Invalid webhook URL!")
+		return
+	}
+	webhookInfo, statusCode, err := http.GetJsonStatusCode(url.String())
+	if err != nil {
+		_ = ctx.RespondText("Invalid webhook URL!")
+		return
+	}
+	if statusCode != 200 {
+		_ = ctx.RespondText("Invalid webhook URL!")
+		return
+	}
+	embed.NewEmbed().
+		AddField("Type", map[int]string{1: "Incoming", 2: "Channel Follower", 3: "Application"}[webhookInfo.Get("type").MustInt()]).
+		AddField("ID", webhookInfo.Get("id").MustString()).
+		AddField("Name", webhookInfo.Get("name").MustString()).
+		AddField("Avatar", webhookInfo.Get("avatar").MustString()).
+		AddField("Channel ID", webhookInfo.Get("channel_id").MustString()).
+		AddField("Server ID", webhookInfo.Get("guild_id").MustString()).
+		AddField("Application ID", webhookInfo.Get("application_id").MustString()).
+		AddField("Token", webhookInfo.Get("token").MustString()).
+		Send(ctx)
+}
+
+func (AdministrationCommands) webhooksend(ctx *dgc.Ctx) {
+	url, err := url.Parse(utils.Arguments["<webhook url>"])
+	if err != nil {
+		_ = ctx.RespondText("Invalid webhook URL!")
+		return
+	}
+	if !strings.Contains(url.Host, "discord.com") {
+		_ = ctx.RespondText("Invalid webhook URL!")
+		return
+	}
+	data := struct {
+		Content string `json:"content"`
+	}{utils.Arguments["<\"message\">"]}
+	jsonData, _ := json.Marshal(data)
+	http.PostJson(url.String(), string(jsonData))
+}
+
 // Member Control
 
 func (AdministrationCommands) userinfo(ctx *dgc.Ctx) {
 	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
-		ctx.RespondText("Could not find user")
+		_ = ctx.RespondText("Could not find user")
 		return
 	}
 	member, _ := ctx.Session.GuildMember(ctx.Event.GuildID, user.ID)
@@ -735,6 +890,127 @@ func (AdministrationCommands) userinfo(ctx *dgc.Ctx) {
 	embed.Send(ctx)
 }
 
+func (AdministrationCommands) userage(ctx *dgc.Ctx) {
+	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
+	if !success {
+		_ = ctx.RespondText("Could not find user")
+		return
+	}
+	age := time.Since(utils.Discord.SnowflakeToTime(user.ID))
+	embed.NewEmbed().
+		SetDescription(fmt.Sprintf("User Age (%s - %s)", user.String(), user.ID)).
+		AddField("Age", utils.Misc.FormatDuration(age)).
+		Send(ctx)
+}
+
+func (AdministrationCommands) mutualfriends(ctx *dgc.Ctx) {
+	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
+	if !success {
+		_ = ctx.RespondText("Could not find user")
+		return
+	}
+	mutualFriends, err := ctx.Session.UserMutualFriends(user.ID)
+	if err != nil {
+		_ = ctx.RespondText("Could not find user")
+		return
+	}
+	mutualFriendsString := ""
+	for _, friend := range mutualFriends {
+		mutualFriendsString += fmt.Sprintf("%s - %s\n", friend.String(), friend.ID)
+	}
+	embed.NewEmbed().
+		SetDescription(fmt.Sprintf("Mutual Friends (%s - %s)", user.String(), user.ID)).
+		AddField("Mutual Friends", mutualFriendsString).
+		Send(ctx)
+}
+
+func (AdministrationCommands) mutualservers(ctx *dgc.Ctx) {
+	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
+	if !success {
+		_ = ctx.RespondText("Could not find user")
+		return
+	}
+	mutualServers, err := ctx.Session.UserProfile(user.ID)
+	if err != nil {
+		_ = ctx.RespondText("Could not find user")
+		return
+	}
+	mutualServersString := ""
+	for _, guild_ := range mutualServers.MutualGuilds {
+		guild, err := utils.Discord.GetGuild(ctx.Session, guild_.ID)
+		if err != nil {
+			continue
+		}
+		mutualServersString += fmt.Sprintf("%s - %s\n", guild.Name, guild.ID)
+	}
+	embed.NewEmbed().
+		SetDescription(fmt.Sprintf("Mutual Servers (%s - %s)", user.String(), user.ID)).
+		AddField("Mutual Servers", mutualServersString).
+		Send(ctx)
+}
+
+func (AdministrationCommands) mobile(ctx *dgc.Ctx) {
+	member, success := utils.Discord.TryGetMemberFromMention(ctx, ctx.Arguments.Get(0))
+	if !success {
+		_ = ctx.RespondText("Could not find user")
+		return
+	}
+	embed.NewEmbed().
+		SetDescription(fmt.Sprintf("%s - %s", member.User.String(), member.User.ID)).
+		AddField("Is On Mobile", utils.Misc.FormatBool(member.Presence.ClientStatus["mobile"] != "")).
+		Send(ctx)
+}
+
+func (AdministrationCommands) web(ctx *dgc.Ctx) {
+	member, success := utils.Discord.TryGetMemberFromMention(ctx, ctx.Arguments.Get(0))
+	if !success {
+		_ = ctx.RespondText("Could not find user")
+		return
+	}
+	embed.NewEmbed().
+		SetDescription(fmt.Sprintf("%s - %s", member.User.String(), member.User.ID)).
+		AddField("Is On Web", utils.Misc.FormatBool(member.Presence.ClientStatus["web"] != "")).
+		Send(ctx)
+}
+
+func (AdministrationCommands) desktop(ctx *dgc.Ctx) {
+	member, success := utils.Discord.TryGetMemberFromMention(ctx, ctx.Arguments.Get(0))
+	if !success {
+		_ = ctx.RespondText("Could not find user")
+		return
+	}
+	embed.NewEmbed().
+		SetDescription(fmt.Sprintf("%s - %s", member.User.String(), member.User.ID)).
+		AddField("Is On Desktop", utils.Misc.FormatBool(member.Presence.ClientStatus["desktop"] != "")).
+		Send(ctx)
+}
+
+func (AdministrationCommands) avatar(ctx *dgc.Ctx) {
+	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
+	if !success {
+		_ = ctx.RespondText("Could not find user")
+		return
+	}
+	if user.Avatar == "" {
+		_ = ctx.RespondText("User has no avatar")
+		return
+	}
+	_ = ctx.RespondText(user.AvatarURL(""))
+}
+
+func (AdministrationCommands) banner(ctx *dgc.Ctx) {
+	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
+	if !success {
+		_ = ctx.RespondText("Could not find user")
+		return
+	}
+	if user.Banner == "" {
+		_ = ctx.RespondText("User has no banner")
+		return
+	}
+	_ = ctx.RespondText(user.BannerURL(""))
+}
+
 func (AdministrationCommands) report(ctx *dgc.Ctx) {
 	link := utils.Arguments["<message link>"]
 	reason := utils.Arguments["<reason>"]
@@ -742,12 +1018,12 @@ func (AdministrationCommands) report(ctx *dgc.Ctx) {
 	// Verify message link
 	url, err := url.Parse(link)
 	if err != nil {
-		ctx.RespondText("Invalid message link.")
+		_ = ctx.RespondText("Invalid message link.")
 		return
 	}
 	urlPathParts := strings.Split(url.Path, "/")
 	if len(urlPathParts) < 4 {
-		ctx.RespondText("Invalid message link.")
+		_ = ctx.RespondText("Invalid message link.")
 		return
 	}
 	guildID := urlPathParts[2]
@@ -768,7 +1044,7 @@ func (AdministrationCommands) report(ctx *dgc.Ctx) {
 	case "nsfw":
 		reasonInt = 4
 	default:
-		ctx.RespondText("Argument `<reason>` must be one of: `illegalcontent`, `harassment`, `spam`, `phishing`, `selfharm`, `nsfw`")
+		_ = ctx.RespondText("Argument `<reason>` must be one of: `illegalcontent`, `harassment`, `spam`, `phishing`, `selfharm`, `nsfw`")
 		return
 	}
 
@@ -785,14 +1061,14 @@ func (AdministrationCommands) mute(ctx *dgc.Ctx) {
 	}
 	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
-		ctx.RespondText("Could not find user")
+		_ = ctx.RespondText("Could not find user")
 		return
 	}
 
 	member, _ := ctx.Session.GuildMember(ctx.Event.GuildID, user.ID)
 	roles, err := ctx.Session.GuildRoles(ctx.Event.GuildID)
 	if member == nil || err != nil {
-		ctx.RespondText("Error muting user: " + err.Error())
+		_ = ctx.RespondText("Error muting user: " + err.Error())
 		return
 	}
 
@@ -808,7 +1084,7 @@ func (AdministrationCommands) mute(ctx *dgc.Ctx) {
 		}
 		err = ctx.Session.GuildMemberEdit(ctx.Event.GuildID, user.ID, append(member.Roles, role.ID))
 		if err != nil {
-			ctx.RespondText("Error muting user: " + err.Error())
+			_ = ctx.RespondText("Error muting user: " + err.Error())
 			return
 		}
 		embed.NewEmbed().
@@ -819,13 +1095,13 @@ func (AdministrationCommands) mute(ctx *dgc.Ctx) {
 
 	channels, err := ctx.Session.GuildChannels(ctx.Event.GuildID)
 	if err != nil {
-		ctx.RespondText("Error muting user: " + err.Error())
+		_ = ctx.RespondText("Error muting user: " + err.Error())
 		return
 	}
 
 	role, err := ctx.Session.GuildRoleCreate(ctx.Event.GuildID, "Muted", 0, false, 0, false)
 	if err != nil {
-		ctx.RespondText("Error muting user: " + err.Error())
+		_ = ctx.RespondText("Error muting user: " + err.Error())
 		return
 	}
 
@@ -833,7 +1109,7 @@ func (AdministrationCommands) mute(ctx *dgc.Ctx) {
 		if channel.Type == 1 {
 			err = ctx.Session.ChannelPermissionSet(channel.ID, role.ID, discordgo.PermissionOverwriteTypeRole, 0, discordgo.PermissionSendMessages)
 			if err != nil {
-				ctx.RespondText("Error muting user: " + err.Error())
+				_ = ctx.RespondText("Error muting user: " + err.Error())
 				return
 			}
 		}
@@ -841,7 +1117,7 @@ func (AdministrationCommands) mute(ctx *dgc.Ctx) {
 
 	err = ctx.Session.GuildMemberEdit(ctx.Event.GuildID, user.ID, append(member.Roles, role.ID))
 	if err != nil {
-		ctx.RespondText("Error muting user: " + err.Error())
+		_ = ctx.RespondText("Error muting user: " + err.Error())
 		return
 	}
 
@@ -857,13 +1133,13 @@ func (AdministrationCommands) unmute(ctx *dgc.Ctx) {
 
 	member, success := utils.Discord.TryGetMemberFromMention(ctx, ctx.Arguments.Get(0))
 	if !success {
-		ctx.RespondText("Could not find user")
+		_ = ctx.RespondText("Could not find user")
 		return
 	}
 
 	roles, err := ctx.Session.GuildRoles(ctx.Event.GuildID)
 	if member == nil || err != nil {
-		ctx.RespondText("Error unmuting user: " + err.Error())
+		_ = ctx.RespondText("Error unmuting user: " + err.Error())
 		return
 	}
 
@@ -885,7 +1161,7 @@ func (AdministrationCommands) unmute(ctx *dgc.Ctx) {
 		}
 		err = ctx.Session.GuildMemberEdit(ctx.Event.GuildID, member.User.ID, member.Roles)
 		if err != nil {
-			ctx.RespondText("Error unmuting user: " + err.Error())
+			_ = ctx.RespondText("Error unmuting user: " + err.Error())
 			return
 		}
 		embed.NewEmbed().
@@ -893,7 +1169,7 @@ func (AdministrationCommands) unmute(ctx *dgc.Ctx) {
 			Send(ctx)
 		return
 	}
-	ctx.RespondText("Error: No muted role found!")
+	_ = ctx.RespondText("Error: No muted role found!")
 }
 
 func (AdministrationCommands) timeout(ctx *dgc.Ctx) {
@@ -903,20 +1179,20 @@ func (AdministrationCommands) timeout(ctx *dgc.Ctx) {
 
 	member, success := utils.Discord.TryGetMemberFromMention(ctx, ctx.Arguments.Get(0))
 	if !success {
-		ctx.RespondText("Could not find user")
+		_ = ctx.RespondText("Could not find user")
 		return
 	}
 
 	seconds, err := strconv.Atoi(utils.Arguments["<seconds>"])
 	if err != nil {
-		ctx.RespondText("Argument <seconds> must be a number.")
+		_ = ctx.RespondText("Argument <seconds> must be a number.")
 		return
 	}
 	time := time.Now().Add(time.Duration(seconds) * time.Second)
 
 	err = ctx.Session.GuildMemberTimeout(ctx.Event.GuildID, member.User.ID, &time)
 	if err != nil {
-		ctx.RespondText("Error timing out user: " + err.Error())
+		_ = ctx.RespondText("Error timing out user: " + err.Error())
 		return
 	}
 
@@ -932,13 +1208,13 @@ func (AdministrationCommands) removetimeout(ctx *dgc.Ctx) {
 
 	member, success := utils.Discord.TryGetMemberFromMention(ctx, ctx.Arguments.Get(0))
 	if !success {
-		ctx.RespondText("Could not find user")
+		_ = ctx.RespondText("Could not find user")
 		return
 	}
 
 	err := ctx.Session.GuildMemberTimeout(ctx.Event.GuildID, member.User.ID, nil)
 	if err != nil {
-		ctx.RespondText("Error removing timeout: " + err.Error())
+		_ = ctx.RespondText("Error removing timeout: " + err.Error())
 		return
 	}
 
@@ -954,13 +1230,13 @@ func (AdministrationCommands) kick(ctx *dgc.Ctx) {
 
 	member, success := utils.Discord.TryGetMemberFromMention(ctx, ctx.Arguments.Get(0))
 	if !success {
-		ctx.RespondText("Could not find user")
+		_ = ctx.RespondText("Could not find user")
 		return
 	}
 
 	err := ctx.Session.GuildMemberDeleteWithReason(ctx.Event.GuildID, member.User.ID, utils.Arguments["[reason]"])
 	if err != nil {
-		ctx.RespondText("Error kicking user: " + err.Error())
+		_ = ctx.RespondText("Error kicking user: " + err.Error())
 		return
 	}
 
@@ -982,7 +1258,7 @@ func (AdministrationCommands) ban(ctx *dgc.Ctx) {
 
 	err := ctx.Session.GuildBanCreateWithReason(ctx.Event.GuildID, memberID, utils.Arguments["[reason]"], 0)
 	if err != nil {
-		ctx.RespondText("Error banning user: " + err.Error())
+		_ = ctx.RespondText("Error banning user: " + err.Error())
 		return
 	}
 
@@ -998,18 +1274,18 @@ func (AdministrationCommands) softban(ctx *dgc.Ctx) {
 
 	member, success := utils.Discord.TryGetMemberFromMention(ctx, ctx.Arguments.Get(0))
 	if !success {
-		ctx.RespondText("Could not find user")
+		_ = ctx.RespondText("Could not find user")
 		return
 	}
 
 	err := ctx.Session.GuildBanCreateWithReason(ctx.Event.GuildID, member.User.ID, utils.Arguments["[reason]"], 0)
 	if err != nil {
-		ctx.RespondText("Error softbanning user: " + err.Error())
+		_ = ctx.RespondText("Error softbanning user: " + err.Error())
 		return
 	}
 	err = ctx.Session.GuildBanDelete(ctx.Event.GuildID, member.User.ID)
 	if err != nil {
-		ctx.RespondText("Error softbanning user: " + err.Error())
+		_ = ctx.RespondText("Error softbanning user: " + err.Error())
 		return
 	}
 
@@ -1025,7 +1301,7 @@ func (AdministrationCommands) unban(ctx *dgc.Ctx) {
 
 	err := ctx.Session.GuildBanDelete(ctx.Event.GuildID, utils.Arguments["<user id>"])
 	if err != nil {
-		ctx.RespondText("Error unbanning user: " + err.Error())
+		_ = ctx.RespondText("Error unbanning user: " + err.Error())
 		return
 	}
 
@@ -1040,12 +1316,12 @@ func (AdministrationCommands) banlist(ctx *dgc.Ctx) {
 		guildID = ctx.Event.GuildID
 	}
 	if guildID == "" {
-		ctx.RespondText("Error: No server ID specified!")
+		_ = ctx.RespondText("Error: No server ID specified!")
 		return
 	}
 	banList, err := ctx.Session.GuildBans(ctx.Event.GuildID, 1000, "", "")
 	if err != nil {
-		ctx.RespondText("Error getting ban list: " + err.Error())
+		_ = ctx.RespondText("Error getting ban list: " + err.Error())
 		return
 	}
 	banListString := ""
@@ -1069,19 +1345,19 @@ func (AdministrationCommands) copybans(ctx *dgc.Ctx) {
 		destinationServerID = ctx.Event.GuildID
 	}
 	if destinationServerID == "" {
-		ctx.RespondText("Error: No server ID specified!")
+		_ = ctx.RespondText("Error: No server ID specified!")
 		return
 	}
 	banList, err := ctx.Session.GuildBans(sourceServerID, 1000, "", "")
 	if err != nil {
-		ctx.RespondText("Error copying bans: " + err.Error())
+		_ = ctx.RespondText("Error copying bans: " + err.Error())
 		return
 	}
 
 	for _, ban := range banList {
 		err := ctx.Session.GuildBanCreateWithReason(destinationServerID, ban.User.ID, ban.Reason, 0)
 		if err != nil {
-			ctx.RespondText("Error copying bans: " + err.Error())
+			_ = ctx.RespondText("Error copying bans: " + err.Error())
 			return
 		}
 	}
@@ -1095,7 +1371,7 @@ func (AdministrationCommands) nick(ctx *dgc.Ctx) {
 	}
 	err := ctx.Session.GuildMemberNickname(ctx.Event.GuildID, "@me", ctx.Arguments.Raw())
 	if err != nil {
-		ctx.RespondText("Error changing nickname: " + err.Error())
+		_ = ctx.RespondText("Error changing nickname: " + err.Error())
 		return
 	}
 	embed.NewEmbed().
@@ -1110,13 +1386,13 @@ func (AdministrationCommands) nickuser(ctx *dgc.Ctx) {
 
 	member, success := utils.Discord.TryGetMemberFromMention(ctx, ctx.Arguments.Get(0))
 	if !success {
-		ctx.RespondText("Could not find user")
+		_ = ctx.RespondText("Could not find user")
 		return
 	}
 
 	err := ctx.Session.GuildMemberNickname(ctx.Event.GuildID, strings.ReplaceAll(member.User.ID, ctx.Event.Author.ID, "@me"), utils.String.RemoveWords(ctx.Arguments.Raw(), 1))
 	if err != nil {
-		ctx.RespondText("Error changing nickname: " + err.Error())
+		_ = ctx.RespondText("Error changing nickname: " + err.Error())
 		return
 	}
 	embed.NewEmbed().
@@ -1136,7 +1412,7 @@ func (AdministrationCommands) clearnick(ctx *dgc.Ctx) {
 	}
 	err := ctx.Session.GuildMemberNickname(ctx.Event.GuildID, userID, "")
 	if err != nil {
-		ctx.RespondText("Error changing nickname: " + err.Error())
+		_ = ctx.RespondText("Error changing nickname: " + err.Error())
 		return
 	}
 	embed.NewEmbed().
@@ -1153,7 +1429,7 @@ func (AdministrationCommands) serverinfo(ctx *dgc.Ctx) {
 
 	guild, err := utils.Discord.GetGuild(ctx.Session, utils.Misc.Or(utils.Arguments["[server id]"], ctx.Event.GuildID))
 	if err != nil {
-		ctx.RespondText("Error getting server: " + err.Error())
+		_ = ctx.RespondText("Error getting server: " + err.Error())
 		return
 	}
 
@@ -1181,6 +1457,19 @@ func (AdministrationCommands) serverinfo(ctx *dgc.Ctx) {
 	embed.Send(ctx)
 }
 
+func (AdministrationCommands) serverage(ctx *dgc.Ctx) {
+	guild, err := utils.Discord.GetGuild(ctx.Session, utils.Misc.Or(utils.Arguments["[server id]"], ctx.Event.GuildID))
+	if err != nil {
+		_ = ctx.RespondText("Error getting server: " + err.Error())
+		return
+	}
+	age := time.Since(utils.Discord.SnowflakeToTime(guild.ID))
+	embed.NewEmbed().
+		SetDescription(fmt.Sprintf("Server Age (%s - %s)", guild.Name, guild.ID)).
+		AddField("Age", utils.Misc.FormatDuration(age)).
+		Send(ctx)
+}
+
 func (AdministrationCommands) serverowner(ctx *dgc.Ctx) {
 	if !utils.Discord.CheckIfInServer(ctx) {
 		return
@@ -1188,12 +1477,12 @@ func (AdministrationCommands) serverowner(ctx *dgc.Ctx) {
 
 	guild, err := utils.Discord.GetGuild(ctx.Session, utils.Misc.Or(utils.Arguments["[server id]"], ctx.Event.GuildID))
 	if err != nil {
-		ctx.RespondText("Error getting server: " + err.Error())
+		_ = ctx.RespondText("Error getting server: " + err.Error())
 		return
 	}
 	owner, err := utils.Discord.GetMember(ctx.Session, guild.ID, guild.OwnerID)
 	if err != nil {
-		ctx.RespondText("Error getting server owner: " + err.Error())
+		_ = ctx.RespondText("Error getting server owner: " + err.Error())
 		return
 	}
 	embed.NewEmbed().
@@ -1209,7 +1498,7 @@ func (AdministrationCommands) servericon(ctx *dgc.Ctx) {
 
 	guild, err := utils.Discord.GetGuild(ctx.Session, utils.Misc.Or(utils.Arguments["[server id]"], ctx.Event.GuildID))
 	if err != nil {
-		ctx.RespondText("Error getting server: " + err.Error())
+		_ = ctx.RespondText("Error getting server: " + err.Error())
 		return
 	}
 
@@ -1226,20 +1515,56 @@ func (AdministrationCommands) serverbanner(ctx *dgc.Ctx) {
 	if !utils.Discord.CheckIfInServer(ctx) {
 		return
 	}
-
 	guild, err := utils.Discord.GetGuild(ctx.Session, utils.Misc.Or(utils.Arguments["[server id]"], ctx.Event.GuildID))
 	if err != nil {
-		ctx.RespondText("Error getting server: " + err.Error())
+		_ = ctx.RespondText("Error getting server: " + err.Error())
 		return
 	}
-
-	embed := embed.NewEmbed().
-		SetDescription(fmt.Sprintf("Server Banner - %s", guild.Name)).
-		SetImage(guild.BannerURL())
 	if guild.Banner == "" {
-		embed.AddField("Error", "Server has no banner!")
+		embed.NewEmbed().AddField("Error", "Server has no banner!").Send(ctx)
 	}
-	embed.Send(ctx)
+	embed.NewEmbed().
+		SetDescription(fmt.Sprintf("Server Banner - %s", guild.Name)).
+		SetImage(guild.BannerURL()).
+		Send(ctx)
+}
+
+func (AdministrationCommands) serversplash(ctx *dgc.Ctx) {
+	if !utils.Discord.CheckIfInServer(ctx) {
+		return
+	}
+	guild, err := utils.Discord.GetGuild(ctx.Session, utils.Misc.Or(utils.Arguments["[server id]"], ctx.Event.GuildID))
+	if err != nil {
+		_ = ctx.RespondText("Error getting server: " + err.Error())
+		return
+	}
+	if guild.Splash == "" {
+		_ = ctx.RespondText("Server has no invite splash!")
+		return
+	}
+	embed.NewEmbed().
+		SetDescription(fmt.Sprintf("Server Invite Splash - %s", guild.Name)).
+		SetImage(discordgo.EndpointGuildSplash(guild.ID, guild.Splash)).
+		Send(ctx)
+}
+
+func (AdministrationCommands) serverdsplash(ctx *dgc.Ctx) {
+	if !utils.Discord.CheckIfInServer(ctx) {
+		return
+	}
+	guild, err := utils.Discord.GetGuild(ctx.Session, utils.Misc.Or(utils.Arguments["[server id]"], ctx.Event.GuildID))
+	if err != nil {
+		_ = ctx.RespondText("Error getting server: " + err.Error())
+		return
+	}
+	if guild.DiscoverySplash == "" {
+		_ = ctx.RespondText("Server has no discovery splash!")
+		return
+	}
+	embed.NewEmbed().
+		SetDescription(fmt.Sprintf("Server Discovery Splash - %s", guild.Name)).
+		SetImage(discordgo.EndpointGuildSplash(guild.ID, guild.DiscoverySplash)).
+		Send(ctx)
 }
 
 func (AdministrationCommands) serverboosters(ctx *dgc.Ctx) {
@@ -1249,7 +1574,7 @@ func (AdministrationCommands) serverboosters(ctx *dgc.Ctx) {
 
 	guild, err := utils.Discord.GetGuild(ctx.Session, utils.Misc.Or(utils.Arguments["[server id]"], ctx.Event.GuildID))
 	if err != nil {
-		ctx.RespondText("Error getting server: " + err.Error())
+		_ = ctx.RespondText("Error getting server: " + err.Error())
 		return
 	}
 
@@ -1277,7 +1602,7 @@ func (AdministrationCommands) serverboostlevel(ctx *dgc.Ctx) {
 
 	guild, err := utils.Discord.GetGuild(ctx.Session, utils.Misc.Or(utils.Arguments["[server id]"], ctx.Event.GuildID))
 	if err != nil {
-		ctx.RespondText("Error getting server: " + err.Error())
+		_ = ctx.RespondText("Error getting server: " + err.Error())
 		return
 	}
 
@@ -1295,7 +1620,7 @@ func (AdministrationCommands) setservername(ctx *dgc.Ctx) {
 		Name: ctx.Arguments.Raw(),
 	})
 	if err != nil {
-		ctx.RespondText("Error changing server name: " + err.Error())
+		_ = ctx.RespondText("Error changing server name: " + err.Error())
 		return
 	}
 	embed.NewEmbed().
@@ -1311,7 +1636,7 @@ func (AdministrationCommands) setservericon(ctx *dgc.Ctx) {
 		Icon: utils.Arguments["<url>"],
 	})
 	if err != nil {
-		ctx.RespondText("Error changing server icon: " + err.Error())
+		_ = ctx.RespondText("Error changing server icon: " + err.Error())
 		return
 	}
 	embed.NewEmbed().
@@ -1327,7 +1652,7 @@ func (AdministrationCommands) setserverbanner(ctx *dgc.Ctx) {
 		Banner: utils.Arguments["<url>"],
 	})
 	if err != nil {
-		ctx.RespondText("Error changing server icon: " + err.Error())
+		_ = ctx.RespondText("Error changing server icon: " + err.Error())
 		return
 	}
 	embed.NewEmbed().
@@ -1338,7 +1663,7 @@ func (AdministrationCommands) setserverbanner(ctx *dgc.Ctx) {
 func (AdministrationCommands) lockserver(ctx *dgc.Ctx) {
 	guild, err := utils.Discord.GetGuild(ctx.Session, utils.Misc.Or(utils.Arguments["[server id]"], ctx.Event.GuildID))
 	if err != nil {
-		ctx.RespondText("Error getting server: " + err.Error())
+		_ = ctx.RespondText("Error getting server: " + err.Error())
 		return
 	}
 
@@ -1354,7 +1679,7 @@ func (AdministrationCommands) lockserver(ctx *dgc.Ctx) {
 				},
 			})
 			if err != nil {
-				ctx.RespondText("Error locking server: " + err.Error())
+				_ = ctx.RespondText("Error locking server: " + err.Error())
 				return
 			}
 		}
@@ -1368,7 +1693,7 @@ func (AdministrationCommands) lockserver(ctx *dgc.Ctx) {
 func (AdministrationCommands) unlockserver(ctx *dgc.Ctx) {
 	guild, err := utils.Discord.GetGuild(ctx.Session, utils.Misc.Or(utils.Arguments["[server id]"], ctx.Event.GuildID))
 	if err != nil {
-		ctx.RespondText("Error getting server: " + err.Error())
+		_ = ctx.RespondText("Error getting server: " + err.Error())
 		return
 	}
 
@@ -1384,7 +1709,7 @@ func (AdministrationCommands) unlockserver(ctx *dgc.Ctx) {
 				},
 			})
 			if err != nil {
-				ctx.RespondText("Error locking server: " + err.Error())
+				_ = ctx.RespondText("Error locking server: " + err.Error())
 				return
 			}
 		}
@@ -1392,6 +1717,93 @@ func (AdministrationCommands) unlockserver(ctx *dgc.Ctx) {
 
 	embed.NewEmbed().
 		SetDescription("Successfully locked server!").
+		Send(ctx)
+}
+
+func (AdministrationCommands) channels(ctx *dgc.Ctx) {
+	guild, err := utils.Discord.GetGuild(ctx.Session, utils.Misc.Or(utils.Arguments["[server id]"], ctx.Event.GuildID))
+	if err != nil {
+		_ = ctx.RespondText("Error getting server: " + err.Error())
+		return
+	}
+
+	categories, categoryChannels := utils.Discord.MapCategories(guild.Channels)
+	embed := embed.NewEmbed().SetDescription(fmt.Sprintf("Server Channels - %s", guild.Name))
+	for _, category := range categories {
+		channelsString := ""
+		for _, channel := range categoryChannels[category.ID] {
+			channelsString += channel.Mention() + "\n"
+		}
+		embed.AddField("Category: "+category.Name, channelsString)
+	}
+	embed.Send(ctx)
+}
+
+func (AdministrationCommands) bots(ctx *dgc.Ctx) {
+	guild, err := utils.Discord.GetGuild(ctx.Session, utils.Misc.Or(utils.Arguments["[server id]"], ctx.Event.GuildID))
+	if err != nil {
+		_ = ctx.RespondText("Error getting server: " + err.Error())
+		return
+	}
+	fmt.Println(len(guild.Members))
+	botString := ""
+	for _, member := range guild.Members {
+		if member.User.Bot {
+			botString += member.User.Mention() + "\n"
+		}
+	}
+	botString = utils.Misc.Or(botString, "No bots found!")
+	embed.NewEmbed().
+		SetDescription(fmt.Sprintf("Server Bots - %s", guild.Name)).
+		AddField("Server Bots", botString).
+		Send(ctx)
+}
+
+func (AdministrationCommands) admins(ctx *dgc.Ctx) {
+	guild, err := utils.Discord.GetGuild(ctx.Session, utils.Misc.Or(utils.Arguments["[server id]"], ctx.Event.GuildID))
+	if err != nil {
+		_ = ctx.RespondText("Error getting server: " + err.Error())
+		return
+	}
+	if len(guild.Channels) == 0 {
+		_ = ctx.RespondText("Error getting server: " + err.Error())
+		return
+	}
+	adminString := ""
+	for _, member := range guild.Members {
+		permissions, _ := ctx.Session.UserChannelPermissions(member.User.ID, guild.Channels[0].ID)
+		if permissions&discordgo.PermissionAdministrator != 0 && !member.User.Bot {
+			adminString += fmt.Sprintf("%s - %s\n", member.User.String(), member.User.ID)
+		}
+	}
+	adminString = utils.Misc.Or(adminString, "No admins found!")
+	embed.NewEmbed().
+		SetDescription(fmt.Sprintf("Server Admins - %s", guild.Name)).
+		AddField("Server Admins", adminString).
+		Send(ctx)
+}
+
+func (AdministrationCommands) roles(ctx *dgc.Ctx) {
+	guild, err := utils.Discord.GetGuild(ctx.Session, utils.Misc.Or(utils.Arguments["[server id]"], ctx.Event.GuildID))
+	if err != nil {
+		_ = ctx.RespondText("Error getting server: " + err.Error())
+		return
+	}
+	sort.Slice(guild.Roles, func(i, j int) bool {
+		return guild.Roles[i].Position < guild.Roles[j].Position
+	})
+	roleString := ""
+	for _, role := range guild.Roles {
+		if role.ID == guild.ID {
+			// Ignore @everyone role
+			continue
+		}
+		roleString += fmt.Sprintf("%s - %s\n", role.Name, role.ID)
+	}
+	roleString = utils.Misc.Or(roleString, "No roles found!")
+	embed.NewEmbed().
+		SetDescription(fmt.Sprintf("Server Roles - %s", guild.Name)).
+		AddField("Server Roles", roleString).
 		Send(ctx)
 }
 
@@ -1406,13 +1818,13 @@ func (AdministrationCommands) invite(ctx *dgc.Ctx) {
 
 	ageInt, err := strconv.Atoi(utils.Arguments["[max age]"])
 	if err != nil && utils.Arguments["[max age]"] != "" {
-		ctx.RespondText("Argument [max age] must be a number.")
+		_ = ctx.RespondText("Argument [max age] must be a number.")
 		return
 	}
 
 	usesInt, err := strconv.Atoi(utils.Arguments["[max uses]"])
 	if err != nil && utils.Arguments["[max uses]"] != "" {
-		ctx.RespondText("Argument [max uses] must be a number.")
+		_ = ctx.RespondText("Argument [max uses] must be a number.")
 		return
 	}
 
@@ -1423,7 +1835,7 @@ func (AdministrationCommands) invite(ctx *dgc.Ctx) {
 		Unique:    true,
 	})
 	if err != nil {
-		ctx.RespondText("Error creating invite: " + err.Error())
+		_ = ctx.RespondText("Error creating invite: " + err.Error())
 		return
 	}
 
@@ -1435,7 +1847,7 @@ func (AdministrationCommands) invite(ctx *dgc.Ctx) {
 func (AdministrationCommands) friendinvite(ctx *dgc.Ctx) {
 	invite, err := ctx.Session.CreateFriendInvite("@me")
 	if err != nil {
-		ctx.RespondText("Error creating friend invite: " + err.Error())
+		_ = ctx.RespondText("Error creating friend invite: " + err.Error())
 		return
 	}
 
@@ -1449,7 +1861,7 @@ func (AdministrationCommands) inviteinfo(ctx *dgc.Ctx) {
 	parsedInvite := utils.Discord.ParseInvite(utils.Arguments["<invite>"])
 	invite, err := ctx.Session.InviteWithCounts(parsedInvite)
 	if err != nil {
-		ctx.RespondText("Error getting invite: " + err.Error())
+		_ = ctx.RespondText("Error getting invite: " + err.Error())
 		return
 	}
 
@@ -1482,13 +1894,13 @@ func (AdministrationCommands) deleteinvite(ctx *dgc.Ctx) {
 	parsedInvite := utils.Discord.ParseInvite(utils.Arguments["<invite>"])
 	invite, err := ctx.Session.InviteWithCounts(parsedInvite)
 	if err != nil {
-		ctx.RespondText("Error getting invite: " + err.Error())
+		_ = ctx.RespondText("Error getting invite: " + err.Error())
 		return
 	}
 
 	invite, err = ctx.Session.InviteDelete(invite.Code)
 	if err != nil {
-		ctx.RespondText("Error deleting invite: " + err.Error())
+		_ = ctx.RespondText("Error deleting invite: " + err.Error())
 		return
 	}
 
@@ -1500,7 +1912,7 @@ func (AdministrationCommands) deleteinvite(ctx *dgc.Ctx) {
 func (m *AdministrationCommands) serverinvites(ctx *dgc.Ctx) {
 	invites, err := ctx.Session.GuildInvites(utils.Misc.Or(utils.Arguments["[server id]"], ctx.Event.GuildID))
 	if err != nil {
-		ctx.RespondText("Error getting invites: " + err.Error())
+		_ = ctx.RespondText("Error getting invites: " + err.Error())
 		return
 	}
 	invitesString := ""
@@ -1530,7 +1942,7 @@ func (m *AdministrationCommands) channelinvites(ctx *dgc.Ctx) {
 	}
 	invites, err := ctx.Session.ChannelInvites(channelID)
 	if err != nil {
-		ctx.RespondText("Error getting invites: " + err.Error())
+		_ = ctx.RespondText("Error getting invites: " + err.Error())
 		return
 	}
 	invitesString := ""
@@ -1559,13 +1971,13 @@ func (m *AdministrationCommands) userinvites(ctx *dgc.Ctx) {
 
 	member, success := utils.Discord.TryGetMemberFromMention(ctx, ctx.Arguments.Get(0))
 	if !success {
-		ctx.RespondText("Could not find user")
+		_ = ctx.RespondText("Could not find user")
 		return
 	}
 
 	invites, err := ctx.Session.GuildInvites(utils.Misc.Or(utils.Arguments["[server id]"], ctx.Event.GuildID))
 	if err != nil {
-		ctx.RespondText("Error getting invites: " + err.Error())
+		_ = ctx.RespondText("Error getting invites: " + err.Error())
 		return
 	}
 	invitesString := ""
@@ -1589,15 +2001,22 @@ func (m *AdministrationCommands) userinvites(ctx *dgc.Ctx) {
 }
 
 func (AdministrationCommands) roleinfo(ctx *dgc.Ctx) {
+	if !utils.Discord.CheckIfInServer(ctx) {
+		return
+	}
 	role, success := utils.Discord.TryGetRoleFromMention(ctx, ctx.Arguments.Get(0))
 	if !success {
-		ctx.RespondText("Could not find role")
+		_ = ctx.RespondText("Could not find role")
 		return
 	}
 	// Get all members in guild and check if they have the role
-	members, _ := ctx.Session.LazyRequestMembers(ctx.Event.GuildID, 1000, true)
+	guild, err := utils.Discord.GetGuild(ctx.Session, ctx.Event.GuildID)
+	if err != nil {
+		_ = ctx.RespondText("Error getting server: " + err.Error())
+		return
+	}
 	memberCount := 0
-	for _, member := range members {
+	for _, member := range guild.Members {
 		if utils.SliceContains(member.Roles, role.ID) {
 			memberCount++
 		}
@@ -1623,18 +2042,18 @@ func (AdministrationCommands) giverole(ctx *dgc.Ctx) {
 	}
 	member, success := utils.Discord.TryGetMemberFromMention(ctx, ctx.Arguments.Get(0))
 	if !success {
-		ctx.RespondText("Could not find user")
+		_ = ctx.RespondText("Could not find user")
 		return
 	}
 	role, success := utils.Discord.TryGetRoleFromMention(ctx, ctx.Arguments.Get(1))
 	if !success {
-		ctx.RespondText("Could not find role")
+		_ = ctx.RespondText("Could not find role")
 		return
 	}
 
 	err := ctx.Session.GuildMemberRoleAdd(ctx.Event.GuildID, member.User.ID, role.ID)
 	if err != nil {
-		ctx.RespondText("Error giving role: " + err.Error())
+		_ = ctx.RespondText("Error giving role: " + err.Error())
 		return
 	}
 	embed.NewEmbed().
@@ -1648,18 +2067,18 @@ func (AdministrationCommands) removerole(ctx *dgc.Ctx) {
 	}
 	member, success := utils.Discord.TryGetMemberFromMention(ctx, ctx.Arguments.Get(0))
 	if !success {
-		ctx.RespondText("Could not find user")
+		_ = ctx.RespondText("Could not find user")
 		return
 	}
 	role, success := utils.Discord.TryGetRoleFromMention(ctx, ctx.Arguments.Get(1))
 	if !success {
-		ctx.RespondText("Could not find role")
+		_ = ctx.RespondText("Could not find role")
 		return
 	}
 
 	err := ctx.Session.GuildMemberRoleRemove(ctx.Event.GuildID, member.User.ID, role.ID)
 	if err != nil {
-		ctx.RespondText("Error removing role: " + err.Error())
+		_ = ctx.RespondText("Error removing role: " + err.Error())
 		return
 	}
 	embed.NewEmbed().
@@ -1673,7 +2092,7 @@ func (AdministrationCommands) createrole(ctx *dgc.Ctx) {
 	}
 	role, err := ctx.Session.GuildRoleCreate(ctx.Event.GuildID, ctx.Arguments.Raw(), 0, false, 0, false)
 	if err != nil {
-		ctx.RespondText("Error creating role: " + err.Error())
+		_ = ctx.RespondText("Error creating role: " + err.Error())
 		return
 	}
 	embed.NewEmbed().
@@ -1687,12 +2106,12 @@ func (AdministrationCommands) deleterole(ctx *dgc.Ctx) {
 	}
 	role, success := utils.Discord.TryGetRoleFromMention(ctx, ctx.Arguments.Get(0))
 	if !success {
-		ctx.RespondText("Could not find role")
+		_ = ctx.RespondText("Could not find role")
 		return
 	}
 	err := ctx.Session.GuildRoleDelete(ctx.Event.GuildID, role.ID)
 	if err != nil {
-		ctx.RespondText("Error deleting role: " + err.Error())
+		_ = ctx.RespondText("Error deleting role: " + err.Error())
 		return
 	}
 	embed.NewEmbed().
@@ -1706,12 +2125,12 @@ func (AdministrationCommands) renamerole(ctx *dgc.Ctx) {
 	}
 	role, success := utils.Discord.TryGetRoleFromMention(ctx, ctx.Arguments.Get(0))
 	if !success {
-		ctx.RespondText("Could not find role")
+		_ = ctx.RespondText("Could not find role")
 		return
 	}
 	role, err := ctx.Session.GuildRoleEdit(ctx.Event.GuildID, role.ID, utils.String.RemoveWords(ctx.Arguments.Raw(), 1), role.Color, role.Hoist, role.Permissions, role.Mentionable)
 	if err != nil {
-		ctx.RespondText("Error renaming role: " + err.Error())
+		_ = ctx.RespondText("Error renaming role: " + err.Error())
 		return
 	}
 	embed.NewEmbed().

@@ -17,8 +17,8 @@ const (
 func OnError(ctx *dgc.Ctx, err CommandError, text string) {
 	switch err {
 	case MissingRequiredArgument:
-		ctx.RespondText("Missing required argument: " + text)
+		_ = ctx.RespondText("Missing required argument: " + text)
 	case ServerOnlyCommand:
-		ctx.RespondText(fmt.Sprintf("The `%s` is only available in a server.", text))
+		_ = ctx.RespondText(fmt.Sprintf("The `%s` is only available in a server.", text))
 	}
 }

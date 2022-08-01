@@ -18,15 +18,13 @@ type Embed struct {
 	*discordgo.MessageEmbed
 }
 
-// Constants for message embed character limits
 const (
-	EmbedLimitTitle       = 256
-	EmbedLimitDescription = 2048
-	EmbedLimitFieldValue  = 1024
-	EmbedLimitFieldName   = 256
-	EmbedLimitField       = 25
-	EmbedLimitFooter      = 2048
-	EmbedLimit            = 4000
+	LimitTitle       = 256
+	LimitDescription = 2048
+	LimitFieldValue  = 1024
+	LimitFieldName   = 256
+	LimitField       = 25
+	LimitFooter      = 2048
 )
 
 //NewEmbed returns a new embed object
@@ -60,33 +58,33 @@ func (e *Embed) SetDescription(description string) *Embed {
 func (e *Embed) AddField(name, value string) *Embed {
 	fields := make([]*discordgo.MessageEmbedField, 0)
 
-	if len(name) > EmbedLimitFieldName {
-		name = name[:EmbedLimitFieldName]
+	if len(name) > LimitFieldName {
+		name = name[:LimitFieldName]
 	}
 
-	if len(value) > EmbedLimitFieldValue {
-		i := EmbedLimitFieldValue
+	if len(value) > LimitFieldValue {
+		i := LimitFieldValue
 		extended := false
-		for i = EmbedLimitFieldValue; i < len(value); {
-			if i != EmbedLimitFieldValue && !extended {
+		for i = LimitFieldValue; i < len(value); {
+			if i != LimitFieldValue && !extended {
 				name += " (extended)"
 				extended = true
 			}
 			if value[i] == []byte(" ")[0] || value[i] == []byte("\n")[0] || value[i] == []byte("-")[0] {
 				fields = append(fields, &discordgo.MessageEmbedField{
 					Name:  name,
-					Value: value[i-EmbedLimitFieldValue : i],
+					Value: value[i-LimitFieldValue : i],
 				})
 			} else {
 				fields = append(fields, &discordgo.MessageEmbedField{
 					Name:  name,
-					Value: value[i-EmbedLimitFieldValue:i-1] + "-",
+					Value: value[i-LimitFieldValue:i-1] + "-",
 				})
 				i--
 			}
 
-			if (i + EmbedLimitFieldValue) < len(value) {
-				i += EmbedLimitFieldValue
+			if (i + LimitFieldValue) < len(value) {
+				i += LimitFieldValue
 			} else {
 				break
 			}
@@ -244,7 +242,7 @@ func (e *Embed) Truncate() *Embed {
 	return e
 }
 
-// Adds last field as InLine
+// MakeFieldInline adds last field as InLine
 func (e *Embed) MakeFieldInline() *Embed {
 	length := len(e.Fields) - 1
 	e.Fields[length].Inline = true
@@ -254,17 +252,17 @@ func (e *Embed) MakeFieldInline() *Embed {
 // TruncateFields truncates fields that are too long
 func (e *Embed) TruncateFields() *Embed {
 	if len(e.Fields) > 25 {
-		e.Fields = e.Fields[:EmbedLimitField]
+		e.Fields = e.Fields[:LimitField]
 	}
 
 	for _, v := range e.Fields {
 
-		if len(v.Name) > EmbedLimitFieldName {
-			v.Name = v.Name[:EmbedLimitFieldName]
+		if len(v.Name) > LimitFieldName {
+			v.Name = v.Name[:LimitFieldName]
 		}
 
-		if len(v.Value) > EmbedLimitFieldValue {
-			v.Value = v.Value[:EmbedLimitFieldValue]
+		if len(v.Value) > LimitFieldValue {
+			v.Value = v.Value[:LimitFieldValue]
 		}
 
 	}
@@ -273,24 +271,24 @@ func (e *Embed) TruncateFields() *Embed {
 
 // TruncateDescription ...
 func (e *Embed) TruncateDescription() *Embed {
-	if len(e.Description) > EmbedLimitDescription {
-		e.Description = e.Description[:EmbedLimitDescription]
+	if len(e.Description) > LimitDescription {
+		e.Description = e.Description[:LimitDescription]
 	}
 	return e
 }
 
 // TruncateTitle ...
 func (e *Embed) TruncateTitle() *Embed {
-	if len(e.Title) > EmbedLimitTitle {
-		e.Title = e.Title[:EmbedLimitTitle]
+	if len(e.Title) > LimitTitle {
+		e.Title = e.Title[:LimitTitle]
 	}
 	return e
 }
 
 // TruncateFooter ...
 func (e *Embed) TruncateFooter() *Embed {
-	if e.Footer != nil && len(e.Footer.Text) > EmbedLimitFooter {
-		e.Footer.Text = e.Footer.Text[:EmbedLimitFooter]
+	if e.Footer != nil && len(e.Footer.Text) > LimitFooter {
+		e.Footer.Text = e.Footer.Text[:LimitFooter]
 	}
 	return e
 }
@@ -301,53 +299,53 @@ func (e *Embed) ToJson() string {
 }
 
 func (e *Embed) ToCodeblock() []string {
-	embed_string := ""
-	embed_list := []string{}
+	embedString := ""
+	var embedList []string
 	if e.Author != nil {
-		embed_string += fmt.Sprintf("```fix\n%s\n```\n", e.Author.Name)
+		embedString += fmt.Sprintf("```fix\n%s\n```\n", e.Author.Name)
 	}
 	if e.Title != "" {
-		embed_string += fmt.Sprintf("```ini\n[%s]\n```", e.Title)
+		embedString += fmt.Sprintf("```ini\n[%s]\n```", e.Title)
 	}
 	if e.Description != "" {
-		if len(embed_string+e.Description) > 2000 {
-			embed_list = append(embed_list, embed_string)
-			embed_string = ""
+		if len(embedString+e.Description) > 2000 {
+			embedList = append(embedList, embedString)
+			embedString = ""
 		}
-		embed_string += fmt.Sprintf("```md\n%s\n```", e.Description)
+		embedString += fmt.Sprintf("```md\n%s\n```", e.Description)
 	}
 	if len(e.Fields) > 0 {
 		mdAdded := false
 		for _, v := range e.Fields {
 			fieldText := fmt.Sprintf("# %s\n%s\n\n", v.Name, v.Value)
-			if len(embed_string+fieldText) > 2000 {
+			if len(embedString+fieldText) > 2000 {
 				if mdAdded {
-					embed_string += "```"
+					embedString += "```"
 					mdAdded = false
 				}
-				embed_list = append(embed_list, embed_string)
-				embed_string = ""
+				embedList = append(embedList, embedString)
+				embedString = ""
 			}
 			if !mdAdded {
-				embed_string += "```md\n"
+				embedString += "```md\n"
 				mdAdded = true
 			}
-			embed_string += fieldText
+			embedString += fieldText
 		}
-		embed_string += "```"
+		embedString += "```"
 	}
 	if e.Footer != nil {
 		footerString := fmt.Sprintf("```css\n[%s]```", e.Footer.Text)
-		if len(embed_string+footerString) > 2000 {
-			embed_list = append(embed_list, embed_string)
-			embed_string = ""
+		if len(embedString+footerString) > 2000 {
+			embedList = append(embedList, embedString)
+			embedString = ""
 		}
-		embed_string += footerString
+		embedString += footerString
 	}
-	if embed_string != "" {
-		embed_list = append(embed_list, embed_string)
+	if embedString != "" {
+		embedList = append(embedList, embedString)
 	}
-	return embed_list
+	return embedList
 }
 
 func (e *Embed) ToText() []string {
@@ -369,17 +367,17 @@ func (e *Embed) ToText() []string {
 	if e.Footer != nil {
 		str += fmt.Sprintf("\n```css\n[%s]```\n", e.Footer.Text)
 	}
-	strs := []string{}
+	var strings_ []string
 	newStr := ""
 	for _, line := range strings.Split(str, "\n") {
 		if len(newStr+line)+1 > 2000 {
-			strs = append(strs, newStr)
+			strings_ = append(strings_, newStr)
 			newStr = ""
 		}
 		newStr += line + "\n"
 	}
-	strs = append(strs, newStr)
-	return strs
+	strings_ = append(strings_, newStr)
+	return strings_
 }
 
 func (e *Embed) ToURLEmbed() []string {
@@ -387,10 +385,10 @@ func (e *Embed) ToURLEmbed() []string {
 }
 
 func (e *Embed) ToString() []string {
-	config, err := config.GetConfig()
+	cfg, err := config.GetConfig()
 	commandMode := "Codeblock"
 	if err == nil {
-		commandMode = config.Selfbot.CommandMode
+		commandMode = cfg.Selfbot.CommandMode
 	}
 	switch commandMode {
 	case "Codeblock":
@@ -410,7 +408,7 @@ func (e *Embed) Send(ctx *dgc.Ctx) *discordgo.Message {
 		message, _ = ctx.Session.ChannelMessageSend(ctx.Event.ChannelID, text)
 	}
 	if e.Image != nil && e.Image.URL != "" {
-		ctx.Session.ChannelMessageSend(ctx.Event.ChannelID, e.Image.URL)
+		_, _ = ctx.Session.ChannelMessageSend(ctx.Event.ChannelID, e.Image.URL)
 	}
 	return message
 }

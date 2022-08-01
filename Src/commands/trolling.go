@@ -75,40 +75,40 @@ func (t TrollingCommands) RegisterCommands(router *dgc.Router) {
 }
 
 func (TrollingCommands) purgehack(ctx *dgc.Ctx) {
-	ctx.RespondText("ﾠ" + strings.Repeat("\n", 1998) + "ﾠ")
+	_ = ctx.RespondText("ﾠ" + strings.Repeat("\n", 1998) + "ﾠ")
 }
 
-func (TrollingCommands) ghostping(ctx *dgc.Ctx) {
+func (TrollingCommands) ghostping(*dgc.Ctx) {
 	// noop
 }
 
-func (TrollingCommands) gprole(ctx *dgc.Ctx) {
+func (TrollingCommands) gprole(*dgc.Ctx) {
 	// noop
 }
 
 func (TrollingCommands) token(ctx *dgc.Ctx) {
 	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
-		ctx.RespondText("Could not find user.")
+		_ = ctx.RespondText("Could not find user.")
 		return
 	}
-	ctx.RespondText(encodings.Base64(user.ID, false))
+	_ = ctx.RespondText(encodings.Base64(user.ID, false))
 }
 
 func (TrollingCommands) trollnitro(ctx *dgc.Ctx) {
-	ctx.RespondText(fmt.Sprintf("dıscord.gift/%s %s https://media.discordapp.net/attachments/759817334121824297/763209007170453544/xedy9ugkqo621.png", utils.Random.String(16), constants.InvisibleText))
+	_ = ctx.RespondText(fmt.Sprintf("dıscord.gift/%s %s https://media.discordapp.net/attachments/759817334121824297/763209007170453544/xedy9ugkqo621.png", utils.Random.String(16), constants.InvisibleText))
 }
 
 func (TrollingCommands) hiddeninvite(ctx *dgc.Ctx) {
 	text := utils.String.RemoveWords(ctx.Arguments.Raw(), 1)
-	ctx.RespondText(fmt.Sprintf("%s %s %s", text, constants.InvisibleText, utils.Arguments["<invite>"]))
+	_ = ctx.RespondText(fmt.Sprintf("%s %s %s", text, constants.InvisibleText, utils.Arguments["<invite>"]))
 }
 
 func (TrollingCommands) hiddenping(ctx *dgc.Ctx) {
 	text := utils.String.RemoveWords(ctx.Arguments.Raw(), 1)
-	ctx.RespondText(fmt.Sprintf("%s %s %s", text, constants.InvisibleText, utils.Arguments["<user>"]))
+	_ = ctx.RespondText(fmt.Sprintf("%s %s %s", text, constants.InvisibleText, utils.Arguments["<user>"]))
 }
 
 func (TrollingCommands) hiddeneveryone(ctx *dgc.Ctx) {
-	ctx.RespondText(fmt.Sprintf("%s %s @everyone", ctx.Arguments.Raw(), constants.InvisibleText))
+	_ = ctx.RespondText(fmt.Sprintf("%s %s @everyone", ctx.Arguments.Raw(), constants.InvisibleText))
 }

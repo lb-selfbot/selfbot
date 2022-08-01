@@ -73,6 +73,6 @@ func (CodeblockCommands) generateFunc(element []string) func(ctx *dgc.Ctx) {
 	// If you put the function in the RegisterCommands function, the element
 	// variable will always be the last element in the command array.
 	return func(ctx *dgc.Ctx) {
-		ctx.RespondText("```" + element[2] + "\n" + ctx.Arguments.Raw() + "\n```")
+		_ = ctx.RespondText("```" + element[2] + "\n" + ctx.Arguments.Raw() + "\n```")
 	}
 }

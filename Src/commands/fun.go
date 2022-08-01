@@ -1,7 +1,6 @@
 package commands
 
 import (
-	"bytes"
 	"fmt"
 	"strings"
 	"time"
@@ -15,7 +14,7 @@ import (
 	"github.com/LightningDev1/discordgo"
 	"github.com/PuerkitoBio/goquery"
 	"github.com/brianvoe/gofakeit/v6"
-	owoify_go "github.com/deadshot465/owoify-go"
+	owoifygo "github.com/deadshot465/owoify-go"
 )
 
 type FunCommands struct{}
@@ -92,12 +91,6 @@ func (f FunCommands) RegisterCommands(router *dgc.Router) {
 		Description: "Play the slot machine",
 		Usage:       "[p]slot",
 		Handler:     f.slot,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "tts",
-		Description: "Send a Text-To-Speech message",
-		Usage:       "[p]tts <language> <text>",
-		Handler:     f.tts,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "advice",
@@ -498,7 +491,7 @@ func (FunCommands) insult(ctx *dgc.Ctx) {
 	user, _ := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	insult, err := http.GetJson(fmt.Sprintf("https://lightning-bot.com/api/v2/selfbot/roast?mention=%s", user.String()))
 	if err != nil {
-		ctx.RespondText("An error has occurred.")
+		_ = ctx.RespondText("An error has occurred.")
 	}
 	embed.NewEmbed().
 		AddField("Insult", insult.Get("roast").MustString()).
@@ -508,7 +501,7 @@ func (FunCommands) insult(ctx *dgc.Ctx) {
 func (FunCommands) dadjoke(ctx *dgc.Ctx) {
 	joke, err := http.GetJson("https://icanhazdadjoke.com/", map[string]string{"Accept": "application/json"})
 	if err != nil {
-		ctx.RespondText("An error has occurred.")
+		_ = ctx.RespondText("An error has occurred.")
 		return
 	}
 	embed.NewEmbed().
@@ -519,7 +512,7 @@ func (FunCommands) dadjoke(ctx *dgc.Ctx) {
 func (FunCommands) yomomma(ctx *dgc.Ctx) {
 	joke, err := http.GetJson("https://api.yomomma.info/")
 	if err != nil {
-		ctx.RespondText("An error has occurred.")
+		_ = ctx.RespondText("An error has occurred.")
 		return
 	}
 	embed.NewEmbed().
@@ -530,7 +523,7 @@ func (FunCommands) yomomma(ctx *dgc.Ctx) {
 func (FunCommands) wouldyourather(ctx *dgc.Ctx) {
 	html, err := http.Get("https://www.conversationstarters.com/wyrqlist.php")
 	if err != nil {
-		ctx.RespondText("An error has occurred.")
+		_ = ctx.RespondText("An error has occurred.")
 		return
 	}
 	embed.NewEmbed().
@@ -543,7 +536,7 @@ func (FunCommands) wouldyourather(ctx *dgc.Ctx) {
 func (FunCommands) topic(ctx *dgc.Ctx) {
 	html, err := http.Get("https://www.conversationstarters.com/generator.php")
 	if err != nil {
-		ctx.RespondText("An error has occurred.")
+		_ = ctx.RespondText("An error has occurred.")
 		return
 	}
 	embed.NewEmbed().
@@ -583,23 +576,10 @@ func (FunCommands) slot(ctx *dgc.Ctx) {
 	ctx.Session.ChannelMessageEdit(message.ChannelID, message.ID, getEmbed(true))
 }
 
-func (FunCommands) tts(ctx *dgc.Ctx) {
-	ttsFile, err := api.TTS(utils.String.RemoveWords(ctx.Arguments.Raw(), 1), utils.Arguments["<language>"])
-	if err != nil {
-		ctx.RespondText("An error has occurred.")
-		return
-	}
-	if strings.Contains(string(ttsFile), "Bad Request") {
-		ctx.RespondText("Invalid language. Please use an ISO 639-1 language code. See https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes for more information.")
-		return
-	}
-	ctx.Session.ChannelFileSend(ctx.Event.ChannelID, "tts.mp3", bytes.NewReader(ttsFile))
-}
-
 func (FunCommands) advice(ctx *dgc.Ctx) {
 	advice, err := http.GetJson("https://api.adviceslip.com/advice")
 	if err != nil {
-		ctx.RespondText("An error has occurred.")
+		_ = ctx.RespondText("An error has occurred.")
 		return
 	}
 	embed.NewEmbed().
@@ -610,7 +590,7 @@ func (FunCommands) advice(ctx *dgc.Ctx) {
 func (FunCommands) catfact(ctx *dgc.Ctx) {
 	fact, err := http.GetJson("https://some-random-api.ml/facts/cat")
 	if err != nil {
-		ctx.RespondText("An error has occurred.")
+		_ = ctx.RespondText("An error has occurred.")
 		return
 	}
 	embed.NewEmbed().
@@ -621,7 +601,7 @@ func (FunCommands) catfact(ctx *dgc.Ctx) {
 func (FunCommands) dogfact(ctx *dgc.Ctx) {
 	fact, err := http.GetJson("https://some-random-api.ml/facts/dog")
 	if err != nil {
-		ctx.RespondText("An error has occurred.")
+		_ = ctx.RespondText("An error has occurred.")
 		return
 	}
 	embed.NewEmbed().
@@ -632,7 +612,7 @@ func (FunCommands) dogfact(ctx *dgc.Ctx) {
 func (FunCommands) pandafact(ctx *dgc.Ctx) {
 	fact, err := http.GetJson("https://some-random-api.ml/facts/panda")
 	if err != nil {
-		ctx.RespondText("An error has occurred.")
+		_ = ctx.RespondText("An error has occurred.")
 		return
 	}
 	embed.NewEmbed().
@@ -643,7 +623,7 @@ func (FunCommands) pandafact(ctx *dgc.Ctx) {
 func (FunCommands) foxfact(ctx *dgc.Ctx) {
 	fact, err := http.GetJson("https://some-random-api.ml/facts/fox")
 	if err != nil {
-		ctx.RespondText("An error has occurred.")
+		_ = ctx.RespondText("An error has occurred.")
 		return
 	}
 	embed.NewEmbed().
@@ -654,7 +634,7 @@ func (FunCommands) foxfact(ctx *dgc.Ctx) {
 func (FunCommands) koalafact(ctx *dgc.Ctx) {
 	fact, err := http.GetJson("https://some-random-api.ml/facts/koala")
 	if err != nil {
-		ctx.RespondText("An error has occurred.")
+		_ = ctx.RespondText("An error has occurred.")
 		return
 	}
 	embed.NewEmbed().
@@ -665,7 +645,7 @@ func (FunCommands) koalafact(ctx *dgc.Ctx) {
 func (FunCommands) birdfact(ctx *dgc.Ctx) {
 	fact, err := http.GetJson("https://api.animality.xyz/fact/bird")
 	if err != nil {
-		ctx.RespondText("An error has occurred.")
+		_ = ctx.RespondText("An error has occurred.")
 		return
 	}
 	embed.NewEmbed().
@@ -676,7 +656,7 @@ func (FunCommands) birdfact(ctx *dgc.Ctx) {
 func (FunCommands) redpandafact(ctx *dgc.Ctx) {
 	fact, err := http.GetJson("https://api.animality.xyz/fact/redpanda")
 	if err != nil {
-		ctx.RespondText("An error has occurred.")
+		_ = ctx.RespondText("An error has occurred.")
 		return
 	}
 	embed.NewEmbed().
@@ -687,7 +667,7 @@ func (FunCommands) redpandafact(ctx *dgc.Ctx) {
 func (FunCommands) whalefact(ctx *dgc.Ctx) {
 	fact, err := http.GetJson("https://api.animality.xyz/fact/whale")
 	if err != nil {
-		ctx.RespondText("An error has occurred.")
+		_ = ctx.RespondText("An error has occurred.")
 		return
 	}
 	embed.NewEmbed().
@@ -698,7 +678,7 @@ func (FunCommands) whalefact(ctx *dgc.Ctx) {
 func (FunCommands) kangaroofact(ctx *dgc.Ctx) {
 	fact, err := http.GetJson("https://api.animality.xyz/fact/kangaroo")
 	if err != nil {
-		ctx.RespondText("An error has occurred.")
+		_ = ctx.RespondText("An error has occurred.")
 		return
 	}
 	embed.NewEmbed().
@@ -709,7 +689,7 @@ func (FunCommands) kangaroofact(ctx *dgc.Ctx) {
 func (FunCommands) bunnyfact(ctx *dgc.Ctx) {
 	fact, err := http.GetJson("https://api.animality.xyz/fact/bunny")
 	if err != nil {
-		ctx.RespondText("An error has occurred.")
+		_ = ctx.RespondText("An error has occurred.")
 		return
 	}
 	embed.NewEmbed().
@@ -720,7 +700,7 @@ func (FunCommands) bunnyfact(ctx *dgc.Ctx) {
 func (FunCommands) lionfact(ctx *dgc.Ctx) {
 	fact, err := http.GetJson("https://api.animality.xyz/fact/lion")
 	if err != nil {
-		ctx.RespondText("An error has occurred.")
+		_ = ctx.RespondText("An error has occurred.")
 		return
 	}
 	embed.NewEmbed().
@@ -731,7 +711,7 @@ func (FunCommands) lionfact(ctx *dgc.Ctx) {
 func (FunCommands) frogfact(ctx *dgc.Ctx) {
 	fact, err := http.GetJson("https://api.animality.xyz/fact/frog")
 	if err != nil {
-		ctx.RespondText("An error has occurred.")
+		_ = ctx.RespondText("An error has occurred.")
 		return
 	}
 	embed.NewEmbed().
@@ -742,7 +722,7 @@ func (FunCommands) frogfact(ctx *dgc.Ctx) {
 func (FunCommands) duckfact(ctx *dgc.Ctx) {
 	fact, err := http.GetJson("https://api.animality.xyz/fact/duck")
 	if err != nil {
-		ctx.RespondText("An error has occurred.")
+		_ = ctx.RespondText("An error has occurred.")
 		return
 	}
 	embed.NewEmbed().
@@ -753,7 +733,7 @@ func (FunCommands) duckfact(ctx *dgc.Ctx) {
 func (FunCommands) penguinfact(ctx *dgc.Ctx) {
 	fact, err := http.GetJson("https://api.animality.xyz/fact/penguin")
 	if err != nil {
-		ctx.RespondText("An error has occurred.")
+		_ = ctx.RespondText("An error has occurred.")
 		return
 	}
 	embed.NewEmbed().
@@ -767,7 +747,7 @@ func (FunCommands) trivia(ctx *dgc.Ctx) {
 	rawJson = strings.Replace(rawJson, "&#039;", "'", -1)
 	trivia, err2 := json.SimpleUnmarshal(rawJson)
 	if err1 != nil || err2 != nil {
-		ctx.RespondText("An error has occurred.")
+		_ = ctx.RespondText("An error has occurred.")
 		return
 	}
 	trivia = trivia.Get("results").GetIndex(0)
@@ -795,11 +775,11 @@ func (FunCommands) randomemoji(ctx *dgc.Ctx) {
 	}
 	emojis, err := ctx.Session.GuildEmojis(ctx.Event.GuildID)
 	if err != nil {
-		ctx.RespondText("An error has occurred.")
+		_ = ctx.RespondText("An error has occurred.")
 		return
 	}
 	emoji := utils.RandomChoice(emojis)
-	ctx.RespondText(emoji.MessageFormat())
+	_ = ctx.RespondText(emoji.MessageFormat())
 }
 
 func (FunCommands) randomchannel(ctx *dgc.Ctx) {
@@ -808,7 +788,7 @@ func (FunCommands) randomchannel(ctx *dgc.Ctx) {
 	}
 	channels, err := ctx.Session.GuildChannels(ctx.Event.GuildID)
 	if err != nil {
-		ctx.RespondText("An error has occurred.")
+		_ = ctx.RespondText("An error has occurred.")
 		return
 	}
 	for index, channel := range channels {
@@ -818,7 +798,7 @@ func (FunCommands) randomchannel(ctx *dgc.Ctx) {
 		}
 	}
 	channel := utils.RandomChoice(channels)
-	ctx.RespondText(channel.Mention())
+	_ = ctx.RespondText(channel.Mention())
 }
 
 func (FunCommands) choose(ctx *dgc.Ctx) {
@@ -841,7 +821,7 @@ func (FunCommands) numberfact(ctx *dgc.Ctx) {
 	number := utils.Arguments["<number>"]
 	fact, err := http.Get(fmt.Sprintf("http://numbersapi.com/%s", number))
 	if err != nil {
-		ctx.RespondText("An error has occurred.")
+		_ = ctx.RespondText("An error has occurred.")
 		return
 	}
 	embed.NewEmbed().
@@ -853,7 +833,7 @@ func (FunCommands) numberfact(ctx *dgc.Ctx) {
 func (FunCommands) joke(ctx *dgc.Ctx) {
 	joke, err := http.GetJson("https://v2.jokeapi.dev/joke/Any")
 	if err != nil {
-		ctx.RespondText("An error has occurred.")
+		_ = ctx.RespondText("An error has occurred.")
 		return
 	}
 	embed := embed.NewEmbed()
@@ -869,12 +849,12 @@ func (FunCommands) joke(ctx *dgc.Ctx) {
 func (FunCommands) fml(ctx *dgc.Ctx) {
 	html, err := http.Get("https://www.fmylife.com/random")
 	if err != nil {
-		ctx.RespondText("An error has occurred.")
+		_ = ctx.RespondText("An error has occurred.")
 		return
 	}
 	doc, err := goquery.NewDocumentFromReader(strings.NewReader(html))
 	if err != nil {
-		ctx.RespondText("An error has occurred.")
+		_ = ctx.RespondText("An error has occurred.")
 		return
 	}
 	embed.NewEmbed().
@@ -885,7 +865,7 @@ func (FunCommands) fml(ctx *dgc.Ctx) {
 func (FunCommands) tronald(ctx *dgc.Ctx) {
 	tronald, err := http.GetJson("https://api.tronalddump.io/random/quote", map[string]string{"Accept": "application/hal+json"})
 	if err != nil {
-		ctx.RespondText("An error has occurred.")
+		_ = ctx.RespondText("An error has occurred.")
 		return
 	}
 	embed.NewEmbed().
@@ -896,7 +876,7 @@ func (FunCommands) tronald(ctx *dgc.Ctx) {
 func (FunCommands) kanyewest(ctx *dgc.Ctx) {
 	kanyewest, err := http.GetJson("https://api.kanye.rest")
 	if err != nil {
-		ctx.RespondText("An error has occurred.")
+		_ = ctx.RespondText("An error has occurred.")
 		return
 	}
 	embed.NewEmbed().
@@ -907,7 +887,7 @@ func (FunCommands) kanyewest(ctx *dgc.Ctx) {
 func (FunCommands) rps(ctx *dgc.Ctx) {
 	choice := utils.Arguments["<rock/paper/scissors>"]
 	if choice != "rock" && choice != "paper" && choice != "scissors" {
-		ctx.RespondText("You can only choose rock, paper or scissors.")
+		_ = ctx.RespondText("You can only choose rock, paper or scissors.")
 		return
 	}
 	embed.NewEmbed().
@@ -927,70 +907,70 @@ func (FunCommands) covidtest(ctx *dgc.Ctx) {
 func (FunCommands) hug(ctx *dgc.Ctx) {
 	url, err := utils.Misc.GetImageUrlFromJson("https://nekos.life/api/v2/img/hug", "url")
 	if err != nil {
-		ctx.RespondText("An error has occurred.")
+		_ = ctx.RespondText("An error has occurred.")
 		return
 	}
-	ctx.RespondText(url)
+	_ = ctx.RespondText(url)
 }
 
 func (FunCommands) kiss(ctx *dgc.Ctx) {
 	url, err := utils.Misc.GetImageUrlFromJson("https://nekos.life/api/v2/img/kiss", "url")
 	if err != nil {
-		ctx.RespondText("An error has occurred.")
+		_ = ctx.RespondText("An error has occurred.")
 		return
 	}
-	ctx.RespondText(url)
+	_ = ctx.RespondText(url)
 }
 
 func (FunCommands) slap(ctx *dgc.Ctx) {
 	url, err := utils.Misc.GetImageUrlFromJson("https://nekos.life/api/v2/img/slap", "url")
 	if err != nil {
-		ctx.RespondText("An error has occurred.")
+		_ = ctx.RespondText("An error has occurred.")
 		return
 	}
-	ctx.RespondText(url)
+	_ = ctx.RespondText(url)
 }
 
 func (FunCommands) cuddle(ctx *dgc.Ctx) {
 	url, err := utils.Misc.GetImageUrlFromJson("https://nekos.life/api/v2/img/cuddle", "url")
 	if err != nil {
-		ctx.RespondText("An error has occurred.")
+		_ = ctx.RespondText("An error has occurred.")
 		return
 	}
-	ctx.RespondText(url)
+	_ = ctx.RespondText(url)
 }
 
 func (FunCommands) pat(ctx *dgc.Ctx) {
 	url, err := utils.Misc.GetImageUrlFromJson("https://nekos.life/api/v2/img/pat", "url")
 	if err != nil {
-		ctx.RespondText("An error has occurred.")
+		_ = ctx.RespondText("An error has occurred.")
 		return
 	}
-	ctx.RespondText(url)
+	_ = ctx.RespondText(url)
 }
 
 func (FunCommands) feed(ctx *dgc.Ctx) {
 	url, err := utils.Misc.GetImageUrlFromJson("https://nekos.life/api/v2/img/feed", "url")
 	if err != nil {
-		ctx.RespondText("An error has occurred.")
+		_ = ctx.RespondText("An error has occurred.")
 		return
 	}
-	ctx.RespondText(url)
+	_ = ctx.RespondText(url)
 }
 
 func (FunCommands) wink(ctx *dgc.Ctx) {
 	url, err := utils.Misc.GetImageUrlFromJson("https://some-random-api.ml/animu/wink", "link")
 	if err != nil {
-		ctx.RespondText("An error has occurred.")
+		_ = ctx.RespondText("An error has occurred.")
 		return
 	}
-	ctx.RespondText(url)
+	_ = ctx.RespondText(url)
 }
 
 func (FunCommands) chucknorris(ctx *dgc.Ctx) {
 	joke, err := http.GetJson("https://api.chucknorris.io/jokes/random")
 	if err != nil {
-		ctx.RespondText("An error has occurred.")
+		_ = ctx.RespondText("An error has occurred.")
 		return
 	}
 	embed.NewEmbed().
@@ -1001,7 +981,7 @@ func (FunCommands) chucknorris(ctx *dgc.Ctx) {
 func (FunCommands) iss(ctx *dgc.Ctx) {
 	iss, err := http.GetJson("http://api.open-notify.org/iss-now.json")
 	if err != nil {
-		ctx.RespondText("An error has occurred.")
+		_ = ctx.RespondText("An error has occurred.")
 		return
 	}
 	latitude := iss.GetPath("iss_position", "latitude").MustString()
@@ -1017,7 +997,7 @@ func (FunCommands) iss(ctx *dgc.Ctx) {
 func (FunCommands) apod(ctx *dgc.Ctx) {
 	apod, err := http.GetJson("https://api.nasa.gov/planetary/apod?api_key=rDenYNQFftu3YADWdUmF9s8iw0cyZckV7vBcibGe")
 	if err != nil {
-		ctx.RespondText("An error has occurred.")
+		_ = ctx.RespondText("An error has occurred.")
 		return
 	}
 	copyright := apod.Get("copyright").MustString()
@@ -1047,12 +1027,12 @@ func (FunCommands) httpcat(ctx *dgc.Ctx) {
 func (FunCommands) riddle(ctx *dgc.Ctx) {
 	html, err := http.Get("https://generatorfun.com/code/model/generatorcontent.php?recordtable=generator&recordkey=69&gen=Y&itemnumber=10&randomoption=undefined&genimage=Yes&geneditor=No&nsfw=undefined&keyword=undefined&searchfilter=&searchfilterexclude=&tone=Normal&prefix=None&randomai=No")
 	if err != nil {
-		ctx.RespondText("An error has occurred.")
+		_ = ctx.RespondText("An error has occurred.")
 		return
 	}
 	doc, err := goquery.NewDocumentFromReader(strings.NewReader(html))
 	if err != nil {
-		ctx.RespondText("An error has occurred.")
+		_ = ctx.RespondText("An error has occurred.")
 		return
 	}
 	riddles := doc.Find("#gencont").Find("p").Map(func(i int, s *goquery.Selection) string {
@@ -1067,7 +1047,7 @@ func (FunCommands) riddle(ctx *dgc.Ctx) {
 func (FunCommands) quote(ctx *dgc.Ctx) {
 	quote, err := http.GetJson("https://api.quotable.io/random")
 	if err != nil {
-		ctx.RespondText("An error has occurred.")
+		_ = ctx.RespondText("An error has occurred.")
 		return
 	}
 	embed.NewEmbed().
@@ -1079,7 +1059,7 @@ func (FunCommands) quote(ctx *dgc.Ctx) {
 func (FunCommands) evilinsult(ctx *dgc.Ctx) {
 	insult, err := http.Get("https://evilinsult.com/generate_insult.php?lang=en")
 	if err != nil {
-		ctx.RespondText("An error has occurred.")
+		_ = ctx.RespondText("An error has occurred.")
 		return
 	}
 	embed.NewEmbed().
@@ -1088,42 +1068,42 @@ func (FunCommands) evilinsult(ctx *dgc.Ctx) {
 }
 
 func (FunCommands) owoify(ctx *dgc.Ctx) {
-	ctx.RespondText(owoify_go.Owoify(ctx.Arguments.Raw(), "owo"))
+	_ = ctx.RespondText(owoifygo.Owoify(ctx.Arguments.Raw(), "owo"))
 }
 
 func (FunCommands) uwuify(ctx *dgc.Ctx) {
-	ctx.RespondText(owoify_go.Owoify(ctx.Arguments.Raw(), "uwu"))
+	_ = ctx.RespondText(owoifygo.Owoify(ctx.Arguments.Raw(), "uwu"))
 }
 
 func (FunCommands) uvuify(ctx *dgc.Ctx) {
-	ctx.RespondText(owoify_go.Owoify(ctx.Arguments.Raw(), "uvu"))
+	_ = ctx.RespondText(owoifygo.Owoify(ctx.Arguments.Raw(), "uvu"))
 }
 
 func (FunCommands) rickrollurl(ctx *dgc.Ctx) {
-	ctx.RespondText("https://www.youtube.com/watch?v=dQw4w9WgXcQ")
+	_ = ctx.RespondText("https://www.youtube.com/watch?v=dQw4w9WgXcQ")
 }
 
 func (FunCommands) rickroll(ctx *dgc.Ctx) {
-	ctx.RespondText("**We're no strangers to love\nYou know the rules and so do I\nA full commitment's what I'm thinking of\nYou wouldn't get this from any other guy\nI just wanna tell you how I'm feeling\nGotta make you understand\nNever gonna give you up\nNever gonna let you down\nNever gonna run around and desert you\nNever gonna make you cry\nNever gonna say goodbye\nNever gonna tell a lie and hurt you\nWe've known each other for so long\nYour heart's been aching but you're too shy to say it\nInside we both know what's been going on\nWe know the game and we're gonna play it\nAnd if you ask me how I'm feeling\nDon't tell me you're too blind to see\nNever gonna give you up\nNever gonna let you down\nNever gonna run around and desert you\nNever gonna make you cry\nNever gonna say goodbye\nNever gonna tell a lie and hurt you\nNever gonna give you up\nNever gonna let you down\nNever gonna run around and desert you\nNever gonna make you cry\nNever gonna say goodbye\nNever gonna tell a lie and hurt you\nNever gonna give, never gonna give\n(Give you up)\n(Ooh) Never gonna give, never gonna give\n(Give you up)\nWe've known each other for so long\nYour heart's been aching but you're too shy to say it\nInside we both know what's been going on\nWe know the game and we're gonna play it\nI just wanna tell you how I'm feeling\nGotta make you understand\nNever gonna give you up\nNever gonna let you down\nNever gonna run around and desert you\nNever gonna make you cry\nNever gonna say goodbye\nNever gonna tell a lie and hurt you\nNever gonna give you up\nNever gonna let you down\nNever gonna run around and desert you\nNever gonna make you cry\nNever gonna say goodbye\nNever gonna tell a lie and hurt you\nNever gonna give you up\nNever gonna let you down\nNever gonna run around and desert you\nNever gonna make you cry**")
+	_ = ctx.RespondText("**We're no strangers to love\nYou know the rules and so do I\nA full commitment's what I'm thinking of\nYou wouldn't get this from any other guy\nI just wanna tell you how I'm feeling\nGotta make you understand\nNever gonna give you up\nNever gonna let you down\nNever gonna run around and desert you\nNever gonna make you cry\nNever gonna say goodbye\nNever gonna tell a lie and hurt you\nWe've known each other for so long\nYour heart's been aching but you're too shy to say it\nInside we both know what's been going on\nWe know the game and we're gonna play it\nAnd if you ask me how I'm feeling\nDon't tell me you're too blind to see\nNever gonna give you up\nNever gonna let you down\nNever gonna run around and desert you\nNever gonna make you cry\nNever gonna say goodbye\nNever gonna tell a lie and hurt you\nNever gonna give you up\nNever gonna let you down\nNever gonna run around and desert you\nNever gonna make you cry\nNever gonna say goodbye\nNever gonna tell a lie and hurt you\nNever gonna give, never gonna give\n(Give you up)\n(Ooh) Never gonna give, never gonna give\n(Give you up)\nWe've known each other for so long\nYour heart's been aching but you're too shy to say it\nInside we both know what's been going on\nWe know the game and we're gonna play it\nI just wanna tell you how I'm feeling\nGotta make you understand\nNever gonna give you up\nNever gonna let you down\nNever gonna run around and desert you\nNever gonna make you cry\nNever gonna say goodbye\nNever gonna tell a lie and hurt you\nNever gonna give you up\nNever gonna let you down\nNever gonna run around and desert you\nNever gonna make you cry\nNever gonna say goodbye\nNever gonna tell a lie and hurt you\nNever gonna give you up\nNever gonna let you down\nNever gonna run around and desert you\nNever gonna make you cry**")
 }
 
 func (FunCommands) impersonate(ctx *dgc.Ctx) {
 	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
-		ctx.RespondText("Could not find user.")
+		_ = ctx.RespondText("Could not find user.")
 		return
 	}
 	text := utils.String.RemoveWords(ctx.Arguments.Raw(), 1)
 	webhooks, err := ctx.Session.ChannelWebhooks(ctx.Event.ChannelID)
 	if err != nil {
-		ctx.RespondText("You need the manage_webhooks permission to use this command.")
+		_ = ctx.RespondText("You need the manage_webhooks permission to use this command.")
 		return
 	}
 	var webhook *discordgo.Webhook
 	if len(webhooks) == 0 {
 		webhook, err = ctx.Session.WebhookCreate(ctx.Event.ChannelID, "Impersonate", "")
 		if err != nil {
-			ctx.RespondText("An error has occurred creating a webhook.")
+			_ = ctx.RespondText("An error has occurred creating a webhook.")
 			return
 		}
 	} else {
@@ -1149,14 +1129,14 @@ func (FunCommands) coinflip(ctx *dgc.Ctx) {
 }
 
 func (FunCommands) notfunny(ctx *dgc.Ctx) {
-	ctx.RespondText("**Not funny I didn't laugh. Your joke is so bad I would have preferred the joke went over my head and you gave up re-telling me the joke. To be honest this is a horrid attempt at trying to get a laugh out of me. Not a chuckle, not a hehe, not even a subtle burst of air out of my esophagus. Science says before you laugh your brain preps your face muscles but I didn't even feel the slightest twitch. 0/10 this joke is so bad I cannot believe anyone legally allowed you to be creative at all. The amount of brain power you must have put into that joke has the potential to power every house on Earth. Get a personality and learn how to make jokes, read a book. I'm not saying this to be funny I genuinely mean it on how this is just bottom barrel embarrassment at comedy. You've single handedly killed humor and every comedic act on the planet. I'm so disappointed that society has failed as a whole in being able to teach you how to be funny. Honestly if I put in all my power and time to try and make your joke funny it would require Einstein himself to build a device to strap me into so I can be connected to the energy of a billion stars to do it, and even then all that joke would get from people is a subtle scuff. You're lucky I still have the slightest of empathy for you after telling that joke otherwise I would have committed every war crime in the book just to prevent you from attempting any humor ever again. We should put that joke in text books so future generations can be wary of becoming such an absolute comedic failure. Im disappointed, hurt, and outright offended that my precious time has been wasted in my brain understanding that joke. In the time that took I was planning on helping kids who have been orphaned, but because of that you've waisted my time explaining the obscene integrity of your terrible attempt at comedy. Now those kids are suffering without meals and there's nobody to blame but you.**")
-	ctx.RespondText("**I hope you're happy with what you have done and I truly hope you can move on and learn from this piss poor attempt**")
+	_ = ctx.RespondText("**Not funny I didn't laugh. Your joke is so bad I would have preferred the joke went over my head and you gave up re-telling me the joke. To be honest this is a horrid attempt at trying to get a laugh out of me. Not a chuckle, not a hehe, not even a subtle burst of air out of my esophagus. Science says before you laugh your brain preps your face muscles but I didn't even feel the slightest twitch. 0/10 this joke is so bad I cannot believe anyone legally allowed you to be creative at all. The amount of brain power you must have put into that joke has the potential to power every house on Earth. Get a personality and learn how to make jokes, read a book. I'm not saying this to be funny I genuinely mean it on how this is just bottom barrel embarrassment at comedy. You've single handedly killed humor and every comedic act on the planet. I'm so disappointed that society has failed as a whole in being able to teach you how to be funny. Honestly if I put in all my power and time to try and make your joke funny it would require Einstein himself to build a device to strap me into so I can be connected to the energy of a billion stars to do it, and even then all that joke would get from people is a subtle scuff. You're lucky I still have the slightest of empathy for you after telling that joke otherwise I would have committed every war crime in the book just to prevent you from attempting any humor ever again. We should put that joke in text books so future generations can be wary of becoming such an absolute comedic failure. Im disappointed, hurt, and outright offended that my precious time has been wasted in my brain understanding that joke. In the time that took I was planning on helping kids who have been orphaned, but because of that you've waisted my time explaining the obscene integrity of your terrible attempt at comedy. Now those kids are suffering without meals and there's nobody to blame but you.**")
+	_ = ctx.RespondText("**I hope you're happy with what you have done and I truly hope you can move on and learn from this piss poor attempt**")
 }
 
 func (FunCommands) randomquestion(ctx *dgc.Ctx) {
 	question, err := http.GetJson("https://nekos.life/api/v2/why")
 	if err != nil {
-		ctx.RespondText("An error has occurred.")
+		_ = ctx.RespondText("An error has occurred.")
 		return
 	}
 	embed.NewEmbed().

@@ -74,7 +74,7 @@ func (CryptoCommands) generateFunc(element []string) func(ctx *dgc.Ctx) {
 	return func(ctx *dgc.Ctx) {
 		json, err := http.GetJson("https://min-api.cryptocompare.com/data/price?fsym=" + element[1] + "&tsyms=USD,EUR")
 		if err != nil {
-			ctx.RespondText("An error has occurred.")
+			_ = ctx.RespondText("An error has occurred.")
 		}
 		usd := json.Get("USD").MustFloat64()
 		eur := json.Get("EUR").MustFloat64()

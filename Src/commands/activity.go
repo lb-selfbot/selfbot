@@ -1,9 +1,12 @@
 package commands
 
 import (
+	"encoding/json"
+	"fmt"
 	"time"
 
 	"github.com/LightningDev1/LB-Selfbot/api"
+	"github.com/LightningDev1/LB-Selfbot/embed"
 	"github.com/LightningDev1/LB-Selfbot/utils"
 	"github.com/LightningDev1/dgc"
 	"github.com/LightningDev1/discordgo"
@@ -17,7 +20,8 @@ type ActivityCommands struct {
 	Session      *discordgo.Session
 }
 
-func (a *ActivityCommands) RegisterCommands(router *dgc.Router) {
+func (a *ActivityCommands) RegisterCommands(router *dgc.Router, session *discordgo.Session) {
+	a.Session = session
 	router.RegisterCmd(&dgc.Command{
 		Name:        "online",
 		Description: "Set your status to online",
@@ -180,6 +184,18 @@ func (a *ActivityCommands) RegisterCommands(router *dgc.Router) {
 		Usage:       "[p]timestatus",
 		Handler:     a.timestatus,
 	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "getuseractivity",
+		Description: "Get a users activity in JSON format",
+		Usage:       "[p]getuseractivity <user>",
+		Handler:     a.getuseractivity,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "setactivityjson",
+		Description: "Set your activity using raw JSON",
+		Usage:       "[p]setactivityjson <json>",
+		Handler:     a.setactivityjson,
+	})
 
 	statuses := []string{"online", "dnd", "idle", "invisible"}
 	activityTypes := []string{"listening", "watching", "playing", "streaming", "competing"}
@@ -262,32 +278,26 @@ func (a *ActivityCommands) setActivity(activityType, text string) {
 }
 
 func (a *ActivityCommands) online(ctx *dgc.Ctx) {
-	a.Session = ctx.Session
 	a.setActivity("status", "online")
 }
 
 func (a *ActivityCommands) dnd(ctx *dgc.Ctx) {
-	a.Session = ctx.Session
 	a.setActivity("status", "dnd")
 }
 
 func (a *ActivityCommands) idle(ctx *dgc.Ctx) {
-	a.Session = ctx.Session
 	a.setActivity("status", "idle")
 }
 
 func (a *ActivityCommands) invisible(ctx *dgc.Ctx) {
-	a.Session = ctx.Session
 	a.setActivity("status", "invisible")
 }
 
 func (a *ActivityCommands) customstatus(ctx *dgc.Ctx) {
-	a.Session = ctx.Session
 	a.setActivity("customstatus", ctx.Arguments.Raw())
 }
 
 func (a *ActivityCommands) clearcustomstatus(ctx *dgc.Ctx) {
-	a.Session = ctx.Session
 	a.setActivity("customstatus", "")
 }
 
@@ -295,33 +305,28 @@ func (a *ActivityCommands) aboutme(ctx *dgc.Ctx) {
 	api.ChangeSettings(map[string]interface{}{"bio": ctx.Arguments.Raw()}, false)
 }
 
-func (a *ActivityCommands) clearaboutme(ctx *dgc.Ctx) {
+func (a *ActivityCommands) clearaboutme(*dgc.Ctx) {
 	api.ChangeSettings(map[string]interface{}{"bio": ""}, false)
 }
 
 func (a *ActivityCommands) listening(ctx *dgc.Ctx) {
-	a.Session = ctx.Session
 	a.setActivity("listening", ctx.Arguments.Raw())
 }
 
 func (a *ActivityCommands) watching(ctx *dgc.Ctx) {
-	a.Session = ctx.Session
 	a.setActivity("watching", ctx.Arguments.Raw())
 }
 
 func (a *ActivityCommands) playing(ctx *dgc.Ctx) {
-	a.Session = ctx.Session
 	a.setActivity("playing", ctx.Arguments.Raw())
 }
 
 func (a *ActivityCommands) streaming(ctx *dgc.Ctx) {
-	a.Session = ctx.Session
 	a.StreamingURL = utils.Arguments["<url>"]
 	a.setActivity("streaming", utils.String.RemoveWords(ctx.Arguments.Raw(), 1))
 }
 
 func (a *ActivityCommands) competing(ctx *dgc.Ctx) {
-	a.Session = ctx.Session
 	a.setActivity("competing", ctx.Arguments.Raw())
 }
 
@@ -400,7 +405,6 @@ func (ActivityCommands) discordactivity(ctx *dgc.Ctx) {
 }
 
 func (a *ActivityCommands) cyclestatus(ctx *dgc.Ctx) {
-	a.Session = ctx.Session
 	a.CycleOn = true
 	a.CycleMode = "status"
 }
@@ -419,35 +423,30 @@ func (a *ActivityCommands) setCycleText() {
 }
 
 func (a *ActivityCommands) cyclecstatus(ctx *dgc.Ctx) {
-	a.Session = ctx.Session
 	a.CycleOn = true
 	a.CycleMode = "customstatus"
 	a.setCycleText()
 }
 
 func (a *ActivityCommands) cyclelistening(ctx *dgc.Ctx) {
-	a.Session = ctx.Session
 	a.CycleOn = true
 	a.CycleMode = "listening"
 	a.setCycleText()
 }
 
 func (a *ActivityCommands) cyclewatching(ctx *dgc.Ctx) {
-	a.Session = ctx.Session
 	a.CycleOn = true
 	a.CycleMode = "watching"
 	a.setCycleText()
 }
 
 func (a *ActivityCommands) cycleplaying(ctx *dgc.Ctx) {
-	a.Session = ctx.Session
 	a.CycleOn = true
 	a.CycleMode = "playing"
 	a.setCycleText()
 }
 
 func (a *ActivityCommands) cyclestreaming(ctx *dgc.Ctx) {
-	a.Session = ctx.Session
 	a.CycleOn = true
 	a.CycleMode = "streaming"
 	a.StreamingURL = utils.Arguments["<url>"]
@@ -455,14 +454,12 @@ func (a *ActivityCommands) cyclestreaming(ctx *dgc.Ctx) {
 }
 
 func (a *ActivityCommands) cyclecompeting(ctx *dgc.Ctx) {
-	a.Session = ctx.Session
 	a.CycleOn = true
 	a.CycleMode = "competing"
 	a.setCycleText()
 }
 
 func (a *ActivityCommands) cycleactivity(ctx *dgc.Ctx) {
-	a.Session = ctx.Session
 	a.CycleOn = true
 	a.CycleMode = "activitytype"
 	a.StreamingURL = utils.Arguments["<stream url>"]
@@ -470,7 +467,54 @@ func (a *ActivityCommands) cycleactivity(ctx *dgc.Ctx) {
 }
 
 func (a *ActivityCommands) timestatus(ctx *dgc.Ctx) {
-	a.Session = ctx.Session
 	a.CycleOn = true
 	a.CycleMode = "timestatus"
+}
+
+func (a *ActivityCommands) getuseractivity(ctx *dgc.Ctx) {
+	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
+	if !success {
+		_ = ctx.RespondText("Could not find user")
+		return
+	}
+	mutualServers, err := ctx.Session.UserProfile(user.ID)
+	if err != nil {
+		_ = ctx.RespondText("Could not find user")
+		return
+	}
+	if len(mutualServers.MutualGuilds) < 1 {
+		_ = ctx.RespondText("User is not in any mutual servers")
+		return
+	}
+	emb := embed.NewEmbed()
+	for _, guild_ := range mutualServers.MutualGuilds {
+		guild, err := utils.Discord.GetGuild(ctx.Session, guild_.ID)
+		if err != nil {
+			continue
+		}
+		member, err := utils.Discord.GetMember(ctx.Session, guild.ID, user.ID)
+		if err != nil {
+			continue
+		}
+		if member.Presence == nil {
+			continue
+		}
+		for index, activity := range member.Presence.Activities {
+			jsonActivity, _ := json.MarshalIndent(activity, "", "    ")
+			emb.AddField(fmt.Sprintf("Activity %d", index+1), string(jsonActivity))
+		}
+		break
+	}
+	emb.Send(ctx)
+}
+
+func (a *ActivityCommands) setactivityjson(ctx *dgc.Ctx) {
+	rawJson := ctx.Arguments.Raw()
+	var activity discordgo.Activity
+	err := json.Unmarshal([]byte(rawJson), &activity)
+	if err != nil {
+		_ = ctx.RespondText("Invalid activity JSON! " + err.Error())
+		return
+	}
+	ctx.Session.UpdateStatusComplex(discordgo.UpdateStatusData{Game: &activity})
 }

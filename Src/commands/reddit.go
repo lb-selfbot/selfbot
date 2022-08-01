@@ -51,7 +51,7 @@ func (RedditCommands) generateFunc(subreddit string) func(ctx *dgc.Ctx) {
 	return func(ctx *dgc.Ctx) {
 		post, success := api.GetImageFromSubreddit(subreddit)
 		if !success {
-			ctx.RespondText("That subreddit is invalid.")
+			_ = ctx.RespondText("That subreddit is invalid.")
 			return
 		}
 		embed.NewEmbed().
@@ -66,7 +66,7 @@ func (RedditCommands) subreddit(ctx *dgc.Ctx) {
 	subreddit := utils.Arguments["<subreddit>"]
 	post, success := api.GetImageFromSubreddit(subreddit)
 	if !success {
-		ctx.RespondText("That subreddit is invalid.")
+		_ = ctx.RespondText("That subreddit is invalid.")
 		return
 	}
 	embed.NewEmbed().

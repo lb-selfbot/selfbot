@@ -12,6 +12,7 @@ import (
 	"time"
 
 	"github.com/LightningDev1/LB-Selfbot/config"
+	"github.com/LightningDev1/LB-Selfbot/constants"
 	"github.com/LightningDev1/LB-Selfbot/http"
 	"github.com/bitly/go-simplejson"
 	"github.com/go-ping/ping"
@@ -150,10 +151,53 @@ func GetMacAddress() string {
 	return "Error"
 }
 
-func TTS(text string, language string) ([]byte, error) {
+func TTS(text, language string) ([]byte, error) {
 	url := fmt.Sprintf("https://translate.google.com/translate_tts?ie=UTF-8&total=1&idx=0&textlen=32&client=tw-ob&q=%s&tl=%s", url.QueryEscape(text), url.QueryEscape(language))
 	tts, _, err := http.GetBytes(url)
 	return tts, err
+}
+
+type TranslateResult struct {
+	Original            string
+	Result              string
+	SourceLanguage      string
+	DestinationLanguage string
+	Confidence          float64
+	Error               error
+}
+
+func Translate(text, language string) *TranslateResult {
+	language = strings.ToLower(language)
+	language = strings.Split(language, "_")[0]
+
+	if _, ok := constants.Languages[language]; !ok {
+		if _, ok := constants.LanguageSpecialCases[language]; ok {
+			language = constants.LanguageSpecialCases[language]
+		} else if _, ok := constants.LanguageCodes[language]; ok {
+			language = constants.LanguageCodes[language]
+		} else {
+			return &TranslateResult{
+				Error: fmt.Errorf("invalid destination language"),
+			}
+		}
+	}
+
+	url := fmt.Sprintf("https://translate.google.com/translate_a/single?client=gtx&sl=auto&tl=%s&dt=t&q=%s", url.QueryEscape(language), url.QueryEscape(text))
+	jsonResult, err := http.GetJson(url)
+	if err != nil {
+		return &TranslateResult{
+			Error: err,
+		}
+	}
+
+	translateData := jsonResult.GetIndex(0).GetIndex(0)
+	return &TranslateResult{
+		Original:            translateData.GetIndex(1).MustString(),
+		Result:              translateData.GetIndex(0).MustString(),
+		SourceLanguage:      jsonResult.GetIndex(2).MustString(),
+		DestinationLanguage: language,
+		Confidence:          jsonResult.GetIndex(6).MustFloat64(),
+	}
 }
 
 func ChangeSettings(settings map[string]interface{}, settingsPath bool) (*simplejson.Json, error) {

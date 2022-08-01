@@ -29,12 +29,12 @@ func (i *IPC) Init() {
 	i.OpCodes.EXIT = 100
 	i.OpCodes.CLS = 101
 	i.OpCodes.NOTIFICATION = 102
-	i.OpCodes.INVALID_TOKEN = 103
+	i.OpCodes.InvalidToken = 103
 	i.OpCodes.ERROR = 104
-	i.OpCodes.CONFIG_EDIT = 105
+	i.OpCodes.ConfigEdit = 105
 	i.OpCodes.CONSOLE = 106
 	i.OpCodes.RESTART = 107
-	i.OpCodes.NEW_TOKEN = 108
+	i.OpCodes.NewToken = 108
 
 	go func() {
 		for {

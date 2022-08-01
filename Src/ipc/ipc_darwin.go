@@ -2,7 +2,7 @@
 
 package ipc
 
-// This should not be used on MacOS.
+// This should not be used on macOS.
 
 func (i *IPC) Init() {
 

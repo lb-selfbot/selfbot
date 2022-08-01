@@ -7,7 +7,7 @@ import (
 )
 
 var (
-	Ipc IPC = IPC{}
+	Ipc = IPC{}
 )
 
 type JsonEventData struct {
@@ -20,15 +20,15 @@ type JsonEvent struct {
 }
 
 type OpCodes struct {
-	EXIT          int
-	CLS           int
-	NOTIFICATION  int
-	INVALID_TOKEN int
-	ERROR         int
-	CONFIG_EDIT   int
-	CONSOLE       int
-	RESTART       int
-	NEW_TOKEN     int
+	EXIT         int
+	CLS          int
+	NOTIFICATION int
+	InvalidToken int
+	ERROR        int
+	ConfigEdit   int
+	CONSOLE      int
+	RESTART      int
+	NewToken     int
 }
 
 type IPC struct {

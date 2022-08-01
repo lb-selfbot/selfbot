@@ -25,11 +25,11 @@ import (
 	"github.com/PuerkitoBio/goquery"
 )
 
-var LowercaseAlphabet string = "abcdefghijklmnopqrstuvwxyz"
+var LowercaseAlphabet = "abcdefghijklmnopqrstuvwxyz"
 
-var Arguments map[string]string = make(map[string]string)
+var Arguments = make(map[string]string)
 
-var InviteRegex *regexp.Regexp = regexp.MustCompile(`(?:https?://)?discord(?:(?:app)?\.com/invite|\.gg)/?[a-zA-Z0-9]+/?`)
+var InviteRegex = regexp.MustCompile(`(?:https?://)?discord(?:(?:app)?\.com/invite|\.gg)/?[a-zA-Z\d]+/?`)
 
 type DiscordUtils struct{}
 
@@ -42,7 +42,11 @@ func (DiscordUtils) TryGetUserFromMention(session *discordgo.Session, mention *d
 }
 
 func (DiscordUtils) TryGetMemberFromMention(ctx *dgc.Ctx, mention *dgc.Argument) (*discordgo.Member, bool) {
-	member, err := ctx.Session.GuildMember(ctx.Event.GuildID, Misc.Or(mention.AsUserMentionID(), mention.Raw()))
+	userID := Misc.Or(mention.AsUserMentionID(), mention.Raw())
+	member, err := ctx.Session.State.Member(ctx.Event.GuildID, userID)
+	if err != nil {
+		member, err = ctx.Session.GuildMember(ctx.Event.GuildID, Misc.Or(mention.AsUserMentionID(), mention.Raw()))
+	}
 	if err != nil {
 		return nil, false
 	}
@@ -112,7 +116,7 @@ func (DiscordUtils) CheckIfInServer(ctx *dgc.Ctx) bool {
 
 func (DiscordUtils) GetArguments(ctx *dgc.Ctx) (map[string]string, bool) {
 	rawArguments := strings.Replace(ctx.Command.Usage, fmt.Sprintf("[p]%s", ctx.Command.Name), "", -1)
-	commandArguments := regexp.MustCompile(`(<(.*?)>|\[(.*?)\])`).FindAllString(rawArguments, -1)
+	commandArguments := regexp.MustCompile(`(<(.*?)>|\[(.*?)])`).FindAllString(rawArguments, -1)
 	arguments := map[string]string{}
 	content := ctx.Event.Message.Content
 	for index, arg := range commandArguments {
@@ -159,7 +163,7 @@ func (DiscordUtils) GetChannelMessages(ctx *dgc.Ctx, channelID string, limit int
 }
 
 func (DiscordUtils) GetRoleNames(ctx *dgc.Ctx, member *discordgo.Member) string {
-	roleNames := []string{}
+	var roleNames []string
 	for _, role := range member.Roles {
 		role, err := ctx.Session.State.Role(member.GuildID, role)
 		if err == nil {
@@ -192,7 +196,7 @@ func (DiscordUtils) GetMember(session *discordgo.Session, guildID, userID string
 }
 
 func (DiscordUtils) GetBoosters(guild *discordgo.Guild) []*discordgo.Member {
-	boostedMembers := []*discordgo.Member{}
+	var boostedMembers []*discordgo.Member
 	for _, member := range guild.Members {
 		if member.PremiumSince != nil {
 			boostedMembers = append(boostedMembers, member)
@@ -282,7 +286,24 @@ func (DiscordUtils) SendFileFromURL(ctx *dgc.Ctx, url string, fileName string) e
 	return err
 }
 
-var Discord *DiscordUtils = &DiscordUtils{}
+func (DiscordUtils) MapCategories(channels []*discordgo.Channel) (categories []*discordgo.Channel, categoryChannels map[string][]*discordgo.Channel) {
+	categoryChannels = make(map[string][]*discordgo.Channel)
+
+	for _, channel := range channels {
+		if channel.Type == discordgo.ChannelTypeGuildCategory {
+			categories = append(categories, channel)
+			categoryChannels[channel.ID] = []*discordgo.Channel{}
+			for _, subChannel := range channels {
+				if subChannel.ParentID == channel.ID {
+					categoryChannels[channel.ID] = append(categoryChannels[channel.ID], subChannel)
+				}
+			}
+		}
+	}
+	return categories, categoryChannels
+}
+
+var Discord = &DiscordUtils{}
 
 type StringUtils struct{}
 
@@ -399,7 +420,7 @@ func (StringUtils) Capitalize(text string) string {
 	return strings.ToUpper(text[:1]) + text[1:]
 }
 
-var String *StringUtils = &StringUtils{}
+var String = &StringUtils{}
 
 type RandomUtils struct{}
 
@@ -412,15 +433,14 @@ func (RandomUtils) Percentage() string {
 }
 
 func (RandomUtils) String(length int) string {
-	bytes := make([]byte, length)
+	b := make([]byte, length)
 	for i := 0; i < length; i++ {
-		bytes[i] = byte(Random.Number(65, 90))
+		b[i] = byte(Random.Number(65, 90))
 	}
-	return string(bytes)
+	return string(b)
 }
 
-// Golang prevents you from using a generic function on a
-// normal struct so these have to be outside RandomUtils
+// RandomChoice has to be outside the Random struct because of Golang limitations
 func RandomChoice[T comparable](choices []T) T {
 	return choices[rand.Intn(len(choices))]
 }
@@ -433,7 +453,7 @@ func RandomShuffle[T comparable](slice []T) []T {
 	return slice
 }
 
-var Random *RandomUtils = &RandomUtils{}
+var Random = &RandomUtils{}
 
 type FileUtils struct{}
 
@@ -489,17 +509,17 @@ func (FileUtils) GetMainFolder() string {
 	}
 }
 
-var File *FileUtils = &FileUtils{}
+var File = &FileUtils{}
 
 type ProcessUtils struct{}
 
-func (ProcessUtils) OpenURL(url string) {
+func (ProcessUtils) OpenURL(url string) error {
 	if runtime.GOOS == "windows" {
-		exec.Command("explorer", url).Start()
+		return exec.Command("explorer", url).Start()
 	} else if runtime.GOOS == "darwin" {
-		exec.Command("open", url).Start()
+		return exec.Command("open", url).Start()
 	} else {
-		exec.Command("xdg-open", url).Start()
+		return exec.Command("xdg-open", url).Start()
 	}
 }
 
@@ -524,7 +544,7 @@ func (ProcessUtils) Restart() error {
 	return syscall.Exec(self, os.Args, env)
 }
 
-var Process *ProcessUtils = &ProcessUtils{}
+var Process = &ProcessUtils{}
 
 type MiscUtils struct{}
 
@@ -562,7 +582,7 @@ func (MiscUtils) FormatBool(b bool) string {
 	return "No"
 }
 
-// If a is not empty, returns a. If a is empty, returns b.
+// Or returns `a` if it isn't empty, else it returns `b`
 func (MiscUtils) Or(a, b string) string {
 	if a != "" {
 		return a
@@ -570,9 +590,31 @@ func (MiscUtils) Or(a, b string) string {
 	return b
 }
 
-var Misc *MiscUtils = &MiscUtils{}
+func (MiscUtils) FormatDuration(duration time.Duration) string {
+	if duration.Seconds() < 60.0 {
+		return fmt.Sprintf("%d seconds", int64(duration.Seconds()))
+	}
+	if duration.Minutes() < 60.0 {
+		remainingSeconds := math.Mod(duration.Seconds(), 60)
+		return fmt.Sprintf("%d minutes %d seconds", int64(duration.Minutes()), int64(remainingSeconds))
+	}
+	if duration.Hours() < 24.0 {
+		remainingMinutes := math.Mod(duration.Minutes(), 60)
+		remainingSeconds := math.Mod(duration.Seconds(), 60)
+		return fmt.Sprintf("%d hours %d minutes %d seconds",
+			int64(duration.Hours()), int64(remainingMinutes), int64(remainingSeconds))
+	}
+	remainingHours := math.Mod(duration.Hours(), 24)
+	remainingMinutes := math.Mod(duration.Minutes(), 60)
+	remainingSeconds := math.Mod(duration.Seconds(), 60)
+	return fmt.Sprintf("%d days %d hours %d minutes %d seconds",
+		int64(duration.Hours()/24), int64(remainingHours),
+		int64(remainingMinutes), int64(remainingSeconds))
+}
 
-// Golang generics limitation
+var Misc = &MiscUtils{}
+
+// SliceContains has to be outside the Slice struct because of Golang limitations
 func SliceContains[T comparable](s []T, e T) bool {
 	for _, v := range s {
 		if v == e {

@@ -123,6 +123,12 @@ func (i ImageCommands) RegisterCommands(router *dgc.Router) {
 		Handler:     i.jail,
 	})
 	router.RegisterCmd(&dgc.Command{
+		Name:        "nobitches",
+		Description: "Make a no bitches meme",
+		Usage:       "[p]nobitches <text>",
+		Handler:     i.nobitches,
+	})
+	router.RegisterCmd(&dgc.Command{
 		Name:        "threat",
 		Description: "Make biggest threats meme",
 		Usage:       "[p]threat [user]",
@@ -821,16 +827,16 @@ func (ImageCommands) tweet(ctx *dgc.Ctx) {
 		url.QueryEscape(utils.Arguments["<username>"]),
 	))
 	if err != nil {
-		ctx.RespondText("An error has occurred: " + err.Error())
+		_ = ctx.RespondText("An error has occurred: " + err.Error())
 		return
 	}
-	ctx.RespondText(jsonResult.Get("message").MustString())
+	_ = ctx.RespondText(jsonResult.Get("message").MustString())
 }
 
 func (ImageCommands) meme(ctx *dgc.Ctx) {
 	jsonResult, err := http.GetJson("https://meme-api.herokuapp.com/gimme")
 	if err != nil {
-		ctx.RespondText("An error has occurred: " + err.Error())
+		_ = ctx.RespondText("An error has occurred: " + err.Error())
 		return
 	}
 	embed.NewEmbed().
@@ -846,7 +852,7 @@ func (ImageCommands) ytcomment(ctx *dgc.Ctx) {
 	if !success {
 		user = ctx.Event.Author
 	}
-	ctx.RespondText(fmt.Sprintf(
+	_ = ctx.RespondText(fmt.Sprintf(
 		"https://some-random-api.ml/canvas/youtube-comment?avatar=%s&comment=%s&username=%s",
 		url.QueryEscape(user.AvatarURL("")),
 		url.QueryEscape(utils.String.RemoveWords(ctx.Arguments.Raw(), 1)),
@@ -855,7 +861,7 @@ func (ImageCommands) ytcomment(ctx *dgc.Ctx) {
 }
 
 func (ImageCommands) pokemon(ctx *dgc.Ctx) {
-	ctx.RespondText(fmt.Sprintf("https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/%d.png", utils.Random.Number(1, 898)))
+	_ = ctx.RespondText(fmt.Sprintf("https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/%d.png", utils.Random.Number(1, 898)))
 }
 
 func (ImageCommands) wasted(ctx *dgc.Ctx) {
@@ -863,7 +869,7 @@ func (ImageCommands) wasted(ctx *dgc.Ctx) {
 	if !success {
 		user = ctx.Event.Author
 	}
-	ctx.RespondText(fmt.Sprintf("https://some-random-api.ml/canvas/wasted?avatar=%s", url.QueryEscape(user.AvatarURL(""))))
+	_ = ctx.RespondText(fmt.Sprintf("https://some-random-api.ml/canvas/wasted?avatar=%s", url.QueryEscape(user.AvatarURL(""))))
 }
 
 func (ImageCommands) triggered(ctx *dgc.Ctx) {
@@ -871,7 +877,7 @@ func (ImageCommands) triggered(ctx *dgc.Ctx) {
 	if !success {
 		user = ctx.Event.Author
 	}
-	ctx.RespondText(fmt.Sprintf("https://some-random-api.ml/canvas/triggered?avatar=%s", url.QueryEscape(user.AvatarURL(""))))
+	_ = ctx.RespondText(fmt.Sprintf("https://some-random-api.ml/canvas/triggered?avatar=%s", url.QueryEscape(user.AvatarURL(""))))
 }
 
 func (ImageCommands) glass(ctx *dgc.Ctx) {
@@ -879,7 +885,7 @@ func (ImageCommands) glass(ctx *dgc.Ctx) {
 	if !success {
 		user = ctx.Event.Author
 	}
-	ctx.RespondText(fmt.Sprintf("https://some-random-api.ml/canvas/glass?avatar=%s", url.QueryEscape(user.AvatarURL(""))))
+	_ = ctx.RespondText(fmt.Sprintf("https://some-random-api.ml/canvas/glass?avatar=%s", url.QueryEscape(user.AvatarURL(""))))
 }
 
 func (ImageCommands) greyscale(ctx *dgc.Ctx) {
@@ -887,7 +893,7 @@ func (ImageCommands) greyscale(ctx *dgc.Ctx) {
 	if !success {
 		user = ctx.Event.Author
 	}
-	ctx.RespondText(fmt.Sprintf("https://some-random-api.ml/canvas/greyscale?avatar=%s", url.QueryEscape(user.AvatarURL(""))))
+	_ = ctx.RespondText(fmt.Sprintf("https://some-random-api.ml/canvas/greyscale?avatar=%s", url.QueryEscape(user.AvatarURL(""))))
 }
 
 func (ImageCommands) invert(ctx *dgc.Ctx) {
@@ -895,7 +901,7 @@ func (ImageCommands) invert(ctx *dgc.Ctx) {
 	if !success {
 		user = ctx.Event.Author
 	}
-	ctx.RespondText(fmt.Sprintf("https://some-random-api.ml/canvas/invert?avatar=%s", url.QueryEscape(user.AvatarURL(""))))
+	_ = ctx.RespondText(fmt.Sprintf("https://some-random-api.ml/canvas/invert?avatar=%s", url.QueryEscape(user.AvatarURL(""))))
 }
 
 func (ImageCommands) invertgreyscale(ctx *dgc.Ctx) {
@@ -903,7 +909,7 @@ func (ImageCommands) invertgreyscale(ctx *dgc.Ctx) {
 	if !success {
 		user = ctx.Event.Author
 	}
-	ctx.RespondText(fmt.Sprintf("https://some-random-api.ml/canvas/invertgreyscale?avatar=%s", url.QueryEscape(user.AvatarURL(""))))
+	_ = ctx.RespondText(fmt.Sprintf("https://some-random-api.ml/canvas/invertgreyscale?avatar=%s", url.QueryEscape(user.AvatarURL(""))))
 }
 
 func (ImageCommands) brightness(ctx *dgc.Ctx) {
@@ -911,7 +917,7 @@ func (ImageCommands) brightness(ctx *dgc.Ctx) {
 	if !success {
 		user = ctx.Event.Author
 	}
-	ctx.RespondText(fmt.Sprintf("https://some-random-api.ml/canvas/brightness?avatar=%s", url.QueryEscape(user.AvatarURL(""))))
+	_ = ctx.RespondText(fmt.Sprintf("https://some-random-api.ml/canvas/brightness?avatar=%s", url.QueryEscape(user.AvatarURL(""))))
 }
 
 func (ImageCommands) red(ctx *dgc.Ctx) {
@@ -919,7 +925,7 @@ func (ImageCommands) red(ctx *dgc.Ctx) {
 	if !success {
 		user = ctx.Event.Author
 	}
-	ctx.RespondText(fmt.Sprintf("https://some-random-api.ml/canvas/red?avatar=%s", url.QueryEscape(user.AvatarURL(""))))
+	_ = ctx.RespondText(fmt.Sprintf("https://some-random-api.ml/canvas/red?avatar=%s", url.QueryEscape(user.AvatarURL(""))))
 }
 
 func (ImageCommands) green(ctx *dgc.Ctx) {
@@ -927,7 +933,7 @@ func (ImageCommands) green(ctx *dgc.Ctx) {
 	if !success {
 		user = ctx.Event.Author
 	}
-	ctx.RespondText(fmt.Sprintf("https://some-random-api.ml/canvas/green?avatar=%s", url.QueryEscape(user.AvatarURL(""))))
+	_ = ctx.RespondText(fmt.Sprintf("https://some-random-api.ml/canvas/green?avatar=%s", url.QueryEscape(user.AvatarURL(""))))
 }
 
 func (ImageCommands) blue(ctx *dgc.Ctx) {
@@ -935,7 +941,7 @@ func (ImageCommands) blue(ctx *dgc.Ctx) {
 	if !success {
 		user = ctx.Event.Author
 	}
-	ctx.RespondText(fmt.Sprintf("https://some-random-api.ml/canvas/blue?avatar=%s", url.QueryEscape(user.AvatarURL(""))))
+	_ = ctx.RespondText(fmt.Sprintf("https://some-random-api.ml/canvas/blue?avatar=%s", url.QueryEscape(user.AvatarURL(""))))
 }
 
 func (ImageCommands) pixelate(ctx *dgc.Ctx) {
@@ -943,7 +949,7 @@ func (ImageCommands) pixelate(ctx *dgc.Ctx) {
 	if !success {
 		user = ctx.Event.Author
 	}
-	ctx.RespondText(fmt.Sprintf("https://some-random-api.ml/canvas/pixelate?avatar=%s", url.QueryEscape(user.AvatarURL(""))))
+	_ = ctx.RespondText(fmt.Sprintf("https://some-random-api.ml/canvas/pixelate?avatar=%s", url.QueryEscape(user.AvatarURL(""))))
 }
 
 func (ImageCommands) comrade(ctx *dgc.Ctx) {
@@ -951,7 +957,7 @@ func (ImageCommands) comrade(ctx *dgc.Ctx) {
 	if !success {
 		user = ctx.Event.Author
 	}
-	ctx.RespondText(fmt.Sprintf("https://some-random-api.ml/canvas/comrade?avatar=%s", url.QueryEscape(user.AvatarURL(""))))
+	_ = ctx.RespondText(fmt.Sprintf("https://some-random-api.ml/canvas/comrade?avatar=%s", url.QueryEscape(user.AvatarURL(""))))
 }
 
 func (ImageCommands) missionpassed(ctx *dgc.Ctx) {
@@ -959,7 +965,7 @@ func (ImageCommands) missionpassed(ctx *dgc.Ctx) {
 	if !success {
 		user = ctx.Event.Author
 	}
-	ctx.RespondText(fmt.Sprintf("https://some-random-api.ml/canvas/passed?avatar=%s", url.QueryEscape(user.AvatarURL(""))))
+	_ = ctx.RespondText(fmt.Sprintf("https://some-random-api.ml/canvas/passed?avatar=%s", url.QueryEscape(user.AvatarURL(""))))
 }
 
 func (ImageCommands) jail(ctx *dgc.Ctx) {
@@ -967,7 +973,11 @@ func (ImageCommands) jail(ctx *dgc.Ctx) {
 	if !success {
 		user = ctx.Event.Author
 	}
-	ctx.RespondText(fmt.Sprintf("https://some-random-api.ml/canvas/jail?avatar=%s", url.QueryEscape(user.AvatarURL(""))))
+	_ = ctx.RespondText(fmt.Sprintf("https://some-random-api.ml/canvas/jail?avatar=%s", url.QueryEscape(user.AvatarURL(""))))
+}
+
+func (ImageCommands) nobitches(ctx *dgc.Ctx) {
+	_ = ctx.RespondText(fmt.Sprintf("https://some-random-api.ml/canvas/nobitches?no=%s", url.QueryEscape(ctx.Arguments.Raw())))
 }
 
 func (ImageCommands) threat(ctx *dgc.Ctx) {
@@ -977,19 +987,19 @@ func (ImageCommands) threat(ctx *dgc.Ctx) {
 	}
 	jsonResult, err := http.GetJson(fmt.Sprintf("https://nekobot.xyz/api/imagegen?type=threats&url=%s", url.QueryEscape(user.AvatarURL(""))))
 	if err != nil {
-		ctx.RespondText("An error has occurred: " + err.Error())
+		_ = ctx.RespondText("An error has occurred: " + err.Error())
 		return
 	}
-	ctx.RespondText(jsonResult.Get("message").MustString())
+	_ = ctx.RespondText(jsonResult.Get("message").MustString())
 }
 
 func (ImageCommands) clyde(ctx *dgc.Ctx) {
 	jsonResult, err := http.GetJson(fmt.Sprintf("https://nekobot.xyz/api/imagegen?type=clyde&text=%s", url.QueryEscape(ctx.Arguments.Raw())))
 	if err != nil {
-		ctx.RespondText("An error has occurred: " + err.Error())
+		_ = ctx.RespondText("An error has occurred: " + err.Error())
 		return
 	}
-	ctx.RespondText(jsonResult.Get("message").MustString())
+	_ = ctx.RespondText(jsonResult.Get("message").MustString())
 }
 
 func (ImageCommands) distractedbf(ctx *dgc.Ctx) {
@@ -1003,10 +1013,10 @@ func (ImageCommands) distractedbf(ctx *dgc.Ctx) {
 	}
 	jsonResult, err := http.GetJson(fmt.Sprintf("https://nekobot.xyz/api/imagegen?type=ship&user1=%s&user2=%s", url.QueryEscape(user1.AvatarURL("")), url.QueryEscape(user2.AvatarURL(""))))
 	if err != nil {
-		ctx.RespondText("An error has occurred: " + err.Error())
+		_ = ctx.RespondText("An error has occurred: " + err.Error())
 		return
 	}
-	ctx.RespondText(jsonResult.Get("message").MustString())
+	_ = ctx.RespondText(jsonResult.Get("message").MustString())
 }
 
 func (ImageCommands) captcha(ctx *dgc.Ctx) {
@@ -1019,10 +1029,10 @@ func (ImageCommands) captcha(ctx *dgc.Ctx) {
 		url.QueryEscape(utils.String.RemoveWords(ctx.Arguments.Raw(), 1)),
 	))
 	if err != nil {
-		ctx.RespondText("An error has occurred: " + err.Error())
+		_ = ctx.RespondText("An error has occurred: " + err.Error())
 		return
 	}
-	ctx.RespondText(jsonResult.Get("message").MustString())
+	_ = ctx.RespondText(jsonResult.Get("message").MustString())
 }
 
 func (ImageCommands) whowouldwin(ctx *dgc.Ctx) {
@@ -1036,19 +1046,19 @@ func (ImageCommands) whowouldwin(ctx *dgc.Ctx) {
 	}
 	jsonResult, err := http.GetJson(fmt.Sprintf("https://nekobot.xyz/api/imagegen?type=whowouldwin&user1=%s&user2=%s", url.QueryEscape(user1.AvatarURL("")), url.QueryEscape(user2.AvatarURL(""))))
 	if err != nil {
-		ctx.RespondText("An error has occurred: " + err.Error())
+		_ = ctx.RespondText("An error has occurred: " + err.Error())
 		return
 	}
-	ctx.RespondText(jsonResult.Get("message").MustString())
+	_ = ctx.RespondText(jsonResult.Get("message").MustString())
 }
 
 func (ImageCommands) changemymind(ctx *dgc.Ctx) {
 	jsonResult, err := http.GetJson(fmt.Sprintf("https://nekobot.xyz/api/imagegen?type=changemymind&text=%s", url.QueryEscape(ctx.Arguments.Raw())))
 	if err != nil {
-		ctx.RespondText("An error has occurred: " + err.Error())
+		_ = ctx.RespondText("An error has occurred: " + err.Error())
 		return
 	}
-	ctx.RespondText(jsonResult.Get("message").MustString())
+	_ = ctx.RespondText(jsonResult.Get("message").MustString())
 }
 
 func (ImageCommands) jpeg(ctx *dgc.Ctx) {
@@ -1058,10 +1068,10 @@ func (ImageCommands) jpeg(ctx *dgc.Ctx) {
 	}
 	jsonResult, err := http.GetJson(fmt.Sprintf("https://nekobot.xyz/api/imagegen?type=jpeg&url=%s", url.QueryEscape(user.AvatarURL(""))))
 	if err != nil {
-		ctx.RespondText("An error has occurred: " + err.Error())
+		_ = ctx.RespondText("An error has occurred: " + err.Error())
 		return
 	}
-	ctx.RespondText(jsonResult.Get("message").MustString())
+	_ = ctx.RespondText(jsonResult.Get("message").MustString())
 }
 
 func (ImageCommands) lolice(ctx *dgc.Ctx) {
@@ -1071,19 +1081,19 @@ func (ImageCommands) lolice(ctx *dgc.Ctx) {
 	}
 	jsonResult, err := http.GetJson(fmt.Sprintf("https://nekobot.xyz/api/imagegen?type=lolice&url=%s", url.QueryEscape(user.AvatarURL(""))))
 	if err != nil {
-		ctx.RespondText("An error has occurred: " + err.Error())
+		_ = ctx.RespondText("An error has occurred: " + err.Error())
 		return
 	}
-	ctx.RespondText(jsonResult.Get("message").MustString())
+	_ = ctx.RespondText(jsonResult.Get("message").MustString())
 }
 
 func (ImageCommands) kannagen(ctx *dgc.Ctx) {
 	jsonResult, err := http.GetJson(fmt.Sprintf("https://nekobot.xyz/api/imagegen?type=kannagen&text=%s", url.QueryEscape(ctx.Arguments.Raw())))
 	if err != nil {
-		ctx.RespondText("An error has occurred: " + err.Error())
+		_ = ctx.RespondText("An error has occurred: " + err.Error())
 		return
 	}
-	ctx.RespondText(jsonResult.Get("message").MustString())
+	_ = ctx.RespondText(jsonResult.Get("message").MustString())
 }
 
 func (ImageCommands) iphonex(ctx *dgc.Ctx) {
@@ -1093,10 +1103,10 @@ func (ImageCommands) iphonex(ctx *dgc.Ctx) {
 	}
 	jsonResult, err := http.GetJson(fmt.Sprintf("https://nekobot.xyz/api/imagegen?type=iphonex&url=%s", url.QueryEscape(user.AvatarURL(""))))
 	if err != nil {
-		ctx.RespondText("An error has occurred: " + err.Error())
+		_ = ctx.RespondText("An error has occurred: " + err.Error())
 		return
 	}
-	ctx.RespondText(jsonResult.Get("message").MustString())
+	_ = ctx.RespondText(jsonResult.Get("message").MustString())
 }
 
 func (ImageCommands) awooify(ctx *dgc.Ctx) {
@@ -1106,10 +1116,10 @@ func (ImageCommands) awooify(ctx *dgc.Ctx) {
 	}
 	jsonResult, err := http.GetJson(fmt.Sprintf("https://nekobot.xyz/api/imagegen?type=awooify&url=%s", url.QueryEscape(user.AvatarURL(""))))
 	if err != nil {
-		ctx.RespondText("An error has occurred: " + err.Error())
+		_ = ctx.RespondText("An error has occurred: " + err.Error())
 		return
 	}
-	ctx.RespondText(jsonResult.Get("message").MustString())
+	_ = ctx.RespondText(jsonResult.Get("message").MustString())
 }
 
 func (ImageCommands) trap(ctx *dgc.Ctx) {
@@ -1123,19 +1133,19 @@ func (ImageCommands) trap(ctx *dgc.Ctx) {
 		url.QueryEscape(ctx.Event.Author.String()),
 	))
 	if err != nil {
-		ctx.RespondText("An error has occurred: " + err.Error())
+		_ = ctx.RespondText("An error has occurred: " + err.Error())
 		return
 	}
-	ctx.RespondText(jsonResult.Get("message").MustString())
+	_ = ctx.RespondText(jsonResult.Get("message").MustString())
 }
 
 func (ImageCommands) trumptweet(ctx *dgc.Ctx) {
 	jsonResult, err := http.GetJson(fmt.Sprintf("https://nekobot.xyz/api/imagegen?type=trumptweet&text=%s", url.QueryEscape(ctx.Arguments.Raw())))
 	if err != nil {
-		ctx.RespondText("An error has occurred: " + err.Error())
+		_ = ctx.RespondText("An error has occurred: " + err.Error())
 		return
 	}
-	ctx.RespondText(jsonResult.Get("message").MustString())
+	_ = ctx.RespondText(jsonResult.Get("message").MustString())
 }
 
 func (ImageCommands) deepfry(ctx *dgc.Ctx) {
@@ -1145,10 +1155,10 @@ func (ImageCommands) deepfry(ctx *dgc.Ctx) {
 	}
 	jsonResult, err := http.GetJson(fmt.Sprintf("https://nekobot.xyz/api/imagegen?type=deepfry&image=%s", url.QueryEscape(user.AvatarURL(""))))
 	if err != nil {
-		ctx.RespondText("An error has occurred: " + err.Error())
+		_ = ctx.RespondText("An error has occurred: " + err.Error())
 		return
 	}
-	ctx.RespondText(jsonResult.Get("message").MustString())
+	_ = ctx.RespondText(jsonResult.Get("message").MustString())
 }
 
 func (ImageCommands) blurpify(ctx *dgc.Ctx) {
@@ -1158,10 +1168,10 @@ func (ImageCommands) blurpify(ctx *dgc.Ctx) {
 	}
 	jsonResult, err := http.GetJson(fmt.Sprintf("https://nekobot.xyz/api/imagegen?type=blurpify&image=%s", url.QueryEscape(user.AvatarURL(""))))
 	if err != nil {
-		ctx.RespondText("An error has occurred: " + err.Error())
+		_ = ctx.RespondText("An error has occurred: " + err.Error())
 		return
 	}
-	ctx.RespondText(jsonResult.Get("message").MustString())
+	_ = ctx.RespondText(jsonResult.Get("message").MustString())
 }
 
 func (ImageCommands) phcomment(ctx *dgc.Ctx) {
@@ -1175,19 +1185,19 @@ func (ImageCommands) phcomment(ctx *dgc.Ctx) {
 		url.QueryEscape(user.AvatarURL("")),
 	))
 	if err != nil {
-		ctx.RespondText("An error has occurred: " + err.Error())
+		_ = ctx.RespondText("An error has occurred: " + err.Error())
 		return
 	}
-	ctx.RespondText(jsonResult.Get("message").MustString())
+	_ = ctx.RespondText(jsonResult.Get("message").MustString())
 }
 
 func (ImageCommands) fact(ctx *dgc.Ctx) {
 	jsonResult, err := http.GetJson(fmt.Sprintf("https://nekobot.xyz/api/imagegen?type=fact&text=%s", url.QueryEscape(ctx.Arguments.Raw())))
 	if err != nil {
-		ctx.RespondText("An error has occurred: " + err.Error())
+		_ = ctx.RespondText("An error has occurred: " + err.Error())
 		return
 	}
-	ctx.RespondText(jsonResult.Get("message").MustString())
+	_ = ctx.RespondText(jsonResult.Get("message").MustString())
 }
 
 func (ImageCommands) trash(ctx *dgc.Ctx) {
@@ -1197,10 +1207,10 @@ func (ImageCommands) trash(ctx *dgc.Ctx) {
 	}
 	jsonResult, err := http.GetJson(fmt.Sprintf("https://nekobot.xyz/api/imagegen?type=trash&url=%s", url.QueryEscape(user.AvatarURL(""))))
 	if err != nil {
-		ctx.RespondText("An error has occurred: " + err.Error())
+		_ = ctx.RespondText("An error has occurred: " + err.Error())
 		return
 	}
-	ctx.RespondText(jsonResult.Get("message").MustString())
+	_ = ctx.RespondText(jsonResult.Get("message").MustString())
 }
 
 func (ImageCommands) stickbug(ctx *dgc.Ctx) {
@@ -1210,233 +1220,233 @@ func (ImageCommands) stickbug(ctx *dgc.Ctx) {
 	}
 	jsonResult, err := http.GetJson(fmt.Sprintf("https://nekobot.xyz/api/imagegen?type=stickbug&url=%s", url.QueryEscape(user.AvatarURL(""))))
 	if err != nil {
-		ctx.RespondText("An error has occurred: " + err.Error())
+		_ = ctx.RespondText("An error has occurred: " + err.Error())
 		return
 	}
-	ctx.RespondText(jsonResult.Get("message").MustString())
+	_ = ctx.RespondText(jsonResult.Get("message").MustString())
 }
 
 func (ImageCommands) randomgif(ctx *dgc.Ctx) {
 	jsonResult, err := http.GetJson("https://api.giphy.com/v1/gifs/random?api_key=ldQeNHnpL3WcCxJE1uO8HTk17ICn8i34&tag=&rating=R&limit=1&lang=en&offset=0")
 	if err != nil {
-		ctx.RespondText("An error has occurred: " + err.Error())
+		_ = ctx.RespondText("An error has occurred: " + err.Error())
 		return
 	}
-	ctx.RespondText(jsonResult.GetPath("data", "bitly_url").MustString())
+	_ = ctx.RespondText(jsonResult.GetPath("data", "bitly_url").MustString())
 }
 
 func (ImageCommands) searchgif(ctx *dgc.Ctx) {
 	jsonResult, err := http.GetJson(fmt.Sprintf("https://api.giphy.com/v1/gifs/search?api_key=ldQeNHnpL3WcCxJE1uO8HTk17ICn8i34&q=%s&limit=1&offset=0&rating=R&lang=en", url.QueryEscape(ctx.Arguments.Raw())))
 	if err != nil {
-		ctx.RespondText("An error has occurred: " + err.Error())
+		_ = ctx.RespondText("An error has occurred: " + err.Error())
 		return
 	}
 	if len(jsonResult.Get("data").MustArray()) == 0 {
-		ctx.RespondText("No results found.")
+		_ = ctx.RespondText("No results found.")
 		return
 	}
-	ctx.RespondText(jsonResult.Get("data").GetIndex(0).Get("bitly_url").MustString())
+	_ = ctx.RespondText(jsonResult.Get("data").GetIndex(0).Get("bitly_url").MustString())
 }
 
 func (ImageCommands) sadcat(ctx *dgc.Ctx) {
 	url, err := utils.Misc.GetImageUrlFromJson("https://api.alexflipnote.dev/sadcat", "file")
 	if err != nil {
-		ctx.RespondText("An error has occurred: " + err.Error())
+		_ = ctx.RespondText("An error has occurred: " + err.Error())
 		return
 	}
-	ctx.RespondText(url)
+	_ = ctx.RespondText(url)
 }
 
 func (ImageCommands) bird(ctx *dgc.Ctx) {
 	url, err := utils.Misc.GetImageUrlFromJson("https://api.alexflipnote.dev/birb", "file")
 	if err != nil {
-		ctx.RespondText("An error has occurred: " + err.Error())
+		_ = ctx.RespondText("An error has occurred: " + err.Error())
 		return
 	}
-	ctx.RespondText(url)
+	_ = ctx.RespondText(url)
 }
 
 func (ImageCommands) cat(ctx *dgc.Ctx) {
 	err := utils.Discord.SendFileFromURL(ctx, "https://cataas.com/cat", "cat.jpg")
 	if err != nil {
-		ctx.RespondText("An error has occurred: " + err.Error())
+		_ = ctx.RespondText("An error has occurred: " + err.Error())
 	}
 }
 
 func (ImageCommands) catgif(ctx *dgc.Ctx) {
 	err := utils.Discord.SendFileFromURL(ctx, "https://cataas.com/cat/gif", "cat.gif")
 	if err != nil {
-		ctx.RespondText("An error has occurred: " + err.Error())
+		_ = ctx.RespondText("An error has occurred: " + err.Error())
 	}
 }
 
 func (ImageCommands) catsays(ctx *dgc.Ctx) {
 	err := utils.Discord.SendFileFromURL(ctx, "https://cataas.com/cat/says/"+url.PathEscape(ctx.Arguments.Raw()), "cat.jpg")
 	if err != nil {
-		ctx.RespondText("An error has occurred: " + err.Error())
+		_ = ctx.RespondText("An error has occurred: " + err.Error())
 	}
 }
 
 func (ImageCommands) dog(ctx *dgc.Ctx) {
 	url, err := utils.Misc.GetImageUrlFromJson("https://dog.ceo/api/breeds/image/random", "message")
 	if err != nil {
-		ctx.RespondText("An error has occurred: " + err.Error())
+		_ = ctx.RespondText("An error has occurred: " + err.Error())
 		return
 	}
-	ctx.RespondText(url)
+	_ = ctx.RespondText(url)
 }
 
 func (ImageCommands) panda(ctx *dgc.Ctx) {
 	url, err := utils.Misc.GetImageUrlFromJson("https://some-random-api.ml/img/panda", "link")
 	if err != nil {
-		ctx.RespondText("An error has occurred: " + err.Error())
+		_ = ctx.RespondText("An error has occurred: " + err.Error())
 		return
 	}
-	ctx.RespondText(url)
+	_ = ctx.RespondText(url)
 }
 
 func (ImageCommands) redpanda(ctx *dgc.Ctx) {
 	url, err := utils.Misc.GetImageUrlFromJson("https://some-random-api.ml/img/red_panda", "link")
 	if err != nil {
-		ctx.RespondText("An error has occurred: " + err.Error())
+		_ = ctx.RespondText("An error has occurred: " + err.Error())
 		return
 	}
-	ctx.RespondText(url)
+	_ = ctx.RespondText(url)
 }
 
 func (ImageCommands) koala(ctx *dgc.Ctx) {
 	url, err := utils.Misc.GetImageUrlFromJson("https://some-random-api.ml/img/koala", "link")
 	if err != nil {
-		ctx.RespondText("An error has occurred: " + err.Error())
+		_ = ctx.RespondText("An error has occurred: " + err.Error())
 		return
 	}
-	ctx.RespondText(url)
+	_ = ctx.RespondText(url)
 }
 
 func (ImageCommands) raccoon(ctx *dgc.Ctx) {
 	url, err := utils.Misc.GetImageUrlFromJson("https://some-random-api.ml/img/raccoon", "link")
 	if err != nil {
-		ctx.RespondText("An error has occurred: " + err.Error())
+		_ = ctx.RespondText("An error has occurred: " + err.Error())
 		return
 	}
-	ctx.RespondText(url)
+	_ = ctx.RespondText(url)
 }
 
 func (ImageCommands) fox(ctx *dgc.Ctx) {
 	url, err := utils.Misc.GetImageUrlFromJson("https://randomfox.ca/floof", "image")
 	if err != nil {
-		ctx.RespondText("An error has occurred: " + err.Error())
+		_ = ctx.RespondText("An error has occurred: " + err.Error())
 		return
 	}
-	ctx.RespondText(url)
+	_ = ctx.RespondText(url)
 }
 
 func (ImageCommands) shibe(ctx *dgc.Ctx) {
 	jsonResult, err := http.GetJson("https://shibe.online/api/shibes?count=1&urls=true&httpsUrls=true")
 	if err != nil {
-		ctx.RespondText("An error has occurred: " + err.Error())
+		_ = ctx.RespondText("An error has occurred: " + err.Error())
 		return
 	}
-	ctx.RespondText(jsonResult.GetIndex(0).MustString())
+	_ = ctx.RespondText(jsonResult.GetIndex(0).MustString())
 }
 
 func (ImageCommands) whale(ctx *dgc.Ctx) {
 	url, err := utils.Misc.GetImageUrlFromJson("https://api.animality.xyz/img/whale", "link")
 	if err != nil {
-		ctx.RespondText("An error has occurred: " + err.Error())
+		_ = ctx.RespondText("An error has occurred: " + err.Error())
 		return
 	}
-	ctx.RespondText(url)
+	_ = ctx.RespondText(url)
 }
 
 func (ImageCommands) kangaroo(ctx *dgc.Ctx) {
 	url, err := utils.Misc.GetImageUrlFromJson("https://api.animality.xyz/img/kangaroo", "link")
 	if err != nil {
-		ctx.RespondText("An error has occurred: " + err.Error())
+		_ = ctx.RespondText("An error has occurred: " + err.Error())
 		return
 	}
-	ctx.RespondText(url)
+	_ = ctx.RespondText(url)
 }
 
 func (ImageCommands) bunny(ctx *dgc.Ctx) {
 	url, err := utils.Misc.GetImageUrlFromJson("https://api.animality.xyz/img/bunny", "link")
 	if err != nil {
-		ctx.RespondText("An error has occurred: " + err.Error())
+		_ = ctx.RespondText("An error has occurred: " + err.Error())
 		return
 	}
-	ctx.RespondText(url)
+	_ = ctx.RespondText(url)
 }
 
 func (ImageCommands) lion(ctx *dgc.Ctx) {
 	url, err := utils.Misc.GetImageUrlFromJson("https://api.animality.xyz/img/lion", "link")
 	if err != nil {
-		ctx.RespondText("An error has occurred: " + err.Error())
+		_ = ctx.RespondText("An error has occurred: " + err.Error())
 		return
 	}
-	ctx.RespondText(url)
+	_ = ctx.RespondText(url)
 }
 
 func (ImageCommands) frog(ctx *dgc.Ctx) {
 	url, err := utils.Misc.GetImageUrlFromJson("https://api.animality.xyz/img/frog", "link")
 	if err != nil {
-		ctx.RespondText("An error has occurred: " + err.Error())
+		_ = ctx.RespondText("An error has occurred: " + err.Error())
 		return
 	}
-	ctx.RespondText(url)
+	_ = ctx.RespondText(url)
 }
 
 func (ImageCommands) duck(ctx *dgc.Ctx) {
 	url, err := utils.Misc.GetImageUrlFromJson("https://api.animality.xyz/img/duck", "link")
 	if err != nil {
-		ctx.RespondText("An error has occurred: " + err.Error())
+		_ = ctx.RespondText("An error has occurred: " + err.Error())
 		return
 	}
-	ctx.RespondText(url)
+	_ = ctx.RespondText(url)
 }
 
 func (ImageCommands) penguin(ctx *dgc.Ctx) {
 	url, err := utils.Misc.GetImageUrlFromJson("https://api.animality.xyz/img/penguin", "link")
 	if err != nil {
-		ctx.RespondText("An error has occurred: " + err.Error())
+		_ = ctx.RespondText("An error has occurred: " + err.Error())
 		return
 	}
-	ctx.RespondText(url)
+	_ = ctx.RespondText(url)
 }
 
 func (ImageCommands) dolphin(ctx *dgc.Ctx) {
 	url, err := utils.Misc.GetImageUrlFromJson("https://api.animality.xyz/img/dolphin", "link")
 	if err != nil {
-		ctx.RespondText("An error has occurred: " + err.Error())
+		_ = ctx.RespondText("An error has occurred: " + err.Error())
 		return
 	}
-	ctx.RespondText(url)
+	_ = ctx.RespondText(url)
 }
 
 func (ImageCommands) bear(ctx *dgc.Ctx) {
 	url, err := utils.Misc.GetImageUrlFromJson("https://api.animality.xyz/img/bear", "link")
 	if err != nil {
-		ctx.RespondText("An error has occurred: " + err.Error())
+		_ = ctx.RespondText("An error has occurred: " + err.Error())
 		return
 	}
-	ctx.RespondText(url)
+	_ = ctx.RespondText(url)
 }
 
 func (ImageCommands) axolotl(ctx *dgc.Ctx) {
 	url, err := utils.Misc.GetImageUrlFromJson("https://api.animality.xyz/img/axolotl", "link")
 	if err != nil {
-		ctx.RespondText("An error has occurred: " + err.Error())
+		_ = ctx.RespondText("An error has occurred: " + err.Error())
 		return
 	}
-	ctx.RespondText(url)
+	_ = ctx.RespondText(url)
 }
 
 func (ImageCommands) capybara(ctx *dgc.Ctx) {
 	url, err := utils.Misc.GetImageUrlFromJson("https://api.animality.xyz/img/capybara", "link")
 	if err != nil {
-		ctx.RespondText("An error has occurred: " + err.Error())
+		_ = ctx.RespondText("An error has occurred: " + err.Error())
 		return
 	}
-	ctx.RespondText(url)
+	_ = ctx.RespondText(url)
 }
 
 func (ImageCommands) bed(ctx *dgc.Ctx) {
@@ -1620,7 +1630,7 @@ func (ImageCommands) qrcode(ctx *dgc.Ctx) {
 		"qrcode.png",
 	)
 	if err != nil {
-		ctx.RespondText("An error has occurred: " + err.Error())
+		_ = ctx.RespondText("An error has occurred: " + err.Error())
 	}
 }
 
@@ -1631,17 +1641,17 @@ func (ImageCommands) darkqrcode(ctx *dgc.Ctx) {
 		"qrcode.png",
 	)
 	if err != nil {
-		ctx.RespondText("An error has occurred: " + err.Error())
+		_ = ctx.RespondText("An error has occurred: " + err.Error())
 	}
 }
 
 func (ImageCommands) rule34(ctx *dgc.Ctx) {
 	jsonResult, err := http.GetJson("https://api.rule34.xxx/index.php?page=dapi&s=post&q=index&json=1")
 	if err != nil {
-		ctx.RespondText("An error has occurred: " + err.Error())
+		_ = ctx.RespondText("An error has occurred: " + err.Error())
 		return
 	}
-	ctx.RespondText(jsonResult.GetIndex(rand.Intn(len(jsonResult.MustArray()))).Get("file_url").MustString())
+	_ = ctx.RespondText(jsonResult.GetIndex(rand.Intn(len(jsonResult.MustArray()))).Get("file_url").MustString())
 }
 
 func (ImageCommands) achievement(ctx *dgc.Ctx) {
@@ -1721,7 +1731,7 @@ func (ImageCommands) adios(ctx *dgc.Ctx) {
 	if !success {
 		user = ctx.Event.Author
 	}
-	ctx.RespondText(fmt.Sprintf("https://vacefron.nl/api/adios?user=%s", url.QueryEscape(user.AvatarURL(""))))
+	_ = ctx.RespondText(fmt.Sprintf("https://vacefron.nl/api/adios?user=%s", url.QueryEscape(user.AvatarURL(""))))
 }
 
 func (ImageCommands) batmanslap(ctx *dgc.Ctx) {
@@ -1730,7 +1740,7 @@ func (ImageCommands) batmanslap(ctx *dgc.Ctx) {
 }
 
 func (ImageCommands) carreverse(ctx *dgc.Ctx) {
-	ctx.RespondText(fmt.Sprintf("https://vacefron.nl/api/carreverse?text=%s", url.QueryEscape(ctx.Arguments.Raw())))
+	_ = ctx.RespondText(fmt.Sprintf("https://vacefron.nl/api/carreverse?text=%s", url.QueryEscape(ctx.Arguments.Raw())))
 }
 
 func (ImageCommands) drip(ctx *dgc.Ctx) {
@@ -1738,21 +1748,21 @@ func (ImageCommands) drip(ctx *dgc.Ctx) {
 	if !success {
 		user = ctx.Event.Author
 	}
-	ctx.RespondText(fmt.Sprintf("https://vacefron.nl/api/drip?user=%s", url.QueryEscape(user.AvatarURL(""))))
+	_ = ctx.RespondText(fmt.Sprintf("https://vacefron.nl/api/drip?user=%s", url.QueryEscape(user.AvatarURL(""))))
 }
 
 func (ImageCommands) impostor(ctx *dgc.Ctx) {
 	crewmate := utils.RandomChoice([]string{"black", "blue", "brown", "cyan", "darkgreen", "lime", "orange", "pink", "purple", "red", "white", "yellow"})
-	ctx.RespondText(fmt.Sprintf("https://vacefron.nl/api/ejected?name=%s&impostor=true&crewmate=%s", ctx.Arguments.Raw(), crewmate))
+	_ = ctx.RespondText(fmt.Sprintf("https://vacefron.nl/api/ejected?name=%s&impostor=true&crewmate=%s", ctx.Arguments.Raw(), crewmate))
 }
 
 func (ImageCommands) notimpostor(ctx *dgc.Ctx) {
 	crewmate := utils.RandomChoice([]string{"black", "blue", "brown", "cyan", "darkgreen", "lime", "orange", "pink", "purple", "red", "white", "yellow"})
-	ctx.RespondText(fmt.Sprintf("https://vacefron.nl/api/ejected?name=%s&impostor=false&crewmate=%s", ctx.Arguments.Raw(), crewmate))
+	_ = ctx.RespondText(fmt.Sprintf("https://vacefron.nl/api/ejected?name=%s&impostor=false&crewmate=%s", ctx.Arguments.Raw(), crewmate))
 }
 
 func (ImageCommands) emergencymeeting(ctx *dgc.Ctx) {
-	ctx.RespondText(fmt.Sprintf("https://vacefron.nl/api/emergencymeeting?text=%s", url.QueryEscape(ctx.Arguments.Raw())))
+	_ = ctx.RespondText(fmt.Sprintf("https://vacefron.nl/api/emergencymeeting?text=%s", url.QueryEscape(ctx.Arguments.Raw())))
 }
 
 func (ImageCommands) firsttime(ctx *dgc.Ctx) {
@@ -1760,7 +1770,7 @@ func (ImageCommands) firsttime(ctx *dgc.Ctx) {
 	if !success {
 		user = ctx.Event.Author
 	}
-	ctx.RespondText(fmt.Sprintf("https://vacefron.nl/api/firsttime?user=%s", url.QueryEscape(user.AvatarURL(""))))
+	_ = ctx.RespondText(fmt.Sprintf("https://vacefron.nl/api/firsttime?user=%s", url.QueryEscape(user.AvatarURL(""))))
 }
 
 func (ImageCommands) grave(ctx *dgc.Ctx) {
@@ -1768,7 +1778,7 @@ func (ImageCommands) grave(ctx *dgc.Ctx) {
 	if !success {
 		user = ctx.Event.Author
 	}
-	ctx.RespondText(fmt.Sprintf("https://vacefron.nl/api/grave?user=%s", url.QueryEscape(user.AvatarURL(""))))
+	_ = ctx.RespondText(fmt.Sprintf("https://vacefron.nl/api/grave?user=%s", url.QueryEscape(user.AvatarURL(""))))
 }
 
 func (ImageCommands) iamspeed(ctx *dgc.Ctx) {
@@ -1776,7 +1786,7 @@ func (ImageCommands) iamspeed(ctx *dgc.Ctx) {
 	if !success {
 		user = ctx.Event.Author
 	}
-	ctx.RespondText(fmt.Sprintf("https://vacefron.nl/api/iamspeed?user=%s", url.QueryEscape(user.AvatarURL(""))))
+	_ = ctx.RespondText(fmt.Sprintf("https://vacefron.nl/api/iamspeed?user=%s", url.QueryEscape(user.AvatarURL(""))))
 }
 
 func (ImageCommands) icanmilkyou(ctx *dgc.Ctx) {
@@ -1788,7 +1798,7 @@ func (ImageCommands) icanmilkyou(ctx *dgc.Ctx) {
 	if !success {
 		user2 = ctx.Event.Author
 	}
-	ctx.RespondText(fmt.Sprintf("https://vacefron.nl/api/icanmilkyou?user1=%s&user2=%s", url.QueryEscape(user1.AvatarURL("")), url.QueryEscape(user2.AvatarURL(""))))
+	_ = ctx.RespondText(fmt.Sprintf("https://vacefron.nl/api/icanmilkyou?user1=%s&user2=%s", url.QueryEscape(user1.AvatarURL("")), url.QueryEscape(user2.AvatarURL(""))))
 }
 
 func (ImageCommands) heaven(ctx *dgc.Ctx) {
@@ -1796,11 +1806,11 @@ func (ImageCommands) heaven(ctx *dgc.Ctx) {
 	if !success {
 		user = ctx.Event.Author
 	}
-	ctx.RespondText(fmt.Sprintf("https://vacefron.nl/api/heaven?user=%s", url.QueryEscape(user.AvatarURL(""))))
+	_ = ctx.RespondText(fmt.Sprintf("https://vacefron.nl/api/heaven?user=%s", url.QueryEscape(user.AvatarURL(""))))
 }
 
 func (ImageCommands) npc(ctx *dgc.Ctx) {
-	ctx.RespondText(fmt.Sprintf("https://vacefron.nl/api/npc?text1=%s&text2=%s", url.QueryEscape(utils.Arguments["<\"text1\">"]), url.QueryEscape(utils.Arguments["<\"text2\">"])))
+	_ = ctx.RespondText(fmt.Sprintf("https://vacefron.nl/api/npc?text1=%s&text2=%s", url.QueryEscape(utils.Arguments["<\"text1\">"]), url.QueryEscape(utils.Arguments["<\"text2\">"])))
 }
 
 func (ImageCommands) stonks(ctx *dgc.Ctx) {
@@ -1808,7 +1818,7 @@ func (ImageCommands) stonks(ctx *dgc.Ctx) {
 	if !success {
 		user = ctx.Event.Author
 	}
-	ctx.RespondText(fmt.Sprintf("https://vacefron.nl/api/stonks?user=%s", url.QueryEscape(user.AvatarURL(""))))
+	_ = ctx.RespondText(fmt.Sprintf("https://vacefron.nl/api/stonks?user=%s", url.QueryEscape(user.AvatarURL(""))))
 }
 
 func (ImageCommands) notstonks(ctx *dgc.Ctx) {
@@ -1816,7 +1826,7 @@ func (ImageCommands) notstonks(ctx *dgc.Ctx) {
 	if !success {
 		user = ctx.Event.Author
 	}
-	ctx.RespondText(fmt.Sprintf("https://vacefron.nl/api/stonks?user=%s&notstonks=true", url.QueryEscape(user.AvatarURL(""))))
+	_ = ctx.RespondText(fmt.Sprintf("https://vacefron.nl/api/stonks?user=%s&notstonks=true", url.QueryEscape(user.AvatarURL(""))))
 }
 
 func (ImageCommands) fliptable(ctx *dgc.Ctx) {
@@ -1824,11 +1834,11 @@ func (ImageCommands) fliptable(ctx *dgc.Ctx) {
 	if !success {
 		user = ctx.Event.Author
 	}
-	ctx.RespondText(fmt.Sprintf("https://vacefron.nl/api/tableflip?user=%s", url.QueryEscape(user.AvatarURL(""))))
+	_ = ctx.RespondText(fmt.Sprintf("https://vacefron.nl/api/tableflip?user=%s", url.QueryEscape(user.AvatarURL(""))))
 }
 
 func (ImageCommands) water(ctx *dgc.Ctx) {
-	ctx.RespondText(fmt.Sprintf("https://vacefron.nl/api/water?text=%s", url.QueryEscape(ctx.Arguments.Raw())))
+	_ = ctx.RespondText(fmt.Sprintf("https://vacefron.nl/api/water?text=%s", url.QueryEscape(ctx.Arguments.Raw())))
 }
 
 func (ImageCommands) wolverine(ctx *dgc.Ctx) {
@@ -1836,7 +1846,7 @@ func (ImageCommands) wolverine(ctx *dgc.Ctx) {
 	if !success {
 		user = ctx.Event.Author
 	}
-	ctx.RespondText(fmt.Sprintf("https://vacefron.nl/api/wolverine?user=%s", url.QueryEscape(user.AvatarURL(""))))
+	_ = ctx.RespondText(fmt.Sprintf("https://vacefron.nl/api/wolverine?user=%s", url.QueryEscape(user.AvatarURL(""))))
 }
 
 func (ImageCommands) womanyellingatcat(ctx *dgc.Ctx) {
@@ -1848,14 +1858,14 @@ func (ImageCommands) womanyellingatcat(ctx *dgc.Ctx) {
 	if !success {
 		user2 = ctx.Event.Author
 	}
-	ctx.RespondText(fmt.Sprintf("https://vacefron.nl/api/womanyellingatcat?woman=%s&cat=%s", url.QueryEscape(user1.AvatarURL("")), url.QueryEscape(user2.AvatarURL(""))))
+	_ = ctx.RespondText(fmt.Sprintf("https://vacefron.nl/api/womanyellingatcat?woman=%s&cat=%s", url.QueryEscape(user1.AvatarURL("")), url.QueryEscape(user2.AvatarURL(""))))
 }
 
 func (ImageCommands) pikachu(ctx *dgc.Ctx) {
 	url, err := utils.Misc.GetImageUrlFromJson("https://some-random-api.ml/img/pikachu", "link")
 	if err != nil {
-		ctx.RespondText("An error has occurred: " + err.Error())
+		_ = ctx.RespondText("An error has occurred: " + err.Error())
 		return
 	}
-	ctx.RespondText(url)
+	_ = ctx.RespondText(url)
 }

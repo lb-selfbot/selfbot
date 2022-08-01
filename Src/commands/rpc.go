@@ -178,7 +178,7 @@ func (RPCCommands) getSecrets(rpcData config.RPCData) *client.Secrets {
 func (RPCCommands) rpc(ctx *dgc.Ctx) {
 	toggle := strings.ToLower(utils.Arguments["<on/off>"])
 	if toggle != "on" && toggle != "off" {
-		ctx.RespondText("Invalid value. Use `on` or `off`.")
+		_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
 		return
 	}
 	cfg, _ := config.GetConfig()
@@ -186,19 +186,19 @@ func (RPCCommands) rpc(ctx *dgc.Ctx) {
 	cfg.Save()
 }
 
-func (RPCCommands) rpcid(ctx *dgc.Ctx) {
+func (RPCCommands) rpcid(*dgc.Ctx) {
 	cfg, _ := config.GetConfig()
 	cfg.RPC.ClientID = utils.Arguments["<client id>"]
 	cfg.Save()
 }
 
-func (RPCCommands) rpcstate(ctx *dgc.Ctx) {
+func (RPCCommands) rpcstate(*dgc.Ctx) {
 	cfg, _ := config.GetConfig()
 	cfg.RPC.State = utils.Arguments["<text>"]
 	cfg.Save()
 }
 
-func (RPCCommands) rpcdetails(ctx *dgc.Ctx) {
+func (RPCCommands) rpcdetails(*dgc.Ctx) {
 	cfg, _ := config.GetConfig()
 	cfg.RPC.Details = utils.Arguments["<text>"]
 	cfg.Save()
@@ -207,7 +207,7 @@ func (RPCCommands) rpcdetails(ctx *dgc.Ctx) {
 func (RPCCommands) rpctime(ctx *dgc.Ctx) {
 	toggle := strings.ToLower(utils.Arguments["<on/off>"])
 	if toggle != "on" && toggle != "off" {
-		ctx.RespondText("Invalid value. Use `on` or `off`.")
+		_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
 		return
 	}
 	cfg, _ := config.GetConfig()
@@ -218,7 +218,7 @@ func (RPCCommands) rpctime(ctx *dgc.Ctx) {
 func (RPCCommands) rpcinvitable(ctx *dgc.Ctx) {
 	toggle := strings.ToLower(utils.Arguments["<on/off>"])
 	if toggle != "on" && toggle != "off" {
-		ctx.RespondText("Invalid value. Use `on` or `off`.")
+		_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
 		return
 	}
 	cfg, _ := config.GetConfig()
@@ -226,31 +226,31 @@ func (RPCCommands) rpcinvitable(ctx *dgc.Ctx) {
 	cfg.Save()
 }
 
-func (RPCCommands) rpclargeimage(ctx *dgc.Ctx) {
+func (RPCCommands) rpclargeimage(*dgc.Ctx) {
 	cfg, _ := config.GetConfig()
 	cfg.RPC.LargeImage = utils.Arguments["<image name>"]
 	cfg.Save()
 }
 
-func (RPCCommands) rpclargetext(ctx *dgc.Ctx) {
+func (RPCCommands) rpclargetext(*dgc.Ctx) {
 	cfg, _ := config.GetConfig()
 	cfg.RPC.LargeText = utils.Arguments["<text>"]
 	cfg.Save()
 }
 
-func (RPCCommands) rpcsmallimage(ctx *dgc.Ctx) {
+func (RPCCommands) rpcsmallimage(*dgc.Ctx) {
 	cfg, _ := config.GetConfig()
 	cfg.RPC.LargeImage = utils.Arguments["<image name>"]
 	cfg.Save()
 }
 
-func (RPCCommands) rpcsmalltext(ctx *dgc.Ctx) {
+func (RPCCommands) rpcsmalltext(*dgc.Ctx) {
 	cfg, _ := config.GetConfig()
 	cfg.RPC.LargeText = utils.Arguments["<text>"]
 	cfg.Save()
 }
 
-func (RPCCommands) rpcbutton1text(ctx *dgc.Ctx) {
+func (RPCCommands) rpcbutton1text(*dgc.Ctx) {
 	cfg, _ := config.GetConfig()
 	if len(cfg.RPC.Buttons) < 1 {
 		cfg.RPC.Buttons[0] = config.RPCButton{}
@@ -259,7 +259,7 @@ func (RPCCommands) rpcbutton1text(ctx *dgc.Ctx) {
 	cfg.Save()
 }
 
-func (RPCCommands) rpcbutton1url(ctx *dgc.Ctx) {
+func (RPCCommands) rpcbutton1url(*dgc.Ctx) {
 	cfg, _ := config.GetConfig()
 	if len(cfg.RPC.Buttons) < 1 {
 		cfg.RPC.Buttons[0] = config.RPCButton{}
@@ -268,7 +268,7 @@ func (RPCCommands) rpcbutton1url(ctx *dgc.Ctx) {
 	cfg.Save()
 }
 
-func (RPCCommands) rpcbutton2text(ctx *dgc.Ctx) {
+func (RPCCommands) rpcbutton2text(*dgc.Ctx) {
 	cfg, _ := config.GetConfig()
 	if len(cfg.RPC.Buttons) < 1 {
 		cfg.RPC.Buttons[0] = config.RPCButton{}
@@ -280,7 +280,7 @@ func (RPCCommands) rpcbutton2text(ctx *dgc.Ctx) {
 	cfg.Save()
 }
 
-func (RPCCommands) rpcbutton2url(ctx *dgc.Ctx) {
+func (RPCCommands) rpcbutton2url(*dgc.Ctx) {
 	cfg, _ := config.GetConfig()
 	if len(cfg.RPC.Buttons) < 1 {
 		cfg.RPC.Buttons[0] = config.RPCButton{}

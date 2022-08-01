@@ -224,7 +224,7 @@ func (c ConfigCommands) RegisterCommands(router *dgc.Router) {
 	})
 }
 
-func (ConfigCommands) commandprefix(ctx *dgc.Ctx) {
+func (ConfigCommands) commandprefix(*dgc.Ctx) {
 	cfg, _ := config.GetConfig()
 	cfg.Selfbot.CommandPrefix = utils.Arguments["<prefix>"]
 	cfg.Save()
@@ -234,7 +234,7 @@ func (ConfigCommands) commandmode(ctx *dgc.Ctx) {
 	cfg, _ := config.GetConfig()
 	mode := utils.String.Capitalize(utils.Arguments["<codeblock/text/urlembed>"])
 	if mode != "Codeblock" && mode != "Text" && mode != "Urlembed" {
-		ctx.RespondText("Invalid command mode.")
+		_ = ctx.RespondText("Invalid command mode.")
 		return
 	}
 	cfg.Selfbot.CommandMode = strings.ReplaceAll(mode, "Urlembed", "URLEmbed")
@@ -257,7 +257,7 @@ func (ConfigCommands) delresponses(ctx *dgc.Ctx) {
 	cfg, _ := config.GetConfig()
 	toggle := strings.ToLower(utils.Arguments["<on/off>"])
 	if toggle != "on" && toggle != "off" {
-		ctx.RespondText("Invalid value. Use `on` or `off`.")
+		_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
 		return
 	}
 	cfg.Selfbot.DeleteResponses = toggle == "on"
@@ -268,7 +268,7 @@ func (ConfigCommands) delresponsesdelay(ctx *dgc.Ctx) {
 	cfg, _ := config.GetConfig()
 	delay, err := strconv.Atoi(utils.Arguments["<seconds>"])
 	if err != nil {
-		ctx.RespondText("Argument <seconds> must be a number.")
+		_ = ctx.RespondText("Argument <seconds> must be a number.")
 		return
 	}
 	cfg.Selfbot.DeleteResponsesDelay = delay
@@ -279,7 +279,7 @@ func (ConfigCommands) delcommands(ctx *dgc.Ctx) {
 	cfg, _ := config.GetConfig()
 	toggle := strings.ToLower(utils.Arguments["<on/off>"])
 	if toggle != "on" && toggle != "off" {
-		ctx.RespondText("Invalid value. Use `on` or `off`.")
+		_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
 		return
 	}
 	cfg.Selfbot.DeleteCommands = toggle == "on"
@@ -290,7 +290,7 @@ func (ConfigCommands) notifications(ctx *dgc.Ctx) {
 	cfg, _ := config.GetConfig()
 	toggle := strings.ToLower(utils.Arguments["<on/off>"])
 	if toggle != "on" && toggle != "off" {
-		ctx.RespondText("Invalid value. Use `on` or `off`.")
+		_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
 		return
 	}
 	cfg.Notifications.Enabled = toggle == "on"
@@ -301,14 +301,14 @@ func (ConfigCommands) notificationtype(ctx *dgc.Ctx) {
 	cfg, _ := config.GetConfig()
 	notificationType := utils.String.Capitalize(utils.Arguments["<default/custom>"])
 	if notificationType != "Default" && notificationType != "Custom" {
-		ctx.RespondText("Invalid command mode.")
+		_ = ctx.RespondText("Invalid command mode.")
 		return
 	}
 	cfg.Notifications.Type = notificationType
 	cfg.Save()
 }
 
-func (ConfigCommands) examplenotification(ctx *dgc.Ctx) {
+func (ConfigCommands) examplenotification(*dgc.Ctx) {
 	/*_ = toast.Push("test message",
 		toast.WithTitle("app title"),
 		toast.WithMessage("test message 2"),
@@ -322,7 +322,7 @@ func (ConfigCommands) nitrosniper(ctx *dgc.Ctx) {
 	cfg, _ := config.GetConfig()
 	toggle := strings.ToLower(utils.Arguments["<on/off>"])
 	if toggle != "on" && toggle != "off" {
-		ctx.RespondText("Invalid value. Use `on` or `off`.")
+		_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
 		return
 	}
 	cfg.Snipers.NitroSniper = toggle == "on"
@@ -333,7 +333,7 @@ func (ConfigCommands) giveawaysniper(ctx *dgc.Ctx) {
 	cfg, _ := config.GetConfig()
 	toggle := strings.ToLower(utils.Arguments["<on/off>"])
 	if toggle != "on" && toggle != "off" {
-		ctx.RespondText("Invalid value. Use `on` or `off`.")
+		_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
 		return
 	}
 	cfg.Snipers.GiveawaySniper.Sniper = toggle == "on"
@@ -344,7 +344,7 @@ func (ConfigCommands) gsnipersleep(ctx *dgc.Ctx) {
 	cfg, _ := config.GetConfig()
 	delay, err := strconv.Atoi(utils.Arguments["<seconds>"])
 	if err != nil {
-		ctx.RespondText("Argument <seconds> must be a number.")
+		_ = ctx.RespondText("Argument <seconds> must be a number.")
 		return
 	}
 	cfg.Snipers.GiveawaySniper.Sleep = delay
@@ -369,7 +369,7 @@ func (ConfigCommands) setupwebhooks(ctx *dgc.Ctx) {
 	cfg, _ := config.GetConfig()
 	category, err := ctx.Session.GuildChannelCreate(serverID, "LightningBot", discordgo.ChannelTypeGuildCategory)
 	if err != nil {
-		ctx.RespondText("Failed to create channel: " + err.Error())
+		_ = ctx.RespondText("Failed to create channel: " + err.Error())
 		return
 	}
 	for channelName, configName := range channels {
@@ -379,12 +379,12 @@ func (ConfigCommands) setupwebhooks(ctx *dgc.Ctx) {
 			Name:     channelName,
 		})
 		if err != nil {
-			ctx.RespondText("Failed to create channel: " + err.Error())
+			_ = ctx.RespondText("Failed to create channel: " + err.Error())
 			return
 		}
 		webhook, err := ctx.Session.WebhookCreate(channel.ID, channelName, "")
 		if err != nil {
-			ctx.RespondText("Failed to create webhook: " + err.Error())
+			_ = ctx.RespondText("Failed to create webhook: " + err.Error())
 			return
 		}
 		f := reflect.Indirect(reflect.ValueOf(cfg.Webhooks)).FieldByName(configName)
@@ -393,7 +393,7 @@ func (ConfigCommands) setupwebhooks(ctx *dgc.Ctx) {
 	cfg.Save()
 }
 
-func (ConfigCommands) wall(ctx *dgc.Ctx) {
+func (ConfigCommands) wall(*dgc.Ctx) {
 	cfg, _ := config.GetConfig()
 	cfg.Webhooks.NitroSniper = utils.Arguments["<webhook url>"]
 	cfg.Webhooks.GiveawaySniper = utils.Arguments["<webhook url>"]
@@ -406,49 +406,49 @@ func (ConfigCommands) wall(ctx *dgc.Ctx) {
 	cfg.Save()
 }
 
-func (ConfigCommands) wnitro(ctx *dgc.Ctx) {
+func (ConfigCommands) wnitro(*dgc.Ctx) {
 	cfg, _ := config.GetConfig()
 	cfg.Webhooks.NitroSniper = utils.Arguments["<webhook url>"]
 	cfg.Save()
 }
 
-func (ConfigCommands) wgiveaway(ctx *dgc.Ctx) {
+func (ConfigCommands) wgiveaway(*dgc.Ctx) {
 	cfg, _ := config.GetConfig()
 	cfg.Webhooks.GiveawaySniper = utils.Arguments["<webhook url>"]
 	cfg.Save()
 }
 
-func (ConfigCommands) wprivnote(ctx *dgc.Ctx) {
+func (ConfigCommands) wprivnote(*dgc.Ctx) {
 	cfg, _ := config.GetConfig()
 	cfg.Webhooks.PrivnoteSniper = utils.Arguments["<webhook url>"]
 	cfg.Save()
 }
 
-func (ConfigCommands) wselfbotdetection(ctx *dgc.Ctx) {
+func (ConfigCommands) wselfbotdetection(*dgc.Ctx) {
 	cfg, _ := config.GetConfig()
 	cfg.Webhooks.SelfbotDetection = utils.Arguments["<webhook url>"]
 	cfg.Save()
 }
 
-func (ConfigCommands) wstaffdetection(ctx *dgc.Ctx) {
+func (ConfigCommands) wstaffdetection(*dgc.Ctx) {
 	cfg, _ := config.GetConfig()
 	cfg.Webhooks.StaffDetection = utils.Arguments["<webhook url>"]
 	cfg.Save()
 }
 
-func (ConfigCommands) wnotifiers(ctx *dgc.Ctx) {
+func (ConfigCommands) wnotifiers(*dgc.Ctx) {
 	cfg, _ := config.GetConfig()
 	cfg.Webhooks.Notifiers = utils.Arguments["<webhook url>"]
 	cfg.Save()
 }
 
-func (ConfigCommands) wpingdetection(ctx *dgc.Ctx) {
+func (ConfigCommands) wpingdetection(*dgc.Ctx) {
 	cfg, _ := config.GetConfig()
 	cfg.Webhooks.PingDetection = utils.Arguments["<webhook url>"]
 	cfg.Save()
 }
 
-func (ConfigCommands) wmisc(ctx *dgc.Ctx) {
+func (ConfigCommands) wmisc(*dgc.Ctx) {
 	cfg, _ := config.GetConfig()
 	cfg.Webhooks.Misc = utils.Arguments["<webhook url>"]
 	cfg.Save()
@@ -457,7 +457,7 @@ func (ConfigCommands) wmisc(ctx *dgc.Ctx) {
 func (ConfigCommands) staffdetection(ctx *dgc.Ctx) {
 	toggle := strings.ToLower(utils.Arguments["<on/off>"])
 	if toggle != "on" && toggle != "off" {
-		ctx.RespondText("Invalid value. Use `on` or `off`.")
+		_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
 		return
 	}
 	cfg, _ := config.GetConfig()
@@ -468,7 +468,7 @@ func (ConfigCommands) staffdetection(ctx *dgc.Ctx) {
 func (ConfigCommands) pingdetection(ctx *dgc.Ctx) {
 	toggle := strings.ToLower(utils.Arguments["<on/off>"])
 	if toggle != "on" && toggle != "off" {
-		ctx.RespondText("Invalid value. Use `on` or `off`.")
+		_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
 		return
 	}
 	cfg, _ := config.GetConfig()
@@ -479,7 +479,7 @@ func (ConfigCommands) pingdetection(ctx *dgc.Ctx) {
 func (ConfigCommands) ticketnotifier(ctx *dgc.Ctx) {
 	toggle := strings.ToLower(utils.Arguments["<on/off>"])
 	if toggle != "on" && toggle != "off" {
-		ctx.RespondText("Invalid value. Use `on` or `off`.")
+		_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
 		return
 	}
 	cfg, _ := config.GetConfig()
@@ -490,7 +490,7 @@ func (ConfigCommands) ticketnotifier(ctx *dgc.Ctx) {
 func (ConfigCommands) selfbotdetection(ctx *dgc.Ctx) {
 	toggle := strings.ToLower(utils.Arguments["<on/off>"])
 	if toggle != "on" && toggle != "off" {
-		ctx.RespondText("Invalid value. Use `on` or `off`.")
+		_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
 		return
 	}
 	cfg, _ := config.GetConfig()
@@ -501,7 +501,7 @@ func (ConfigCommands) selfbotdetection(ctx *dgc.Ctx) {
 func (ConfigCommands) dmtypingdetection(ctx *dgc.Ctx) {
 	toggle := strings.ToLower(utils.Arguments["<on/off>"])
 	if toggle != "on" && toggle != "off" {
-		ctx.RespondText("Invalid value. Use `on` or `off`.")
+		_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
 		return
 	}
 	cfg, _ := config.GetConfig()
@@ -512,7 +512,7 @@ func (ConfigCommands) dmtypingdetection(ctx *dgc.Ctx) {
 func (ConfigCommands) dmdetection(ctx *dgc.Ctx) {
 	toggle := strings.ToLower(utils.Arguments["<on/off>"])
 	if toggle != "on" && toggle != "off" {
-		ctx.RespondText("Invalid value. Use `on` or `off`.")
+		_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
 		return
 	}
 	cfg, _ := config.GetConfig()
@@ -523,7 +523,7 @@ func (ConfigCommands) dmdetection(ctx *dgc.Ctx) {
 func (ConfigCommands) dmdeletedetection(ctx *dgc.Ctx) {
 	toggle := strings.ToLower(utils.Arguments["<on/off>"])
 	if toggle != "on" && toggle != "off" {
-		ctx.RespondText("Invalid value. Use `on` or `off`.")
+		_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
 		return
 	}
 	cfg, _ := config.GetConfig()
@@ -534,7 +534,7 @@ func (ConfigCommands) dmdeletedetection(ctx *dgc.Ctx) {
 func (ConfigCommands) dmeditdetection(ctx *dgc.Ctx) {
 	toggle := strings.ToLower(utils.Arguments["<on/off>"])
 	if toggle != "on" && toggle != "off" {
-		ctx.RespondText("Invalid value. Use `on` or `off`.")
+		_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
 		return
 	}
 	cfg, _ := config.GetConfig()
@@ -545,7 +545,7 @@ func (ConfigCommands) dmeditdetection(ctx *dgc.Ctx) {
 func (ConfigCommands) messagedeletedetection(ctx *dgc.Ctx) {
 	toggle := strings.ToLower(utils.Arguments["<on/off>"])
 	if toggle != "on" && toggle != "off" {
-		ctx.RespondText("Invalid value. Use `on` or `off`.")
+		_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
 		return
 	}
 	cfg, _ := config.GetConfig()
@@ -556,7 +556,7 @@ func (ConfigCommands) messagedeletedetection(ctx *dgc.Ctx) {
 func (ConfigCommands) uitheme(ctx *dgc.Ctx) {
 	theme := strings.ToLower(utils.Arguments["<light/dark>"])
 	if theme != "light" && theme != "dark" {
-		ctx.RespondText("Invalid value. Use `light` or `dark`.")
+		_ = ctx.RespondText("Invalid value. Use `light` or `dark`.")
 		return
 	}
 	cfg, _ := config.GetConfig()
@@ -567,7 +567,7 @@ func (ConfigCommands) uitheme(ctx *dgc.Ctx) {
 func (ConfigCommands) hidetosystray(ctx *dgc.Ctx) {
 	toggle := strings.ToLower(utils.Arguments["<on/off>"])
 	if toggle != "on" && toggle != "off" {
-		ctx.RespondText("Invalid value. Use `on` or `off`.")
+		_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
 		return
 	}
 	cfg, _ := config.GetConfig()

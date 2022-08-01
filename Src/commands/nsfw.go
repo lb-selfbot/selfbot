@@ -56,7 +56,7 @@ func (NSFWCommands) generateFunc(name string, subReddits []string) func(ctx *dgc
 	return func(ctx *dgc.Ctx) {
 		image, success := api.GetImageFromSubreddit(utils.RandomChoice(subReddits))
 		if !success {
-			ctx.RespondText("An error has occurred.")
+			_ = ctx.RespondText("An error has occurred.")
 			return
 		}
 		embed.NewEmbed().

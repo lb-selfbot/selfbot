@@ -12,7 +12,7 @@
 - Image Commands:                 80%
 - Network Commands:              100%
 - Moderation Commands:           100%
-- Util Commands:                   0%
+- Util Commands:                  40%
 - Spotify Commands:              100%
 - Game Commands:                 100%
 - Activity Commands:             100%
@@ -35,7 +35,7 @@
 - Trolling Commands:              60%
 - Event Reaction Commands:         0%
 - Image Commands:                 80%
-- Util Commands:                   0%
+- Util Commands:                  40%
 - Animation Commands:             75%
 - Share Commands:                  0%
 - Custom Commands:                 0%

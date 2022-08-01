@@ -24,11 +24,11 @@ import (
 
 func main() {
 	overseer.Run(overseer.Config{
-		Program: selfbot_main,
+		Program: selfbotMain,
 	})
 }
 
-func selfbot_main(overseer.State) {
+func selfbotMain(overseer.State) {
 	cfg, err := config.GetConfig()
 	if err != nil {
 		panic(err)
@@ -62,9 +62,14 @@ func selfbot_main(overseer.State) {
 	}
 
 	router := dgc.Create(&dgc.Router{
-		Prefixes:         []string{cfg.Selfbot.CommandPrefix},
+		PrefixFunc: func() []string {
+			cfg, err := config.GetConfig()
+			if err != nil {
+				return []string{"!"}
+			}
+			return []string{cfg.Selfbot.CommandPrefix}
+		},
 		IgnorePrefixCase: true,
-		BotsAllowed:      false,
 		SelfBot:          true,
 		Commands:         []*dgc.Command{},
 		Middlewares:      []dgc.Middleware{},
@@ -74,15 +79,15 @@ func selfbot_main(overseer.State) {
 		return func(ctx *dgc.Ctx) {
 			events.OnCommand(ctx)
 			arguments, success := utils.Discord.GetArguments(ctx)
-			utils.Arguments = arguments
 			if success {
+				utils.Arguments = arguments
 				following(ctx)
 			}
 		}
 	})
 
-	commands := commands.Commands{}
-	commands.RegisterCommands(router, session)
+	cmds := commands.Commands{}
+	cmds.RegisterCommands(router, session)
 
 	session.AddHandler(func(_ *discordgo.Session, event *discordgo.Ready) {
 		fmt.Println("Logged in as:", event.User.Username)
@@ -96,6 +101,6 @@ func selfbot_main(overseer.State) {
 		panic(err)
 	}
 	sc := make(chan os.Signal, 1)
-	signal.Notify(sc, syscall.SIGINT, syscall.SIGTERM, os.Interrupt, syscall.SIGTERM)
+	signal.Notify(sc, syscall.SIGINT, syscall.SIGTERM)
 	<-sc
 }

@@ -277,7 +277,7 @@ func (NetworkCommands) googlesearch(ctx *dgc.Ctx) {
 	query := ctx.Arguments.Raw()
 	results, err := googlesearch.Search(context.TODO(), query)
 	if err != nil {
-		ctx.RespondText("An error has occurred.")
+		_ = ctx.RespondText("An error has occurred.")
 		return
 	}
 	emb := embed.NewEmbed()
@@ -294,7 +294,7 @@ func (NetworkCommands) youtubesearch(ctx *dgc.Ctx) {
 	query := ctx.Arguments.Raw()
 	results, err := googlesearch.Search(context.TODO(), query+" site:youtube.com")
 	if err != nil {
-		ctx.RespondText("An error has occurred.")
+		_ = ctx.RespondText("An error has occurred.")
 		return
 	}
 	emb := embed.NewEmbed()
@@ -315,12 +315,12 @@ func (NetworkCommands) urbandictionary(ctx *dgc.Ctx) {
 	word := ctx.Arguments.Raw()
 	results, err := http.GetJson(fmt.Sprintf("https://api.urbandictionary.com/v0/define?term=%s", url.QueryEscape(word)))
 	if err != nil {
-		ctx.RespondText("An error has occurred.")
+		_ = ctx.RespondText("An error has occurred.")
 		return
 	}
 	list := results.Get("list")
 	if len(list.MustArray()) == 0 {
-		ctx.RespondText("No results found.")
+		_ = ctx.RespondText("No results found.")
 		return
 	}
 	result := list.GetIndex(0)
@@ -338,7 +338,7 @@ func (NetworkCommands) wikipedia(ctx *dgc.Ctx) {
 	query := ctx.Arguments.Raw()
 	article, err := api.WikipediaSearch(query)
 	if err != nil {
-		ctx.RespondText("An error has occurred.")
+		_ = ctx.RespondText("An error has occurred.")
 		return
 	}
 	embed.NewEmbed().
@@ -349,13 +349,13 @@ func (NetworkCommands) wikipedia(ctx *dgc.Ctx) {
 
 func (NetworkCommands) weather(ctx *dgc.Ctx) {
 	city := ctx.Arguments.Raw()
-	weather, err := http.GetJson(fmt.Sprintf("http://api.openweathermap.org/data/2.5/weather?appid=533d00f29739edba54c5fb2b1a8262b3&q=%s", city))
+	weather, err := http.GetJson(fmt.Sprintf("https:///api.openweathermap.org/data/2.5/weather?appid=533d00f29739edba54c5fb2b1a8262b3&q=%s", city))
 	if err != nil {
-		ctx.RespondText("An error has occurred.")
+		_ = ctx.RespondText("An error has occurred.")
 		return
 	}
 	if fmt.Sprint(weather.Get("cod").MustInt()) == "404" {
-		ctx.RespondText("No results found.")
+		_ = ctx.RespondText("No results found.")
 		return
 	}
 	embed.NewEmbed().
@@ -388,9 +388,9 @@ func (NetworkCommands) hypesquad(ctx *dgc.Ctx) {
 
 func (NetworkCommands) tinyurl(ctx *dgc.Ctx) {
 	url := ctx.Arguments.Raw()
-	tinyurl, err := http.Get(fmt.Sprintf("http://tinyurl.com/api-create.php?url=%s", url))
+	tinyurl, err := http.Get(fmt.Sprintf("https://tinyurl.com/api-create.php?url=%s", url))
 	if err != nil {
-		ctx.RespondText("An error has occurred.")
+		_ = ctx.RespondText("An error has occurred.")
 		return
 	}
 	embed.NewEmbed().
@@ -401,13 +401,13 @@ func (NetworkCommands) tinyurl(ctx *dgc.Ctx) {
 
 func (NetworkCommands) ipinfo(ctx *dgc.Ctx) {
 	ip := utils.Arguments["<ip>"]
-	ipinfo, err := http.GetJson(fmt.Sprintf("http://ipinfo.io/%s/json", ip))
+	ipinfo, err := http.GetJson(fmt.Sprintf("https://ipinfo.io/%s/json", ip))
 	if err != nil {
-		ctx.RespondText("An error has occurred.")
+		_ = ctx.RespondText("An error has occurred.")
 		return
 	}
 	if ipinfo.Get("hostname").MustInt(0) == 404 {
-		ctx.RespondText("No results found.")
+		_ = ctx.RespondText("No results found.")
 		return
 	}
 	embed.NewEmbed().
@@ -431,30 +431,30 @@ func (NetworkCommands) youtubedl(ctx *dgc.Ctx) {
 			client := youtube.Client{}
 			video, err := client.GetVideo(result.URL)
 			if err != nil {
-				ctx.RespondText("An error has occurred: " + err.Error())
+				_ = ctx.RespondText("An error has occurred: " + err.Error())
 				return
 			}
-			ctx.RespondText(fmt.Sprintf("Downloading %s...", video.Title))
+			_ = ctx.RespondText(fmt.Sprintf("Downloading %s...", video.Title))
 			formats := video.Formats.WithAudioChannels()
 			stream, _, err := client.GetStream(video, &formats[0])
 			if err != nil {
-				ctx.RespondText("An error has occurred: " + err.Error())
+				_ = ctx.RespondText("An error has occurred: " + err.Error())
 				return
 			}
 			filepath := fmt.Sprintf("%s\\%s", utils.GetWindowsFolder(0), utils.File.SanitizeFilename(fmt.Sprintf("%s.mp4", video.Title)))
 			file, err := os.Create(filepath)
 			if err != nil {
-				ctx.RespondText("An error has occurred: " + err.Error())
+				_ = ctx.RespondText("An error has occurred: " + err.Error())
 				return
 			}
 			defer file.Close()
 			_, err = io.Copy(file, stream)
 			if err != nil {
-				ctx.RespondText("An error has occurred: " + err.Error())
+				_ = ctx.RespondText("An error has occurred: " + err.Error())
 				return
 			}
-			exec.Command("explorer", filepath).Run()
-			ctx.RespondText("Successfully downloaded " + video.Title + ".")
+			_ = exec.Command("explorer", filepath).Start()
+			_ = ctx.RespondText("Successfully downloaded " + video.Title + ".")
 			break
 		}
 	}
@@ -463,10 +463,10 @@ func (NetworkCommands) youtubedl(ctx *dgc.Ctx) {
 func (NetworkCommands) lvbypass(ctx *dgc.Ctx) {
 	result, err := http.PostJson("https://api.bypass.vip/", fmt.Sprintf("{\"url\": \"%s\"}", ctx.Arguments.Raw()), map[string]string{"Content-Type": "application/json"})
 	if err != nil {
-		ctx.RespondText("An error has occurred.")
+		_ = ctx.RespondText("An error has occurred.")
 		return
 	}
-	ctx.RespondText(fmt.Sprintf("Bypassed Link: %s", result.Get("destination").MustString()))
+	_ = ctx.RespondText(fmt.Sprintf("Bypassed Link: %s", result.Get("destination").MustString()))
 }
 
 func (NetworkCommands) portscan(ctx *dgc.Ctx) {
@@ -511,17 +511,17 @@ func (NetworkCommands) hastebin(ctx *dgc.Ctx) {
 	text := ctx.Arguments.Raw()
 	result, err := http.PostJson("https://www.toptal.com/developers/hastebin/documents", text)
 	if err != nil {
-		ctx.RespondText("An error has occurred.")
+		_ = ctx.RespondText("An error has occurred.")
 		return
 	}
-	ctx.RespondText(fmt.Sprintf("https://hastebin.com/%s", result.Get("key").MustString()))
+	_ = ctx.RespondText(fmt.Sprintf("https://hastebin.com/%s", result.Get("key").MustString()))
 }
 
 func (NetworkCommands) checktoken(ctx *dgc.Ctx) {
 	token := utils.Arguments["<token>"]
 	response, statusCode, err := http.GetJsonStatusCode("https://discord.com/api/v10/users/@me", http.GetDiscordHeaders(token))
 	if err != nil {
-		ctx.RespondText("An error has occurred.")
+		_ = ctx.RespondText("An error has occurred.")
 		return
 	}
 	if statusCode != 200 {
@@ -578,7 +578,7 @@ func (NetworkCommands) resolve(ctx *dgc.Ctx) {
 	domain := utils.Arguments["<domain>"]
 	response, err := http.GetJson(fmt.Sprintf("https://json.geoiplookup.io/%s", domain))
 	if err != nil {
-		ctx.RespondText("An error has occurred.")
+		_ = ctx.RespondText("An error has occurred.")
 		return
 	}
 	if response.Get("ip").MustString() == "" {
@@ -595,7 +595,7 @@ func (NetworkCommands) reversedns(ctx *dgc.Ctx) {
 	ip := utils.Arguments["<ip>"]
 	response, err := http.GetJson(fmt.Sprintf("https://api.domaintools.com/v1/%s/host-domains/", ip))
 	if err != nil {
-		ctx.RespondText("An error has occurred.")
+		_ = ctx.RespondText("An error has occurred.")
 		return
 	}
 	if response.Get("error").MustArray() != nil {
@@ -613,7 +613,7 @@ func (NetworkCommands) reversemac(ctx *dgc.Ctx) {
 	mac := utils.Arguments["<mac>"]
 	response, err := http.Get(fmt.Sprintf("https://api.macvendors.com/%s", mac))
 	if err != nil {
-		ctx.RespondText("An error has occurred.")
+		_ = ctx.RespondText("An error has occurred.")
 		return
 	}
 	if strings.Contains(response, "Not Found") {
@@ -658,7 +658,7 @@ func (NetworkCommands) covid(ctx *dgc.Ctx) {
 	country := ctx.Arguments.Raw()
 	covid, err := http.GetJson(fmt.Sprintf("https://coronavirus-19-api.herokuapp.com/countries/%s", country))
 	if err != nil {
-		ctx.RespondText("Country not found.")
+		_ = ctx.RespondText("Country not found.")
 		return
 	}
 	embed.NewEmbed().
@@ -680,7 +680,7 @@ func (NetworkCommands) covid(ctx *dgc.Ctx) {
 func (NetworkCommands) discordstatus(ctx *dgc.Ctx) {
 	status, err := http.GetJson("https://srhpyqt94yxb.statuspage.io/api/v2/components.json")
 	if err != nil {
-		ctx.RespondText("An error has occurred.")
+		_ = ctx.RespondText("An error has occurred.")
 		return
 	}
 	emb := embed.NewEmbed()
@@ -693,30 +693,30 @@ func (NetworkCommands) discordstatus(ctx *dgc.Ctx) {
 }
 
 func (NetworkCommands) open(ctx *dgc.Ctx) {
-	utils.Process.OpenURL(ctx.Arguments.Raw())
+	_ = utils.Process.OpenURL(ctx.Arguments.Raw())
 }
 
 func (NetworkCommands) searchcountry(ctx *dgc.Ctx) {
 	response, err := http.Get(fmt.Sprintf("https://restcountries.com/v3.1/name/%s?fullText=true", ctx.Arguments.Raw()))
 	countryList, err2 := json.SimpleUnmarshal(response)
 	if err != nil || err2 != nil {
-		ctx.RespondText("Country not found.")
+		_ = ctx.RespondText("Country not found.")
 		return
 	}
 	if status, ok := countryList.CheckGet("status"); ok {
 		if statusInt, err := status.Int(); err == nil && statusInt == 404 {
-			ctx.RespondText("Country not found.")
+			_ = ctx.RespondText("Country not found.")
 			return
 		}
 	}
 	country := countryList.GetIndex(0)
 	rawCurrencies := country.Get("currencies").Interface().(map[string]interface{})
-	currencies := []string{}
+	var currencies []string
 	for shortName, ifa := range rawCurrencies {
 		currencies = append(currencies, fmt.Sprintf("%s (%s)", shortName, ifa.(map[string]interface{})["name"].(string)))
 	}
 	rawLanguages := country.Get("languages").Interface().(map[string]interface{})
-	languages := []string{}
+	var languages []string
 	for _, language := range rawLanguages {
 		languages = append(languages, language.(string))
 	}
@@ -740,17 +740,17 @@ func (NetworkCommands) randomcountry(ctx *dgc.Ctx) {
 	response, err := http.Get("https://restcountries.com/v3.1/all")
 	countryList, err2 := json.SimpleUnmarshal(response)
 	if err != nil || err2 != nil {
-		ctx.RespondText("An error has occurred.")
+		_ = ctx.RespondText("An error has occurred.")
 		return
 	}
 	country := countryList.GetIndex(utils.Random.Number(0, len(countryList.MustArray())))
 	rawCurrencies := country.Get("currencies").Interface().(map[string]interface{})
-	currencies := []string{}
+	var currencies []string
 	for shortName, ifa := range rawCurrencies {
 		currencies = append(currencies, fmt.Sprintf("%s (%s)", shortName, ifa.(map[string]interface{})["name"].(string)))
 	}
 	rawLanguages := country.Get("languages").Interface().(map[string]interface{})
-	languages := []string{}
+	var languages []string
 	for _, language := range rawLanguages {
 		languages = append(languages, language.(string))
 	}
@@ -774,7 +774,7 @@ func (NetworkCommands) headers(ctx *dgc.Ctx) {
 	url := utils.Arguments["<url>"]
 	headers, err := http.GetHeadersString(url)
 	if err != nil {
-		ctx.RespondText("An error has occurred.")
+		_ = ctx.RespondText("An error has occurred.")
 		return
 	}
 	embed.NewEmbed().
@@ -801,7 +801,7 @@ func (NetworkCommands) revimage(ctx *dgc.Ctx) {
 func (NetworkCommands) pastebin(ctx *dgc.Ctx) {
 	paste, err := api.CreatePaste(ctx.Arguments.Raw())
 	if err != nil {
-		ctx.RespondText("An error has occurred.")
+		_ = ctx.RespondText("An error has occurred.")
 		return
 	}
 	embed.NewEmbed().
@@ -814,13 +814,13 @@ func (NetworkCommands) pastefile(ctx *dgc.Ctx) {
 	if content, success := utils.File.Read(filePath); success {
 		paste, err := api.CreatePaste(content)
 		if err != nil {
-			ctx.RespondText("An error has occurred.")
+			_ = ctx.RespondText("An error has occurred.")
 			return
 		}
 		embed.NewEmbed().
 			AddField("Paste URL", paste).
 			Send(ctx)
 	} else {
-		ctx.RespondText("That file does not exist.")
+		_ = ctx.RespondText("That file does not exist.")
 	}
 }
