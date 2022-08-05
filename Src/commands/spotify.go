@@ -20,6 +20,7 @@ import (
 type SpotifyCommands struct{}
 
 func (s SpotifyCommands) RegisterCommands(router *dgc.Router) {
+	router.StartCategory("Spotify", "Spotify control commands")
 	router.RegisterCmd(&dgc.Command{
 		Name:        "spause",
 		Description: "Pause Spotify Music",

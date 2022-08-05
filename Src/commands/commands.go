@@ -5,13 +5,14 @@ import (
 	"github.com/LightningDev1/discordgo"
 )
 
-type Commands struct {
+type CommandsStruct struct {
 	TextCommands           TextCommands
 	EncodingCommands       EncodingCommands
 	CodeblockCommands      CodeblockCommands
 	CryptoCommands         CryptoCommands
 	FunCommands            FunCommands
 	TrollingCommands       TrollingCommands
+	EventReactionsCommands EventReactionsCommands
 	ImageCommands          ImageCommands
 	NetworkCommands        NetworkCommands
 	AdministrationCommands AdministrationCommands
@@ -25,15 +26,17 @@ type Commands struct {
 	SessionsCommands       SessionsCommands
 	NSFWCommands           NSFWCommands
 	RedditCommands         RedditCommands
+	HelpCommand            HelpCommand
 }
 
-func (c Commands) RegisterCommands(router *dgc.Router, session *discordgo.Session) {
+func (c CommandsStruct) RegisterCommands(session *discordgo.Session, router *dgc.Router) {
 	c.TextCommands.RegisterCommands(router)
 	c.EncodingCommands.RegisterCommands(router)
 	c.CodeblockCommands.RegisterCommands(router)
 	c.CryptoCommands.RegisterCommands(router)
 	c.FunCommands.RegisterCommands(router)
 	c.TrollingCommands.RegisterCommands(router)
+	c.EventReactionsCommands.RegisterCommands(router)
 	c.ImageCommands.RegisterCommands(router)
 	c.NetworkCommands.RegisterCommands(router)
 	c.AdministrationCommands.RegisterCommands(router)
@@ -47,4 +50,7 @@ func (c Commands) RegisterCommands(router *dgc.Router, session *discordgo.Sessio
 	c.SessionsCommands.RegisterCommands(router, session)
 	c.NSFWCommands.RegisterCommands(router)
 	c.RedditCommands.RegisterCommands(router)
+	c.HelpCommand.RegisterHelpCommand(router, session)
 }
+
+var Commands = CommandsStruct{}

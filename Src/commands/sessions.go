@@ -16,6 +16,7 @@ type SessionsCommands struct {
 }
 
 func (s *SessionsCommands) RegisterCommands(router *dgc.Router, mainSession *discordgo.Session) {
+	router.StartCategory("Sessions", "Discord session commands")
 	router.RegisterCmd(&dgc.Command{
 		Name:        "viewsessions",
 		Description: "View all your logged in sessions",

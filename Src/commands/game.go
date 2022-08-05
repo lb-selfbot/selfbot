@@ -15,6 +15,7 @@ import (
 type GameCommands struct{}
 
 func (g GameCommands) RegisterCommands(router *dgc.Router) {
+	router.StartCategory("Game", "Game commands")
 	router.RegisterCmd(&dgc.Command{
 		Name:        "mcuuid",
 		Description: "Get the minecraft uuid of a player",

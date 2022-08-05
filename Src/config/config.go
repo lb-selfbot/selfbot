@@ -90,6 +90,9 @@ type Config struct {
 		DeleteResponsesDelay int    `json:"DeleteResponsesDelay"`
 		DeleteCommands       bool   `json:"DeleteCommands"`
 	}
+	Protections struct {
+		AntiPhising bool `json:"AntiPhising"`
+	} `json:"Protections"`
 }
 
 func (c Config) Save() error {

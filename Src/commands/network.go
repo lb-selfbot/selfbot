@@ -24,6 +24,7 @@ import (
 type NetworkCommands struct{}
 
 func (n NetworkCommands) RegisterCommands(router *dgc.Router) {
+	router.StartCategory("Network", "Network commands")
 	router.RegisterCmd(&dgc.Command{
 		Name:        "ping",
 		Description: "Check the latency of the bot",
@@ -67,12 +68,6 @@ func (n NetworkCommands) RegisterCommands(router *dgc.Router) {
 		Handler:     n.weather,
 	})
 	router.RegisterCmd(&dgc.Command{
-		Name:        "hypesquad",
-		Description: "Change your Hypesquad House",
-		Usage:       "[p]hypesquad <bravery/brilliance/balance>",
-		Handler:     n.hypesquad,
-	})
-	router.RegisterCmd(&dgc.Command{
 		Name:        "tinyurl",
 		Description: "Shorten a URL with TinyURL",
 		Usage:       "[p]tinyurl <url>",
@@ -103,12 +98,6 @@ func (n NetworkCommands) RegisterCommands(router *dgc.Router) {
 		Handler:     n.portscan,
 	})
 	router.RegisterCmd(&dgc.Command{
-		Name:        "theme",
-		Description: "Change your Discord theme",
-		Usage:       "[p]theme <light/dark>",
-		Handler:     n.theme,
-	})
-	router.RegisterCmd(&dgc.Command{
 		Name:        "hastebin",
 		Description: "Upload text to Hastebin",
 		Usage:       "[p]hastebin <text>",
@@ -119,24 +108,6 @@ func (n NetworkCommands) RegisterCommands(router *dgc.Router) {
 		Description: "Check if a Discord token is valid",
 		Usage:       "[p]checktoken <token>",
 		Handler:     n.checktoken,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "delwebhook",
-		Description: "Delete a webook",
-		Usage:       "[p]delwebhook <webhook url>",
-		Handler:     n.delwebhook,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "compact",
-		Description: "Toggle Discord compact mode",
-		Usage:       "[p]compact <on/off>",
-		Handler:     n.compact,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "devmode",
-		Description: "Toggle Discord developer mode",
-		Usage:       "[p]devmode <on/off>",
-		Handler:     n.devmode,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "resolve",
@@ -498,15 +469,6 @@ func (NetworkCommands) portscan(ctx *dgc.Ctx) {
 	emb.Send(ctx)
 }
 
-func (NetworkCommands) theme(ctx *dgc.Ctx) {
-	theme := strings.ToLower(utils.Arguments["<light/dark>"])
-	if theme != "light" && theme != "dark" {
-		error_handling.OnError(ctx, error_handling.InvalidArgument, "<light/dark> must be either \"light\" or \"dark\"")
-		return
-	}
-	api.ChangeSettings(map[string]interface{}{"theme": theme}, true)
-}
-
 func (NetworkCommands) hastebin(ctx *dgc.Ctx) {
 	text := ctx.Arguments.Raw()
 	result, err := http.PostJson("https://www.toptal.com/developers/hastebin/documents", text)
@@ -547,31 +509,6 @@ func (NetworkCommands) checktoken(ctx *dgc.Ctx) {
 		AddField("Verified", utils.Misc.FormatBool(response.Get("verified").MustBool())).
 		AddField("Phone", response.Get("phone").MustString()).
 		Send(ctx)
-}
-
-func (NetworkCommands) delwebhook(ctx *dgc.Ctx) {
-	http.Delete(utils.Arguments["<webhook url>"])
-	embed.NewEmbed().
-		SetDescription("Successfully deleted webhook.").
-		Send(ctx)
-}
-
-func (NetworkCommands) compact(ctx *dgc.Ctx) {
-	toggle := strings.ToLower(utils.Arguments["<on/off>"])
-	if toggle != "on" && toggle != "off" {
-		error_handling.OnError(ctx, error_handling.InvalidArgument, "<on/off> must be either \"on\" or \"off\"")
-		return
-	}
-	api.ChangeSettings(map[string]interface{}{"message_display_compact": toggle == "on"}, true)
-}
-
-func (NetworkCommands) devmode(ctx *dgc.Ctx) {
-	toggle := strings.ToLower(utils.Arguments["<on/off>"])
-	if toggle != "on" && toggle != "off" {
-		error_handling.OnError(ctx, error_handling.InvalidArgument, "<on/off> must be either \"on\" or \"off\"")
-		return
-	}
-	api.ChangeSettings(map[string]interface{}{"developer_mode": toggle == "on"}, true)
 }
 
 func (NetworkCommands) resolve(ctx *dgc.Ctx) {

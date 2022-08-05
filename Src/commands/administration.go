@@ -37,6 +37,7 @@ var (
 type AdministrationCommands struct{}
 
 func (m AdministrationCommands) RegisterCommands(router *dgc.Router) {
+	router.StartCategory("Administration", "Administration commands")
 	router.RegisterCmd(&dgc.Command{
 		Name:        "channelinfo",
 		Description: "Get info about a channel",
@@ -144,6 +145,12 @@ func (m AdministrationCommands) RegisterCommands(router *dgc.Router) {
 		Description: "Send a webhook message",
 		Usage:       "[p]webhooksend <webhook url> <\"message\">",
 		Handler:     m.webhooksend,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "webhookdelete",
+		Description: "Delete a webhook",
+		Usage:       "[p]webhookdelete <webhook url>",
+		Handler:     m.webhookdelete,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "userinfo",
@@ -861,6 +868,22 @@ func (AdministrationCommands) webhooksend(ctx *dgc.Ctx) {
 	}{utils.Arguments["<\"message\">"]}
 	jsonData, _ := json.Marshal(data)
 	http.PostJson(url.String(), string(jsonData))
+}
+
+func (AdministrationCommands) webhookdelete(ctx *dgc.Ctx) {
+	url, err := url.Parse(utils.Arguments["<webhook url>"])
+	if err != nil {
+		_ = ctx.RespondText("Invalid webhook URL!")
+		return
+	}
+	if !strings.Contains(url.Host, "discord.com") {
+		_ = ctx.RespondText("Invalid webhook URL!")
+		return
+	}
+	_, _ = http.Delete(url.String())
+	embed.NewEmbed().
+		SetDescription("Successfully deleted webhook.").
+		Send(ctx)
 }
 
 // Member Control

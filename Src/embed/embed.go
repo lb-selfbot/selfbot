@@ -16,6 +16,7 @@ import (
 //Embed ...
 type Embed struct {
 	*discordgo.MessageEmbed
+	Subtext string
 }
 
 const (
@@ -29,13 +30,13 @@ const (
 
 //NewEmbed returns a new embed object
 func NewEmbed() *Embed {
-	embed := &Embed{&discordgo.MessageEmbed{}}
-	config, err := config.GetConfig()
+	embed := &Embed{&discordgo.MessageEmbed{}, ""}
+	cfg, err := config.GetConfig()
 	if err != nil {
 		return embed
 	}
-	embed.SetTitle(strings.Replace(config.Selfbot.Title, "$VERSION", constants.VersionString, -1))
-	embed.SetFooter(strings.Replace(config.Selfbot.Footer, "$VERSION", constants.VersionString, -1))
+	embed.SetTitle(strings.Replace(cfg.Selfbot.Title, "$VERSION", constants.VersionString, -1))
+	embed.SetFooter(strings.Replace(cfg.Selfbot.Footer, "$VERSION", constants.VersionString, -1))
 	return embed
 }
 
@@ -54,15 +55,23 @@ func (e *Embed) SetDescription(description string) *Embed {
 	return e
 }
 
+// SetSubtext ...
+func (e *Embed) SetSubtext(text string) *Embed {
+	e.Subtext = text
+	return e
+}
+
 //AddField [name] [value]
-func (e *Embed) AddField(name, value string) *Embed {
+func (e *Embed) AddField(name, value string, flags ...bool) *Embed {
+	inline := len(flags) > 0
+	bypass := len(flags) > 1
 	fields := make([]*discordgo.MessageEmbedField, 0)
 
 	if len(name) > LimitFieldName {
 		name = name[:LimitFieldName]
 	}
 
-	if len(value) > LimitFieldValue {
+	if len(value) > LimitFieldValue && !bypass {
 		i := LimitFieldValue
 		extended := false
 		for i = LimitFieldValue; i < len(value); {
@@ -72,13 +81,15 @@ func (e *Embed) AddField(name, value string) *Embed {
 			}
 			if value[i] == []byte(" ")[0] || value[i] == []byte("\n")[0] || value[i] == []byte("-")[0] {
 				fields = append(fields, &discordgo.MessageEmbedField{
-					Name:  name,
-					Value: value[i-LimitFieldValue : i],
+					Name:   name,
+					Value:  value[i-LimitFieldValue : i],
+					Inline: inline,
 				})
 			} else {
 				fields = append(fields, &discordgo.MessageEmbedField{
-					Name:  name,
-					Value: value[i-LimitFieldValue:i-1] + "-",
+					Name:   name,
+					Value:  value[i-LimitFieldValue:i-1] + "-",
+					Inline: inline,
 				})
 				i--
 			}
@@ -92,14 +103,16 @@ func (e *Embed) AddField(name, value string) *Embed {
 		if i < len(value) {
 			name += " (extended)"
 			fields = append(fields, &discordgo.MessageEmbedField{
-				Name:  name,
-				Value: value[i:],
+				Name:   name,
+				Value:  value[i:],
+				Inline: inline,
 			})
 		}
 	} else {
 		fields = append(fields, &discordgo.MessageEmbedField{
-			Name:  name,
-			Value: value,
+			Name:   name,
+			Value:  value,
+			Inline: inline,
 		})
 	}
 
@@ -334,6 +347,9 @@ func (e *Embed) ToCodeblock() []string {
 		}
 		embedString += "```"
 	}
+	if e.Subtext != "" {
+		embedString += fmt.Sprintf("```ansi\n%s\n```", e.Subtext)
+	}
 	if e.Footer != nil {
 		footerString := fmt.Sprintf("```css\n[%s]```", e.Footer.Text)
 		if len(embedString+footerString) > 2000 {
@@ -361,8 +377,14 @@ func (e *Embed) ToText() []string {
 	}
 	if len(e.Fields) > 0 {
 		for _, v := range e.Fields {
+			if v.Inline {
+				v.Value = "```" + v.Value + "```"
+			}
 			str += fmt.Sprintf("> **%s**\n%s\n\n", v.Name, v.Value)
 		}
+	}
+	if e.Subtext != "" {
+		str += fmt.Sprintf("```ansi\n%s\n```", e.Subtext)
 	}
 	if e.Footer != nil {
 		str += fmt.Sprintf("\n```css\n[%s]```\n", e.Footer.Text)

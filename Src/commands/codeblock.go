@@ -7,6 +7,7 @@ import (
 type CodeblockCommands struct{}
 
 func (c CodeblockCommands) RegisterCommands(router *dgc.Router) {
+	router.StartCategory("Codeblock", "Codeblock commands")
 	codeBlockCommands := [][]string{
 		{"Python", "python", "py"},
 		{"Ruby", "ruby", "ruby"},

@@ -57,14 +57,24 @@ func WikipediaSearch(query string) (string, error) {
 	return "No results found", nil
 }
 
-func SetHypesquad(hypesquad string) {
+func SetHypesquad(hypesquad string) (err error) {
 	hypesquadInt, _ := strconv.Atoi(hypesquad)
-	jsonData := fmt.Sprintf(`{"hypesquad": %d}`, hypesquadInt)
+	jsonData := fmt.Sprintf(`{"house_id": %d}`, hypesquadInt)
 	cfg, err := config.GetConfig()
 	if err != nil {
-		return
+		return err
 	}
-	http.Post("https://discord.com/api/v10/hypesquad/online", jsonData, http.GetDiscordHeaders(cfg.Account.Discord.Token))
+	_, err = http.Post("https://discord.com/api/v10/hypesquad/online", jsonData, http.GetDiscordHeaders(cfg.Account.Discord.Token))
+	return err
+}
+
+func LeaveHypesquad() (err error) {
+	cfg, err := config.GetConfig()
+	if err != nil {
+		return err
+	}
+	_, err = http.Delete("https://discord.com/api/v10/hypesquad/online", http.GetDiscordHeaders(cfg.Account.Discord.Token))
+	return err
 }
 
 type RedditPost struct {

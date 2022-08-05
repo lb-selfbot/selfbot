@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/LightningDev1/LB-Selfbot/eventhandlers"
 	"math/rand"
 	"os"
 	"os/signal"
@@ -16,7 +17,6 @@ import (
 
 	"github.com/LightningDev1/LB-Selfbot/commands"
 	"github.com/LightningDev1/LB-Selfbot/config"
-	"github.com/LightningDev1/LB-Selfbot/events"
 	"github.com/LightningDev1/LB-Selfbot/ipc"
 	"github.com/LightningDev1/LB-Selfbot/utils"
 	"github.com/LightningDev1/LB-Selfbot/websocket"
@@ -45,16 +45,17 @@ func selfbotMain(overseer.State) {
 	ipc.Ipc.OnRead = func(s string) {
 		fmt.Println(s)
 		event := ipc.JsonEvent{}
-		json.Unmarshal([]byte(s), &event)
+		err := json.Unmarshal([]byte(s), &event)
+		if err != nil {
+			return
+		}
 		switch event.Op {
 		case ipc.Ipc.OpCodes.EXIT:
 			os.Exit(0)
 		case ipc.Ipc.OpCodes.RESTART:
-			utils.Process.Restart()
+			_ = utils.Process.Restart()
 		}
 	}
-
-	events := events.Events{}
 
 	session, err := discordgo.New(cfg.Account.Discord.Token)
 	if err != nil {
@@ -75,24 +76,8 @@ func selfbotMain(overseer.State) {
 		Middlewares:      []dgc.Middleware{},
 	})
 
-	router.RegisterMiddleware(func(following dgc.ExecutionHandler) dgc.ExecutionHandler {
-		return func(ctx *dgc.Ctx) {
-			events.OnCommand(ctx)
-			arguments, success := utils.Discord.GetArguments(ctx)
-			if success {
-				utils.Arguments = arguments
-				following(ctx)
-			}
-		}
-	})
-
-	cmds := commands.Commands{}
-	cmds.RegisterCommands(router, session)
-
-	session.AddHandler(func(_ *discordgo.Session, event *discordgo.Ready) {
-		fmt.Println("Logged in as:", event.User.Username)
-		fmt.Println(len(router.Commands), "commands")
-	})
+	eventhandlers.EventHandlers.RegisterHandlers(session, router)
+	commands.Commands.RegisterCommands(session, router)
 
 	router.Initialize(session)
 

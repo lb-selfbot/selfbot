@@ -12,6 +12,7 @@ import (
 type AnimationCommands struct{}
 
 func (a AnimationCommands) RegisterCommands(router *dgc.Router) {
+	router.StartCategory("Animation", "Animation commands")
 	router.RegisterCmd(&dgc.Command{
 		Name:        "virus",
 		Description: "Send an animated virus message",
@@ -35,6 +36,12 @@ func (a AnimationCommands) RegisterCommands(router *dgc.Router) {
 		Description: "Send an animated fuck you message",
 		Usage:       "[p]fuckyou",
 		Handler:     a.fuckyou,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "fap",
+		Description: "Send a fap animation",
+		Usage:       "[p]fap",
+		Handler:     a.fap,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "asciianimation",
@@ -94,6 +101,25 @@ var (
 		"**FUCK YOU**",
 		"**FUCK YOU!**",
 	}
+	fap = []string{
+		"8:punch:=====Đ",
+		"8=:punch:====Đ",
+		"8==:punch:===Đ",
+		"8===:punch:==Đ",
+		"8====:punch:=Đ",
+		"8=====:punch:Đ",
+		"8====:punch:=Đ",
+		"8===:punch:==Đ",
+		"8==:punch:===Đ",
+		"8=:punch:====Đ",
+		"8:punch:=====Đ",
+		"8=:punch:====Đ",
+		"8==:punch:===Đ",
+		"8===:punch:==Đ",
+		"8====:punch:=Đ",
+		"8=====:punch:Đ",
+		"8=====Đ:sweat_drops:",
+	}
 )
 
 func (AnimationCommands) virus(ctx *dgc.Ctx) {
@@ -132,7 +158,7 @@ func (AnimationCommands) bomb(ctx *dgc.Ctx) {
 		return
 	}
 
-	for i := 1; i < len(virus); i++ {
+	for i := 1; i < len(bomb); i++ {
 		time.Sleep(time.Second * 1)
 		message, err = ctx.Session.ChannelMessageEdit(ctx.Event.ChannelID, message.ID, bomb[i])
 		if err != nil {
@@ -147,9 +173,24 @@ func (AnimationCommands) fuckyou(ctx *dgc.Ctx) {
 		return
 	}
 
-	for i := 1; i < len(virus); i++ {
+	for i := 1; i < len(fuckYou); i++ {
 		time.Sleep(time.Second * 1)
 		message, err = ctx.Session.ChannelMessageEdit(ctx.Event.ChannelID, message.ID, fuckYou[i])
+		if err != nil {
+			return
+		}
+	}
+}
+
+func (AnimationCommands) fap(ctx *dgc.Ctx) {
+	message, err := ctx.Session.ChannelMessageSend(ctx.Event.ChannelID, fap[0])
+	if err != nil {
+		return
+	}
+
+	for i := 1; i < len(fap); i++ {
+		time.Sleep(time.Second * 1)
+		message, err = ctx.Session.ChannelMessageEdit(ctx.Event.ChannelID, message.ID, fap[i])
 		if err != nil {
 			return
 		}

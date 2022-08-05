@@ -12,6 +12,7 @@ import (
 type EncodingCommands struct{}
 
 func (e EncodingCommands) RegisterCommands(router *dgc.Router) {
+	router.StartCategory("Encoding", "Encoding commands")
 	router.RegisterCmd(&dgc.Command{
 		Name:        "rot13",
 		Description: "Encodes or decodes text using ROT13",

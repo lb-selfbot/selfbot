@@ -20,6 +20,7 @@ import (
 type FunCommands struct{}
 
 func (f FunCommands) RegisterCommands(router *dgc.Router) {
+	router.StartCategory("Fun", "Fun commands")
 	router.RegisterCmd(&dgc.Command{
 		Name:        "eightball",
 		Description: "Asks the 8-Ball a question",
@@ -453,7 +454,7 @@ func (FunCommands) penis(ctx *dgc.Ctx) {
 	for i := 0; i < penisLength; i++ {
 		penis += "="
 	}
-	penis += "D"
+	penis += "Đ"
 	user, _ := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	embed.NewEmbed().
 		AddField("User", user.String()).
@@ -571,9 +572,9 @@ func (FunCommands) slot(ctx *dgc.Ctx) {
 	message, _ := ctx.Session.ChannelMessageSend(ctx.Event.ChannelID, getEmbed(false))
 	for i := 0; i < 5; i++ {
 		time.Sleep(500 * time.Millisecond)
-		ctx.Session.ChannelMessageEdit(message.ChannelID, message.ID, getEmbed(false))
+		_, _ = ctx.Session.ChannelMessageEdit(message.ChannelID, message.ID, getEmbed(false))
 	}
-	ctx.Session.ChannelMessageEdit(message.ChannelID, message.ID, getEmbed(true))
+	_, _ = ctx.Session.ChannelMessageEdit(message.ChannelID, message.ID, getEmbed(true))
 }
 
 func (FunCommands) advice(ctx *dgc.Ctx) {
@@ -813,8 +814,8 @@ func (FunCommands) poll(ctx *dgc.Ctx) {
 		SetDescription("Answer to this poll by reacting with :thumbsup: or :thumbsdown:").
 		AddField("Question", ctx.Arguments.Raw()).
 		Send(ctx)
-	ctx.Session.MessageReactionAdd(ctx.Event.ChannelID, message.ID, "👍")
-	ctx.Session.MessageReactionAdd(ctx.Event.ChannelID, message.ID, "👎")
+	_ = ctx.Session.MessageReactionAdd(ctx.Event.ChannelID, message.ID, "👍")
+	_ = ctx.Session.MessageReactionAdd(ctx.Event.ChannelID, message.ID, "👎")
 }
 
 func (FunCommands) numberfact(ctx *dgc.Ctx) {
@@ -836,14 +837,14 @@ func (FunCommands) joke(ctx *dgc.Ctx) {
 		_ = ctx.RespondText("An error has occurred.")
 		return
 	}
-	embed := embed.NewEmbed()
+	emb := embed.NewEmbed()
 	if joke.Get("type").MustString() == "twopart" {
-		embed.AddField("Setup", joke.Get("setup").MustString()).
+		emb.AddField("Setup", joke.Get("setup").MustString()).
 			AddField("Delivery", joke.Get("delivery").MustString())
 	} else {
-		embed.AddField("Joke", joke.Get("joke").MustString())
+		emb.AddField("Joke", joke.Get("joke").MustString())
 	}
-	embed.AddField("Category", joke.Get("category").MustString()).Send(ctx)
+	emb.AddField("Category", joke.Get("category").MustString()).Send(ctx)
 }
 
 func (FunCommands) fml(ctx *dgc.Ctx) {
@@ -1109,7 +1110,7 @@ func (FunCommands) impersonate(ctx *dgc.Ctx) {
 	} else {
 		webhook = webhooks[0]
 	}
-	ctx.Session.WebhookExecute(webhook.ID, webhook.Token, false, &discordgo.WebhookParams{
+	_, _ = ctx.Session.WebhookExecute(webhook.ID, webhook.Token, false, &discordgo.WebhookParams{
 		Username:  user.Username,
 		AvatarURL: user.AvatarURL(""),
 		Content:   text,
@@ -1129,7 +1130,7 @@ func (FunCommands) coinflip(ctx *dgc.Ctx) {
 }
 
 func (FunCommands) notfunny(ctx *dgc.Ctx) {
-	_ = ctx.RespondText("**Not funny I didn't laugh. Your joke is so bad I would have preferred the joke went over my head and you gave up re-telling me the joke. To be honest this is a horrid attempt at trying to get a laugh out of me. Not a chuckle, not a hehe, not even a subtle burst of air out of my esophagus. Science says before you laugh your brain preps your face muscles but I didn't even feel the slightest twitch. 0/10 this joke is so bad I cannot believe anyone legally allowed you to be creative at all. The amount of brain power you must have put into that joke has the potential to power every house on Earth. Get a personality and learn how to make jokes, read a book. I'm not saying this to be funny I genuinely mean it on how this is just bottom barrel embarrassment at comedy. You've single handedly killed humor and every comedic act on the planet. I'm so disappointed that society has failed as a whole in being able to teach you how to be funny. Honestly if I put in all my power and time to try and make your joke funny it would require Einstein himself to build a device to strap me into so I can be connected to the energy of a billion stars to do it, and even then all that joke would get from people is a subtle scuff. You're lucky I still have the slightest of empathy for you after telling that joke otherwise I would have committed every war crime in the book just to prevent you from attempting any humor ever again. We should put that joke in text books so future generations can be wary of becoming such an absolute comedic failure. Im disappointed, hurt, and outright offended that my precious time has been wasted in my brain understanding that joke. In the time that took I was planning on helping kids who have been orphaned, but because of that you've waisted my time explaining the obscene integrity of your terrible attempt at comedy. Now those kids are suffering without meals and there's nobody to blame but you.**")
+	_ = ctx.RespondText("**Not funny I didn't laugh. Your joke is so bad I would have preferred the joke went over my head and you gave up re-telling me the joke. To be honest this is a horrid attempt at trying to get a laugh out of me. Not a chuckle, not a hehe, not even a subtle burst of air out of my esophagus. Science says before you laugh your brain preps your face muscles but I didn't even feel the slightest twitch. 0/10 this joke is so bad I cannot believe anyone legally allowed you to be creative at all. The amount of brain power you must have put into that joke has the potential to power every house on Earth. Get a personality and learn how to make jokes, read a book. I'm not saying this to be funny I genuinely mean it on how this is just bottom barrel embarrassment at comedy. You've single-handedly killed humor and every comedic act on the planet. I'm so disappointed that society has failed as a whole in being able to teach you how to be funny. Honestly if I put in all my power and time to try and make your joke funny it would require Einstein himself to build a device to strap me into so I can be connected to the energy of a billion stars to do it, and even then all that joke would get from people is a subtle scuff. You're lucky I still have the slightest of empathy for you after telling that joke otherwise I would have committed every war crime in the book just to prevent you from attempting any humor ever again. We should put that joke in text books so future generations can be wary of becoming such an absolute comedic failure. Im disappointed, hurt, and outright offended that my precious time has been wasted in my brain understanding that joke. In the time that took I was planning on helping kids who have been orphaned, but because of that you've waisted my time explaining the obscene integrity of your terrible attempt at comedy. Now those kids are suffering without meals and there's nobody to blame but you.**")
 	_ = ctx.RespondText("**I hope you're happy with what you have done and I truly hope you can move on and learn from this piss poor attempt**")
 }
 

@@ -12,6 +12,7 @@ import (
 type NSFWCommands struct{}
 
 func (n NSFWCommands) RegisterCommands(router *dgc.Router) {
+	router.StartCategory("NSFW", "NSFW commands")
 	nsfwCommands := map[string][]string{
 		"thighs":  {"girlsinyogapants", "Thighs", "thighhighs", "ThickThighs", "UnderwearGW", "datgap", "leggingsgonewild", "pawg", "hipcleavage", "legs", "pantyhose"},
 		"ass":     {"ass", "asstastic", "facedownassup", "assinthong", "bigasses"},

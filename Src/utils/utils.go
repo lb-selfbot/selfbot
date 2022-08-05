@@ -34,7 +34,11 @@ var InviteRegex = regexp.MustCompile(`(?:https?://)?discord(?:(?:app)?\.com/invi
 type DiscordUtils struct{}
 
 func (DiscordUtils) TryGetUserFromMention(session *discordgo.Session, mention *dgc.Argument) (*discordgo.User, bool) {
-	user, err := session.User(Misc.Or(mention.AsUserMentionID(), mention.Raw()))
+	userID := Misc.Or(mention.AsUserMentionID(), mention.Raw())
+	user, err := session.State.GetUser(userID)
+	if err != nil {
+		user, err = session.User(userID)
+	}
 	if err != nil {
 		return nil, false
 	}
@@ -330,7 +334,7 @@ func (StringUtils) FilterAlphaNumeric(str string) string {
 	return string(s[:j])
 }
 
-func (StringUtils) Flip(text string, unflip bool) string {
+func (StringUtils) Flip(text string, unFlip bool) string {
 	flipChars := [][]string{
 		{"a", "ɐ"},
 		{"b", "q"},
@@ -396,7 +400,7 @@ func (StringUtils) Flip(text string, unflip bool) string {
 		{"∴", "∵"},
 		{"⁅", "⁆"},
 	}
-	if unflip {
+	if unFlip {
 		for _, element := range flipChars {
 			text = strings.ReplaceAll(text, element[1], element[0])
 		}
@@ -567,11 +571,10 @@ func (MiscUtils) GetImageUrlFromJson(url string, jsonQuery string) (string, erro
 func (MiscUtils) IsPortOpen(hostname string, port int) bool {
 	address := hostname + ":" + strconv.Itoa(port)
 	conn, err := net.DialTimeout("tcp", address, 100*time.Millisecond)
-
 	if err != nil {
 		return false
 	}
-	defer conn.Close()
+	_ = conn.Close()
 	return true
 }
 
@@ -614,7 +617,7 @@ func (MiscUtils) FormatDuration(duration time.Duration) string {
 
 var Misc = &MiscUtils{}
 
-// SliceContains has to be outside the Slice struct because of Golang limitations
+// SliceContains checks if a slice has a certain item
 func SliceContains[T comparable](s []T, e T) bool {
 	for _, v := range s {
 		if v == e {
@@ -622,4 +625,14 @@ func SliceContains[T comparable](s []T, e T) bool {
 		}
 	}
 	return false
+}
+
+// RemoveSliceItem removes an item from a slice
+func RemoveSliceItem[T comparable](s []T, e T) []T {
+	for i, v := range s {
+		if v == e {
+			return append(s[:i], s[i+1:]...)
+		}
+	}
+	return s
 }

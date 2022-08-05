@@ -18,6 +18,7 @@ import (
 type ConfigCommands struct{}
 
 func (c ConfigCommands) RegisterCommands(router *dgc.Router) {
+	router.StartCategory("Config", "Config commands")
 	router.RegisterCmd(&dgc.Command{
 		Name:        "commandprefix",
 		Description: "Set your command prefix",

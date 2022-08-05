@@ -10,13 +10,14 @@ import (
 type RedditCommands struct{}
 
 func (r RedditCommands) RegisterCommands(router *dgc.Router) {
+	router.StartCategory("Reddit", "Reddit commands")
 	router.RegisterCmd(&dgc.Command{
 		Name:        "subreddit",
 		Description: "Get a random post from a subreddit",
 		Usage:       "[p]subreddit <subreddit>",
 		Handler:     r.subreddit,
 	})
-	subReddits := []string{
+	subreddits := []string{
 		"mildlyinteresting",
 		"thatsinsane",
 		"funny",
@@ -30,11 +31,22 @@ func (r RedditCommands) RegisterCommands(router *dgc.Router) {
 		"interestingasfuck",
 		"dataisbeautiful",
 		"makemesuffer",
+		"memes",
 		"dankmemes",
 		"nextfuckinglevel",
 		"foodporn",
+		"programmerhumor",
+		"suspiciouslyspecific",
+		"mademesmile",
+		"whitepeopletwitter",
+		"blackpeopletwitter",
+		"minecraft",
+		"damnthatsinteresting",
+		"mildlyinfuriating",
+		"extremelyinfuriating",
+		"whatswrongwithyourdog",
 	}
-	for _, subreddit := range subReddits {
+	for _, subreddit := range subreddits {
 		router.RegisterCmd(&dgc.Command{
 			Name:        subreddit,
 			Description: "Get a random post from r/" + subreddit,

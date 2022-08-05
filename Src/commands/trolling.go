@@ -13,6 +13,7 @@ import (
 type TrollingCommands struct{}
 
 func (t TrollingCommands) RegisterCommands(router *dgc.Router) {
+	router.StartCategory("Trolling", "Trolling commands")
 	router.RegisterCmd(&dgc.Command{
 		Name:        "purgehack",
 		Description: "Purge a chat without permissions",

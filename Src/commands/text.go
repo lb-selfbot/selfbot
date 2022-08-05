@@ -12,6 +12,7 @@ import (
 type TextCommands struct{}
 
 func (t TextCommands) RegisterCommands(router *dgc.Router) {
+	router.StartCategory("Text", "Text commands")
 	router.RegisterCmd(&dgc.Command{
 		Name:        "empty",
 		Description: "Sends an empty message",

@@ -3,6 +3,7 @@ package commands
 import (
 	"bytes"
 	"fmt"
+	"github.com/LightningDev1/LB-Selfbot/error_handling"
 	"math"
 	"os"
 	"os/exec"
@@ -21,6 +22,7 @@ import (
 type UtilityCommands struct{}
 
 func (u UtilityCommands) RegisterCommands(router *dgc.Router) {
+	router.StartCategory("Utility", "Utility commands")
 	router.RegisterCmd(&dgc.Command{
 		Name:        "copyserver",
 		Description: "Make an exact copy of a server",
@@ -98,12 +100,6 @@ func (u UtilityCommands) RegisterCommands(router *dgc.Router) {
 		Description: "Delete a server",
 		Usage:       "[p]deleteserver [server id]",
 		Handler:     u.deleteserver,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "spotifyinfo",
-		Description: "See info about users currently playing music",
-		Usage:       "[p]spotifyinfo <user>",
-		Handler:     u.spotifyinfo,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "systeminfo",
@@ -309,6 +305,42 @@ func (u UtilityCommands) RegisterCommands(router *dgc.Router) {
 		Usage:       "[p]firstmessage [channel]",
 		Handler:     u.firstmessage,
 	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "hypesquad",
+		Description: "Change your Hypesquad House",
+		Usage:       "[p]hypesquad <bravery/brilliance/balance>",
+		Handler:     u.hypesquad,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "leavehypesquad",
+		Description: "Leave Hypesquad",
+		Usage:       "[p]leavehypesquad",
+		Handler:     u.leavehypesquad,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "theme",
+		Description: "Change your Discord theme",
+		Usage:       "[p]theme <light/dark>",
+		Handler:     u.theme,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "compact",
+		Description: "Toggle Discord compact mode",
+		Usage:       "[p]compact <on/off>",
+		Handler:     u.compact,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "devmode",
+		Description: "Toggle Discord developer mode",
+		Usage:       "[p]devmode <on/off>",
+		Handler:     u.devmode,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "sessionid",
+		Description: "See LightningBot's Discord session ID",
+		Usage:       "[p]sessionid",
+		Handler:     u.sessionid,
+	})
 }
 
 func getChannelType(channelType discordgo.ChannelType) discordgo.ChannelType {
@@ -405,18 +437,18 @@ func (UtilityCommands) copyserver(ctx *dgc.Ctx) {
 		Send(ctx)
 }
 
-func (UtilityCommands) leaveservers(ctx *dgc.Ctx) {
+func (UtilityCommands) leaveservers(ctx *dgc.Ctx) { // Admin
 	//     for Server in bot.guilds:
 	//         await Server.leave()
 }
 
-func (UtilityCommands) leavegroups(ctx *dgc.Ctx) {
+func (UtilityCommands) leavegroups(ctx *dgc.Ctx) { // Admin
 	//     for Channel in bot.private_channels:
 	//         if isinstance(Channel, discord.GroupChannel):
 	//             await Channel.leave()
 }
 
-func (UtilityCommands) ack(ctx *dgc.Ctx) {
+func (UtilityCommands) ack(ctx *dgc.Ctx) { // Admin
 	//     Server = Server or ctx.guild
 	//     await Server.ack()
 }
@@ -474,11 +506,11 @@ func (UtilityCommands) english(ctx *dgc.Ctx) {
 		Send(ctx)
 }
 
-func (UtilityCommands) adminservers(ctx *dgc.Ctx) {
+func (UtilityCommands) adminservers(ctx *dgc.Ctx) { // Admin
 	//     await bot.Helper.SendMessage(ctx, embed=bot.DefaultEmbed().add_field(name='Admin Servers', value=', '.join(Server.name for Server in bot.guilds if Server.me.guild_permissions.administrator)))
 }
 
-func (UtilityCommands) admingroups(ctx *dgc.Ctx) {
+func (UtilityCommands) admingroups(ctx *dgc.Ctx) { // Admin
 	//     await bot.Helper.SendMessage(ctx, embed=bot.DefaultEmbed().add_field(name='Admin Groups', value=', '.join(str(Group) for Group in bot.private_channels if isinstance(Group, discord.GroupChannel) and Group.owner == bot.user)))
 }
 
@@ -494,33 +526,14 @@ func (UtilityCommands) optionpoll(ctx *dgc.Ctx) {
 	}
 }
 
-func (UtilityCommands) leaveserver(ctx *dgc.Ctx) {
+func (UtilityCommands) leaveserver(ctx *dgc.Ctx) { // Admin
 	//     Server = Server or ctx.guild
 	//     await Server.leave()
 }
 
-func (UtilityCommands) deleteserver(ctx *dgc.Ctx) {
+func (UtilityCommands) deleteserver(ctx *dgc.Ctx) { // Admin
 	//     Server = Server or ctx.guild
 	//     await Server.delete()
-}
-
-func (UtilityCommands) spotifyinfo(ctx *dgc.Ctx) {
-	//     '''
-	//     try:
-	//         if ctx.guild:
-	//             if User.id in [Member.id for Member in ctx.guild.members]:
-	//                 User: discord.Member = await ctx.guild.fetch_member(User.id)
-	//         if isinstance(User, discord.User):
-	//             Mutual = await User.mutual_guilds()
-	//             if len(Mutual) > 0:
-	//                 User: discord.Member = await Mutual[0].fetch_member(User.id)
-	//         if isinstance(User, discord.ClientUser):
-	//             User: discord.Member = await bot.guilds[0].fetch_member(User.id)
-	//         assert isinstance(User, discord.Member)
-	//     except: return await ctx.send("You must have at least one mutual server with the user to use this command due to an API limitation!")
-	//     await User.guild.subscribe()
-	//     await ctx.send(str(User.activity))
-	//     '''
 }
 
 func (UtilityCommands) systeminfo(ctx *dgc.Ctx) {
@@ -725,5 +738,55 @@ func (UtilityCommands) firstmessage(ctx *dgc.Ctx) {
 		AddField("Author", messages[0].Author.String()).
 		AddField("Message", messages[0].Content).
 		AddField("Jump URL", fmt.Sprintf("https://discord.com/channels/%s/%s/%s", channel.GuildID, channel.ID, messages[0].ID)).
+		Send(ctx)
+}
+
+func (UtilityCommands) hypesquad(ctx *dgc.Ctx) {
+	house := utils.Arguments["<bravery/brilliance/balance>"]
+	house = strings.ReplaceAll(house, "bravery", "1")
+	house = strings.ReplaceAll(house, "brilliance", "2")
+	house = strings.ReplaceAll(house, "balance", "3")
+	fmt.Println(house)
+	if house != "1" && house != "2" && house != "3" {
+		error_handling.OnError(ctx, error_handling.InvalidArgument, "<bravery/brilliance/balance>")
+		return
+	}
+	_ = api.SetHypesquad(house)
+}
+
+func (UtilityCommands) leavehypesquad(ctx *dgc.Ctx) {
+	_ = api.LeaveHypesquad()
+}
+
+func (UtilityCommands) theme(ctx *dgc.Ctx) {
+	theme := strings.ToLower(utils.Arguments["<light/dark>"])
+	if theme != "light" && theme != "dark" {
+		error_handling.OnError(ctx, error_handling.InvalidArgument, "<light/dark> must be either \"light\" or \"dark\"")
+		return
+	}
+	_, _ = api.ChangeSettings(map[string]interface{}{"theme": theme}, true)
+}
+
+func (UtilityCommands) compact(ctx *dgc.Ctx) {
+	toggle := strings.ToLower(utils.Arguments["<on/off>"])
+	if toggle != "on" && toggle != "off" {
+		error_handling.OnError(ctx, error_handling.InvalidArgument, "<on/off> must be either \"on\" or \"off\"")
+		return
+	}
+	_, _ = api.ChangeSettings(map[string]interface{}{"message_display_compact": toggle == "on"}, true)
+}
+
+func (UtilityCommands) devmode(ctx *dgc.Ctx) {
+	toggle := strings.ToLower(utils.Arguments["<on/off>"])
+	if toggle != "on" && toggle != "off" {
+		error_handling.OnError(ctx, error_handling.InvalidArgument, "<on/off> must be either \"on\" or \"off\"")
+		return
+	}
+	_, _ = api.ChangeSettings(map[string]interface{}{"developer_mode": toggle == "on"}, true)
+}
+
+func (UtilityCommands) sessionid(ctx *dgc.Ctx) {
+	embed.NewEmbed().
+		AddField("Session ID", ctx.Session.State.SessionID).
 		Send(ctx)
 }

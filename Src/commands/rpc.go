@@ -15,6 +15,7 @@ import (
 type RPCCommands struct{}
 
 func (r RPCCommands) RegisterCommands(router *dgc.Router) {
+	router.StartCategory("RPC", "RPC commands")
 	router.RegisterCmd(&dgc.Command{
 		Name:        "rpc",
 		Description: "Turn Rich Presence on or off",
@@ -104,25 +105,31 @@ func (r RPCCommands) RegisterCommands(router *dgc.Router) {
 		startTime := time.Now()
 		for {
 			time.Sleep(time.Second * 5)
-			config, err := config.GetConfig()
+			cfg, err := config.GetConfig()
 			if err != nil {
 				// TODO: log error
 				continue
 			}
-			if config.RPC.Enabled {
-				client.Login(config.RPC.ClientID)
-				client.SetActivity(client.Activity{
-					State:      strings.ReplaceAll(config.RPC.State, "$VERSION", constants.VersionString),
-					Details:    strings.ReplaceAll(config.RPC.Details, "$VERSION", constants.VersionString),
-					LargeImage: config.RPC.LargeImage,
-					LargeText:  strings.ReplaceAll(config.RPC.LargeText, "$VERSION", constants.VersionString),
-					SmallImage: config.RPC.SmallImage,
-					SmallText:  strings.ReplaceAll(config.RPC.SmallText, "$VERSION", constants.VersionString),
-					Buttons:    r.getButtons(config.RPC),
-					Timestamps: r.getTimestamps(config.RPC.Time, startTime),
-					Party:      r.getParty(config.RPC),
-					Secrets:    r.getSecrets(config.RPC),
+			if cfg.RPC.Enabled {
+				err = client.Login(cfg.RPC.ClientID)
+				if err != nil {
+					// TODO: log error
+				}
+				err = client.SetActivity(client.Activity{
+					State:      strings.ReplaceAll(cfg.RPC.State, "$VERSION", constants.VersionString),
+					Details:    strings.ReplaceAll(cfg.RPC.Details, "$VERSION", constants.VersionString),
+					LargeImage: cfg.RPC.LargeImage,
+					LargeText:  strings.ReplaceAll(cfg.RPC.LargeText, "$VERSION", constants.VersionString),
+					SmallImage: cfg.RPC.SmallImage,
+					SmallText:  strings.ReplaceAll(cfg.RPC.SmallText, "$VERSION", constants.VersionString),
+					Buttons:    r.getButtons(cfg.RPC),
+					Timestamps: r.getTimestamps(cfg.RPC.Time, startTime),
+					Party:      r.getParty(cfg.RPC),
+					Secrets:    r.getSecrets(cfg.RPC),
 				})
+				if err != nil {
+					// TODO: log error
+				}
 			} else {
 				client.Logout()
 			}
@@ -183,25 +190,25 @@ func (RPCCommands) rpc(ctx *dgc.Ctx) {
 	}
 	cfg, _ := config.GetConfig()
 	cfg.RPC.Enabled = toggle == "on"
-	cfg.Save()
+	_ = cfg.Save()
 }
 
 func (RPCCommands) rpcid(*dgc.Ctx) {
 	cfg, _ := config.GetConfig()
 	cfg.RPC.ClientID = utils.Arguments["<client id>"]
-	cfg.Save()
+	_ = cfg.Save()
 }
 
 func (RPCCommands) rpcstate(*dgc.Ctx) {
 	cfg, _ := config.GetConfig()
 	cfg.RPC.State = utils.Arguments["<text>"]
-	cfg.Save()
+	_ = cfg.Save()
 }
 
 func (RPCCommands) rpcdetails(*dgc.Ctx) {
 	cfg, _ := config.GetConfig()
 	cfg.RPC.Details = utils.Arguments["<text>"]
-	cfg.Save()
+	_ = cfg.Save()
 }
 
 func (RPCCommands) rpctime(ctx *dgc.Ctx) {
@@ -212,7 +219,7 @@ func (RPCCommands) rpctime(ctx *dgc.Ctx) {
 	}
 	cfg, _ := config.GetConfig()
 	cfg.RPC.Time = toggle == "on"
-	cfg.Save()
+	_ = cfg.Save()
 }
 
 func (RPCCommands) rpcinvitable(ctx *dgc.Ctx) {
@@ -223,31 +230,31 @@ func (RPCCommands) rpcinvitable(ctx *dgc.Ctx) {
 	}
 	cfg, _ := config.GetConfig()
 	cfg.RPC.Invitable = toggle == "on"
-	cfg.Save()
+	_ = cfg.Save()
 }
 
 func (RPCCommands) rpclargeimage(*dgc.Ctx) {
 	cfg, _ := config.GetConfig()
 	cfg.RPC.LargeImage = utils.Arguments["<image name>"]
-	cfg.Save()
+	_ = cfg.Save()
 }
 
 func (RPCCommands) rpclargetext(*dgc.Ctx) {
 	cfg, _ := config.GetConfig()
 	cfg.RPC.LargeText = utils.Arguments["<text>"]
-	cfg.Save()
+	_ = cfg.Save()
 }
 
 func (RPCCommands) rpcsmallimage(*dgc.Ctx) {
 	cfg, _ := config.GetConfig()
 	cfg.RPC.LargeImage = utils.Arguments["<image name>"]
-	cfg.Save()
+	_ = cfg.Save()
 }
 
 func (RPCCommands) rpcsmalltext(*dgc.Ctx) {
 	cfg, _ := config.GetConfig()
 	cfg.RPC.LargeText = utils.Arguments["<text>"]
-	cfg.Save()
+	_ = cfg.Save()
 }
 
 func (RPCCommands) rpcbutton1text(*dgc.Ctx) {
@@ -256,7 +263,7 @@ func (RPCCommands) rpcbutton1text(*dgc.Ctx) {
 		cfg.RPC.Buttons[0] = config.RPCButton{}
 	}
 	cfg.RPC.Buttons[0].Label = utils.Arguments["<text>"]
-	cfg.Save()
+	_ = cfg.Save()
 }
 
 func (RPCCommands) rpcbutton1url(*dgc.Ctx) {
@@ -265,7 +272,7 @@ func (RPCCommands) rpcbutton1url(*dgc.Ctx) {
 		cfg.RPC.Buttons[0] = config.RPCButton{}
 	}
 	cfg.RPC.Buttons[0].URL = utils.Arguments["<url>"]
-	cfg.Save()
+	_ = cfg.Save()
 }
 
 func (RPCCommands) rpcbutton2text(*dgc.Ctx) {
@@ -277,7 +284,7 @@ func (RPCCommands) rpcbutton2text(*dgc.Ctx) {
 		cfg.RPC.Buttons[1] = config.RPCButton{}
 	}
 	cfg.RPC.Buttons[1].Label = utils.Arguments["<text>"]
-	cfg.Save()
+	_ = cfg.Save()
 }
 
 func (RPCCommands) rpcbutton2url(*dgc.Ctx) {
@@ -289,5 +296,5 @@ func (RPCCommands) rpcbutton2url(*dgc.Ctx) {
 		cfg.RPC.Buttons[1] = config.RPCButton{}
 	}
 	cfg.RPC.Buttons[1].URL = utils.Arguments["<url>"]
-	cfg.Save()
+	_ = cfg.Save()
 }
