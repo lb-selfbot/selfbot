@@ -2,6 +2,7 @@ package commands
 
 import (
 	"fmt"
+	"net/url"
 	"strings"
 	"time"
 
@@ -397,6 +398,12 @@ func (f FunCommands) RegisterCommands(router *dgc.Router) {
 		Description: "Send a random question",
 		Usage:       "[p]randomquestion",
 		Handler:     f.randomquestion,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "lyrics",
+		Description: "Get the lyrics of a song",
+		Usage:       "[p]lyrics <song name>",
+		Handler:     f.lyrics,
 	})
 }
 
@@ -1127,5 +1134,22 @@ func (FunCommands) randomquestion(ctx *dgc.Ctx) {
 	}
 	embed.NewEmbed().
 		AddField("Question", question.Get("why").MustString()).
+		Send(ctx)
+}
+
+func (FunCommands) lyrics(ctx *dgc.Ctx) {
+	lyrics, err := http.GetJson("https://some-random-api.ml/lyrics?title=" + url.QueryEscape(ctx.Arguments.Raw()))
+	if err != nil {
+		_ = ctx.RespondText("An error has occurred.")
+		return
+	}
+	if lyrics.Get("error").MustString() != "" {
+		_ = ctx.RespondText("Could not find lyrics.")
+		return
+	}
+	embed.NewEmbed().
+		AddField("Artist", lyrics.Get("author").MustString()).
+		AddField("Title", lyrics.Get("title").MustString()).
+		AddField("Lyrics", lyrics.Get("lyrics").MustString()).
 		Send(ctx)
 }
