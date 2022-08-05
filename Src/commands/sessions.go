@@ -43,7 +43,7 @@ func (s *SessionsCommands) RegisterCommands(router *dgc.Router, mainSession *dis
 			session.ShouldSubscribeGuilds = false
 			session.AddHandler(func(_ *discordgo.Session, e *discordgo.Ready) {
 				time.Sleep(time.Second * 2)
-				session.Close()
+				_ = session.Close()
 
 				tempSessions := make([]*discordgo.DiscordSession, 0)
 
@@ -101,12 +101,12 @@ func (s *SessionsCommands) HandleSessions(oldSessions, newSessions []*discordgo.
 }
 
 func (s *SessionsCommands) viewsessions(ctx *dgc.Ctx) {
-	embed := embed.NewEmbed().SetDescription("Sessions")
+	emb := embed.NewEmbed().SetDescription("Sessions")
 	for index, session := range s.Sessions {
-		embed.AddField(
+		emb.AddField(
 			fmt.Sprintf("Session %d", index+1),
 			fmt.Sprintf("Session ID: %s\nOS: %s\nClient: %s", session.SessionID, utils.String.Capitalize(session.ClientInfo.OS), utils.String.Capitalize(session.ClientInfo.Client)),
 		)
 	}
-	embed.Send(ctx)
+	emb.Send(ctx)
 }

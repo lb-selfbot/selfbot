@@ -22,7 +22,6 @@ import (
 	"github.com/LightningDev1/LB-Selfbot/http"
 	"github.com/LightningDev1/dgc"
 	"github.com/LightningDev1/discordgo"
-	"github.com/PuerkitoBio/goquery"
 )
 
 var LowercaseAlphabet = "abcdefghijklmnopqrstuvwxyz"
@@ -281,8 +280,8 @@ Permission: View Guild Insights      | Value: %s`,
 	return permissionsString
 }
 
-func (DiscordUtils) SendFileFromURL(ctx *dgc.Ctx, url string, fileName string) error {
-	bytes_, _, err := http.GetBytes(url)
+func (DiscordUtils) SendFileFromURL(ctx *dgc.Ctx, url string, fileName string, headers ...map[string]string) error {
+	bytes_, _, err := http.GetBytes(url, headers...)
 	if err != nil {
 		return err
 	}
@@ -551,14 +550,6 @@ func (ProcessUtils) Restart() error {
 var Process = &ProcessUtils{}
 
 type MiscUtils struct{}
-
-func (MiscUtils) GetElementById(html string, id string) string {
-	doc, err := goquery.NewDocumentFromReader(strings.NewReader(html))
-	if err != nil {
-		return ""
-	}
-	return doc.Find(id).Text()
-}
 
 func (MiscUtils) GetImageUrlFromJson(url string, jsonQuery string) (string, error) {
 	json, err := http.GetJson(url)

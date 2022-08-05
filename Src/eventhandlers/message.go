@@ -89,7 +89,7 @@ func (e *Events) checkPrivnoteSniper(message *discordgo.Message, cfg *config.Con
 	}
 }
 
-func (e *Events) checkGiveawaySniper(message *discordgo.Message, cfg *config.Config) {
+func (e *Events) checkGiveawaySniper(_ *discordgo.Message, cfg *config.Config) {
 	if !cfg.Snipers.GiveawaySniper.Sniper {
 		return
 	}

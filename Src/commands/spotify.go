@@ -224,7 +224,7 @@ func (s SpotifyCommands) splay(ctx *dgc.Ctx) {
 		for _, artist := range song["artists"].([]interface{}) {
 			songArtists = append(songArtists, artist.(map[string]interface{})["name"].(string))
 		}
-		http.Post(fmt.Sprintf("https://api.spotify.com/v1/me/player/queue?uri=%s", url.QueryEscape(songUrl)), "", headers)
+		_, _ = http.Post(fmt.Sprintf("https://api.spotify.com/v1/me/player/queue?uri=%s", url.QueryEscape(songUrl)), "", headers)
 		response, err := http.Post("https://api.spotify.com/v1/me/player/next", "", headers)
 		s.HandleRequest(ctx, response, err, fmt.Sprintf("Successfully playing %s - %s.", strings.Join(songArtists, ", "), songName))
 	}
@@ -302,8 +302,11 @@ func (s SpotifyCommands) svolume(ctx *dgc.Ctx) {
 func (s SpotifyCommands) spresence(ctx *dgc.Ctx) {
 	toggle := strings.ToLower(utils.Arguments["<on/off>"]) == "on"
 	if !toggle {
-		ctx.Session.UpdateStatusComplex(discordgo.UpdateStatusData{
-			//Activities: []*discordgo.Activity{},
+		_ = ctx.Session.UpdateStatusComplex(discordgo.UpdateStatusData{
+			Game: &discordgo.Activity{
+				Type: discordgo.ActivityType(4),
+			},
+			Activities: []*discordgo.Activity{},
 		})
 		return
 	}
@@ -350,7 +353,7 @@ func (s SpotifyCommands) spresence(ctx *dgc.Ctx) {
 		json.Escape(utils.Arguments["[\"album\"]"]),
 		imageID,
 	)
-	ctx.Session.SendWsData(data)
+	_ = ctx.Session.SendWsData(data)
 }
 
 func (s SpotifyCommands) simageid(ctx *dgc.Ctx) {
@@ -363,12 +366,12 @@ func (s SpotifyCommands) simageid(ctx *dgc.Ctx) {
 			_ = ctx.RespondText("A Spotify error occured: No song found")
 			return
 		}
-		url := searchResponse.GetPath("tracks", "items").GetIndex(0).GetPath("album", "images").GetIndex(0).Get("url").MustString()
-		if url == "" {
+		imageUrl := searchResponse.GetPath("tracks", "items").GetIndex(0).GetPath("album", "images").GetIndex(0).Get("url").MustString()
+		if imageUrl == "" {
 			_ = ctx.RespondText("A Spotify error occured: Song not found.")
 			return
 		}
-		splitUrl := strings.Split(url, "/")
+		splitUrl := strings.Split(imageUrl, "/")
 		embed.NewEmbed().
 			AddField("Song", searchResponse.GetPath("tracks", "items").GetIndex(0).Get("name").MustString()).
 			AddField("Image ID", splitUrl[len(splitUrl)-1]).

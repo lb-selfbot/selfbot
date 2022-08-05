@@ -532,6 +532,12 @@ func (i ImageCommands) RegisterCommands(router *dgc.Router) {
 		Handler:     i.bigbrain,
 	})
 	router.RegisterCmd(&dgc.Command{
+		Name:        "brazzers",
+		Description: "Make a brazzers meme",
+		Usage:       "[p]brazzers <user>",
+		Handler:     i.brazzers,
+	})
+	router.RegisterCmd(&dgc.Command{
 		Name:        "byemom",
 		Description: "Make a byemom meme",
 		Usage:       "[p]byemom <user> <text>",
@@ -1056,7 +1062,7 @@ func (ImageCommands) distractedbf(ctx *dgc.Ctx) {
 	if !success {
 		user1 = ctx.Event.Author
 	}
-	user2, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
+	user2, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(1))
 	if !success {
 		user2 = ctx.Event.Author
 	}
@@ -1089,7 +1095,7 @@ func (ImageCommands) whowouldwin(ctx *dgc.Ctx) {
 	if !success {
 		user1 = ctx.Event.Author
 	}
-	user2, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
+	user2, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(1))
 	if !success {
 		user2 = ctx.Event.Author
 	}
@@ -1499,177 +1505,505 @@ func (ImageCommands) capybara(ctx *dgc.Ctx) {
 }
 
 func (ImageCommands) bed(ctx *dgc.Ctx) {
-	//     Image = bot.Helper.BytesToFile(requests.get(f"https://imgen.herokuapp.com/bed", headers={"avatars": f"{UserOne.avatar_url_as(format='png')},{UserTwo.avatar_url_as(format='png')}"}).content, "image.png")
-	// 	   Embed = bot.DefaultEmbed().set_image(url="attachment://image.png")
-	//     await bot.Helper.SendMessage(ctx, embed=Embed, file=Image)
+	user1, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
+	if !success {
+		user1 = ctx.Event.Author
+	}
+	user2, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(1))
+	if !success {
+		user2 = ctx.Event.Author
+	}
+	err := utils.Discord.SendFileFromURL(
+		ctx,
+		"https://imgen.herokuapp.com/bed",
+		"bed.png",
+		map[string]string{
+			"avatars": user1.AvatarURL("") + "," + user2.AvatarURL(""),
+		},
+	)
+	if err != nil {
+		_ = ctx.RespondText("An error has occurred: " + err.Error())
+	}
 }
 
 func (ImageCommands) balloon(ctx *dgc.Ctx) {
-	//     Image = bot.Helper.BytesToFile(requests.get(f"https://imgen.herokuapp.com/balloon", headers={"text": f"{TextOne},{TextTwo}"}).content, "image.png")
-	//     Embed = bot.DefaultEmbed().set_image(url="attachment://image.png")
-	//     await bot.Helper.SendMessage(ctx, embed=Embed, file=Image)
+	err := utils.Discord.SendFileFromURL(
+		ctx,
+		"https://imgen.herokuapp.com/balloon",
+		"balloon.png",
+		map[string]string{
+			"text": utils.Arguments["<\"text1\">"] + "," + utils.Arguments["<\"text2\">"],
+		},
+	)
+	if err != nil {
+		_ = ctx.RespondText("An error has occurred: " + err.Error())
+	}
 }
 
 func (ImageCommands) abandon(ctx *dgc.Ctx) {
-	//     Image = bot.Helper.BytesToFile(requests.get(f"https://imgen.herokuapp.com/abandon", headers={"text": Text}).content, "image.png")
-	//     Embed = bot.DefaultEmbed().set_image(url="attachment://image.png")
-	//     await bot.Helper.SendMessage(ctx, embed=Embed, file=Image)
+	err := utils.Discord.SendFileFromURL(
+		ctx,
+		"https://imgen.herokuapp.com/abandon",
+		"abandon.png",
+		map[string]string{
+			"text": ctx.Arguments.Raw(),
+		},
+	)
+	if err != nil {
+		_ = ctx.RespondText("An error has occurred: " + err.Error())
+	}
 }
 
 func (ImageCommands) aborted(ctx *dgc.Ctx) {
-	//     Image = bot.Helper.BytesToFile(requests.get(f"https://imgen.herokuapp.com/aborted", headers={"avatars": f"{User.avatar_url_as(format='png')}"}).content, "image.png")
-	//     Embed = bot.DefaultEmbed().set_image(url="attachment://image.png")
-	//     await bot.Helper.SendMessage(ctx, embed=Embed, file=Image)
+	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
+	if !success {
+		user = ctx.Event.Author
+	}
+	err := utils.Discord.SendFileFromURL(
+		ctx,
+		"https://imgen.herokuapp.com/aborted",
+		"aborted.png",
+		map[string]string{
+			"avatars": user.AvatarURL(""),
+		},
+	)
+	if err != nil {
+		_ = ctx.RespondText("An error has occurred: " + err.Error())
+	}
 }
 
 func (ImageCommands) affect(ctx *dgc.Ctx) {
-	//     Image = bot.Helper.BytesToFile(requests.get(f"https://imgen.herokuapp.com/affect", headers={"avatars": f"{User.avatar_url_as(format='png')}"}).content, "image.png")
-	//     Embed = bot.DefaultEmbed().set_image(url="attachment://image.png")
-	//     await bot.Helper.SendMessage(ctx, embed=Embed, file=Image)
+	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
+	if !success {
+		user = ctx.Event.Author
+	}
+	err := utils.Discord.SendFileFromURL(
+		ctx,
+		"https://imgen.herokuapp.com/affect",
+		"affect.png",
+		map[string]string{
+			"avatars": user.AvatarURL(""),
+		},
+	)
+	if err != nil {
+		_ = ctx.RespondText("An error has occurred: " + err.Error())
+	}
 }
 
 func (ImageCommands) airpods(ctx *dgc.Ctx) {
-	//     Image = bot.Helper.BytesToFile(requests.get(f"https://imgen.herokuapp.com/airpods", headers={"avatars": f"{User.avatar_url_as(format='png')}"}).content, "image.png")
-	//     Embed = bot.DefaultEmbed().set_image(url="attachment://image.png")
-	//     await bot.Helper.SendMessage(ctx, embed=Embed, file=Image)
+	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
+	if !success {
+		user = ctx.Event.Author
+	}
+	err := utils.Discord.SendFileFromURL(
+		ctx,
+		"https://imgen.herokuapp.com/airpods",
+		"airpods.gif",
+		map[string]string{
+			"avatars": user.AvatarURL(""),
+		},
+	)
+	if err != nil {
+		_ = ctx.RespondText("An error has occurred: " + err.Error())
+	}
 }
 
 func (ImageCommands) america(ctx *dgc.Ctx) {
-	//     Image = bot.Helper.BytesToFile(requests.get(f"https://imgen.herokuapp.com/america", headers={"avatars": f"{User.avatar_url_as(format='png')}"}).content, "image.png")
-	//     Embed = bot.DefaultEmbed().set_image(url="attachment://image.png")
-	//     await bot.Helper.SendMessage(ctx, embed=Embed, file=Image)
+	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
+	if !success {
+		user = ctx.Event.Author
+	}
+	err := utils.Discord.SendFileFromURL(
+		ctx,
+		"https://imgen.herokuapp.com/america",
+		"america.gif",
+		map[string]string{
+			"avatars": user.AvatarURL(""),
+		},
+	)
+	if err != nil {
+		_ = ctx.RespondText("An error has occurred: " + err.Error())
+	}
 }
 
 func (ImageCommands) armor(ctx *dgc.Ctx) {
-	//     Image = bot.Helper.BytesToFile(requests.get(f"https://imgen.herokuapp.com/armor", headers={"text": Text}).content, "image.png")
-	//     Embed = bot.DefaultEmbed().set_image(url="attachment://image.png")
-	//     await bot.Helper.SendMessage(ctx, embed=Embed, file=Image)
+	err := utils.Discord.SendFileFromURL(
+		ctx,
+		"https://imgen.herokuapp.com/armor",
+		"armor.png",
+		map[string]string{
+			"text": ctx.Arguments.Raw(),
+		},
+	)
+	if err != nil {
+		_ = ctx.RespondText("An error has occurred: " + err.Error())
+	}
 }
 
 func (ImageCommands) bongocat(ctx *dgc.Ctx) {
-	//     Image = bot.Helper.BytesToFile(requests.get(f"https://imgen.herokuapp.com/bongocat", headers={"avatars": f"{User.avatar_url_as(format='png')}"}).content, "image.png")
-	//     Embed = bot.DefaultEmbed().set_image(url="attachment://image.png")
-	//     await bot.Helper.SendMessage(ctx, embed=Embed, file=Image)
+	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
+	if !success {
+		user = ctx.Event.Author
+	}
+	err := utils.Discord.SendFileFromURL(
+		ctx,
+		"https://imgen.herokuapp.com/bongocat",
+		"bongocat.png",
+		map[string]string{
+			"avatars": user.AvatarURL(""),
+		},
+	)
+	if err != nil {
+		_ = ctx.RespondText("An error has occurred: " + err.Error())
+	}
 }
 
 func (ImageCommands) boo(ctx *dgc.Ctx) {
-	//     Image = bot.Helper.BytesToFile(requests.get(f"https://imgen.herokuapp.com/boo", headers={"text": f"{TextOne},{TextTwo}"}).content, "image.png")
-	//     Embed = bot.DefaultEmbed().set_image(url="attachment://image.png")
-	//     await bot.Helper.SendMessage(ctx, embed=Embed, file=Image)
+	err := utils.Discord.SendFileFromURL(
+		ctx,
+		"https://imgen.herokuapp.com/boo",
+		"boo.png",
+		map[string]string{
+			"text": utils.Arguments["<\"text1\">"] + "," + utils.Arguments["<\"text2\">"],
+		},
+	)
+	if err != nil {
+		_ = ctx.RespondText("An error has occurred: " + err.Error())
+	}
 }
 
 func (ImageCommands) bigbrain(ctx *dgc.Ctx) {
-	//     Image = bot.Helper.BytesToFile(requests.get(f"https://imgen.herokuapp.com/brain", headers={"text": f"{ItemOne},{ItemTwo},{ItemThree},{ItemFour}"}).content, "image.png")
-	//     Embed = bot.DefaultEmbed().set_image(url="attachment://image.png")
-	//     await bot.Helper.SendMessage(ctx, embed=Embed, file=Image)
+	err := utils.Discord.SendFileFromURL(
+		ctx,
+		"https://imgen.herokuapp.com/brain",
+		"bigbrain.png",
+		map[string]string{
+			"text": utils.Arguments["<\"item 1\">"] +
+				"," + utils.Arguments["<\"item 2\">"] +
+				"," + utils.Arguments["<\"item 3\">"] +
+				"," + utils.Arguments["<\"item 4\">"],
+		},
+	)
+	if err != nil {
+		_ = ctx.RespondText("An error has occurred: " + err.Error())
+	}
+}
+
+func (ImageCommands) brazzers(ctx *dgc.Ctx) {
+	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
+	if !success {
+		user = ctx.Event.Author
+	}
+	err := utils.Discord.SendFileFromURL(
+		ctx,
+		"https://imgen.herokuapp.com/brazzers",
+		"brazzers.png",
+		map[string]string{
+			"avatars": user.AvatarURL(""),
+		},
+	)
+	if err != nil {
+		_ = ctx.RespondText("An error has occurred: " + err.Error())
+	}
+
 }
 
 func (ImageCommands) byemom(ctx *dgc.Ctx) {
-	//     Image = bot.Helper.BytesToFile(requests.get(f"https://imgen.herokuapp.com/byemom", headers={"avatars": f"{User.avatar_url_as(format='png')}", "text": Text, "usernames": User.name}).content, "image.png")
-	//     Embed = bot.DefaultEmbed().set_image(url="attachment://image.png")
-	//     await bot.Helper.SendMessage(ctx, embed=Embed, file=Image)
+	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
+	if !success {
+		user = ctx.Event.Author
+	}
+	err := utils.Discord.SendFileFromURL(
+		ctx,
+		"https://imgen.herokuapp.com/byemom",
+		"byemom.png",
+		map[string]string{
+			"avatars":   user.AvatarURL(""),
+			"usernames": user.String(),
+			"text":      utils.String.RemoveWords(ctx.Arguments.Raw(), 1),
+		},
+	)
+	if err != nil {
+		_ = ctx.RespondText("An error has occurred: " + err.Error())
+	}
 }
 
 func (ImageCommands) cancer(ctx *dgc.Ctx) {
-	//     Image = bot.Helper.BytesToFile(requests.get(f"https://imgen.herokuapp.com/cancer", headers={"avatars": str(User.avatar_url_as(format='png'))}).content, "image.png")
-	//     Embed = bot.DefaultEmbed().set_image(url="attachment://image.png")
-	//     await bot.Helper.SendMessage(ctx, embed=Embed, file=Image)
+	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
+	if !success {
+		user = ctx.Event.Author
+	}
+	err := utils.Discord.SendFileFromURL(
+		ctx,
+		"https://imgen.herokuapp.com/cancer",
+		"cancer.png",
+		map[string]string{
+			"avatars": user.AvatarURL(""),
+		},
+	)
+	if err != nil {
+		_ = ctx.RespondText("An error has occurred: " + err.Error())
+	}
 }
 
 func (ImageCommands) cheating(ctx *dgc.Ctx) {
-	//     Image = bot.Helper.BytesToFile(requests.get(f"https://imgen.herokuapp.com/cheating", headers={"text": f"{Text1},{Text2}"}).content, "image.png")
-	//     Embed = bot.DefaultEmbed().set_image(url="attachment://image.png")
-	//     await bot.Helper.SendMessage(ctx, embed=Embed, file=Image)
+	err := utils.Discord.SendFileFromURL(
+		ctx,
+		"https://imgen.herokuapp.com/cheating",
+		"cheating.png",
+		map[string]string{
+			"text": utils.Arguments["<\"text1\">"] + "," + utils.Arguments["<\"text2\">"],
+		},
+	)
+	if err != nil {
+		_ = ctx.RespondText("An error has occurred: " + err.Error())
+	}
 }
 
 func (ImageCommands) citation(ctx *dgc.Ctx) {
-	//     Image = bot.Helper.BytesToFile(requests.get(f"https://imgen.herokuapp.com/citation", headers={"text": f"{Text1},{Text2},{Text3}"}).content, "image.png")
-	//     Embed = bot.DefaultEmbed().set_image(url="attachment://image.png")
-	//     await bot.Helper.SendMessage(ctx, embed=Embed, file=Image)
+	err := utils.Discord.SendFileFromURL(
+		ctx,
+		"https://imgen.herokuapp.com/citation",
+		"citation.png",
+		map[string]string{
+			"text": utils.Arguments["<\"text1\">"] + "," + utils.Arguments["<\"text2\">"] + "," + utils.Arguments["<\"text3\">"],
+		},
+	)
+	if err != nil {
+		_ = ctx.RespondText("An error has occurred: " + err.Error())
+	}
 }
 
 func (ImageCommands) communism(ctx *dgc.Ctx) {
-	//     Image = bot.Helper.BytesToFile(requests.get(f"https://imgen.herokuapp.com/communism", headers={"avatars": f"{User.avatar_url_as(format='png')}"}).content, "image.png")
-	//     Embed = bot.DefaultEmbed().set_image(url="attachment://image.png")
-	//     await bot.Helper.SendMessage(ctx, embed=Embed, file=Image)
+	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
+	if !success {
+		user = ctx.Event.Author
+	}
+	err := utils.Discord.SendFileFromURL(
+		ctx,
+		"https://imgen.herokuapp.com/communism",
+		"communism.gif",
+		map[string]string{
+			"avatars": user.AvatarURL(""),
+		},
+	)
+	if err != nil {
+		_ = ctx.RespondText("An error has occurred: " + err.Error())
+	}
 }
 
 func (ImageCommands) confusedcat(ctx *dgc.Ctx) {
-	//     Image = bot.Helper.BytesToFile(requests.get(f"https://imgen.herokuapp.com/confusedcat", headers={"text": f"{Text1},{Text2}"}).content, "image.png")
-	//     Embed = bot.DefaultEmbed().set_image(url="attachment://image.png")
-	//     await bot.Helper.SendMessage(ctx, embed=Embed, file=Image)
+	err := utils.Discord.SendFileFromURL(
+		ctx,
+		"https://imgen.herokuapp.com/confusedcat",
+		"confusedcat.png",
+		map[string]string{
+			"text": utils.Arguments["<\"text1\">"] + "," + utils.Arguments["<\"text2\">"],
+		},
+	)
+	if err != nil {
+		_ = ctx.RespondText("An error has occurred: " + err.Error())
+	}
 }
 
 func (ImageCommands) corporate(ctx *dgc.Ctx) {
-	//     Image = bot.Helper.BytesToFile(requests.get(f"https://imgen.herokuapp.com/corporate", headers={"avatars": f"{User.avatar_url_as(format='png')}"}).content, "image.png")
-	//     Embed = bot.DefaultEmbed().set_image(url="attachment://image.png")
-	//     await bot.Helper.SendMessage(ctx, embed=Embed, file=Image)
+	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
+	if !success {
+		user = ctx.Event.Author
+	}
+	err := utils.Discord.SendFileFromURL(
+		ctx,
+		"https://imgen.herokuapp.com/corporate",
+		"corporate.png",
+		map[string]string{
+			"avatars": user.AvatarURL(""),
+		},
+	)
+	if err != nil {
+		_ = ctx.RespondText("An error has occurred: " + err.Error())
+	}
 }
 
 func (ImageCommands) cry(ctx *dgc.Ctx) {
-	//     Image = bot.Helper.BytesToFile(requests.get(f"https://imgen.herokuapp.com/cry", headers={"text": Text}).content, "image.png")
-	//     Embed = bot.DefaultEmbed().set_image(url="attachment://image.png")
-	//     await bot.Helper.SendMessage(ctx, embed=Embed, file=Image)
+	err := utils.Discord.SendFileFromURL(
+		ctx,
+		"https://imgen.herokuapp.com/cry",
+		"cry.png",
+		map[string]string{
+			"text": ctx.Arguments.Raw(),
+		},
+	)
+	if err != nil {
+		_ = ctx.RespondText("An error has occurred: " + err.Error())
+	}
 }
 
 func (ImageCommands) dab(ctx *dgc.Ctx) {
-	//     Image = bot.Helper.BytesToFile(requests.get(f"https://imgen.herokuapp.com/dab", headers={"avatars": f"{User.avatar_url_as(format='png')}"}).content, "image.png")
-	//     Embed = bot.DefaultEmbed().set_image(url="attachment://image.png")
-	//     await bot.Helper.SendMessage(ctx, embed=Embed, file=Image)
+	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
+	if !success {
+		user = ctx.Event.Author
+	}
+	err := utils.Discord.SendFileFromURL(
+		ctx,
+		"https://imgen.herokuapp.com/dab",
+		"dab.png",
+		map[string]string{
+			"avatars": user.AvatarURL(""),
+		},
+	)
+	if err != nil {
+		_ = ctx.RespondText("An error has occurred: " + err.Error())
+	}
 }
 
 func (ImageCommands) dank(ctx *dgc.Ctx) {
-	//     Image = bot.Helper.BytesToFile(requests.get(f"https://imgen.herokuapp.com/dank", headers={"avatars": f"{User.avatar_url_as(format='png')}"}).content, "image.png")
-	//     Embed = bot.DefaultEmbed().set_image(url="attachment://image.png")
-	//     await bot.Helper.SendMessage(ctx, embed=Embed, file=Image)
+	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
+	if !success {
+		user = ctx.Event.Author
+	}
+	err := utils.Discord.SendFileFromURL(
+		ctx,
+		"https://imgen.herokuapp.com/dank",
+		"dank.gif",
+		map[string]string{
+			"avatars": user.AvatarURL(""),
+		},
+	)
+	if err != nil {
+		_ = ctx.RespondText("An error has occurred: " + err.Error())
+	}
 }
 
 func (ImageCommands) delete(ctx *dgc.Ctx) {
-	//     Image = bot.Helper.BytesToFile(requests.get(f"https://imgen.herokuapp.com/delete", headers={"avatars": f"{User.avatar_url_as(format='png')}"}).content, "image.png")
-	//     Embed = bot.DefaultEmbed().set_image(url="attachment://image.png")
-	//     await bot.Helper.SendMessage(ctx, embed=Embed, file=Image)
+	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
+	if !success {
+		user = ctx.Event.Author
+	}
+	err := utils.Discord.SendFileFromURL(
+		ctx,
+		"https://imgen.herokuapp.com/delete",
+		"delete.png",
+		map[string]string{
+			"avatars": user.AvatarURL(""),
+		},
+	)
+	if err != nil {
+		_ = ctx.RespondText("An error has occurred: " + err.Error())
+	}
 }
 
 func (ImageCommands) disability(ctx *dgc.Ctx) {
-	//     Image = bot.Helper.BytesToFile(requests.get(f"https://imgen.herokuapp.com/disability", headers={"avatars": f"{User.avatar_url_as(format='png')}"}).content, "image.png")
-	//     Embed = bot.DefaultEmbed().set_image(url="attachment://image.png")
-	//     await bot.Helper.SendMessage(ctx, embed=Embed, file=Image)
+	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
+	if !success {
+		user = ctx.Event.Author
+	}
+	err := utils.Discord.SendFileFromURL(
+		ctx,
+		"https://imgen.herokuapp.com/disability",
+		"disability.png",
+		map[string]string{
+			"avatars": user.AvatarURL(""),
+		},
+	)
+	if err != nil {
+		_ = ctx.RespondText("An error has occurred: " + err.Error())
+	}
 }
 
 func (ImageCommands) doglemon(ctx *dgc.Ctx) {
-	//     Image = bot.Helper.BytesToFile(requests.get(f"https://imgen.herokuapp.com/doglemon", headers={"text": f"{Text1},{Text2}"}).content, "image.png")
-	//     Embed = bot.DefaultEmbed().set_image(url="attachment://image.png")
-	//     await bot.Helper.SendMessage(ctx, embed=Embed, file=Image)
+	err := utils.Discord.SendFileFromURL(
+		ctx,
+		"https://imgen.herokuapp.com/doglemon",
+		"doglemon.png",
+		map[string]string{
+			"text": utils.Arguments["<\"text1\">"] + "," + utils.Arguments["<\"text2\">"],
+		},
+	)
+	if err != nil {
+		_ = ctx.RespondText("An error has occurred: " + err.Error())
+	}
 }
 
 func (ImageCommands) door(ctx *dgc.Ctx) {
-	//     Image = bot.Helper.BytesToFile(requests.get(f"https://imgen.herokuapp.com/door", headers={"avatars": f"{User.avatar_url_as(format='png')}"}).content, "image.png")
-	//     Embed = bot.DefaultEmbed().set_image(url="attachment://image.png")
-	//     await bot.Helper.SendMessage(ctx, embed=Embed, file=Image)
+	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
+	if !success {
+		user = ctx.Event.Author
+	}
+	err := utils.Discord.SendFileFromURL(
+		ctx,
+		"https://imgen.herokuapp.com/door",
+		"door.png",
+		map[string]string{
+			"avatars": user.AvatarURL(""),
+		},
+	)
+	if err != nil {
+		_ = ctx.RespondText("An error has occurred: " + err.Error())
+	}
 }
 
 func (ImageCommands) egg(ctx *dgc.Ctx) {
-	//     Image = bot.Helper.BytesToFile(requests.get(f"https://imgen.herokuapp.com/egg", headers={"avatars": f"{User.avatar_url_as(format='png')}"}).content, "image.png")
-	//     Embed = bot.DefaultEmbed().set_image(url="attachment://image.png")
-	//     await bot.Helper.SendMessage(ctx, embed=Embed, file=Image)
+	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
+	if !success {
+		user = ctx.Event.Author
+	}
+	err := utils.Discord.SendFileFromURL(
+		ctx,
+		"https://imgen.herokuapp.com/egg",
+		"egg.png",
+		map[string]string{
+			"avatars": user.AvatarURL(""),
+		},
+	)
+	if err != nil {
+		_ = ctx.RespondText("An error has occurred: " + err.Error())
+	}
 }
 
 func (ImageCommands) excuseme(ctx *dgc.Ctx) {
-	//     Image = bot.Helper.BytesToFile(requests.get(f"https://imgen.herokuapp.com/excuseme", headers={"text": Text}).content, "image.png")
-	//     Embed = bot.DefaultEmbed().set_image(url="attachment://image.png")
-	//     await bot.Helper.SendMessage(ctx, embed=Embed, file=Image)
+	err := utils.Discord.SendFileFromURL(
+		ctx,
+		"https://imgen.herokuapp.com/excuseme",
+		"excuseme.png",
+		map[string]string{
+			"text": ctx.Arguments.Raw(),
+		},
+	)
+	if err != nil {
+		_ = ctx.RespondText("An error has occurred: " + err.Error())
+	}
 }
 
 func (ImageCommands) expanddong(ctx *dgc.Ctx) {
-	//     Image = bot.Helper.BytesToFile(requests.get(f"https://imgen.herokuapp.com/expanddong", headers={"text": Text}).content, "image.png")
-	//     Embed = bot.DefaultEmbed().set_image(url="attachment://image.png")
-	//     await bot.Helper.SendMessage(ctx, embed=Embed, file=Image)
+	err := utils.Discord.SendFileFromURL(
+		ctx,
+		"https://imgen.herokuapp.com/expanddong",
+		"expanddong.png",
+		map[string]string{
+			"text": ctx.Arguments.Raw(),
+		},
+	)
+	if err != nil {
+		_ = ctx.RespondText("An error has occurred: " + err.Error())
+	}
 }
 
 func (ImageCommands) expandingwwe(ctx *dgc.Ctx) {
-	//     Image = bot.Helper.BytesToFile(requests.get(f"https://imgen.herokuapp.com/expandingwwe", headers={"text": f"{Item1},{Item2},{Item3},{Item4},{Item5}"}).content, "image.png")
-	//     Embed = bot.DefaultEmbed().set_image(url="attachment://image.png")
-	//     await bot.Helper.SendMessage(ctx, embed=Embed, file=Image)
+	err := utils.Discord.SendFileFromURL(
+		ctx,
+		"https://imgen.herokuapp.com/expandingwwe",
+		"expandingwwe.png",
+		map[string]string{
+			"text": utils.Arguments["<\"item 1\">"] +
+				"," + utils.Arguments["<\"item 2\">"] +
+				"," + utils.Arguments["<\"item 3\">"] +
+				"," + utils.Arguments["<\"item 4\">"] +
+				"," + utils.Arguments["<\"item 5\">"],
+		},
+	)
+	if err != nil {
+		_ = ctx.RespondText("An error has occurred: " + err.Error())
+	}
 }
 
 func (ImageCommands) qrcode(ctx *dgc.Ctx) {

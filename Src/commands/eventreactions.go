@@ -114,7 +114,7 @@ func (EventReactionsCommands) userignorelist(ctx *dgc.Ctx) {
 		Send(ctx)
 }
 
-func (EventReactionsCommands) clearuserignorelist(ctx *dgc.Ctx) {
+func (EventReactionsCommands) clearuserignorelist(*dgc.Ctx) {
 	eventhandlers.EventHandlers.Settings.IgnoredUsers = []*discordgo.User{}
 }
 
@@ -170,6 +170,6 @@ func (EventReactionsCommands) serverignorelist(ctx *dgc.Ctx) {
 		Send(ctx)
 }
 
-func (EventReactionsCommands) clearserverignorelist(ctx *dgc.Ctx) {
+func (EventReactionsCommands) clearserverignorelist(*dgc.Ctx) {
 	eventhandlers.EventHandlers.Settings.IgnoredGuilds = []*discordgo.Guild{}
 }

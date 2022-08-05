@@ -229,11 +229,11 @@ func (a *ActivityCommands) RegisterCommands(router *dgc.Router, session *discord
 func (a *ActivityCommands) setActivity(activityType, text string) {
 	switch activityType {
 	case "status":
-		api.ChangeSettings(map[string]interface{}{"status": text}, true)
+		_, _ = api.ChangeSettings(map[string]interface{}{"status": text}, true)
 	case "customstatus":
-		api.ChangeSettings(map[string]interface{}{"custom_status": map[string]string{"text": text}}, true)
+		_, _ = api.ChangeSettings(map[string]interface{}{"custom_status": map[string]string{"text": text}}, true)
 	case "listening":
-		a.Session.UpdateStatusComplex(discordgo.UpdateStatusData{
+		_ = a.Session.UpdateStatusComplex(discordgo.UpdateStatusData{
 			Game: &discordgo.Activity{
 				Name:  text,
 				Type:  discordgo.ActivityTypeListening,
@@ -241,7 +241,7 @@ func (a *ActivityCommands) setActivity(activityType, text string) {
 			},
 		})
 	case "watching":
-		a.Session.UpdateStatusComplex(discordgo.UpdateStatusData{
+		_ = a.Session.UpdateStatusComplex(discordgo.UpdateStatusData{
 			Game: &discordgo.Activity{
 				Name:  text,
 				Type:  discordgo.ActivityTypeWatching,
@@ -249,7 +249,7 @@ func (a *ActivityCommands) setActivity(activityType, text string) {
 			},
 		})
 	case "playing":
-		a.Session.UpdateStatusComplex(discordgo.UpdateStatusData{
+		_ = a.Session.UpdateStatusComplex(discordgo.UpdateStatusData{
 			Game: &discordgo.Activity{
 				Name:  text,
 				Type:  discordgo.ActivityTypeGame,
@@ -257,7 +257,7 @@ func (a *ActivityCommands) setActivity(activityType, text string) {
 			},
 		})
 	case "streaming":
-		a.Session.UpdateStatusComplex(discordgo.UpdateStatusData{
+		_ = a.Session.UpdateStatusComplex(discordgo.UpdateStatusData{
 			Activities: []*discordgo.Activity{},
 			Game: &discordgo.Activity{
 				Name:    text,
@@ -268,7 +268,7 @@ func (a *ActivityCommands) setActivity(activityType, text string) {
 			},
 		})
 	case "competing":
-		a.Session.UpdateStatusComplex(discordgo.UpdateStatusData{
+		_ = a.Session.UpdateStatusComplex(discordgo.UpdateStatusData{
 			Game: &discordgo.Activity{
 				Name:  text,
 				Type:  discordgo.ActivityTypeCompeting,
@@ -303,11 +303,11 @@ func (a *ActivityCommands) clearcustomstatus(ctx *dgc.Ctx) {
 }
 
 func (a *ActivityCommands) aboutme(ctx *dgc.Ctx) {
-	api.ChangeSettings(map[string]interface{}{"bio": ctx.Arguments.Raw()}, false)
+	_, _ = api.ChangeSettings(map[string]interface{}{"bio": ctx.Arguments.Raw()}, false)
 }
 
 func (a *ActivityCommands) clearaboutme(*dgc.Ctx) {
-	api.ChangeSettings(map[string]interface{}{"bio": ""}, false)
+	_, _ = api.ChangeSettings(map[string]interface{}{"bio": ""}, false)
 }
 
 func (a *ActivityCommands) listening(ctx *dgc.Ctx) {
@@ -336,7 +336,7 @@ func (a *ActivityCommands) clearactivity(ctx *dgc.Ctx) {
 	a.CycleMode = ""
 	a.StreamingURL = ""
 	a.CycleText = []string{}
-	ctx.Session.UpdateStatusComplex(discordgo.UpdateStatusData{
+	_ = ctx.Session.UpdateStatusComplex(discordgo.UpdateStatusData{
 		Game: &discordgo.Activity{
 			Type: discordgo.ActivityType(4),
 		},
@@ -345,7 +345,7 @@ func (a *ActivityCommands) clearactivity(ctx *dgc.Ctx) {
 }
 
 func (ActivityCommands) rickrollactivity(ctx *dgc.Ctx) {
-	ctx.Session.UpdateStatusComplex(discordgo.UpdateStatusData{
+	_ = ctx.Session.UpdateStatusComplex(discordgo.UpdateStatusData{
 		Activities: []*discordgo.Activity{},
 		Game: &discordgo.Activity{
 			Name:    "Never Gonna Give You Up",
@@ -361,7 +361,7 @@ func (ActivityCommands) rickrollactivity(ctx *dgc.Ctx) {
 }
 
 func (ActivityCommands) youtubeactivity(ctx *dgc.Ctx) {
-	ctx.Session.UpdateStatusComplex(discordgo.UpdateStatusData{
+	_ = ctx.Session.UpdateStatusComplex(discordgo.UpdateStatusData{
 		Game: &discordgo.Activity{
 			Name:    "YouTube",
 			Details: ctx.Arguments.Raw(),
@@ -376,7 +376,7 @@ func (ActivityCommands) youtubeactivity(ctx *dgc.Ctx) {
 }
 
 func (ActivityCommands) twitchactivity(ctx *dgc.Ctx) {
-	ctx.Session.UpdateStatusComplex(discordgo.UpdateStatusData{
+	_ = ctx.Session.UpdateStatusComplex(discordgo.UpdateStatusData{
 		Game: &discordgo.Activity{
 			Name:    "Twitch",
 			Details: ctx.Arguments.Raw(),
@@ -391,7 +391,7 @@ func (ActivityCommands) twitchactivity(ctx *dgc.Ctx) {
 }
 
 func (ActivityCommands) discordactivity(ctx *dgc.Ctx) {
-	ctx.Session.UpdateStatusComplex(discordgo.UpdateStatusData{
+	_ = ctx.Session.UpdateStatusComplex(discordgo.UpdateStatusData{
 		Game: &discordgo.Activity{
 			Name:    "Discord",
 			Details: "Discord",
@@ -517,5 +517,5 @@ func (a *ActivityCommands) setactivityjson(ctx *dgc.Ctx) {
 		_ = ctx.RespondText("Invalid activity JSON! " + err.Error())
 		return
 	}
-	ctx.Session.UpdateStatusComplex(discordgo.UpdateStatusData{Game: &activity})
+	_ = ctx.Session.UpdateStatusComplex(discordgo.UpdateStatusData{Game: &activity})
 }

@@ -570,7 +570,6 @@ func (AdministrationCommands) thread(ctx *dgc.Ctx) {
 	if !utils.Discord.CheckIfInServer(ctx) {
 		return
 	}
-	ctx.Session.ThreadStart(ctx.Event.ChannelID, ctx.Arguments.Raw(), discordgo.ChannelTypeGuildPublicThread, 0)
 	channel, err := ctx.Session.ThreadStart(ctx.Event.ChannelID, ctx.Arguments.Raw(), discordgo.ChannelTypeGuildPublicThread, 0)
 	if err != nil {
 		_ = ctx.RespondText("Error creating thread: " + err.Error())
@@ -773,7 +772,11 @@ func (AdministrationCommands) purge(ctx *dgc.Ctx) {
 	}
 
 	for _, message := range messages {
-		ctx.Session.ChannelMessageDelete(channelID, message.ID)
+		err = ctx.Session.ChannelMessageDelete(channelID, message.ID)
+		if err != nil {
+			_ = ctx.RespondText("Error deleting messages: " + err.Error())
+			return
+		}
 	}
 }
 
@@ -809,7 +812,7 @@ func (AdministrationCommands) nuke(ctx *dgc.Ctx) {
 		_ = ctx.RespondText("Error creating channel: " + err.Error())
 		return
 	}
-	ctx.Session.ChannelEditComplex(channel.ID, &discordgo.ChannelEdit{
+	_, _ = ctx.Session.ChannelEditComplex(channel.ID, &discordgo.ChannelEdit{
 		Position: channel.Position,
 	})
 
@@ -823,16 +826,16 @@ func (AdministrationCommands) nuke(ctx *dgc.Ctx) {
 // Webhook Control
 
 func (AdministrationCommands) webhookinfo(ctx *dgc.Ctx) {
-	url, err := url.Parse(utils.Arguments["<webhook url>"])
+	webhookUrl, err := url.Parse(utils.Arguments["<webhook url>"])
 	if err != nil {
 		_ = ctx.RespondText("Invalid webhook URL!")
 		return
 	}
-	if !strings.Contains(url.Host, "discord.com") {
+	if !strings.Contains(webhookUrl.Host, "discord.com") {
 		_ = ctx.RespondText("Invalid webhook URL!")
 		return
 	}
-	webhookInfo, statusCode, err := http.GetJsonStatusCode(url.String())
+	webhookInfo, statusCode, err := http.GetJsonStatusCode(webhookUrl.String())
 	if err != nil {
 		_ = ctx.RespondText("Invalid webhook URL!")
 		return
@@ -854,12 +857,12 @@ func (AdministrationCommands) webhookinfo(ctx *dgc.Ctx) {
 }
 
 func (AdministrationCommands) webhooksend(ctx *dgc.Ctx) {
-	url, err := url.Parse(utils.Arguments["<webhook url>"])
+	webhookUrl, err := url.Parse(utils.Arguments["<webhook url>"])
 	if err != nil {
 		_ = ctx.RespondText("Invalid webhook URL!")
 		return
 	}
-	if !strings.Contains(url.Host, "discord.com") {
+	if !strings.Contains(webhookUrl.Host, "discord.com") {
 		_ = ctx.RespondText("Invalid webhook URL!")
 		return
 	}
@@ -867,20 +870,20 @@ func (AdministrationCommands) webhooksend(ctx *dgc.Ctx) {
 		Content string `json:"content"`
 	}{utils.Arguments["<\"message\">"]}
 	jsonData, _ := json.Marshal(data)
-	http.PostJson(url.String(), string(jsonData))
+	_, _ = http.Post(webhookUrl.String(), string(jsonData))
 }
 
 func (AdministrationCommands) webhookdelete(ctx *dgc.Ctx) {
-	url, err := url.Parse(utils.Arguments["<webhook url>"])
+	webhookUrl, err := url.Parse(utils.Arguments["<webhook url>"])
 	if err != nil {
 		_ = ctx.RespondText("Invalid webhook URL!")
 		return
 	}
-	if !strings.Contains(url.Host, "discord.com") {
+	if !strings.Contains(webhookUrl.Host, "discord.com") {
 		_ = ctx.RespondText("Invalid webhook URL!")
 		return
 	}
-	_, _ = http.Delete(url.String())
+	_, _ = http.Delete(webhookUrl.String())
 	embed.NewEmbed().
 		SetDescription("Successfully deleted webhook.").
 		Send(ctx)
@@ -1071,7 +1074,7 @@ func (AdministrationCommands) report(ctx *dgc.Ctx) {
 		return
 	}
 
-	api.ReportMessage(guildID, channelID, messageID, reasonInt)
+	_, _ = api.ReportMessage(guildID, channelID, messageID, reasonInt)
 
 	embed.NewEmbed().
 		SetDescription("Successfully reported message!").
@@ -1211,9 +1214,9 @@ func (AdministrationCommands) timeout(ctx *dgc.Ctx) {
 		_ = ctx.RespondText("Argument <seconds> must be a number.")
 		return
 	}
-	time := time.Now().Add(time.Duration(seconds) * time.Second)
+	until := time.Now().Add(time.Duration(seconds) * time.Second)
 
-	err = ctx.Session.GuildMemberTimeout(ctx.Event.GuildID, member.User.ID, &time)
+	err = ctx.Session.GuildMemberTimeout(ctx.Event.GuildID, member.User.ID, &until)
 	if err != nil {
 		_ = ctx.RespondText("Error timing out user: " + err.Error())
 		return
@@ -1462,7 +1465,7 @@ func (AdministrationCommands) serverinfo(ctx *dgc.Ctx) {
 		ownerMention = owner.User.String()
 	}
 
-	embed := embed.NewEmbed().
+	embed.NewEmbed().
 		SetDescription(fmt.Sprintf("Server Info - %s", guild.Name)).
 		AddField("ID", guild.ID).
 		AddField("Owner", ownerMention).
@@ -1473,11 +1476,9 @@ func (AdministrationCommands) serverinfo(ctx *dgc.Ctx) {
 		AddField("Member Count", fmt.Sprint(guild.MemberCount)).
 		AddField("Channel Count", fmt.Sprint(len(guild.Channels))).
 		AddField("Role Count", fmt.Sprint(len(guild.Roles))).
-		AddField("Joined At", guild.JoinedAt.Format(time.RFC1123))
-	if guild.Icon != "" {
-		embed.SetImage(guild.IconURL())
-	}
-	embed.Send(ctx)
+		AddField("Joined At", guild.JoinedAt.Format(time.RFC1123)).
+		SetImage(guild.IconURL()).
+		Send(ctx)
 }
 
 func (AdministrationCommands) serverage(ctx *dgc.Ctx) {

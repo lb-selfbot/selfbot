@@ -173,7 +173,7 @@ func (TextCommands) alphabet(ctx *dgc.Ctx) {
 	for i := 1; i < len(chars); i++ {
 		time.Sleep(1 * time.Second)
 		char := string(chars[i])
-		ctx.Session.ChannelMessageEdit(message.ChannelID, message.ID, char)
+		_, _ = ctx.Session.ChannelMessageEdit(message.ChannelID, message.ID, char)
 	}
 }
 
@@ -254,7 +254,7 @@ func (TextCommands) edit(ctx *dgc.Ctx) {
 	for i := 1; i < len(fullText); i++ {
 		time.Sleep(500 * time.Millisecond)
 		currentText = currentText + string(fullText[i])
-		ctx.Session.ChannelMessageEdit(message.ChannelID, message.ID, currentText)
+		_, _ = ctx.Session.ChannelMessageEdit(message.ChannelID, message.ID, currentText)
 	}
 }
 

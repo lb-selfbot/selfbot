@@ -12,7 +12,6 @@ import (
 	"github.com/LightningDev1/LB-Selfbot/utils"
 	"github.com/LightningDev1/dgc"
 	"github.com/LightningDev1/discordgo"
-	"github.com/PuerkitoBio/goquery"
 	"github.com/brianvoe/gofakeit/v6"
 	owoifygo "github.com/deadshot465/owoify-go"
 )
@@ -522,27 +521,26 @@ func (FunCommands) yomomma(ctx *dgc.Ctx) {
 }
 
 func (FunCommands) wouldyourather(ctx *dgc.Ctx) {
-	html, err := http.Get("https://www.conversationstarters.com/wyrqlist.php")
+	wyrJson, err := http.GetJson("https://lightning-bot.com/api/v3/selfbot-utils/wouldyourather")
 	if err != nil {
 		_ = ctx.RespondText("An error has occurred.")
 		return
 	}
 	embed.NewEmbed().
 		SetDescription("Would you rather...").
-		AddField("A", utils.Misc.GetElementById(html, "#qa")).
-		AddField("B", utils.Misc.GetElementById(html, "#qb")).
+		AddField("A", wyrJson.Get("question_a").MustString()).
+		AddField("B", wyrJson.Get("question_b").MustString()).
 		Send(ctx)
 }
 
 func (FunCommands) topic(ctx *dgc.Ctx) {
-	html, err := http.Get("https://www.conversationstarters.com/generator.php")
+	topicJson, err := http.GetJson("https://lightning-bot.com/api/v3/selfbot-utils/fml")
 	if err != nil {
 		_ = ctx.RespondText("An error has occurred.")
 		return
 	}
 	embed.NewEmbed().
-		SetDescription("Would you rather...").
-		AddField("Topic", utils.Misc.GetElementById(html, "#random")).
+		AddField("Topic", topicJson.Get("topic").MustString()).
 		Send(ctx)
 }
 
@@ -848,18 +846,13 @@ func (FunCommands) joke(ctx *dgc.Ctx) {
 }
 
 func (FunCommands) fml(ctx *dgc.Ctx) {
-	html, err := http.Get("https://www.fmylife.com/random")
-	if err != nil {
-		_ = ctx.RespondText("An error has occurred.")
-		return
-	}
-	doc, err := goquery.NewDocumentFromReader(strings.NewReader(html))
+	fmlJson, err := http.GetJson("https://lightning-bot.com/api/v3/selfbot-utils/fml")
 	if err != nil {
 		_ = ctx.RespondText("An error has occurred.")
 		return
 	}
 	embed.NewEmbed().
-		AddField("FML", doc.Find("a.block text-blue-500 my-4").Text()).
+		AddField("FML", fmlJson.Get("fml").MustString()).
 		Send(ctx)
 }
 
@@ -1026,22 +1019,14 @@ func (FunCommands) httpcat(ctx *dgc.Ctx) {
 }
 
 func (FunCommands) riddle(ctx *dgc.Ctx) {
-	html, err := http.Get("https://generatorfun.com/code/model/generatorcontent.php?recordtable=generator&recordkey=69&gen=Y&itemnumber=10&randomoption=undefined&genimage=Yes&geneditor=No&nsfw=undefined&keyword=undefined&searchfilter=&searchfilterexclude=&tone=Normal&prefix=None&randomai=No")
+	riddleJson, err := http.GetJson("https://lightning-bot.com/api/v3/selfbot-utils/fml")
 	if err != nil {
 		_ = ctx.RespondText("An error has occurred.")
 		return
 	}
-	doc, err := goquery.NewDocumentFromReader(strings.NewReader(html))
-	if err != nil {
-		_ = ctx.RespondText("An error has occurred.")
-		return
-	}
-	riddles := doc.Find("#gencont").Find("p").Map(func(i int, s *goquery.Selection) string {
-		return s.Text()
-	})
-	riddle := strings.Replace(utils.RandomChoice(riddles), "SHOW", "", -1)
 	embed.NewEmbed().
-		AddField("Riddle", riddle).
+		AddField("Riddle", riddleJson.Get("question").MustString()).
+		AddField("Answer", "||"+riddleJson.Get("answer").MustString()+"||").
 		Send(ctx)
 }
 

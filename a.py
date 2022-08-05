@@ -1,4 +1,13 @@
-import re
+import re, requests, random, bs4
+
+
+
+wouldyourather_html = requests.get("https://www.wouldyourather.com/").content
+wouldyourather = random.choice(bs4.BeautifulSoup(wouldyourather_html, "html.parser").find("div", id="wouldyourather").find_all("div"))
+question = wouldyourather.find('p').contents[0]
+answer = wouldyourather.find('i').contents[0][1:]
+print(bs4.BeautifulSoup(requests.get("https://riddles.com/").content, 'html.parser').find_all('div', class_='riddle-text')[0].get_text().strip())
+exit()
 
 
 

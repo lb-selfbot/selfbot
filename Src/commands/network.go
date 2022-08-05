@@ -1,7 +1,6 @@
 package commands
 
 import (
-	"context"
 	"fmt"
 	"io"
 	"math"
@@ -18,7 +17,6 @@ import (
 	"github.com/LightningDev1/LB-Selfbot/utils"
 	"github.com/LightningDev1/dgc"
 	"github.com/kkdai/youtube/v2"
-	googlesearch "github.com/rocketlaunchr/google-search"
 )
 
 type NetworkCommands struct{}
@@ -245,39 +243,33 @@ func (NetworkCommands) pingweb(ctx *dgc.Ctx) {
 }
 
 func (NetworkCommands) googlesearch(ctx *dgc.Ctx) {
-	query := ctx.Arguments.Raw()
-	results, err := googlesearch.Search(context.TODO(), query)
+	results, err := api.GoogleSearch(ctx.Arguments.Raw())
 	if err != nil {
 		_ = ctx.RespondText("An error has occurred.")
 		return
 	}
 	emb := embed.NewEmbed()
-	for index, result := range results {
-		emb.AddField(result.Title, result.URL)
-		if index == 5 {
-			break
-		}
+	for i := 0; i < len(results.MustArray()); i++ {
+		result := results.GetIndex(i)
+		emb.AddField(result.Get("title").MustString(), result.Get("url").MustString())
 	}
 	emb.Send(ctx)
 }
 
 func (NetworkCommands) youtubesearch(ctx *dgc.Ctx) {
-	query := ctx.Arguments.Raw()
-	results, err := googlesearch.Search(context.TODO(), query+" site:youtube.com")
+	results, err := api.GoogleSearch(ctx.Arguments.Raw() + " site:youtube.com")
 	if err != nil {
 		_ = ctx.RespondText("An error has occurred.")
 		return
 	}
 	emb := embed.NewEmbed()
-	for index, result := range results {
-		if strings.Contains(result.URL, "playlist") {
-			index -= 1
+	for i := 0; i < len(results.MustArray()); i++ {
+		result := results.GetIndex(i)
+		resultUrl := result.Get("url").MustString()
+		if strings.Contains(resultUrl, "playlist") {
 			continue
 		}
-		emb.AddField(result.Title, result.URL)
-		if index == 5 {
-			break
-		}
+		emb.AddField(result.Get("title").MustString(), result.Get("url").MustString())
 	}
 	emb.Send(ctx)
 }
@@ -354,18 +346,18 @@ func (NetworkCommands) hypesquad(ctx *dgc.Ctx) {
 		error_handling.OnError(ctx, error_handling.InvalidArgument, "<bravery/brilliance/balance>")
 		return
 	}
-	api.SetHypesquad(house)
+	_ = api.SetHypesquad(house)
 }
 
 func (NetworkCommands) tinyurl(ctx *dgc.Ctx) {
-	url := ctx.Arguments.Raw()
-	tinyurl, err := http.Get(fmt.Sprintf("https://tinyurl.com/api-create.php?url=%s", url))
+	sourceUrl := ctx.Arguments.Raw()
+	tinyurl, err := http.Get(fmt.Sprintf("https://tinyurl.com/api-create.php?url=%s", sourceUrl))
 	if err != nil {
 		_ = ctx.RespondText("An error has occurred.")
 		return
 	}
 	embed.NewEmbed().
-		AddField("URL", url).
+		AddField("URL", sourceUrl).
 		AddField("TinyURL", tinyurl).
 		Send(ctx)
 }
@@ -392,15 +384,17 @@ func (NetworkCommands) ipinfo(ctx *dgc.Ctx) {
 }
 
 func (NetworkCommands) youtubedl(ctx *dgc.Ctx) {
-	results, err := googlesearch.Search(context.TODO(), fmt.Sprintf("%s site:youtube.com", ctx.Arguments.Raw()))
+	results, err := api.GoogleSearch(ctx.Arguments.Raw() + " site:youtube.com")
 	if err != nil {
-		fmt.Println("An error has occurred.")
+		_ = ctx.RespondText("An error has occurred.")
 		return
 	}
-	for _, result := range results {
-		if strings.Contains(result.URL, "/watch?v=") {
+	for i := 0; i < len(results.MustArray()); i++ {
+		result := results.GetIndex(i)
+		resultUrl := result.Get("url").MustString()
+		if strings.Contains(resultUrl, "/watch?v=") {
 			client := youtube.Client{}
-			video, err := client.GetVideo(result.URL)
+			video, err := client.GetVideo(resultUrl)
 			if err != nil {
 				_ = ctx.RespondText("An error has occurred: " + err.Error())
 				return
@@ -418,14 +412,15 @@ func (NetworkCommands) youtubedl(ctx *dgc.Ctx) {
 				_ = ctx.RespondText("An error has occurred: " + err.Error())
 				return
 			}
-			defer file.Close()
 			_, err = io.Copy(file, stream)
 			if err != nil {
 				_ = ctx.RespondText("An error has occurred: " + err.Error())
+				_ = file.Close()
 				return
 			}
 			_ = exec.Command("explorer", filepath).Start()
 			_ = ctx.RespondText("Successfully downloaded " + video.Title + ".")
+			_ = file.Close()
 			break
 		}
 	}
@@ -708,14 +703,13 @@ func (NetworkCommands) randomcountry(ctx *dgc.Ctx) {
 }
 
 func (NetworkCommands) headers(ctx *dgc.Ctx) {
-	url := utils.Arguments["<url>"]
-	headers, err := http.GetHeadersString(url)
+	headers, err := http.GetHeadersString(utils.Arguments["<url>"])
 	if err != nil {
 		_ = ctx.RespondText("An error has occurred.")
 		return
 	}
 	embed.NewEmbed().
-		AddField("URL", url).
+		AddField("URL", utils.Arguments["<url>"]).
 		AddField("Headers", headers).
 		Send(ctx)
 }

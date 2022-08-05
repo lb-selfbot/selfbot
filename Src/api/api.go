@@ -112,13 +112,13 @@ func ExtractRedditURL(jsonData *simplejson.Json, tries int) (*RedditPost, bool) 
 	if post.Get("is_video").MustBool() || post.Get("media").MustMap() == nil {
 		return ExtractRedditURL(jsonData, tries+1)
 	}
-	url := post.GetPath("media", "oembed", "thumbnail_url").MustString()
-	if strings.Contains(url, "gfycat") {
+	postUrl := post.GetPath("media", "oembed", "thumbnail_url").MustString()
+	if strings.Contains(postUrl, "gfycat") {
 		return ExtractRedditURL(jsonData, tries+1)
 	}
 	return &RedditPost{
 		Title:    post.Get("title").MustString(),
-		ImageURL: strings.ReplaceAll(url, " .gifv", ".gif"),
+		ImageURL: strings.ReplaceAll(postUrl, " .gifv", ".gif"),
 	}, true
 }
 
@@ -162,8 +162,8 @@ func GetMacAddress() string {
 }
 
 func TTS(text, language string) ([]byte, error) {
-	url := fmt.Sprintf("https://translate.google.com/translate_tts?ie=UTF-8&total=1&idx=0&textlen=32&client=tw-ob&q=%s&tl=%s", url.QueryEscape(text), url.QueryEscape(language))
-	tts, _, err := http.GetBytes(url)
+	ttsUrl := fmt.Sprintf("https://translate.google.com/translate_tts?ie=UTF-8&total=1&idx=0&textlen=32&client=tw-ob&q=%s&tl=%s", url.QueryEscape(text), url.QueryEscape(language))
+	tts, _, err := http.GetBytes(ttsUrl)
 	return tts, err
 }
 
@@ -192,8 +192,8 @@ func Translate(text, language string) *TranslateResult {
 		}
 	}
 
-	url := fmt.Sprintf("https://translate.google.com/translate_a/single?client=gtx&sl=auto&tl=%s&dt=t&q=%s", url.QueryEscape(language), url.QueryEscape(text))
-	jsonResult, err := http.GetJson(url)
+	translateUrl := fmt.Sprintf("https://translate.google.com/translate_a/single?client=gtx&sl=auto&tl=%s&dt=t&q=%s", url.QueryEscape(language), url.QueryEscape(text))
+	jsonResult, err := http.GetJson(translateUrl)
 	if err != nil {
 		return &TranslateResult{
 			Error: err,
@@ -219,13 +219,13 @@ func ChangeSettings(settings map[string]interface{}, settingsPath bool) (*simple
 	if err != nil {
 		return nil, err
 	}
-	url := ""
+	settingsUrl := ""
 	if settingsPath {
-		url = "https://discord.com/api/v10/users/@me/settings"
+		settingsUrl = "https://discord.com/api/v10/users/@me/settings"
 	} else {
-		url = "https://discord.com/api/v10/users/@me"
+		settingsUrl = "https://discord.com/api/v10/users/@me"
 	}
-	return http.PatchJson(url, string(jsonBytes), http.GetDiscordHeaders(cfg.Account.Discord.Token))
+	return http.PatchJson(settingsUrl, string(jsonBytes), http.GetDiscordHeaders(cfg.Account.Discord.Token))
 }
 
 func ReportMessage(guildID, channelID, messageID string, reason int) (*simplejson.Json, error) {
@@ -244,4 +244,12 @@ func ReportMessage(guildID, channelID, messageID string, reason int) (*simplejso
 		return nil, err
 	}
 	return http.PostJson("https://discord.com/api/v10/report", string(jsonBytes), http.GetDiscordHeaders(cfg.Account.Discord.Token))
+}
+
+func GoogleSearch(query string) (*simplejson.Json, error) {
+	jsonResult, err := http.GetJson("https://lightning-bot.com/api/v3/selfbot-utils/googlesearch?query=" + url.QueryEscape(query))
+	if err != nil {
+		return nil, err
+	}
+	return jsonResult.Get("results"), nil
 }

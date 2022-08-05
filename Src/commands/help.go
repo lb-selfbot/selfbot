@@ -126,7 +126,7 @@ func specificHelpCommand(ctx *dgc.Ctx) {
 	}
 
 	// Send the help embed
-	ctx.Session.ChannelMessageSendEmbed(ctx.Event.ChannelID, renderDefaultSpecificHelpEmbed(ctx, command))
+	_, _ = ctx.Session.ChannelMessageSendEmbed(ctx.Event.ChannelID, renderDefaultSpecificHelpEmbed(ctx, command))
 }
 
 // renderDefaultGeneralHelpEmbed renders the general help embed on the given page

@@ -228,7 +228,7 @@ func (c ConfigCommands) RegisterCommands(router *dgc.Router) {
 func (ConfigCommands) commandprefix(*dgc.Ctx) {
 	cfg, _ := config.GetConfig()
 	cfg.Selfbot.CommandPrefix = utils.Arguments["<prefix>"]
-	cfg.Save()
+	_ = cfg.Save()
 }
 
 func (ConfigCommands) commandmode(ctx *dgc.Ctx) {
@@ -239,19 +239,19 @@ func (ConfigCommands) commandmode(ctx *dgc.Ctx) {
 		return
 	}
 	cfg.Selfbot.CommandMode = strings.ReplaceAll(mode, "Urlembed", "URLEmbed")
-	cfg.Save()
+	_ = cfg.Save()
 }
 
 func (ConfigCommands) title(ctx *dgc.Ctx) {
 	cfg, _ := config.GetConfig()
 	cfg.Selfbot.Title = ctx.Arguments.Raw()
-	cfg.Save()
+	_ = cfg.Save()
 }
 
 func (ConfigCommands) footer(ctx *dgc.Ctx) {
 	cfg, _ := config.GetConfig()
 	cfg.Selfbot.Footer = ctx.Arguments.Raw()
-	cfg.Save()
+	_ = cfg.Save()
 }
 
 func (ConfigCommands) delresponses(ctx *dgc.Ctx) {
@@ -262,7 +262,7 @@ func (ConfigCommands) delresponses(ctx *dgc.Ctx) {
 		return
 	}
 	cfg.Selfbot.DeleteResponses = toggle == "on"
-	cfg.Save()
+	_ = cfg.Save()
 }
 
 func (ConfigCommands) delresponsesdelay(ctx *dgc.Ctx) {
@@ -273,7 +273,7 @@ func (ConfigCommands) delresponsesdelay(ctx *dgc.Ctx) {
 		return
 	}
 	cfg.Selfbot.DeleteResponsesDelay = delay
-	cfg.Save()
+	_ = cfg.Save()
 }
 
 func (ConfigCommands) delcommands(ctx *dgc.Ctx) {
@@ -284,7 +284,7 @@ func (ConfigCommands) delcommands(ctx *dgc.Ctx) {
 		return
 	}
 	cfg.Selfbot.DeleteCommands = toggle == "on"
-	cfg.Save()
+	_ = cfg.Save()
 }
 
 func (ConfigCommands) notifications(ctx *dgc.Ctx) {
@@ -295,7 +295,7 @@ func (ConfigCommands) notifications(ctx *dgc.Ctx) {
 		return
 	}
 	cfg.Notifications.Enabled = toggle == "on"
-	cfg.Save()
+	_ = cfg.Save()
 }
 
 func (ConfigCommands) notificationtype(ctx *dgc.Ctx) {
@@ -306,7 +306,7 @@ func (ConfigCommands) notificationtype(ctx *dgc.Ctx) {
 		return
 	}
 	cfg.Notifications.Type = notificationType
-	cfg.Save()
+	_ = cfg.Save()
 }
 
 func (ConfigCommands) examplenotification(*dgc.Ctx) {
@@ -327,7 +327,7 @@ func (ConfigCommands) nitrosniper(ctx *dgc.Ctx) {
 		return
 	}
 	cfg.Snipers.NitroSniper = toggle == "on"
-	cfg.Save()
+	_ = cfg.Save()
 }
 
 func (ConfigCommands) giveawaysniper(ctx *dgc.Ctx) {
@@ -338,7 +338,7 @@ func (ConfigCommands) giveawaysniper(ctx *dgc.Ctx) {
 		return
 	}
 	cfg.Snipers.GiveawaySniper.Sniper = toggle == "on"
-	cfg.Save()
+	_ = cfg.Save()
 }
 
 func (ConfigCommands) gsnipersleep(ctx *dgc.Ctx) {
@@ -349,7 +349,7 @@ func (ConfigCommands) gsnipersleep(ctx *dgc.Ctx) {
 		return
 	}
 	cfg.Snipers.GiveawaySniper.Sleep = delay
-	cfg.Save()
+	_ = cfg.Save()
 }
 
 func (ConfigCommands) setupwebhooks(ctx *dgc.Ctx) {
@@ -391,7 +391,7 @@ func (ConfigCommands) setupwebhooks(ctx *dgc.Ctx) {
 		f := reflect.Indirect(reflect.ValueOf(cfg.Webhooks)).FieldByName(configName)
 		f.SetString(fmt.Sprintf("https://discord.com/api/webhooks/%s/%s", webhook.ID, webhook.Token))
 	}
-	cfg.Save()
+	_ = cfg.Save()
 }
 
 func (ConfigCommands) wall(*dgc.Ctx) {
@@ -404,55 +404,55 @@ func (ConfigCommands) wall(*dgc.Ctx) {
 	cfg.Webhooks.Notifiers = utils.Arguments["<webhook url>"]
 	cfg.Webhooks.PingDetection = utils.Arguments["<webhook url>"]
 	cfg.Webhooks.Misc = utils.Arguments["<webhook url>"]
-	cfg.Save()
+	_ = cfg.Save()
 }
 
 func (ConfigCommands) wnitro(*dgc.Ctx) {
 	cfg, _ := config.GetConfig()
 	cfg.Webhooks.NitroSniper = utils.Arguments["<webhook url>"]
-	cfg.Save()
+	_ = cfg.Save()
 }
 
 func (ConfigCommands) wgiveaway(*dgc.Ctx) {
 	cfg, _ := config.GetConfig()
 	cfg.Webhooks.GiveawaySniper = utils.Arguments["<webhook url>"]
-	cfg.Save()
+	_ = cfg.Save()
 }
 
 func (ConfigCommands) wprivnote(*dgc.Ctx) {
 	cfg, _ := config.GetConfig()
 	cfg.Webhooks.PrivnoteSniper = utils.Arguments["<webhook url>"]
-	cfg.Save()
+	_ = cfg.Save()
 }
 
 func (ConfigCommands) wselfbotdetection(*dgc.Ctx) {
 	cfg, _ := config.GetConfig()
 	cfg.Webhooks.SelfbotDetection = utils.Arguments["<webhook url>"]
-	cfg.Save()
+	_ = cfg.Save()
 }
 
 func (ConfigCommands) wstaffdetection(*dgc.Ctx) {
 	cfg, _ := config.GetConfig()
 	cfg.Webhooks.StaffDetection = utils.Arguments["<webhook url>"]
-	cfg.Save()
+	_ = cfg.Save()
 }
 
 func (ConfigCommands) wnotifiers(*dgc.Ctx) {
 	cfg, _ := config.GetConfig()
 	cfg.Webhooks.Notifiers = utils.Arguments["<webhook url>"]
-	cfg.Save()
+	_ = cfg.Save()
 }
 
 func (ConfigCommands) wpingdetection(*dgc.Ctx) {
 	cfg, _ := config.GetConfig()
 	cfg.Webhooks.PingDetection = utils.Arguments["<webhook url>"]
-	cfg.Save()
+	_ = cfg.Save()
 }
 
 func (ConfigCommands) wmisc(*dgc.Ctx) {
 	cfg, _ := config.GetConfig()
 	cfg.Webhooks.Misc = utils.Arguments["<webhook url>"]
-	cfg.Save()
+	_ = cfg.Save()
 }
 
 func (ConfigCommands) staffdetection(ctx *dgc.Ctx) {
@@ -463,7 +463,7 @@ func (ConfigCommands) staffdetection(ctx *dgc.Ctx) {
 	}
 	cfg, _ := config.GetConfig()
 	cfg.Events.DiscordStaffDetection = toggle == "on"
-	cfg.Save()
+	_ = cfg.Save()
 }
 
 func (ConfigCommands) pingdetection(ctx *dgc.Ctx) {
@@ -474,7 +474,7 @@ func (ConfigCommands) pingdetection(ctx *dgc.Ctx) {
 	}
 	cfg, _ := config.GetConfig()
 	cfg.Events.GhostPingDetection = toggle == "on"
-	cfg.Save()
+	_ = cfg.Save()
 }
 
 func (ConfigCommands) ticketnotifier(ctx *dgc.Ctx) {
@@ -485,7 +485,7 @@ func (ConfigCommands) ticketnotifier(ctx *dgc.Ctx) {
 	}
 	cfg, _ := config.GetConfig()
 	cfg.Events.TicketDetection = toggle == "on"
-	cfg.Save()
+	_ = cfg.Save()
 }
 
 func (ConfigCommands) selfbotdetection(ctx *dgc.Ctx) {
@@ -496,7 +496,7 @@ func (ConfigCommands) selfbotdetection(ctx *dgc.Ctx) {
 	}
 	cfg, _ := config.GetConfig()
 	cfg.Events.SelfbotDetection = toggle == "on"
-	cfg.Save()
+	_ = cfg.Save()
 }
 
 func (ConfigCommands) dmtypingdetection(ctx *dgc.Ctx) {
@@ -507,7 +507,7 @@ func (ConfigCommands) dmtypingdetection(ctx *dgc.Ctx) {
 	}
 	cfg, _ := config.GetConfig()
 	cfg.Events.DMTypingDetection = toggle == "on"
-	cfg.Save()
+	_ = cfg.Save()
 }
 
 func (ConfigCommands) dmdetection(ctx *dgc.Ctx) {
@@ -518,7 +518,7 @@ func (ConfigCommands) dmdetection(ctx *dgc.Ctx) {
 	}
 	cfg, _ := config.GetConfig()
 	cfg.Events.DMMessageDetection = toggle == "on"
-	cfg.Save()
+	_ = cfg.Save()
 }
 
 func (ConfigCommands) dmdeletedetection(ctx *dgc.Ctx) {
@@ -529,7 +529,7 @@ func (ConfigCommands) dmdeletedetection(ctx *dgc.Ctx) {
 	}
 	cfg, _ := config.GetConfig()
 	cfg.Events.DMMessageDeleteDetection = toggle == "on"
-	cfg.Save()
+	_ = cfg.Save()
 }
 
 func (ConfigCommands) dmeditdetection(ctx *dgc.Ctx) {
@@ -540,7 +540,7 @@ func (ConfigCommands) dmeditdetection(ctx *dgc.Ctx) {
 	}
 	cfg, _ := config.GetConfig()
 	cfg.Events.DMMessageEditDetection = toggle == "on"
-	cfg.Save()
+	_ = cfg.Save()
 }
 
 func (ConfigCommands) messagedeletedetection(ctx *dgc.Ctx) {
@@ -551,7 +551,7 @@ func (ConfigCommands) messagedeletedetection(ctx *dgc.Ctx) {
 	}
 	cfg, _ := config.GetConfig()
 	cfg.Events.MessageDeleteDetection = toggle == "on"
-	cfg.Save()
+	_ = cfg.Save()
 }
 
 func (ConfigCommands) uitheme(ctx *dgc.Ctx) {
@@ -562,7 +562,7 @@ func (ConfigCommands) uitheme(ctx *dgc.Ctx) {
 	}
 	cfg, _ := config.GetConfig()
 	cfg.UI.Theme = utils.String.Capitalize(theme)
-	cfg.Save()
+	_ = cfg.Save()
 }
 
 func (ConfigCommands) hidetosystray(ctx *dgc.Ctx) {
@@ -573,5 +573,5 @@ func (ConfigCommands) hidetosystray(ctx *dgc.Ctx) {
 	}
 	cfg, _ := config.GetConfig()
 	cfg.UI.HideToSystemTray = toggle == "on"
-	cfg.Save()
+	_ = cfg.Save()
 }
