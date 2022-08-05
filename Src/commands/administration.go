@@ -899,7 +899,7 @@ func (AdministrationCommands) userinfo(ctx *dgc.Ctx) {
 	}
 	member, _ := ctx.Session.GuildMember(ctx.Event.GuildID, user.ID)
 
-	embed := embed.NewEmbed().
+	emb := embed.NewEmbed().
 		SetDescription(fmt.Sprintf("User Info (%s - %s)", user.String(), user.ID)).
 		AddField("Avatar", user.AvatarURL("")).
 		AddField("Banner", user.BannerURL("")).
@@ -908,12 +908,12 @@ func (AdministrationCommands) userinfo(ctx *dgc.Ctx) {
 		AddField("Created At", utils.Discord.SnowflakeToTime(user.ID).Format(time.RFC1123)).
 		AddField("Flags", fmt.Sprint(user.Flags))
 	if member != nil {
-		embed.AddField("Nickname", member.Nick)
-		embed.AddField("Joined Server At", member.JoinedAt.Format(time.RFC1123))
-		embed.AddField("Role Amount", fmt.Sprint(len(member.Roles)))
-		embed.AddField("Roles", utils.Discord.GetRoleNames(ctx, member))
+		emb.AddField("Nickname", member.Nick).
+			AddField("Joined Server At", member.JoinedAt.Format(time.RFC1123)).
+			AddField("Role Amount", fmt.Sprint(len(member.Roles))).
+			AddField("Roles", utils.Discord.GetRoleNames(ctx, member))
 	}
-	embed.Send(ctx)
+	emb.Send(ctx)
 }
 
 func (AdministrationCommands) userage(ctx *dgc.Ctx) {
@@ -1042,12 +1042,12 @@ func (AdministrationCommands) report(ctx *dgc.Ctx) {
 	reason := utils.Arguments["<reason>"]
 
 	// Verify message link
-	url, err := url.Parse(link)
+	messageUrl, err := url.Parse(link)
 	if err != nil {
 		_ = ctx.RespondText("Invalid message link.")
 		return
 	}
-	urlPathParts := strings.Split(url.Path, "/")
+	urlPathParts := strings.Split(messageUrl.Path, "/")
 	if len(urlPathParts) < 4 {
 		_ = ctx.RespondText("Invalid message link.")
 		return
@@ -1526,13 +1526,13 @@ func (AdministrationCommands) servericon(ctx *dgc.Ctx) {
 		return
 	}
 
-	embed := embed.NewEmbed().
+	emb := embed.NewEmbed().
 		SetDescription(fmt.Sprintf("Server Icon - %s", guild.Name)).
 		SetImage(guild.IconURL())
 	if guild.Icon == "" {
-		embed.AddField("Error", "Server has no icon")
+		emb.AddField("Error", "Server has no icon")
 	}
-	embed.Send(ctx)
+	emb.Send(ctx)
 }
 
 func (AdministrationCommands) serverbanner(ctx *dgc.Ctx) {
@@ -1752,15 +1752,15 @@ func (AdministrationCommands) channels(ctx *dgc.Ctx) {
 	}
 
 	categories, categoryChannels := utils.Discord.MapCategories(guild.Channels)
-	embed := embed.NewEmbed().SetDescription(fmt.Sprintf("Server Channels - %s", guild.Name))
+	emb := embed.NewEmbed().SetDescription(fmt.Sprintf("Server Channels - %s", guild.Name))
 	for _, category := range categories {
 		channelsString := ""
 		for _, channel := range categoryChannels[category.ID] {
 			channelsString += channel.Mention() + "\n"
 		}
-		embed.AddField("Category: "+category.Name, channelsString)
+		emb.AddField("Category: "+category.Name, channelsString)
 	}
-	embed.Send(ctx)
+	emb.Send(ctx)
 }
 
 func (AdministrationCommands) bots(ctx *dgc.Ctx) {
@@ -1889,24 +1889,23 @@ func (AdministrationCommands) inviteinfo(ctx *dgc.Ctx) {
 		return
 	}
 
-	embed := embed.NewEmbed().SetDescription(fmt.Sprintf("Invite Info - %s", invite.Code))
-
+	emb := embed.NewEmbed().SetDescription(fmt.Sprintf("Invite Info - %s", invite.Code))
 	if invite.Guild != nil {
-		embed.AddField("Server", invite.Guild.Name)
+		emb.AddField("Server", invite.Guild.Name)
 		if invite.Guild.Icon != "" {
-			embed.SetImage(invite.Guild.IconURL())
+			emb.SetImage(invite.Guild.IconURL())
 		}
 	}
 	if invite.Channel != nil {
-		embed.AddField("Channel", invite.Channel.Name)
+		emb.AddField("Channel", invite.Channel.Name)
 	}
 	if invite.Inviter != nil {
-		embed.AddField("Inviter", invite.Inviter.String())
+		emb.AddField("Inviter", invite.Inviter.String())
 	}
 	if invite.ExpiresAt != nil {
-		embed.AddField("Expires At", invite.ExpiresAt.Format(time.RFC1123))
+		emb.AddField("Expires At", invite.ExpiresAt.Format(time.RFC1123))
 	}
-	embed.AddField("Max Age", fmt.Sprint(invite.MaxAge)).
+	emb.AddField("Max Age", fmt.Sprint(invite.MaxAge)).
 		AddField("Uses", fmt.Sprint(invite.Uses)).
 		AddField("Max Uses", fmt.Sprint(invite.MaxUses)).
 		AddField("Member Count", fmt.Sprint(invite.ApproximateMemberCount)).

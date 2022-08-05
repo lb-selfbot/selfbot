@@ -5,7 +5,7 @@ import (
 	"github.com/LightningDev1/discordgo"
 )
 
-type CommandsStruct struct {
+type CommandRegistrar struct {
 	TextCommands           TextCommands
 	EncodingCommands       EncodingCommands
 	CodeblockCommands      CodeblockCommands
@@ -29,7 +29,7 @@ type CommandsStruct struct {
 	HelpCommand            HelpCommand
 }
 
-func (c CommandsStruct) RegisterCommands(session *discordgo.Session, router *dgc.Router) {
+func (c CommandRegistrar) RegisterCommands(session *discordgo.Session, router *dgc.Router) {
 	c.TextCommands.RegisterCommands(router)
 	c.EncodingCommands.RegisterCommands(router)
 	c.CodeblockCommands.RegisterCommands(router)
@@ -53,4 +53,4 @@ func (c CommandsStruct) RegisterCommands(session *discordgo.Session, router *dgc
 	c.HelpCommand.RegisterHelpCommand(router, session)
 }
 
-var Commands = CommandsStruct{}
+var Commands = CommandRegistrar{}
