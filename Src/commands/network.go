@@ -11,7 +11,6 @@ import (
 
 	"github.com/LightningDev1/LB-Selfbot/api"
 	"github.com/LightningDev1/LB-Selfbot/embed"
-	"github.com/LightningDev1/LB-Selfbot/error_handling"
 	"github.com/LightningDev1/LB-Selfbot/http"
 	"github.com/LightningDev1/LB-Selfbot/json"
 	"github.com/LightningDev1/LB-Selfbot/utils"
@@ -335,18 +334,6 @@ func (NetworkCommands) weather(ctx *dgc.Ctx) {
 		AddField("Wind Gust", fmt.Sprintf("%.2f Km/h", math.Round(weather.GetPath("wind", "gust").MustFloat64()*3.6))).
 		AddField("Wind Direction", fmt.Sprintf("%.2f°", weather.GetPath("wind", "deg").MustFloat64())).
 		Send(ctx)
-}
-
-func (NetworkCommands) hypesquad(ctx *dgc.Ctx) {
-	house := utils.Arguments["<bravery/brilliance/balance>"]
-	house = strings.Replace(house, "bravery", "1", -1)
-	house = strings.Replace(house, "brilliance", "2", -1)
-	house = strings.Replace(house, "balance", "3", -1)
-	if house != "1" && house != "2" && house != "3" {
-		error_handling.OnError(ctx, error_handling.InvalidArgument, "<bravery/brilliance/balance>")
-		return
-	}
-	_ = api.SetHypesquad(house)
 }
 
 func (NetworkCommands) tinyurl(ctx *dgc.Ctx) {

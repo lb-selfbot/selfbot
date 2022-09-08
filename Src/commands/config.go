@@ -18,7 +18,7 @@ import (
 type ConfigCommands struct{}
 
 func (c ConfigCommands) RegisterCommands(router *dgc.Router) {
-	router.StartCategory("Config", "Config commands")
+	router.StartCategory("Config", "Change your config")
 	router.RegisterCmd(&dgc.Command{
 		Name:        "commandprefix",
 		Description: "Set your command prefix",
@@ -94,8 +94,20 @@ func (c ConfigCommands) RegisterCommands(router *dgc.Router) {
 	router.RegisterCmd(&dgc.Command{
 		Name:        "gsnipersleep",
 		Description: "Set the delay before the bot enters a giveaway",
-		Usage:       "[p]gsnipersleep <on/off>",
+		Usage:       "[p]gsnipersleep <seconds>",
 		Handler:     c.gsnipersleep,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "addgsniperbot",
+		Description: "Add a bot to the custom bot list",
+		Usage:       "[p]addgsniperbot <user>",
+		Handler:     c.addgsniperbot,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "removegsniperbot",
+		Description: "Remove a bot from the custom bot list",
+		Usage:       "[p]removegsniperbot <user>",
+		Handler:     c.removegsniperbot,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "setupwebhooks",
@@ -182,34 +194,34 @@ func (c ConfigCommands) RegisterCommands(router *dgc.Router) {
 		Handler:     c.selfbotdetection,
 	})
 	router.RegisterCmd(&dgc.Command{
-		Name:        "dmtypingdetection",
+		Name:        "dmtypingnotifier",
 		Description: "Turn DM typing detection on or off",
-		Usage:       "[p]dmtypingdetection <on/off>",
-		Handler:     c.dmtypingdetection,
+		Usage:       "[p]dmtypingnotifier <on/off>",
+		Handler:     c.dmtypingnotifier,
 	})
 	router.RegisterCmd(&dgc.Command{
-		Name:        "dmdetection",
+		Name:        "dmnotifier",
 		Description: "Turn DM message detection on or off",
-		Usage:       "[p]dmdetection <on/off>",
-		Handler:     c.dmdetection,
+		Usage:       "[p]dmnotifier <on/off>",
+		Handler:     c.dmnotifier,
 	})
 	router.RegisterCmd(&dgc.Command{
-		Name:        "dmeditdetection",
+		Name:        "dmeditnotifier",
 		Description: "Turn DM edit detection on or off",
-		Usage:       "[p]dmeditdetection <on/off>",
-		Handler:     c.dmeditdetection,
+		Usage:       "[p]dmeditnotifier <on/off>",
+		Handler:     c.dmeditnotifier,
 	})
 	router.RegisterCmd(&dgc.Command{
-		Name:        "dmdeletedetection",
+		Name:        "dmdeletenotifier",
 		Description: "Turn DM delete detection on or off",
-		Usage:       "[p]dmdeletedetection <on/off>",
-		Handler:     c.dmdeletedetection,
+		Usage:       "[p]dmdeletenotifier <on/off>",
+		Handler:     c.dmdeletenotifier,
 	})
 	router.RegisterCmd(&dgc.Command{
-		Name:        "messagedeletedetection",
+		Name:        "messagedeletenotifier",
 		Description: "Turn message delete detection on or off",
-		Usage:       "[p]messagedeletedetection <on/off>",
-		Handler:     c.messagedeletedetection,
+		Usage:       "[p]messagedeletenotifier <on/off>",
+		Handler:     c.messagedeletenotifier,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "uitheme",
@@ -352,6 +364,36 @@ func (ConfigCommands) gsnipersleep(ctx *dgc.Ctx) {
 	_ = cfg.Save()
 }
 
+func (ConfigCommands) addgsniperbot(ctx *dgc.Ctx) {
+	cfg, _ := config.GetConfig()
+	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
+	if !success {
+		_ = ctx.RespondText("Could not find bot.")
+		return
+	}
+	if utils.SliceContains(cfg.Snipers.GiveawaySniper.CustomBots, user.ID) {
+		_ = ctx.RespondText(fmt.Sprintf("%s is already in the custom bot list.", user.String()))
+		return
+	}
+	cfg.Snipers.GiveawaySniper.CustomBots = append(cfg.Snipers.GiveawaySniper.CustomBots, user.ID)
+	_ = cfg.Save()
+}
+
+func (ConfigCommands) removegsniperbot(ctx *dgc.Ctx) {
+	cfg, _ := config.GetConfig()
+	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
+	if !success {
+		_ = ctx.RespondText("Could not find bot.")
+		return
+	}
+	if !utils.SliceContains(cfg.Snipers.GiveawaySniper.CustomBots, user.ID) {
+		_ = ctx.RespondText(fmt.Sprintf("%s is not in the custom bot list.", user.String()))
+		return
+	}
+	cfg.Snipers.GiveawaySniper.CustomBots = utils.RemoveSliceItem(cfg.Snipers.GiveawaySniper.CustomBots, user.ID)
+	_ = cfg.Save()
+}
+
 func (ConfigCommands) setupwebhooks(ctx *dgc.Ctx) {
 	serverID := ctx.Event.GuildID
 	if utils.Arguments["[server id]"] != "" {
@@ -484,7 +526,7 @@ func (ConfigCommands) ticketnotifier(ctx *dgc.Ctx) {
 		return
 	}
 	cfg, _ := config.GetConfig()
-	cfg.Events.TicketDetection = toggle == "on"
+	cfg.Events.TicketNotifier = toggle == "on"
 	_ = cfg.Save()
 }
 
@@ -499,58 +541,58 @@ func (ConfigCommands) selfbotdetection(ctx *dgc.Ctx) {
 	_ = cfg.Save()
 }
 
-func (ConfigCommands) dmtypingdetection(ctx *dgc.Ctx) {
+func (ConfigCommands) dmtypingnotifier(ctx *dgc.Ctx) {
 	toggle := strings.ToLower(utils.Arguments["<on/off>"])
 	if toggle != "on" && toggle != "off" {
 		_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
 		return
 	}
 	cfg, _ := config.GetConfig()
-	cfg.Events.DMTypingDetection = toggle == "on"
+	cfg.Events.DMTypingNotifier = toggle == "on"
 	_ = cfg.Save()
 }
 
-func (ConfigCommands) dmdetection(ctx *dgc.Ctx) {
+func (ConfigCommands) dmnotifier(ctx *dgc.Ctx) {
 	toggle := strings.ToLower(utils.Arguments["<on/off>"])
 	if toggle != "on" && toggle != "off" {
 		_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
 		return
 	}
 	cfg, _ := config.GetConfig()
-	cfg.Events.DMMessageDetection = toggle == "on"
+	cfg.Events.DMNotifier = toggle == "on"
 	_ = cfg.Save()
 }
 
-func (ConfigCommands) dmdeletedetection(ctx *dgc.Ctx) {
+func (ConfigCommands) dmdeletenotifier(ctx *dgc.Ctx) {
 	toggle := strings.ToLower(utils.Arguments["<on/off>"])
 	if toggle != "on" && toggle != "off" {
 		_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
 		return
 	}
 	cfg, _ := config.GetConfig()
-	cfg.Events.DMMessageDeleteDetection = toggle == "on"
+	cfg.Events.DMDeleteNotifier = toggle == "on"
 	_ = cfg.Save()
 }
 
-func (ConfigCommands) dmeditdetection(ctx *dgc.Ctx) {
+func (ConfigCommands) dmeditnotifier(ctx *dgc.Ctx) {
 	toggle := strings.ToLower(utils.Arguments["<on/off>"])
 	if toggle != "on" && toggle != "off" {
 		_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
 		return
 	}
 	cfg, _ := config.GetConfig()
-	cfg.Events.DMMessageEditDetection = toggle == "on"
+	cfg.Events.DMEditNotifier = toggle == "on"
 	_ = cfg.Save()
 }
 
-func (ConfigCommands) messagedeletedetection(ctx *dgc.Ctx) {
+func (ConfigCommands) messagedeletenotifier(ctx *dgc.Ctx) {
 	toggle := strings.ToLower(utils.Arguments["<on/off>"])
 	if toggle != "on" && toggle != "off" {
 		_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
 		return
 	}
 	cfg, _ := config.GetConfig()
-	cfg.Events.MessageDeleteDetection = toggle == "on"
+	cfg.Events.MessageDeleteNotifier = toggle == "on"
 	_ = cfg.Save()
 }
 

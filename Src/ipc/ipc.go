@@ -1,17 +1,18 @@
 package ipc
 
 import (
-	"encoding/json"
-	"net"
+	"log"
+	"net/http"
 	"os"
-)
 
-var (
-	Ipc = IPC{}
+	"github.com/LightningDev1/LB-Selfbot/constants"
+	"github.com/gorilla/websocket"
+	"github.com/jpillora/overseer"
 )
 
 type JsonEventData struct {
-	Text string `json:"text,omitempty"`
+	Text       string `json:"text,omitempty"`
+	MainFolder string `json:"mainFolder,omitempty"`
 }
 
 type JsonEvent struct {
@@ -19,31 +20,128 @@ type JsonEvent struct {
 	Data JsonEventData `json:"data"`
 }
 
-type OpCodes struct {
-	EXIT         int
-	CLS          int
-	NOTIFICATION int
-	InvalidToken int
-	ERROR        int
-	ConfigEdit   int
-	CONSOLE      int
-	RESTART      int
-	NewToken     int
+var (
+	OP_Connected     = 98
+	OP_Hello         = 99
+	OP_Exit          = 100
+	OP_Restart       = 101
+	OP_Notification  = 102
+	OP_InvalidToken  = 103
+	OP_Error         = 104
+	OP_ConfigEdit    = 105
+	OP_NewToken      = 106
+	OP_ConsoleAppend = 107
+	OP_ConsoleClear  = 108
+	OP_ConsoleSet    = 109
+)
+
+type Ipc struct {
+	Upgrader  *websocket.Upgrader
+	Conn      *websocket.Conn
+	Connected bool
+	Connect   chan struct{}
 }
 
-type IPC struct {
-	readPipe  net.Conn
-	writeFile *os.File
-	OnRead    func(string)
-	OpCodes   OpCodes
+func (i *Ipc) Init() {
+	i.Upgrader = &websocket.Upgrader{}
+	i.Connect = make(chan struct{})
+
+	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		c, err := i.Upgrader.Upgrade(w, r, nil)
+		if err != nil {
+			return
+		}
+		defer c.Close()
+		log.Printf("connected: %v", c.RemoteAddr())
+		i.Connected = true
+		close(i.Connect)
+		//i.Connect <- struct{}{}
+		i.Conn = c
+		i.OnConnect()
+		for {
+			message := JsonEvent{}
+			err := c.ReadJSON(&message)
+			if err != nil {
+				log.Println("read:", err)
+				break
+			}
+			i.OnMessage(&message)
+		}
+		i.Connected = false
+		i.Conn = nil
+		if !constants.Debug {
+			os.Exit(0)
+		}
+	})
+
+	go func() {
+		log.Fatal(http.ListenAndServe("127.0.0.1:13249", nil))
+	}()
 }
 
-func SendNotification(text string) {
-	jsonBytes, _ := json.Marshal(JsonEvent{
-		Op: Ipc.OpCodes.NOTIFICATION,
+func (i *Ipc) Write(data interface{}) {
+	if i.Conn != nil {
+		i.Conn.WriteJSON(data)
+	}
+}
+
+func (i *Ipc) OnConnect() {
+	i.Write(JsonEvent{
+		Op:   OP_Connected,
+		Data: JsonEventData{},
+	})
+	i.ConsoleAppend("LightningBot v4.0.0 Alpha")
+}
+
+func (i *Ipc) OnMessage(jsonEvent *JsonEvent) {
+	log.Println("recv: ", jsonEvent)
+	switch jsonEvent.Op {
+	case OP_Exit:
+		os.Exit(0)
+	case OP_Restart:
+		overseer.Restart()
+	}
+}
+
+func (i *Ipc) ConsoleSet(text string) {
+	i.Write(JsonEvent{
+		Op: OP_ConsoleSet,
 		Data: JsonEventData{
 			Text: text,
 		},
 	})
-	Ipc.Write(string(jsonBytes))
+}
+
+func (i *Ipc) ConsoleAppend(text string) {
+	i.Write(JsonEvent{
+		Op: OP_ConsoleAppend,
+		Data: JsonEventData{
+			Text: text,
+		},
+	})
+}
+
+func (i *Ipc) ConsoleClear() {
+	i.Write(JsonEvent{
+		Op:   OP_ConsoleClear,
+		Data: JsonEventData{},
+	})
+}
+
+func (i *Ipc) WaitForConnection() {
+	if i.Connected {
+		return
+	}
+	<-i.Connect
+}
+
+var IPC = Ipc{}
+
+func SendNotification(text string) {
+	IPC.Write(JsonEvent{
+		Op: OP_Notification,
+		Data: JsonEventData{
+			Text: text,
+		},
+	})
 }

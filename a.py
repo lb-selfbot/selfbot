@@ -2,6 +2,15 @@ import re, requests, random, bs4
 
 
 
+"""
+dolphinfact
+bearfact
+axolotlfact
+capybarafact
+
+"""
+
+
 wouldyourather_html = requests.get("https://www.wouldyourather.com/").content
 wouldyourather = random.choice(bs4.BeautifulSoup(wouldyourather_html, "html.parser").find("div", id="wouldyourather").find_all("div"))
 question = wouldyourather.find('p').contents[0]

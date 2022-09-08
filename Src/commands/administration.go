@@ -36,7 +36,7 @@ var (
 
 type AdministrationCommands struct{}
 
-func (m AdministrationCommands) RegisterCommands(router *dgc.Router) {
+func (m *AdministrationCommands) RegisterCommands(router *dgc.Router) {
 	router.StartCategory("Administration", "Administration commands")
 	router.RegisterCmd(&dgc.Command{
 		Name:        "channelinfo",
@@ -133,6 +133,18 @@ func (m AdministrationCommands) RegisterCommands(router *dgc.Router) {
 		Description: "Nuke a channel",
 		Usage:       "[p]nuke [channel]",
 		Handler:     m.nuke,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "ackchannel",
+		Description: "Ack a channel",
+		Usage:       "[p]ackchannel [channel]",
+		Handler:     m.ackchannel,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "ackmessage",
+		Description: "Ack a message",
+		Usage:       "[p]ackmessage <channel> <message id>",
+		Handler:     m.ackmessage,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "webhookinfo",
@@ -405,6 +417,18 @@ func (m AdministrationCommands) RegisterCommands(router *dgc.Router) {
 		Handler:     m.roles,
 	})
 	router.RegisterCmd(&dgc.Command{
+		Name:        "leaveserver",
+		Description: "Leave a server",
+		Usage:       "[p]leaveserver [server id]",
+		Handler:     m.leaveserver,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "deleteserver",
+		Description: "Delete a server",
+		Usage:       "[p]deleteserver [server id]",
+		Handler:     m.deleteserver,
+	})
+	router.RegisterCmd(&dgc.Command{
 		Name:        "invite",
 		Description: "Create an invite",
 		Usage:       "[p]invite [channel] [max age] [max uses]",
@@ -486,7 +510,7 @@ func (m AdministrationCommands) RegisterCommands(router *dgc.Router) {
 
 // Channel Control
 
-func (AdministrationCommands) channelinfo(ctx *dgc.Ctx) {
+func (*AdministrationCommands) channelinfo(ctx *dgc.Ctx) {
 	channel, success := utils.Discord.TryGetChannelFromMention(ctx, ctx.Arguments.Get(0))
 	if !success {
 		_ = ctx.RespondText("Could not find channel")
@@ -506,7 +530,7 @@ func (AdministrationCommands) channelinfo(ctx *dgc.Ctx) {
 		Send(ctx)
 }
 
-func (AdministrationCommands) textchannel(ctx *dgc.Ctx) {
+func (*AdministrationCommands) textchannel(ctx *dgc.Ctx) {
 	if !utils.Discord.CheckIfInServer(ctx) {
 		return
 	}
@@ -521,7 +545,7 @@ func (AdministrationCommands) textchannel(ctx *dgc.Ctx) {
 		Send(ctx)
 }
 
-func (AdministrationCommands) voicechannel(ctx *dgc.Ctx) {
+func (*AdministrationCommands) voicechannel(ctx *dgc.Ctx) {
 	if !utils.Discord.CheckIfInServer(ctx) {
 		return
 	}
@@ -536,7 +560,7 @@ func (AdministrationCommands) voicechannel(ctx *dgc.Ctx) {
 		Send(ctx)
 }
 
-func (AdministrationCommands) stagechannel(ctx *dgc.Ctx) {
+func (*AdministrationCommands) stagechannel(ctx *dgc.Ctx) {
 	if !utils.Discord.CheckIfInServer(ctx) {
 		return
 	}
@@ -551,7 +575,7 @@ func (AdministrationCommands) stagechannel(ctx *dgc.Ctx) {
 		Send(ctx)
 }
 
-func (AdministrationCommands) newschannel(ctx *dgc.Ctx) {
+func (*AdministrationCommands) newschannel(ctx *dgc.Ctx) {
 	if !utils.Discord.CheckIfInServer(ctx) {
 		return
 	}
@@ -566,7 +590,7 @@ func (AdministrationCommands) newschannel(ctx *dgc.Ctx) {
 		Send(ctx)
 }
 
-func (AdministrationCommands) thread(ctx *dgc.Ctx) {
+func (*AdministrationCommands) thread(ctx *dgc.Ctx) {
 	if !utils.Discord.CheckIfInServer(ctx) {
 		return
 	}
@@ -581,7 +605,7 @@ func (AdministrationCommands) thread(ctx *dgc.Ctx) {
 		Send(ctx)
 }
 
-func (AdministrationCommands) category(ctx *dgc.Ctx) {
+func (*AdministrationCommands) category(ctx *dgc.Ctx) {
 	if !utils.Discord.CheckIfInServer(ctx) {
 		return
 	}
@@ -596,7 +620,7 @@ func (AdministrationCommands) category(ctx *dgc.Ctx) {
 		Send(ctx)
 }
 
-func (AdministrationCommands) deletecategory(ctx *dgc.Ctx) {
+func (*AdministrationCommands) deletecategory(ctx *dgc.Ctx) {
 	channel, success := utils.Discord.TryGetChannelFromMention(ctx, ctx.Arguments.Get(0))
 	if !success {
 		_ = ctx.RespondText("Could not find category")
@@ -613,7 +637,7 @@ func (AdministrationCommands) deletecategory(ctx *dgc.Ctx) {
 		Send(ctx)
 }
 
-func (AdministrationCommands) renamechannel(ctx *dgc.Ctx) {
+func (*AdministrationCommands) renamechannel(ctx *dgc.Ctx) {
 	channel, success := utils.Discord.TryGetChannelFromMention(ctx, ctx.Arguments.Get(0))
 	if !success {
 		_ = ctx.RespondText("Could not find channel")
@@ -632,7 +656,7 @@ func (AdministrationCommands) renamechannel(ctx *dgc.Ctx) {
 		Send(ctx)
 }
 
-func (AdministrationCommands) deletechannel(ctx *dgc.Ctx) {
+func (*AdministrationCommands) deletechannel(ctx *dgc.Ctx) {
 	channel, success := utils.Discord.TryGetChannelFromMention(ctx, ctx.Arguments.Get(0))
 	if !success {
 		_ = ctx.RespondText("Could not find channel")
@@ -650,7 +674,7 @@ func (AdministrationCommands) deletechannel(ctx *dgc.Ctx) {
 		Send(ctx)
 }
 
-func (AdministrationCommands) slowmode(ctx *dgc.Ctx) {
+func (*AdministrationCommands) slowmode(ctx *dgc.Ctx) {
 	channel, success := utils.Discord.TryGetChannelFromMention(ctx, ctx.Arguments.Get(0))
 	if !success {
 		_ = ctx.RespondText("Could not find channel")
@@ -677,7 +701,7 @@ func (AdministrationCommands) slowmode(ctx *dgc.Ctx) {
 		Send(ctx)
 }
 
-func (AdministrationCommands) removeslowmode(ctx *dgc.Ctx) {
+func (*AdministrationCommands) removeslowmode(ctx *dgc.Ctx) {
 	channel, success := utils.Discord.TryGetChannelFromMention(ctx, ctx.Arguments.Get(0))
 	if !success {
 		_ = ctx.RespondText("Could not find channel")
@@ -698,7 +722,7 @@ func (AdministrationCommands) removeslowmode(ctx *dgc.Ctx) {
 		Send(ctx)
 }
 
-func (AdministrationCommands) lockchannel(ctx *dgc.Ctx) {
+func (*AdministrationCommands) lockchannel(ctx *dgc.Ctx) {
 	channel, success := utils.Discord.TryGetChannelFromMention(ctx, ctx.Arguments.Get(0))
 	if !success {
 		_ = ctx.RespondText("Could not find channel")
@@ -725,7 +749,7 @@ func (AdministrationCommands) lockchannel(ctx *dgc.Ctx) {
 		Send(ctx)
 }
 
-func (AdministrationCommands) unlockchannel(ctx *dgc.Ctx) {
+func (*AdministrationCommands) unlockchannel(ctx *dgc.Ctx) {
 	channel, success := utils.Discord.TryGetChannelFromMention(ctx, ctx.Arguments.Get(0))
 	if !success {
 		_ = ctx.RespondText("Could not find channel")
@@ -752,7 +776,7 @@ func (AdministrationCommands) unlockchannel(ctx *dgc.Ctx) {
 		Send(ctx)
 }
 
-func (AdministrationCommands) purge(ctx *dgc.Ctx) {
+func (*AdministrationCommands) purge(ctx *dgc.Ctx) {
 	amount, err := strconv.Atoi(utils.Arguments["<amount>"])
 	if err != nil {
 		_ = ctx.RespondText("Argument <amount> must be a number.")
@@ -765,7 +789,7 @@ func (AdministrationCommands) purge(ctx *dgc.Ctx) {
 		channelID = channel.ID
 	}
 
-	messages, err := utils.Discord.GetChannelMessages(ctx, channelID, amount)
+	messages, err := utils.Discord.GetChannelMessages(ctx.Session, channelID, amount)
 	if err != nil {
 		_ = ctx.RespondText("Error getting messages: " + err.Error())
 		return
@@ -780,7 +804,7 @@ func (AdministrationCommands) purge(ctx *dgc.Ctx) {
 	}
 }
 
-func (AdministrationCommands) nuke(ctx *dgc.Ctx) {
+func (*AdministrationCommands) nuke(ctx *dgc.Ctx) {
 	channel, success := utils.Discord.TryGetChannelFromMention(ctx, ctx.Arguments.Get(0))
 	if !success {
 		channel, _ = ctx.Session.State.Channel(ctx.Event.ChannelID)
@@ -823,9 +847,33 @@ func (AdministrationCommands) nuke(ctx *dgc.Ctx) {
 		Send(ctx)
 }
 
+func (*AdministrationCommands) ackchannel(ctx *dgc.Ctx) {
+	channel, success := utils.Discord.TryGetChannelFromMention(ctx, ctx.Arguments.Get(0))
+	if !success {
+		channel, _ = ctx.Session.State.Channel(ctx.Event.ChannelID)
+		if channel == nil {
+			_ = ctx.RespondText("Could not find channel")
+			return
+		}
+	}
+	messages, _ := utils.Discord.GetChannelMessages(ctx.Session, channel.ID, 50)
+	if len(messages) > 0 {
+		_ = ctx.Session.MessageAck(channel.ID, messages[0].ID)
+	}
+}
+
+func (*AdministrationCommands) ackmessage(ctx *dgc.Ctx) {
+	channel, success := utils.Discord.TryGetChannelFromMention(ctx, ctx.Arguments.Get(0))
+	if !success {
+		_ = ctx.RespondText("Could not find channel")
+		return
+	}
+	_ = ctx.Session.MessageAck(channel.ID, ctx.Arguments.Get(1).Raw())
+}
+
 // Webhook Control
 
-func (AdministrationCommands) webhookinfo(ctx *dgc.Ctx) {
+func (*AdministrationCommands) webhookinfo(ctx *dgc.Ctx) {
 	webhookUrl, err := url.Parse(utils.Arguments["<webhook url>"])
 	if err != nil {
 		_ = ctx.RespondText("Invalid webhook URL!")
@@ -856,7 +904,7 @@ func (AdministrationCommands) webhookinfo(ctx *dgc.Ctx) {
 		Send(ctx)
 }
 
-func (AdministrationCommands) webhooksend(ctx *dgc.Ctx) {
+func (*AdministrationCommands) webhooksend(ctx *dgc.Ctx) {
 	webhookUrl, err := url.Parse(utils.Arguments["<webhook url>"])
 	if err != nil {
 		_ = ctx.RespondText("Invalid webhook URL!")
@@ -873,7 +921,7 @@ func (AdministrationCommands) webhooksend(ctx *dgc.Ctx) {
 	_, _ = http.Post(webhookUrl.String(), string(jsonData))
 }
 
-func (AdministrationCommands) webhookdelete(ctx *dgc.Ctx) {
+func (*AdministrationCommands) webhookdelete(ctx *dgc.Ctx) {
 	webhookUrl, err := url.Parse(utils.Arguments["<webhook url>"])
 	if err != nil {
 		_ = ctx.RespondText("Invalid webhook URL!")
@@ -891,7 +939,7 @@ func (AdministrationCommands) webhookdelete(ctx *dgc.Ctx) {
 
 // Member Control
 
-func (AdministrationCommands) userinfo(ctx *dgc.Ctx) {
+func (*AdministrationCommands) userinfo(ctx *dgc.Ctx) {
 	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
 		_ = ctx.RespondText("Could not find user")
@@ -916,7 +964,7 @@ func (AdministrationCommands) userinfo(ctx *dgc.Ctx) {
 	emb.Send(ctx)
 }
 
-func (AdministrationCommands) userage(ctx *dgc.Ctx) {
+func (*AdministrationCommands) userage(ctx *dgc.Ctx) {
 	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
 		_ = ctx.RespondText("Could not find user")
@@ -929,7 +977,7 @@ func (AdministrationCommands) userage(ctx *dgc.Ctx) {
 		Send(ctx)
 }
 
-func (AdministrationCommands) mutualfriends(ctx *dgc.Ctx) {
+func (*AdministrationCommands) mutualfriends(ctx *dgc.Ctx) {
 	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
 		_ = ctx.RespondText("Could not find user")
@@ -950,7 +998,7 @@ func (AdministrationCommands) mutualfriends(ctx *dgc.Ctx) {
 		Send(ctx)
 }
 
-func (AdministrationCommands) mutualservers(ctx *dgc.Ctx) {
+func (*AdministrationCommands) mutualservers(ctx *dgc.Ctx) {
 	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
 		_ = ctx.RespondText("Could not find user")
@@ -975,43 +1023,55 @@ func (AdministrationCommands) mutualservers(ctx *dgc.Ctx) {
 		Send(ctx)
 }
 
-func (AdministrationCommands) mobile(ctx *dgc.Ctx) {
+func (*AdministrationCommands) mobile(ctx *dgc.Ctx) {
 	member, success := utils.Discord.TryGetMemberFromMention(ctx, ctx.Arguments.Get(0))
 	if !success {
 		_ = ctx.RespondText("Could not find user")
 		return
 	}
+	var clientStatus map[string]string
+	if member.Presence != nil {
+		clientStatus = member.Presence.ClientStatus
+	}
 	embed.NewEmbed().
 		SetDescription(fmt.Sprintf("%s - %s", member.User.String(), member.User.ID)).
-		AddField("Is On Mobile", utils.Misc.FormatBool(member.Presence.ClientStatus["mobile"] != "")).
+		AddField("Is On Mobile", utils.Misc.FormatBool(clientStatus["mobile"] != "")).
 		Send(ctx)
 }
 
-func (AdministrationCommands) web(ctx *dgc.Ctx) {
+func (*AdministrationCommands) web(ctx *dgc.Ctx) {
 	member, success := utils.Discord.TryGetMemberFromMention(ctx, ctx.Arguments.Get(0))
 	if !success {
 		_ = ctx.RespondText("Could not find user")
 		return
 	}
+	var clientStatus map[string]string
+	if member.Presence != nil {
+		clientStatus = member.Presence.ClientStatus
+	}
 	embed.NewEmbed().
 		SetDescription(fmt.Sprintf("%s - %s", member.User.String(), member.User.ID)).
-		AddField("Is On Web", utils.Misc.FormatBool(member.Presence.ClientStatus["web"] != "")).
+		AddField("Is On Web", utils.Misc.FormatBool(clientStatus["web"] != "")).
 		Send(ctx)
 }
 
-func (AdministrationCommands) desktop(ctx *dgc.Ctx) {
+func (*AdministrationCommands) desktop(ctx *dgc.Ctx) {
 	member, success := utils.Discord.TryGetMemberFromMention(ctx, ctx.Arguments.Get(0))
 	if !success {
 		_ = ctx.RespondText("Could not find user")
 		return
 	}
+	var clientStatus map[string]string
+	if member.Presence != nil {
+		clientStatus = member.Presence.ClientStatus
+	}
 	embed.NewEmbed().
 		SetDescription(fmt.Sprintf("%s - %s", member.User.String(), member.User.ID)).
-		AddField("Is On Desktop", utils.Misc.FormatBool(member.Presence.ClientStatus["desktop"] != "")).
+		AddField("Is On Desktop", utils.Misc.FormatBool(clientStatus["desktop"] != "")).
 		Send(ctx)
 }
 
-func (AdministrationCommands) avatar(ctx *dgc.Ctx) {
+func (*AdministrationCommands) avatar(ctx *dgc.Ctx) {
 	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
 		_ = ctx.RespondText("Could not find user")
@@ -1024,7 +1084,7 @@ func (AdministrationCommands) avatar(ctx *dgc.Ctx) {
 	_ = ctx.RespondText(user.AvatarURL(""))
 }
 
-func (AdministrationCommands) banner(ctx *dgc.Ctx) {
+func (*AdministrationCommands) banner(ctx *dgc.Ctx) {
 	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
 		_ = ctx.RespondText("Could not find user")
@@ -1037,7 +1097,7 @@ func (AdministrationCommands) banner(ctx *dgc.Ctx) {
 	_ = ctx.RespondText(user.BannerURL(""))
 }
 
-func (AdministrationCommands) report(ctx *dgc.Ctx) {
+func (*AdministrationCommands) report(ctx *dgc.Ctx) {
 	link := utils.Arguments["<message link>"]
 	reason := utils.Arguments["<reason>"]
 
@@ -1081,69 +1141,18 @@ func (AdministrationCommands) report(ctx *dgc.Ctx) {
 		Send(ctx)
 }
 
-func (AdministrationCommands) mute(ctx *dgc.Ctx) {
+func (*AdministrationCommands) mute(ctx *dgc.Ctx) {
 	if !utils.Discord.CheckIfInServer(ctx) {
 		return
 	}
-	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
+	member, success := utils.Discord.TryGetMemberFromMention(ctx, ctx.Arguments.Get(0))
 	if !success {
 		_ = ctx.RespondText("Could not find user")
 		return
 	}
 
-	member, _ := ctx.Session.GuildMember(ctx.Event.GuildID, user.ID)
-	roles, err := ctx.Session.GuildRoles(ctx.Event.GuildID)
-	if member == nil || err != nil {
-		_ = ctx.RespondText("Error muting user: " + err.Error())
-		return
-	}
-
-	for _, role := range roles {
-		if strings.ToLower(role.Name) != "muted" {
-			continue
-		}
-		if utils.SliceContains(member.Roles, role.ID) {
-			embed.NewEmbed().
-				SetDescription("User is already muted!").
-				Send(ctx)
-			return
-		}
-		err = ctx.Session.GuildMemberEdit(ctx.Event.GuildID, user.ID, append(member.Roles, role.ID))
-		if err != nil {
-			_ = ctx.RespondText("Error muting user: " + err.Error())
-			return
-		}
-		embed.NewEmbed().
-			SetDescription("Successfully muted user!").
-			Send(ctx)
-		return
-	}
-
-	channels, err := ctx.Session.GuildChannels(ctx.Event.GuildID)
-	if err != nil {
-		_ = ctx.RespondText("Error muting user: " + err.Error())
-		return
-	}
-
-	role, err := ctx.Session.GuildRoleCreate(ctx.Event.GuildID, "Muted", 0, false, 0, false)
-	if err != nil {
-		_ = ctx.RespondText("Error muting user: " + err.Error())
-		return
-	}
-
-	for _, channel := range channels {
-		if channel.Type == 1 {
-			err = ctx.Session.ChannelPermissionSet(channel.ID, role.ID, discordgo.PermissionOverwriteTypeRole, 0, discordgo.PermissionSendMessages)
-			if err != nil {
-				_ = ctx.RespondText("Error muting user: " + err.Error())
-				return
-			}
-		}
-	}
-
-	err = ctx.Session.GuildMemberEdit(ctx.Event.GuildID, user.ID, append(member.Roles, role.ID))
-	if err != nil {
-		_ = ctx.RespondText("Error muting user: " + err.Error())
+	if err := utils.Discord.MuteUser(ctx.Session, member); err != nil {
+		_ = ctx.RespondText(utils.String.Capitalize(err.Error()))
 		return
 	}
 
@@ -1152,7 +1161,7 @@ func (AdministrationCommands) mute(ctx *dgc.Ctx) {
 		Send(ctx)
 }
 
-func (AdministrationCommands) unmute(ctx *dgc.Ctx) {
+func (*AdministrationCommands) unmute(ctx *dgc.Ctx) {
 	if !utils.Discord.CheckIfInServer(ctx) {
 		return
 	}
@@ -1198,7 +1207,7 @@ func (AdministrationCommands) unmute(ctx *dgc.Ctx) {
 	_ = ctx.RespondText("Error: No muted role found!")
 }
 
-func (AdministrationCommands) timeout(ctx *dgc.Ctx) {
+func (*AdministrationCommands) timeout(ctx *dgc.Ctx) {
 	if !utils.Discord.CheckIfInServer(ctx) {
 		return
 	}
@@ -1227,7 +1236,7 @@ func (AdministrationCommands) timeout(ctx *dgc.Ctx) {
 		Send(ctx)
 }
 
-func (AdministrationCommands) removetimeout(ctx *dgc.Ctx) {
+func (*AdministrationCommands) removetimeout(ctx *dgc.Ctx) {
 	if !utils.Discord.CheckIfInServer(ctx) {
 		return
 	}
@@ -1249,7 +1258,7 @@ func (AdministrationCommands) removetimeout(ctx *dgc.Ctx) {
 		Send(ctx)
 }
 
-func (AdministrationCommands) kick(ctx *dgc.Ctx) {
+func (*AdministrationCommands) kick(ctx *dgc.Ctx) {
 	if !utils.Discord.CheckIfInServer(ctx) {
 		return
 	}
@@ -1271,7 +1280,7 @@ func (AdministrationCommands) kick(ctx *dgc.Ctx) {
 		Send(ctx)
 }
 
-func (AdministrationCommands) ban(ctx *dgc.Ctx) {
+func (*AdministrationCommands) ban(ctx *dgc.Ctx) {
 	if !utils.Discord.CheckIfInServer(ctx) {
 		return
 	}
@@ -1293,7 +1302,7 @@ func (AdministrationCommands) ban(ctx *dgc.Ctx) {
 		Send(ctx)
 }
 
-func (AdministrationCommands) softban(ctx *dgc.Ctx) {
+func (*AdministrationCommands) softban(ctx *dgc.Ctx) {
 	if !utils.Discord.CheckIfInServer(ctx) {
 		return
 	}
@@ -1320,7 +1329,7 @@ func (AdministrationCommands) softban(ctx *dgc.Ctx) {
 		Send(ctx)
 }
 
-func (AdministrationCommands) unban(ctx *dgc.Ctx) {
+func (*AdministrationCommands) unban(ctx *dgc.Ctx) {
 	if !utils.Discord.CheckIfInServer(ctx) {
 		return
 	}
@@ -1336,7 +1345,7 @@ func (AdministrationCommands) unban(ctx *dgc.Ctx) {
 		Send(ctx)
 }
 
-func (AdministrationCommands) banlist(ctx *dgc.Ctx) {
+func (*AdministrationCommands) banlist(ctx *dgc.Ctx) {
 	guildID := utils.Arguments["[server id]"]
 	if guildID == "" {
 		guildID = ctx.Event.GuildID
@@ -1364,7 +1373,7 @@ func (AdministrationCommands) banlist(ctx *dgc.Ctx) {
 		Send(ctx)
 }
 
-func (AdministrationCommands) copybans(ctx *dgc.Ctx) {
+func (*AdministrationCommands) copybans(ctx *dgc.Ctx) {
 	sourceServerID := utils.Arguments["<source server id>"]
 	destinationServerID := utils.Arguments["[dest server id]"]
 	if destinationServerID == "" {
@@ -1391,7 +1400,7 @@ func (AdministrationCommands) copybans(ctx *dgc.Ctx) {
 
 // Nickname Control
 
-func (AdministrationCommands) nick(ctx *dgc.Ctx) {
+func (*AdministrationCommands) nick(ctx *dgc.Ctx) {
 	if !utils.Discord.CheckIfInServer(ctx) {
 		return
 	}
@@ -1405,7 +1414,7 @@ func (AdministrationCommands) nick(ctx *dgc.Ctx) {
 		Send(ctx)
 }
 
-func (AdministrationCommands) nickuser(ctx *dgc.Ctx) {
+func (*AdministrationCommands) nickuser(ctx *dgc.Ctx) {
 	if !utils.Discord.CheckIfInServer(ctx) {
 		return
 	}
@@ -1426,7 +1435,7 @@ func (AdministrationCommands) nickuser(ctx *dgc.Ctx) {
 		Send(ctx)
 }
 
-func (AdministrationCommands) clearnick(ctx *dgc.Ctx) {
+func (*AdministrationCommands) clearnick(ctx *dgc.Ctx) {
 	if !utils.Discord.CheckIfInServer(ctx) {
 		return
 	}
@@ -1448,11 +1457,7 @@ func (AdministrationCommands) clearnick(ctx *dgc.Ctx) {
 
 // Server Control
 
-func (AdministrationCommands) serverinfo(ctx *dgc.Ctx) {
-	if !utils.Discord.CheckIfInServer(ctx) {
-		return
-	}
-
+func (*AdministrationCommands) serverinfo(ctx *dgc.Ctx) {
 	guild, err := utils.Discord.GetGuild(ctx.Session, utils.Misc.Or(utils.Arguments["[server id]"], ctx.Event.GuildID))
 	if err != nil {
 		_ = ctx.RespondText("Error getting server: " + err.Error())
@@ -1481,7 +1486,7 @@ func (AdministrationCommands) serverinfo(ctx *dgc.Ctx) {
 		Send(ctx)
 }
 
-func (AdministrationCommands) serverage(ctx *dgc.Ctx) {
+func (*AdministrationCommands) serverage(ctx *dgc.Ctx) {
 	guild, err := utils.Discord.GetGuild(ctx.Session, utils.Misc.Or(utils.Arguments["[server id]"], ctx.Event.GuildID))
 	if err != nil {
 		_ = ctx.RespondText("Error getting server: " + err.Error())
@@ -1494,11 +1499,7 @@ func (AdministrationCommands) serverage(ctx *dgc.Ctx) {
 		Send(ctx)
 }
 
-func (AdministrationCommands) serverowner(ctx *dgc.Ctx) {
-	if !utils.Discord.CheckIfInServer(ctx) {
-		return
-	}
-
+func (*AdministrationCommands) serverowner(ctx *dgc.Ctx) {
 	guild, err := utils.Discord.GetGuild(ctx.Session, utils.Misc.Or(utils.Arguments["[server id]"], ctx.Event.GuildID))
 	if err != nil {
 		_ = ctx.RespondText("Error getting server: " + err.Error())
@@ -1515,11 +1516,7 @@ func (AdministrationCommands) serverowner(ctx *dgc.Ctx) {
 		Send(ctx)
 }
 
-func (AdministrationCommands) servericon(ctx *dgc.Ctx) {
-	if !utils.Discord.CheckIfInServer(ctx) {
-		return
-	}
-
+func (*AdministrationCommands) servericon(ctx *dgc.Ctx) {
 	guild, err := utils.Discord.GetGuild(ctx.Session, utils.Misc.Or(utils.Arguments["[server id]"], ctx.Event.GuildID))
 	if err != nil {
 		_ = ctx.RespondText("Error getting server: " + err.Error())
@@ -1535,10 +1532,7 @@ func (AdministrationCommands) servericon(ctx *dgc.Ctx) {
 	emb.Send(ctx)
 }
 
-func (AdministrationCommands) serverbanner(ctx *dgc.Ctx) {
-	if !utils.Discord.CheckIfInServer(ctx) {
-		return
-	}
+func (*AdministrationCommands) serverbanner(ctx *dgc.Ctx) {
 	guild, err := utils.Discord.GetGuild(ctx.Session, utils.Misc.Or(utils.Arguments["[server id]"], ctx.Event.GuildID))
 	if err != nil {
 		_ = ctx.RespondText("Error getting server: " + err.Error())
@@ -1553,10 +1547,7 @@ func (AdministrationCommands) serverbanner(ctx *dgc.Ctx) {
 		Send(ctx)
 }
 
-func (AdministrationCommands) serversplash(ctx *dgc.Ctx) {
-	if !utils.Discord.CheckIfInServer(ctx) {
-		return
-	}
+func (*AdministrationCommands) serversplash(ctx *dgc.Ctx) {
 	guild, err := utils.Discord.GetGuild(ctx.Session, utils.Misc.Or(utils.Arguments["[server id]"], ctx.Event.GuildID))
 	if err != nil {
 		_ = ctx.RespondText("Error getting server: " + err.Error())
@@ -1572,10 +1563,7 @@ func (AdministrationCommands) serversplash(ctx *dgc.Ctx) {
 		Send(ctx)
 }
 
-func (AdministrationCommands) serverdsplash(ctx *dgc.Ctx) {
-	if !utils.Discord.CheckIfInServer(ctx) {
-		return
-	}
+func (*AdministrationCommands) serverdsplash(ctx *dgc.Ctx) {
 	guild, err := utils.Discord.GetGuild(ctx.Session, utils.Misc.Or(utils.Arguments["[server id]"], ctx.Event.GuildID))
 	if err != nil {
 		_ = ctx.RespondText("Error getting server: " + err.Error())
@@ -1591,11 +1579,7 @@ func (AdministrationCommands) serverdsplash(ctx *dgc.Ctx) {
 		Send(ctx)
 }
 
-func (AdministrationCommands) serverboosters(ctx *dgc.Ctx) {
-	if !utils.Discord.CheckIfInServer(ctx) {
-		return
-	}
-
+func (*AdministrationCommands) serverboosters(ctx *dgc.Ctx) {
 	guild, err := utils.Discord.GetGuild(ctx.Session, utils.Misc.Or(utils.Arguments["[server id]"], ctx.Event.GuildID))
 	if err != nil {
 		_ = ctx.RespondText("Error getting server: " + err.Error())
@@ -1619,11 +1603,7 @@ func (AdministrationCommands) serverboosters(ctx *dgc.Ctx) {
 		Send(ctx)
 }
 
-func (AdministrationCommands) serverboostlevel(ctx *dgc.Ctx) {
-	if !utils.Discord.CheckIfInServer(ctx) {
-		return
-	}
-
+func (*AdministrationCommands) serverboostlevel(ctx *dgc.Ctx) {
 	guild, err := utils.Discord.GetGuild(ctx.Session, utils.Misc.Or(utils.Arguments["[server id]"], ctx.Event.GuildID))
 	if err != nil {
 		_ = ctx.RespondText("Error getting server: " + err.Error())
@@ -1636,7 +1616,7 @@ func (AdministrationCommands) serverboostlevel(ctx *dgc.Ctx) {
 		Send(ctx)
 }
 
-func (AdministrationCommands) setservername(ctx *dgc.Ctx) {
+func (*AdministrationCommands) setservername(ctx *dgc.Ctx) {
 	if !utils.Discord.CheckIfInServer(ctx) {
 		return
 	}
@@ -1652,7 +1632,7 @@ func (AdministrationCommands) setservername(ctx *dgc.Ctx) {
 		Send(ctx)
 }
 
-func (AdministrationCommands) setservericon(ctx *dgc.Ctx) {
+func (*AdministrationCommands) setservericon(ctx *dgc.Ctx) {
 	if !utils.Discord.CheckIfInServer(ctx) {
 		return
 	}
@@ -1668,7 +1648,7 @@ func (AdministrationCommands) setservericon(ctx *dgc.Ctx) {
 		Send(ctx)
 }
 
-func (AdministrationCommands) setserverbanner(ctx *dgc.Ctx) {
+func (*AdministrationCommands) setserverbanner(ctx *dgc.Ctx) {
 	if !utils.Discord.CheckIfInServer(ctx) {
 		return
 	}
@@ -1684,7 +1664,7 @@ func (AdministrationCommands) setserverbanner(ctx *dgc.Ctx) {
 		Send(ctx)
 }
 
-func (AdministrationCommands) lockserver(ctx *dgc.Ctx) {
+func (*AdministrationCommands) lockserver(ctx *dgc.Ctx) {
 	guild, err := utils.Discord.GetGuild(ctx.Session, utils.Misc.Or(utils.Arguments["[server id]"], ctx.Event.GuildID))
 	if err != nil {
 		_ = ctx.RespondText("Error getting server: " + err.Error())
@@ -1714,7 +1694,7 @@ func (AdministrationCommands) lockserver(ctx *dgc.Ctx) {
 		Send(ctx)
 }
 
-func (AdministrationCommands) unlockserver(ctx *dgc.Ctx) {
+func (*AdministrationCommands) unlockserver(ctx *dgc.Ctx) {
 	guild, err := utils.Discord.GetGuild(ctx.Session, utils.Misc.Or(utils.Arguments["[server id]"], ctx.Event.GuildID))
 	if err != nil {
 		_ = ctx.RespondText("Error getting server: " + err.Error())
@@ -1744,7 +1724,7 @@ func (AdministrationCommands) unlockserver(ctx *dgc.Ctx) {
 		Send(ctx)
 }
 
-func (AdministrationCommands) channels(ctx *dgc.Ctx) {
+func (*AdministrationCommands) channels(ctx *dgc.Ctx) {
 	guild, err := utils.Discord.GetGuild(ctx.Session, utils.Misc.Or(utils.Arguments["[server id]"], ctx.Event.GuildID))
 	if err != nil {
 		_ = ctx.RespondText("Error getting server: " + err.Error())
@@ -1763,13 +1743,12 @@ func (AdministrationCommands) channels(ctx *dgc.Ctx) {
 	emb.Send(ctx)
 }
 
-func (AdministrationCommands) bots(ctx *dgc.Ctx) {
+func (*AdministrationCommands) bots(ctx *dgc.Ctx) {
 	guild, err := utils.Discord.GetGuild(ctx.Session, utils.Misc.Or(utils.Arguments["[server id]"], ctx.Event.GuildID))
 	if err != nil {
 		_ = ctx.RespondText("Error getting server: " + err.Error())
 		return
 	}
-	fmt.Println(len(guild.Members))
 	botString := ""
 	for _, member := range guild.Members {
 		if member.User.Bot {
@@ -1783,7 +1762,7 @@ func (AdministrationCommands) bots(ctx *dgc.Ctx) {
 		Send(ctx)
 }
 
-func (AdministrationCommands) admins(ctx *dgc.Ctx) {
+func (*AdministrationCommands) admins(ctx *dgc.Ctx) {
 	guild, err := utils.Discord.GetGuild(ctx.Session, utils.Misc.Or(utils.Arguments["[server id]"], ctx.Event.GuildID))
 	if err != nil {
 		_ = ctx.RespondText("Error getting server: " + err.Error())
@@ -1807,7 +1786,7 @@ func (AdministrationCommands) admins(ctx *dgc.Ctx) {
 		Send(ctx)
 }
 
-func (AdministrationCommands) roles(ctx *dgc.Ctx) {
+func (*AdministrationCommands) roles(ctx *dgc.Ctx) {
 	guild, err := utils.Discord.GetGuild(ctx.Session, utils.Misc.Or(utils.Arguments["[server id]"], ctx.Event.GuildID))
 	if err != nil {
 		_ = ctx.RespondText("Error getting server: " + err.Error())
@@ -1831,9 +1810,27 @@ func (AdministrationCommands) roles(ctx *dgc.Ctx) {
 		Send(ctx)
 }
 
+func (*AdministrationCommands) leaveserver(ctx *dgc.Ctx) {
+	guild, err := utils.Discord.GetGuild(ctx.Session, utils.Misc.Or(utils.Arguments["[server id]"], ctx.Event.GuildID))
+	if err != nil {
+		_ = ctx.RespondText("Error getting server: " + err.Error())
+		return
+	}
+	_ = ctx.Session.GuildLeave(guild.ID)
+}
+
+func (*AdministrationCommands) deleteserver(ctx *dgc.Ctx) {
+	guild, err := utils.Discord.GetGuild(ctx.Session, utils.Misc.Or(utils.Arguments["[server id]"], ctx.Event.GuildID))
+	if err != nil {
+		_ = ctx.RespondText("Error getting server: " + err.Error())
+		return
+	}
+	_, _ = ctx.Session.GuildDelete(guild.ID)
+}
+
 // Invite Control
 
-func (AdministrationCommands) invite(ctx *dgc.Ctx) {
+func (*AdministrationCommands) invite(ctx *dgc.Ctx) {
 	channel, success := utils.Discord.TryGetChannelFromMention(ctx, ctx.Arguments.Get(0))
 	channelID := ctx.Event.ChannelID
 	if !success {
@@ -1868,7 +1865,7 @@ func (AdministrationCommands) invite(ctx *dgc.Ctx) {
 		Send(ctx)
 }
 
-func (AdministrationCommands) friendinvite(ctx *dgc.Ctx) {
+func (*AdministrationCommands) friendinvite(ctx *dgc.Ctx) {
 	invite, err := ctx.Session.CreateFriendInvite("@me")
 	if err != nil {
 		_ = ctx.RespondText("Error creating friend invite: " + err.Error())
@@ -1881,7 +1878,7 @@ func (AdministrationCommands) friendinvite(ctx *dgc.Ctx) {
 		Send(ctx)
 }
 
-func (AdministrationCommands) inviteinfo(ctx *dgc.Ctx) {
+func (*AdministrationCommands) inviteinfo(ctx *dgc.Ctx) {
 	parsedInvite := utils.Discord.ParseInvite(utils.Arguments["<invite>"])
 	invite, err := ctx.Session.InviteWithCounts(parsedInvite)
 	if err != nil {
@@ -1913,7 +1910,7 @@ func (AdministrationCommands) inviteinfo(ctx *dgc.Ctx) {
 		Send(ctx)
 }
 
-func (AdministrationCommands) deleteinvite(ctx *dgc.Ctx) {
+func (*AdministrationCommands) deleteinvite(ctx *dgc.Ctx) {
 	parsedInvite := utils.Discord.ParseInvite(utils.Arguments["<invite>"])
 	invite, err := ctx.Session.InviteWithCounts(parsedInvite)
 	if err != nil {
@@ -1991,7 +1988,6 @@ func (m *AdministrationCommands) userinvites(ctx *dgc.Ctx) {
 	if !utils.Discord.CheckIfInServer(ctx) {
 		return
 	}
-
 	member, success := utils.Discord.TryGetMemberFromMention(ctx, ctx.Arguments.Get(0))
 	if !success {
 		_ = ctx.RespondText("Could not find user")
@@ -2023,7 +2019,7 @@ func (m *AdministrationCommands) userinvites(ctx *dgc.Ctx) {
 		Send(ctx)
 }
 
-func (AdministrationCommands) roleinfo(ctx *dgc.Ctx) {
+func (*AdministrationCommands) roleinfo(ctx *dgc.Ctx) {
 	if !utils.Discord.CheckIfInServer(ctx) {
 		return
 	}
@@ -2059,7 +2055,7 @@ func (AdministrationCommands) roleinfo(ctx *dgc.Ctx) {
 		Send(ctx)
 }
 
-func (AdministrationCommands) giverole(ctx *dgc.Ctx) {
+func (*AdministrationCommands) giverole(ctx *dgc.Ctx) {
 	if !utils.Discord.CheckIfInServer(ctx) {
 		return
 	}
@@ -2084,7 +2080,7 @@ func (AdministrationCommands) giverole(ctx *dgc.Ctx) {
 		Send(ctx)
 }
 
-func (AdministrationCommands) removerole(ctx *dgc.Ctx) {
+func (*AdministrationCommands) removerole(ctx *dgc.Ctx) {
 	if !utils.Discord.CheckIfInServer(ctx) {
 		return
 	}
@@ -2109,7 +2105,7 @@ func (AdministrationCommands) removerole(ctx *dgc.Ctx) {
 		Send(ctx)
 }
 
-func (AdministrationCommands) createrole(ctx *dgc.Ctx) {
+func (*AdministrationCommands) createrole(ctx *dgc.Ctx) {
 	if !utils.Discord.CheckIfInServer(ctx) {
 		return
 	}
@@ -2123,7 +2119,7 @@ func (AdministrationCommands) createrole(ctx *dgc.Ctx) {
 		Send(ctx)
 }
 
-func (AdministrationCommands) deleterole(ctx *dgc.Ctx) {
+func (*AdministrationCommands) deleterole(ctx *dgc.Ctx) {
 	if !utils.Discord.CheckIfInServer(ctx) {
 		return
 	}
@@ -2142,7 +2138,7 @@ func (AdministrationCommands) deleterole(ctx *dgc.Ctx) {
 		Send(ctx)
 }
 
-func (AdministrationCommands) renamerole(ctx *dgc.Ctx) {
+func (*AdministrationCommands) renamerole(ctx *dgc.Ctx) {
 	if !utils.Discord.CheckIfInServer(ctx) {
 		return
 	}

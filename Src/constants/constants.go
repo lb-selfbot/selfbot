@@ -116,6 +116,7 @@ var (
 		"zu":    "zulu",
 	}
 	LanguageCodes = reverse(Languages)
+	Debug         = true
 )
 
 func reverse(m map[string]string) map[string]string {

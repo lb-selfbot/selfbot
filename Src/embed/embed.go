@@ -3,6 +3,7 @@ package embed
 import (
 	"encoding/json"
 	"fmt"
+	"regexp"
 	"strings"
 
 	"github.com/LightningDev1/LB-Selfbot/config"
@@ -19,13 +20,15 @@ type Embed struct {
 	Subtext string
 }
 
-const (
+var (
 	LimitTitle       = 256
 	LimitDescription = 2048
 	LimitFieldValue  = 1024
 	LimitFieldName   = 256
 	LimitField       = 25
 	LimitFooter      = 2048
+
+	ansiRegex = regexp.MustCompile("\x1b(.*?)m")
 )
 
 //NewEmbed returns a new embed object
@@ -411,6 +414,9 @@ func (e *Embed) ToString() []string {
 	commandMode := "Codeblock"
 	if err == nil {
 		commandMode = cfg.Selfbot.CommandMode
+		if cfg.Selfbot.MobileFriendly {
+			e.Subtext = ansiRegex.ReplaceAllString(e.Subtext, "")
+		}
 	}
 	switch commandMode {
 	case "Codeblock":

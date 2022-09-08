@@ -8,6 +8,7 @@ import (
 
 	"github.com/LightningDev1/LB-Selfbot/config"
 	"github.com/LightningDev1/LB-Selfbot/constants"
+	"github.com/LightningDev1/LB-Selfbot/logging"
 	"github.com/LightningDev1/LB-Selfbot/utils"
 	"github.com/LightningDev1/dgc"
 )
@@ -107,13 +108,14 @@ func (r RPCCommands) RegisterCommands(router *dgc.Router) {
 			time.Sleep(time.Second * 5)
 			cfg, err := config.GetConfig()
 			if err != nil {
-				// TODO: log error
+				logging.Error(err)
 				continue
 			}
 			if cfg.RPC.Enabled {
 				err = client.Login(cfg.RPC.ClientID)
 				if err != nil {
-					// TODO: log error
+					logging.Warn("RPC login failed: ", err)
+					continue
 				}
 				err = client.SetActivity(client.Activity{
 					State:      strings.ReplaceAll(cfg.RPC.State, "$VERSION", constants.VersionString),
@@ -128,7 +130,8 @@ func (r RPCCommands) RegisterCommands(router *dgc.Router) {
 					Secrets:    r.getSecrets(cfg.RPC),
 				})
 				if err != nil {
-					// TODO: log error
+					logging.Warn("RPC set activity failed: ", err)
+					continue
 				}
 			} else {
 				client.Logout()

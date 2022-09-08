@@ -9,6 +9,7 @@ import (
 	"net"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"regexp"
 	"runtime"
 	"strconv"
@@ -56,16 +57,28 @@ func (DiscordUtils) TryGetMemberFromMention(ctx *dgc.Ctx, mention *dgc.Argument)
 	return member, true
 }
 
-func (d *DiscordUtils) TryGetUsernameFromMention(session *discordgo.Session, mention *dgc.Argument) (string, bool) {
+func (d DiscordUtils) TryGetUsernameFromMention(session *discordgo.Session, mention *dgc.Argument) (string, bool) {
 	user, success := d.TryGetUserFromMention(session, mention)
 	if !success {
 		return "", false
 	}
-	return fmt.Sprintf("%s#%s", user.Username, user.Discriminator), true
+	return user.String(), true
 }
 
-func (DiscordUtils) TryGetChannelFromMention(ctx *dgc.Ctx, mention *dgc.Argument) (*discordgo.Channel, bool) {
-	channel, err := ctx.Session.Channel(Misc.Or(mention.AsChannelMentionID(), mention.Raw()))
+func (DiscordUtils) GetChannel(session *discordgo.Session, channelID string) (*discordgo.Channel, error) {
+	channel, err := session.State.Channel(channelID)
+	if err != nil {
+		channel, err = session.Channel(channelID)
+		if err != nil {
+			return nil, err
+		}
+	}
+	return channel, nil
+}
+
+func (d DiscordUtils) TryGetChannelFromMention(ctx *dgc.Ctx, mention *dgc.Argument) (*discordgo.Channel, bool) {
+	channelID := Misc.Or(mention.AsChannelMentionID(), mention.Raw())
+	channel, err := d.GetChannel(ctx.Session, channelID)
 	if err != nil {
 		return nil, false
 	}
@@ -142,19 +155,21 @@ func (DiscordUtils) GetArguments(ctx *dgc.Ctx) (map[string]string, bool) {
 	return arguments, true
 }
 
-func (DiscordUtils) GetChannelMessages(ctx *dgc.Ctx, channelID string, limit int) ([]*discordgo.Message, error) {
+func (DiscordUtils) GetChannelMessages(session *discordgo.Session, channelID string, limit int) ([]*discordgo.Message, error) {
 	// The maximum number of messages that can be retrieved at once is 100.
 	if limit <= 100 {
-		return ctx.Session.ChannelMessages(channelID, limit, "", "", ctx.Event.Message.ID)
+		return session.ChannelMessages(channelID, limit, "", "", "")
 	}
 
 	amountOfRequests := int(math.Ceil(float64(limit) / 100))
-	messages := []*discordgo.Message{ctx.Event.Message}
-	// Subtract 1 from the limit because we already have the message that executed the command
-	limit -= 1
+	var messages []*discordgo.Message
 
 	for i := 0; i < amountOfRequests; i++ {
-		newMessages, err := ctx.Session.ChannelMessages(channelID, int(math.Min(float64(limit), 100)), messages[len(messages)-1].ID, "", "")
+		lastID := ""
+		if len(messages) > 0 {
+			lastID = messages[len(messages)-1].ID
+		}
+		newMessages, err := session.ChannelMessages(channelID, int(math.Min(float64(limit), 100)), lastID, "", "")
 		if err != nil {
 			return nil, err
 		}
@@ -306,6 +321,60 @@ func (DiscordUtils) MapCategories(channels []*discordgo.Channel) (categories []*
 	return categories, categoryChannels
 }
 
+func (DiscordUtils) MuteUser(session *discordgo.Session, member *discordgo.Member) error {
+	roles, err := session.GuildRoles(member.GuildID)
+	if err != nil {
+		return err
+	}
+
+	for _, role := range roles {
+		if strings.ToLower(role.Name) != "muted" {
+			continue
+		}
+		if SliceContains(member.Roles, role.ID) {
+			return fmt.Errorf("user is already muted")
+		}
+		return session.GuildMemberEdit(member.GuildID, member.User.ID, append(member.Roles, role.ID))
+	}
+
+	channels, err := session.GuildChannels(member.GuildID)
+	if err != nil {
+		return err
+	}
+
+	role, err := session.GuildRoleCreate(member.GuildID, "Muted", 0, false, 0, false)
+	if err != nil {
+		return err
+	}
+
+	for _, channel := range channels {
+		if channel.Type == 1 {
+			err = session.ChannelPermissionSet(channel.ID, role.ID, discordgo.PermissionOverwriteTypeRole, 0, discordgo.PermissionSendMessages)
+			if err != nil {
+				return err
+			}
+		}
+	}
+
+	return session.GuildMemberEdit(member.GuildID, member.User.ID, append(member.Roles, role.ID))
+}
+
+func (DiscordUtils) SleepWithTyping(session *discordgo.Session, channelID string, duration time.Duration) {
+	for i := 0; i < int(duration.Seconds()/5); i++ {
+		time.Sleep(5 * time.Second)
+		_ = session.ChannelTyping(channelID)
+	}
+	time.Sleep(duration - (time.Duration(int(duration.Seconds()/5)) * 5 * time.Second))
+}
+
+func (DiscordUtils) SleepWithTypingFix(session *discordgo.Session, channelID string, duration time.Duration) {
+	for i := 0; i < int(duration.Seconds()/5); i++ {
+		_ = session.ChannelTyping(channelID)
+		time.Sleep(5 * time.Second)
+	}
+	time.Sleep(duration - (time.Duration(int(duration.Seconds()/5)) * 5 * time.Second))
+}
+
 var Discord = &DiscordUtils{}
 
 type StringUtils struct{}
@@ -435,10 +504,16 @@ func (RandomUtils) Percentage() string {
 	return fmt.Sprintf("%d%%", Random.Number(0, 100))
 }
 
-func (RandomUtils) String(length int) string {
+func (RandomUtils) String(length int, alphabet ...string) string {
+	var alphabet_ string
+	if len(alphabet) > 0 {
+		alphabet_ = alphabet[0]
+	} else {
+		alphabet_ = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+	}
 	b := make([]byte, length)
-	for i := 0; i < length; i++ {
-		b[i] = byte(Random.Number(65, 90))
+	for i := range b {
+		b[i] = alphabet_[Random.Number(0, len(alphabet_))]
 	}
 	return string(b)
 }
@@ -460,7 +535,7 @@ var Random = &RandomUtils{}
 
 type FileUtils struct{}
 
-func (FileUtils) SanitizeFilename(filename string) string {
+func (*FileUtils) SanitizeFilename(filename string) string {
 	blacklist := []string{"\\", "/", ":", "*", "?", "\"", "<", ">", "|", "\x00"}
 	reserved := []string{
 		"CON", "PRN", "AUX", "NUL", "COM1", "COM2", "COM3", "COM4", "COM5",
@@ -495,15 +570,33 @@ func (FileUtils) SanitizeFilename(filename string) string {
 	return filename
 }
 
-func (FileUtils) Read(file string) (string, bool) {
-	fileContents, err := ioutil.ReadFile(file)
+func (*FileUtils) Read(file string) (string, bool) {
+	fileContents, err := ioutil.ReadFile(filepath.FromSlash(file))
 	if err != nil {
 		return "", false
 	}
 	return string(fileContents), true
 }
 
-func (FileUtils) GetMainFolder() string {
+func (*FileUtils) WriteBytes(filePath string, data []byte) error {
+	file, err := os.Create(filepath.FromSlash(filePath))
+	if err != nil {
+		return err
+	}
+	_, err = file.Write(data)
+	if err != nil {
+		_ = file.Close()
+		return err
+	}
+	_ = file.Close()
+	return nil
+}
+
+func (f *FileUtils) Write(filePath, content string) error {
+	return f.WriteBytes(filePath, []byte(content))
+}
+
+func (*FileUtils) GetMainFolder() string {
 	if runtime.GOOS == "windows" {
 		return fmt.Sprintf("%s\\LightningBot", WindowsGetDocumentsFolder())
 	} else {
@@ -545,6 +638,22 @@ func (ProcessUtils) Restart() error {
 		return err
 	}
 	return syscall.Exec(self, os.Args, env)
+}
+
+func (ProcessUtils) ShutdownPC() error {
+	if runtime.GOOS == "windows" {
+		return exec.Command("shutdown", "/s", "/t", "0").Start()
+	} else {
+		return exec.Command("shutdown", "-h", "now").Start()
+	}
+}
+
+func (ProcessUtils) RestartPC() error {
+	if runtime.GOOS == "windows" {
+		return exec.Command("shutdown", "/r", "/t", "0").Start()
+	} else {
+		return exec.Command("shutdown", "-r", "now").Start()
+	}
 }
 
 var Process = &ProcessUtils{}
@@ -604,6 +713,45 @@ func (MiscUtils) FormatDuration(duration time.Duration) string {
 	return fmt.Sprintf("%d days %d hours %d minutes %d seconds",
 		int64(duration.Hours()/24), int64(remainingHours),
 		int64(remainingMinutes), int64(remainingSeconds))
+}
+
+// GetDistance returns the Levenshtein distance between two strings.
+func (MiscUtils) GetDistance(str1, str2 string) int {
+	s1len := len(str1)
+	s2len := len(str2)
+	column := make([]int, len(str1)+1)
+
+	for y := 1; y <= s1len; y++ {
+		column[y] = y
+	}
+	for x := 1; x <= s2len; x++ {
+		column[0] = x
+		lastKey := x - 1
+		for y := 1; y <= s1len; y++ {
+			oldKey := column[y]
+			var incr int
+			if str1[y-1] != str2[x-1] {
+				incr = 1
+			}
+
+			column[y] = Misc.Minimum(column[y]+1, column[y-1]+1, lastKey+incr)
+			lastKey = oldKey
+		}
+	}
+	return column[s1len]
+}
+
+func (MiscUtils) Minimum(a, b, c int) int {
+	if a < b {
+		if a < c {
+			return a
+		}
+	} else {
+		if b < c {
+			return b
+		}
+	}
+	return c
 }
 
 var Misc = &MiscUtils{}

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"math/rand"
 	"net/url"
+	"strings"
 
 	"github.com/LightningDev1/LB-Selfbot/embed"
 	"github.com/LightningDev1/LB-Selfbot/http"
@@ -136,6 +137,96 @@ func (i ImageCommands) RegisterCommands(router *dgc.Router) {
 		Handler:     i.threat,
 	})
 	router.RegisterCmd(&dgc.Command{
+		Name:        "threshold",
+		Description: "Add a threshold filter to a users avatar",
+		Usage:       "[p]threshold <user>",
+		Handler:     i.threshold,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "blurple",
+		Description: "Make the users avatar blurple",
+		Usage:       "[p]blurple",
+		Handler:     i.blurple,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "blurple2",
+		Description: "Make the users avatar new blurple",
+		Usage:       "[p]blurple2",
+		Handler:     i.blurple2,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "color",
+		Description: "Make the users avatar a custom color",
+		Usage:       "[p]color <user> <color>",
+		Handler:     i.color,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "sostupid",
+		Description: "Make an it's so stupid meme",
+		Usage:       "[p]sostupid <user> <text>",
+		Handler:     i.sostupid,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "simpcard",
+		Description: "Make a simp card for a user",
+		Usage:       "[p]simpcard <user>",
+		Handler:     i.simpcard,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "horny",
+		Description: "Make a horny card for a user",
+		Usage:       "[p]horny <user>",
+		Handler:     i.horny,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "lgbt",
+		Description: "Add an lgbt border to the user",
+		Usage:       "[p]lgbt <user>",
+		Handler:     i.lgbt,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "pansexual",
+		Description: "Add a pansexual border to the user",
+		Usage:       "[p]pansexual <user>",
+		Handler:     i.pansexual,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "nonbinary",
+		Description: "Add a nonbinary border to the user",
+		Usage:       "[p]nonbinary <user>",
+		Handler:     i.nonbinary,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "lesbian2",
+		Description: "Add a lesbian border to the user",
+		Usage:       "[p]lesbian2 <user>",
+		Handler:     i.lesbian,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "bixesual",
+		Description: "Add a bixesual border to the user",
+		Usage:       "[p]bixesual <user>",
+		Handler:     i.bixesual,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "trans",
+		Description: "Add a trans border to the user",
+		Usage:       "[p]trans <user>",
+		Handler:     i.trans,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "oogway",
+		Description: "Make a master oogway meme",
+		Usage:       "[p]oogway <text>",
+		Handler:     i.oogway,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "oogway2",
+		Description: "Make a master oogway meme",
+		Usage:       "[p]oogway2 <text>",
+		Handler:     i.oogway2,
+	})
+	router.RegisterCmd(&dgc.Command{
 		Name:        "clyde",
 		Description: "Make Clyde say something",
 		Usage:       "[p]clyde <text>",
@@ -164,12 +255,6 @@ func (i ImageCommands) RegisterCommands(router *dgc.Router) {
 		Description: "Make a who would win meme",
 		Usage:       "[p]whowouldwin <user1> <user2>",
 		Handler:     i.whowouldwin,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "changemymind",
-		Description: "Make a change my mind meme",
-		Usage:       "[p]changemymind <user1> <user2>",
-		Handler:     i.changemymind,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "jpeg",
@@ -248,6 +333,12 @@ func (i ImageCommands) RegisterCommands(router *dgc.Router) {
 		Description: "Make a stickbug meme",
 		Usage:       "[p]stickbug <user>",
 		Handler:     i.stickbug,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "magik",
+		Description: "Make a users avatar magik",
+		Usage:       "[p]magik <user>",
+		Handler:     i.magik,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "randomgif",
@@ -1035,6 +1126,124 @@ func (ImageCommands) nobitches(ctx *dgc.Ctx) {
 	_ = ctx.RespondText(fmt.Sprintf("https://some-random-api.ml/canvas/nobitches?no=%s", url.QueryEscape(ctx.Arguments.Raw())))
 }
 
+func (ImageCommands) threshold(ctx *dgc.Ctx) {
+	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
+	if !success {
+		user = ctx.Event.Author
+	}
+	_ = ctx.RespondText(fmt.Sprintf("https://some-random-api.ml/canvas/threshold?avatar=%s", url.QueryEscape(user.AvatarURL(""))))
+}
+
+func (ImageCommands) blurple(ctx *dgc.Ctx) {
+	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
+	if !success {
+		user = ctx.Event.Author
+	}
+	_ = ctx.RespondText(fmt.Sprintf("https://some-random-api.ml/canvas/blurple?avatar=%s", url.QueryEscape(user.AvatarURL(""))))
+}
+
+func (ImageCommands) blurple2(ctx *dgc.Ctx) {
+	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
+	if !success {
+		user = ctx.Event.Author
+	}
+	_ = ctx.RespondText(fmt.Sprintf("https://some-random-api.ml/canvas/blurple2?avatar=%s", url.QueryEscape(user.AvatarURL(""))))
+}
+
+func (ImageCommands) color(ctx *dgc.Ctx) {
+	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
+	if !success {
+		user = ctx.Event.Author
+	}
+	_ = ctx.RespondText(fmt.Sprintf("https://some-random-api.ml/canvas/color?avatar=%s&color=%s",
+		url.QueryEscape(user.AvatarURL("")),
+		url.QueryEscape(strings.ReplaceAll(utils.Arguments["<color>"], "#", "")),
+	))
+}
+
+func (ImageCommands) sostupid(ctx *dgc.Ctx) {
+	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
+	if !success {
+		user = ctx.Event.Author
+	}
+	_ = ctx.RespondText(fmt.Sprintf("https://some-random-api.ml/canvas/its-so-stupid?avatar=%s&dog=%s",
+		url.QueryEscape(user.AvatarURL("")),
+		url.QueryEscape(utils.String.RemoveWords(ctx.Arguments.Raw(), 1)),
+	))
+}
+
+func (ImageCommands) simpcard(ctx *dgc.Ctx) {
+	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
+	if !success {
+		user = ctx.Event.Author
+	}
+	_ = ctx.RespondText(fmt.Sprintf("https://some-random-api.ml/canvas/simpcard?avatar=%s", url.QueryEscape(user.AvatarURL(""))))
+}
+
+func (ImageCommands) horny(ctx *dgc.Ctx) {
+	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
+	if !success {
+		user = ctx.Event.Author
+	}
+	_ = ctx.RespondText(fmt.Sprintf("https://some-random-api.ml/canvas/horny?avatar=%s", url.QueryEscape(user.AvatarURL(""))))
+}
+
+func (ImageCommands) lgbt(ctx *dgc.Ctx) {
+	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
+	if !success {
+		user = ctx.Event.Author
+	}
+	_ = ctx.RespondText(fmt.Sprintf("https://some-random-api.ml/canvas/lgbt?avatar=%s", url.QueryEscape(user.AvatarURL(""))))
+}
+
+func (ImageCommands) pansexual(ctx *dgc.Ctx) {
+	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
+	if !success {
+		user = ctx.Event.Author
+	}
+	_ = ctx.RespondText(fmt.Sprintf("https://some-random-api.ml/canvas/pansexual?avatar=%s", url.QueryEscape(user.AvatarURL(""))))
+}
+
+func (ImageCommands) nonbinary(ctx *dgc.Ctx) {
+	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
+	if !success {
+		user = ctx.Event.Author
+	}
+	_ = ctx.RespondText(fmt.Sprintf("https://some-random-api.ml/canvas/nonbinary?avatar=%s", url.QueryEscape(user.AvatarURL(""))))
+}
+
+func (ImageCommands) lesbian(ctx *dgc.Ctx) {
+	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
+	if !success {
+		user = ctx.Event.Author
+	}
+	_ = ctx.RespondText(fmt.Sprintf("https://some-random-api.ml/canvas/lesbian?avatar=%s", url.QueryEscape(user.AvatarURL(""))))
+}
+
+func (ImageCommands) bixesual(ctx *dgc.Ctx) {
+	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
+	if !success {
+		user = ctx.Event.Author
+	}
+	_ = ctx.RespondText(fmt.Sprintf("https://some-random-api.ml/canvas/bisexual?avatar=%s", url.QueryEscape(user.AvatarURL(""))))
+}
+
+func (ImageCommands) trans(ctx *dgc.Ctx) {
+	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
+	if !success {
+		user = ctx.Event.Author
+	}
+	_ = ctx.RespondText(fmt.Sprintf("https://some-random-api.ml/canvas/transgender?avatar=%s", url.QueryEscape(user.AvatarURL(""))))
+}
+
+func (ImageCommands) oogway(ctx *dgc.Ctx) {
+	_ = ctx.RespondText(fmt.Sprintf("https://some-random-api.ml/canvas/oogway?quote=%s", url.QueryEscape(ctx.Arguments.Raw())))
+}
+
+func (ImageCommands) oogway2(ctx *dgc.Ctx) {
+	_ = ctx.RespondText(fmt.Sprintf("https://some-random-api.ml/canvas/oogway2?quote=%s", url.QueryEscape(ctx.Arguments.Raw())))
+}
+
 func (ImageCommands) threat(ctx *dgc.Ctx) {
 	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
@@ -1274,6 +1483,19 @@ func (ImageCommands) stickbug(ctx *dgc.Ctx) {
 		user = ctx.Event.Author
 	}
 	jsonResult, err := http.GetJson(fmt.Sprintf("https://nekobot.xyz/api/imagegen?type=stickbug&url=%s", url.QueryEscape(user.AvatarURL(""))))
+	if err != nil {
+		_ = ctx.RespondText("An error has occurred: " + err.Error())
+		return
+	}
+	_ = ctx.RespondText(jsonResult.Get("message").MustString())
+}
+
+func (ImageCommands) magik(ctx *dgc.Ctx) {
+	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
+	if !success {
+		user = ctx.Event.Author
+	}
+	jsonResult, err := http.GetJson(fmt.Sprintf("https://nekobot.xyz/api/imagegen?type=magik&image=%s&intensity=5", url.QueryEscape(user.AvatarURL(""))))
 	if err != nil {
 		_ = ctx.RespondText("An error has occurred: " + err.Error())
 		return
@@ -2160,8 +2382,8 @@ func (ImageCommands) snow(ctx *dgc.Ctx) {
 func (ImageCommands) hub(ctx *dgc.Ctx) {
 	_ = ctx.RespondText(fmt.Sprintf(
 		"https://lightning-bot.com/api/v3/imagegen/pornhub?text1=%s&text2=%s",
-		url.QueryEscape(utils.Arguments["<\"top\">"]),
-		url.QueryEscape(utils.Arguments["<\"bottom\">"]),
+		url.QueryEscape(utils.Arguments["<\"text1\">"]),
+		url.QueryEscape(utils.Arguments["<\"text2\">"]),
 	))
 }
 

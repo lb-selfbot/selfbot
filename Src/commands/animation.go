@@ -2,7 +2,13 @@ package commands
 
 import (
 	"fmt"
+	"os"
+	"path/filepath"
+	"strconv"
+	"strings"
 	"time"
+
+	"github.com/LightningDev1/LB-Selfbot/embed"
 
 	"github.com/LightningDev1/LB-Selfbot/utils"
 	"github.com/LightningDev1/dgc"
@@ -12,7 +18,7 @@ import (
 type AnimationCommands struct{}
 
 func (a AnimationCommands) RegisterCommands(router *dgc.Router) {
-	router.StartCategory("Animation", "Animation commands")
+	router.StartCategory("Animation", "Send animated messages")
 	router.RegisterCmd(&dgc.Command{
 		Name:        "virus",
 		Description: "Send an animated virus message",
@@ -44,10 +50,40 @@ func (a AnimationCommands) RegisterCommands(router *dgc.Router) {
 		Handler:     a.fap,
 	})
 	router.RegisterCmd(&dgc.Command{
+		Name:        "countup",
+		Description: "Count up to a number",
+		Usage:       "[p]countup <number>",
+		Handler:     a.countup,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "countdown",
+		Description: "Count down to a number",
+		Usage:       "[p]countdown <number>",
+		Handler:     a.countdown,
+	})
+	router.RegisterCmd(&dgc.Command{
 		Name:        "asciianimation",
 		Description: "Send an animated ascii message",
 		Usage:       "[p]asciianimation <text>",
 		Handler:     a.asciianimation,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "customanimationhelp",
+		Description: "View custom animation help",
+		Usage:       "[p]customanimationhelp",
+		Handler:     a.customanimationhelp,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "customanimations",
+		Description: "View all custom animations",
+		Usage:       "[p]customanimations",
+		Handler:     a.customanimations,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "customanimation",
+		Description: "Invoke a custom animation",
+		Usage:       "[p]customanimation <name>",
+		Handler:     a.customanimation,
 	})
 }
 
@@ -197,6 +233,46 @@ func (AnimationCommands) fap(ctx *dgc.Ctx) {
 	}
 }
 
+func (AnimationCommands) countup(ctx *dgc.Ctx) {
+	number, err := strconv.Atoi(utils.Arguments["<number>"])
+	if err != nil && utils.Arguments["<number>"] != "" {
+		_ = ctx.RespondText("Argument <number> must be a number.")
+		return
+	}
+	message, err := ctx.Session.ChannelMessageSend(ctx.Event.ChannelID, "1")
+	if err != nil {
+		return
+	}
+
+	for i := 2; i <= number; i++ {
+		time.Sleep(time.Second * 1)
+		message, err = ctx.Session.ChannelMessageEdit(ctx.Event.ChannelID, message.ID, fmt.Sprint(i))
+		if err != nil {
+			return
+		}
+	}
+}
+
+func (AnimationCommands) countdown(ctx *dgc.Ctx) {
+	number, err := strconv.Atoi(utils.Arguments["<number>"])
+	if err != nil && utils.Arguments["<number>"] != "" {
+		_ = ctx.RespondText("Argument <number> must be a number.")
+		return
+	}
+	message, err := ctx.Session.ChannelMessageSend(ctx.Event.ChannelID, fmt.Sprint(number))
+	if err != nil {
+		return
+	}
+
+	for i := number; i > 0; i-- {
+		time.Sleep(time.Second * 1)
+		message, err = ctx.Session.ChannelMessageEdit(ctx.Event.ChannelID, message.ID, fmt.Sprint(i-1))
+		if err != nil {
+			return
+		}
+	}
+}
+
 func (AnimationCommands) asciianimation(ctx *dgc.Ctx) {
 	text := utils.Arguments["<text>"]
 	firstCharAscii := figure.NewFigure(string(text[0]), "", false).String()
@@ -219,4 +295,71 @@ func (AnimationCommands) asciianimation(ctx *dgc.Ctx) {
 	}
 }
 
-// Custom Animations
+func (AnimationCommands) customanimationhelp(ctx *dgc.Ctx) {
+	embed.NewEmbed().
+		AddField("Creating an animation", fmt.Sprintf(
+			"To create an animation, create a text file in %s. Every line in the file will be a frame of the animation.\n",
+			filepath.FromSlash(utils.File.GetMainFolder()+"/Animations/"),
+		)).
+		AddField("Using an animation", fmt.Sprintf(
+			"To use an animation, use the command `%scustomanimation <filename without .txt>`.\n",
+			ctx.Router.GetPrefixes()[0],
+		)).
+		Send(ctx)
+}
+
+func (AnimationCommands) customanimations(ctx *dgc.Ctx) {
+	folder := utils.File.GetMainFolder() + "/Animations/"
+	folder = filepath.FromSlash(folder)
+	_ = os.MkdirAll(folder, os.ModePerm)
+
+	customAnimString := ""
+	_ = filepath.Walk(folder, func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+		if info.IsDir() {
+			return nil
+		}
+		nameSplit := strings.Split(info.Name(), ".")
+		if len(nameSplit) != 2 {
+			return nil
+		}
+		if nameSplit[1] != "txt" {
+			return nil
+		}
+		customAnimString += " - " + nameSplit[0] + "\n"
+		return nil
+	})
+
+	embed.NewEmbed().AddField("Custom Animations", customAnimString).Send(ctx)
+}
+
+func (AnimationCommands) customanimation(ctx *dgc.Ctx) {
+	name := utils.Arguments["<name>"]
+	folder := utils.File.GetMainFolder() + "/Animations/"
+	folder = filepath.FromSlash(folder)
+	_ = os.MkdirAll(folder, os.ModePerm)
+	path := folder + utils.File.SanitizeFilename(name+".txt")
+	if _, err := os.Stat(path); os.IsNotExist(err) {
+		_ = ctx.RespondText("Animation does not exist.")
+		return
+	}
+	rawAnimation, ok := utils.File.Read(path)
+	if !ok {
+		_ = ctx.RespondText("Animation could not be read.")
+		return
+	}
+	animationFrames := strings.Split(rawAnimation, "\n")
+	message, err := ctx.Session.ChannelMessageSend(ctx.Event.ChannelID, animationFrames[0])
+	if err != nil {
+		return
+	}
+	for i := 1; i < len(animationFrames); i++ {
+		time.Sleep(time.Second * 1)
+		message, err = ctx.Session.ChannelMessageEdit(ctx.Event.ChannelID, message.ID, animationFrames[i])
+		if err != nil {
+			return
+		}
+	}
+}

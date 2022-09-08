@@ -40,11 +40,20 @@ func (r RedditCommands) RegisterCommands(router *dgc.Router) {
 		"mademesmile",
 		"whitepeopletwitter",
 		"blackpeopletwitter",
+		"nonpoliticaltwitter",
 		"minecraft",
 		"damnthatsinteresting",
 		"mildlyinfuriating",
 		"extremelyinfuriating",
 		"whatswrongwithyourdog",
+		"humansbeingbros",
+		"humansaremetal",
+		"animalsbeingbros",
+		"animalsbeingderps",
+		"tihi",
+		"tumblr",
+		"wholesomememes",
+		"atbge",
 	}
 	for _, subreddit := range subreddits {
 		router.RegisterCmd(&dgc.Command{

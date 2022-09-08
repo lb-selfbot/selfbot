@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"sync"
+	"time"
 
 	"github.com/LightningDev1/LB-Selfbot/utils"
 )
@@ -45,8 +47,9 @@ type Config struct {
 	Snipers struct {
 		Blacklist      []string `json:"Blacklist"`
 		GiveawaySniper struct {
-			Sleep  int  `json:"Sleep"`
-			Sniper bool `json:"Sniper"`
+			Sleep      int      `json:"Sleep"`
+			Sniper     bool     `json:"Sniper"`
+			CustomBots []string `json:"CustomBots"`
 		} `json:"GiveawaySniper"`
 		NitroSniper      bool     `json:"NitroSniper"`
 		PrivnoteSniper   bool     `json:"PrivnoteSniper"`
@@ -65,16 +68,16 @@ type Config struct {
 		Misc             string `json:"Misc"`
 	} `json:"Webhooks"`
 	Events struct {
-		DiscordStaffDetection    bool `json:"DiscordStaffDetection"`
-		GhostPingDetection       bool `json:"GhostPingDetection"`
-		TicketDetection          bool `json:"TicketDetection"`
-		SelfbotDetection         bool `json:"SelfbotDetection"`
-		DMTypingDetection        bool `json:"DMTypingDetection"`
-		DMMessageDetection       bool `json:"DMMessageDetection"`
-		DMMessageDeleteDetection bool `json:"DMMessageDeleteDetection"`
-		DMMessageEditDetection   bool `json:"DMMessageEditDetection"`
-		MessageDeleteDetection   bool `json:"MessageDeleteDetection"`
-		BanNotifier              bool `json:"BanNotifier"`
+		BanNotifier           bool `json:"BanNotifier"`
+		DMNotifier            bool `json:"DMNotifier"`
+		DMEditNotifier        bool `json:"DMEditNotifier"`
+		DMDeleteNotifier      bool `json:"DMDeleteNotifier"`
+		DMTypingNotifier      bool `json:"DMTypingNotifier"`
+		MessageDeleteNotifier bool `json:"MessageDeleteNotifier"`
+		DiscordStaffDetection bool `json:"DiscordStaffDetection"`
+		GhostPingDetection    bool `json:"GhostPingDetection"`
+		SelfbotDetection      bool `json:"SelfbotDetection"`
+		TicketNotifier        bool `json:"TicketNotifier"`
 	} `json:"Events"`
 	RPC RPCData `json:"RPC"`
 	UI  struct {
@@ -89,13 +92,48 @@ type Config struct {
 		DeleteResponses      bool   `json:"DeleteResponses"`
 		DeleteResponsesDelay int    `json:"DeleteResponsesDelay"`
 		DeleteCommands       bool   `json:"DeleteCommands"`
+		MobileFriendly       bool   `json:"MobileFriendly"`
 	}
 	Protections struct {
-		AntiPhising bool `json:"AntiPhising"`
+		AntiPhising       bool `json:"AntiPhising"`
+		AntiFriendRequest bool `json:"AntiFriendRequest"`
+		AntiMassDM        bool `json:"AntiMassDM"`
+		ServerProtections struct {
+			AntiInvite       bool     `json:"AntiInvite"`
+			AntiSpam         bool     `json:"AntiSpam"`
+			AntiUpper        bool     `json:"AntiUpper"`
+			AntiDelete       bool     `json:"AntiDelete"`
+			ProtectedServers []string `json:"ProtectedServers"`
+		}
 	} `json:"Protections"`
+	AFK struct {
+		Enabled        bool     `json:"Enabled"`
+		OnPing         bool     `json:"OnPing"`
+		OnDM           bool     `json:"OnDM"`
+		Message        string   `json:"Message"`
+		Reply          bool     `json:"Reply"`
+		Typing         bool     `json:"Typing"`
+		Delay          int      `json:"Delay"`
+		IgnoredServers []string `json:"IgnoredServers"`
+		IgnoredUsers   []string `json:"IgnoredUsers"`
+	} `json:"AFK"`
+	Sharing struct {
+		SharedUsers      []string `json:"SharedUsers"`
+		SharedCategories []string `json:"SharedCategories"`
+		SharedCommands   []string `json:"SharedCommands"`
+		ShareAll         bool     `json:"ShareAll"`
+	}
 }
 
+var (
+	lastConfig     *Config
+	lastConfigTime time.Time
+	configMutex    = &sync.Mutex{}
+)
+
 func (c Config) Save() error {
+	configMutex.Lock()
+	defer configMutex.Unlock()
 	configFile, err := os.Create(fmt.Sprintf("%s\\Config\\config.json", utils.File.GetMainFolder()))
 	if err != nil {
 		return err
@@ -109,10 +147,18 @@ func (c Config) Save() error {
 	if err != nil {
 		return err
 	}
+	lastConfig = &c
+	lastConfigTime = time.Now()
 	return nil
 }
 
 func GetConfig() (config Config, err error) {
+	configMutex.Lock()
+	defer configMutex.Unlock()
+	// Check if the config is already loaded in the last 2 seconds
+	if lastConfig != nil && time.Since(lastConfigTime) < time.Second*10 {
+		return *lastConfig, nil
+	}
 	configFile, err := os.Open(fmt.Sprintf("%s\\Config\\config.json", utils.File.GetMainFolder()))
 	if err != nil {
 		return config, err
@@ -122,5 +168,7 @@ func GetConfig() (config Config, err error) {
 	if err != nil {
 		return config, err
 	}
+	lastConfig = &config
+	lastConfigTime = time.Now()
 	return config, nil
 }

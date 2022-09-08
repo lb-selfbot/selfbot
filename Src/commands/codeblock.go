@@ -7,7 +7,7 @@ import (
 type CodeblockCommands struct{}
 
 func (c CodeblockCommands) RegisterCommands(router *dgc.Router) {
-	router.StartCategory("Codeblock", "Codeblock commands")
+	router.StartCategory("Codeblock", "Send codeblocks with syntax highlighting")
 	codeBlockCommands := [][]string{
 		{"Python", "python", "py"},
 		{"Ruby", "ruby", "ruby"},
@@ -17,8 +17,6 @@ func (c CodeblockCommands) RegisterCommands(router *dgc.Router) {
 		{"JSON", "json", "json"},
 		{"JavaScript", "javascript", "js"},
 		{"C++", "cpp", "cpp"},
-		{"CSS", "css", "css"},
-		{"CSS", "css", "css"},
 		{"C", "c", "c"},
 		{"C#", "cs", "cs"},
 		{"VBScript", "vbcript", "vbscript"},

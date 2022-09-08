@@ -184,6 +184,30 @@ func (f FunCommands) RegisterCommands(router *dgc.Router) {
 		Handler:     f.penguinfact,
 	})
 	router.RegisterCmd(&dgc.Command{
+		Name:        "dolphinfact",
+		Description: "Send a random dolphin fact",
+		Usage:       "[p]dolphinfact",
+		Handler:     f.dolphinfact,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "bearfact",
+		Description: "Send a random bear fact",
+		Usage:       "[p]bearfact",
+		Handler:     f.bearfact,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "axolotlfact",
+		Description: "Send a random axolotl fact",
+		Usage:       "[p]axolotlfact",
+		Handler:     f.axolotlfact,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "capybarafact",
+		Description: "Send a random capybara fact",
+		Usage:       "[p]capybarafact",
+		Handler:     f.capybarafact,
+	})
+	router.RegisterCmd(&dgc.Command{
 		Name:        "trivia",
 		Description: "Send a random trivia question",
 		Usage:       "[p]trivia",
@@ -744,6 +768,50 @@ func (FunCommands) penguinfact(ctx *dgc.Ctx) {
 	}
 	embed.NewEmbed().
 		AddField("Penguin Fact", fact.Get("fact").MustString()).
+		Send(ctx)
+}
+
+func (FunCommands) dolphinfact(ctx *dgc.Ctx) {
+	fact, err := http.GetJson("https://api.animality.xyz/fact/dolphin")
+	if err != nil {
+		_ = ctx.RespondText("An error has occurred.")
+		return
+	}
+	embed.NewEmbed().
+		AddField("Dolphin Fact", fact.Get("fact").MustString()).
+		Send(ctx)
+}
+
+func (FunCommands) bearfact(ctx *dgc.Ctx) {
+	fact, err := http.GetJson("https://api.animality.xyz/fact/bear")
+	if err != nil {
+		_ = ctx.RespondText("An error has occurred.")
+		return
+	}
+	embed.NewEmbed().
+		AddField("Bear Fact", fact.Get("fact").MustString()).
+		Send(ctx)
+}
+
+func (FunCommands) axolotlfact(ctx *dgc.Ctx) {
+	fact, err := http.GetJson("https://api.animality.xyz/fact/axolotl")
+	if err != nil {
+		_ = ctx.RespondText("An error has occurred.")
+		return
+	}
+	embed.NewEmbed().
+		AddField("Axolotl Fact", fact.Get("fact").MustString()).
+		Send(ctx)
+}
+
+func (FunCommands) capybarafact(ctx *dgc.Ctx) {
+	fact, err := http.GetJson("https://api.animality.xyz/fact/capybara")
+	if err != nil {
+		_ = ctx.RespondText("An error has occurred.")
+		return
+	}
+	embed.NewEmbed().
+		AddField("Capybara Fact", fact.Get("fact").MustString()).
 		Send(ctx)
 }
 

@@ -22,7 +22,7 @@ type ActivityCommands struct {
 
 func (a *ActivityCommands) RegisterCommands(router *dgc.Router, session *discordgo.Session) {
 	a.Session = session
-	router.StartCategory("Activity", "Activity commands")
+	router.StartCategory("Activity", "Set your Discord activity")
 	router.RegisterCmd(&dgc.Command{
 		Name:        "online",
 		Description: "Set your status to online",

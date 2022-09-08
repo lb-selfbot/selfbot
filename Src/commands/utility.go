@@ -3,12 +3,23 @@ package commands
 import (
 	"bytes"
 	"fmt"
-	"github.com/LightningDev1/LB-Selfbot/error_handling"
 	"math"
+	"net/url"
 	"os"
 	"os/exec"
 	"runtime"
+	"strconv"
 	"strings"
+	"time"
+
+	"github.com/LightningDev1/LB-Selfbot/error_handling"
+	"github.com/LightningDev1/LB-Selfbot/eventhandlers"
+	"github.com/LightningDev1/LB-Selfbot/ipc"
+	"github.com/jpillora/overseer"
+	"github.com/shirou/gopsutil/cpu"
+	"github.com/shirou/gopsutil/disk"
+	"github.com/shirou/gopsutil/host"
+	"github.com/shirou/gopsutil/mem"
 
 	"github.com/LightningDev1/LB-Selfbot/api"
 	"github.com/LightningDev1/LB-Selfbot/constants"
@@ -40,12 +51,6 @@ func (u UtilityCommands) RegisterCommands(router *dgc.Router) {
 		Description: "Leave all of your groups",
 		Usage:       "[p]leavegroups",
 		Handler:     u.leavegroups,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "ack",
-		Description: "Mark a server as read",
-		Usage:       "[p]ack [server id]",
-		Handler:     u.ack,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "tts",
@@ -90,34 +95,10 @@ func (u UtilityCommands) RegisterCommands(router *dgc.Router) {
 		Handler:     u.optionpoll,
 	})
 	router.RegisterCmd(&dgc.Command{
-		Name:        "leaveserver",
-		Description: "Leave a server",
-		Usage:       "[p]leaveserver [server id]",
-		Handler:     u.leaveserver,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "deleteserver",
-		Description: "Delete a server",
-		Usage:       "[p]deleteserver [server id]",
-		Handler:     u.deleteserver,
-	})
-	router.RegisterCmd(&dgc.Command{
 		Name:        "systeminfo",
 		Description: "See info about your system",
 		Usage:       "[p]systeminfo",
 		Handler:     u.systeminfo,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "dumpemojis",
-		Description: "Download all the server emojis",
-		Usage:       "[p]dumpemojis [server id]",
-		Handler:     u.dumpemojis,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "addemojis",
-		Description: "Add all images in the folder to the server",
-		Usage:       "[p]addemojis <\"folder\"> [server id]",
-		Handler:     u.addemojis,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "findserver",
@@ -126,10 +107,10 @@ func (u UtilityCommands) RegisterCommands(router *dgc.Router) {
 		Handler:     u.findserver,
 	})
 	router.RegisterCmd(&dgc.Command{
-		Name:        "howold",
-		Description: "See how old a user is",
-		Usage:       "[p]howold <user>",
-		Handler:     u.howold,
+		Name:        "finduser",
+		Description: "Find a user by ID",
+		Usage:       "[p]finduser <server id>",
+		Handler:     u.finduser,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "passgen",
@@ -148,18 +129,6 @@ func (u UtilityCommands) RegisterCommands(router *dgc.Router) {
 		Description: "Search for servers with a nickname",
 		Usage:       "[p]nickscan",
 		Handler:     u.nickscan,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "emoji",
-		Description: "Send bigger emoji (emoji url)",
-		Usage:       "[p]emoji <emoji>",
-		Handler:     u.emoji,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "chatdump",
-		Description: "Dump all messages in the channel",
-		Usage:       "[p]chatdump <limit>",
-		Handler:     u.chatdump,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "shudownpc",
@@ -184,12 +153,6 @@ func (u UtilityCommands) RegisterCommands(router *dgc.Router) {
 		Description: "See the last edited message in this channel",
 		Usage:       "[p]editsnipe",
 		Handler:     u.editsnipe,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "repeat",
-		Description: "Repeat the last used command",
-		Usage:       "[p]repeat",
-		Handler:     u.repeat,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "history",
@@ -437,20 +400,18 @@ func (UtilityCommands) copyserver(ctx *dgc.Ctx) {
 		Send(ctx)
 }
 
-func (UtilityCommands) leaveservers(ctx *dgc.Ctx) { // Admin
-	//     for Server in bot.guilds:
-	//         await Server.leave()
+func (UtilityCommands) leaveservers(ctx *dgc.Ctx) {
+	for _, guild := range ctx.Session.State.Guilds {
+		_ = ctx.Session.GuildLeave(guild.ID)
+	}
 }
 
-func (UtilityCommands) leavegroups(ctx *dgc.Ctx) { // Admin
-	//     for Channel in bot.private_channels:
-	//         if isinstance(Channel, discord.GroupChannel):
-	//             await Channel.leave()
-}
-
-func (UtilityCommands) ack(ctx *dgc.Ctx) { // Admin
-	//     Server = Server or ctx.guild
-	//     await Server.ack()
+func (UtilityCommands) leavegroups(ctx *dgc.Ctx) {
+	for _, channel := range ctx.Session.State.PrivateChannels {
+		if channel.Type == discordgo.ChannelTypeGroupDM {
+			_, _ = ctx.Session.ChannelDelete(channel.ID)
+		}
+	}
 }
 
 func (UtilityCommands) tts(ctx *dgc.Ctx) {
@@ -506,12 +467,39 @@ func (UtilityCommands) english(ctx *dgc.Ctx) {
 		Send(ctx)
 }
 
-func (UtilityCommands) adminservers(ctx *dgc.Ctx) { // Admin
-	//     await bot.Helper.SendMessage(ctx, embed=bot.DefaultEmbed().add_field(name='Admin Servers', value=', '.join(Server.name for Server in bot.guilds if Server.me.guild_permissions.administrator)))
+func (UtilityCommands) adminservers(ctx *dgc.Ctx) {
+	adminServerString := ""
+	for _, guild := range ctx.Session.State.Guilds {
+		if len(guild.Channels) < 1 {
+			continue
+		}
+		member, _ := ctx.Session.GuildMember(guild.ID, ctx.Session.State.User.ID)
+		_ = ctx.Session.State.MemberAdd(member)
+		permissions, err := ctx.Session.State.UserChannelPermissions(ctx.Session.State.User.ID, guild.Channels[0].ID)
+		if err != nil {
+			continue
+		}
+		if permissions&discordgo.PermissionAdministrator != 0 {
+			adminServerString += guild.Name + "\n"
+		}
+	}
+	embed.NewEmbed().
+		AddField("Admin Servers", adminServerString).
+		Send(ctx)
 }
 
-func (UtilityCommands) admingroups(ctx *dgc.Ctx) { // Admin
-	//     await bot.Helper.SendMessage(ctx, embed=bot.DefaultEmbed().add_field(name='Admin Groups', value=', '.join(str(Group) for Group in bot.private_channels if isinstance(Group, discord.GroupChannel) and Group.owner == bot.user)))
+func (UtilityCommands) admingroups(ctx *dgc.Ctx) {
+	adminGroupsString := ""
+	for _, channel := range ctx.Session.State.PrivateChannels {
+		if channel.Type == discordgo.ChannelTypeGroupDM {
+			if channel.OwnerID == ctx.Session.State.User.ID {
+				adminGroupsString += channel.Name + "\n"
+			}
+		}
+	}
+	embed.NewEmbed().
+		AddField("Admin Groups", adminGroupsString).
+		Send(ctx)
 }
 
 func (UtilityCommands) optionpoll(ctx *dgc.Ctx) {
@@ -526,179 +514,258 @@ func (UtilityCommands) optionpoll(ctx *dgc.Ctx) {
 	}
 }
 
-func (UtilityCommands) leaveserver(ctx *dgc.Ctx) { // Admin
-	//     Server = Server or ctx.guild
-	//     await Server.leave()
-}
-
-func (UtilityCommands) deleteserver(ctx *dgc.Ctx) { // Admin
-	//     Server = Server or ctx.guild
-	//     await Server.delete()
-}
-
 func (UtilityCommands) systeminfo(ctx *dgc.Ctx) {
-	//     CPUInfo = cpuinfo.get_cpu_info(); Embed = bot.DefaultEmbed().add_field(name="CPU Info", value=f"CPU Name: {CPUInfo['brand_raw']}\nBits: {CPUInfo['bits']}\nCPU Threads: {CPUInfo['count']}\nCPU Arch: {CPUInfo['arch']}/{CPUInfo['arch_string_raw']}\nCPU Base Frequency: {CPUInfo['hz_advertised_friendly']}\nCPU Usage: {round(psutil.cpu_percent())}%", inline=False).add_field(name="RAM Info", value=f"Total RAM: {round(psutil.virtual_memory().total / 1000000000, 2)}GB\nUsed RAM: {round(psutil.virtual_memory().percent)}%", inline=False)
-	//     for GPU in GPUtil.getGPUs():
-	//         Embed.add_field(name=f"GPU {GPU.id} Info", value=f"GPU Name: {GPU.name}\nGPU Usage: {GPU.load * 100}%\nFree VRAM: {GPU.memoryFree}MB\nUsed VRAM: {GPU.memoryUsed}MB\nTotal VRAM: {GPU.memoryTotal}MB\nGPU Temp: {GPU.temperature} °C\nGPU UUID: {GPU.uuid}", inline=False)
-	//     await bot.Helper.SendMessage(ctx, embed=Embed)
-}
-
-func (UtilityCommands) dumpemojis(ctx *dgc.Ctx) {
-	//     Server = Server or ctx.guild; Emojis = await Server.fetch_emojis()
-	//     try: os.makedirs(f'{bot.Helper.GetDocumentsFolder()}\\LightningBot\\Emojis\\{bot.Helper.SanitizeFilename(Server.name)}', exist_ok=True)
-	//     except FileExistsError: pass
-	//     for Emoji in Emojis:
-	//         with open(f"{bot.Helper.GetDocumentsFolder()}\\LightningBot\\Emojis\\{bot.Helper.SanitizeFilename(Server.name)}\\{bot.Helper.SanitizeFilename(Emoji.name)}.{str(Emoji.url).split('.')[-1]}", 'wb+') as f: shutil.copyfileobj(requests.get(Emoji.url, stream=True).raw, f)
-}
-
-func (UtilityCommands) addemojis(ctx *dgc.Ctx) {
-	//     if not pathlib.Path(Folder).exists(): return await ctx.send("Invalid folder!")
-	//     for Image in os.listdir(Folder):
-	//         if Image[-4::1] in [".png", ".jpg", ".gif"]:
-	//             with open(f"{Folder}\\{Image}", "rb") as File:
-	//                 try: await ctx.guild.create_custom_emoji(name=Image[:-4], image=File.read())
-	//                 except: return await ctx.send("You are missing permissions to use this command!")
+	path := "/"
+	if runtime.GOOS == "windows" {
+		path = "C:"
+	}
+	hostStat, _ := host.Info()
+	cpuStat, _ := cpu.Info()
+	cpuInfo := cpuStat[0]
+	vmStat, _ := mem.VirtualMemory()
+	diskStat, _ := disk.Usage(path)
+	embed.NewEmbed().
+		SetDescription("System Information").
+		AddField("OS", utils.String.Capitalize(hostStat.OS)).
+		AddField("Platform", fmt.Sprintf("%s - %s", hostStat.Platform, hostStat.PlatformVersion)).
+		AddField("Kernel Arch and Version", fmt.Sprintf("%s - %s", hostStat.KernelArch, hostStat.KernelVersion)).
+		AddField("CPU Info", fmt.Sprintf("Model: %s\nFrequency: %.f MHz\nCores: %d\nVendor: %s", cpuInfo.ModelName, cpuInfo.Mhz, cpuInfo.Cores, cpuInfo.VendorID)).
+		AddField("Memory Info", fmt.Sprintf("Total: %d MB\nFree: %d MB\nUsed: %d MB\nUsed Percentage: %.2f%%", vmStat.Total/1024/1024, vmStat.Free/1024/1024, vmStat.Used/1024/1024, vmStat.UsedPercent)).
+		AddField("Disk Info", fmt.Sprintf("Total: %d MB\nFree: %d MB\nUsed: %d MB\nUsed Percentage: %.2f%%", diskStat.Total/1024/1024, diskStat.Free/1024/1024, diskStat.Used/1024/1024, diskStat.UsedPercent)).
+		Send(ctx)
 }
 
 func (UtilityCommands) findserver(ctx *dgc.Ctx) {
-	//     await bot.Helper.SendMessage(ctx, embed=bot.DefaultEmbed().add_field(name="Server Name", value=Server.name).add_field(name="Created At", value=Server.created_at.__format__('%A, %d. %B %Y @ %H:%M:%S')))
+	guild, err := utils.Discord.GetGuild(ctx.Session, utils.Misc.Or(utils.Arguments["<server id>"], ctx.Event.GuildID))
+	if err != nil {
+		_ = ctx.RespondText("Error getting server: " + err.Error())
+		return
+	}
+	embed.NewEmbed().
+		AddField("Server Name", guild.Name).
+		AddField("Created At", utils.Discord.SnowflakeToTime(guild.ID).Format("2006-01-02 15:04:05")).
+		Send(ctx)
 }
 
-func (UtilityCommands) howold(ctx *dgc.Ctx) {
-	//     await bot.Helper.SendMessage(ctx, embed=bot.DefaultEmbed().add_field(name="User", value=str(User)).add_field(name="Created At", value=User.created_at.__format__('%A, %d. %B %Y @ %H:%M:%S')))
+func (UtilityCommands) finduser(ctx *dgc.Ctx) {
+	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
+	if !success {
+		_ = ctx.RespondText("Could not find user")
+		return
+	}
+	embed.NewEmbed().
+		AddField("User", user.String()).
+		AddField("Created At", utils.Discord.SnowflakeToTime(user.ID).Format("2006-01-02 15:04:05")).
+		Send(ctx)
 }
 
 func (UtilityCommands) passgen(ctx *dgc.Ctx) {
-	//     await bot.Helper.SendMessage(ctx, embed=bot.DefaultEmbed().add_field(name="Password", value=''.join(random.choices(string.ascii_letters + string.digits + string.punctuation, k=Characters))))
+	charAmount, err := strconv.Atoi(utils.Arguments["<character amount>"])
+	if err != nil {
+		_ = ctx.RespondText("Argument <character amount> must be a number.")
+		return
+	}
+	embed.NewEmbed().
+		AddField("Password", utils.Random.String(charAmount, "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789#$%&")).
+		Send(ctx)
 }
 
 func (UtilityCommands) tokengen(ctx *dgc.Ctx) {
-	//     await bot.Helper.SendMessage(ctx, embed=bot.DefaultEmbed().add_field(name="Token", value=requests.get('https://some-random-api.ml/bottoken').json()['token']))
+	jsonResult, err := http.GetJson("https://some-random-api.ml/bottoken")
+	if err != nil {
+		_ = ctx.RespondText("Error: " + err.Error())
+		return
+	}
+	embed.NewEmbed().
+		AddField("Token", jsonResult.Get("token").MustString()).
+		Send(ctx)
 }
 
 func (UtilityCommands) nickscan(ctx *dgc.Ctx) {
-	//     Nicks = '\n'.join(f"{Server} | {Server.me.nick}" for Server in bot.guilds if Server.me.nick != None)
-	//     await bot.Helper.SendMessage(ctx, embed=bot.DefaultEmbed().add_field(name="Nicknames", value=Nicks if Nicks else "No nicknames found!"))
-}
-
-func (UtilityCommands) emoji(ctx *dgc.Ctx) {
-	//     await bot.Helper.SendMessage(ctx, embed=bot.DefaultEmbed().add_field(name="Server Name", value=Server.name).add_field(name="Created At", value=Server.created_at.__format__('%A, %d. %B %Y @ %H:%M:%S')))
-}
-
-func (UtilityCommands) chatdump(ctx *dgc.Ctx) {
-	//     try: os.mkdir(f'{bot.Helper.GetDocumentsFolder()}\\LightningBot\\Dumps\\{bot.Helper.SanitizeFilename(ctx.guild.name)}')
-	//     except FileExistsError: pass
-	//     Messages = [message async for message in ctx.channel.history(limit=Limit)]; Messages.sort(key=lambda e: e.created_at)
-	//     with open(f"{bot.Helper.GetDocumentsFolder()}\\LightningBot\\Dumps\\{bot.Helper.SanitizeFilename(ctx.guild.name)}\\{bot.Helper.SanitizeFilename(ctx.channel.name)}.txt", 'a+') as f:
-	//         for M in Messages:
-	//             f.write(f"[{M.created_at.strftime('%H:%M %p')}] Author: {M.author} | Server: {M.guild} | Attachments: {(', '.join(A for A in M.attachments) if M.attachments else 'None')} | Jump URL: {M.jump_url} | Content: {M.content}\n")
+	nickText := ""
+	for _, guild := range ctx.Session.State.Guilds {
+		me, err := ctx.Session.State.Member(guild.ID, ctx.Event.Author.ID)
+		if err != nil {
+			me, err = ctx.Session.GuildMember(guild.ID, ctx.Event.Author.ID)
+			if err != nil {
+				continue
+			}
+		}
+		if me.Nick != "" {
+			nickText += fmt.Sprintf("%s: %s\n", guild.Name, me.Nick)
+		}
+	}
+	embed.NewEmbed().
+		AddField("Nicknames", nickText).
+		Send(ctx)
 }
 
 func (UtilityCommands) shudownpc(ctx *dgc.Ctx) {
-	//     os.system('shutdown -s -t 0')
+	_ = utils.Process.ShutdownPC()
 }
 
 func (UtilityCommands) restartpc(ctx *dgc.Ctx) {
-	//     os.system('shutdown -t 0 -r -f')
+	_ = utils.Process.RestartPC()
 }
 
 func (UtilityCommands) snipe(ctx *dgc.Ctx) {
-	//     if DeletedMsg := bot.EventListenerClass.LastDeleted.get(ctx.channel.id, None):
-	//         await bot.Helper.SendMessage(ctx, embed=bot.DefaultEmbed().set_author(name=DeletedMsg.author, icon_url=DeletedMsg.author.avatar_url).add_field(name="Content", value=DeletedMsg.content))
-	//     else: return await ctx.send("No deleted message found in this channel!")
+	messages, ok := eventhandlers.EventHandlers.Settings.DeletedMessages[ctx.Event.ChannelID]
+	if !ok || len(messages) == 0 {
+		embed.NewEmbed().
+			SetDescription("No deleted message was found in this channel!").
+			Send(ctx)
+	} else {
+		message := messages[len(messages)-1]
+		emb := embed.NewEmbed()
+		if message.Author != nil {
+			emb.AddField("Author", message.Author.String() + " | " + message.Author.ID)
+		}
+		emb.AddField("Sent At", utils.Discord.SnowflakeToTime(message.ID).Format(time.RFC1123))
+		emb.AddField("Content", message.Content)
+		emb.Send(ctx)
+	}
 }
 
 func (UtilityCommands) editsnipe(ctx *dgc.Ctx) {
-	//     if EditedMsg := bot.EventListenerClass.LastEdited.get(ctx.channel.id, None):
-	//         await bot.Helper.SendMessage(ctx, embed=bot.DefaultEmbed().set_author(name=EditedMsg[0].author, icon_url=EditedMsg[0].author.avatar_url).add_field(name="Before", value=EditedMsg[0].content).add_field(name="After", value=EditedMsg[1].content, inline=False))
-	//     else: return await ctx.send("No edited message found in this channel!")
-}
-
-func (UtilityCommands) repeat(ctx *dgc.Ctx) {
-	//     if not bot.EventListenerClass.LastUsedCommand: return await ctx.send("You haven't used any commands yet!")
-	//     await ctx.send(bot.EventListenerClass.LastUsedCommand)
+	messages, ok := eventhandlers.EventHandlers.Settings.EditedMessages[ctx.Event.ChannelID]
+	if !ok || len(messages) == 0 {
+		embed.NewEmbed().
+			SetDescription("No deleted message was found in this channel!").
+			Send(ctx)
+	} else {
+		message := messages[len(messages)-1]
+		emb := embed.NewEmbed()
+		if message.Author != nil {
+			emb.AddField("Author", message.Author.String() + " | " + message.Author.ID)
+		}
+		emb.AddField("Sent At", utils.Discord.SnowflakeToTime(message.ID).Format(time.RFC1123))
+		emb.AddField("Content", message.Content)
+		emb.Send(ctx)
+	}
 }
 
 func (UtilityCommands) history(ctx *dgc.Ctx) {
-	//     await bot.Helper.SendMessage(ctx, embed=bot.DefaultEmbed().add_field(name="User", value=str(User)).add_field(name="Is On Mobile", value=User.is_on_mobile()))
+	usedCommands := ""
+	index := 1
+	for i := len(eventhandlers.EventHandlers.Settings.UsedCommands) - 1; i >= 0 && i <= 10; i-- {
+		cmd := eventhandlers.EventHandlers.Settings.UsedCommands[i]
+		usedCommands += fmt.Sprintf("%d. %s\n", index, cmd.Event.Content)
+		index++
+	}
+	embed.NewEmbed().
+		AddField("Used Commands", usedCommands).
+		Send(ctx)
 }
 
-func (UtilityCommands) website(ctx *dgc.Ctx) {
+func (UtilityCommands) website(*dgc.Ctx) {
 	_ = utils.Process.OpenURL("https://lightning-bot.com/")
 }
 
-func (UtilityCommands) dashboard(ctx *dgc.Ctx) {
+func (UtilityCommands) dashboard(*dgc.Ctx) {
 	_ = utils.Process.OpenURL("https://lightning-bot.com/dashboard")
 }
 
-func (UtilityCommands) restartbot(ctx *dgc.Ctx) {
-	_ = utils.Process.Restart()
+func (UtilityCommands) restartbot(*dgc.Ctx) {
+	overseer.Restart()
 }
 
-func (UtilityCommands) stopbot(ctx *dgc.Ctx) {
+func (UtilityCommands) stopbot(*dgc.Ctx) {
 	os.Exit(0)
 }
 
 func (UtilityCommands) changelog(ctx *dgc.Ctx) {
-	//     Release = requests.get("https://lightning-bot.com/api/v2/releases/getlatest?branch=main").json()
-	//     Changelog = Release["changelog"].replace("&nbsp;", " ").replace("<p>", "").replace("</p>", "\n")[:1021]
-	//     if len(Changelog) == 1021: Changelog += "..."
-	//     await bot.Helper.SendMessage(ctx, embed=bot.DefaultEmbed().add_field(name="Version", value=Release["version"]).add_field(name="Changelog", value=Changelog, inline=False))
+	// TODO
 }
 
 func (UtilityCommands) uptime(ctx *dgc.Ctx) {
-	//     await bot.Helper.SendMessage(ctx, embed=bot.DefaultEmbed().add_field(name="Uptime", value=display_time(int(time.time() - bot.StartTime))))
+	embed.NewEmbed().
+		AddField("Uptime", utils.Misc.FormatDuration(time.Since(eventhandlers.EventHandlers.StartTime))).
+		Send(ctx)
 }
 
-func (UtilityCommands) cls(ctx *dgc.Ctx) {
-	//     bot.LightningBot.CLS()
-	//     bot.LightningBot.PrintBanner()
+func (UtilityCommands) cls(*dgc.Ctx) {
+	ipc.IPC.ConsoleClear()
 }
 
 func (UtilityCommands) mastercard(ctx *dgc.Ctx) {
-	//     CC = bot.CreditCardGenerator.credit_card_number(bot.CreditCardGenerator.mastercardPrefixList, 16, 1)[0]
-	//     await bot.Helper.SendMessage(ctx, embed=bot.DefaultEmbed().add_field(name="Number", value=CC[0]).add_field(name="CCV", value=CC[1]).add_field(name="Expiry Date", value=CC[2])
-	//         .set_author(name='MasterCard',icon_url='https://upload.wikimedia.org/wikipedia/commons/thumb/2/2a/Mastercard-logo.svg/1920px-Mastercard-logo.svg.png'))
+	creditCard := api.GenerateCreditCard("mastercard")
+	embed.NewEmbed().
+		AddField("Card Type", "Mastercard").
+		AddField("Card Number", creditCard.Number).
+		AddField("CCV", creditCard.CCV).
+		AddField("Expiry Date", creditCard.ExpiryDate).
+		Send(ctx)
 }
 
 func (UtilityCommands) visa16(ctx *dgc.Ctx) {
-	//     CC = bot.CreditCardGenerator.credit_card_number(bot.CreditCardGenerator.visaPrefixList, 16, 1)[0]
-	//     await bot.Helper.SendMessage(ctx, embed=bot.DefaultEmbed().add_field(name="Number", value=CC[0]).add_field(name="CCV", value=CC[1]).add_field(name="Expiry Date", value=CC[2])
-	//         .set_author(name='Visa',icon_url='https://th.bing.com/th/id/R161dd5c504711b4644b769827cbd2aaf?rik=2BzQFCfHGrAJMQ&riu=http%3a%2f%2flogok.org%2fwp-content%2fuploads%2f2014%2f03%2fvisa-logo.png&ehk=DlfrlLCoE7o7DPrrnIiLPwVyCLovXEfIKvLBTD%2fVcFs%3d&risl=&pid=ImgRaw'))
+	creditCard := api.GenerateCreditCard("visa16")
+	embed.NewEmbed().
+		AddField("Card Type", "Visa").
+		AddField("Card Number", creditCard.Number).
+		AddField("CCV", creditCard.CCV).
+		AddField("Expiry Date", creditCard.ExpiryDate).
+		Send(ctx)
 }
 
 func (UtilityCommands) visa13(ctx *dgc.Ctx) {
-	//     CC = bot.CreditCardGenerator.credit_card_number(bot.CreditCardGenerator.visaPrefixList, 13, 1)[0]
-	//     await bot.Helper.SendMessage(ctx, embed=bot.DefaultEmbed().add_field(name="Number", value=CC[0]).add_field(name="CCV", value=CC[1]).add_field(name="Expiry Date", value=CC[2])
-	//         .set_author(name='Visa',icon_url='https://th.bing.com/th/id/R161dd5c504711b4644b769827cbd2aaf?rik=2BzQFCfHGrAJMQ&riu=http%3a%2f%2flogok.org%2fwp-content%2fuploads%2f2014%2f03%2fvisa-logo.png&ehk=DlfrlLCoE7o7DPrrnIiLPwVyCLovXEfIKvLBTD%2fVcFs%3d&risl=&pid=ImgRaw'))
+	creditCard := api.GenerateCreditCard("visa13")
+	embed.NewEmbed().
+		AddField("Card Type", "Visa").
+		AddField("Card Number", creditCard.Number).
+		AddField("CCV", creditCard.CCV).
+		AddField("Expiry Date", creditCard.ExpiryDate).
+		Send(ctx)
 }
 
 func (UtilityCommands) amex(ctx *dgc.Ctx) {
-	//     CC = bot.CreditCardGenerator.credit_card_number(bot.CreditCardGenerator.amexPrefixList, 15, 1)[0]
-	//     await bot.Helper.SendMessage(ctx, embed=bot.DefaultEmbed().add_field(name="Number", value=CC[0]).add_field(name="CCV", value=CC[1]).add_field(name="Expiry Date", value=CC[2])
-	//         .set_author(name='American Express',icon_url='https://images.fastcompany.net/image/upload/w_596,c_limit,q_auto:best,f_auto,fl_lossy/wp-cms/uploads/sites/4/2018/04/4-you-might-not-notice-amex-new-brand.jpg'))
+	creditCard := api.GenerateCreditCard("amex")
+	embed.NewEmbed().
+		AddField("Card Type", "American Express").
+		AddField("Card Number", creditCard.Number).
+		AddField("CCV", creditCard.CCV).
+		AddField("Expiry Date", creditCard.ExpiryDate).
+		Send(ctx)
 }
 
 func (UtilityCommands) discover(ctx *dgc.Ctx) {
-	//     CC = bot.CreditCardGenerator.credit_card_number(bot.CreditCardGenerator.discoverPrefixList, 16, 1)[0]
-	//     await bot.Helper.SendMessage(ctx, embed=bot.DefaultEmbed().add_field(name="Number", value=CC[0]).add_field(name="CCV", value=CC[1]).add_field(name="Expiry Date", value=CC[2])
-	//         .set_author(name='Discover',icon_url='https://th.bing.com/th/id/R875eb1db718b104f8b263a8241a79923?rik=GPJOPmauU249aw&riu=http%3a%2f%2fwww.hustlermoneyblog.com%2fwp-content%2fuploads%2f2016%2f10%2fDiscover-Logo.jpg&ehk=VURPeIHuOFuFNNRpdRW%2buoDTrsG46EwHoJ5QkjnopKs%3d&risl=&pid=ImgRaw'))
+	creditCard := api.GenerateCreditCard("discover")
+	embed.NewEmbed().
+		AddField("Card Type", "Discover").
+		AddField("Card Number", creditCard.Number).
+		AddField("CCV", creditCard.CCV).
+		AddField("Expiry Date", creditCard.ExpiryDate).
+		Send(ctx)
 }
 
 func (UtilityCommands) diners(ctx *dgc.Ctx) {
-	//     CC = bot.CreditCardGenerator.credit_card_number(bot.CreditCardGenerator.discoverPrefixList, 14, 1)[0]
-	//     await bot.Helper.SendMessage(ctx, embed=bot.DefaultEmbed().add_field(name="Number", value=CC[0]).add_field(name="CCV", value=CC[1]).add_field(name="Expiry Date", value=CC[2])
-	//         .set_author(name='Diners',icon_url='https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQedJZA8K4inF8fS2ufGUvk4GQTRW_ympFDJs4ksvVH4ANAFfCG_9gNN3P6wPkkL6Rm8gU&usqp=CAU'))
+	creditCard := api.GenerateCreditCard("diners")
+	embed.NewEmbed().
+		AddField("Card Type", "Diners").
+		AddField("Card Number", creditCard.Number).
+		AddField("CCV", creditCard.CCV).
+		AddField("Expiry Date", creditCard.ExpiryDate).
+		Send(ctx)
 }
 
 func (UtilityCommands) jcb(ctx *dgc.Ctx) {
-	//     CC = bot.CreditCardGenerator.credit_card_number(bot.CreditCardGenerator.discoverPrefixList, 16, 1)[0]
-	//     await bot.Helper.SendMessage(ctx, embed=bot.DefaultEmbed().add_field(name="Number", value=CC[0]).add_field(name="CCV", value=CC[1]).add_field(name="Expiry Date", value=CC[2])
-	//         .set_author(name='JCB',icon_url='https://upload.wikimedia.org/wikipedia/commons/thumb/4/40/JCB_logo.svg/1200px-JCB_logo.svg.png'))
+	creditCard := api.GenerateCreditCard("jcb")
+	embed.NewEmbed().
+		AddField("Card Type", "JCB").
+		AddField("Card Number", creditCard.Number).
+		AddField("CCV", creditCard.CCV).
+		AddField("Expiry Date", creditCard.ExpiryDate).
+		Send(ctx)
 }
 
 func (UtilityCommands) revavatarsearch(ctx *dgc.Ctx) {
-	//     await bot.Helper.SendMessage(ctx, embed=bot.DefaultEmbed().add_field(name="URL", value=f"https://images.google.com/searchbyimage?image_url={User.avatar_url}"))
+	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
+	if !success {
+		_ = ctx.RespondText("Could not find user")
+		return
+	}
+	embed.NewEmbed().
+		AddField("Search URL", fmt.Sprintf("https://www.google.com/searchbyimage?&image_url=%s", url.QueryEscape(user.AvatarURL("")))).
+		Send(ctx)
 }
 
 func (UtilityCommands) calc(ctx *dgc.Ctx) {
@@ -746,7 +813,6 @@ func (UtilityCommands) hypesquad(ctx *dgc.Ctx) {
 	house = strings.ReplaceAll(house, "bravery", "1")
 	house = strings.ReplaceAll(house, "brilliance", "2")
 	house = strings.ReplaceAll(house, "balance", "3")
-	fmt.Println(house)
 	if house != "1" && house != "2" && house != "3" {
 		error_handling.OnError(ctx, error_handling.InvalidArgument, "<bravery/brilliance/balance>")
 		return
@@ -754,7 +820,7 @@ func (UtilityCommands) hypesquad(ctx *dgc.Ctx) {
 	_ = api.SetHypesquad(house)
 }
 
-func (UtilityCommands) leavehypesquad(ctx *dgc.Ctx) {
+func (UtilityCommands) leavehypesquad(*dgc.Ctx) {
 	_ = api.LeaveHypesquad()
 }
 

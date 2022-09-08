@@ -2,6 +2,10 @@ package commands
 
 import (
 	"fmt"
+	"strconv"
+	"strings"
+
+	"github.com/LightningDev1/LB-Selfbot/config"
 	"github.com/LightningDev1/LB-Selfbot/embed"
 	"github.com/LightningDev1/LB-Selfbot/eventhandlers"
 	"github.com/LightningDev1/LB-Selfbot/utils"
@@ -12,7 +16,7 @@ import (
 type EventReactionsCommands struct{}
 
 func (e *EventReactionsCommands) RegisterCommands(router *dgc.Router) {
-	router.StartCategory("Event Reaction", "Event Reaction commands")
+	router.StartCategory("Event Reactions", "Event Reaction commands")
 	router.RegisterCmd(&dgc.Command{
 		Name:        "ignoreuser",
 		Description: "Ignore messages from a user",
@@ -60,6 +64,108 @@ func (e *EventReactionsCommands) RegisterCommands(router *dgc.Router) {
 		Description: "Clear the list of ignored servers",
 		Usage:       "[p]clearserverignorelist",
 		Handler:     e.clearserverignorelist,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "pingmute",
+		Description: "Mute a user when they ping you",
+		Usage:       "[p]pingmute <on/off>",
+		Handler:     e.pingmute,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "pingtimeout",
+		Description: "Time a user out when they ping you",
+		Usage:       "[p]pingtimeout <on/off>",
+		Handler:     e.pingtimeout,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "pingban",
+		Description: "Ban a user when they ping you",
+		Usage:       "[p]pingban <on/off>",
+		Handler:     e.pingban,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "pingkick",
+		Description: "Kick a user when they ping you",
+		Usage:       "[p]pingkick <on/off>",
+		Handler:     e.pingkick,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "pinginsult",
+		Description: "Insult a user when they ping you",
+		Usage:       "[p]pinginsult <on/off>",
+		Handler:     e.pinginsult,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "pingping",
+		Description: "Ping a user back when they ping you",
+		Usage:       "[p]pingping <on/off>",
+		Handler:     e.pingping,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "afkenabled",
+		Description: "Turn AFK mode on or off",
+		Usage:       "[p]afkenabled <on/off>",
+		Handler:     e.afkenabled,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "afkonping",
+		Description: "Set if an AFK message should be sent on ping",
+		Usage:       "[p]afkonping <on/off>",
+		Handler:     e.afkonping,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "afkondm",
+		Description: "Set if an AFK message should be sent on DM",
+		Usage:       "[p]afkondm <on/off>",
+		Handler:     e.afkondm,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "afkmessage",
+		Description: "Set the AFK message",
+		Usage:       "[p]afkmessage <text>",
+		Handler:     e.afkmessage,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "afkreply",
+		Description: "Set if the AFK message should be a reply",
+		Usage:       "[p]afkreply <on/off>",
+		Handler:     e.afkreply,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "afktyping",
+		Description: "Set if the bot should show typing before sending message",
+		Usage:       "[p]afktyping <on/off>",
+		Handler:     e.afktyping,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "afkdelay",
+		Description: "Set delay before sending AFK message",
+		Usage:       "[p]afkdelay <seconds>",
+		Handler:     e.afkdelay,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "afkignoreserver",
+		Description: "Ignore messages from a server",
+		Usage:       "[p]afkignoreserver <server id>",
+		Handler:     e.afkignoreserver,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "afkunignoreserver",
+		Description: "Unignore messages from a server",
+		Usage:       "[p]afkunignoreserver <server id>",
+		Handler:     e.afkunignoreserver,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "afkignoreuser",
+		Description: "Ignore messages from a user",
+		Usage:       "[p]afkignoreuser <<user>",
+		Handler:     e.afkignoreuser,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "afkunignoreuser",
+		Description: "Unignore messages from a user",
+		Usage:       "[p]afkunignoreuser <user>",
+		Handler:     e.afkunignoreuser,
 	})
 }
 
@@ -172,4 +278,298 @@ func (EventReactionsCommands) serverignorelist(ctx *dgc.Ctx) {
 
 func (EventReactionsCommands) clearserverignorelist(*dgc.Ctx) {
 	eventhandlers.EventHandlers.Settings.IgnoredGuilds = []*discordgo.Guild{}
+}
+
+func (EventReactionsCommands) pingmute(ctx *dgc.Ctx) {
+	if !utils.Discord.CheckIfInServer(ctx) {
+		return
+	}
+	toggleString := strings.ToLower(utils.Arguments["<on/off>"])
+	if toggleString != "on" && toggleString != "off" {
+		_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
+		return
+	}
+	alreadyOn := utils.SliceContains(eventhandlers.EventHandlers.Settings.PingMuteServers, ctx.Event.GuildID)
+	if toggleString == "on" && alreadyOn {
+		_ = ctx.RespondText("Ping mute is already on in this server.")
+		return
+	} else if toggleString == "off" && !alreadyOn {
+		_ = ctx.RespondText("Ping mute is already off in this server.")
+		return
+	}
+	if toggleString == "on" {
+		eventhandlers.EventHandlers.Settings.PingMuteServers = append(eventhandlers.EventHandlers.Settings.PingMuteServers, ctx.Event.GuildID)
+	} else {
+		eventhandlers.EventHandlers.Settings.PingMuteServers = utils.RemoveSliceItem(
+			eventhandlers.EventHandlers.Settings.PingMuteServers,
+			ctx.Event.GuildID,
+		)
+	}
+}
+
+func (EventReactionsCommands) pingtimeout(ctx *dgc.Ctx) {
+	if !utils.Discord.CheckIfInServer(ctx) {
+		return
+	}
+	toggleString := strings.ToLower(utils.Arguments["<on/off>"])
+	if toggleString != "on" && toggleString != "off" {
+		_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
+		return
+	}
+	alreadyOn := utils.SliceContains(eventhandlers.EventHandlers.Settings.PingTimeoutServers, ctx.Event.GuildID)
+	if toggleString == "on" && alreadyOn {
+		_ = ctx.RespondText("Ping timeout is already on in this server.")
+		return
+	} else if toggleString == "off" && !alreadyOn {
+		_ = ctx.RespondText("Ping timeout is already off in this server.")
+		return
+	}
+	if toggleString == "on" {
+		eventhandlers.EventHandlers.Settings.PingTimeoutServers = append(eventhandlers.EventHandlers.Settings.PingTimeoutServers, ctx.Event.GuildID)
+	} else {
+		eventhandlers.EventHandlers.Settings.PingTimeoutServers = utils.RemoveSliceItem(
+			eventhandlers.EventHandlers.Settings.PingTimeoutServers,
+			ctx.Event.GuildID,
+		)
+	}
+}
+
+func (EventReactionsCommands) pingban(ctx *dgc.Ctx) {
+	if !utils.Discord.CheckIfInServer(ctx) {
+		return
+	}
+	toggleString := strings.ToLower(utils.Arguments["<on/off>"])
+	if toggleString != "on" && toggleString != "off" {
+		_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
+		return
+	}
+	alreadyOn := utils.SliceContains(eventhandlers.EventHandlers.Settings.PingBanServers, ctx.Event.GuildID)
+	if toggleString == "on" && alreadyOn {
+		_ = ctx.RespondText("Ping ban is already on in this server.")
+		return
+	} else if toggleString == "off" && !alreadyOn {
+		_ = ctx.RespondText("Ping ban is already off in this server.")
+		return
+	}
+	if toggleString == "on" {
+		eventhandlers.EventHandlers.Settings.PingBanServers = append(eventhandlers.EventHandlers.Settings.PingBanServers, ctx.Event.GuildID)
+	} else {
+		eventhandlers.EventHandlers.Settings.PingBanServers = utils.RemoveSliceItem(
+			eventhandlers.EventHandlers.Settings.PingBanServers,
+			ctx.Event.GuildID,
+		)
+	}
+}
+
+func (EventReactionsCommands) pingkick(ctx *dgc.Ctx) {
+	if !utils.Discord.CheckIfInServer(ctx) {
+		return
+	}
+	toggleString := strings.ToLower(utils.Arguments["<on/off>"])
+	if toggleString != "on" && toggleString != "off" {
+		_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
+		return
+	}
+	alreadyOn := utils.SliceContains(eventhandlers.EventHandlers.Settings.PingKickServers, ctx.Event.GuildID)
+	if toggleString == "on" && alreadyOn {
+		_ = ctx.RespondText("Ping kick is already on in this server.")
+		return
+	} else if toggleString == "off" && !alreadyOn {
+		_ = ctx.RespondText("Ping kick is already off in this server.")
+		return
+	}
+	if toggleString == "on" {
+		eventhandlers.EventHandlers.Settings.PingKickServers = append(eventhandlers.EventHandlers.Settings.PingKickServers, ctx.Event.GuildID)
+	} else {
+		eventhandlers.EventHandlers.Settings.PingKickServers = utils.RemoveSliceItem(
+			eventhandlers.EventHandlers.Settings.PingKickServers,
+			ctx.Event.GuildID,
+		)
+	}
+}
+
+func (EventReactionsCommands) pinginsult(ctx *dgc.Ctx) {
+	if !utils.Discord.CheckIfInServer(ctx) {
+		return
+	}
+	toggleString := strings.ToLower(utils.Arguments["<on/off>"])
+	if toggleString != "on" && toggleString != "off" {
+		_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
+		return
+	}
+	alreadyOn := utils.SliceContains(eventhandlers.EventHandlers.Settings.PingInsultServers, ctx.Event.GuildID)
+	if toggleString == "on" && alreadyOn {
+		_ = ctx.RespondText("Ping insult is already on in this server.")
+		return
+	} else if toggleString == "off" && !alreadyOn {
+		_ = ctx.RespondText("Ping insult is already off in this server.")
+		return
+	}
+	if toggleString == "on" {
+		eventhandlers.EventHandlers.Settings.PingInsultServers = append(eventhandlers.EventHandlers.Settings.PingInsultServers, ctx.Event.GuildID)
+	} else {
+		eventhandlers.EventHandlers.Settings.PingInsultServers = utils.RemoveSliceItem(
+			eventhandlers.EventHandlers.Settings.PingInsultServers,
+			ctx.Event.GuildID,
+		)
+	}
+}
+
+func (EventReactionsCommands) pingping(ctx *dgc.Ctx) {
+	if !utils.Discord.CheckIfInServer(ctx) {
+		return
+	}
+	toggleString := strings.ToLower(utils.Arguments["<on/off>"])
+	if toggleString != "on" && toggleString != "off" {
+		_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
+		return
+	}
+	alreadyOn := utils.SliceContains(eventhandlers.EventHandlers.Settings.PingPingServers, ctx.Event.GuildID)
+	if toggleString == "on" && alreadyOn {
+		_ = ctx.RespondText("Ping ping is already on in this server.")
+		return
+	} else if toggleString == "off" && !alreadyOn {
+		_ = ctx.RespondText("Ping ping is already off in this server.")
+		return
+	}
+	if toggleString == "on" {
+		eventhandlers.EventHandlers.Settings.PingPingServers = append(eventhandlers.EventHandlers.Settings.PingPingServers, ctx.Event.GuildID)
+	} else {
+		eventhandlers.EventHandlers.Settings.PingPingServers = utils.RemoveSliceItem(
+			eventhandlers.EventHandlers.Settings.PingPingServers,
+			ctx.Event.GuildID,
+		)
+	}
+}
+
+func (EventReactionsCommands) afkenabled(ctx *dgc.Ctx) {
+	toggle := strings.ToLower(utils.Arguments["<on/off>"])
+	if toggle != "on" && toggle != "off" {
+		_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
+		return
+	}
+	cfg, _ := config.GetConfig()
+	cfg.AFK.Enabled = toggle == "on"
+	_ = cfg.Save()
+}
+
+func (EventReactionsCommands) afkonping(ctx *dgc.Ctx) {
+	toggle := strings.ToLower(utils.Arguments["<on/off>"])
+	if toggle != "on" && toggle != "off" {
+		_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
+		return
+	}
+	cfg, _ := config.GetConfig()
+	cfg.AFK.OnPing = toggle == "on"
+	_ = cfg.Save()
+}
+
+func (EventReactionsCommands) afkondm(ctx *dgc.Ctx) {
+	toggle := strings.ToLower(utils.Arguments["<on/off>"])
+	if toggle != "on" && toggle != "off" {
+		_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
+		return
+	}
+	cfg, _ := config.GetConfig()
+	cfg.AFK.OnDM = toggle == "on"
+	_ = cfg.Save()
+}
+
+func (EventReactionsCommands) afkmessage(ctx *dgc.Ctx) {
+	cfg, _ := config.GetConfig()
+	cfg.AFK.Message = ctx.Arguments.Raw()
+	_ = cfg.Save()
+}
+
+func (EventReactionsCommands) afkreply(ctx *dgc.Ctx) {
+	toggle := strings.ToLower(utils.Arguments["<on/off>"])
+	if toggle != "on" && toggle != "off" {
+		_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
+		return
+	}
+	cfg, _ := config.GetConfig()
+	cfg.AFK.Reply = toggle == "on"
+	_ = cfg.Save()
+}
+
+func (EventReactionsCommands) afktyping(ctx *dgc.Ctx) {
+	toggle := strings.ToLower(utils.Arguments["<on/off>"])
+	if toggle != "on" && toggle != "off" {
+		_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
+		return
+	}
+	cfg, _ := config.GetConfig()
+	cfg.AFK.Typing = toggle == "on"
+	_ = cfg.Save()
+}
+
+func (EventReactionsCommands) afkdelay(ctx *dgc.Ctx) {
+	cfg, _ := config.GetConfig()
+	delay, err := strconv.Atoi(utils.Arguments["<seconds>"])
+	if err != nil {
+		_ = ctx.RespondText("Argument <seconds> must be a number.")
+		return
+	}
+	cfg.AFK.Delay = delay
+	_ = cfg.Save()
+}
+
+func (EventReactionsCommands) afkignoreserver(ctx *dgc.Ctx) {
+	guild, err := utils.Discord.GetGuild(ctx.Session, utils.Misc.Or(utils.Arguments["<server id>"], ctx.Event.GuildID))
+	if err != nil {
+		_ = ctx.RespondText("Could not find user.")
+		return
+	}
+	cfg, _ := config.GetConfig()
+	if utils.SliceContains(cfg.AFK.IgnoredServers, guild.ID) {
+		_ = ctx.RespondText("Server is already ignored.")
+		return
+	}
+	cfg.AFK.IgnoredServers = append(cfg.AFK.IgnoredServers, guild.ID)
+	_ = cfg.Save()
+}
+
+func (EventReactionsCommands) afkunignoreserver(ctx *dgc.Ctx) {
+	guild, err := utils.Discord.GetGuild(ctx.Session, utils.Misc.Or(utils.Arguments["<server id>"], ctx.Event.GuildID))
+	if err != nil {
+		_ = ctx.RespondText("Could not find user.")
+		return
+	}
+	cfg, _ := config.GetConfig()
+	if !utils.SliceContains(cfg.AFK.IgnoredServers, guild.ID) {
+		_ = ctx.RespondText("Server is already not ignored.")
+		return
+	}
+	cfg.AFK.IgnoredServers = utils.RemoveSliceItem(cfg.AFK.IgnoredServers, guild.ID)
+	_ = cfg.Save()
+}
+
+func (EventReactionsCommands) afkignoreuser(ctx *dgc.Ctx) {
+	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
+	if !success {
+		_ = ctx.RespondText("Could not find user.")
+		return
+	}
+	cfg, _ := config.GetConfig()
+	if utils.SliceContains(cfg.AFK.IgnoredUsers, user.ID) {
+		_ = ctx.RespondText("User is already ignored.")
+		return
+	}
+	cfg.AFK.IgnoredUsers = append(cfg.AFK.IgnoredUsers, user.ID)
+	_ = cfg.Save()
+}
+
+func (EventReactionsCommands) afkunignoreuser(ctx *dgc.Ctx) {
+	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
+	if !success {
+		_ = ctx.RespondText("Could not find user.")
+		return
+	}
+	cfg, _ := config.GetConfig()
+	if !utils.SliceContains(cfg.AFK.IgnoredUsers, user.ID) {
+		_ = ctx.RespondText("User is already not ignored.")
+		return
+	}
+	cfg.AFK.IgnoredUsers = utils.RemoveSliceItem(cfg.AFK.IgnoredUsers, user.ID)
+	_ = cfg.Save()
 }

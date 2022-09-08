@@ -11,7 +11,7 @@ import (
 type CryptoCommands struct{}
 
 func (c CryptoCommands) RegisterCommands(router *dgc.Router) {
-	router.StartCategory("Crypto", "Crypto commands")
+	router.StartCategory("Crypto", "Check cryptocurrency prices")
 	cryptoCommands := [][]string{
 		{"btc", "BTC", "Bitcoin", "1"},
 		{"eth", "ETH", "Ethereum", "1027"},

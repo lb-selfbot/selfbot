@@ -2,13 +2,15 @@ package commands
 
 import (
 	"fmt"
+	"github.com/LightningDev1/LB-Selfbot/config"
 	"github.com/LightningDev1/LB-Selfbot/constants"
 	"github.com/LightningDev1/LB-Selfbot/embed"
+	"github.com/LightningDev1/LB-Selfbot/eventhandlers"
+	"github.com/LightningDev1/LB-Selfbot/utils"
 	"github.com/LightningDev1/dgc"
-	"strings"
-	"time"
-
 	"github.com/LightningDev1/discordgo"
+	"math"
+	"strings"
 )
 
 type HelpCommand struct{}
@@ -20,7 +22,7 @@ type HelpMessage struct {
 }
 
 // RegisterHelpCommand registers the help command to the router
-func (HelpCommand) RegisterHelpCommand(router *dgc.Router, session *discordgo.Session) {
+func (h *HelpCommand) RegisterHelpCommand(router *dgc.Router, session *discordgo.Session) {
 	// Initialize the help messages storage
 	router.InitializeStorage("helpMessages")
 
@@ -83,6 +85,18 @@ func (HelpCommand) RegisterHelpCommand(router *dgc.Router, session *discordgo.Se
 		Name:    "help",
 		Handler: generalHelpCommand,
 	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "search",
+		Usage:       "[p]search <query>",
+		Description: "Search for a command",
+		Handler:     h.search,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "repeat",
+		Usage:       "[p]repeat",
+		Description: "Repeat the last used command",
+		Handler:     h.repeat,
+	})
 }
 
 // generalHelpCommand handles the general help command
@@ -93,134 +107,174 @@ func generalHelpCommand(ctx *dgc.Ctx) {
 		return
 	}
 
-	// Define useful variables
-	channelID := ctx.Event.ChannelID
-
 	// Send the general help embed
-	message := renderDefaultGeneralHelpEmbed(ctx.Router).Send(ctx)
-
-	// Add the reactions to the message
-	//_ = session.MessageReactionAdd(channelID, message.ID, "❌")
-	//_ = session.MessageReactionAdd(channelID, message.ID, "➡️")
-
-	// Define the message as a help message
-	ctx.Router.Storage["helpMessages"].Set(channelID+":"+message.ID+":"+ctx.Event.Author.ID, 1)
+	renderDefaultGeneralHelpEmbed(ctx.Router).Send(ctx)
 }
 
 // specificHelpCommand handles the specific help command
 func specificHelpCommand(ctx *dgc.Ctx) {
-	// Define the command names
-	commandNames := strings.Split(ctx.Arguments.Raw(), " ")
+	oldName := strings.ToLower(ctx.Arguments.Get(0).Raw())
+	name := strings.ReplaceAll(oldName, "eventreactions", "Event Reactions")
+	name = strings.ReplaceAll(name, "eventreaction", "Event Reactions")
+	name = strings.ReplaceAll(name, "nsfw", "NSFW")
+	page, _ := ctx.Arguments.Get(1).AsInt()
+	prefix := ctx.Router.GetPrefixes()[0]
 
-	// Define the command
-	var command *dgc.Command
-	for index, commandName := range commandNames {
-		if index == 0 {
-			command = ctx.Router.GetCmd(commandName)
-			continue
+	if command := ctx.Router.GetCmd(name); command != nil {
+		renderCommandHelp(ctx.Router, command).Send(ctx)
+	} else {
+		if category := ctx.Router.GetCategory(utils.String.Capitalize(name)); category != nil {
+			renderCategoryHelp(ctx.Router, category, oldName, page).Send(ctx)
+		} else {
+			var closeCommands []string
+			for _, command := range ctx.Router.Commands {
+				if len(closeCommands) >= 5 {
+					break
+				}
+				distance := utils.Misc.GetDistance(command.Name, name)
+				if distance < 2 || strings.Contains(command.Name, name) {
+					closeCommands = append(closeCommands, strings.ReplaceAll(command.Usage, "[p]", prefix)+" - "+command.Description)
+				}
+			}
+			var closeCategories []string
+			for _, category := range ctx.Router.Categories {
+				if len(closeCategories) >= 5 {
+					break
+				}
+				distance := utils.Misc.GetDistance(category.Name, utils.String.Capitalize(name))
+				if distance < 2 || strings.Contains(category.Name, utils.String.Capitalize(name)) {
+					closeCategories = append(closeCategories, category.Name+" - "+category.Description)
+				}
+			}
+			description := fmt.Sprintf("`%s` is not a command or category!", name)
+			if len(closeCommands) > 0 {
+				description += "\n\nDid you mean one of these commands?\n\n" + strings.Join(closeCommands, "\n")
+			}
+			if len(closeCategories) > 0 {
+				description += "\n\nDid you mean one of these categories?\n\n" + strings.Join(closeCategories, "\n")
+			}
+			embed.NewEmbed().SetDescription(description).Send(ctx)
 		}
-		if command == nil {
-			break
-		}
-		command = command.GetSubCmd(commandName)
 	}
+}
 
-	// Send the help embed
-	_, _ = ctx.Session.ChannelMessageSendEmbed(ctx.Event.ChannelID, renderDefaultSpecificHelpEmbed(ctx, command))
+func renderCommandHelp(router *dgc.Router, command *dgc.Command) *embed.Embed {
+	categoryName := ""
+	// Try to get the category the command belongs in
+	for _, category := range router.Categories {
+		category = router.GetCategory(category.Name)
+		for _, cmd := range category.Commands {
+			if cmd.Name == command.Name {
+				categoryName = category.Name
+				break
+			}
+		}
+	}
+	return embed.NewEmbed().
+		SetDescription("Command Help: "+command.Name).
+		AddField("Command Name", command.Name).
+		AddField("Usage", "<> is required, [] is optional\n\n"+strings.ReplaceAll(command.Usage, "[p]", router.GetPrefixes()[0])).
+		AddField("Description", command.Description).
+		AddField("Category", categoryName)
+}
+
+func renderCategoryHelp(router *dgc.Router, category *dgc.Category, rawArgument string, page int) *embed.Embed {
+	helpPages := map[int]string{}
+	currentPage := 0
+	for _, command := range category.Commands {
+		splitUsage := strings.SplitN(command.Usage, " ", 2)
+		usage := ""
+		if len(splitUsage) > 1 {
+			usage = " " + splitUsage[1]
+		}
+		helpText := fmt.Sprintf("%s%s%s - %s\n", router.GetPrefixes()[0], command.Name, usage, command.Description)
+		if len(helpPages[currentPage])+len(helpText) > 1700 {
+			currentPage++
+		}
+		helpPages[currentPage] += helpText
+	}
+	page = int(math.Max(0, float64(page-1)))
+
+	emb := embed.NewEmbed().
+		SetDescription(fmt.Sprintf("<> is required, [] is optional\n\nAmount of %s commands: %d", category.Name, len(category.Commands))).
+		SetSubtext(fmt.Sprintf("Page: %d/%d", page+1, len(helpPages)))
+
+	if page < len(helpPages) {
+		emb.AddField("Commands", helpPages[page], true, true)
+	} else {
+		return embed.NewEmbed().SetDescription(fmt.Sprintf("That page does not exist! %s has %d pages.", category.Name, len(helpPages)))
+	}
+	if len(helpPages) > 1 {
+		emb.SetSubtext(fmt.Sprintf("Page: %d/%d\n\nUse \x1b[34;1m%shelp %s <page>\x1b[0m to go to the next page", page+1, len(helpPages), router.GetPrefixes()[0], rawArgument))
+	}
+	return emb
 }
 
 // renderDefaultGeneralHelpEmbed renders the general help embed on the given page
 func renderDefaultGeneralHelpEmbed(router *dgc.Router) *embed.Embed {
-	// Define useful variables
-
-	categoriesString := "ansi\n\x1b[1;31m"
+	cfg, _ := config.GetConfig()
+	categoriesString := ""
+	if !cfg.Selfbot.MobileFriendly {
+		categoriesString = "ansi\n\x1B[1;31m"
+	}
 	for _, category := range router.Categories {
 		// Get the commands in the category, will be empty otherwise
 		category = router.GetCategory(category.Name)
-		categoriesString += fmt.Sprintf("%s - %s\n", category.Name+strings.Repeat(" ", 14-len(category.Name)), category.Description)
+		categoriesString += fmt.Sprintf("%s - %s\n", category.Name+strings.Repeat(" ", 15-len(category.Name)), category.Description)
 	}
+	prefix := router.GetPrefixes()[0]
 	return embed.NewEmbed().
 		SetDescription(fmt.Sprintf("LightningBot %s Help\nAmount of Commands: %d, <> is required, [] is optional\n", constants.VersionString, len(router.Commands))).
 		AddField("Categories", categoriesString, true, true).
-		SetSubtext(fmt.Sprintf("Use \x1b[34;1m%shelp <category name>\x1b[0m or \u001B[34;1m%shelp <command name>\u001B[0m to get more info.", router.GetPrefixes()[0], router.GetPrefixes()[0]))
+		SetSubtext(fmt.Sprintf(
+			"Use \x1b[34;1m%shelp <category name>\x1b[0m or \x1b[34;1m%shelp <command name>\x1b[0m to get more info.\nUse \x1b[34;1m%ssearch <query>\x1b[0m to search commands.\nUse \x1b[34;1m%srepeat\x1b[0m to repeat the last command.",
+			prefix,
+			prefix,
+			prefix,
+			prefix,
+		))
 }
 
-// renderDefaultSpecificHelpEmbed renders the specific help embed of the given command
-func renderDefaultSpecificHelpEmbed(ctx *dgc.Ctx, command *dgc.Command) *discordgo.MessageEmbed {
-	// Define useful variables
-	prefix := ctx.Router.Prefixes[0]
-
-	// Check if the command is invalid
-	if command == nil {
-		return &discordgo.MessageEmbed{
-			Type:      "rich",
-			Title:     "Error",
-			Timestamp: time.Now().Format(time.RFC3339),
-			Color:     0xff0000,
-			Fields: []*discordgo.MessageEmbedField{
-				{
-					Name:   "Message",
-					Value:  "```The given command doesn't exist. Type `" + prefix + "help` for a list of available commands.```",
-					Inline: false,
-				},
-			},
+func (HelpCommand) search(ctx *dgc.Ctx) {
+	query := utils.Arguments["<query>"]
+	prefix := ctx.Router.GetPrefixes()[0]
+	var closeCommands []string
+	for _, command := range ctx.Router.Commands {
+		if len(closeCommands) >= 10 {
+			break
+		}
+		distance := utils.Misc.GetDistance(command.Name, query)
+		if distance < 2 || strings.Contains(command.Name, query) {
+			closeCommands = append(closeCommands, strings.ReplaceAll(command.Usage, "[p]", prefix)+" - "+command.Description)
 		}
 	}
-
-	// Define the sub commands string
-	subCommands := "No sub commands"
-	if len(command.SubCommands) > 0 {
-		subCommandNames := make([]string, len(command.SubCommands))
-		for index, subCommand := range command.SubCommands {
-			subCommandNames[index] = subCommand.Name
-		}
-		subCommands = "`" + strings.Join(subCommandNames, "`, `") + "`"
+	if len(closeCommands) == 0 {
+		embed.NewEmbed().
+			SetDescription(fmt.Sprintf("No commands found for query `%s`", query)).
+			Send(ctx)
+		return
 	}
+	embed.NewEmbed().
+		SetDescription(fmt.Sprintf("Found %d commands for query `%s`", len(closeCommands), query)).
+		AddField("Commands", strings.Join(closeCommands, "\n"), true, true).
+		Send(ctx)
+}
 
-	// Define the aliases string
-	aliases := "No aliases"
-	if len(command.Aliases) > 0 {
-		aliases = "`" + strings.Join(command.Aliases, "`, `") + "`"
+func (HelpCommand) repeat(ctx *dgc.Ctx) {
+	usedCommands := eventhandlers.EventHandlers.Settings.UsedCommands
+	if len(eventhandlers.EventHandlers.Settings.UsedCommands) < 2 {
+		embed.NewEmbed().
+			SetDescription("No commands have been used yet").
+			Send(ctx)
+		return
 	}
+	lastCommand := usedCommands[len(usedCommands)-2]
+	lastCommand.Event = ctx.Event
 
-	// Return the embed
-	return &discordgo.MessageEmbed{
-		Type:        "rich",
-		Title:       "Command Information",
-		Description: "Displaying the information for the `" + command.Name + "` command.",
-		Timestamp:   time.Now().Format(time.RFC3339),
-		Color:       0xffff00,
-		Fields: []*discordgo.MessageEmbedField{
-			{
-				Name:   "Name",
-				Value:  "`" + command.Name + "`",
-				Inline: false,
-			},
-			{
-				Name:   "Sub Commands",
-				Value:  subCommands,
-				Inline: false,
-			},
-			{
-				Name:   "Aliases",
-				Value:  aliases,
-				Inline: false,
-			},
-			{
-				Name:   "Description",
-				Value:  "```" + command.Description + "```",
-				Inline: false,
-			},
-			{
-				Name:   "Usage",
-				Value:  "```" + prefix + command.Usage + "```",
-				Inline: false,
-			},
-			{
-				Name:   "Example",
-				Value:  "```" + prefix + command.Example + "```",
-				Inline: false,
-			},
-		},
-	}
+	// Restore arguments
+	arguments, _ := utils.Discord.GetArguments(lastCommand)
+	utils.Arguments = arguments
+
+	// Invoke the last command
+	lastCommand.Command.Handler(lastCommand)
 }

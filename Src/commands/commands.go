@@ -17,15 +17,17 @@ type CommandRegistrar struct {
 	NetworkCommands        NetworkCommands
 	AdministrationCommands AdministrationCommands
 	UtilityCommands        UtilityCommands
+	DumpingCommands        DumpingCommands
 	SpotifyCommands        SpotifyCommands
 	GameCommands           GameCommands
 	ActivityCommands       ActivityCommands
 	AnimationCommands      AnimationCommands
-	ConfigCommands         ConfigCommands
 	RPCCommands            RPCCommands
 	SessionsCommands       SessionsCommands
 	NSFWCommands           NSFWCommands
 	RedditCommands         RedditCommands
+	SharingCommands        SharingCommands
+	ConfigCommands         ConfigCommands
 	HelpCommand            HelpCommand
 }
 
@@ -41,15 +43,17 @@ func (c CommandRegistrar) RegisterCommands(session *discordgo.Session, router *d
 	c.NetworkCommands.RegisterCommands(router)
 	c.AdministrationCommands.RegisterCommands(router)
 	c.UtilityCommands.RegisterCommands(router)
+	c.DumpingCommands.RegisterCommands(router)
 	c.SpotifyCommands.RegisterCommands(router)
 	c.GameCommands.RegisterCommands(router)
 	c.ActivityCommands.RegisterCommands(router, session)
 	c.AnimationCommands.RegisterCommands(router)
-	c.ConfigCommands.RegisterCommands(router)
 	c.RPCCommands.RegisterCommands(router)
 	c.SessionsCommands.RegisterCommands(router, session)
 	c.NSFWCommands.RegisterCommands(router)
 	c.RedditCommands.RegisterCommands(router)
+	c.SharingCommands.RegisterCommands(router)
+	c.ConfigCommands.RegisterCommands(router)
 	c.HelpCommand.RegisterHelpCommand(router, session)
 }
 
