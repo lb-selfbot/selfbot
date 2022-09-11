@@ -69,7 +69,8 @@ func selfbotMain(s overseer.State) {
 				return false
 			}
 
-			if !utils.SliceContains(cfg.Sharing.SharedUsers, ctx.Event.Author.ID) {
+			if !utils.SliceContains(cfg.Sharing.SharedUsers, ctx.Event.Author.ID) &&
+				!utils.SliceContains(cfg.Sharing.SharedUsers, ctx.Event.Author.String()) {
 				return false
 			}
 

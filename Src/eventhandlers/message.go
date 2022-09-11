@@ -438,10 +438,17 @@ func (e *Events) checkEventReactions(message *discordgo.Message) {
 }
 
 func (e *Events) checkAFK(message *discordgo.Message, cfg *config.Config) {
+	guild, err := e.Session.State.Guild(message.GuildID)
+	guildName := ""
+	if err == nil {
+		guildName = guild.Name
+	}
 	if message.Author.ID == e.Session.State.User.ID ||
 		!cfg.AFK.Enabled ||
 		utils.SliceContains(cfg.AFK.IgnoredUsers, message.Author.ID) ||
-		utils.SliceContains(cfg.AFK.IgnoredServers, message.GuildID) {
+		utils.SliceContains(cfg.AFK.IgnoredUsers, message.Author.String()) ||
+		utils.SliceContains(cfg.AFK.IgnoredServers, message.GuildID) ||
+		utils.SliceContains(cfg.AFK.IgnoredServers, guildName) {
 		return
 	}
 	isMentioned := false
@@ -474,7 +481,6 @@ func (e *Events) checkProtections(message *discordgo.Message, cfg *config.Config
 		return
 	}
 	if cfg.Protections.AntiMassDM && message.GuildID == "" {
-		logging.Warn("message.go:477: ", message)
 		amountOfDMs := 0
 		messages, _ := utils.Discord.GetChannelMessages(e.Session, message.ChannelID, 100)
 		for _, message := range messages {
@@ -505,7 +511,15 @@ func (e *Events) checkProtections(message *discordgo.Message, cfg *config.Config
 			}
 		}
 	}
-	if message.GuildID != "" && utils.SliceContains(cfg.Protections.ServerProtections.ProtectedServers, message.GuildID) {
+
+	guild, err := e.Session.State.Guild(message.GuildID)
+	guildName := ""
+	if err == nil {
+		guildName = guild.Name
+	}
+
+	if message.GuildID != "" && (utils.SliceContains(cfg.Protections.ServerProtections.ProtectedServers, message.GuildID) ||
+		utils.SliceContains(cfg.Protections.ServerProtections.ProtectedServers, guildName)) {
 		userPerms, _ := e.Session.UserChannelPermissions(message.Author.ID, message.ChannelID)
 		if userPerms&discordgo.PermissionManageMessages != 0 || userPerms&discordgo.PermissionAdministrator != 0 {
 			return
