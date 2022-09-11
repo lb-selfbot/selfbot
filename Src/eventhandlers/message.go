@@ -198,174 +198,174 @@ func (e *Events) OnMessageDelete(_ *discordgo.Session, m *discordgo.MessageDelet
 // 	}
 // }
 
-func (e *Events) checkGiveawaySniper(m *discordgo.Message, cfg *config.Config) {
-	if !cfg.Snipers.GiveawaySniper.Sniper || !m.Author.Bot {
-		return
-	}
-	lowerContent := strings.ToLower(m.Content)
+// func (e *Events) checkGiveawaySniper(m *discordgo.Message, cfg *config.Config) {
+// 	if !cfg.Snipers.GiveawaySniper.Sniper || !m.Author.Bot {
+// 		return
+// 	}
+// 	lowerContent := strings.ToLower(m.Content)
 
-	winningWords := []string{"congratulations", "new", "**congratulations**", "congratulations,", "__congratulations:__", "won"}
-	for _, winningWord := range winningWords {
-		if !strings.Contains(lowerContent, winningWord) {
-			continue
-		}
-		for _, mention := range m.Mentions {
-			if mention.ID != e.Session.State.User.ID {
-				continue
-			}
-			switch m.Author.ID {
-			case "294882584201003009": // GiveawayBot#2381
-			case "570338970261782559": // GiveawayBot#8109
-			case "606026008109514762": // Giveawaysbot#3411
-			case "396464677032427530": // Giveaway#7832
-				if strings.Contains(lowerContent, "the new winner") {
-					// TODO: Won Unknown Giveaway
-				} else {
-					prizeSlice := strings.Split(m.Content, "**")
-					if len(prizeSlice) < 1 {
-						// TODO: Won Unknown Giveaway
-					}
-					prize := prizeSlice[1]
-					_ = prize
-					// TODO: Won Giveaway
-				}
-			case "673918978178940951": // Prism#5621
-				if len(m.Embeds) < 1 {
-					break
-				}
-				splitDescription := strings.Split(m.Embeds[0].Description, "[")
-				if len(splitDescription) < 2 {
-					break
-				}
-				splitDescription = strings.Split(splitDescription[1], "]")
-				if len(splitDescription) < 1 {
-					break
-				}
-				prize := splitDescription[0]
-				_ = prize
-				// TODO: Won Giveaway
-			case "239631525350604801": // Pancake#3691
-				if strings.Contains(lowerContent, "you are the new winner!") {
-					// TODO: Won Unknown Giveaway
-				} else {
-					prizeSlice := strings.Split(m.Content, " **")
-					if len(prizeSlice) < 2 {
-						break
-					}
-					prize := strings.ReplaceAll(prizeSlice[1], "**!", "")
-					_ = prize
-					// TODO: Won Giveaway
-				}
-			case "720351927581278219": // Invite Tracker#0478
-				prizeSlice := strings.Split(m.Content, "the **")
-				if len(prizeSlice) < 2 {
-					break
-				}
-				prize := strings.ReplaceAll(prizeSlice[1], "**!", "")
-				_ = prize
-				// TODO: Won Giveaway
-			case "530082442967646230": // Giveaway Boat#2911
-				if strings.Contains(lowerContent, "new winner") {
-					prizeSlice := strings.Split(m.Content, "**")
-					if len(prizeSlice) < 2 {
-						break
-					}
-					prize := prizeSlice[1]
-					_ = prize
-					// TODO: Won Giveaway
-				} else if len(m.Embeds) > 0 {
-					descriptionSlice := strings.Split(m.Embeds[0].Description, "[")
-					if len(descriptionSlice) < 2 {
-						break
-					}
-					descriptionSlice = strings.Split(descriptionSlice[1], "]")
-					if len(descriptionSlice) < 1 {
-						break
-					}
-					prize := descriptionSlice[0]
-					_ = prize
-					// TODO: Won Giveaway
-				}
-			default:
-				if utils.SliceContains(cfg.Snipers.GiveawaySniper.CustomBots, m.Author.ID) {
-					// TODO: Won Custom Giveaway
-				}
-			}
-		}
-	}
+// 	winningWords := []string{"congratulations", "new", "**congratulations**", "congratulations,", "__congratulations:__", "won"}
+// 	for _, winningWord := range winningWords {
+// 		if !strings.Contains(lowerContent, winningWord) {
+// 			continue
+// 		}
+// 		for _, mention := range m.Mentions {
+// 			if mention.ID != e.Session.State.User.ID {
+// 				continue
+// 			}
+// 			switch m.Author.ID {
+// 			case "294882584201003009": // GiveawayBot#2381
+// 			case "570338970261782559": // GiveawayBot#8109
+// 			case "606026008109514762": // Giveawaysbot#3411
+// 			case "396464677032427530": // Giveaway#7832
+// 				if strings.Contains(lowerContent, "the new winner") {
+// 					// TODO: Won Unknown Giveaway
+// 				} else {
+// 					prizeSlice := strings.Split(m.Content, "**")
+// 					if len(prizeSlice) < 1 {
+// 						// TODO: Won Unknown Giveaway
+// 					}
+// 					prize := prizeSlice[1]
+// 					_ = prize
+// 					// TODO: Won Giveaway
+// 				}
+// 			case "673918978178940951": // Prism#5621
+// 				if len(m.Embeds) < 1 {
+// 					break
+// 				}
+// 				splitDescription := strings.Split(m.Embeds[0].Description, "[")
+// 				if len(splitDescription) < 2 {
+// 					break
+// 				}
+// 				splitDescription = strings.Split(splitDescription[1], "]")
+// 				if len(splitDescription) < 1 {
+// 					break
+// 				}
+// 				prize := splitDescription[0]
+// 				_ = prize
+// 				// TODO: Won Giveaway
+// 			case "239631525350604801": // Pancake#3691
+// 				if strings.Contains(lowerContent, "you are the new winner!") {
+// 					// TODO: Won Unknown Giveaway
+// 				} else {
+// 					prizeSlice := strings.Split(m.Content, " **")
+// 					if len(prizeSlice) < 2 {
+// 						break
+// 					}
+// 					prize := strings.ReplaceAll(prizeSlice[1], "**!", "")
+// 					_ = prize
+// 					// TODO: Won Giveaway
+// 				}
+// 			case "720351927581278219": // Invite Tracker#0478
+// 				prizeSlice := strings.Split(m.Content, "the **")
+// 				if len(prizeSlice) < 2 {
+// 					break
+// 				}
+// 				prize := strings.ReplaceAll(prizeSlice[1], "**!", "")
+// 				_ = prize
+// 				// TODO: Won Giveaway
+// 			case "530082442967646230": // Giveaway Boat#2911
+// 				if strings.Contains(lowerContent, "new winner") {
+// 					prizeSlice := strings.Split(m.Content, "**")
+// 					if len(prizeSlice) < 2 {
+// 						break
+// 					}
+// 					prize := prizeSlice[1]
+// 					_ = prize
+// 					// TODO: Won Giveaway
+// 				} else if len(m.Embeds) > 0 {
+// 					descriptionSlice := strings.Split(m.Embeds[0].Description, "[")
+// 					if len(descriptionSlice) < 2 {
+// 						break
+// 					}
+// 					descriptionSlice = strings.Split(descriptionSlice[1], "]")
+// 					if len(descriptionSlice) < 1 {
+// 						break
+// 					}
+// 					prize := descriptionSlice[0]
+// 					_ = prize
+// 					// TODO: Won Giveaway
+// 				}
+// 			default:
+// 				if utils.SliceContains(cfg.Snipers.GiveawaySniper.CustomBots, m.Author.ID) {
+// 					// TODO: Won Custom Giveaway
+// 				}
+// 			}
+// 		}
+// 	}
 
-	if len(m.Embeds) < 1 {
-		return
-	}
-	var (
-		prize    string
-		emoji    string
-		isCustom bool
-	)
+// 	if len(m.Embeds) < 1 {
+// 		return
+// 	}
+// 	var (
+// 		prize    string
+// 		emoji    string
+// 		isCustom bool
+// 	)
 
-	giveawayWords := []string{"**giveaway**", "**new", "giveaway**", "**giveaway", "giveaway"}
-	for _, giveawayWord := range giveawayWords {
-		if strings.Contains(lowerContent, giveawayWord) {
-			switch m.Author.ID {
-			case "294882584201003009": // GiveawayBot#2381
-			case "570338970261782559": // GiveawayBot#8109
-				prize = m.Embeds[0].Author.Name
-				emoji = "🎉"
-			case "673918978178940951": // Prism#5621
-				prizeSlice := strings.Split(m.Embeds[0].Description, "[")
-				if len(prizeSlice) < 2 {
-					break
-				}
-				prize = prizeSlice[1]
-				emoji = "🎉"
-			case "606026008109514762": // Giveawaysbot#3411
-				prize = m.Embeds[0].Title
-				emoji = "🎉"
-			case "239631525350604801": // Pancake#3691
-				prize = m.Embeds[0].Title
-				prize = strings.ReplaceAll(prize, "🎉 ", "")
-				prize = strings.ReplaceAll(prize, " 🎉", "")
-				emoji = "🎁"
-			case "720351927581278219": // Invite Tracker#0478
-				prize = m.Embeds[0].Title
-				prize = strings.ReplaceAll(prize, "<a:blobgift:834855281358930020>  ", "")
-				prize = strings.ReplaceAll(prize, "  <a:blobgift:834855281358930020>", "")
-				emoji = "🎉"
-			default:
-				if utils.SliceContains(cfg.Snipers.GiveawaySniper.CustomBots, m.Author.ID) {
-					prize = "Unknown"
-					emoji = "🎉"
-					isCustom = true
-				}
-			}
-		}
-	}
+// 	giveawayWords := []string{"**giveaway**", "**new", "giveaway**", "**giveaway", "giveaway"}
+// 	for _, giveawayWord := range giveawayWords {
+// 		if strings.Contains(lowerContent, giveawayWord) {
+// 			switch m.Author.ID {
+// 			case "294882584201003009": // GiveawayBot#2381
+// 			case "570338970261782559": // GiveawayBot#8109
+// 				prize = m.Embeds[0].Author.Name
+// 				emoji = "🎉"
+// 			case "673918978178940951": // Prism#5621
+// 				prizeSlice := strings.Split(m.Embeds[0].Description, "[")
+// 				if len(prizeSlice) < 2 {
+// 					break
+// 				}
+// 				prize = prizeSlice[1]
+// 				emoji = "🎉"
+// 			case "606026008109514762": // Giveawaysbot#3411
+// 				prize = m.Embeds[0].Title
+// 				emoji = "🎉"
+// 			case "239631525350604801": // Pancake#3691
+// 				prize = m.Embeds[0].Title
+// 				prize = strings.ReplaceAll(prize, "🎉 ", "")
+// 				prize = strings.ReplaceAll(prize, " 🎉", "")
+// 				emoji = "🎁"
+// 			case "720351927581278219": // Invite Tracker#0478
+// 				prize = m.Embeds[0].Title
+// 				prize = strings.ReplaceAll(prize, "<a:blobgift:834855281358930020>  ", "")
+// 				prize = strings.ReplaceAll(prize, "  <a:blobgift:834855281358930020>", "")
+// 				emoji = "🎉"
+// 			default:
+// 				if utils.SliceContains(cfg.Snipers.GiveawaySniper.CustomBots, m.Author.ID) {
+// 					prize = "Unknown"
+// 					emoji = "🎉"
+// 					isCustom = true
+// 				}
+// 			}
+// 		}
+// 	}
 
-	if prize == "" && strings.Contains(m.Embeds[0].Description, "React with 🎉 to enter") {
-		switch m.Author.ID {
-		case "396464677032427530": // Giveaway#7832
-			prize = m.Embeds[0].Fields[0].Value
-			emoji = "🎉"
-		case "530082442967646230": // Giveaway Boat#2911
-			prize = m.Embeds[0].Title
-			emoji = "🎉"
-		}
-	}
+// 	if prize == "" && strings.Contains(m.Embeds[0].Description, "React with 🎉 to enter") {
+// 		switch m.Author.ID {
+// 		case "396464677032427530": // Giveaway#7832
+// 			prize = m.Embeds[0].Fields[0].Value
+// 			emoji = "🎉"
+// 		case "530082442967646230": // Giveaway Boat#2911
+// 			prize = m.Embeds[0].Title
+// 			emoji = "🎉"
+// 		}
+// 	}
 
-	if prize != "" && emoji != "" {
-		for _, blacklistedWord := range cfg.Snipers.Blacklist {
-			if strings.Contains(prize, blacklistedWord) {
-				return
-			}
-		}
-		_ = isCustom
-		// TODO: Giveaway Found
-		go func() {
-			time.Sleep(time.Second * time.Duration(cfg.Snipers.GiveawaySniper.Sleep))
-			_ = e.Session.MessageReactionAdd(m.ChannelID, m.ID, emoji)
-		}()
-	}
-}
+// 	if prize != "" && emoji != "" {
+// 		for _, blacklistedWord := range cfg.Snipers.Blacklist {
+// 			if strings.Contains(prize, blacklistedWord) {
+// 				return
+// 			}
+// 		}
+// 		_ = isCustom
+// 		// TODO: Giveaway Found
+// 		go func() {
+// 			time.Sleep(time.Second * time.Duration(cfg.Snipers.GiveawaySniper.Sleep))
+// 			_ = e.Session.MessageReactionAdd(m.ChannelID, m.ID, emoji)
+// 		}()
+// 	}
+// }
 
 func (e *Events) checkIgnore(message *discordgo.Message) {
 	for _, user := range e.Settings.IgnoredUsers {
