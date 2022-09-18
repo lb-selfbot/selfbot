@@ -6,6 +6,7 @@ import (
 
 	"github.com/LightningDev1/LB-Selfbot/config"
 	"github.com/LightningDev1/LB-Selfbot/embed"
+	"github.com/LightningDev1/LB-Selfbot/logging"
 	"github.com/LightningDev1/LB-Selfbot/utils"
 	"github.com/LightningDev1/dgc"
 	"github.com/LightningDev1/discordgo"
@@ -27,6 +28,9 @@ func (s *SessionsCommands) RegisterCommands(router *dgc.Router, mainSession *dis
 	// The sessions are currently only sent in the READY event.
 	// The sessions API is not enabled yet outside of experiments,
 	// So we have to connect to the gateway every time to refresh sessions
+
+	// UPDATE 17/09/2022: The sessions API is now enabled for everyone,
+	// but the API is not as reliable as the READY event.
 
 	go func() {
 		for {
@@ -67,13 +71,15 @@ func (s *SessionsCommands) RegisterCommands(router *dgc.Router, mainSession *dis
 }
 
 func (s *SessionsCommands) HandleSessions(oldSessions, newSessions []*discordgo.DiscordSession) {
-	if len(oldSessions) != len(newSessions) {
-		fmt.Println("Sessions:", len(oldSessions), "->", len(newSessions))
-	}
 
 	// oldSessions will be empty at the beginning, we don't want to
 	// detect new sessions if they were already connected before us
 	if len(oldSessions) == 0 {
+		return
+	}
+
+	cfg, err := config.GetConfig()
+	if err != nil {
 		return
 	}
 
@@ -88,14 +94,16 @@ func (s *SessionsCommands) HandleSessions(oldSessions, newSessions []*discordgo.
 	}
 
 	for _, oldSession := range oldSessions {
-		if !utils.SliceContains(newSessionIDs, oldSession.SessionID) {
-			fmt.Println("Session disconnected:", oldSession.SessionID, " OS: ", oldSession.ClientInfo.OS, " Browser: ", oldSession.ClientInfo.Client)
+		if !utils.SliceContains(newSessionIDs, oldSession.SessionID) &&
+			cfg.Events.SessionDisconnected {
+			logging.UI.SessionDisconnected(oldSession.SessionID, oldSession.ClientInfo.OS, oldSession.ClientInfo.Client)
 		}
 	}
 
 	for _, newSession := range newSessions {
-		if !utils.SliceContains(oldSessionIDs, newSession.SessionID) {
-			fmt.Println("Session connected:", newSession.SessionID, " OS: ", newSession.ClientInfo.OS, " Browser: ", newSession.ClientInfo.Client)
+		if !utils.SliceContains(oldSessionIDs, newSession.SessionID) &&
+			cfg.Events.SessionConnected {
+			logging.UI.SessionConnected(newSession.SessionID, newSession.ClientInfo.OS, newSession.ClientInfo.Client)
 		}
 	}
 }

@@ -37,35 +37,31 @@ type Config struct {
 		} `json:"LightningBot"`
 		Discord struct {
 			Token    string `json:"Token"`
-			Password string `json:"Password"`
 		} `json:"Discord"`
 	} `json:"Account"`
 	Notifications struct {
-		Enabled bool   `json:"Enabled"`
-		Type    string `json:"Type"`
+		Enabled bool `json:"Enabled"`
 	} `json:"Notifications"`
 	Snipers struct {
 		Blacklist      []string `json:"Blacklist"`
 		GiveawaySniper struct {
 			Sleep      int      `json:"Sleep"`
-			Sniper     bool     `json:"Sniper"`
+			Enabled    bool     `json:"Enabled"`
 			CustomBots []string `json:"CustomBots"`
 		} `json:"GiveawaySniper"`
 		NitroSniper      bool     `json:"NitroSniper"`
-		PrivnoteSniper   bool     `json:"PrivnoteSniper"`
 		MultiTokenSniper bool     `json:"MultiTokenSniper"`
 		Tokens           []string `json:"Tokens"`
-		RedeemToken      string   `json:"RedeemToken"`
 	} `json:"Snipers"`
 	Webhooks struct {
 		NitroSniper      string `json:"NitroSniper"`
 		GiveawaySniper   string `json:"GiveawaySniper"`
-		PrivnoteSniper   string `json:"PrivnoteSniper"`
 		SelfbotDetection string `json:"SelfbotDetection"`
 		StaffDetection   string `json:"StaffDetection"`
 		Notifiers        string `json:"Notifiers"`
 		PingDetection    string `json:"PingDetection"`
 		Misc             string `json:"Misc"`
+		Sessions         string `json:"Sessions"`
 	} `json:"Webhooks"`
 	Events struct {
 		BanNotifier           bool `json:"BanNotifier"`
@@ -78,6 +74,8 @@ type Config struct {
 		GhostPingDetection    bool `json:"GhostPingDetection"`
 		SelfbotDetection      bool `json:"SelfbotDetection"`
 		TicketNotifier        bool `json:"TicketNotifier"`
+		SessionConnected      bool `json:"SessionConnected"`
+		SessionDisconnected   bool `json:"SessionDisconnected"`
 	} `json:"Events"`
 	RPC RPCData `json:"RPC"`
 	UI  struct {

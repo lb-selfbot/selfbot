@@ -380,4 +380,26 @@ func (UILogging) MultiTokenSniperConnected(amount int) {
 		Show()
 }
 
+func (UILogging) SessionConnected(id, os, client string) {
+	UI.Notification("Session Connected\nOS: " + os + "\nClient: " + client)
+	NewConsoleMessage().
+		SetTitle("Session Connected").
+		SetColor("#C1EFFF").
+		AddInfo("Session ID", id).
+		AddInfo("OS", os).
+		AddInfo("Client", client).
+		Show()
+}
+
+func (UILogging) SessionDisconnected(id, os, client string) {
+	UI.Notification("Session Disconnected\nOS: " + os + "\nClient: " + client)
+	NewConsoleMessage().
+		SetTitle("Session Disconnected").
+		SetColor("#C1EFFF").
+		AddInfo("Session ID", id).
+		AddInfo("OS", os).
+		AddInfo("Client", client).
+		Show()
+}
+
 var UI = UILogging{}

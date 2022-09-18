@@ -1,6 +1,7 @@
 package snipers
 
 import (
+	"encoding/json"
 	"fmt"
 	"regexp"
 	"strconv"
@@ -101,8 +102,17 @@ func CheckNitroSniper(
 	return alreadyCheckedNitroCodes, sentNitroCodes
 }
 
+func checkBlacklist(prize string, cfg *config.Config) bool {
+	for _, blacklist := range cfg.Snipers.Blacklist {
+		if strings.Contains(strings.ToLower(prize), strings.ToLower(blacklist)) {
+			return true
+		}
+	}
+	return false
+}
+
 func CheckGiveawaySniper(session *discordgo.Session, message *discordgo.Message, cfg *config.Config, account string) {
-	if !cfg.Snipers.GiveawaySniper.Sniper {
+	if !cfg.Snipers.GiveawaySniper.Enabled {
 		return
 	}
 	switch message.Author.ID {
@@ -122,7 +132,11 @@ func CheckGiveawaySniper(session *discordgo.Session, message *discordgo.Message,
 						endsUnix, _ = strconv.ParseInt(endsUnixList[1], 10, 64)
 					}
 					endsIn := utils.Misc.FormatDuration(time.Until(time.Unix(endsUnix, 0)))
-					logging.UI.GiveawayFound(session, message, message.Embeds[0].Title, hostID, endsIn, account)
+					prize := message.Embeds[0].Title
+					if checkBlacklist(prize, cfg) {
+						return
+					}
+					logging.UI.GiveawayFound(session, message, prize, hostID, endsIn, account)
 					go func() {
 						time.Sleep(time.Second * time.Duration(cfg.Snipers.GiveawaySniper.Sleep))
 						_ = session.InteractionClick(button, message)
@@ -147,7 +161,11 @@ func CheckGiveawaySniper(session *discordgo.Session, message *discordgo.Message,
 					host = hostList[1]
 				}
 				endsInTime, _ := time.Parse(time.RFC3339, message.Embeds[0].Timestamp)
-				logging.UI.GiveawayFound(session, message, message.Embeds[0].Fields[0].Value, host, utils.Misc.FormatDuration(time.Until(endsInTime)), account)
+				prize := message.Embeds[0].Fields[0].Value
+				if checkBlacklist(prize, cfg) {
+					return
+				}
+				logging.UI.GiveawayFound(session, message, prize, host, utils.Misc.FormatDuration(time.Until(endsInTime)), account)
 				go func() {
 					time.Sleep(time.Second * time.Duration(cfg.Snipers.GiveawaySniper.Sleep))
 					_ = session.MessageReactionAdd(message.ChannelID, message.ID, "🎉")
@@ -169,7 +187,11 @@ func CheckGiveawaySniper(session *discordgo.Session, message *discordgo.Message,
 					host = hostList[1]
 				}
 				endsInTime, _ := time.Parse(time.RFC3339, message.Embeds[0].Timestamp)
-				logging.UI.GiveawayFound(session, message, message.Embeds[0].Title, host, utils.Misc.FormatDuration(time.Until(endsInTime)), account)
+				prize := message.Embeds[0].Title
+				if checkBlacklist(prize, cfg) {
+					return
+				}
+				logging.UI.GiveawayFound(session, message, prize, host, utils.Misc.FormatDuration(time.Until(endsInTime)), account)
 				go func() {
 					time.Sleep(time.Second * time.Duration(cfg.Snipers.GiveawaySniper.Sleep))
 					_ = session.MessageReactionAdd(message.ChannelID, message.ID, "🎉")
@@ -186,7 +208,11 @@ func CheckGiveawaySniper(session *discordgo.Session, message *discordgo.Message,
 		if len(message.Embeds) > 0 {
 			if strings.Contains(message.Embeds[0].Description, "React with") {
 				endsInTime, _ := time.Parse(time.RFC3339, message.Embeds[0].Timestamp)
-				logging.UI.GiveawayFound(session, message, message.Embeds[0].Title, "", utils.Misc.FormatDuration(time.Until(endsInTime)), account)
+				prize := message.Embeds[0].Title
+				if checkBlacklist(prize, cfg) {
+					return
+				}
+				logging.UI.GiveawayFound(session, message, prize, "", utils.Misc.FormatDuration(time.Until(endsInTime)), account)
 				go func() {
 					time.Sleep(time.Second * time.Duration(cfg.Snipers.GiveawaySniper.Sleep))
 					_ = session.MessageReactionAdd(message.ChannelID, message.ID, "🎉")
@@ -217,6 +243,9 @@ func CheckGiveawaySniper(session *discordgo.Session, message *discordgo.Message,
 					endsUnix, _ = strconv.ParseInt(endsUnixList[1], 10, 64)
 				}
 				endsIn := utils.Misc.FormatDuration(time.Until(time.Unix(endsUnix, 0)))
+				if checkBlacklist(prize, cfg) {
+					return
+				}
 				logging.UI.GiveawayFound(session, message, prize, "", endsIn, account)
 				go func() {
 					time.Sleep(time.Second * time.Duration(cfg.Snipers.GiveawaySniper.Sleep))
@@ -246,7 +275,11 @@ func CheckGiveawaySniper(session *discordgo.Session, message *discordgo.Message,
 							hostID = hostIDList[1]
 						}
 						endsInTime, _ := time.Parse(time.RFC3339, message.Embeds[0].Timestamp)
-						logging.UI.GiveawayFound(session, message, message.Embeds[0].Title, hostID, utils.Misc.FormatDuration(time.Until(endsInTime)), account)
+						prize := message.Embeds[0].Title
+						if checkBlacklist(prize, cfg) {
+							return
+						}
+						logging.UI.GiveawayFound(session, message, prize, hostID, utils.Misc.FormatDuration(time.Until(endsInTime)), account)
 						go func() {
 							time.Sleep(time.Second * time.Duration(cfg.Snipers.GiveawaySniper.Sleep))
 							_ = session.InteractionClick(button, message)
@@ -259,6 +292,53 @@ func CheckGiveawaySniper(session *discordgo.Session, message *discordgo.Message,
 		prizeList := regexp.MustCompile(fmt.Sprintf(`Congratulations, %s! You won \*\*(.*?)\*\*!`, session.State.User.Mention())).FindStringSubmatch(message.Content)
 		if len(prizeList) > 1 {
 			logging.UI.GiveawayWon(session, message, prizeList[1], account)
+		}
+	default:
+		isCustomBot := utils.SliceContains(cfg.Snipers.GiveawaySniper.CustomBots, message.Author.ID) ||
+			utils.SliceContains(cfg.Snipers.GiveawaySniper.CustomBots, message.Author.String())
+
+		if isCustomBot {
+			// custom bot
+			messageJsonBytes, err := json.Marshal(message)
+			if err != nil {
+				return
+			}
+			messageJson := string(messageJsonBytes)
+			messageJsonLower := strings.ToLower(messageJson)
+
+			isNewGiveaway := strings.Contains(messageJsonLower, "react with") ||
+				strings.Contains(messageJsonLower, "to enter") ||
+				strings.Contains(messageJsonLower, "new giveaway")
+
+			if isNewGiveaway {
+				// check if there is a button to enter the giveaway
+				if component, ok := message.Components[0].(*discordgo.ActionsRow); ok {
+					if button, ok := component.Components[0].(*discordgo.Button); ok {
+						logging.UI.GiveawayFound(session, message, "", "", "", account)
+						go func() {
+							time.Sleep(time.Second * time.Duration(cfg.Snipers.GiveawaySniper.Sleep))
+							_ = session.InteractionClick(button, message)
+						}()
+						return
+					}
+				}
+				go func() {
+					// wait until the bot has probably reacted with an emoji
+					time.Sleep(10 * time.Second)
+
+					// reload the message to get the updated reactions
+					newMessage, err := session.ChannelMessage(message.ChannelID, message.ID)
+					if err != nil {
+						return
+					}
+
+					// if there are reactions, react with the first one
+					if len(newMessage.Reactions) > 0 {
+						time.Sleep(time.Second * time.Duration(cfg.Snipers.GiveawaySniper.Sleep))
+						_ = session.MessageReactionAdd(message.ChannelID, message.ID, newMessage.Reactions[0].Emoji.APIName())
+					}
+				}()
+			}
 		}
 	}
 }

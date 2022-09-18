@@ -129,6 +129,18 @@ func (m *AdministrationCommands) RegisterCommands(router *dgc.Router) {
 		Handler:     m.purge,
 	})
 	router.RegisterCmd(&dgc.Command{
+		Name:        "purgeself",
+		Description: "Delete your own messages in a channel",
+		Usage:       "[p]purgeself <amount> [channel]",
+		Handler:     m.purgeself,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "purgeself",
+		Description: "Delete a users messages in a channel",
+		Usage:       "[p]purgeself <amount> <user> [channel]",
+		Handler:     m.purgeuser,
+	})
+	router.RegisterCmd(&dgc.Command{
 		Name:        "nuke",
 		Description: "Nuke a channel",
 		Usage:       "[p]nuke [channel]",
@@ -796,6 +808,74 @@ func (*AdministrationCommands) purge(ctx *dgc.Ctx) {
 	}
 
 	for _, message := range messages {
+		err = ctx.Session.ChannelMessageDelete(channelID, message.ID)
+		if err != nil {
+			_ = ctx.RespondText("Error deleting messages: " + err.Error())
+			return
+		}
+	}
+}
+
+func (*AdministrationCommands) purgeself(ctx *dgc.Ctx) {
+	amount, err := strconv.Atoi(utils.Arguments["<amount>"])
+	if err != nil {
+		_ = ctx.RespondText("Argument <amount> must be a number.")
+		return
+	}
+
+	channel, success := utils.Discord.TryGetChannelFromMention(ctx, ctx.Arguments.Get(1))
+	channelID := ctx.Event.ChannelID
+	if success {
+		channelID = channel.ID
+	}
+
+	messages, err := utils.Discord.GetChannelMessages(ctx.Session, channelID, amount)
+	if err != nil {
+		_ = ctx.RespondText("Error getting messages: " + err.Error())
+		return
+	}
+
+	for _, message := range messages {
+		if message.Author.ID != ctx.Session.State.User.ID {
+			continue
+		}
+		err = ctx.Session.ChannelMessageDelete(channelID, message.ID)
+		if err != nil {
+			_ = ctx.RespondText("Error deleting messages: " + err.Error())
+			return
+		}
+	}
+}
+
+func (*AdministrationCommands) purgeuser(ctx *dgc.Ctx) {
+	amount, err := strconv.Atoi(utils.Arguments["<amount>"])
+	if err != nil {
+		_ = ctx.RespondText("Argument <amount> must be a number.")
+		return
+	}
+
+	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(1))
+	if !success {
+		_ = ctx.RespondText("Could not find user")
+		return
+	}
+
+	channel, success := utils.Discord.TryGetChannelFromMention(ctx, ctx.Arguments.Get(2))
+	channelID := ctx.Event.ChannelID
+	if success {
+		channelID = channel.ID
+	}
+
+	messages, err := utils.Discord.GetChannelMessages(ctx.Session, channelID, amount)
+	if err != nil {
+		_ = ctx.RespondText("Error getting messages: " + err.Error())
+		return
+	}
+
+	for _, message := range messages {
+		if message.Author.ID != user.ID {
+			continue
+		}
 		err = ctx.Session.ChannelMessageDelete(channelID, message.ID)
 		if err != nil {
 			_ = ctx.RespondText("Error deleting messages: " + err.Error())

@@ -68,12 +68,6 @@ func (c ConfigCommands) RegisterCommands(router *dgc.Router) {
 		Handler:     c.notifications,
 	})
 	router.RegisterCmd(&dgc.Command{
-		Name:        "notificationtype",
-		Description: "Change the notification type",
-		Usage:       "[p]notificationtype <default/custom>",
-		Handler:     c.notificationtype,
-	})
-	router.RegisterCmd(&dgc.Command{
 		Name:        "examplenotification",
 		Description: "Show an example notification",
 		Usage:       "[p]examplenotification",
@@ -134,12 +128,6 @@ func (c ConfigCommands) RegisterCommands(router *dgc.Router) {
 		Handler:     c.wgiveaway,
 	})
 	router.RegisterCmd(&dgc.Command{
-		Name:        "wprivnote",
-		Description: "Set the privnote sniper webhook",
-		Usage:       "[p]wprivnote <webhook url>",
-		Handler:     c.wprivnote,
-	})
-	router.RegisterCmd(&dgc.Command{
 		Name:        "wselfbotdetection",
 		Description: "Set the selfbot detection webhook",
 		Usage:       "[p]wselfbotdetection <webhook url>",
@@ -170,6 +158,12 @@ func (c ConfigCommands) RegisterCommands(router *dgc.Router) {
 		Handler:     c.wmisc,
 	})
 	router.RegisterCmd(&dgc.Command{
+		Name:        "wsessions",
+		Description: "Set the sessions webhook",
+		Usage:       "[p]wsessions <webhook url>",
+		Handler:     c.wsessions,
+	})
+	router.RegisterCmd(&dgc.Command{
 		Name:        "staffdetection",
 		Description: "Turn staff detection on or off",
 		Usage:       "[p]staffdetection <on/off>",
@@ -186,6 +180,18 @@ func (c ConfigCommands) RegisterCommands(router *dgc.Router) {
 		Description: "Turn ticket notifier on or off",
 		Usage:       "[p]ticketnotifier <on/off>",
 		Handler:     c.ticketnotifier,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "sessionconnected",
+		Description: "Turn session connected notifier on or off",
+		Usage:       "[p]sessionconnected <on/off>",
+		Handler:     c.sessionconnected,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "sessiondisconnected",
+		Description: "Turn session disconnected notifier on or off",
+		Usage:       "[p]sessiondisconnected <on/off>",
+		Handler:     c.sessiondisconnected,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "selfbotdetection",
@@ -310,17 +316,6 @@ func (ConfigCommands) notifications(ctx *dgc.Ctx) {
 	_ = cfg.Save()
 }
 
-func (ConfigCommands) notificationtype(ctx *dgc.Ctx) {
-	cfg, _ := config.GetConfig()
-	notificationType := utils.String.Capitalize(utils.Arguments["<default/custom>"])
-	if notificationType != "Default" && notificationType != "Custom" {
-		_ = ctx.RespondText("Invalid command mode.")
-		return
-	}
-	cfg.Notifications.Type = notificationType
-	_ = cfg.Save()
-}
-
 func (ConfigCommands) examplenotification(*dgc.Ctx) {
 	/*_ = toast.Push("test message",
 		toast.WithTitle("app title"),
@@ -349,7 +344,7 @@ func (ConfigCommands) giveawaysniper(ctx *dgc.Ctx) {
 		_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
 		return
 	}
-	cfg.Snipers.GiveawaySniper.Sniper = toggle == "on"
+	cfg.Snipers.GiveawaySniper.Enabled = toggle == "on"
 	_ = cfg.Save()
 }
 
@@ -402,12 +397,12 @@ func (ConfigCommands) setupwebhooks(ctx *dgc.Ctx) {
 	channels := map[string]string{
 		"nitrosniper":      "NitroSniper",
 		"giveawaysniper":   "GiveawaySniper",
-		"privnotesniper":   "PrivnoteSniper",
 		"selfbotdetection": "SelfbotDetection",
 		"staffdetection":   "StaffDetection",
 		"notifiers":        "Notifiers",
 		"pingdetection":    "PingDetection",
 		"misc":             "Misc",
+		"sessions":         "Sessions",
 	}
 	cfg, _ := config.GetConfig()
 	category, err := ctx.Session.GuildChannelCreate(serverID, "LightningBot", discordgo.ChannelTypeGuildCategory)
@@ -440,12 +435,12 @@ func (ConfigCommands) wall(*dgc.Ctx) {
 	cfg, _ := config.GetConfig()
 	cfg.Webhooks.NitroSniper = utils.Arguments["<webhook url>"]
 	cfg.Webhooks.GiveawaySniper = utils.Arguments["<webhook url>"]
-	cfg.Webhooks.PrivnoteSniper = utils.Arguments["<webhook url>"]
 	cfg.Webhooks.SelfbotDetection = utils.Arguments["<webhook url>"]
 	cfg.Webhooks.StaffDetection = utils.Arguments["<webhook url>"]
 	cfg.Webhooks.Notifiers = utils.Arguments["<webhook url>"]
 	cfg.Webhooks.PingDetection = utils.Arguments["<webhook url>"]
 	cfg.Webhooks.Misc = utils.Arguments["<webhook url>"]
+	cfg.Webhooks.Sessions = utils.Arguments["<webhook url>"]
 	_ = cfg.Save()
 }
 
@@ -458,12 +453,6 @@ func (ConfigCommands) wnitro(*dgc.Ctx) {
 func (ConfigCommands) wgiveaway(*dgc.Ctx) {
 	cfg, _ := config.GetConfig()
 	cfg.Webhooks.GiveawaySniper = utils.Arguments["<webhook url>"]
-	_ = cfg.Save()
-}
-
-func (ConfigCommands) wprivnote(*dgc.Ctx) {
-	cfg, _ := config.GetConfig()
-	cfg.Webhooks.PrivnoteSniper = utils.Arguments["<webhook url>"]
 	_ = cfg.Save()
 }
 
@@ -497,6 +486,12 @@ func (ConfigCommands) wmisc(*dgc.Ctx) {
 	_ = cfg.Save()
 }
 
+func (ConfigCommands) wsessions(*dgc.Ctx) {
+	cfg, _ := config.GetConfig()
+	cfg.Webhooks.Sessions = utils.Arguments["<webhook url>"]
+	_ = cfg.Save()
+}
+
 func (ConfigCommands) staffdetection(ctx *dgc.Ctx) {
 	toggle := strings.ToLower(utils.Arguments["<on/off>"])
 	if toggle != "on" && toggle != "off" {
@@ -527,6 +522,28 @@ func (ConfigCommands) ticketnotifier(ctx *dgc.Ctx) {
 	}
 	cfg, _ := config.GetConfig()
 	cfg.Events.TicketNotifier = toggle == "on"
+	_ = cfg.Save()
+}
+
+func (ConfigCommands) sessionconnected(ctx *dgc.Ctx) {
+	toggle := strings.ToLower(utils.Arguments["<on/off>"])
+	if toggle != "on" && toggle != "off" {
+		_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
+		return
+	}
+	cfg, _ := config.GetConfig()
+	cfg.Events.SessionConnected = toggle == "on"
+	_ = cfg.Save()
+}
+
+func (ConfigCommands) sessiondisconnected(ctx *dgc.Ctx) {
+	toggle := strings.ToLower(utils.Arguments["<on/off>"])
+	if toggle != "on" && toggle != "off" {
+		_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
+		return
+	}
+	cfg, _ := config.GetConfig()
+	cfg.Events.SessionDisconnected = toggle == "on"
 	_ = cfg.Save()
 }
 
