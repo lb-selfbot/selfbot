@@ -55,7 +55,7 @@ func (i *Ipc) Init() {
 		log.Printf("connected: %v", c.RemoteAddr())
 		i.Connected = true
 		close(i.Connect)
-		//i.Connect <- struct{}{}
+
 		i.Conn = c
 		i.OnConnect()
 		for {
@@ -69,6 +69,7 @@ func (i *Ipc) Init() {
 		}
 		i.Connected = false
 		i.Conn = nil
+		i.Connect = make(chan struct{})
 		if !constants.Debug {
 			os.Exit(0)
 		}
