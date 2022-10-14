@@ -75,9 +75,7 @@ func (i *Ipc) Init() {
 		}
 	})
 
-	go func() {
-		log.Fatal(http.ListenAndServe("127.0.0.1:13249", nil))
-	}()
+	go log.Fatal(http.ListenAndServe("127.0.0.1:13249", nil))
 }
 
 func (i *Ipc) Write(data interface{}) {
