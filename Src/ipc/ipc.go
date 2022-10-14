@@ -90,7 +90,6 @@ func (i *Ipc) OnConnect() {
 		Op:   OP_Connected,
 		Data: JsonEventData{},
 	})
-	i.ConsoleAppend("LightningBot v4.0.0 Alpha")
 }
 
 func (i *Ipc) OnMessage(jsonEvent *JsonEvent) {

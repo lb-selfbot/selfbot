@@ -164,7 +164,7 @@ func (UILogging) OnReady(router *dgc.Router, event *discordgo.Ready) {
 	}
 	ipc.IPC.ConsoleClear()
 	UI.Notification("Connected to " + event.User.String())
-	message := "<image Source=\"assets/Logo.150.png\" Width=\"650\" Height=\"150\" Centered />\n" +
+	message := "<image Source=\"assets/Banner.png\" Width=\"650\" Height=\"150\" Centered />\n" +
 		UI.Centered("LightningBot "+constants.VersionString+" | "+event.User.String()+" | Prefix: "+cfg.Selfbot.CommandPrefix, "#C1EFFF") + "\n" +
 		UI.Centered(fmt.Sprint(len(router.Commands))+" Commands | "+fmt.Sprint(len(event.Guilds))+" Servers | "+fmt.Sprint(friends)+" Friends", "#C1EFFF") + "\n"
 	ipc.IPC.ConsoleAppend(message)
