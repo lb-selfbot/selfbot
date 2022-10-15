@@ -7,7 +7,6 @@ import (
 
 	"github.com/LightningDev1/LB-Selfbot/constants"
 	"github.com/gorilla/websocket"
-	"github.com/jpillora/overseer"
 )
 
 type JsonEventData struct {
@@ -34,6 +33,8 @@ var (
 	OP_ConsoleClear  = 108
 	OP_ConsoleSet    = 109
 )
+
+var Console string
 
 type Ipc struct {
 	Upgrader  *websocket.Upgrader
@@ -98,8 +99,6 @@ func (i *Ipc) OnMessage(jsonEvent *JsonEvent) {
 	switch jsonEvent.Op {
 	case OP_Exit:
 		os.Exit(0)
-	case OP_Restart:
-		overseer.Restart()
 	}
 }
 
@@ -110,6 +109,7 @@ func (i *Ipc) ConsoleSet(text string) {
 			Text: text,
 		},
 	})
+	Console = text
 }
 
 func (i *Ipc) ConsoleAppend(text string) {
@@ -119,6 +119,7 @@ func (i *Ipc) ConsoleAppend(text string) {
 			Text: text,
 		},
 	})
+	Console += text + "\n"
 }
 
 func (i *Ipc) ConsoleClear() {
@@ -126,6 +127,15 @@ func (i *Ipc) ConsoleClear() {
 		Op:   OP_ConsoleClear,
 		Data: JsonEventData{},
 	})
+	Console = ""
+}
+
+func (i *Ipc) Restart() {
+	i.Write(JsonEvent{
+		Op:   OP_Restart,
+		Data: JsonEventData{},
+	})
+	os.Exit(0)
 }
 
 func (i *Ipc) WaitForConnection() {

@@ -10,6 +10,7 @@ import (
 	"github.com/LightningDev1/LB-Selfbot/constants"
 	"github.com/LightningDev1/LB-Selfbot/ipc"
 	"github.com/LightningDev1/LB-Selfbot/utils"
+	"github.com/LightningDev1/LB-Selfbot/websocket"
 	"github.com/LightningDev1/dgc"
 	"github.com/LightningDev1/discordgo"
 	toast "github.com/electricbubble/go-toast"
@@ -65,6 +66,24 @@ func getUserName(session *discordgo.Session, userID string) string {
 	return utils.Misc.Or(userName, "Unknown")
 }
 
+func ConsoleAppend(text string) {
+	ipc.IPC.ConsoleAppend(text)
+	websocket.Send(websocket.WsMessage{
+		Op: "CONSOLE_APPEND",
+		Data: websocket.WsData{
+			Text: text,
+		},
+	})
+}
+
+func ConsoleClear() {
+	ipc.IPC.ConsoleClear()
+	websocket.Send(websocket.WsMessage{
+		Op: "CONSOLE_CLEAR",
+		Data: websocket.WsData{},
+	})
+}
+
 type ConsoleMessage struct {
 	Title string
 	Color string
@@ -106,7 +125,7 @@ func (c *ConsoleMessage) Show() {
 		}
 	}
 
-	ipc.IPC.ConsoleAppend(message)
+	ConsoleAppend(message)
 }
 
 func NewConsoleMessage() *ConsoleMessage {
@@ -146,7 +165,7 @@ func (UILogging) ConsoleMessage(title string, color string, v map[string]string)
 			message += UI.Colored("  "+value, "#C1EFFF") + "\n"
 		}
 	}
-	ipc.IPC.ConsoleAppend(message)
+	ConsoleAppend(message)
 }
 
 func (UILogging) CommandUsed(commandName string) {
@@ -162,12 +181,12 @@ func (UILogging) OnReady(router *dgc.Router, event *discordgo.Ready) {
 			friends++
 		}
 	}
-	ipc.IPC.ConsoleClear()
+	ConsoleClear()
 	UI.Notification("Connected to " + event.User.String())
 	message := "<image Source=\"assets/Banner.png\" Width=\"650\" Height=\"150\" Centered />\n" +
 		UI.Centered("LightningBot "+constants.VersionString+" | "+event.User.String()+" | Prefix: "+cfg.Selfbot.CommandPrefix, "#C1EFFF") + "\n" +
 		UI.Centered(fmt.Sprint(len(router.Commands))+" Commands | "+fmt.Sprint(len(event.Guilds))+" Servers | "+fmt.Sprint(friends)+" Friends", "#C1EFFF") + "\n"
-	ipc.IPC.ConsoleAppend(message)
+	ConsoleAppend(message)
 }
 
 func (UILogging) NitroSniperFake(session *discordgo.Session, message *discordgo.Message, code, account string) {

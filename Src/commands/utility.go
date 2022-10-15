@@ -15,7 +15,6 @@ import (
 	"github.com/LightningDev1/LB-Selfbot/error_handling"
 	"github.com/LightningDev1/LB-Selfbot/eventhandlers"
 	"github.com/LightningDev1/LB-Selfbot/ipc"
-	"github.com/jpillora/overseer"
 	"github.com/shirou/gopsutil/cpu"
 	"github.com/shirou/gopsutil/disk"
 	"github.com/shirou/gopsutil/host"
@@ -618,7 +617,7 @@ func (UtilityCommands) snipe(ctx *dgc.Ctx) {
 		message := messages[len(messages)-1]
 		emb := embed.NewEmbed()
 		if message.Author != nil {
-			emb.AddField("Author", message.Author.String() + " | " + message.Author.ID)
+			emb.AddField("Author", message.Author.String()+" | "+message.Author.ID)
 		}
 		emb.AddField("Sent At", utils.Discord.SnowflakeToTime(message.ID).Format(time.RFC1123))
 		emb.AddField("Content", message.Content)
@@ -636,7 +635,7 @@ func (UtilityCommands) editsnipe(ctx *dgc.Ctx) {
 		message := messages[len(messages)-1]
 		emb := embed.NewEmbed()
 		if message.Author != nil {
-			emb.AddField("Author", message.Author.String() + " | " + message.Author.ID)
+			emb.AddField("Author", message.Author.String()+" | "+message.Author.ID)
 		}
 		emb.AddField("Sent At", utils.Discord.SnowflakeToTime(message.ID).Format(time.RFC1123))
 		emb.AddField("Content", message.Content)
@@ -666,7 +665,7 @@ func (UtilityCommands) dashboard(*dgc.Ctx) {
 }
 
 func (UtilityCommands) restartbot(*dgc.Ctx) {
-	overseer.Restart()
+	ipc.IPC.Restart()
 }
 
 func (UtilityCommands) stopbot(*dgc.Ctx) {

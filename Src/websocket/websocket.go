@@ -8,8 +8,7 @@ import (
 
 	"github.com/LightningDev1/LB-Selfbot/constants"
 	"github.com/LightningDev1/LB-Selfbot/encryption"
-	"github.com/LightningDev1/LB-Selfbot/logging"
-	"github.com/jpillora/overseer"
+	"github.com/LightningDev1/LB-Selfbot/ipc"
 	"github.com/rgamba/evtwebsocket"
 )
 
@@ -23,6 +22,8 @@ type WsData struct {
 	Password     string `json:"password,omitempty"`
 	ComputerName string `json:"computer_name,omitempty"`
 	Time         int64  `json:"time,omitempty"`
+	ConsoleText  string `json:"console_text,omitempty"`
+	Text         string `json:"text,omitempty"`
 }
 
 type WsMessage struct {
@@ -55,6 +56,7 @@ func Init(username, password string) error {
 					Password:     password,
 					ComputerName: hostname,
 					Time:         time.Now().Unix(),
+					ConsoleText:  ipc.Console,
 				},
 			})
 		},
@@ -71,13 +73,20 @@ func Init(username, password string) error {
 			case "EXIT":
 				os.Exit(0)
 			case "RESTART":
-				overseer.Restart()
+				ipc.IPC.Restart()
+			case "WEBSITE_CONNECT":
+				Send(WsMessage{
+					Op: "CONSOLE_SET",
+					Data: WsData{
+						Text: ipc.Console,
+					},
+				})
 			default:
 				fmt.Println(wsMessage)
 			}
 		},
 		OnError: func(err error) {
-			logging.Error(err)
+			//logging.Error(err)
 			if !constants.Debug {
 				os.Exit(0)
 			}
