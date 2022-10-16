@@ -3,7 +3,6 @@ package utils
 import (
 	"bytes"
 	"fmt"
-	"io/ioutil"
 	"math"
 	"math/rand"
 	"net"
@@ -17,6 +16,7 @@ import (
 	"syscall"
 	"time"
 
+	"golang.org/x/term"
 	"golang.org/x/text/unicode/norm"
 
 	"github.com/LightningDev1/LB-Selfbot/error_handling"
@@ -492,6 +492,27 @@ func (StringUtils) Capitalize(text string) string {
 	return strings.ToUpper(text[:1]) + text[1:]
 }
 
+func (StringUtils) CenterSlices(rows []string) string {
+	fd := int(os.Stdout.Fd())
+	w, _, err := term.GetSize(fd)
+	if err != nil {
+		return strings.Join(rows, "\n")
+	}
+	// Get the max length of the rows
+	max := 0
+	for _, row := range rows {
+		if len(row) > max {
+			max = len(row)
+		}
+	}
+	// Center the rows
+	spaceCount := (w-max)/2
+	for i, row := range rows {
+		rows[i] = strings.Repeat(" ", spaceCount) + row
+	}
+	return strings.Join(rows, "\n")
+}
+
 var String = &StringUtils{}
 
 type RandomUtils struct{}
@@ -571,7 +592,7 @@ func (*FileUtils) SanitizeFilename(filename string) string {
 }
 
 func (*FileUtils) Read(file string) (string, bool) {
-	fileContents, err := ioutil.ReadFile(filepath.FromSlash(file))
+	fileContents, err := os.ReadFile(filepath.FromSlash(file))
 	if err != nil {
 		return "", false
 	}
@@ -752,6 +773,14 @@ func (MiscUtils) Minimum(a, b, c int) int {
 		}
 	}
 	return c
+}
+
+func (MiscUtils) HexToRGB(hex string) (int, int, int) {
+	hex = strings.Replace(hex, "#", "", -1)
+	r, _ := strconv.ParseInt(hex[0:2], 16, 64)
+	g, _ := strconv.ParseInt(hex[2:4], 16, 64)
+	b, _ := strconv.ParseInt(hex[4:6], 16, 64)
+	return int(r), int(g), int(b)
 }
 
 var Misc = &MiscUtils{}

@@ -4,6 +4,7 @@ import (
 	"math/rand"
 	"os"
 	"os/signal"
+	"runtime"
 	"strings"
 	"time"
 
@@ -23,6 +24,19 @@ import (
 	"github.com/jpillora/overseer"
 )
 
+func init() {
+	// Fix ANSI on Windows cmd
+	if strings.Contains(runtime.GOOS, "windows") && constants.Console {
+		stdout := syscall.Handle(os.Stdout.Fd())
+
+		var originalMode uint32
+		syscall.GetConsoleMode(stdout, &originalMode)
+		originalMode |= 0x0004
+
+		syscall.MustLoadDLL("kernel32").MustFindProc("SetConsoleMode").Call(uintptr(stdout), uintptr(originalMode))
+	}
+}
+
 func main() {
 	overseer.Run(overseer.Config{
 		Program: selfbotMain,
@@ -39,7 +53,9 @@ func selfbotMain(s overseer.State) {
 	if err != nil {
 		panic(err)
 	}
-	ipc.IPC.Init()
+	if !constants.Console {
+		ipc.IPC.Init()
+	}
 
 	err = websocket.Init(cfg.Account.LightningBot.Username, cfg.Account.LightningBot.Password)
 	if err != nil {

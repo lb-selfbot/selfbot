@@ -53,7 +53,6 @@ func (i *Ipc) Init() {
 			return
 		}
 		defer c.Close()
-		log.Printf("connected: %v", c.RemoteAddr())
 		i.Connected = true
 		close(i.Connect)
 
@@ -63,7 +62,6 @@ func (i *Ipc) Init() {
 			message := JsonEvent{}
 			err := c.ReadJSON(&message)
 			if err != nil {
-				log.Println("read:", err)
 				break
 			}
 			i.OnMessage(&message)
@@ -95,7 +93,6 @@ func (i *Ipc) OnConnect() {
 }
 
 func (i *Ipc) OnMessage(jsonEvent *JsonEvent) {
-	log.Println("recv: ", jsonEvent)
 	switch jsonEvent.Op {
 	case OP_Exit:
 		os.Exit(0)
