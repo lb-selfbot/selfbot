@@ -6,6 +6,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/LightningDev1/LB-Selfbot/config"
 	"github.com/LightningDev1/LB-Selfbot/constants"
 	"github.com/LightningDev1/LB-Selfbot/encryption"
 	"github.com/LightningDev1/LB-Selfbot/ipc"
@@ -24,6 +25,7 @@ type WsData struct {
 	Time         int64  `json:"time,omitempty"`
 	ConsoleText  string `json:"console_text,omitempty"`
 	Text         string `json:"text,omitempty"`
+	Config *config.Config `json:"config,omitempty"`
 }
 
 type WsMessage struct {
@@ -79,6 +81,13 @@ func Init(username, password string) error {
 					Op: "CONSOLE_SET",
 					Data: WsData{
 						Text: ipc.Console,
+					},
+				})
+				cfg, _ := config.GetConfig()
+				Send(WsMessage{
+					Op: "CONFIG_UPDATE",
+					Data: WsData{
+						Config: &cfg,
 					},
 				})
 			default:
