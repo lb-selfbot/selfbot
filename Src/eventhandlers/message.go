@@ -353,7 +353,7 @@ func (e *Events) checkNotifiers(message *discordgo.Message, cfg *config.Config) 
 		}
 	}
 
-	if message.Author.PublicFlags&discordgo.UserFlagDiscordEmployee != 0 {
+	if cfg.Events.DiscordStaffDetection && message.Author.PublicFlags&discordgo.UserFlagDiscordEmployee != 0 {
 		logging.UI.DiscordStaffDetection(e.Session, message)
 	}
 }

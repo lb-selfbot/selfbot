@@ -19,13 +19,13 @@ var Connected bool
 var Connect chan struct{} = make(chan struct{})
 
 type WsData struct {
-	Username     string `json:"username,omitempty"`
-	Password     string `json:"password,omitempty"`
-	ComputerName string `json:"computer_name,omitempty"`
-	Time         int64  `json:"time,omitempty"`
-	ConsoleText  string `json:"console_text,omitempty"`
-	Text         string `json:"text,omitempty"`
-	Config *config.Config `json:"config,omitempty"`
+	Username     string         `json:"username,omitempty"`
+	Password     string         `json:"password,omitempty"`
+	ComputerName string         `json:"computer_name,omitempty"`
+	Time         int64          `json:"time,omitempty"`
+	ConsoleText  string         `json:"console_text,omitempty"`
+	Text         string         `json:"text,omitempty"`
+	Config       *config.Config `json:"config,omitempty"`
 }
 
 type WsMessage struct {
@@ -90,6 +90,11 @@ func Init(username, password string) error {
 						Config: &cfg,
 					},
 				})
+			case "CONFIG_UPDATE":
+				if wsMessage.Data.Config != nil {
+					wsMessage.Data.Config.Save()
+					// TODO: send CONFIG_UPDATE to ui
+				}
 			default:
 				fmt.Println(wsMessage)
 			}
