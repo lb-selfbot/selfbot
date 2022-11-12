@@ -393,7 +393,7 @@ func (e *Events) checkNotifiersDelete(message *discordgo.Message, cfg *config.Co
 			break
 		}
 	}
-	if isMentioned {
+	if isMentioned && cfg.Events.GhostPingDetection {
 		logging.UI.GhostPingDetection(e.Session, message)
 	}
 }
