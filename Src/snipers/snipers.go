@@ -65,12 +65,17 @@ func CheckNitroSniper(
 			}
 		}
 		start := time.Now()
-		result, err := http.Post(fmt.Sprintf("https://discord.com/api/v10/entitlements/gift-codes/%s/redeem", nitroCode), "", http.GetDiscordHeaders(cfg.Account.Discord.Token))
+		jsonResult, err := http.PostJson(fmt.Sprintf("https://discord.com/api/v10/entitlements/gift-codes/%s/redeem", nitroCode), "{}", http.GetDiscordHeaders(cfg.Account.Discord.Token))
 		if err != nil {
 			return alreadyCheckedNitroCodes, sentNitroCodes
 		}
 		elapsed := time.Since(start)
 		redeemed := false
+		resultBytes, err := jsonResult.Encode()
+		if err != nil {
+			return alreadyCheckedNitroCodes, sentNitroCodes
+		}
+		result := string(resultBytes)
 		if strings.Contains(result, "This gift has been redeemed already.") {
 			logging.UI.NitroSniper(session, message, elapsed, "Already Redeemed", nitroCode, account)
 		} else if strings.Contains(result, "Already purchased") {
