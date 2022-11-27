@@ -12,10 +12,10 @@ import (
 
 	"github.com/LightningDev1/LB-Selfbot/commands"
 	"github.com/LightningDev1/LB-Selfbot/config"
+	"github.com/LightningDev1/LB-Selfbot/consolelogging"
 	"github.com/LightningDev1/LB-Selfbot/constants"
 	"github.com/LightningDev1/LB-Selfbot/eventhandlers"
 	"github.com/LightningDev1/LB-Selfbot/ipc"
-	"github.com/LightningDev1/LB-Selfbot/logging"
 	"github.com/LightningDev1/LB-Selfbot/multitokensniper"
 	"github.com/LightningDev1/LB-Selfbot/utils"
 	"github.com/LightningDev1/LB-Selfbot/websocket"
@@ -45,7 +45,7 @@ func main() {
 
 func selfbotMain(s overseer.State) {
 	if constants.Debug {
-		logging.Warn("Debug Enabled!")
+		consolelogging.Warn("Debug Enabled!")
 	}
 	//startParams := api.GetStartParams()
 	rand.Seed(time.Now().UnixNano())
@@ -59,7 +59,7 @@ func selfbotMain(s overseer.State) {
 
 	err = websocket.Init(cfg.Account.LightningBot.Username, cfg.Account.LightningBot.Password)
 	if err != nil {
-		logging.Error(err)
+		consolelogging.Error(err)
 		if !constants.Debug {
 			os.Exit(0)
 		}
@@ -121,7 +121,7 @@ func selfbotMain(s overseer.State) {
 
 	err = session.Open()
 	if err != nil {
-		logging.Error(err)
+		consolelogging.Error(err)
 	}
 
 	multitokensniper.Init(cfg)

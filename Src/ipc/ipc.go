@@ -5,13 +5,15 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/LightningDev1/LB-Selfbot/config"
 	"github.com/LightningDev1/LB-Selfbot/constants"
 	"github.com/gorilla/websocket"
 )
 
 type JsonEventData struct {
-	Text       string `json:"text,omitempty"`
-	MainFolder string `json:"mainFolder,omitempty"`
+	Text       string         `json:"text,omitempty"`
+	MainFolder string         `json:"mainFolder,omitempty"`
+	Config     *config.Config `json:"config,omitempty"`
 }
 
 type JsonEvent struct {
@@ -27,7 +29,7 @@ var (
 	OP_Notification  = 102
 	OP_InvalidToken  = 103
 	OP_Error         = 104
-	OP_ConfigEdit    = 105
+	OP_ConfigUpdate  = 105
 	OP_NewToken      = 106
 	OP_ConsoleAppend = 107
 	OP_ConsoleClear  = 108
@@ -149,6 +151,15 @@ func SendNotification(text string) {
 		Op: OP_Notification,
 		Data: JsonEventData{
 			Text: text,
+		},
+	})
+}
+
+func ConfigUpdate(cfg *config.Config) {
+	IPC.Write(JsonEvent{
+		Op: OP_ConfigUpdate,
+		Data: JsonEventData{
+			Config: cfg,
 		},
 	})
 }

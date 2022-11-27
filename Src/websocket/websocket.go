@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/LightningDev1/LB-Selfbot/config"
+	"github.com/LightningDev1/LB-Selfbot/consolelogging"
 	"github.com/LightningDev1/LB-Selfbot/constants"
 	"github.com/LightningDev1/LB-Selfbot/encryption"
 	"github.com/LightningDev1/LB-Selfbot/ipc"
@@ -64,6 +65,7 @@ func Init(username, password string) error {
 		},
 		OnMessage: func(msg []byte, _ *evtwebsocket.Conn) {
 			decryptedMsg, _ := Encryption.Decrypt(msg)
+			consolelogging.Debug("Received ws=>sb message: " + string(decryptedMsg))
 			wsMessage := WsMessage{}
 			_ = json.Unmarshal(decryptedMsg, &wsMessage)
 			switch wsMessage.Op {
@@ -96,7 +98,7 @@ func Init(username, password string) error {
 					// TODO: send CONFIG_UPDATE to ui
 				}
 			default:
-				fmt.Println(wsMessage)
+				fmt.Println("Unknown op", wsMessage, "raw data", string(msg))
 			}
 		},
 		OnError: func(err error) {
@@ -105,11 +107,11 @@ func Init(username, password string) error {
 				os.Exit(0)
 			}
 		},
-		PingIntervalSecs: 5,
+		PingIntervalSecs: 10,
 		PingMsg:          pingMsgEncrypted,
 		Reconnect:        true,
 	}
-	return Conn.Dial("ws://127.0.0.1:8000/api/v3/ws/selfbot", "")
+	return Conn.Dial("wss://api.lightning-bot.com/api/v3/ws/selfbot", "")
 }
 
 func Send(message WsMessage) {

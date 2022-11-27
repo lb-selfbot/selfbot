@@ -9,6 +9,7 @@ import (
 
 	"github.com/LightningDev1/LB-Selfbot/api"
 	"github.com/LightningDev1/LB-Selfbot/config"
+	"github.com/LightningDev1/LB-Selfbot/consolelogging"
 	"github.com/LightningDev1/LB-Selfbot/embed"
 	"github.com/LightningDev1/LB-Selfbot/http"
 	"github.com/LightningDev1/LB-Selfbot/logging"
@@ -22,7 +23,7 @@ var inviteRegex = regexp.MustCompile(`(https://)?(www\.)?(((discord(app)?)?\.com
 
 func (e *Events) OnMessage(_ *discordgo.Session, m *discordgo.MessageCreate) {
 	if m.Author == nil || m.Message == nil {
-		logging.Warn("Message: Author or Message is nil: ", m.Author, m.Message)
+		consolelogging.Warn("Message: Author or Message is nil: ", m.Author, m.Message)
 		return
 	}
 	if m.Type != discordgo.MessageTypeDefault && m.Type != discordgo.MessageTypeReply {
@@ -58,7 +59,7 @@ func (e *Events) OnMessageEdit(_ *discordgo.Session, m *discordgo.MessageUpdate)
 		m.Message = message
 	}
 	if m.Author == nil || m.Message == nil {
-		logging.Warn("MessageEdit: Author or Message is nil: ", m.Author, m.Message)
+		consolelogging.Warn("MessageEdit: Author or Message is nil: ", m.Author, m.Message)
 		return
 	}
 	if m.Type != discordgo.MessageTypeDefault {
@@ -408,7 +409,7 @@ func (e *Events) ensureUserEntry(userID string) SBDScore {
 func (e *Events) logSelfbotDetection(score SBDScore, message *discordgo.Message) {
 	if score.Score >= 15 && !score.Logged {
 		logging.UI.SelfbotDetection(e.Session, message, "")
-		logging.Info("Selfbot detection triggered for user " + message.Author.String())
+		consolelogging.Info("Selfbot detection triggered for user " + message.Author.String())
 		score.Logged = true
 	}
 }
