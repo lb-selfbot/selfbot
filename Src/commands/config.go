@@ -62,6 +62,12 @@ func (c ConfigCommands) RegisterCommands(router *dgc.Router) {
 		Handler:     c.delcommands,
 	})
 	router.RegisterCmd(&dgc.Command{
+		Name:        "mobilefriendly",
+		Description: "Make the embeds mobile friendly",
+		Usage:       "[p]mobilefriendly <on/off>",
+		Handler:     c.mobilefriendly,
+	})
+	router.RegisterCmd(&dgc.Command{
 		Name:        "notifications",
 		Description: "Turn toast notifications on or off",
 		Usage:       "[p]notifications <on/off>",
@@ -302,6 +308,17 @@ func (ConfigCommands) delcommands(ctx *dgc.Ctx) {
 		return
 	}
 	cfg.Selfbot.DeleteCommands = toggle == "on"
+	_ = cfg.Save()
+}
+
+func (ConfigCommands) mobilefriendly(ctx *dgc.Ctx) {
+	toggle := strings.ToLower(utils.Arguments["<on/off>"])
+	if toggle != "on" && toggle != "off" {
+		_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
+		return
+	}
+	cfg, _ := config.GetConfig()
+	cfg.Selfbot.MobileFriendly = toggle == "on"
 	_ = cfg.Save()
 }
 
