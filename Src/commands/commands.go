@@ -27,6 +27,7 @@ type CommandRegistrar struct {
 	NSFWCommands           NSFWCommands
 	RedditCommands         RedditCommands
 	SharingCommands        SharingCommands
+	ProtectionsCommands    ProtectionsCommands
 	ConfigCommands         ConfigCommands
 	HelpCommand            HelpCommand
 }
@@ -53,6 +54,7 @@ func (c CommandRegistrar) RegisterCommands(session *discordgo.Session, router *d
 	c.NSFWCommands.RegisterCommands(router)
 	c.RedditCommands.RegisterCommands(router)
 	c.SharingCommands.RegisterCommands(router)
+	c.ProtectionsCommands.RegisterCommands(router)
 	c.ConfigCommands.RegisterCommands(router)
 	c.HelpCommand.RegisterHelpCommand(router, session)
 }
