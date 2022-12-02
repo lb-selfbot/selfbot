@@ -57,6 +57,9 @@ func (c CryptoCommands) RegisterCommands(router *dgc.Router) {
 		{"zrx", "ZRX", "0x", "1896"},
 		{"ravencoin", "RVN", "RavenCoin", "2577"},
 		{"nano", "NANO", "Nano", "1567"},
+		{"polygon", "MATIC", "Polygon", "3890"},
+		{"avalanche", "AVAX", "Avalanche", "5805"},
+		{"algorand", "ALGO", "Algorand", "4030"},
 	}
 	for _, element := range cryptoCommands {
 		router.RegisterCmd(&dgc.Command{
