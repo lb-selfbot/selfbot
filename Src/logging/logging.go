@@ -3,6 +3,7 @@ package logging
 import (
 	"container/list"
 	"fmt"
+	"path/filepath"
 	"strings"
 	"time"
 
@@ -137,7 +138,7 @@ func (UILogging) Notification(message string) {
 		go toast.Push(message,
 			toast.WithTitle("LightningBot"),
 			toast.WithAppID("LightningBot"),
-			toast.WithIcon(utils.File.GetMainFolder()+"/Logo.png"),
+			toast.WithIcon(filepath.Join(utils.File.GetMainFolder(), "Logo.png")),
 		)
 	}
 }

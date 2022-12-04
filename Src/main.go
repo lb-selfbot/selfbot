@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"math/rand"
 	"os"
 	"os/signal"
@@ -44,9 +45,20 @@ func main() {
 }
 
 func selfbotMain(s overseer.State) {
+	args := strings.Join(os.Args, " ")
+
+	// constants.Console must be true if "-l" flag is not set
+	constants.Console = !strings.Contains(args, "-l")
+
+	if strings.Contains(args, "-v") {
+		fmt.Println(constants.VersionString[1:])
+		os.Exit(0)
+	}
+
 	if constants.Debug {
 		consolelogging.Warn("Debug Enabled!")
 	}
+
 	//startParams := api.GetStartParams()
 	rand.Seed(time.Now().UnixNano())
 	cfg, err := config.GetConfig()
@@ -122,6 +134,9 @@ func selfbotMain(s overseer.State) {
 	err = session.Open()
 	if err != nil {
 		consolelogging.Error(err)
+		if !constants.Debug {
+			os.Exit(0)
+		}
 	}
 
 	multitokensniper.Init(cfg)

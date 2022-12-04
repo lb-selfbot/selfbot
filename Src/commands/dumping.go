@@ -2,15 +2,16 @@ package commands
 
 import (
 	"fmt"
+	"os"
+	"path/filepath"
+	"strings"
+	"time"
+
 	"github.com/LightningDev1/LB-Selfbot/embed"
 	"github.com/LightningDev1/LB-Selfbot/http"
 	"github.com/LightningDev1/LB-Selfbot/utils"
 	"github.com/LightningDev1/dgc"
 	"github.com/LightningDev1/discordgo"
-	"os"
-	"path/filepath"
-	"strings"
-	"time"
 )
 
 type DumpingCommands struct{}
@@ -110,10 +111,9 @@ func (*DumpingCommands) dumpall(ctx *dgc.Ctx) {
 			message.Content,
 		)
 	}
-	folder := utils.File.GetMainFolder() + "/Dumping/All/"
-	folder = filepath.FromSlash(folder)
+	folder := filepath.Join(utils.File.GetMainFolder(), "Dumping", "All")
 	_ = os.MkdirAll(folder, os.ModePerm)
-	filePath := folder + utils.File.SanitizeFilename(channel.Name+".txt")
+	filePath := filepath.Join(folder, utils.File.SanitizeFilename(channel.Name+".txt"))
 	_ = utils.File.Write(filePath, logString)
 	_ = utils.Process.OpenURL(filePath)
 	embed.NewEmbed().
@@ -135,15 +135,14 @@ func (*DumpingCommands) dumpimages(ctx *dgc.Ctx) {
 		_ = ctx.RespondText("Error getting messages")
 		return
 	}
-	folder := utils.File.GetMainFolder() + "/Dumping/Images/" + utils.File.SanitizeFilename(channel.Name) + "/"
-	folder = filepath.FromSlash(folder)
+	folder := filepath.Join(utils.File.GetMainFolder(), "Dumping", "Images", utils.File.SanitizeFilename(channel.Name))
 	_ = os.MkdirAll(folder, os.ModePerm)
 	_ = utils.Process.OpenURL(folder)
 	images := 0
 	for _, message := range messages {
 		for _, attachment := range message.Attachments {
 			if strings.HasPrefix(attachment.ContentType, "image/") {
-				filePath := folder + utils.File.SanitizeFilename(attachment.Filename)
+				filePath := filepath.Join(folder, utils.File.SanitizeFilename(attachment.Filename))
 				fileBytes, _, _ := http.GetBytes(utils.Misc.Or(attachment.ProxyURL, attachment.URL))
 				_ = utils.File.WriteBytes(filePath, fileBytes)
 				images++
@@ -169,15 +168,14 @@ func (*DumpingCommands) dumpvideos(ctx *dgc.Ctx) {
 		_ = ctx.RespondText("Error getting messages")
 		return
 	}
-	folder := utils.File.GetMainFolder() + "/Dumping/Videos/" + utils.File.SanitizeFilename(channel.Name) + "/"
-	folder = filepath.FromSlash(folder)
+	folder := filepath.Join(utils.File.GetMainFolder(), "Dumping", "Videos", utils.File.SanitizeFilename(channel.Name))
 	_ = os.MkdirAll(folder, os.ModePerm)
 	_ = utils.Process.OpenURL(folder)
 	videos := 0
 	for _, message := range messages {
 		for _, attachment := range message.Attachments {
 			if strings.HasPrefix(attachment.ContentType, "video/") {
-				filePath := folder + utils.File.SanitizeFilename(attachment.Filename)
+				filePath := filepath.Join(folder, utils.File.SanitizeFilename(attachment.Filename))
 				fileBytes, _, _ := http.GetBytes(utils.Misc.Or(attachment.ProxyURL, attachment.URL))
 				_ = utils.File.WriteBytes(filePath, fileBytes)
 				videos++
@@ -203,15 +201,14 @@ func (*DumpingCommands) dumpaudio(ctx *dgc.Ctx) {
 		_ = ctx.RespondText("Error getting messages")
 		return
 	}
-	folder := utils.File.GetMainFolder() + "/Dumping/Audio/" + utils.File.SanitizeFilename(channel.Name) + "/"
-	folder = filepath.FromSlash(folder)
+	folder := filepath.Join(utils.File.GetMainFolder(), "Dumping", "Audio", utils.File.SanitizeFilename(channel.Name))
 	_ = os.MkdirAll(folder, os.ModePerm)
 	_ = utils.Process.OpenURL(folder)
 	audios := 0
 	for _, message := range messages {
 		for _, attachment := range message.Attachments {
 			if strings.HasPrefix(attachment.ContentType, "audio/") {
-				filePath := folder + utils.File.SanitizeFilename(attachment.Filename)
+				filePath := filepath.Join(folder, utils.File.SanitizeFilename(attachment.Filename))
 				fileBytes, _, _ := http.GetBytes(utils.Misc.Or(attachment.ProxyURL, attachment.URL))
 				_ = utils.File.WriteBytes(filePath, fileBytes)
 				audios++
@@ -237,15 +234,14 @@ func (*DumpingCommands) dumptext(ctx *dgc.Ctx) {
 		_ = ctx.RespondText("Error getting messages")
 		return
 	}
-	folder := utils.File.GetMainFolder() + "/Dumping/Text/" + utils.File.SanitizeFilename(channel.Name) + "/"
-	folder = filepath.FromSlash(folder)
+	folder := filepath.Join(utils.File.GetMainFolder(), "Dumping", "Text", utils.File.SanitizeFilename(channel.Name))
 	_ = os.MkdirAll(folder, os.ModePerm)
 	_ = utils.Process.OpenURL(folder)
 	texts := 0
 	for _, message := range messages {
 		for _, attachment := range message.Attachments {
 			if strings.HasPrefix(attachment.ContentType, "text/") {
-				filePath := folder + utils.File.SanitizeFilename(attachment.Filename)
+				filePath := filepath.Join(folder, utils.File.SanitizeFilename(attachment.Filename))
 				fileBytes, _, _ := http.GetBytes(utils.Misc.Or(attachment.ProxyURL, attachment.URL))
 				_ = utils.File.WriteBytes(filePath, fileBytes)
 				texts++
@@ -268,8 +264,7 @@ func (*DumpingCommands) dumpemojis(ctx *dgc.Ctx) {
 		_ = ctx.RespondText("Error getting emojis: " + err.Error())
 		return
 	}
-	folder := utils.File.GetMainFolder() + "/Dumping/Emojis/" + utils.File.SanitizeFilename(guild.Name) + "/"
-	folder = filepath.FromSlash(folder)
+	folder := filepath.Join(utils.File.GetMainFolder(), "Dumping", "Emojis", utils.File.SanitizeFilename(guild.Name))
 	_ = os.MkdirAll(folder, os.ModePerm)
 	_ = utils.Process.OpenURL(folder)
 	for _, emoji := range emojis {
@@ -279,7 +274,7 @@ func (*DumpingCommands) dumpemojis(ctx *dgc.Ctx) {
 		} else {
 			name += ".png"
 		}
-		filePath := folder + utils.File.SanitizeFilename(name)
+		filePath := filepath.Join(folder, utils.File.SanitizeFilename(name))
 		fileBytes, _, _ := http.GetBytes(emoji.URL())
 		_ = utils.File.WriteBytes(filePath, fileBytes)
 	}
@@ -294,8 +289,7 @@ func (*DumpingCommands) dumpavatars(ctx *dgc.Ctx) {
 		_ = ctx.RespondText("Error getting server: " + err.Error())
 		return
 	}
-	folder := utils.File.GetMainFolder() + "/Dumping/Avatars/" + utils.File.SanitizeFilename(guild.Name) + "/"
-	folder = filepath.FromSlash(folder)
+	folder := filepath.Join(utils.File.GetMainFolder(), "Dumping", "Avatars", utils.File.SanitizeFilename(guild.Name))
 	_ = os.MkdirAll(folder, os.ModePerm)
 	_ = utils.Process.OpenURL(folder)
 	for _, member := range guild.Members {
@@ -328,10 +322,9 @@ func (*DumpingCommands) dumpchannels(ctx *dgc.Ctx) {
 			logString += fmt.Sprintf("\t%s\n", channel.Name)
 		}
 	}
-	folder := utils.File.GetMainFolder() + "/Dumping/Channels/"
-	folder = filepath.FromSlash(folder)
+	folder := filepath.Join(utils.File.GetMainFolder(), "Dumping", "Channels")
 	_ = os.MkdirAll(folder, os.ModePerm)
-	filePath := folder + utils.File.SanitizeFilename(guild.Name+".txt")
+	filePath := filepath.Join(folder, utils.File.SanitizeFilename(guild.Name)+".txt")
 	_ = utils.File.Write(filePath, logString)
 	_ = utils.Process.OpenURL(filePath)
 	embed.NewEmbed().
@@ -355,10 +348,9 @@ func (*DumpingCommands) dumpmembers(ctx *dgc.Ctx) {
 	for _, member := range guild.Members {
 		logString += fmt.Sprintf("%s - %s\n", member.User.String(), member.User.ID)
 	}
-	folder := utils.File.GetMainFolder() + "/Dumping/Members/"
-	folder = filepath.FromSlash(folder)
+	folder := filepath.Join(utils.File.GetMainFolder(), "Dumping", "Members")
 	_ = os.MkdirAll(folder, os.ModePerm)
-	filePath := folder + utils.File.SanitizeFilename(guild.Name+".txt")
+	filePath := filepath.Join(folder, utils.File.SanitizeFilename(guild.Name)+".txt")
 	_ = utils.File.Write(filePath, logString)
 	_ = utils.Process.OpenURL(filePath)
 	embed.NewEmbed().

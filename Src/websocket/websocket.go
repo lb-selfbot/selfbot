@@ -95,14 +95,14 @@ func Init(username, password string) error {
 			case "CONFIG_UPDATE":
 				if wsMessage.Data.Config != nil {
 					wsMessage.Data.Config.Save()
-					// TODO: send CONFIG_UPDATE to ui
+					ipc.ConfigUpdate(wsMessage.Data.Config)
 				}
 			default:
 				fmt.Println("Unknown op", wsMessage, "raw data", string(msg))
 			}
 		},
 		OnError: func(err error) {
-			//logging.Error(err)
+			consolelogging.Error("Websocket error: ", err)
 			if !constants.Debug {
 				os.Exit(0)
 			}
@@ -111,7 +111,11 @@ func Init(username, password string) error {
 		PingMsg:          pingMsgEncrypted,
 		Reconnect:        true,
 	}
-	return Conn.Dial("wss://api.lightning-bot.com/api/v3/ws/selfbot", "")
+	err := Conn.Dial("wss://api.lightning-bot.com/api/v3/ws/selfbot", "")
+	if err != nil {
+		return err
+	}
+	
 }
 
 func Send(message WsMessage) {

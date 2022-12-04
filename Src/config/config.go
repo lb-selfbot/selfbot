@@ -2,8 +2,8 @@ package config
 
 import (
 	"encoding/json"
-	"fmt"
 	"os"
+	"path/filepath"
 	"sync"
 	"time"
 
@@ -36,7 +36,7 @@ type Config struct {
 			Password string `json:"Password"`
 		} `json:"LightningBot"`
 		Discord struct {
-			Token    string `json:"Token"`
+			Token string `json:"Token"`
 		} `json:"Discord"`
 	} `json:"Account"`
 	Notifications struct {
@@ -132,7 +132,7 @@ var (
 func (c Config) Save() error {
 	configMutex.Lock()
 	defer configMutex.Unlock()
-	configFile, err := os.Create(fmt.Sprintf("%s\\Config\\config.json", utils.File.GetMainFolder()))
+	configFile, err := os.OpenFile(filepath.Join(utils.File.GetMainFolder(), "Config", "config.json"), os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0644)
 	if err != nil {
 		return err
 	}
@@ -157,7 +157,7 @@ func GetConfig() (config Config, err error) {
 	if lastConfig != nil && time.Since(lastConfigTime) < time.Second*10 {
 		return *lastConfig, nil
 	}
-	configFile, err := os.Open(fmt.Sprintf("%s\\Config\\config.json", utils.File.GetMainFolder()))
+	configFile, err := os.Open(filepath.Join(utils.File.GetMainFolder(), "Config", "config.json"))
 	if err != nil {
 		return config, err
 	}
@@ -169,4 +169,11 @@ func GetConfig() (config Config, err error) {
 	lastConfig = &config
 	lastConfigTime = time.Now()
 	return config, nil
+}
+
+func SaveConfigFromUI(config *Config) {
+	configMutex.Lock()
+	defer configMutex.Unlock()
+	lastConfig = config
+	lastConfigTime = time.Now()
 }

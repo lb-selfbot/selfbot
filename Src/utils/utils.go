@@ -506,7 +506,7 @@ func (StringUtils) CenterSlices(rows []string) string {
 		}
 	}
 	// Center the rows
-	spaceCount := (w-max)/2
+	spaceCount := (w - max) / 2
 	for i, row := range rows {
 		rows[i] = strings.Repeat(" ", spaceCount) + row
 	}
@@ -618,12 +618,11 @@ func (f *FileUtils) Write(filePath, content string) error {
 }
 
 func (*FileUtils) GetMainFolder() string {
-	if runtime.GOOS == "windows" {
-		return fmt.Sprintf("%s\\LightningBot", WindowsGetDocumentsFolder())
-	} else {
-		// TODO: Linux support
-		return "/.config/discordgo/"
+	configDir, err := os.UserConfigDir()
+	if err != nil {
+		return ""
 	}
+	return filepath.Join(configDir, "LightningBot")
 }
 
 var File = &FileUtils{}

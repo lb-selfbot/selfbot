@@ -6,6 +6,7 @@ import (
 	"os"
 
 	"github.com/LightningDev1/LB-Selfbot/config"
+	"github.com/LightningDev1/LB-Selfbot/consolelogging"
 	"github.com/LightningDev1/LB-Selfbot/constants"
 	"github.com/gorilla/websocket"
 )
@@ -96,8 +97,14 @@ func (i *Ipc) OnConnect() {
 
 func (i *Ipc) OnMessage(jsonEvent *JsonEvent) {
 	switch jsonEvent.Op {
+	case OP_Hello:
+		break
 	case OP_Exit:
 		os.Exit(0)
+	case OP_ConfigUpdate:
+		config.SaveConfigFromUI(jsonEvent.Data.Config)
+	default:
+		consolelogging.Warn("Unknown IPC message:", jsonEvent)
 	}
 }
 
