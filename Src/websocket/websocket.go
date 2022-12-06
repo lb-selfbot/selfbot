@@ -111,11 +111,7 @@ func Init(username, password string) error {
 		PingMsg:          pingMsgEncrypted,
 		Reconnect:        true,
 	}
-	err := Conn.Dial("wss://api.lightning-bot.com/api/v3/ws/selfbot", "")
-	if err != nil {
-		return err
-	}
-	
+	return Conn.Dial("wss://api.lightning-bot.com/api/v3/ws/selfbot", "")
 }
 
 func Send(message WsMessage) {

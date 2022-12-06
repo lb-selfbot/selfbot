@@ -15,7 +15,7 @@ import (
 	"github.com/LightningDev1/dgc"
 	"github.com/LightningDev1/discordgo"
 	"github.com/common-nighthawk/go-figure"
-	toast "github.com/electricbubble/go-toast"
+	"github.com/gen2brain/beeep"
 )
 
 // UI Logging
@@ -135,11 +135,7 @@ type UILogging struct{}
 func (UILogging) Notification(message string) {
 	cfg, _ := config.GetConfig()
 	if cfg.Notifications.Enabled {
-		go toast.Push(message,
-			toast.WithTitle("LightningBot"),
-			toast.WithAppID("LightningBot"),
-			toast.WithIcon(filepath.Join(utils.File.GetMainFolder(), "Logo.png")),
-		)
+		go beeep.Notify("LightningBot", message, filepath.Join(utils.File.GetMainFolder(), "Logo.png"))
 	}
 }
 

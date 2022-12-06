@@ -5,7 +5,6 @@ import (
 	"math/rand"
 	"os"
 	"os/signal"
-	"runtime"
 	"strings"
 	"time"
 
@@ -22,29 +21,9 @@ import (
 	"github.com/LightningDev1/LB-Selfbot/websocket"
 	"github.com/LightningDev1/dgc"
 	"github.com/LightningDev1/discordgo"
-	"github.com/jpillora/overseer"
 )
 
-func init() {
-	// Fix ANSI on Windows cmd
-	if strings.Contains(runtime.GOOS, "windows") && constants.Console {
-		stdout := syscall.Handle(os.Stdout.Fd())
-
-		var originalMode uint32
-		syscall.GetConsoleMode(stdout, &originalMode)
-		originalMode |= 0x0004
-
-		syscall.MustLoadDLL("kernel32").MustFindProc("SetConsoleMode").Call(uintptr(stdout), uintptr(originalMode))
-	}
-}
-
-func main() {
-	overseer.Run(overseer.Config{
-		Program: selfbotMain,
-	})
-}
-
-func selfbotMain(s overseer.State) {
+func init_args() {
 	args := strings.Join(os.Args, " ")
 
 	// constants.Console must be true if "-l" flag is not set
@@ -54,7 +33,10 @@ func selfbotMain(s overseer.State) {
 		fmt.Println(constants.VersionString[1:])
 		os.Exit(0)
 	}
+}
 
+func main() {
+	init_args()
 	if constants.Debug {
 		consolelogging.Warn("Debug Enabled!")
 	}
@@ -127,11 +109,14 @@ func selfbotMain(s overseer.State) {
 	router.Initialize(session)
 
 	if !constants.Debug {
-		ipc.IPC.WaitForConnection()
+		if !constants.Console {
+			ipc.IPC.WaitForConnection()
+		}
 		websocket.WaitForConnection()
 	}
 
 	err = session.Open()
+	fmt.Println(err)
 	if err != nil {
 		consolelogging.Error(err)
 		if !constants.Debug {

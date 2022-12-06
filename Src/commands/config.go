@@ -6,13 +6,12 @@ import (
 	"strconv"
 	"strings"
 
-	//"github.com/electricbubble/go-toast"
-
 	"github.com/LightningDev1/LB-Selfbot/config"
-	"github.com/LightningDev1/LB-Selfbot/ipc"
+	"github.com/LightningDev1/LB-Selfbot/logging"
 	"github.com/LightningDev1/LB-Selfbot/utils"
 	"github.com/LightningDev1/dgc"
 	"github.com/LightningDev1/discordgo"
+	"github.com/gen2brain/beeep"
 )
 
 type ConfigCommands struct{}
@@ -334,13 +333,8 @@ func (ConfigCommands) notifications(ctx *dgc.Ctx) {
 }
 
 func (ConfigCommands) examplenotification(*dgc.Ctx) {
-	/*_ = toast.Push("test message",
-		toast.WithTitle("app title"),
-		toast.WithMessage("test message 2"),
-		toast.WithAudio(toast.LoopingAlarm4),
-		toast.WithProtocolAction("Open Maps", "bingmaps:?q=sushi"),
-	)*/
-	ipc.SendNotification("This is an example notification.")
+	_ = beeep.Notify("Title", "Message body", "assets/information.png")
+	logging.UI.Notification("This is an example notification.")
 }
 
 func (ConfigCommands) nitrosniper(ctx *dgc.Ctx) {
