@@ -3,7 +3,7 @@ module github.com/LightningDev1/LB-Selfbot
 go 1.19
 
 require (
-	github.com/LightningDev1/dgc v1.1.2
+	github.com/LightningDev1/dgc v1.1.3
 	github.com/LightningDev1/discordgo v0.26.0
 	github.com/bitly/go-simplejson v0.5.0
 	github.com/brianvoe/gofakeit/v6 v6.19.0
