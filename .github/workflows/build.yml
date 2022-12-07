@@ -39,7 +39,6 @@ jobs:
           mkdir ${{ github.workspace }}/executables/linux/arm64
           mkdir ${{ github.workspace }}/executables/macos
           mkdir ${{ github.workspace }}/executables/macos/amd64
-          mkdir ${{ github.workspace }}/executables/macos/arm
           mkdir ${{ github.workspace }}/executables/macos/arm64
 
       - name: Build for Windows
@@ -76,8 +75,6 @@ jobs:
           cd Src
           export GOARCH=amd64
           go build -ldflags "-s -w" -o ${{ github.workspace }}/executables/macos/amd64/selfbot
-          export GOARCH=arm
-          go build -ldflags "-s -w" -o ${{ github.workspace }}/executables/macos/arm/selfbot
           export GOARCH=arm64
           go build -ldflags "-s -w" -o ${{ github.workspace }}/executables/macos/arm64/selfbot
           
