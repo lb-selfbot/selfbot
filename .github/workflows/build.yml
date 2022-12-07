@@ -38,7 +38,6 @@ jobs:
           mkdir ${{ github.workspace }}/executables/linux/arm
           mkdir ${{ github.workspace }}/executables/linux/arm64
           mkdir ${{ github.workspace }}/executables/macos
-          mkdir ${{ github.workspace }}/executables/macos/386
           mkdir ${{ github.workspace }}/executables/macos/amd64
           mkdir ${{ github.workspace }}/executables/macos/arm
           mkdir ${{ github.workspace }}/executables/macos/arm64
@@ -75,8 +74,6 @@ jobs:
           GOOS: "darwin"
         run: |
           cd Src
-          export GOARCH=386
-          go build -ldflags "-s -w" -o ${{ github.workspace }}/executables/macos/386/selfbot
           export GOARCH=amd64
           go build -ldflags "-s -w" -o ${{ github.workspace }}/executables/macos/amd64/selfbot
           export GOARCH=arm
