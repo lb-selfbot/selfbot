@@ -107,7 +107,7 @@ func Init(username, password string) error {
 				os.Exit(0)
 			}
 		},
-		PingIntervalSecs: 10,
+		PingIntervalSecs: 60,
 		PingMsg:          pingMsgEncrypted,
 		Reconnect:        true,
 	}
