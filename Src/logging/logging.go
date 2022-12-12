@@ -12,10 +12,10 @@ import (
 	"github.com/LightningDev1/LB-Selfbot/ipc"
 	"github.com/LightningDev1/LB-Selfbot/utils"
 	"github.com/LightningDev1/LB-Selfbot/websocket"
+	"github.com/LightningDev1/beeep"
 	"github.com/LightningDev1/dgc"
 	"github.com/LightningDev1/discordgo"
 	"github.com/common-nighthawk/go-figure"
-	"github.com/gen2brain/beeep"
 )
 
 // UI Logging
@@ -135,7 +135,7 @@ type UILogging struct{}
 func (UILogging) Notification(message string) {
 	cfg, _ := config.GetConfig()
 	if cfg.Notifications.Enabled {
-		go beeep.Notify("LightningBot", message, filepath.Join(utils.File.GetMainFolder(), "Logo.png"))
+		go beeep.Notify("LightningBot", message, "LightningBot", filepath.Join(utils.File.GetMainFolder(), "Logo.png"))
 	}
 }
 
@@ -190,7 +190,6 @@ func (UILogging) OnReady(router *dgc.Router, event *discordgo.Ready) {
 		)
 
 		fmt.Println(message)
-
 	}
 
 	message := "<image Source=\"assets/Banner.png\" Width=\"650\" Height=\"150\" Centered />\n" +
