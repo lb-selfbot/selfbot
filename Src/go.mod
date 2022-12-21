@@ -22,6 +22,8 @@ require (
 	golang.org/x/text v0.5.0
 )
 
+require nhooyr.io/websocket v1.8.7 // indirect
+
 require (
 	github.com/LightningDev1/beeep v0.0.0-20221212160032-7204ef4397be
 	github.com/andybalholm/brotli v1.0.4 // indirect

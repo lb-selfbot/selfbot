@@ -72,7 +72,7 @@ func (i *Ipc) Init() {
 		i.Connected = false
 		i.Conn = nil
 		i.Connect = make(chan struct{})
-		if !constants.Debug {
+		if !constants.DEBUG {
 			os.Exit(0)
 		}
 	})

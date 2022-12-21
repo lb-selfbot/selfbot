@@ -14,7 +14,7 @@ import (
 
 // https://github.com/Clinet/discordgo-embed
 
-//Embed ...
+// Embed ...
 type Embed struct {
 	*discordgo.MessageEmbed
 	Subtext string
@@ -31,25 +31,25 @@ var (
 	ansiRegex = regexp.MustCompile("\x1b(.*?)m")
 )
 
-//NewEmbed returns a new embed object
+// NewEmbed returns a new embed object
 func NewEmbed() *Embed {
 	embed := &Embed{&discordgo.MessageEmbed{}, ""}
 	cfg, err := config.GetConfig()
 	if err != nil {
 		return embed
 	}
-	embed.SetTitle(strings.Replace(cfg.Selfbot.Title, "$VERSION", constants.VersionString, -1))
-	embed.SetFooter(strings.Replace(cfg.Selfbot.Footer, "$VERSION", constants.VersionString, -1))
+	embed.SetTitle(strings.Replace(cfg.Selfbot.Title, "$VERSION", constants.VERSION_STRING, -1))
+	embed.SetFooter(strings.Replace(cfg.Selfbot.Footer, "$VERSION", constants.VERSION_STRING, -1))
 	return embed
 }
 
-//SetTitle ...
+// SetTitle ...
 func (e *Embed) SetTitle(name string) *Embed {
 	e.Title = name
 	return e
 }
 
-//SetDescription [desc]
+// SetDescription [desc]
 func (e *Embed) SetDescription(description string) *Embed {
 	if len(description) > 2048 {
 		description = description[:2048]
@@ -64,7 +64,7 @@ func (e *Embed) SetSubtext(text string) *Embed {
 	return e
 }
 
-//AddField [name] [value]
+// AddField [name] [value]
 func (e *Embed) AddField(name, value string, flags ...bool) *Embed {
 	inline := len(flags) > 0
 	bypass := len(flags) > 1
@@ -124,7 +124,7 @@ func (e *Embed) AddField(name, value string, flags ...bool) *Embed {
 	return e
 }
 
-//SetFooter [Text] [iconURL]
+// SetFooter [Text] [iconURL]
 func (e *Embed) SetFooter(args ...string) *Embed {
 	iconURL := ""
 	text := ""
@@ -152,7 +152,7 @@ func (e *Embed) SetFooter(args ...string) *Embed {
 	return e
 }
 
-//SetImage ...
+// SetImage ...
 func (e *Embed) SetImage(args ...string) *Embed {
 	var URL string
 	var proxyURL string
@@ -173,7 +173,7 @@ func (e *Embed) SetImage(args ...string) *Embed {
 	return e
 }
 
-//SetThumbnail ...
+// SetThumbnail ...
 func (e *Embed) SetThumbnail(args ...string) *Embed {
 	var URL string
 	var proxyURL string
@@ -194,7 +194,7 @@ func (e *Embed) SetThumbnail(args ...string) *Embed {
 	return e
 }
 
-//SetAuthor ...
+// SetAuthor ...
 func (e *Embed) SetAuthor(args ...string) *Embed {
 	var (
 		name     string
@@ -229,13 +229,13 @@ func (e *Embed) SetAuthor(args ...string) *Embed {
 	return e
 }
 
-//SetURL ...
+// SetURL ...
 func (e *Embed) SetURL(URL string) *Embed {
 	e.URL = URL
 	return e
 }
 
-//SetColor ...
+// SetColor ...
 func (e *Embed) SetColor(clr int) *Embed {
 	e.Color = clr
 	return e

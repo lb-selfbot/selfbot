@@ -23,21 +23,22 @@ import (
 	"github.com/LightningDev1/discordgo"
 )
 
-func init_args() {
+func initArgs() {
 	args := strings.Join(os.Args, " ")
 
 	// constants.Console must be true if "-l" flag is not set
-	constants.Console = !strings.Contains(args, "-l")
+	constants.CONSOLE = !strings.Contains(args, "-l")
 
 	if strings.Contains(args, "-v") {
-		fmt.Println(constants.VersionString[1:])
+		fmt.Println(constants.VERSION_STRING[1:])
 		os.Exit(0)
 	}
 }
 
 func main() {
-	init_args()
-	if constants.Debug {
+	initArgs()
+
+	if constants.DEBUG {
 		consolelogging.Warn("Debug Enabled!")
 	}
 
@@ -47,14 +48,14 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	if !constants.Console {
+	if !constants.CONSOLE {
 		ipc.IPC.Init()
 	}
 
-	err = websocket.Init(cfg.Account.LightningBot.Username, cfg.Account.LightningBot.Password)
+	err = websocket.Init(cfg.Account.LightningBot.Username, cfg.Account.LightningBot.Password+"a")
 	if err != nil {
 		consolelogging.Error(err)
-		if !constants.Debug {
+		if !constants.DEBUG {
 			os.Exit(0)
 		}
 	}
@@ -108,18 +109,22 @@ func main() {
 
 	router.Initialize(session)
 
-	if !constants.Debug {
-		if !constants.Console {
+	if !constants.DEBUG {
+		if !constants.CONSOLE {
 			ipc.IPC.WaitForConnection()
 		}
 		websocket.WaitForConnection()
 	}
 
 	err = session.Open()
-	fmt.Println(err)
 	if err != nil {
-		consolelogging.Error(err)
-		if !constants.Debug {
+		if strings.Contains(err.Error(), "Authentication failed") {
+			consolelogging.Error("Invalid token!")
+		} else {
+			consolelogging.Error(err)
+		}
+
+		if !constants.DEBUG {
 			os.Exit(0)
 		}
 	}

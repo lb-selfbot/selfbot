@@ -40,7 +40,7 @@ func Ping(host string) (time.Duration, error) {
 	if err != nil {
 		return time.Duration(0), err
 	}
-	stats := pinger.Statistics() // get send/receive/duplicate/rtt stats
+	stats := pinger.Statistics()
 	return stats.AvgRtt, nil
 }
 
@@ -183,11 +183,11 @@ func Translate(text, language string) *TranslateResult {
 	language = strings.ToLower(language)
 	language = strings.Split(language, "_")[0]
 
-	if _, ok := constants.Languages[language]; !ok {
-		if _, ok := constants.LanguageSpecialCases[language]; ok {
-			language = constants.LanguageSpecialCases[language]
-		} else if _, ok := constants.LanguageCodes[language]; ok {
-			language = constants.LanguageCodes[language]
+	if _, ok := constants.LANGUAGES[language]; !ok {
+		if _, ok := constants.LANGUAGE_SPECIAL_CASES[language]; ok {
+			language = constants.LANGUAGE_SPECIAL_CASES[language]
+		} else if _, ok := constants.LANGUAGE_CODES[language]; ok {
+			language = constants.LANGUAGE_CODES[language]
 		} else {
 			return &TranslateResult{
 				Error: fmt.Errorf("invalid destination language"),

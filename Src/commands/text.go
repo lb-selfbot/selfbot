@@ -4,6 +4,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/LightningDev1/LB-Selfbot/constants"
 	"github.com/LightningDev1/LB-Selfbot/utils"
 	"github.com/LightningDev1/dgc"
 	"github.com/common-nighthawk/go-figure"
@@ -169,10 +170,9 @@ func (TextCommands) reverse(ctx *dgc.Ctx) {
 
 func (TextCommands) alphabet(ctx *dgc.Ctx) {
 	message, _ := ctx.Session.ChannelMessageSend(ctx.Event.ChannelID, "a")
-	chars := []rune(utils.LowercaseAlphabet)
-	for i := 1; i < len(chars); i++ {
+	for i := 1; i < len(constants.ALPHABET); i++ {
 		time.Sleep(1 * time.Second)
-		char := string(chars[i])
+		char := string(constants.ALPHABET[i])
 		_, _ = ctx.Session.ChannelMessageEdit(message.ChannelID, message.ID, char)
 	}
 }

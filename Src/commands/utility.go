@@ -433,8 +433,8 @@ func (UtilityCommands) translate(ctx *dgc.Ctx) {
 		return
 	}
 	embed.NewEmbed().
-		AddField("Source Language", utils.String.Capitalize(constants.Languages[translateResult.SourceLanguage])).
-		AddField("Destination Language", utils.String.Capitalize(constants.Languages[translateResult.DestinationLanguage])).
+		AddField("Source Language", utils.String.Capitalize(constants.LANGUAGES[translateResult.SourceLanguage])).
+		AddField("Destination Language", utils.String.Capitalize(constants.LANGUAGES[translateResult.DestinationLanguage])).
 		AddField("Original Text", translateResult.Original).
 		AddField("Translated Text", translateResult.Result).
 		Send(ctx)
@@ -448,7 +448,7 @@ func (UtilityCommands) detectlang(ctx *dgc.Ctx) {
 	}
 	embed.NewEmbed().
 		AddField("Text", translateResult.Original).
-		AddField("Detected Language", utils.String.Capitalize(constants.Languages[translateResult.SourceLanguage])).
+		AddField("Detected Language", utils.String.Capitalize(constants.LANGUAGES[translateResult.SourceLanguage])).
 		AddField("Confidence", fmt.Sprintf("%.2f", translateResult.Confidence)).
 		Send(ctx)
 }
@@ -460,7 +460,7 @@ func (UtilityCommands) english(ctx *dgc.Ctx) {
 		return
 	}
 	embed.NewEmbed().
-		AddField("Source Language", utils.String.Capitalize(constants.Languages[translateResult.SourceLanguage])).
+		AddField("Source Language", utils.String.Capitalize(constants.LANGUAGES[translateResult.SourceLanguage])).
 		AddField("Original Text", translateResult.Original).
 		AddField("Translated Text", translateResult.Result).
 		Send(ctx)

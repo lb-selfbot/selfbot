@@ -91,7 +91,7 @@ func (c *ConsoleMessage) AddInfoConditional(key, value string, condition bool) *
 }
 
 func (c *ConsoleMessage) Show() {
-	if constants.Console {
+	if constants.CONSOLE {
 		r, g, b := utils.Misc.HexToRGB(c.Color)
 		timeFormat := UI.ColoredConsole(time.Now().Local().Format("15:04:05"), 193, 239, 255, false)
 		message := UI.ColoredConsole("[", 238, 238, 238, false) + timeFormat + UI.ColoredConsole("] ", 238, 238, 238, false) + UI.ColoredConsole(c.Title, r, g, b, false) + "\n"
@@ -174,10 +174,10 @@ func (UILogging) OnReady(router *dgc.Router, event *discordgo.Ready) {
 	}
 	UI.Notification("Connected to " + event.User.String())
 
-	bannerTextUpper := "LightningBot " + constants.VersionString + " | " + event.User.String() + " | Prefix: " + cfg.Selfbot.CommandPrefix
+	bannerTextUpper := "LightningBot " + constants.VERSION_STRING + " | " + event.User.String() + " | Prefix: " + cfg.Selfbot.CommandPrefix
 	bannerTextLower := fmt.Sprint(len(router.Commands)) + " Commands | " + fmt.Sprint(len(event.Guilds)) + " Servers | " + fmt.Sprint(friends) + " Friends"
 
-	if constants.Console {
+	if constants.CONSOLE {
 		// Clear console
 		fmt.Print("\033[H\033[2J")
 
@@ -193,7 +193,7 @@ func (UILogging) OnReady(router *dgc.Router, event *discordgo.Ready) {
 	}
 
 	message := "<image Source=\"assets/Banner.png\" Width=\"650\" Height=\"150\" Centered />\n" +
-		UI.Centered("LightningBot "+constants.VersionString+" | "+event.User.String()+" | Prefix: "+cfg.Selfbot.CommandPrefix, "#C1EFFF") + "\n" +
+		UI.Centered("LightningBot "+constants.VERSION_STRING+" | "+event.User.String()+" | Prefix: "+cfg.Selfbot.CommandPrefix, "#C1EFFF") + "\n" +
 		UI.Centered(fmt.Sprint(len(router.Commands))+" Commands | "+fmt.Sprint(len(event.Guilds))+" Servers | "+fmt.Sprint(friends)+" Friends", "#C1EFFF") + "\n"
 
 	ConsoleClear()

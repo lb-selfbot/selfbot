@@ -118,12 +118,12 @@ func (r RPCCommands) RegisterCommands(router *dgc.Router) {
 					continue
 				}
 				err = client.SetActivity(client.Activity{
-					State:      strings.ReplaceAll(cfg.RPC.State, "$VERSION", constants.VersionString),
-					Details:    strings.ReplaceAll(cfg.RPC.Details, "$VERSION", constants.VersionString),
+					State:      strings.ReplaceAll(cfg.RPC.State, "$VERSION", constants.VERSION_STRING),
+					Details:    strings.ReplaceAll(cfg.RPC.Details, "$VERSION", constants.VERSION_STRING),
 					LargeImage: cfg.RPC.LargeImage,
-					LargeText:  strings.ReplaceAll(cfg.RPC.LargeText, "$VERSION", constants.VersionString),
+					LargeText:  strings.ReplaceAll(cfg.RPC.LargeText, "$VERSION", constants.VERSION_STRING),
 					SmallImage: cfg.RPC.SmallImage,
-					SmallText:  strings.ReplaceAll(cfg.RPC.SmallText, "$VERSION", constants.VersionString),
+					SmallText:  strings.ReplaceAll(cfg.RPC.SmallText, "$VERSION", constants.VERSION_STRING),
 					Buttons:    r.getButtons(cfg.RPC),
 					Timestamps: r.getTimestamps(cfg.RPC.Time, startTime),
 					Party:      r.getParty(cfg.RPC),
@@ -147,7 +147,7 @@ func (RPCCommands) getButtons(rpcData config.RPCData) []*client.Button {
 	var buttonsToReturn []*client.Button
 	for _, button := range rpcData.Buttons {
 		buttonsToReturn = append(buttonsToReturn, &client.Button{
-			Label: strings.ReplaceAll(button.Label, "$VERSION", constants.VersionString),
+			Label: strings.ReplaceAll(button.Label, "$VERSION", constants.VERSION_STRING),
 			Url:   button.URL,
 		})
 	}

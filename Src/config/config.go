@@ -153,7 +153,7 @@ func (c Config) Save() error {
 func GetConfig() (config Config, err error) {
 	configMutex.Lock()
 	defer configMutex.Unlock()
-	// Check if the config is already loaded in the last 2 seconds
+	// Check if the config is already loaded in the last 10 seconds
 	if lastConfig != nil && time.Since(lastConfigTime) < time.Second*10 {
 		return *lastConfig, nil
 	}

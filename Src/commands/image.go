@@ -980,16 +980,18 @@ func (ImageCommands) tweet(ctx *dgc.Ctx) {
 }
 
 func (ImageCommands) meme(ctx *dgc.Ctx) {
-	jsonResult, err := http.GetJson("https://meme-api.herokuapp.com/gimme")
+	jsonResult, err := http.GetJson("https://api.lightning-bot.com/api/v3/misc/meme")
 	if err != nil {
 		_ = ctx.RespondText("An error has occurred: " + err.Error())
 		return
 	}
+
+	meme := jsonResult.Get("meme")
 	embed.NewEmbed().
-		SetTitle(jsonResult.Get("title").MustString()).
-		SetImage(jsonResult.Get("url").MustString()).
-		AddField("URL", fmt.Sprintf("`%s`", jsonResult.Get("postLink").MustString())).
-		SetFooter(fmt.Sprintf("Subreddit: %s | Upvotes: %d | Posted by: u/%s", jsonResult.Get("subreddit").MustString(), jsonResult.Get("ups").MustInt(), jsonResult.Get("author").MustString())).
+		SetTitle(meme.Get("title").MustString()).
+		SetImage(meme.Get("imagelink").MustString()).
+		AddField("URL", fmt.Sprintf("`%s`", meme.Get("permalink").MustString())).
+		SetFooter(fmt.Sprintf("Subreddit: %s | Upvotes: %d | Posted by: u/%s", meme.Get("subreddit").MustString(), meme.Get("upvotes").MustInt(), meme.Get("author").MustString())).
 		Send(ctx)
 }
 

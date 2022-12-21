@@ -2,7 +2,6 @@ package eventhandlers
 
 import (
 	"net/url"
-	"regexp"
 	"strings"
 	"time"
 	"unicode"
@@ -10,6 +9,7 @@ import (
 	"github.com/LightningDev1/LB-Selfbot/api"
 	"github.com/LightningDev1/LB-Selfbot/config"
 	"github.com/LightningDev1/LB-Selfbot/consolelogging"
+	"github.com/LightningDev1/LB-Selfbot/constants"
 	"github.com/LightningDev1/LB-Selfbot/embed"
 	"github.com/LightningDev1/LB-Selfbot/http"
 	"github.com/LightningDev1/LB-Selfbot/logging"
@@ -18,8 +18,6 @@ import (
 	"github.com/LightningDev1/dgc"
 	"github.com/LightningDev1/discordgo"
 )
-
-var inviteRegex = regexp.MustCompile(`(https://)?(www\.)?(((discord(app)?)?\.com/invite)|((discord(app)?)?\.gg))/(.+)`)
 
 func (e *Events) OnMessage(_ *discordgo.Session, m *discordgo.MessageCreate) {
 	if m.Author == nil || m.Message == nil {
@@ -274,7 +272,7 @@ func (e *Events) checkProtections(message *discordgo.Message, cfg *config.Config
 		if userPerms&discordgo.PermissionManageMessages != 0 || userPerms&discordgo.PermissionAdministrator != 0 {
 			return
 		}
-		if cfg.Protections.ServerProtections.AntiInvite && inviteRegex.MatchString(message.Content) {
+		if cfg.Protections.ServerProtections.AntiInvite && constants.INVITE_REGEX.MatchString(message.Content) {
 			err := e.Session.ChannelMessageDelete(message.ChannelID, message.ID)
 			if err == nil {
 				ctx := &dgc.Ctx{

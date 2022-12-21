@@ -2,22 +2,27 @@ package websocket
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
+	"net/http"
 	"os"
 	"time"
+
+	"golang.org/x/net/context"
+	"nhooyr.io/websocket"
 
 	"github.com/LightningDev1/LB-Selfbot/config"
 	"github.com/LightningDev1/LB-Selfbot/consolelogging"
 	"github.com/LightningDev1/LB-Selfbot/constants"
 	"github.com/LightningDev1/LB-Selfbot/encryption"
 	"github.com/LightningDev1/LB-Selfbot/ipc"
-	"github.com/rgamba/evtwebsocket"
 )
 
-var Conn *evtwebsocket.Conn
+var Context = context.Background()
+var Conn *websocket.Conn
 var Encryption *encryption.AESCBC
 var Connected bool
-var Connect chan struct{} = make(chan struct{})
+var Connect = make(chan struct{})
 
 type WsData struct {
 	Username     string         `json:"username,omitempty"`
@@ -35,6 +40,61 @@ type WsMessage struct {
 }
 
 func Init(username, password string) error {
+	InitEncryption()
+
+	options := &websocket.DialOptions{
+		HTTPHeader: http.Header{
+			"Origin": []string{"http://localhost/"},
+		},
+	}
+
+	conn, _, err := websocket.Dial(Context, "wss://api.lightning-bot.com/api/v3/ws/selfbot", options)
+	if err != nil {
+		return err
+	}
+	Conn = conn
+
+	hostname, _ := os.Hostname()
+	_ = Send(WsMessage{
+		Op: "HELLO",
+		Data: WsData{
+			Username:     username,
+			Password:     password,
+			ComputerName: hostname,
+			Time:         time.Now().Unix(),
+			ConsoleText:  ipc.Console,
+		},
+	})
+
+	go func() {
+		for {
+			_, msg, err := Conn.Read(Context)
+			if err != nil {
+				OnError(err)
+				if !constants.DEBUG {
+					os.Exit(0)
+				}
+				return
+			}
+
+			decryptedMsg, _ := Encryption.Decrypt(msg)
+			consolelogging.Debug("Received ws=>sb message: " + string(decryptedMsg))
+
+			wsMessage := WsMessage{}
+
+			err = json.Unmarshal(decryptedMsg, &wsMessage)
+			if err != nil {
+				continue
+			}
+
+			OnRead(wsMessage)
+		}
+	}()
+
+	return nil
+}
+
+func InitEncryption() {
 	// XOR encryption
 	encrypted := []int{62, 46, 10, 38, 2, 61, 98, 56, 6, 96, 6, 55, 60, 1, 17, 50, 7, 97, 67, 11, 51, 28, 15, 123, 46, 48, 8, 50, 42, 43, 36, 16, 99, 61, 28, 34, 11, 65, 100, 4, 93, 22, 59, 68, 17, 51, 7, 49, 4, 60, 51, 15, 42, 16, 19, 56, 4, 91, 21, 10, 32, 103, 102, 6, 43, 97, 34, 31, 13, 32, 47, 42, 51, 8, 57, 14, 21, 33, 57, 78, 110, 13, 0, 55, 78, 41, 122, 86, 97, 125, 90, 22, 126, 7, 68, 47, 71, 28, 24, 106}
 	keyInt := []int{89, 85, 112, 112, 105, 98, 113, 73, 102, 110, 75, 83, 117, 66, 71, 119, 111, 69, 117, 79, 121, 112, 71, 97, 105, 104, 90, 71, 89, 74, 66, 117, 81, 75, 83, 117, 83, 83, 85, 84, 67, 88, 108, 83, 90, 71, 74, 111, 118, 117}
@@ -47,77 +107,67 @@ func Init(username, password string) error {
 	key, _ := keyEncryption.Decrypt(encryptedKey)
 
 	Encryption = &encryption.AESCBC{Key: string(key)}
-	pingMsg, _ := json.Marshal(WsMessage{Op: "PING"})
-	pingMsgEncrypted, _ := Encryption.Encrypt(pingMsg)
-	Conn = &evtwebsocket.Conn{
-		OnConnected: func(*evtwebsocket.Conn) {
-			hostname, _ := os.Hostname()
-			Send(WsMessage{
-				Op: "HELLO",
-				Data: WsData{
-					Username:     username,
-					Password:     password,
-					ComputerName: hostname,
-					Time:         time.Now().Unix(),
-					ConsoleText:  ipc.Console,
-				},
-			})
-		},
-		OnMessage: func(msg []byte, _ *evtwebsocket.Conn) {
-			decryptedMsg, _ := Encryption.Decrypt(msg)
-			consolelogging.Debug("Received ws=>sb message: " + string(decryptedMsg))
-			wsMessage := WsMessage{}
-			_ = json.Unmarshal(decryptedMsg, &wsMessage)
-			switch wsMessage.Op {
-			case "HELLO_ACK":
-				Connected = true
-				Connect <- struct{}{}
-			case "PONG":
-				break
-			case "EXIT":
-				os.Exit(0)
-			case "RESTART":
-				ipc.IPC.Restart()
-			case "WEBSITE_CONNECT":
-				Send(WsMessage{
-					Op: "CONSOLE_SET",
-					Data: WsData{
-						Text: ipc.Console,
-					},
-				})
-				cfg, _ := config.GetConfig()
-				Send(WsMessage{
-					Op: "CONFIG_UPDATE",
-					Data: WsData{
-						Config: &cfg,
-					},
-				})
-			case "CONFIG_UPDATE":
-				if wsMessage.Data.Config != nil {
-					wsMessage.Data.Config.Save()
-					ipc.ConfigUpdate(wsMessage.Data.Config)
-				}
-			default:
-				fmt.Println("Unknown op", wsMessage, "raw data", string(msg))
-			}
-		},
-		OnError: func(err error) {
-			consolelogging.Error("Websocket error: ", err)
-			if !constants.Debug {
-				os.Exit(0)
-			}
-		},
-		PingIntervalSecs: 60,
-		PingMsg:          pingMsgEncrypted,
-		Reconnect:        true,
-	}
-	return Conn.Dial("wss://api.lightning-bot.com/api/v3/ws/selfbot", "")
 }
 
-func Send(message WsMessage) {
+func OnRead(message WsMessage) {
+	switch message.Op {
+	case "HELLO_ACK":
+		Connected = true
+		Connect <- struct{}{}
+	case "EXIT":
+		os.Exit(0)
+	case "RESTART":
+		ipc.IPC.Restart()
+	case "WEBSITE_CONNECT":
+		_ = Send(WsMessage{
+			Op: "CONSOLE_SET",
+			Data: WsData{
+				Text: ipc.Console,
+			},
+		})
+		cfg, _ := config.GetConfig()
+		_ = Send(WsMessage{
+			Op: "CONFIG_UPDATE",
+			Data: WsData{
+				Config: &cfg,
+			},
+		})
+	case "CONFIG_UPDATE":
+		if message.Data.Config != nil {
+			_ = message.Data.Config.Save()
+			ipc.ConfigUpdate(message.Data.Config)
+		}
+	default:
+		consolelogging.Warn("Unknown op", message.Op)
+	}
+}
+
+func OnError(err error) {
+	var closeError websocket.CloseError
+	if !errors.As(err, &closeError) {
+		consolelogging.Error(err)
+		return
+	}
+
+	switch closeError.Code {
+	case 3004:
+	case 3010:
+		fmt.Println("Invalid credentials!")
+	case 3011:
+		fmt.Println("Free trial expired!")
+	case 3003:
+		fmt.Println("Decryption error!")
+	case 3006:
+		fmt.Println("Another selfbot connected!")
+	default:
+		fmt.Println("Unknown error code", closeError.Code)
+	}
+}
+
+func Send(message WsMessage) error {
 	jsonMessage, _ := json.Marshal(message)
 	encrypted, _ := Encryption.Encrypt(jsonMessage)
-	_ = Conn.Send(evtwebsocket.Msg{Body: encrypted})
+	return Conn.Write(Context, websocket.MessageText, encrypted)
 }
 
 func WaitForConnection() {

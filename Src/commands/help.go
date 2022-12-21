@@ -2,6 +2,9 @@ package commands
 
 import (
 	"fmt"
+	"math"
+	"strings"
+
 	"github.com/LightningDev1/LB-Selfbot/config"
 	"github.com/LightningDev1/LB-Selfbot/constants"
 	"github.com/LightningDev1/LB-Selfbot/embed"
@@ -9,8 +12,6 @@ import (
 	"github.com/LightningDev1/LB-Selfbot/utils"
 	"github.com/LightningDev1/dgc"
 	"github.com/LightningDev1/discordgo"
-	"math"
-	"strings"
 )
 
 type HelpCommand struct{}
@@ -48,35 +49,8 @@ func (h *HelpCommand) RegisterHelpCommand(router *dgc.Router, session *discordgo
 			return
 		}
 
-		// Check which reaction was added
-		//reactionName := event.Emoji.Name
-		//switch reactionName {
-		//case "⬅️":
-		//	// Update the help message
-		//	embed, newPage := renderDefaultGeneralHelpEmbed(router, page-1)
-		//	page = newPage
-		//	//session.ChannelMessageEditEmbed(channelID, messageID, embed)
-		//
-		//	// Remove the reaction
-		//	session.MessageReactionRemove(channelID, messageID, reactionName, userID)
-		//	break
-		//case "❌":
-		//	// Delete the help message
-		//	session.ChannelMessageDelete(channelID, messageID)
-		//	break
-		//case "➡️":
-		//	// Update the help message
-		//	//embed, newPage := renderDefaultGeneralHelpEmbed(router, page+1)
-		//	//page = newPage
-		//	//session.ChannelMessageEditEmbed(channelID, messageID, embed)
-		//
-		//	// Remove the reaction
-		//	session.MessageReactionRemove(channelID, messageID, reactionName, userID)
-		//	break
-		//}
-
 		// Update the stores page
-		router.Storage["dgc_helpMessages"].Set(channelID+":"+messageID+":"+event.UserID, page)
+		router.Storage["helpMessages"].Set(channelID+":"+messageID+":"+event.UserID, page)
 	})
 
 	// Register the default help command
@@ -224,7 +198,7 @@ func renderDefaultGeneralHelpEmbed(router *dgc.Router) *embed.Embed {
 	}
 	prefix := router.GetPrefixes()[0]
 	return embed.NewEmbed().
-		SetDescription(fmt.Sprintf("LightningBot %s Help\nAmount of Commands: %d, <> is required, [] is optional\n", constants.VersionString, len(router.Commands))).
+		SetDescription(fmt.Sprintf("LightningBot %s Help\nAmount of Commands: %d, <> is required, [] is optional\n", constants.VERSION_STRING, len(router.Commands))).
 		AddField("Categories", categoriesString, true, true).
 		SetSubtext(fmt.Sprintf(
 			"Use \x1b[34;1m%shelp <category name>\x1b[0m or \x1b[34;1m%shelp <command name>\x1b[0m to get more info.\nUse \x1b[34;1m%ssearch <query>\x1b[0m to search commands.\nUse \x1b[34;1m%srepeat\x1b[0m to repeat the last command.",
