@@ -175,7 +175,7 @@ func (e *Events) checkEventReactions(message *discordgo.Message) {
 			_ = e.Session.GuildMemberDeleteWithReason(member.GuildID, member.User.ID, "Ping Kick Event Reaction")
 		}
 		if utils.SliceContains(EventHandlers.Settings.PingInsultServers, message.GuildID) {
-			insult, _ := http.Get("https://evilinsult.com/generate_insult.php?lang=en")
+			insult, _ := http.GetOld("https://evilinsult.com/generate_insult.php?lang=en")
 			_, _ = e.Session.ChannelMessageSend(message.ChannelID, insult)
 		}
 		if utils.SliceContains(EventHandlers.Settings.PingPingServers, message.GuildID) {
@@ -249,11 +249,11 @@ func (e *Events) checkProtections(message *discordgo.Message, cfg *config.Config
 					guildIDs = append(guildIDs, g.ID)
 				}
 				_ = e.Session.MessageAck(message.ChannelID, message.ID)
-				_, _ = api.ChangeSettings(map[string]interface{}{"restricted_guilds": guildIDs}, true)
+				_ = api.ChangeSettings(e.Session, map[string]interface{}{"restricted_guilds": guildIDs}, true)
 				logging.Logging.MassDMBlocked()
 				go func() {
 					time.Sleep(5 * 60)
-					_, _ = api.ChangeSettings(map[string]interface{}{"restricted_guilds": []any{}}, true)
+					_ = api.ChangeSettings(e.Session, map[string]interface{}{"restricted_guilds": []any{}}, true)
 				}()
 			}
 		}

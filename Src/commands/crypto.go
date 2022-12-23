@@ -76,7 +76,7 @@ func (CryptoCommands) generateFunc(element []string) func(ctx *dgc.Ctx) {
 	// If you put the function in the RegisterCommands function, the element
 	// variable will always be the last element in the command array.
 	return func(ctx *dgc.Ctx) {
-		json, err := http.GetJson("https://min-api.cryptocompare.com/data/price?fsym=" + element[1] + "&tsyms=USD,EUR")
+		json, err := http.GetJsonOld("https://min-api.cryptocompare.com/data/price?fsym=" + element[1] + "&tsyms=USD,EUR")
 		if err != nil {
 			_ = ctx.RespondText("An error has occurred.")
 		}

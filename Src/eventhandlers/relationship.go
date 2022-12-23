@@ -20,11 +20,11 @@ func (e *Events) OnRelationshipAdd(_ *discordgo.Session, m *discordgo.Relationsh
 		}
 		if friendRequestsInLastMinute > 10 {
 			_ = e.Session.UserRelationshipsDelete(m.User.ID)
-			_ = api.AllowFriendRequestsFrom([]string{})
+			_ = api.AllowFriendRequestsFrom(e.Session, []string{})
 			logging.Logging.FriendRequestSpamBlocked()
 			go func() {
 				time.Sleep(5 * 60)
-				_ = api.AllowFriendRequestsFrom([]string{"all"})
+				_ = api.AllowFriendRequestsFrom(e.Session, []string{"all"})
 			}()
 		}
 	}

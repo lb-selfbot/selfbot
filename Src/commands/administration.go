@@ -963,7 +963,7 @@ func (*AdministrationCommands) webhookinfo(ctx *dgc.Ctx) {
 		_ = ctx.RespondText("Invalid webhook URL!")
 		return
 	}
-	webhookInfo, statusCode, err := http.GetJsonStatusCode(webhookUrl.String())
+	webhookInfo, statusCode, err := http.GetJsonStatusCodeOld(webhookUrl.String())
 	if err != nil {
 		_ = ctx.RespondText("Invalid webhook URL!")
 		return
@@ -998,7 +998,7 @@ func (*AdministrationCommands) webhooksend(ctx *dgc.Ctx) {
 		Content string `json:"content"`
 	}{utils.Arguments["<\"message\">"]}
 	jsonData, _ := json.Marshal(data)
-	_, _ = http.Post(webhookUrl.String(), string(jsonData))
+	_, _ = http.PostOld(webhookUrl.String(), string(jsonData))
 }
 
 func (*AdministrationCommands) webhookdelete(ctx *dgc.Ctx) {
@@ -1011,7 +1011,7 @@ func (*AdministrationCommands) webhookdelete(ctx *dgc.Ctx) {
 		_ = ctx.RespondText("Invalid webhook URL!")
 		return
 	}
-	_, _ = http.Delete(webhookUrl.String())
+	_, _ = http.DeleteOld(webhookUrl.String())
 	embed.NewEmbed().
 		SetDescription("Successfully deleted webhook.").
 		Send(ctx)
@@ -1214,7 +1214,7 @@ func (*AdministrationCommands) report(ctx *dgc.Ctx) {
 		return
 	}
 
-	_, _ = api.ReportMessage(guildID, channelID, messageID, reasonInt)
+	_ = api.ReportMessage(ctx.Session, guildID, channelID, messageID, reasonInt)
 
 	embed.NewEmbed().
 		SetDescription("Successfully reported message!").

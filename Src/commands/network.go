@@ -275,7 +275,7 @@ func (NetworkCommands) youtubesearch(ctx *dgc.Ctx) {
 
 func (NetworkCommands) urbandictionary(ctx *dgc.Ctx) {
 	word := ctx.Arguments.Raw()
-	results, err := http.GetJson(fmt.Sprintf("https://api.urbandictionary.com/v0/define?term=%s", url.QueryEscape(word)))
+	results, err := http.GetJsonOld(fmt.Sprintf("https://api.urbandictionary.com/v0/define?term=%s", url.QueryEscape(word)))
 	if err != nil {
 		_ = ctx.RespondText("An error has occurred.")
 		return
@@ -311,7 +311,7 @@ func (NetworkCommands) wikipedia(ctx *dgc.Ctx) {
 
 func (NetworkCommands) weather(ctx *dgc.Ctx) {
 	city := ctx.Arguments.Raw()
-	weather, err := http.GetJson(fmt.Sprintf("https:///api.openweathermap.org/data/2.5/weather?appid=533d00f29739edba54c5fb2b1a8262b3&q=%s", city))
+	weather, err := http.GetJsonOld(fmt.Sprintf("https:///api.openweathermap.org/data/2.5/weather?appid=533d00f29739edba54c5fb2b1a8262b3&q=%s", city))
 	if err != nil {
 		_ = ctx.RespondText("An error has occurred.")
 		return
@@ -338,7 +338,7 @@ func (NetworkCommands) weather(ctx *dgc.Ctx) {
 
 func (NetworkCommands) tinyurl(ctx *dgc.Ctx) {
 	sourceUrl := ctx.Arguments.Raw()
-	tinyurl, err := http.Get(fmt.Sprintf("https://tinyurl.com/api-create.php?url=%s", sourceUrl))
+	tinyurl, err := http.GetOld(fmt.Sprintf("https://tinyurl.com/api-create.php?url=%s", sourceUrl))
 	if err != nil {
 		_ = ctx.RespondText("An error has occurred.")
 		return
@@ -351,7 +351,7 @@ func (NetworkCommands) tinyurl(ctx *dgc.Ctx) {
 
 func (NetworkCommands) ipinfo(ctx *dgc.Ctx) {
 	ip := utils.Arguments["<ip>"]
-	ipinfo, err := http.GetJson(fmt.Sprintf("https://ipinfo.io/%s/json", ip))
+	ipinfo, err := http.GetJsonOld(fmt.Sprintf("https://ipinfo.io/%s/json", ip))
 	if err != nil {
 		_ = ctx.RespondText("An error has occurred.")
 		return
@@ -430,7 +430,7 @@ func (NetworkCommands) youtubedl(ctx *dgc.Ctx) {
 }
 
 func (NetworkCommands) lvbypass(ctx *dgc.Ctx) {
-	result, err := http.PostJson("https://api.bypass.vip/", fmt.Sprintf("{\"url\": \"%s\"}", ctx.Arguments.Raw()), map[string]string{"Content-Type": "application/json"})
+	result, err := http.PostJsonOld("https://api.bypass.vip/", fmt.Sprintf("{\"url\": \"%s\"}", ctx.Arguments.Raw()), map[string]string{"Content-Type": "application/json"})
 	if err != nil {
 		_ = ctx.RespondText("An error has occurred.")
 		return
@@ -469,7 +469,7 @@ func (NetworkCommands) portscan(ctx *dgc.Ctx) {
 
 func (NetworkCommands) hastebin(ctx *dgc.Ctx) {
 	text := ctx.Arguments.Raw()
-	result, err := http.PostJson("https://www.toptal.com/developers/hastebin/documents", text)
+	result, err := http.PostJsonOld("https://www.toptal.com/developers/hastebin/documents", text)
 	if err != nil {
 		_ = ctx.RespondText("An error has occurred.")
 		return
@@ -479,7 +479,7 @@ func (NetworkCommands) hastebin(ctx *dgc.Ctx) {
 
 func (NetworkCommands) checktoken(ctx *dgc.Ctx) {
 	token := utils.Arguments["<token>"]
-	response, statusCode, err := http.GetJsonStatusCode("https://discord.com/api/v10/users/@me", http.GetDiscordHeaders(token))
+	response, statusCode, err := http.GetJsonStatusCodeOld("https://discord.com/api/v10/users/@me", http.GetDiscordHeadersDEPRECATED(token))
 	if err != nil {
 		_ = ctx.RespondText("An error has occurred.")
 		return
@@ -511,7 +511,7 @@ func (NetworkCommands) checktoken(ctx *dgc.Ctx) {
 
 func (NetworkCommands) resolve(ctx *dgc.Ctx) {
 	domain := utils.Arguments["<domain>"]
-	response, err := http.GetJson(fmt.Sprintf("https://json.geoiplookup.io/%s", domain))
+	response, err := http.GetJsonOld(fmt.Sprintf("https://json.geoiplookup.io/%s", domain))
 	if err != nil {
 		_ = ctx.RespondText("An error has occurred.")
 		return
@@ -528,7 +528,7 @@ func (NetworkCommands) resolve(ctx *dgc.Ctx) {
 
 func (NetworkCommands) reversedns(ctx *dgc.Ctx) {
 	ip := utils.Arguments["<ip>"]
-	response, err := http.GetJson(fmt.Sprintf("https://api.domaintools.com/v1/%s/host-domains/", ip))
+	response, err := http.GetJsonOld(fmt.Sprintf("https://api.domaintools.com/v1/%s/host-domains/", ip))
 	if err != nil {
 		_ = ctx.RespondText("An error has occurred.")
 		return
@@ -546,7 +546,7 @@ func (NetworkCommands) reversedns(ctx *dgc.Ctx) {
 
 func (NetworkCommands) reversemac(ctx *dgc.Ctx) {
 	mac := utils.Arguments["<mac>"]
-	response, err := http.Get(fmt.Sprintf("https://api.macvendors.com/%s", mac))
+	response, err := http.GetOld(fmt.Sprintf("https://api.macvendors.com/%s", mac))
 	if err != nil {
 		_ = ctx.RespondText("An error has occurred.")
 		return
@@ -591,7 +591,7 @@ func (NetworkCommands) stackoverflow(ctx *dgc.Ctx) {
 
 func (NetworkCommands) covid(ctx *dgc.Ctx) {
 	country := ctx.Arguments.Raw()
-	covid, err := http.GetJson(fmt.Sprintf("https://coronavirus-19-api.herokuapp.com/countries/%s", country))
+	covid, err := http.GetJsonOld(fmt.Sprintf("https://coronavirus-19-api.herokuapp.com/countries/%s", country))
 	if err != nil {
 		_ = ctx.RespondText("Country not found.")
 		return
@@ -613,7 +613,7 @@ func (NetworkCommands) covid(ctx *dgc.Ctx) {
 }
 
 func (NetworkCommands) discordstatus(ctx *dgc.Ctx) {
-	status, err := http.GetJson("https://srhpyqt94yxb.statuspage.io/api/v2/components.json")
+	status, err := http.GetJsonOld("https://srhpyqt94yxb.statuspage.io/api/v2/components.json")
 	if err != nil {
 		_ = ctx.RespondText("An error has occurred.")
 		return
@@ -632,7 +632,7 @@ func (NetworkCommands) open(ctx *dgc.Ctx) {
 }
 
 func (NetworkCommands) searchcountry(ctx *dgc.Ctx) {
-	response, err := http.Get(fmt.Sprintf("https://restcountries.com/v3.1/name/%s?fullText=true", ctx.Arguments.Raw()))
+	response, err := http.GetOld(fmt.Sprintf("https://restcountries.com/v3.1/name/%s?fullText=true", ctx.Arguments.Raw()))
 	countryList, err2 := json.SimpleUnmarshal(response)
 	if err != nil || err2 != nil {
 		_ = ctx.RespondText("Country not found.")
@@ -672,7 +672,7 @@ func (NetworkCommands) searchcountry(ctx *dgc.Ctx) {
 }
 
 func (NetworkCommands) randomcountry(ctx *dgc.Ctx) {
-	response, err := http.Get("https://restcountries.com/v3.1/all")
+	response, err := http.GetOld("https://restcountries.com/v3.1/all")
 	countryList, err2 := json.SimpleUnmarshal(response)
 	if err != nil || err2 != nil {
 		_ = ctx.RespondText("An error has occurred.")
@@ -706,7 +706,7 @@ func (NetworkCommands) randomcountry(ctx *dgc.Ctx) {
 }
 
 func (NetworkCommands) headers(ctx *dgc.Ctx) {
-	headers, err := http.GetHeadersString(utils.Arguments["<url>"])
+	headers, err := http.GetHeadersStringOld(utils.Arguments["<url>"])
 	if err != nil {
 		_ = ctx.RespondText("An error has occurred.")
 		return

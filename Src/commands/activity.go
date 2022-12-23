@@ -214,24 +214,24 @@ func (a *ActivityCommands) RegisterCommands(router *dgc.Router, session *discord
 			}
 			switch a.CycleMode {
 			case "status":
-				a.setActivity("status", statuses[current%len(statuses)])
+				a.setActivity(a.Session, "status", statuses[current%len(statuses)])
 			case "activitytype":
-				a.setActivity(activityTypes[current%len(activityTypes)], a.CycleText[0])
+				a.setActivity(a.Session, activityTypes[current%len(activityTypes)], a.CycleText[0])
 			case "timestatus":
-				a.setActivity("customstatus", "Current Time: "+time.Now().Format("15:04:05"))
+				a.setActivity(a.Session, "customstatus", "Current Time: "+time.Now().Format("15:04:05"))
 			default:
-				a.setActivity(a.CycleMode, a.CycleText[current%len(a.CycleText)])
+				a.setActivity(a.Session, a.CycleMode, a.CycleText[current%len(a.CycleText)])
 			}
 		}
 	}()
 }
 
-func (a *ActivityCommands) setActivity(activityType, text string) {
+func (a *ActivityCommands) setActivity(session *discordgo.Session, activityType, text string) {
 	switch activityType {
 	case "status":
-		_, _ = api.ChangeSettings(map[string]interface{}{"status": text}, true)
+		_ = api.ChangeSettings(session, map[string]interface{}{"status": text}, true)
 	case "customstatus":
-		_, _ = api.ChangeSettings(map[string]interface{}{"custom_status": map[string]string{"text": text}}, true)
+		_ = api.ChangeSettings(session, map[string]interface{}{"custom_status": map[string]string{"text": text}}, true)
 	case "listening":
 		_ = a.Session.UpdateStatusComplex(discordgo.UpdateStatusData{
 			Game: &discordgo.Activity{
@@ -279,56 +279,56 @@ func (a *ActivityCommands) setActivity(activityType, text string) {
 }
 
 func (a *ActivityCommands) online(ctx *dgc.Ctx) {
-	a.setActivity("status", "online")
+	a.setActivity(ctx.Session, "status", "online")
 }
 
 func (a *ActivityCommands) dnd(ctx *dgc.Ctx) {
-	a.setActivity("status", "dnd")
+	a.setActivity(ctx.Session, "status", "dnd")
 }
 
 func (a *ActivityCommands) idle(ctx *dgc.Ctx) {
-	a.setActivity("status", "idle")
+	a.setActivity(ctx.Session, "status", "idle")
 }
 
 func (a *ActivityCommands) invisible(ctx *dgc.Ctx) {
-	a.setActivity("status", "invisible")
+	a.setActivity(ctx.Session, "status", "invisible")
 }
 
 func (a *ActivityCommands) customstatus(ctx *dgc.Ctx) {
-	a.setActivity("customstatus", ctx.Arguments.Raw())
+	a.setActivity(ctx.Session, "customstatus", ctx.Arguments.Raw())
 }
 
 func (a *ActivityCommands) clearcustomstatus(ctx *dgc.Ctx) {
-	a.setActivity("customstatus", "")
+	a.setActivity(ctx.Session, "customstatus", "")
 }
 
 func (a *ActivityCommands) aboutme(ctx *dgc.Ctx) {
-	_, _ = api.ChangeSettings(map[string]interface{}{"bio": ctx.Arguments.Raw()}, false)
+	_ = api.ChangeSettings(ctx.Session, map[string]interface{}{"bio": ctx.Arguments.Raw()}, false)
 }
 
-func (a *ActivityCommands) clearaboutme(*dgc.Ctx) {
-	_, _ = api.ChangeSettings(map[string]interface{}{"bio": ""}, false)
+func (a *ActivityCommands) clearaboutme(ctx *dgc.Ctx) {
+	_ = api.ChangeSettings(ctx.Session, map[string]interface{}{"bio": ""}, false)
 }
 
 func (a *ActivityCommands) listening(ctx *dgc.Ctx) {
-	a.setActivity("listening", ctx.Arguments.Raw())
+	a.setActivity(ctx.Session, "listening", ctx.Arguments.Raw())
 }
 
 func (a *ActivityCommands) watching(ctx *dgc.Ctx) {
-	a.setActivity("watching", ctx.Arguments.Raw())
+	a.setActivity(ctx.Session, "watching", ctx.Arguments.Raw())
 }
 
 func (a *ActivityCommands) playing(ctx *dgc.Ctx) {
-	a.setActivity("playing", ctx.Arguments.Raw())
+	a.setActivity(ctx.Session, "playing", ctx.Arguments.Raw())
 }
 
 func (a *ActivityCommands) streaming(ctx *dgc.Ctx) {
 	a.StreamingURL = utils.Arguments["<url>"]
-	a.setActivity("streaming", utils.String.RemoveWords(ctx.Arguments.Raw(), 1))
+	a.setActivity(ctx.Session, "streaming", utils.String.RemoveWords(ctx.Arguments.Raw(), 1))
 }
 
 func (a *ActivityCommands) competing(ctx *dgc.Ctx) {
-	a.setActivity("competing", ctx.Arguments.Raw())
+	a.setActivity(ctx.Session, "competing", ctx.Arguments.Raw())
 }
 
 func (a *ActivityCommands) clearactivity(ctx *dgc.Ctx) {

@@ -108,12 +108,12 @@ func (e *Events) RegisterHandlers(session *discordgo.Session, router *dgc.Router
 
 	e.Session.AddHandler(e.OnTypingStart)
 
-	phisingDomains, err := http.GetJson("https://raw.githubusercontent.com/nikolaischunk/discord-phishing-links/main/domain-list.json")
+	phisingDomains, err := http.GetJsonOld("https://raw.githubusercontent.com/nikolaischunk/discord-phishing-links/main/domain-list.json")
 	if err == nil {
 		e.Settings.phisingDomains = phisingDomains.Get("domains").MustStringArray()
 	}
 
-	suspiciousDomains, err := http.GetJson("https://raw.githubusercontent.com/nikolaischunk/discord-phishing-links/main/suspicious-list.json")
+	suspiciousDomains, err := http.GetJsonOld("https://raw.githubusercontent.com/nikolaischunk/discord-phishing-links/main/suspicious-list.json")
 	if err == nil {
 		e.Settings.suspiciousDomains = suspiciousDomains.Get("domains").MustStringArray()
 	}

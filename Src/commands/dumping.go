@@ -143,7 +143,7 @@ func (*DumpingCommands) dumpimages(ctx *dgc.Ctx) {
 		for _, attachment := range message.Attachments {
 			if strings.HasPrefix(attachment.ContentType, "image/") {
 				filePath := filepath.Join(folder, utils.IO.SanitizeFilename(attachment.Filename))
-				fileBytes, _, _ := http.GetBytes(utils.Misc.Or(attachment.ProxyURL, attachment.URL))
+				fileBytes, _, _ := http.GetBytesOld(utils.Misc.Or(attachment.ProxyURL, attachment.URL))
 				_ = utils.IO.WriteBytes(filePath, fileBytes)
 				images++
 			}
@@ -176,7 +176,7 @@ func (*DumpingCommands) dumpvideos(ctx *dgc.Ctx) {
 		for _, attachment := range message.Attachments {
 			if strings.HasPrefix(attachment.ContentType, "video/") {
 				filePath := filepath.Join(folder, utils.IO.SanitizeFilename(attachment.Filename))
-				fileBytes, _, _ := http.GetBytes(utils.Misc.Or(attachment.ProxyURL, attachment.URL))
+				fileBytes, _, _ := http.GetBytesOld(utils.Misc.Or(attachment.ProxyURL, attachment.URL))
 				_ = utils.IO.WriteBytes(filePath, fileBytes)
 				videos++
 			}
@@ -209,7 +209,7 @@ func (*DumpingCommands) dumpaudio(ctx *dgc.Ctx) {
 		for _, attachment := range message.Attachments {
 			if strings.HasPrefix(attachment.ContentType, "audio/") {
 				filePath := filepath.Join(folder, utils.IO.SanitizeFilename(attachment.Filename))
-				fileBytes, _, _ := http.GetBytes(utils.Misc.Or(attachment.ProxyURL, attachment.URL))
+				fileBytes, _, _ := http.GetBytesOld(utils.Misc.Or(attachment.ProxyURL, attachment.URL))
 				_ = utils.IO.WriteBytes(filePath, fileBytes)
 				audios++
 			}
@@ -242,7 +242,7 @@ func (*DumpingCommands) dumptext(ctx *dgc.Ctx) {
 		for _, attachment := range message.Attachments {
 			if strings.HasPrefix(attachment.ContentType, "text/") {
 				filePath := filepath.Join(folder, utils.IO.SanitizeFilename(attachment.Filename))
-				fileBytes, _, _ := http.GetBytes(utils.Misc.Or(attachment.ProxyURL, attachment.URL))
+				fileBytes, _, _ := http.GetBytesOld(utils.Misc.Or(attachment.ProxyURL, attachment.URL))
 				_ = utils.IO.WriteBytes(filePath, fileBytes)
 				texts++
 			}
@@ -275,7 +275,7 @@ func (*DumpingCommands) dumpemojis(ctx *dgc.Ctx) {
 			name += ".png"
 		}
 		filePath := filepath.Join(folder, utils.IO.SanitizeFilename(name))
-		fileBytes, _, _ := http.GetBytes(emoji.URL())
+		fileBytes, _, _ := http.GetBytesOld(emoji.URL())
 		_ = utils.IO.WriteBytes(filePath, fileBytes)
 	}
 	embed.NewEmbed().
@@ -300,7 +300,7 @@ func (*DumpingCommands) dumpavatars(ctx *dgc.Ctx) {
 			name += ".png"
 		}
 		filePath := folder + utils.IO.SanitizeFilename(name)
-		fileBytes, _, _ := http.GetBytes(member.AvatarURL(""))
+		fileBytes, _, _ := http.GetBytesOld(member.AvatarURL(""))
 		_ = utils.IO.WriteBytes(filePath, fileBytes)
 	}
 	embed.NewEmbed().

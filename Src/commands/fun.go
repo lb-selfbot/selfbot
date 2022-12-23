@@ -520,7 +520,7 @@ func (FunCommands) hack(ctx *dgc.Ctx) {
 
 func (FunCommands) insult(ctx *dgc.Ctx) {
 	user, _ := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
-	insult, err := http.GetJson(fmt.Sprintf("https://lightning-bot.com/api/v2/selfbot/roast?mention=%s", user.String()))
+	insult, err := http.GetJsonOld(fmt.Sprintf("https://lightning-bot.com/api/v2/selfbot/roast?mention=%s", user.String()))
 	if err != nil {
 		_ = ctx.RespondText("An error has occurred.")
 	}
@@ -530,7 +530,7 @@ func (FunCommands) insult(ctx *dgc.Ctx) {
 }
 
 func (FunCommands) dadjoke(ctx *dgc.Ctx) {
-	joke, err := http.GetJson("https://icanhazdadjoke.com/", map[string]string{"Accept": "application/json"})
+	joke, err := http.GetJsonOld("https://icanhazdadjoke.com/", map[string]string{"Accept": "application/json"})
 	if err != nil {
 		_ = ctx.RespondText("An error has occurred.")
 		return
@@ -541,7 +541,7 @@ func (FunCommands) dadjoke(ctx *dgc.Ctx) {
 }
 
 func (FunCommands) yomomma(ctx *dgc.Ctx) {
-	joke, err := http.GetJson("https://api.yomomma.info/")
+	joke, err := http.GetJsonOld("https://api.yomomma.info/")
 	if err != nil {
 		_ = ctx.RespondText("An error has occurred.")
 		return
@@ -552,7 +552,7 @@ func (FunCommands) yomomma(ctx *dgc.Ctx) {
 }
 
 func (FunCommands) wouldyourather(ctx *dgc.Ctx) {
-	wyrJson, err := http.GetJson("https://lightning-bot.com/api/v3/selfbot-utils/wouldyourather")
+	wyrJson, err := http.GetJsonOld("https://lightning-bot.com/api/v3/selfbot-utils/wouldyourather")
 	if err != nil {
 		_ = ctx.RespondText("An error has occurred.")
 		return
@@ -565,7 +565,7 @@ func (FunCommands) wouldyourather(ctx *dgc.Ctx) {
 }
 
 func (FunCommands) topic(ctx *dgc.Ctx) {
-	topicJson, err := http.GetJson("https://lightning-bot.com/api/v3/selfbot-utils/fml")
+	topicJson, err := http.GetJsonOld("https://lightning-bot.com/api/v3/selfbot-utils/fml")
 	if err != nil {
 		_ = ctx.RespondText("An error has occurred.")
 		return
@@ -607,7 +607,7 @@ func (FunCommands) slot(ctx *dgc.Ctx) {
 }
 
 func (FunCommands) advice(ctx *dgc.Ctx) {
-	advice, err := http.GetJson("https://api.adviceslip.com/advice")
+	advice, err := http.GetJsonOld("https://api.adviceslip.com/advice")
 	if err != nil {
 		_ = ctx.RespondText("An error has occurred.")
 		return
@@ -618,7 +618,7 @@ func (FunCommands) advice(ctx *dgc.Ctx) {
 }
 
 func (FunCommands) catfact(ctx *dgc.Ctx) {
-	fact, err := http.GetJson("https://some-random-api.ml/facts/cat")
+	fact, err := http.GetJsonOld("https://some-random-api.ml/facts/cat")
 	if err != nil {
 		_ = ctx.RespondText("An error has occurred.")
 		return
@@ -629,7 +629,7 @@ func (FunCommands) catfact(ctx *dgc.Ctx) {
 }
 
 func (FunCommands) dogfact(ctx *dgc.Ctx) {
-	fact, err := http.GetJson("https://some-random-api.ml/facts/dog")
+	fact, err := http.GetJsonOld("https://some-random-api.ml/facts/dog")
 	if err != nil {
 		_ = ctx.RespondText("An error has occurred.")
 		return
@@ -640,7 +640,7 @@ func (FunCommands) dogfact(ctx *dgc.Ctx) {
 }
 
 func (FunCommands) pandafact(ctx *dgc.Ctx) {
-	fact, err := http.GetJson("https://some-random-api.ml/facts/panda")
+	fact, err := http.GetJsonOld("https://some-random-api.ml/facts/panda")
 	if err != nil {
 		_ = ctx.RespondText("An error has occurred.")
 		return
@@ -651,7 +651,7 @@ func (FunCommands) pandafact(ctx *dgc.Ctx) {
 }
 
 func (FunCommands) foxfact(ctx *dgc.Ctx) {
-	fact, err := http.GetJson("https://some-random-api.ml/facts/fox")
+	fact, err := http.GetJsonOld("https://some-random-api.ml/facts/fox")
 	if err != nil {
 		_ = ctx.RespondText("An error has occurred.")
 		return
@@ -662,7 +662,7 @@ func (FunCommands) foxfact(ctx *dgc.Ctx) {
 }
 
 func (FunCommands) koalafact(ctx *dgc.Ctx) {
-	fact, err := http.GetJson("https://some-random-api.ml/facts/koala")
+	fact, err := http.GetJsonOld("https://some-random-api.ml/facts/koala")
 	if err != nil {
 		_ = ctx.RespondText("An error has occurred.")
 		return
@@ -673,7 +673,7 @@ func (FunCommands) koalafact(ctx *dgc.Ctx) {
 }
 
 func (FunCommands) birdfact(ctx *dgc.Ctx) {
-	fact, err := http.GetJson("https://api.animality.xyz/fact/bird")
+	fact, err := http.GetJsonOld("https://api.animality.xyz/fact/bird")
 	if err != nil {
 		_ = ctx.RespondText("An error has occurred.")
 		return
@@ -684,7 +684,7 @@ func (FunCommands) birdfact(ctx *dgc.Ctx) {
 }
 
 func (FunCommands) redpandafact(ctx *dgc.Ctx) {
-	fact, err := http.GetJson("https://api.animality.xyz/fact/redpanda")
+	fact, err := http.GetJsonOld("https://api.animality.xyz/fact/redpanda")
 	if err != nil {
 		_ = ctx.RespondText("An error has occurred.")
 		return
@@ -695,7 +695,7 @@ func (FunCommands) redpandafact(ctx *dgc.Ctx) {
 }
 
 func (FunCommands) whalefact(ctx *dgc.Ctx) {
-	fact, err := http.GetJson("https://api.animality.xyz/fact/whale")
+	fact, err := http.GetJsonOld("https://api.animality.xyz/fact/whale")
 	if err != nil {
 		_ = ctx.RespondText("An error has occurred.")
 		return
@@ -706,7 +706,7 @@ func (FunCommands) whalefact(ctx *dgc.Ctx) {
 }
 
 func (FunCommands) kangaroofact(ctx *dgc.Ctx) {
-	fact, err := http.GetJson("https://api.animality.xyz/fact/kangaroo")
+	fact, err := http.GetJsonOld("https://api.animality.xyz/fact/kangaroo")
 	if err != nil {
 		_ = ctx.RespondText("An error has occurred.")
 		return
@@ -717,7 +717,7 @@ func (FunCommands) kangaroofact(ctx *dgc.Ctx) {
 }
 
 func (FunCommands) bunnyfact(ctx *dgc.Ctx) {
-	fact, err := http.GetJson("https://api.animality.xyz/fact/bunny")
+	fact, err := http.GetJsonOld("https://api.animality.xyz/fact/bunny")
 	if err != nil {
 		_ = ctx.RespondText("An error has occurred.")
 		return
@@ -728,7 +728,7 @@ func (FunCommands) bunnyfact(ctx *dgc.Ctx) {
 }
 
 func (FunCommands) lionfact(ctx *dgc.Ctx) {
-	fact, err := http.GetJson("https://api.animality.xyz/fact/lion")
+	fact, err := http.GetJsonOld("https://api.animality.xyz/fact/lion")
 	if err != nil {
 		_ = ctx.RespondText("An error has occurred.")
 		return
@@ -739,7 +739,7 @@ func (FunCommands) lionfact(ctx *dgc.Ctx) {
 }
 
 func (FunCommands) frogfact(ctx *dgc.Ctx) {
-	fact, err := http.GetJson("https://api.animality.xyz/fact/frog")
+	fact, err := http.GetJsonOld("https://api.animality.xyz/fact/frog")
 	if err != nil {
 		_ = ctx.RespondText("An error has occurred.")
 		return
@@ -750,7 +750,7 @@ func (FunCommands) frogfact(ctx *dgc.Ctx) {
 }
 
 func (FunCommands) duckfact(ctx *dgc.Ctx) {
-	fact, err := http.GetJson("https://api.animality.xyz/fact/duck")
+	fact, err := http.GetJsonOld("https://api.animality.xyz/fact/duck")
 	if err != nil {
 		_ = ctx.RespondText("An error has occurred.")
 		return
@@ -761,7 +761,7 @@ func (FunCommands) duckfact(ctx *dgc.Ctx) {
 }
 
 func (FunCommands) penguinfact(ctx *dgc.Ctx) {
-	fact, err := http.GetJson("https://api.animality.xyz/fact/penguin")
+	fact, err := http.GetJsonOld("https://api.animality.xyz/fact/penguin")
 	if err != nil {
 		_ = ctx.RespondText("An error has occurred.")
 		return
@@ -772,7 +772,7 @@ func (FunCommands) penguinfact(ctx *dgc.Ctx) {
 }
 
 func (FunCommands) dolphinfact(ctx *dgc.Ctx) {
-	fact, err := http.GetJson("https://api.animality.xyz/fact/dolphin")
+	fact, err := http.GetJsonOld("https://api.animality.xyz/fact/dolphin")
 	if err != nil {
 		_ = ctx.RespondText("An error has occurred.")
 		return
@@ -783,7 +783,7 @@ func (FunCommands) dolphinfact(ctx *dgc.Ctx) {
 }
 
 func (FunCommands) bearfact(ctx *dgc.Ctx) {
-	fact, err := http.GetJson("https://api.animality.xyz/fact/bear")
+	fact, err := http.GetJsonOld("https://api.animality.xyz/fact/bear")
 	if err != nil {
 		_ = ctx.RespondText("An error has occurred.")
 		return
@@ -794,7 +794,7 @@ func (FunCommands) bearfact(ctx *dgc.Ctx) {
 }
 
 func (FunCommands) axolotlfact(ctx *dgc.Ctx) {
-	fact, err := http.GetJson("https://api.animality.xyz/fact/axolotl")
+	fact, err := http.GetJsonOld("https://api.animality.xyz/fact/axolotl")
 	if err != nil {
 		_ = ctx.RespondText("An error has occurred.")
 		return
@@ -805,7 +805,7 @@ func (FunCommands) axolotlfact(ctx *dgc.Ctx) {
 }
 
 func (FunCommands) capybarafact(ctx *dgc.Ctx) {
-	fact, err := http.GetJson("https://api.animality.xyz/fact/capybara")
+	fact, err := http.GetJsonOld("https://api.animality.xyz/fact/capybara")
 	if err != nil {
 		_ = ctx.RespondText("An error has occurred.")
 		return
@@ -816,7 +816,7 @@ func (FunCommands) capybarafact(ctx *dgc.Ctx) {
 }
 
 func (FunCommands) trivia(ctx *dgc.Ctx) {
-	rawJson, err1 := http.Get("https://opentdb.com/api.php?amount=1")
+	rawJson, err1 := http.GetOld("https://opentdb.com/api.php?amount=1")
 	rawJson = strings.Replace(rawJson, "&quot;", "\"", -1)
 	rawJson = strings.Replace(rawJson, "&#039;", "'", -1)
 	trivia, err2 := json.SimpleUnmarshal(rawJson)
@@ -893,7 +893,7 @@ func (FunCommands) poll(ctx *dgc.Ctx) {
 
 func (FunCommands) numberfact(ctx *dgc.Ctx) {
 	number := utils.Arguments["<number>"]
-	fact, err := http.Get(fmt.Sprintf("http://numbersapi.com/%s", number))
+	fact, err := http.GetOld(fmt.Sprintf("http://numbersapi.com/%s", number))
 	if err != nil {
 		_ = ctx.RespondText("An error has occurred.")
 		return
@@ -905,7 +905,7 @@ func (FunCommands) numberfact(ctx *dgc.Ctx) {
 }
 
 func (FunCommands) joke(ctx *dgc.Ctx) {
-	joke, err := http.GetJson("https://v2.jokeapi.dev/joke/Any")
+	joke, err := http.GetJsonOld("https://v2.jokeapi.dev/joke/Any")
 	if err != nil {
 		_ = ctx.RespondText("An error has occurred.")
 		return
@@ -921,7 +921,7 @@ func (FunCommands) joke(ctx *dgc.Ctx) {
 }
 
 func (FunCommands) fml(ctx *dgc.Ctx) {
-	fmlJson, err := http.GetJson("https://lightning-bot.com/api/v3/selfbot-utils/fml")
+	fmlJson, err := http.GetJsonOld("https://lightning-bot.com/api/v3/selfbot-utils/fml")
 	if err != nil {
 		_ = ctx.RespondText("An error has occurred.")
 		return
@@ -932,7 +932,7 @@ func (FunCommands) fml(ctx *dgc.Ctx) {
 }
 
 func (FunCommands) tronald(ctx *dgc.Ctx) {
-	tronald, err := http.GetJson("https://api.tronalddump.io/random/quote", map[string]string{"Accept": "application/hal+json"})
+	tronald, err := http.GetJsonOld("https://api.tronalddump.io/random/quote", map[string]string{"Accept": "application/hal+json"})
 	if err != nil {
 		_ = ctx.RespondText("An error has occurred.")
 		return
@@ -943,7 +943,7 @@ func (FunCommands) tronald(ctx *dgc.Ctx) {
 }
 
 func (FunCommands) kanyewest(ctx *dgc.Ctx) {
-	kanyewest, err := http.GetJson("https://api.kanye.rest")
+	kanyewest, err := http.GetJsonOld("https://api.kanye.rest")
 	if err != nil {
 		_ = ctx.RespondText("An error has occurred.")
 		return
@@ -1037,7 +1037,7 @@ func (FunCommands) wink(ctx *dgc.Ctx) {
 }
 
 func (FunCommands) chucknorris(ctx *dgc.Ctx) {
-	joke, err := http.GetJson("https://api.chucknorris.io/jokes/random")
+	joke, err := http.GetJsonOld("https://api.chucknorris.io/jokes/random")
 	if err != nil {
 		_ = ctx.RespondText("An error has occurred.")
 		return
@@ -1048,7 +1048,7 @@ func (FunCommands) chucknorris(ctx *dgc.Ctx) {
 }
 
 func (FunCommands) iss(ctx *dgc.Ctx) {
-	iss, err := http.GetJson("http://api.open-notify.org/iss-now.json")
+	iss, err := http.GetJsonOld("http://api.open-notify.org/iss-now.json")
 	if err != nil {
 		_ = ctx.RespondText("An error has occurred.")
 		return
@@ -1064,7 +1064,7 @@ func (FunCommands) iss(ctx *dgc.Ctx) {
 }
 
 func (FunCommands) apod(ctx *dgc.Ctx) {
-	apod, err := http.GetJson("https://api.nasa.gov/planetary/apod?api_key=rDenYNQFftu3YADWdUmF9s8iw0cyZckV7vBcibGe")
+	apod, err := http.GetJsonOld("https://api.nasa.gov/planetary/apod?api_key=rDenYNQFftu3YADWdUmF9s8iw0cyZckV7vBcibGe")
 	if err != nil {
 		_ = ctx.RespondText("An error has occurred.")
 		return
@@ -1094,7 +1094,7 @@ func (FunCommands) httpcat(ctx *dgc.Ctx) {
 }
 
 func (FunCommands) riddle(ctx *dgc.Ctx) {
-	riddleJson, err := http.GetJson("https://lightning-bot.com/api/v3/selfbot-utils/fml")
+	riddleJson, err := http.GetJsonOld("https://lightning-bot.com/api/v3/selfbot-utils/fml")
 	if err != nil {
 		_ = ctx.RespondText("An error has occurred.")
 		return
@@ -1106,7 +1106,7 @@ func (FunCommands) riddle(ctx *dgc.Ctx) {
 }
 
 func (FunCommands) quote(ctx *dgc.Ctx) {
-	quote, err := http.GetJson("https://api.quotable.io/random")
+	quote, err := http.GetJsonOld("https://api.quotable.io/random")
 	if err != nil {
 		_ = ctx.RespondText("An error has occurred.")
 		return
@@ -1118,7 +1118,7 @@ func (FunCommands) quote(ctx *dgc.Ctx) {
 }
 
 func (FunCommands) evilinsult(ctx *dgc.Ctx) {
-	insult, err := http.Get("https://evilinsult.com/generate_insult.php?lang=en")
+	insult, err := http.GetOld("https://evilinsult.com/generate_insult.php?lang=en")
 	if err != nil {
 		_ = ctx.RespondText("An error has occurred.")
 		return
@@ -1195,7 +1195,7 @@ func (FunCommands) notfunny(ctx *dgc.Ctx) {
 }
 
 func (FunCommands) randomquestion(ctx *dgc.Ctx) {
-	question, err := http.GetJson("https://nekos.life/api/v2/why")
+	question, err := http.GetJsonOld("https://nekos.life/api/v2/why")
 	if err != nil {
 		_ = ctx.RespondText("An error has occurred.")
 		return
@@ -1206,7 +1206,7 @@ func (FunCommands) randomquestion(ctx *dgc.Ctx) {
 }
 
 func (FunCommands) lyrics(ctx *dgc.Ctx) {
-	lyrics, err := http.GetJson("https://some-random-api.ml/lyrics?title=" + url.QueryEscape(ctx.Arguments.Raw()))
+	lyrics, err := http.GetJsonOld("https://some-random-api.ml/lyrics?title=" + url.QueryEscape(ctx.Arguments.Raw()))
 	if err != nil {
 		_ = ctx.RespondText("An error has occurred.")
 		return

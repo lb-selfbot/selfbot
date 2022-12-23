@@ -283,7 +283,7 @@ Permission: View Guild Insights      | Value: %s`,
 }
 
 func (DiscordUtils) SendFileFromURL(ctx *dgc.Ctx, url string, fileName string, headers ...map[string]string) error {
-	bytes_, _, err := http.GetBytes(url, headers...)
+	bytes_, _, err := http.GetBytesOld(url, headers...)
 	if err != nil {
 		return err
 	}

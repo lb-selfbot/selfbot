@@ -318,7 +318,7 @@ func (UtilityCommands) copyserver(ctx *dgc.Ctx) {
 		_ = ctx.RespondText("Error getting server: " + err.Error())
 		return
 	}
-	icon, _, _ := http.GetBytes(guild.IconURL())
+	icon, _, _ := http.GetBytesOld(guild.IconURL())
 	newGuild, err := ctx.Session.GuildCreate(guild.Name+" Copy", icon)
 	if err != nil {
 		_ = ctx.RespondText("Error copying server: " + err.Error())
@@ -570,7 +570,7 @@ func (UtilityCommands) passgen(ctx *dgc.Ctx) {
 }
 
 func (UtilityCommands) tokengen(ctx *dgc.Ctx) {
-	jsonResult, err := http.GetJson("https://some-random-api.ml/bottoken")
+	jsonResult, err := http.GetJsonOld("https://some-random-api.ml/bottoken")
 	if err != nil {
 		_ = ctx.RespondText("Error: " + err.Error())
 		return
@@ -816,11 +816,11 @@ func (UtilityCommands) hypesquad(ctx *dgc.Ctx) {
 		error_handling.OnError(ctx, error_handling.InvalidArgument, "<bravery/brilliance/balance>")
 		return
 	}
-	_ = api.SetHypesquad(house)
+	_ = api.SetHypesquad(ctx.Session, house)
 }
 
-func (UtilityCommands) leavehypesquad(*dgc.Ctx) {
-	_ = api.LeaveHypesquad()
+func (UtilityCommands) leavehypesquad(ctx *dgc.Ctx) {
+	_ = api.LeaveHypesquad(ctx.Session)
 }
 
 func (UtilityCommands) theme(ctx *dgc.Ctx) {
@@ -829,7 +829,7 @@ func (UtilityCommands) theme(ctx *dgc.Ctx) {
 		error_handling.OnError(ctx, error_handling.InvalidArgument, "<light/dark> must be either \"light\" or \"dark\"")
 		return
 	}
-	_, _ = api.ChangeSettings(map[string]interface{}{"theme": theme}, true)
+	_ = api.ChangeSettings(ctx.Session, map[string]interface{}{"theme": theme}, true)
 }
 
 func (UtilityCommands) compact(ctx *dgc.Ctx) {
@@ -838,7 +838,7 @@ func (UtilityCommands) compact(ctx *dgc.Ctx) {
 		error_handling.OnError(ctx, error_handling.InvalidArgument, "<on/off> must be either \"on\" or \"off\"")
 		return
 	}
-	_, _ = api.ChangeSettings(map[string]interface{}{"message_display_compact": toggle == "on"}, true)
+	_ = api.ChangeSettings(ctx.Session, map[string]interface{}{"message_display_compact": toggle == "on"}, true)
 }
 
 func (UtilityCommands) devmode(ctx *dgc.Ctx) {
@@ -847,7 +847,7 @@ func (UtilityCommands) devmode(ctx *dgc.Ctx) {
 		error_handling.OnError(ctx, error_handling.InvalidArgument, "<on/off> must be either \"on\" or \"off\"")
 		return
 	}
-	_, _ = api.ChangeSettings(map[string]interface{}{"developer_mode": toggle == "on"}, true)
+	_ = api.ChangeSettings(ctx.Session, map[string]interface{}{"developer_mode": toggle == "on"}, true)
 }
 
 func (UtilityCommands) sessionid(ctx *dgc.Ctx) {

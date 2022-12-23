@@ -6,7 +6,7 @@ import (
 	"github.com/valyala/fasthttp"
 )
 
-func GetBytes(url string, headersList ...map[string]string) ([]byte, int, error) {
+func GetBytesOld(url string, headersList ...map[string]string) ([]byte, int, error) {
 	req := fasthttp.AcquireRequest()
 	resp := fasthttp.AcquireResponse()
 	defer fasthttp.ReleaseRequest(req)
@@ -26,21 +26,21 @@ func GetBytes(url string, headersList ...map[string]string) ([]byte, int, error)
 	return resp.Body(), resp.StatusCode(), nil
 }
 
-func Get(url string, headersList ...map[string]string) (string, error) {
-	bytes, _, err := GetBytes(url, headersList...)
+func GetOld(url string, headersList ...map[string]string) (string, error) {
+	bytes, _, err := GetBytesOld(url, headersList...)
 	return string(bytes), err
 }
 
-func GetJson(url string, headersList ...map[string]string) (*simplejson.Json, error) {
-	bytes, _, err := GetBytes(url, headersList...)
+func GetJsonOld(url string, headersList ...map[string]string) (*simplejson.Json, error) {
+	bytes, _, err := GetBytesOld(url, headersList...)
 	if err != nil {
 		return nil, err
 	}
 	return json.SimpleUnmarshal(string(bytes))
 }
 
-func GetJsonStatusCode(url string, headersList ...map[string]string) (*simplejson.Json, int, error) {
-	bytes, statusCode, err := GetBytes(url, headersList...)
+func GetJsonStatusCodeOld(url string, headersList ...map[string]string) (*simplejson.Json, int, error) {
+	bytes, statusCode, err := GetBytesOld(url, headersList...)
 	if err != nil {
 		return nil, -1, err
 	}
@@ -48,7 +48,7 @@ func GetJsonStatusCode(url string, headersList ...map[string]string) (*simplejso
 	return jsonData, statusCode, err
 }
 
-func GetHeadersString(url string) (string, error) {
+func GetHeadersStringOld(url string) (string, error) {
 	req := fasthttp.AcquireRequest()
 	resp := fasthttp.AcquireResponse()
 	defer fasthttp.ReleaseRequest(req)
@@ -64,7 +64,7 @@ func GetHeadersString(url string) (string, error) {
 
 }
 
-func Post(url string, data string, headersList ...map[string]string) (string, error) {
+func PostOld(url string, data string, headersList ...map[string]string) (string, error) {
 	req := fasthttp.AcquireRequest()
 	resp := fasthttp.AcquireResponse()
 	defer fasthttp.ReleaseRequest(req)
@@ -86,16 +86,16 @@ func Post(url string, data string, headersList ...map[string]string) (string, er
 	return string(resp.Body()), nil
 }
 
-func PostJson(url string, data string, headersList ...map[string]string) (*simplejson.Json, error) {
+func PostJsonOld(url string, data string, headersList ...map[string]string) (*simplejson.Json, error) {
 	headersList = append(headersList, map[string]string{"Content-Type": "application/json"})
-	result, err := Post(url, data, headersList...)
+	result, err := PostOld(url, data, headersList...)
 	if err != nil {
 		return nil, err
 	}
 	return json.SimpleUnmarshal(result)
 }
 
-func Patch(url string, data string, headersList ...map[string]string) (string, error) {
+func PatchOld(url string, data string, headersList ...map[string]string) (string, error) {
 	req := fasthttp.AcquireRequest()
 	resp := fasthttp.AcquireResponse()
 	defer fasthttp.ReleaseRequest(req)
@@ -117,16 +117,16 @@ func Patch(url string, data string, headersList ...map[string]string) (string, e
 	return string(resp.Body()), nil
 }
 
-func PatchJson(url string, data string, headersList ...map[string]string) (*simplejson.Json, error) {
+func PatchJsonOld(url string, data string, headersList ...map[string]string) (*simplejson.Json, error) {
 	headersList = append(headersList, map[string]string{"Content-Type": "application/json"})
-	result, err := Patch(url, data, headersList...)
+	result, err := PatchOld(url, data, headersList...)
 	if err != nil {
 		return nil, err
 	}
 	return json.SimpleUnmarshal(result)
 }
 
-func Put(url string, headersList ...map[string]string) (string, error) {
+func PutOld(url string, headersList ...map[string]string) (string, error) {
 	req := fasthttp.AcquireRequest()
 	resp := fasthttp.AcquireResponse()
 	defer fasthttp.ReleaseRequest(req)
@@ -147,7 +147,7 @@ func Put(url string, headersList ...map[string]string) (string, error) {
 	return string(resp.Body()), nil
 }
 
-func Delete(url string, headersList ...map[string]string) (string, error) {
+func DeleteOld(url string, headersList ...map[string]string) (string, error) {
 	req := fasthttp.AcquireRequest()
 	resp := fasthttp.AcquireResponse()
 	defer fasthttp.ReleaseRequest(req)
@@ -168,9 +168,9 @@ func Delete(url string, headersList ...map[string]string) (string, error) {
 	return string(resp.Body()), nil
 }
 
-func GetDiscordHeaders(token string) map[string]string {
+func GetDiscordHeadersDEPRECATED(token string) map[string]string {
 	return map[string]string{
-		"content-type":       "application/json",
-		"authorization":      token,
+		"content-type":  "application/json",
+		"authorization": token,
 	}
 }

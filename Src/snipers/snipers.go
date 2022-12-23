@@ -65,7 +65,7 @@ func CheckNitroSniper(
 			}
 		}
 		start := time.Now()
-		jsonResult, err := http.PostJson(fmt.Sprintf("https://discord.com/api/v10/entitlements/gift-codes/%s/redeem", nitroCode), "{}", http.GetDiscordHeaders(cfg.Account.Discord.Token))
+		jsonResult, err := http.PostJsonOld(fmt.Sprintf("https://discord.com/api/v10/entitlements/gift-codes/%s/redeem", nitroCode), "{}", http.GetDiscordHeadersDEPRECATED(cfg.Account.Discord.Token))
 		if err != nil {
 			return alreadyCheckedNitroCodes, sentNitroCodes
 		}

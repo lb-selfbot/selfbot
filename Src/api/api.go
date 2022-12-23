@@ -13,8 +13,8 @@ import (
 
 	"github.com/LightningDev1/LB-Selfbot/encryption"
 	"github.com/LightningDev1/LB-Selfbot/utils"
+	"github.com/LightningDev1/discordgo"
 
-	"github.com/LightningDev1/LB-Selfbot/config"
 	"github.com/LightningDev1/LB-Selfbot/constants"
 	"github.com/LightningDev1/LB-Selfbot/http"
 	"github.com/bitly/go-simplejson"
@@ -22,7 +22,7 @@ import (
 )
 
 func CreatePaste(text string) (string, error) {
-	paste, err := http.PostJson("https://paste.lightning-bot.com/documents", text)
+	paste, err := http.PostJsonOld("https://paste.lightning-bot.com/documents", text)
 	if err != nil {
 		return "", err
 	}
@@ -45,7 +45,7 @@ func Ping(host string) (time.Duration, error) {
 }
 
 func WikipediaSearch(query string) (string, error) {
-	search, err := http.GetJson(fmt.Sprintf("https://en.wikipedia.org/w/api.php?action=query&prop=extracts&explaintext=&titles=%s&format=json", url.QueryEscape(query)))
+	search, err := http.GetJsonOld(fmt.Sprintf("https://en.wikipedia.org/w/api.php?action=query&prop=extracts&explaintext=&titles=%s&format=json", url.QueryEscape(query)))
 	if err != nil {
 		return "", err
 	}
@@ -60,23 +60,24 @@ func WikipediaSearch(query string) (string, error) {
 	return "No results found", nil
 }
 
-func SetHypesquad(hypesquad string) (err error) {
-	hypesquadInt, _ := strconv.Atoi(hypesquad)
-	jsonData := fmt.Sprintf(`{"house_id": %d}`, hypesquadInt)
-	cfg, err := config.GetConfig()
+func SetHypesquad(session *discordgo.Session, hypesquad string) (err error) {
+	hypesquadInt, err := strconv.Atoi(hypesquad)
 	if err != nil {
 		return err
 	}
-	_, err = http.Post("https://discord.com/api/v10/hypesquad/online", jsonData, http.GetDiscordHeaders(cfg.Account.Discord.Token))
+
+	data := map[string]int{
+		"house_id": hypesquadInt,
+	}
+
+	_, err = session.Request("POST", "https://discord.com/api/v10/hypesquad/online", data)
+
 	return err
 }
 
-func LeaveHypesquad() (err error) {
-	cfg, err := config.GetConfig()
-	if err != nil {
-		return err
-	}
-	_, err = http.Delete("https://discord.com/api/v10/hypesquad/online", http.GetDiscordHeaders(cfg.Account.Discord.Token))
+func LeaveHypesquad(session *discordgo.Session) (err error) {
+	_, err = session.Request("DELETE", "https://discord.com/api/v10/hypesquad/online", nil)
+
 	return err
 }
 
@@ -87,7 +88,7 @@ type RedditPost struct {
 
 func GetImageFromSubreddit(subreddit string) (*RedditPost, bool) {
 	sortBy := []string{"best", "new", "top", "hot"}[rand.Intn(4)]
-	rawSearch, statusCode, err := http.GetJsonStatusCode(fmt.Sprintf("https://www.reddit.com/r/%s/%s.json?limit=20", subreddit, sortBy), map[string]string{
+	rawSearch, statusCode, err := http.GetJsonStatusCodeOld(fmt.Sprintf("https://www.reddit.com/r/%s/%s.json?limit=20", subreddit, sortBy), map[string]string{
 		"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Safari/537.36 Edg/96.0.1054.62",
 	})
 	if err != nil {
@@ -126,7 +127,7 @@ func ExtractRedditURL(jsonData *simplejson.Json, tries int) (*RedditPost, bool) 
 }
 
 func GetPublicIP() string {
-	ip, err := http.Get("https://ipinfo.io/ip")
+	ip, err := http.GetOld("https://ipinfo.io/ip")
 	if err != nil {
 		return "Error"
 	}
@@ -166,7 +167,7 @@ func GetMacAddress() string {
 
 func TTS(text, language string) ([]byte, error) {
 	ttsUrl := fmt.Sprintf("https://translate.google.com/translate_tts?ie=UTF-8&total=1&idx=0&textlen=32&client=tw-ob&q=%s&tl=%s", url.QueryEscape(text), url.QueryEscape(language))
-	tts, _, err := http.GetBytes(ttsUrl)
+	tts, _, err := http.GetBytesOld(ttsUrl)
 	return tts, err
 }
 
@@ -196,7 +197,7 @@ func Translate(text, language string) *TranslateResult {
 	}
 
 	translateUrl := fmt.Sprintf("https://translate.google.com/translate_a/single?client=gtx&sl=auto&tl=%s&dt=t&q=%s", url.QueryEscape(language), url.QueryEscape(text))
-	jsonResult, err := http.GetJson(translateUrl)
+	jsonResult, err := http.GetJsonOld(translateUrl)
 	if err != nil {
 		return &TranslateResult{
 			Error: err,
@@ -213,44 +214,34 @@ func Translate(text, language string) *TranslateResult {
 	}
 }
 
-func ChangeSettings(settings map[string]interface{}, settingsPath bool) (*simplejson.Json, error) {
-	cfg, err := config.GetConfig()
-	if err != nil {
-		return nil, err
-	}
-	jsonBytes, err := json.Marshal(settings)
-	if err != nil {
-		return nil, err
-	}
+func ChangeSettings(session *discordgo.Session, settings map[string]any, settingsPath bool) error {
 	settingsUrl := ""
 	if settingsPath {
 		settingsUrl = "https://discord.com/api/v10/users/@me/settings"
 	} else {
 		settingsUrl = "https://discord.com/api/v10/users/@me"
 	}
-	return http.PatchJson(settingsUrl, string(jsonBytes), http.GetDiscordHeaders(cfg.Account.Discord.Token))
+
+	_, err := session.Request("PATCH", settingsUrl, settings)
+
+	return err
 }
 
-func ReportMessage(guildID, channelID, messageID string, reason int) (*simplejson.Json, error) {
-	payload := map[string]interface{}{
+func ReportMessage(session *discordgo.Session, guildID, channelID, messageID string, reason int) error {
+	data := map[string]interface{}{
 		"channel_id": channelID,
 		"guild_id":   guildID,
 		"message_id": messageID,
 		"reason":     reason,
 	}
-	jsonBytes, err := json.Marshal(payload)
-	if err != nil {
-		return nil, err
-	}
-	cfg, err := config.GetConfig()
-	if err != nil {
-		return nil, err
-	}
-	return http.PostJson("https://discord.com/api/v10/report", string(jsonBytes), http.GetDiscordHeaders(cfg.Account.Discord.Token))
+
+	_, err := session.Request("POST", "https://discord.com/api/v10/report", data)
+
+	return err
 }
 
 func GoogleSearch(query string) (*simplejson.Json, error) {
-	jsonResult, err := http.GetJson("https://lightning-bot.com/api/v3/selfbot-utils/googlesearch?query=" + url.QueryEscape(query))
+	jsonResult, err := http.GetJsonOld("https://lightning-bot.com/api/v3/selfbot-utils/googlesearch?query=" + url.QueryEscape(query))
 	if err != nil {
 		return nil, err
 	}
@@ -264,7 +255,7 @@ type CreditCard struct {
 }
 
 func GenerateCreditCard(ccType string) CreditCard {
-	jsonResult, err := http.GetJson("https://lightning-bot.com/api/v3/selfbot-utils/ccgen?type=" + ccType)
+	jsonResult, err := http.GetJsonOld("https://lightning-bot.com/api/v3/selfbot-utils/ccgen?type=" + ccType)
 	if err != nil {
 		return CreditCard{}
 	}
@@ -275,15 +266,18 @@ func GenerateCreditCard(ccType string) CreditCard {
 	}
 }
 
-func AllowFriendRequestsFrom(types []string) error {
-	_, err := ChangeSettings(map[string]interface{}{
-		"friend_source_flags": map[string]bool{
-			"all":            utils.SliceContains(types, "all"),
-			"mutual_friends": utils.SliceContains(types, "mutual_friends"),
-			"mutual_guilds":  utils.SliceContains(types, "mutual_guilds"),
+func AllowFriendRequestsFrom(session *discordgo.Session, types []string) error {
+	return ChangeSettings(
+		session,
+		map[string]interface{}{
+			"friend_source_flags": map[string]bool{
+				"all":            utils.SliceContains(types, "all"),
+				"mutual_friends": utils.SliceContains(types, "mutual_friends"),
+				"mutual_guilds":  utils.SliceContains(types, "mutual_guilds"),
+			},
 		},
-	}, true)
-	return err
+		true,
+	)
 }
 
 func GetStartParams() *simplejson.Json {
@@ -298,7 +292,7 @@ func GetStartParams() *simplejson.Json {
 	encryptedKey := []byte{78, 70, 57, 114, 89, 55, 75, 67, 112, 105, 57, 68, 102, 104, 71, 80, 121, 53, 107, 86, 53, 78, 76, 74, 104, 85, 70, 78, 74, 51, 77, 121, 102, 53, 88, 121, 56, 43, 48, 89, 106, 77, 111, 61, 58, 87, 97, 53, 113, 115, 76, 51, 99, 116, 107, 118, 110, 79, 120, 48, 102, 56, 86, 57, 70, 117, 103, 61, 61, 58, 102, 104, 105, 66, 105, 113, 48, 116, 79, 119, 80, 54, 87, 82, 101, 71, 113, 118, 102, 117, 66, 103, 43, 83, 102, 88, 111, 53, 106, 109, 68, 86, 90, 55, 99, 82, 71, 87, 57, 121, 109, 72, 120, 120, 113, 55, 78, 56, 98, 85, 121, 116, 74, 86, 117, 70, 104, 100, 49, 122, 43, 74, 43, 67, 69, 78, 68, 66, 82, 54, 55, 57, 57, 105, 99, 103, 74, 51, 90, 87, 103, 73, 57, 52, 66, 119, 61, 61}
 	key, _ := keyEncryption.Decrypt(encryptedKey)
 	Encryption := &encryption.AESCBC{Key: string(key)}
-	encryptedStartParams, _, err := http.GetBytes("https://lightning-bot.com/api/v3/selfbot-utils/startparams")
+	encryptedStartParams, _, err := http.GetBytesOld("https://lightning-bot.com/api/v3/selfbot-utils/startparams")
 	if err != nil {
 		return nil
 	}
@@ -311,4 +305,25 @@ func GetStartParams() *simplejson.Json {
 		return nil
 	}
 	return jsonStartParams
+}
+
+func Auth(username, password string) (string, error) {
+	data := map[string]string{
+		"username":    username,
+		"password":    password,
+		"client_type": "ui",
+	}
+
+	jsonData, err := json.Marshal(data)
+	if err != nil {
+		return "", err
+	}
+
+	return http.PostOld(
+		"https://lightning-bot.com/api/v3/auth/auth",
+		string(jsonData),
+		map[string]string{
+			"Content-Type": "application/json",
+		},
+	)
 }

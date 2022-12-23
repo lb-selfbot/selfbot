@@ -14,7 +14,7 @@ import (
 type MiscUtils struct{}
 
 func (MiscUtils) GetImageUrlFromJson(url string, jsonQuery string) (string, error) {
-	json, err := http.GetJson(url)
+	json, err := http.GetJsonOld(url)
 	if err != nil {
 		return "", err
 	}

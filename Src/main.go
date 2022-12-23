@@ -52,9 +52,12 @@ func initSelfbot() {
 
 	if isFirstLaunch {
 		utils.Logging.Info("First launch detected, starting setup...")
-		os.Exit(0)
-	}
 
+		username, password := utils.Input.GetLogin()
+
+		_ = username
+		_ = password
+	}
 }
 
 func main() {
