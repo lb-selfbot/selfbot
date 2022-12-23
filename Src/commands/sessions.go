@@ -96,14 +96,14 @@ func (s *SessionsCommands) HandleSessions(oldSessions, newSessions []*discordgo.
 	for _, oldSession := range oldSessions {
 		if !utils.SliceContains(newSessionIDs, oldSession.SessionID) &&
 			cfg.Events.SessionDisconnected {
-			logging.UI.SessionDisconnected(oldSession.SessionID, oldSession.ClientInfo.OS, oldSession.ClientInfo.Client)
+			logging.Logging.SessionDisconnected(oldSession.SessionID, oldSession.ClientInfo.OS, oldSession.ClientInfo.Client)
 		}
 	}
 
 	for _, newSession := range newSessions {
 		if !utils.SliceContains(oldSessionIDs, newSession.SessionID) &&
 			cfg.Events.SessionConnected {
-			logging.UI.SessionConnected(newSession.SessionID, newSession.ClientInfo.OS, newSession.ClientInfo.Client)
+			logging.Logging.SessionDisconnected(newSession.SessionID, newSession.ClientInfo.OS, newSession.ClientInfo.Client)
 		}
 	}
 }

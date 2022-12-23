@@ -1,162 +1,35 @@
 package logging
 
 import (
-	"container/list"
 	"fmt"
-	"path/filepath"
 	"strings"
 	"time"
 
 	"github.com/LightningDev1/LB-Selfbot/config"
 	"github.com/LightningDev1/LB-Selfbot/constants"
-	"github.com/LightningDev1/LB-Selfbot/ipc"
 	"github.com/LightningDev1/LB-Selfbot/utils"
-	"github.com/LightningDev1/LB-Selfbot/websocket"
-	"github.com/LightningDev1/beeep"
 	"github.com/LightningDev1/dgc"
 	"github.com/LightningDev1/discordgo"
-	"github.com/common-nighthawk/go-figure"
 )
 
-// UI Logging
+type _Logging struct{}
 
-func getGuildName(session *discordgo.Session, guildID string) string {
-	guild, _ := utils.Discord.GetGuild(session, guildID)
-	guildName := "No Server"
-	if guild != nil {
-		guildName = guild.Name
-	}
-	return guildName
-}
-
-func getChannelName(session *discordgo.Session, channelID string) string {
-	channel, _ := utils.Discord.GetChannel(session, channelID)
-	channelName := "No Channel"
-	if channel != nil {
-		channelName = channel.Name
-	}
-	return channelName
-}
-
-func getUserName(session *discordgo.Session, userID string) string {
-	arg := &dgc.Argument{}
-	userName, _ := utils.Discord.TryGetUsernameFromMention(session, arg.SetRaw(userID))
-	return utils.Misc.Or(userName, "Unknown")
-}
-
-func ConsoleAppend(text string) {
-	ipc.IPC.ConsoleAppend(text)
-	websocket.Send(websocket.WsMessage{
-		Op: "CONSOLE_APPEND",
-		Data: websocket.WsData{
-			Text: text,
-		},
-	})
-}
-
-func ConsoleClear() {
-	ipc.IPC.ConsoleClear()
-	websocket.Send(websocket.WsMessage{
-		Op:   "CONSOLE_CLEAR",
-		Data: websocket.WsData{},
-	})
-}
-
-type ConsoleMessage struct {
-	Title string
-	Color string
-	Info  *list.List
-}
-
-func (c *ConsoleMessage) SetTitle(title string) *ConsoleMessage {
-	c.Title = title
-	return c
-}
-
-func (c *ConsoleMessage) SetColor(color string) *ConsoleMessage {
-	c.Color = color
-	return c
-}
-
-func (c *ConsoleMessage) AddInfo(key, value string) *ConsoleMessage {
-	c.Info.PushBack([]string{key, value})
-	return c
-}
-
-func (c *ConsoleMessage) AddInfoConditional(key, value string, condition bool) *ConsoleMessage {
-	if condition {
-		c.AddInfo(key, value)
-	}
-	return c
-}
-
-func (c *ConsoleMessage) Show() {
-	if constants.CONSOLE {
-		r, g, b := utils.Misc.HexToRGB(c.Color)
-		timeFormat := UI.ColoredConsole(time.Now().Local().Format("15:04:05"), 193, 239, 255, false)
-		message := UI.ColoredConsole("[", 238, 238, 238, false) + timeFormat + UI.ColoredConsole("] ", 238, 238, 238, false) + UI.ColoredConsole(c.Title, r, g, b, false) + "\n"
-
-		for e := c.Info.Front(); e != nil; e = e.Next() {
-			info := e.Value.([]string)
-			if info[0] != "" {
-				message += UI.ColoredConsole("  "+info[0]+": ", 238, 238, 238, false) + UI.ColoredConsole(info[1], 193, 239, 255, false) + "\n"
-			} else {
-				message += UI.ColoredConsole("  "+info[1], 193, 239, 255, false) + "\n"
-			}
-		}
-
-		fmt.Println(message)
-
+func (_Logging) PrintBanner(console bool, ui bool) {
+	if console {
+		Console.PrintBanner()
 	}
 
-	timeFormat := UI.Colored(time.Now().Local().Format("15:04:05"), "#C1EFFF")
-	message := UI.Colored("[", "#eeeeee") + timeFormat + UI.Colored("] ", "#eeeeee") + UI.Colored(c.Title, c.Color) + "\n"
-
-	for e := c.Info.Front(); e != nil; e = e.Next() {
-		info := e.Value.([]string)
-		if info[0] != "" {
-			message += UI.Colored("  "+info[0]+": ", "#eeeeee") + UI.Colored(info[1], "#C1EFFF") + "\n"
-		} else {
-			message += UI.Colored("  "+info[1], "#C1EFFF") + "\n"
-		}
-	}
-
-	ConsoleAppend(message)
-}
-
-func NewConsoleMessage() *ConsoleMessage {
-	return &ConsoleMessage{
-		Info: list.New(),
+	if ui {
+		message := "<image Source=\"assets/Banner.png\" Width=\"650\" Height=\"150\" Centered />"
+		UI.Append(message)
 	}
 }
 
-type UILogging struct{}
+// Specific logging functions
 
-func (UILogging) Notification(message string) {
-	cfg, _ := config.GetConfig()
-	if cfg.Notifications.Enabled {
-		go beeep.Notify("LightningBot", message, "LightningBot", filepath.Join(utils.File.GetMainFolder(), "Logo.png"))
-	}
-}
-
-func (UILogging) Colored(text string, color string) string {
-	return fmt.Sprintf("<text Color=\"%s\">%s</text>", utils.Misc.Or(color, "#ffffff"), text)
-}
-
-func (UILogging) ColoredConsole(text string, r, g, b int, bold bool) string {
-	boldArg := ";1"
-	if !bold {
-		boldArg = ""
-	}
-	return fmt.Sprintf("\033[38;2;%d;%d;%d%sm%s\033[0m", r, g, b, boldArg, text)
-}
-
-func (UILogging) Centered(text string, color string) string {
-	return fmt.Sprintf("<text Color=\"%s\" Centered>%s</text>", utils.Misc.Or(color, "#ffffff"), text)
-}
-
-func (UILogging) CommandUsed(commandName string) {
+func (_Logging) CommandUsed(commandName string) {
 	UI.Notification("Command " + commandName + " used")
+
 	NewConsoleMessage().
 		SetTitle("Command Used").
 		SetColor("#C1EFFF").
@@ -164,45 +37,49 @@ func (UILogging) CommandUsed(commandName string) {
 		Show()
 }
 
-func (UILogging) OnReady(router *dgc.Router, event *discordgo.Ready) {
-	cfg, _ := config.GetConfig()
+func (_Logging) OnReady(router *dgc.Router, event *discordgo.Ready) {
+	cfg, err := config.GetConfig()
+	if err != nil {
+		Console.Error("Error getting config:", err)
+		return
+	}
+
+	// Count friends
 	friends := 0
 	for _, rel := range event.Relationships {
 		if rel.Type == 1 {
 			friends++
 		}
 	}
-	UI.Notification("Connected to " + event.User.String())
 
-	bannerTextUpper := "LightningBot " + constants.VERSION_STRING + " | " + event.User.String() + " | Prefix: " + cfg.Selfbot.CommandPrefix
-	bannerTextLower := fmt.Sprint(len(router.Commands)) + " Commands | " + fmt.Sprint(len(event.Guilds)) + " Servers | " + fmt.Sprint(friends) + " Friends"
+	UI.Notification(fmt.Sprintf("Connected to %s", event.User.String()))
+
+	bannerTextUpper := fmt.Sprintf("LightningBot %s | %s | Prefix: %s", constants.VERSION, event.User.String(), cfg.Selfbot.CommandPrefix)
+	bannerTextLower := fmt.Sprintf("%d Commands | %d Servers | %d Friends", len(router.Commands), len(event.Guilds), friends)
 
 	if constants.CONSOLE {
-		// Clear console
-		fmt.Print("\033[H\033[2J")
+		Console.Clear()
 
-		banner := utils.String.CenterSlices(figure.NewFigure("LightningBot", "stop", true).Slicify())
+		Logging.PrintBanner(true, false)
 
-		message := UI.ColoredConsole(banner, 0, 203, 255, true) + "\n\n"
-
-		message += UI.ColoredConsole(
-			utils.String.CenterSlices([]string{bannerTextUpper})+"\n"+utils.String.CenterSlices([]string{bannerTextLower}), 0, 203, 255, false,
+		message := Console.Colored(
+			utils.String.Center(bannerTextUpper)+"\n"+utils.String.Center(bannerTextLower), 0, 203, 255, false,
 		)
 
 		fmt.Println(message)
 	}
 
 	message := "<image Source=\"assets/Banner.png\" Width=\"650\" Height=\"150\" Centered />\n" +
-		UI.Centered("LightningBot "+constants.VERSION_STRING+" | "+event.User.String()+" | Prefix: "+cfg.Selfbot.CommandPrefix, "#C1EFFF") + "\n" +
-		UI.Centered(fmt.Sprint(len(router.Commands))+" Commands | "+fmt.Sprint(len(event.Guilds))+" Servers | "+fmt.Sprint(friends)+" Friends", "#C1EFFF") + "\n"
+		UI.Centered(bannerTextUpper, "#C1EFFF") + "\n" +
+		UI.Centered(bannerTextLower, "#C1EFFF") + "\n"
 
-	ConsoleClear()
-	ConsoleAppend(message)
+	UI.Clear()
+	UI.Append(message)
 }
 
-func (UILogging) NitroSniperFake(session *discordgo.Session, message *discordgo.Message, code, account string) {
-	guildName := getGuildName(session, message.GuildID)
-	channelName := getChannelName(session, message.ChannelID)
+func (_Logging) NitroSniperFake(session *discordgo.Session, message *discordgo.Message, code, account string) {
+	guildName := utils.Discord.GetGuildName(session, message.GuildID)
+	channelName := utils.Discord.GetChannelName(session, message.ChannelID)
 	UI.Notification(fmt.Sprintf("Nitro Sniper: Fake Code\nServer: %s\nChannel: %s\nAuthor: %s\nCode: %s", guildName, channelName, message.Author.String(), code))
 	NewConsoleMessage().
 		SetTitle("Nitro Sniper").
@@ -216,9 +93,9 @@ func (UILogging) NitroSniperFake(session *discordgo.Session, message *discordgo.
 		Show()
 }
 
-func (UILogging) NitroSniper(session *discordgo.Session, message *discordgo.Message, elapsed time.Duration, status, code, account string) {
-	guildName := getGuildName(session, message.GuildID)
-	channelName := getChannelName(session, message.ChannelID)
+func (_Logging) NitroSniper(session *discordgo.Session, message *discordgo.Message, elapsed time.Duration, status, code, account string) {
+	guildName := utils.Discord.GetGuildName(session, message.GuildID)
+	channelName := utils.Discord.GetChannelName(session, message.ChannelID)
 	UI.Notification(fmt.Sprintf("Nitro Sniper: %s\nServer: %s\nChannel: %s\nAuthor: %s\nCode: %s", status, guildName, channelName, message.Author.String(), code))
 	NewConsoleMessage().
 		SetTitle("Nitro Sniper").
@@ -233,8 +110,8 @@ func (UILogging) NitroSniper(session *discordgo.Session, message *discordgo.Mess
 		Show()
 }
 
-func (UILogging) BanNotifier(session *discordgo.Session, guildID string) {
-	guildName := getGuildName(session, guildID)
+func (_Logging) BanNotifier(session *discordgo.Session, guildID string) {
+	guildName := utils.Discord.GetGuildName(session, guildID)
 	UI.Notification("Ban Notifier: You have been banned from " + guildName)
 	NewConsoleMessage().
 		SetTitle("Ban Notifier").
@@ -243,7 +120,7 @@ func (UILogging) BanNotifier(session *discordgo.Session, guildID string) {
 		Show()
 }
 
-func (UILogging) DMNotifier(message *discordgo.Message) {
+func (_Logging) DMNotifier(message *discordgo.Message) {
 	UI.Notification("DM Notifier: New DM from " + message.Author.String())
 	NewConsoleMessage().
 		SetTitle("DM Notifier").
@@ -252,7 +129,7 @@ func (UILogging) DMNotifier(message *discordgo.Message) {
 		Show()
 }
 
-func (UILogging) DMEditNotifier(message *discordgo.Message) {
+func (_Logging) DMEditNotifier(message *discordgo.Message) {
 	UI.Notification("DM Edit Notifier: Edited DM from " + message.Author.String())
 	NewConsoleMessage().
 		SetTitle("DM Edit Notifier").
@@ -261,7 +138,7 @@ func (UILogging) DMEditNotifier(message *discordgo.Message) {
 		Show()
 }
 
-func (UILogging) DMDeleteNotifier(message *discordgo.Message) {
+func (_Logging) DMDeleteNotifier(message *discordgo.Message) {
 	UI.Notification("DM Delete Notifier: Deleted DM from " + message.Author.String())
 	NewConsoleMessage().
 		SetTitle("DM Delete Notifier").
@@ -271,7 +148,7 @@ func (UILogging) DMDeleteNotifier(message *discordgo.Message) {
 		Show()
 }
 
-func (UILogging) DMTypingNotifier(userName string) {
+func (_Logging) DMTypingNotifier(userName string) {
 	UI.Notification("DM Typing Notifier: " + userName + " is typing")
 	NewConsoleMessage().
 		SetTitle("DM Typing Notifier").
@@ -280,9 +157,9 @@ func (UILogging) DMTypingNotifier(userName string) {
 		Show()
 }
 
-func (UILogging) MessageDeleteNotifier(session *discordgo.Session, message *discordgo.Message) {
-	guildName := getGuildName(session, message.GuildID)
-	channelName := getChannelName(session, message.ChannelID)
+func (_Logging) MessageDeleteNotifier(session *discordgo.Session, message *discordgo.Message) {
+	guildName := utils.Discord.GetGuildName(session, message.GuildID)
+	channelName := utils.Discord.GetChannelName(session, message.ChannelID)
 	UI.Notification("Message Delete Notifier: Deleted message from " + message.Author.String())
 	NewConsoleMessage().
 		SetTitle("Message Delete Notifier").
@@ -294,9 +171,9 @@ func (UILogging) MessageDeleteNotifier(session *discordgo.Session, message *disc
 		Show()
 }
 
-func (UILogging) DiscordStaffDetection(session *discordgo.Session, message *discordgo.Message) {
-	guildName := getGuildName(session, message.GuildID)
-	channelName := getChannelName(session, message.ChannelID)
+func (_Logging) DiscordStaffDetection(session *discordgo.Session, message *discordgo.Message) {
+	guildName := utils.Discord.GetGuildName(session, message.GuildID)
+	channelName := utils.Discord.GetChannelName(session, message.ChannelID)
 	UI.Notification("Discord Staff Detection: " + message.Author.String() + " is Discord staff")
 	NewConsoleMessage().
 		SetTitle("Discord Staff Detection").
@@ -307,9 +184,9 @@ func (UILogging) DiscordStaffDetection(session *discordgo.Session, message *disc
 		Show()
 }
 
-func (UILogging) GhostPingDetection(session *discordgo.Session, message *discordgo.Message) {
-	guildName := getGuildName(session, message.GuildID)
-	channelName := getChannelName(session, message.ChannelID)
+func (_Logging) GhostPingDetection(session *discordgo.Session, message *discordgo.Message) {
+	guildName := utils.Discord.GetGuildName(session, message.GuildID)
+	channelName := utils.Discord.GetChannelName(session, message.ChannelID)
 	UI.Notification("Ghostping Detection: " + message.Author.String() + " has pinged you")
 	NewConsoleMessage().
 		SetTitle("Ghostping Detection").
@@ -320,9 +197,9 @@ func (UILogging) GhostPingDetection(session *discordgo.Session, message *discord
 		Show()
 }
 
-func (UILogging) SelfbotDetection(session *discordgo.Session, message *discordgo.Message, selfbot string) {
-	guildName := getGuildName(session, message.GuildID)
-	channelName := getChannelName(session, message.ChannelID)
+func (_Logging) SelfbotDetection(session *discordgo.Session, message *discordgo.Message, selfbot string) {
+	guildName := utils.Discord.GetGuildName(session, message.GuildID)
+	channelName := utils.Discord.GetChannelName(session, message.ChannelID)
 	UI.Notification("Selfbot Detection: " + message.Author.String() + " was detected using a selfbot")
 	NewConsoleMessage().
 		SetTitle("Selfbot Detection").
@@ -334,9 +211,9 @@ func (UILogging) SelfbotDetection(session *discordgo.Session, message *discordgo
 		Show()
 }
 
-func (UILogging) TicketNotifier(session *discordgo.Session, channel *discordgo.Channel) {
-	guildName := getGuildName(session, channel.GuildID)
-	channelName := getChannelName(session, channel.ID)
+func (_Logging) TicketNotifier(session *discordgo.Session, channel *discordgo.Channel) {
+	guildName := utils.Discord.GetGuildName(session, channel.GuildID)
+	channelName := utils.Discord.GetChannelName(session, channel.ID)
 	NewConsoleMessage().
 		SetTitle("Ticket Notifier").
 		SetColor("#C1EFFF").
@@ -347,9 +224,9 @@ func (UILogging) TicketNotifier(session *discordgo.Session, channel *discordgo.C
 		Show()
 }
 
-func (UILogging) PhisingDetected(session *discordgo.Session, message *discordgo.Message, domain string) {
-	guildName := getGuildName(session, message.GuildID)
-	channelName := getChannelName(session, message.ChannelID)
+func (_Logging) PhisingDetected(session *discordgo.Session, message *discordgo.Message, domain string) {
+	guildName := utils.Discord.GetGuildName(session, message.GuildID)
+	channelName := utils.Discord.GetChannelName(session, message.ChannelID)
 	UI.Notification(fmt.Sprintf("Protections: Phising Detected!\nDomain: %s\nAuthor: %s", domain, message.Author.String()))
 	NewConsoleMessage().
 		SetTitle("Protections").
@@ -362,7 +239,7 @@ func (UILogging) PhisingDetected(session *discordgo.Session, message *discordgo.
 		Show()
 }
 
-func (UILogging) MassDMBlocked() {
+func (_Logging) MassDMBlocked() {
 	UI.Notification("Protections: Mass DM Blocked!\nDMs will be enabled again in 5 minutes.")
 	NewConsoleMessage().
 		SetTitle("Protections").
@@ -372,7 +249,7 @@ func (UILogging) MassDMBlocked() {
 		Show()
 }
 
-func (UILogging) FriendRequestSpamBlocked() {
+func (_Logging) FriendRequestSpamBlocked() {
 	UI.Notification("Protections: Friend Request Spam Blocked!\nFriend Requests will be enabled again in 5 minutes.")
 	NewConsoleMessage().
 		SetTitle("Protections").
@@ -382,9 +259,9 @@ func (UILogging) FriendRequestSpamBlocked() {
 		Show()
 }
 
-func (UILogging) AntiDelete(session *discordgo.Session, message *discordgo.Message) {
-	guildName := getGuildName(session, message.GuildID)
-	channelName := getChannelName(session, message.ChannelID)
+func (_Logging) AntiDelete(session *discordgo.Session, message *discordgo.Message) {
+	guildName := utils.Discord.GetGuildName(session, message.GuildID)
+	channelName := utils.Discord.GetChannelName(session, message.ChannelID)
 	UI.Notification("Anti Delete: " + message.Author.String() + " deleted a message in " + guildName)
 	NewConsoleMessage().
 		SetTitle("Protections").
@@ -395,10 +272,10 @@ func (UILogging) AntiDelete(session *discordgo.Session, message *discordgo.Messa
 		Show()
 }
 
-func (UILogging) GiveawayFound(session *discordgo.Session, message *discordgo.Message, prize, host, endsIn, account string) {
-	guildName := getGuildName(session, message.GuildID)
-	channelName := getChannelName(session, message.ChannelID)
-	hostName := getUserName(session, host)
+func (_Logging) GiveawayFound(session *discordgo.Session, message *discordgo.Message, prize, host, endsIn, account string) {
+	guildName := utils.Discord.GetGuildName(session, message.GuildID)
+	channelName := utils.Discord.GetChannelName(session, message.ChannelID)
+	hostName := utils.Discord.GetUserName(session, host)
 	if hostName == "Unknown" {
 		hostName = host
 	}
@@ -417,9 +294,9 @@ func (UILogging) GiveawayFound(session *discordgo.Session, message *discordgo.Me
 		Show()
 }
 
-func (UILogging) GiveawayWon(session *discordgo.Session, message *discordgo.Message, prize, account string) {
-	guildName := getGuildName(session, message.GuildID)
-	channelName := getChannelName(session, message.ChannelID)
+func (_Logging) GiveawayWon(session *discordgo.Session, message *discordgo.Message, prize, account string) {
+	guildName := utils.Discord.GetGuildName(session, message.GuildID)
+	channelName := utils.Discord.GetChannelName(session, message.ChannelID)
 	UI.Notification("Giveaway Sniper: Won a giveaway in " + guildName + "\nPrize: " + prize)
 	NewConsoleMessage().
 		SetTitle("Giveaway Sniper").
@@ -433,7 +310,7 @@ func (UILogging) GiveawayWon(session *discordgo.Session, message *discordgo.Mess
 		Show()
 }
 
-func (UILogging) MultiTokenSniperConnected(amount int) {
+func (_Logging) MultiTokenSniperConnected(amount int) {
 	info := fmt.Sprintf("%d Account Connected", amount)
 	if amount > 1 {
 		info = strings.ReplaceAll(info, "Account", "Accounts")
@@ -446,7 +323,7 @@ func (UILogging) MultiTokenSniperConnected(amount int) {
 		Show()
 }
 
-func (UILogging) SessionConnected(id, os, client string) {
+func (_Logging) SessionConnected(id, os, client string) {
 	UI.Notification("Session Connected\nOS: " + os + "\nClient: " + client)
 	NewConsoleMessage().
 		SetTitle("Session Connected").
@@ -457,7 +334,7 @@ func (UILogging) SessionConnected(id, os, client string) {
 		Show()
 }
 
-func (UILogging) SessionDisconnected(id, os, client string) {
+func (_Logging) SessionDisconnected(id, os, client string) {
 	UI.Notification("Session Disconnected\nOS: " + os + "\nClient: " + client)
 	NewConsoleMessage().
 		SetTitle("Session Disconnected").
@@ -468,4 +345,4 @@ func (UILogging) SessionDisconnected(id, os, client string) {
 		Show()
 }
 
-var UI = UILogging{}
+var Logging = _Logging{}

@@ -299,7 +299,7 @@ func (AnimationCommands) customanimationhelp(ctx *dgc.Ctx) {
 	embed.NewEmbed().
 		AddField("Creating an animation", fmt.Sprintf(
 			"To create an animation, create a text file in %s. Every line in the file will be a frame of the animation.\n",
-			filepath.Join(utils.File.GetMainFolder(), "Animations"),
+			filepath.Join(utils.IO.GetMainFolder(), "Animations"),
 		)).
 		AddField("Using an animation", fmt.Sprintf(
 			"To use an animation, use the command `%scustomanimation <filename without .txt>`.\n",
@@ -309,7 +309,7 @@ func (AnimationCommands) customanimationhelp(ctx *dgc.Ctx) {
 }
 
 func (AnimationCommands) customanimations(ctx *dgc.Ctx) {
-	folder := filepath.Join(utils.File.GetMainFolder(), "Animations")
+	folder := filepath.Join(utils.IO.GetMainFolder(), "Animations")
 	_ = os.MkdirAll(folder, os.ModePerm)
 
 	customAnimString := ""
@@ -336,14 +336,14 @@ func (AnimationCommands) customanimations(ctx *dgc.Ctx) {
 
 func (AnimationCommands) customanimation(ctx *dgc.Ctx) {
 	name := utils.Arguments["<name>"]
-	folder := filepath.Join(utils.File.GetMainFolder(), "Animations")
+	folder := filepath.Join(utils.IO.GetMainFolder(), "Animations")
 	_ = os.MkdirAll(folder, os.ModePerm)
-	path := folder + utils.File.SanitizeFilename(name+".txt")
+	path := folder + utils.IO.SanitizeFilename(name+".txt")
 	if _, err := os.Stat(path); os.IsNotExist(err) {
 		_ = ctx.RespondText("Animation does not exist.")
 		return
 	}
-	rawAnimation, ok := utils.File.Read(path)
+	rawAnimation, ok := utils.IO.Read(path)
 	if !ok {
 		_ = ctx.RespondText("Animation could not be read.")
 		return

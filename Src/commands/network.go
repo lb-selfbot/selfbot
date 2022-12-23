@@ -403,9 +403,9 @@ func (NetworkCommands) youtubedl(ctx *dgc.Ctx) {
 		}
 
 		downloadPath := filepath.Join(
-			utils.File.GetMainFolder(),
+			utils.IO.GetMainFolder(),
 			"Downloads",
-			utils.File.SanitizeFilename(fmt.Sprintf("%s.mp4", video.Title)),
+			utils.IO.SanitizeFilename(fmt.Sprintf("%s.mp4", video.Title)),
 		)
 
 		file, err := os.Create(downloadPath)
@@ -745,7 +745,7 @@ func (NetworkCommands) pastebin(ctx *dgc.Ctx) {
 
 func (NetworkCommands) pastefile(ctx *dgc.Ctx) {
 	filePath := utils.Arguments["<filepath>"]
-	if content, success := utils.File.Read(filePath); success {
+	if content, success := utils.IO.Read(filePath); success {
 		paste, err := api.CreatePaste(content)
 		if err != nil {
 			_ = ctx.RespondText("An error has occurred.")

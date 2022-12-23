@@ -15,6 +15,7 @@ import (
 	"github.com/LightningDev1/LB-Selfbot/constants"
 	"github.com/LightningDev1/LB-Selfbot/eventhandlers"
 	"github.com/LightningDev1/LB-Selfbot/ipc"
+	"github.com/LightningDev1/LB-Selfbot/logging"
 	"github.com/LightningDev1/LB-Selfbot/multitokensniper"
 	"github.com/LightningDev1/LB-Selfbot/utils"
 	"github.com/LightningDev1/LB-Selfbot/websocket"
@@ -29,9 +30,31 @@ func initArgs() {
 	constants.CONSOLE = !strings.Contains(args, "-l")
 
 	if strings.Contains(args, "-v") {
-		fmt.Println(constants.VERSION_STRING[1:])
+		fmt.Println(constants.VERSION[1:])
 		os.Exit(0)
 	}
+}
+
+func initSelfbot() {
+	if !constants.CONSOLE {
+		return
+	}
+
+	logging.Logging.PrintBanner(true, false)
+
+	err := utils.IO.CreateFolders()
+	if err != nil {
+		utils.Logging.Error("Error creating folders: ", err)
+	}
+
+	// TODO: remove invert
+	isFirstLaunch := !utils.IO.IsFirstLaunch()
+
+	if isFirstLaunch {
+		utils.Logging.Info("First launch detected, starting setup...")
+		os.Exit(0)
+	}
+
 }
 
 func main() {
@@ -42,6 +65,8 @@ func main() {
 	if constants.DEBUG {
 		utils.Logging.Warn("Debug Enabled!")
 	}
+
+	initSelfbot()
 
 	cfg, err := config.GetConfig()
 	if err != nil {

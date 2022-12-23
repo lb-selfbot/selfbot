@@ -362,4 +362,28 @@ func (DiscordUtils) SleepWithTypingFix(session *discordgo.Session, channelID str
 	time.Sleep(duration - (time.Duration(int(duration.Seconds()/5)) * 5 * time.Second))
 }
 
+func (DiscordUtils) GetGuildName(session *discordgo.Session, guildID string) string {
+	guild, _ := Discord.GetGuild(session, guildID)
+	guildName := "No Server"
+	if guild != nil {
+		guildName = guild.Name
+	}
+	return guildName
+}
+
+func (DiscordUtils) GetChannelName(session *discordgo.Session, channelID string) string {
+	channel, _ := Discord.GetChannel(session, channelID)
+	channelName := "No Channel"
+	if channel != nil {
+		channelName = channel.Name
+	}
+	return channelName
+}
+
+func (DiscordUtils) GetUserName(session *discordgo.Session, userID string) string {
+	arg := &dgc.Argument{}
+	userName, _ := Discord.TryGetUsernameFromMention(session, arg.SetRaw(userID))
+	return Misc.Or(userName, "Unknown")
+}
+
 var Discord = &DiscordUtils{}

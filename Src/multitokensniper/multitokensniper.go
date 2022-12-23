@@ -106,7 +106,7 @@ func Init(cfg config.Config) {
 	if len(SniperInstances) > 0 {
 		go func() {
 			time.Sleep(time.Second * 5)
-			logging.UI.MultiTokenSniperConnected(len(SniperInstances))
+			logging.Logging.MultiTokenSniperConnected(len(SniperInstances))
 		}()
 	}
 }

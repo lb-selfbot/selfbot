@@ -122,12 +122,28 @@ func (StringUtils) Capitalize(text string) string {
 	return strings.ToUpper(text[:1]) + text[1:]
 }
 
+func (StringUtils) CenterWidth(text string, width int) string {
+	spaceCount := (width - len(text)) / 2
+	return strings.Repeat(" ", spaceCount) + text
+}
+
+func (StringUtils) Center(text string) string {
+	fd := int(os.Stdout.Fd())
+	w, _, err := term.GetSize(fd)
+	if err != nil {
+		return text
+	}
+	return String.CenterWidth(text, w)
+}
+
+
 func (StringUtils) CenterSlices(rows []string) string {
 	fd := int(os.Stdout.Fd())
 	w, _, err := term.GetSize(fd)
 	if err != nil {
 		return strings.Join(rows, "\n")
 	}
+
 	// Get the max length of the rows
 	max := 0
 	for _, row := range rows {
@@ -135,11 +151,15 @@ func (StringUtils) CenterSlices(rows []string) string {
 			max = len(row)
 		}
 	}
+
 	// Center the rows
 	spaceCount := (w - max) / 2
+	spaces := strings.Repeat(" ", spaceCount)
+
 	for i, row := range rows {
-		rows[i] = strings.Repeat(" ", spaceCount) + row
+		rows[i] = spaces + row
 	}
+
 	return strings.Join(rows, "\n")
 }
 

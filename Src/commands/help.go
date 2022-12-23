@@ -198,7 +198,7 @@ func renderDefaultGeneralHelpEmbed(router *dgc.Router) *embed.Embed {
 	}
 	prefix := router.GetPrefixes()[0]
 	return embed.NewEmbed().
-		SetDescription(fmt.Sprintf("LightningBot %s Help\nAmount of Commands: %d, <> is required, [] is optional\n", constants.VERSION_STRING, len(router.Commands))).
+		SetDescription(fmt.Sprintf("LightningBot %s Help\nAmount of Commands: %d, <> is required, [] is optional\n", constants.VERSION, len(router.Commands))).
 		AddField("Categories", categoriesString, true, true).
 		SetSubtext(fmt.Sprintf(
 			"Use \x1b[34;1m%shelp <category name>\x1b[0m or \x1b[34;1m%shelp <command name>\x1b[0m to get more info.\nUse \x1b[34;1m%ssearch <query>\x1b[0m to search commands.\nUse \x1b[34;1m%srepeat\x1b[0m to repeat the last command.",

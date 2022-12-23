@@ -14,7 +14,7 @@ func (e *Events) OnTypingStart(_ *discordgo.Session, typingStart *discordgo.Typi
 	if cfg.Events.DMTypingNotifier && typingStart.GuildID == "" {
 		user, err := e.Session.State.GetUser(typingStart.UserID)
 		if err == nil {
-			logging.UI.DMTypingNotifier(user.String())
+			logging.Logging.DMTypingNotifier(user.String())
 		}
 	}
 }

@@ -132,7 +132,7 @@ var (
 func (c Config) Save() error {
 	configMutex.Lock()
 	defer configMutex.Unlock()
-	configFile, err := os.OpenFile(filepath.Join(utils.File.GetMainFolder(), "Config", "config.json"), os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0644)
+	configFile, err := os.OpenFile(filepath.Join(utils.IO.GetMainFolder(), "Config", "config.json"), os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0644)
 	if err != nil {
 		return err
 	}
@@ -157,7 +157,7 @@ func GetConfig() (config Config, err error) {
 	if lastConfig != nil && time.Since(lastConfigTime) < time.Second*10 {
 		return *lastConfig, nil
 	}
-	configFile, err := os.Open(filepath.Join(utils.File.GetMainFolder(), "Config", "config.json"))
+	configFile, err := os.Open(filepath.Join(utils.IO.GetMainFolder(), "Config", "config.json"))
 	if err != nil {
 		return config, err
 	}

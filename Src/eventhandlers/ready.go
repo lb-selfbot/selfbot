@@ -6,5 +6,5 @@ import (
 )
 
 func (e *Events) OnReady(_ *discordgo.Session, event *discordgo.Ready) {
-	logging.UI.OnReady(e.Router, event)
+	logging.Logging.OnReady(e.Router, event)
 }

@@ -17,7 +17,7 @@ func (e *Events) OnChannelCreate(_ *discordgo.Session, channel *discordgo.Channe
 			return
 		}
 		if perms&discordgo.PermissionSendMessages != 0 && perms&discordgo.PermissionViewChannel != 0 {
-			logging.UI.TicketNotifier(e.Session, channel.Channel)
+			logging.Logging.TicketNotifier(e.Session, channel.Channel)
 		}
 	}
 }

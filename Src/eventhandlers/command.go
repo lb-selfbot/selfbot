@@ -11,7 +11,7 @@ func (e *Events) OnCommand(following dgc.ExecutionHandler) dgc.ExecutionHandler 
 		arguments, success := utils.Discord.GetArguments(ctx)
 		if success {
 			e.Settings.UsedCommands = append(e.Settings.UsedCommands, ctx)
-			logging.UI.CommandUsed(ctx.Command.Name)
+			logging.Logging.CommandUsed(ctx.Command.Name)
 			_ = ctx.Session.ChannelMessageDelete(ctx.Event.Message.ChannelID, ctx.Event.Message.ID)
 			utils.Arguments = arguments
 			following(ctx)

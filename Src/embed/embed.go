@@ -38,8 +38,8 @@ func NewEmbed() *Embed {
 	if err != nil {
 		return embed
 	}
-	embed.SetTitle(strings.Replace(cfg.Selfbot.Title, "$VERSION", constants.VERSION_STRING, -1))
-	embed.SetFooter(strings.Replace(cfg.Selfbot.Footer, "$VERSION", constants.VERSION_STRING, -1))
+	embed.SetTitle(strings.Replace(cfg.Selfbot.Title, "$VERSION", constants.VERSION, -1))
+	embed.SetFooter(strings.Replace(cfg.Selfbot.Footer, "$VERSION", constants.VERSION, -1))
 	return embed
 }
 

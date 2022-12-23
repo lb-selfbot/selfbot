@@ -139,7 +139,7 @@ func (e *Events) checkPhising(message *discordgo.Message, cfg *config.Config) {
 			if utils.SliceContains(e.Settings.phisingDomains, hostname) ||
 				utils.SliceContains(e.Settings.suspiciousDomains, hostname) {
 				_ = e.Session.MessageAck(message.ChannelID, message.ID)
-				logging.UI.PhisingDetected(e.Session, message, hostname)
+				logging.Logging.PhisingDetected(e.Session, message, hostname)
 			}
 		}
 	}
@@ -250,7 +250,7 @@ func (e *Events) checkProtections(message *discordgo.Message, cfg *config.Config
 				}
 				_ = e.Session.MessageAck(message.ChannelID, message.ID)
 				_, _ = api.ChangeSettings(map[string]interface{}{"restricted_guilds": guildIDs}, true)
-				logging.UI.MassDMBlocked()
+				logging.Logging.MassDMBlocked()
 				go func() {
 					time.Sleep(5 * 60)
 					_, _ = api.ChangeSettings(map[string]interface{}{"restricted_guilds": []any{}}, true)
@@ -336,7 +336,7 @@ func (e *Events) checkProtectionsDelete(message *discordgo.Message, cfg *config.
 		if userPerms&discordgo.PermissionManageMessages != 0 || userPerms&discordgo.PermissionAdministrator != 0 {
 			return
 		}
-		logging.UI.AntiDelete(e.Session, message)
+		logging.Logging.AntiDelete(e.Session, message)
 	}
 }
 
@@ -347,12 +347,12 @@ func (e *Events) checkNotifiers(message *discordgo.Message, cfg *config.Config) 
 
 	if message.GuildID == "" {
 		if cfg.Events.DMNotifier {
-			logging.UI.DMNotifier(message)
+			logging.Logging.DMNotifier(message)
 		}
 	}
 
 	if cfg.Events.DiscordStaffDetection && message.Author.PublicFlags&discordgo.UserFlagDiscordEmployee != 0 {
-		logging.UI.DiscordStaffDetection(e.Session, message)
+		logging.Logging.DiscordStaffDetection(e.Session, message)
 	}
 }
 
@@ -363,7 +363,7 @@ func (e *Events) checkNotifiersEdit(message *discordgo.Message, cfg *config.Conf
 
 	if message.GuildID == "" {
 		if cfg.Events.DMEditNotifier {
-			logging.UI.DMEditNotifier(message)
+			logging.Logging.DMEditNotifier(message)
 		}
 
 	}
@@ -376,11 +376,11 @@ func (e *Events) checkNotifiersDelete(message *discordgo.Message, cfg *config.Co
 
 	if message.GuildID == "" {
 		if cfg.Events.DMDeleteNotifier {
-			logging.UI.DMDeleteNotifier(message)
+			logging.Logging.DMDeleteNotifier(message)
 		}
 	} else {
 		if cfg.Events.MessageDeleteNotifier {
-			logging.UI.MessageDeleteNotifier(e.Session, message)
+			logging.Logging.MessageDeleteNotifier(e.Session, message)
 		}
 	}
 
@@ -392,7 +392,7 @@ func (e *Events) checkNotifiersDelete(message *discordgo.Message, cfg *config.Co
 		}
 	}
 	if isMentioned && cfg.Events.GhostPingDetection {
-		logging.UI.GhostPingDetection(e.Session, message)
+		logging.Logging.GhostPingDetection(e.Session, message)
 	}
 }
 
@@ -405,7 +405,7 @@ func (e *Events) ensureUserEntry(userID string) SBDScore {
 
 func (e *Events) logSelfbotDetection(score SBDScore, message *discordgo.Message) {
 	if score.Score >= 15 && !score.Logged {
-		logging.UI.SelfbotDetection(e.Session, message, "")
+		logging.Logging.SelfbotDetection(e.Session, message, "")
 		utils.Logging.Info("Selfbot detection triggered for user " + message.Author.String())
 		score.Logged = true
 	}
