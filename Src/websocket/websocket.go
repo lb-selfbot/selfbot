@@ -12,10 +12,10 @@ import (
 	"nhooyr.io/websocket"
 
 	"github.com/LightningDev1/LB-Selfbot/config"
-	"github.com/LightningDev1/LB-Selfbot/consolelogging"
 	"github.com/LightningDev1/LB-Selfbot/constants"
 	"github.com/LightningDev1/LB-Selfbot/encryption"
 	"github.com/LightningDev1/LB-Selfbot/ipc"
+	"github.com/LightningDev1/LB-Selfbot/utils"
 )
 
 var Context = context.Background()
@@ -78,7 +78,7 @@ func Init(username, password string) error {
 			}
 
 			decryptedMsg, _ := Encryption.Decrypt(msg)
-			consolelogging.Debug("Received ws=>sb message: " + string(decryptedMsg))
+			utils.Logging.Debug("Received ws=>sb message: " + string(decryptedMsg))
 
 			wsMessage := WsMessage{}
 
@@ -138,14 +138,14 @@ func OnRead(message WsMessage) {
 			ipc.ConfigUpdate(message.Data.Config)
 		}
 	default:
-		consolelogging.Warn("Unknown op", message.Op)
+		utils.Logging.Warn("Unknown op", message.Op)
 	}
 }
 
 func OnError(err error) {
 	var closeError websocket.CloseError
 	if !errors.As(err, &closeError) {
-		consolelogging.Error(err)
+		utils.Logging.Error(err)
 		return
 	}
 

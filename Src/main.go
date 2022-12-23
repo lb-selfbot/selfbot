@@ -12,7 +12,6 @@ import (
 
 	"github.com/LightningDev1/LB-Selfbot/commands"
 	"github.com/LightningDev1/LB-Selfbot/config"
-	"github.com/LightningDev1/LB-Selfbot/consolelogging"
 	"github.com/LightningDev1/LB-Selfbot/constants"
 	"github.com/LightningDev1/LB-Selfbot/eventhandlers"
 	"github.com/LightningDev1/LB-Selfbot/ipc"
@@ -36,25 +35,29 @@ func initArgs() {
 }
 
 func main() {
+	rand.Seed(time.Now().UnixNano())
+
 	initArgs()
 
 	if constants.DEBUG {
-		consolelogging.Warn("Debug Enabled!")
+		utils.Logging.Warn("Debug Enabled!")
 	}
 
-	//startParams := api.GetStartParams()
-	rand.Seed(time.Now().UnixNano())
 	cfg, err := config.GetConfig()
 	if err != nil {
-		panic(err)
+		utils.Logging.Error(err)
+		if !constants.DEBUG {
+			os.Exit(0)
+		}
 	}
+
 	if !constants.CONSOLE {
 		ipc.IPC.Init()
 	}
 
-	err = websocket.Init(cfg.Account.LightningBot.Username, cfg.Account.LightningBot.Password+"a")
+	err = websocket.Init(cfg.Account.LightningBot.Username, cfg.Account.LightningBot.Password)
 	if err != nil {
-		consolelogging.Error(err)
+		utils.Logging.Error(err)
 		if !constants.DEBUG {
 			os.Exit(0)
 		}
@@ -119,9 +122,9 @@ func main() {
 	err = session.Open()
 	if err != nil {
 		if strings.Contains(err.Error(), "Authentication failed") {
-			consolelogging.Error("Invalid token!")
+			utils.Logging.Error("Invalid token!")
 		} else {
-			consolelogging.Error(err)
+			utils.Logging.Error(err)
 		}
 
 		if !constants.DEBUG {

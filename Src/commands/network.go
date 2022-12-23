@@ -6,7 +6,7 @@ import (
 	"math"
 	"net/url"
 	"os"
-	"os/exec"
+	"path/filepath"
 	"strings"
 
 	"github.com/LightningDev1/LB-Selfbot/api"
@@ -373,43 +373,59 @@ func (NetworkCommands) ipinfo(ctx *dgc.Ctx) {
 func (NetworkCommands) youtubedl(ctx *dgc.Ctx) {
 	results, err := api.GoogleSearch(ctx.Arguments.Raw() + " site:youtube.com")
 	if err != nil {
-		_ = ctx.RespondText("An error has occurred.")
+		_ = ctx.RespondText("An error has occurred: " + err.Error())
 		return
 	}
 	for i := 0; i < len(results.MustArray()); i++ {
 		result := results.GetIndex(i)
 		resultUrl := result.Get("url").MustString()
-		if strings.Contains(resultUrl, "/watch?v=") {
-			client := youtube.Client{}
-			video, err := client.GetVideo(resultUrl)
-			if err != nil {
-				_ = ctx.RespondText("An error has occurred: " + err.Error())
-				return
-			}
-			_ = ctx.RespondText(fmt.Sprintf("Downloading %s...", video.Title))
-			formats := video.Formats.WithAudioChannels()
-			stream, _, err := client.GetStream(video, &formats[0])
-			if err != nil {
-				_ = ctx.RespondText("An error has occurred: " + err.Error())
-				return
-			}
-			filepath := fmt.Sprintf("%s\\%s", utils.GetWindowsFolder(0), utils.File.SanitizeFilename(fmt.Sprintf("%s.mp4", video.Title)))
-			file, err := os.Create(filepath)
-			if err != nil {
-				_ = ctx.RespondText("An error has occurred: " + err.Error())
-				return
-			}
-			_, err = io.Copy(file, stream)
-			if err != nil {
-				_ = ctx.RespondText("An error has occurred: " + err.Error())
-				_ = file.Close()
-				return
-			}
-			_ = exec.Command("explorer", filepath).Start()
-			_ = ctx.RespondText("Successfully downloaded " + video.Title + ".")
-			_ = file.Close()
-			break
+
+		if !strings.Contains(resultUrl, "/watch?v=") {
+			continue
 		}
+
+		client := youtube.Client{}
+
+		video, err := client.GetVideo(resultUrl)
+		if err != nil {
+			_ = ctx.RespondText("An error has occurred: " + err.Error())
+			return
+		}
+
+		_ = ctx.RespondText(fmt.Sprintf("Downloading %s...", video.Title))
+
+		formats := video.Formats.WithAudioChannels()
+
+		stream, _, err := client.GetStream(video, &formats[0])
+		if err != nil {
+			_ = ctx.RespondText("An error has occurred: " + err.Error())
+			return
+		}
+
+		downloadPath := filepath.Join(
+			utils.File.GetMainFolder(),
+			"Downloads",
+			utils.File.SanitizeFilename(fmt.Sprintf("%s.mp4", video.Title)),
+		)
+
+		file, err := os.Create(downloadPath)
+		if err != nil {
+			_ = ctx.RespondText("An error has occurred: " + err.Error())
+			return
+		}
+		defer file.Close()
+
+		_, err = io.Copy(file, stream)
+		if err != nil {
+			_ = ctx.RespondText("An error has occurred: " + err.Error())
+			_ = file.Close()
+			return
+		}
+
+		_ = utils.Process.OpenURL(downloadPath)
+		_ = ctx.RespondText(fmt.Sprintf("Successfully downloaded %s", video.Title))
+
+		break
 	}
 }
 

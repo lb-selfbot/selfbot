@@ -7,7 +7,6 @@ import (
 	"github.com/hugolgst/rich-go/client"
 
 	"github.com/LightningDev1/LB-Selfbot/config"
-	"github.com/LightningDev1/LB-Selfbot/consolelogging"
 	"github.com/LightningDev1/LB-Selfbot/constants"
 	"github.com/LightningDev1/LB-Selfbot/utils"
 	"github.com/LightningDev1/dgc"
@@ -108,13 +107,13 @@ func (r RPCCommands) RegisterCommands(router *dgc.Router) {
 			time.Sleep(time.Second * 5)
 			cfg, err := config.GetConfig()
 			if err != nil {
-				consolelogging.Error(err)
+				utils.Logging.Error(err)
 				continue
 			}
 			if cfg.RPC.Enabled {
 				err = client.Login(cfg.RPC.ClientID)
 				if err != nil {
-					consolelogging.Warn("RPC login failed: ", err)
+					utils.Logging.Warn("RPC login failed: ", err)
 					continue
 				}
 				err = client.SetActivity(client.Activity{
@@ -130,7 +129,7 @@ func (r RPCCommands) RegisterCommands(router *dgc.Router) {
 					Secrets:    r.getSecrets(cfg.RPC),
 				})
 				if err != nil {
-					consolelogging.Warn("RPC set activity failed: ", err)
+					utils.Logging.Warn("RPC set activity failed: ", err)
 					continue
 				}
 			} else {

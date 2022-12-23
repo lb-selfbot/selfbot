@@ -6,8 +6,8 @@ import (
 	"os"
 
 	"github.com/LightningDev1/LB-Selfbot/config"
-	"github.com/LightningDev1/LB-Selfbot/consolelogging"
 	"github.com/LightningDev1/LB-Selfbot/constants"
+	"github.com/LightningDev1/LB-Selfbot/utils"
 	"github.com/gorilla/websocket"
 )
 
@@ -104,7 +104,7 @@ func (i *Ipc) OnMessage(jsonEvent *JsonEvent) {
 	case OP_ConfigUpdate:
 		config.SaveConfigFromUI(jsonEvent.Data.Config)
 	default:
-		consolelogging.Warn("Unknown IPC message:", jsonEvent)
+		utils.Logging.Warn("Unknown IPC message:", jsonEvent)
 	}
 }
 
