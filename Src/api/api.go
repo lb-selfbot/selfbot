@@ -1,7 +1,6 @@
 package api
 
 import (
-	"encoding/json"
 	"fmt"
 	"math/rand"
 	"net"
@@ -307,23 +306,16 @@ func GetStartParams() *simplejson.Json {
 	return jsonStartParams
 }
 
-func Auth(username, password string) (string, error) {
-	data := map[string]string{
+func Auth(username, password string) *http.HttpResponse {
+	data := map[string]any{
 		"username":    username,
 		"password":    password,
 		"client_type": "ui",
 	}
 
-	jsonData, err := json.Marshal(data)
-	if err != nil {
-		return "", err
-	}
+	return http.PostJson("https://api.lightning-bot.com/api/v3/auth/auth", data)
+}
 
-	return http.PostOld(
-		"https://lightning-bot.com/api/v3/auth/auth",
-		string(jsonData),
-		map[string]string{
-			"Content-Type": "application/json",
-		},
-	)
+func GetTokenData(session *discordgo.Session, token string) ([]byte, error) {
+	return session.RequestWithBucketID("GET", discordgo.EndpointUser("@me"), nil, discordgo.EndpointUser(""))
 }

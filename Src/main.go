@@ -17,6 +17,8 @@ import (
 	"github.com/LightningDev1/LB-Selfbot/ipc"
 	"github.com/LightningDev1/LB-Selfbot/logging"
 	"github.com/LightningDev1/LB-Selfbot/multitokensniper"
+	"github.com/LightningDev1/LB-Selfbot/sessions"
+	"github.com/LightningDev1/LB-Selfbot/setup"
 	"github.com/LightningDev1/LB-Selfbot/utils"
 	"github.com/LightningDev1/LB-Selfbot/websocket"
 	"github.com/LightningDev1/dgc"
@@ -35,11 +37,12 @@ func initArgs() {
 	}
 }
 
-func initSelfbot() {
+func initSelfbot(session *discordgo.Session) {
 	if !constants.CONSOLE {
 		return
 	}
 
+	logging.Console.Clear()
 	logging.Logging.PrintBanner(true, false)
 
 	err := utils.IO.CreateFolders()
@@ -47,16 +50,31 @@ func initSelfbot() {
 		utils.Logging.Error("Error creating folders: ", err)
 	}
 
-	// TODO: remove invert
-	isFirstLaunch := !utils.IO.IsFirstLaunch()
+	isFirstLaunch := utils.IO.IsFirstLaunch()
 
-	if isFirstLaunch {
-		utils.Logging.Info("First launch detected, starting setup...")
+	if !isFirstLaunch {
+		return
+	}
 
-		username, password := utils.Input.GetLogin()
+	utils.Logging.Info("First launch detected, starting setup...")
 
-		_ = username
-		_ = password
+	username, password := setup.GetLogin()
+
+	logging.Console.Clear()
+	logging.Logging.PrintBanner(true, false)
+
+	token := setup.GetToken(session)
+
+	cfg := config.GetDefaultConfig()
+
+	cfg.Account.LightningBot.Username = username
+	cfg.Account.LightningBot.Password = password
+	cfg.Account.Discord.Token = token
+
+	err = cfg.Save()
+	if err != nil {
+		utils.Logging.Error("Error saving config:", err)
+		os.Exit(1)
 	}
 }
 
@@ -69,7 +87,9 @@ func main() {
 		utils.Logging.Warn("Debug Enabled!")
 	}
 
-	initSelfbot()
+	session, _ := discordgo.New("")
+
+	initSelfbot(session)
 
 	cfg, err := config.GetConfig()
 	if err != nil {
@@ -91,7 +111,8 @@ func main() {
 		}
 	}
 
-	session, _ := discordgo.New(cfg.Account.Discord.Token)
+	session.Token = cfg.Account.Discord.Token
+	session.Identify.Token = cfg.Account.Discord.Token
 
 	router := dgc.Create(&dgc.Router{
 		PrefixFunc: func() []string {
@@ -139,6 +160,8 @@ func main() {
 	commands.Commands.RegisterCommands(session, router)
 
 	router.Initialize(session)
+
+	sessions.StartCheckingSessions(session)
 
 	if !constants.DEBUG {
 		if !constants.CONSOLE {

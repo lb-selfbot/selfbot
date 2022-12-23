@@ -177,3 +177,126 @@ func SaveConfigFromUI(config *Config) {
 	lastConfig = config
 	lastConfigTime = time.Now()
 }
+
+func GetDefaultConfig() Config {
+	defaultConfigJson := `
+	{
+		"AFK": {
+			"Delay": 10,
+			"Enabled": false,
+			"IgnoredServers": [],
+			"IgnoredUsers": [],
+			"Message": "I am currently AFK",
+			"OnDM": true,
+			"OnPing": true,
+			"Reply": true,
+			"Typing": true
+		},
+		"Account": {
+			"Discord": {
+				"Token": ""
+			},
+			"LightningBot": {
+				"Password": "",
+				"Username": ""
+			}
+		},
+		"Events": {
+			"BanNotifier": false,
+			"DMDeleteNotifier": false,
+			"DMEditNotifier": false,
+			"DMNotifier": false,
+			"DMTypingNotifier": false,
+			"DiscordStaffDetection": false,
+			"GhostPingDetection": false,
+			"MessageDeleteNotifier": false,
+			"SelfbotDetection": false,
+			"TicketNotifier": false,
+			"SessionConnected": false,
+			"SessionDisconnected": false
+		},
+		"Notifications": {
+			"Enabled": true
+		},
+		"Protections": {
+			"AntiFriendRequest": false,
+			"AntiMassDM": false,
+			"AntiPhising": false,
+			"ServerProtections": {
+				"AntiDelete": false,
+				"AntiInvite": false,
+				"AntiSpam": false,
+				"AntiUpper": false,
+				"ProtectedServers": []
+			}
+		},
+		"RPC": {
+			"Buttons": [
+				{
+					"Label": "Website",
+					"URL": "https://lightning-bot.com/"
+				},
+				{
+					"Label": "Discord Server",
+					"URL": "https://discord.gg/khVeaCsKCU"
+				}
+			],
+			"ClientID": "898932653049393172",
+			"Details": "",
+			"Enabled": false,
+			"Invitable": true,
+			"LargeImage": "lightningbotlogo",
+			"LargeText": "",
+			"SmallImage": "",
+			"SmallText": "",
+			"State": "Using LightningBot $VERSION",
+			"Time": true
+		},
+		"Selfbot": {
+			"CommandMode": "Text",
+			"CommandPrefix": "!",
+			"DeleteCommands": true,
+			"DeleteResponses": true,
+			"DeleteResponsesDelay": 300,
+			"Footer": "LightningBot $VERSION",
+			"MobileFriendly": false,
+			"Title": "LightningBot"
+		},
+		"Sharing": {
+			"ShareAll": false,
+			"SharedCategories": [],
+			"SharedCommands": [],
+			"SharedUsers": []
+		},
+		"Snipers": {
+			"Blacklist": [],
+			"GiveawaySniper": {
+				"CustomBots": [],
+				"Sleep": 600,
+				"Enabled": true
+			},
+			"MultiTokenSniper": false,
+			"NitroSniper": true,
+			"Tokens": []
+		},
+		"UI": {
+			"HideToSystemTray": false,
+			"Theme": "Dark"
+		},
+		"Webhooks": {
+			"GiveawaySniper": "",
+			"Misc": "",
+			"NitroSniper": "",
+			"Notifiers": "",
+			"PingDetection": "",
+			"SelfbotDetection": "",
+			"StaffDetection": "",
+			"Sessions": ""
+		}
+	}`
+
+	var defaultConfig Config
+	_ = json.Unmarshal([]byte(defaultConfigJson), &defaultConfig)
+	
+	return defaultConfig
+}

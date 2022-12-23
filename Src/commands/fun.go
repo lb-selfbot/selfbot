@@ -596,7 +596,7 @@ func (FunCommands) slot(ctx *dgc.Ctx) {
 		}
 		return embed.NewEmbed().
 			SetDescription(text).
-			ToString()[0]
+			ToString("load")[0]
 	}
 	message, _ := ctx.Session.ChannelMessageSend(ctx.Event.ChannelID, getEmbed(false))
 	for i := 0; i < 5; i++ {
@@ -886,7 +886,7 @@ func (FunCommands) poll(ctx *dgc.Ctx) {
 	message := embed.NewEmbed().
 		SetDescription("Answer to this poll by reacting with :thumbsup: or :thumbsdown:").
 		AddField("Question", ctx.Arguments.Raw()).
-		Send(ctx)
+		Send(ctx)[0]
 	_ = ctx.Session.MessageReactionAdd(ctx.Event.ChannelID, message.ID, "👍")
 	_ = ctx.Session.MessageReactionAdd(ctx.Event.ChannelID, message.ID, "👎")
 }

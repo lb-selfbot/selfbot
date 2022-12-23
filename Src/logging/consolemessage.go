@@ -53,7 +53,6 @@ func (c *ConsoleMessage) Show() {
 		}
 
 		fmt.Println(message)
-
 	}
 
 	timeFormat := UI.Colored(time.Now().Local().Format("15:04:05"), "#C1EFFF")

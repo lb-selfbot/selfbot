@@ -29,11 +29,4 @@ func (InputUtils) PrintPrompt(prompt string) {
 	fmt.Printf("[\x1b[34;1m%s\x1b[0m] [\x1b[35;1mINPUT\x1b[0m] %s: ", t, prompt)
 }
 
-func (InputUtils) GetLogin() (string, string) {
-	username := Input.GetString("Please enter your LightningBot username")
-	password := Input.GetString("Please enter your LightningBot password")
-
-	return username, password
-}
-
 var Input = &InputUtils{}

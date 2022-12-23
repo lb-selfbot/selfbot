@@ -506,7 +506,7 @@ func (UtilityCommands) optionpoll(ctx *dgc.Ctx) {
 		SetDescription("Poll: "+utils.Arguments["<\"question\">"]).
 		AddField("👍", utils.Arguments["<\"option1\">"]).
 		AddField("👎", utils.Arguments["<\"option2\">"]).
-		Send(ctx)
+		Send(ctx)[0]
 	if message != nil {
 		_ = ctx.Session.MessageReactionAdd(ctx.Event.ChannelID, message.ID, "👍")
 		_ = ctx.Session.MessageReactionAdd(ctx.Event.ChannelID, message.ID, "👎")

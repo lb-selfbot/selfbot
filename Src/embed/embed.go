@@ -3,8 +3,8 @@ package embed
 import (
 	"encoding/json"
 	"fmt"
-	"regexp"
 	"strings"
+	"time"
 
 	"github.com/LightningDev1/LB-Selfbot/config"
 	"github.com/LightningDev1/LB-Selfbot/constants"
@@ -27,8 +27,6 @@ var (
 	LimitFieldName   = 256
 	LimitField       = 25
 	LimitFooter      = 2048
-
-	ansiRegex = regexp.MustCompile("\x1b(.*?)m")
 )
 
 // NewEmbed returns a new embed object
@@ -409,15 +407,7 @@ func (e *Embed) ToURLEmbed() []string {
 	return []string{"Not implemented"}
 }
 
-func (e *Embed) ToString() []string {
-	cfg, err := config.GetConfig()
-	commandMode := "Codeblock"
-	if err == nil {
-		commandMode = cfg.Selfbot.CommandMode
-		if cfg.Selfbot.MobileFriendly {
-			e.Subtext = ansiRegex.ReplaceAllString(e.Subtext, "")
-		}
-	}
+func (e *Embed) ToString(commandMode string) []string {
 	switch commandMode {
 	case "Codeblock":
 		return e.ToCodeblock()
@@ -425,18 +415,61 @@ func (e *Embed) ToString() []string {
 		return e.ToText()
 	case "URLEmbed":
 		return e.ToURLEmbed()
+	case "load":
+		cfg, _ := config.GetConfig()
+
+		commandMode := getCommandMode(cfg)
+
+		return e.ToString(commandMode)
 	default:
 		return e.ToCodeblock()
 	}
 }
 
-func (e *Embed) Send(ctx *dgc.Ctx) *discordgo.Message {
-	var message *discordgo.Message
-	for _, text := range e.ToString() {
-		message, _ = ctx.Session.ChannelMessageSend(ctx.Event.ChannelID, text)
+func (e *Embed) Send(ctx *dgc.Ctx) []*discordgo.Message {
+	cfg, _ := config.GetConfig()
+
+	commandMode := getCommandMode(cfg)
+
+	messages := []*discordgo.Message{}
+
+	for _, text := range e.ToString(commandMode) {
+		message, err := ctx.Session.ChannelMessageSend(ctx.Event.ChannelID, text)
+		if err != nil {
+			continue
+		}
+
+		messages = append(messages, message)
 	}
+
 	if e.Image != nil && e.Image.URL != "" {
-		_, _ = ctx.Session.ChannelMessageSend(ctx.Event.ChannelID, e.Image.URL)
+		message, err := ctx.Session.ChannelMessageSend(ctx.Event.ChannelID, e.Image.URL)
+		if err != nil {
+			return messages
+		}
+
+		messages = append(messages, message)
 	}
-	return message
+
+	if cfg.Selfbot.DeleteResponses {
+		go deleteMessagesAfter(ctx.Session, messages, cfg.Selfbot.DeleteResponsesDelay)
+	}
+
+	return messages
+}
+
+func getCommandMode(cfg config.Config) string {
+	if cfg.Selfbot.CommandMode == "" {
+		return "Codeblock"
+	}
+
+	return cfg.Selfbot.CommandMode
+}
+
+func deleteMessagesAfter(session *discordgo.Session, messages []*discordgo.Message, delay int) {
+	time.Sleep(time.Duration(delay) * time.Second)
+
+	for _, message := range messages {
+		session.ChannelMessageDelete(message.ChannelID, message.ID)
+	}
 }

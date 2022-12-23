@@ -315,6 +315,7 @@ func (_Logging) MultiTokenSniperConnected(amount int) {
 	if amount > 1 {
 		info = strings.ReplaceAll(info, "Account", "Accounts")
 	}
+	
 	UI.Notification("Multi Token Sniper: " + info)
 	NewConsoleMessage().
 		SetTitle("Multi Token Sniper").
@@ -324,6 +325,15 @@ func (_Logging) MultiTokenSniperConnected(amount int) {
 }
 
 func (_Logging) SessionConnected(id, os, client string) {
+	cfg, err := config.GetConfig()
+	if err != nil {
+		return
+	}
+
+	if !cfg.Events.SessionDisconnected {
+		return
+	}
+
 	UI.Notification("Session Connected\nOS: " + os + "\nClient: " + client)
 	NewConsoleMessage().
 		SetTitle("Session Connected").
@@ -335,6 +345,15 @@ func (_Logging) SessionConnected(id, os, client string) {
 }
 
 func (_Logging) SessionDisconnected(id, os, client string) {
+	cfg, err := config.GetConfig()
+	if err != nil {
+		return
+	}
+
+	if !cfg.Events.SessionDisconnected {
+		return
+	}
+
 	UI.Notification("Session Disconnected\nOS: " + os + "\nClient: " + client)
 	NewConsoleMessage().
 		SetTitle("Session Disconnected").
