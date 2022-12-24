@@ -551,7 +551,7 @@ func (FunCommands) yomomma(ctx *dgc.Ctx) {
 }
 
 func (FunCommands) wouldyourather(ctx *dgc.Ctx) {
-	wyrJson, err := http.GetJsonOld("https://lightning-bot.com/api/v3/selfbot-utils/wouldyourather")
+	wyrJson, err := http.GetJsonOld("https://api.lightning-bot.com/api/v3/misc/wyr")
 	if err != nil {
 		_ = ctx.RespondText("An error has occurred.")
 		return
@@ -564,7 +564,7 @@ func (FunCommands) wouldyourather(ctx *dgc.Ctx) {
 }
 
 func (FunCommands) topic(ctx *dgc.Ctx) {
-	topicJson, err := http.GetJsonOld("https://lightning-bot.com/api/v3/selfbot-utils/fml")
+	topicJson, err := http.GetJsonOld("https://api.lightning-bot.com/api/v3/misc/topic")
 	if err != nil {
 		_ = ctx.RespondText("An error has occurred.")
 		return
@@ -924,7 +924,7 @@ func (FunCommands) joke(ctx *dgc.Ctx) {
 }
 
 func (FunCommands) fml(ctx *dgc.Ctx) {
-	fmlJson, err := http.GetJsonOld("https://lightning-bot.com/api/v3/selfbot-utils/fml")
+	fmlJson, err := http.GetJsonOld("https://api.lightning-bot.com/api/v3/misc/fml")
 	if err != nil {
 		_ = ctx.RespondText("An error has occurred.")
 		return
@@ -1097,7 +1097,7 @@ func (FunCommands) httpcat(ctx *dgc.Ctx) {
 }
 
 func (FunCommands) riddle(ctx *dgc.Ctx) {
-	riddleJson, err := http.GetJsonOld("https://lightning-bot.com/api/v3/selfbot-utils/fml")
+	riddleJson, err := http.GetJsonOld("https://api.lightning-bot.com/api/v3/misc/riddle")
 	if err != nil {
 		_ = ctx.RespondText("An error has occurred.")
 		return

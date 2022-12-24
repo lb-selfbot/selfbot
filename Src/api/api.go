@@ -292,7 +292,7 @@ func ReportMessage(session *discordgo.Session, guildID, channelID, messageID str
 }
 
 func GoogleSearch(query string) (*simplejson.Json, error) {
-	url := fmt.Sprintf("https://lightning-bot.com/api/v3/selfbot-utils/googlesearch?query=%s", url.QueryEscape(query))
+	url := fmt.Sprintf("https://api.lightning-bot.com/api/v3/misc/search?query=%s", url.QueryEscape(query))
 
 	httpResult := http.Get(url)
 	if httpResult.Error != nil {
@@ -309,7 +309,7 @@ type CreditCard struct {
 }
 
 func GenerateCreditCard(ccType string) CreditCard {
-	url := fmt.Sprintf("https://lightning-bot.com/api/v3/selfbot-utils/ccgen?type=%s", ccType)
+	url := fmt.Sprintf("https://api.lightning-bot.com/api/v3/misc/ccgen?type=%s", ccType)
 
 	httpResult := http.Get(url)
 	if httpResult.Error != nil {
@@ -350,7 +350,7 @@ func GetStartParams() *simplejson.Json {
 	key, _ := keyEncryption.Decrypt(encryptedKey)
 	Encryption := &encryption.AESCBC{Key: string(key)}
 
-	httpResponse := http.Get("https://lightning-bot.com/api/v3/selfbot-utils/startparams")
+	httpResponse := http.Get("https://lightning-bot.com/api/v3/selfbot/startparams")
 	if httpResponse.Error != nil {
 		return nil
 	}

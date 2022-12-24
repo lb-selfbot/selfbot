@@ -2262,7 +2262,7 @@ func (ImageCommands) rule34(ctx *dgc.Ctx) {
 }
 
 func (ImageCommands) achievement(ctx *dgc.Ctx) {
-	_ = ctx.RespondText(fmt.Sprintf("https://lightning-bot.com/api/v3/imagegen/achievement?text=%s", url.QueryEscape(ctx.Arguments.Raw())))
+	_ = ctx.RespondText(fmt.Sprintf("https://api.lightning-bot.com/api/v3/imagegen/achievement?text=%s", url.QueryEscape(ctx.Arguments.Raw())))
 }
 
 func (ImageCommands) amiajoke(ctx *dgc.Ctx) {
@@ -2270,7 +2270,7 @@ func (ImageCommands) amiajoke(ctx *dgc.Ctx) {
 	if !success {
 		user = ctx.Event.Author
 	}
-	_ = ctx.RespondText(fmt.Sprintf("https://lightning-bot.com/api/v3/imagegen/amiajoke?url=%s", url.QueryEscape(user.AvatarURL(""))))
+	_ = ctx.RespondText(fmt.Sprintf("https://api.lightning-bot.com/api/v3/imagegen/amiajoke?url=%s", url.QueryEscape(user.AvatarURL(""))))
 }
 
 func (ImageCommands) bad(ctx *dgc.Ctx) {
@@ -2278,16 +2278,16 @@ func (ImageCommands) bad(ctx *dgc.Ctx) {
 	if !success {
 		user = ctx.Event.Author
 	}
-	_ = ctx.RespondText(fmt.Sprintf("https://lightning-bot.com/api/v3/imagegen/bad?url=%s", url.QueryEscape(user.AvatarURL(""))))
+	_ = ctx.RespondText(fmt.Sprintf("https://api.lightning-bot.com/api/v3/imagegen/bad?url=%s", url.QueryEscape(user.AvatarURL(""))))
 }
 
 func (ImageCommands) calling(ctx *dgc.Ctx) {
-	_ = ctx.RespondText(fmt.Sprintf("https://lightning-bot.com/api/v3/imagegen/calling?text=%s", url.QueryEscape(ctx.Arguments.Raw())))
+	_ = ctx.RespondText(fmt.Sprintf("https://api.lightning-bot.com/api/v3/imagegen/calling?text=%s", url.QueryEscape(ctx.Arguments.Raw())))
 }
 
 func (ImageCommands) didyoumean(ctx *dgc.Ctx) {
 	_ = ctx.RespondText(fmt.Sprintf(
-		"https://lightning-bot.com/api/v3/imagegen/didyoumean?top=%s&bottom=%s",
+		"https://api.lightning-bot.com/api/v3/imagegen/didyoumean?top=%s&bottom=%s",
 		url.QueryEscape(utils.Arguments["<\"top\">"]),
 		url.QueryEscape(utils.Arguments["<\"bottom\">"]),
 	))
@@ -2295,7 +2295,7 @@ func (ImageCommands) didyoumean(ctx *dgc.Ctx) {
 
 func (ImageCommands) drake(ctx *dgc.Ctx) {
 	_ = ctx.RespondText(fmt.Sprintf(
-		"https://lightning-bot.com/api/v3/imagegen/drake?top=%s&bottom=%s&ayano=false",
+		"https://api.lightning-bot.com/api/v3/imagegen/drake?top=%s&bottom=%s&ayano=false",
 		url.QueryEscape(utils.Arguments["<\"top\">"]),
 		url.QueryEscape(utils.Arguments["<\"bottom\">"]),
 	))
@@ -2303,14 +2303,14 @@ func (ImageCommands) drake(ctx *dgc.Ctx) {
 
 func (ImageCommands) ayano(ctx *dgc.Ctx) {
 	_ = ctx.RespondText(fmt.Sprintf(
-		"https://lightning-bot.com/api/v3/imagegen/drake?top=%s&bottom=%s&ayano=true",
+		"https://api.lightning-bot.com/api/v3/imagegen/drake?top=%s&bottom=%s&ayano=true",
 		url.QueryEscape(utils.Arguments["<\"top\">"]),
 		url.QueryEscape(utils.Arguments["<\"bottom\">"]),
 	))
 }
 
 func (ImageCommands) facts(ctx *dgc.Ctx) {
-	_ = ctx.RespondText(fmt.Sprintf("https://lightning-bot.com/api/v3/imagegen/facts?text=%s", url.QueryEscape(ctx.Arguments.Raw())))
+	_ = ctx.RespondText(fmt.Sprintf("https://api.lightning-bot.com/api/v3/imagegen/facts?text=%s", url.QueryEscape(ctx.Arguments.Raw())))
 }
 
 func (ImageCommands) blur(ctx *dgc.Ctx) {
@@ -2318,7 +2318,7 @@ func (ImageCommands) blur(ctx *dgc.Ctx) {
 	if !success {
 		user = ctx.Event.Author
 	}
-	_ = ctx.RespondText(fmt.Sprintf("https://lightning-bot.com/api/v3/imagegen/filter?url=%s&filter=blur", url.QueryEscape(user.AvatarURL(""))))
+	_ = ctx.RespondText(fmt.Sprintf("https://api.lightning-bot.com/api/v3/imagegen/filter?url=%s&filter=blur", url.QueryEscape(user.AvatarURL(""))))
 }
 
 func (ImageCommands) flipav(ctx *dgc.Ctx) {
@@ -2326,7 +2326,7 @@ func (ImageCommands) flipav(ctx *dgc.Ctx) {
 	if !success {
 		user = ctx.Event.Author
 	}
-	_ = ctx.RespondText(fmt.Sprintf("https://lightning-bot.com/api/v3/imagegen/filter?url=%s&filter=flip", url.QueryEscape(user.AvatarURL(""))))
+	_ = ctx.RespondText(fmt.Sprintf("https://api.lightning-bot.com/api/v3/imagegen/filter?url=%s&filter=flip", url.QueryEscape(user.AvatarURL(""))))
 }
 
 func (ImageCommands) mirror(ctx *dgc.Ctx) {
@@ -2334,7 +2334,7 @@ func (ImageCommands) mirror(ctx *dgc.Ctx) {
 	if !success {
 		user = ctx.Event.Author
 	}
-	_ = ctx.RespondText(fmt.Sprintf("https://lightning-bot.com/api/v3/imagegen/filter?url=%s&filter=mirror", url.QueryEscape(user.AvatarURL(""))))
+	_ = ctx.RespondText(fmt.Sprintf("https://api.lightning-bot.com/api/v3/imagegen/filter?url=%s&filter=mirror", url.QueryEscape(user.AvatarURL(""))))
 }
 
 func (ImageCommands) wide(ctx *dgc.Ctx) {
@@ -2342,7 +2342,7 @@ func (ImageCommands) wide(ctx *dgc.Ctx) {
 	if !success {
 		user = ctx.Event.Author
 	}
-	_ = ctx.RespondText(fmt.Sprintf("https://lightning-bot.com/api/v3/imagegen/filter?url=%s&filter=wide", url.QueryEscape(user.AvatarURL(""))))
+	_ = ctx.RespondText(fmt.Sprintf("https://api.lightning-bot.com/api/v3/imagegen/filter?url=%s&filter=wide", url.QueryEscape(user.AvatarURL(""))))
 }
 
 func (ImageCommands) sepia(ctx *dgc.Ctx) {
@@ -2350,11 +2350,11 @@ func (ImageCommands) sepia(ctx *dgc.Ctx) {
 	if !success {
 		user = ctx.Event.Author
 	}
-	_ = ctx.RespondText(fmt.Sprintf("https://lightning-bot.com/api/v3/imagegen/filter?url=%s&filter=sepia", url.QueryEscape(user.AvatarURL(""))))
+	_ = ctx.RespondText(fmt.Sprintf("https://api.lightning-bot.com/api/v3/imagegen/filter?url=%s&filter=sepia", url.QueryEscape(user.AvatarURL(""))))
 }
 
 func (ImageCommands) recaptcha(ctx *dgc.Ctx) {
-	_ = ctx.RespondText(fmt.Sprintf("https://lightning-bot.com/api/v3/imagegen/captcha?text=%s", url.QueryEscape(ctx.Arguments.Raw())))
+	_ = ctx.RespondText(fmt.Sprintf("https://api.lightning-bot.com/api/v3/imagegen/captcha?text=%s", url.QueryEscape(ctx.Arguments.Raw())))
 }
 
 func (ImageCommands) gay(ctx *dgc.Ctx) {
@@ -2362,7 +2362,7 @@ func (ImageCommands) gay(ctx *dgc.Ctx) {
 	if !success {
 		user = ctx.Event.Author
 	}
-	_ = ctx.RespondText(fmt.Sprintf("https://lightning-bot.com/api/v3/imagegen/filter?url=%s&filter=gay", url.QueryEscape(user.AvatarURL(""))))
+	_ = ctx.RespondText(fmt.Sprintf("https://api.lightning-bot.com/api/v3/imagegen/filter?url=%s&filter=gay", url.QueryEscape(user.AvatarURL(""))))
 }
 
 func (ImageCommands) communist(ctx *dgc.Ctx) {
@@ -2370,7 +2370,7 @@ func (ImageCommands) communist(ctx *dgc.Ctx) {
 	if !success {
 		user = ctx.Event.Author
 	}
-	_ = ctx.RespondText(fmt.Sprintf("https://lightning-bot.com/api/v3/imagegen/filter?url=%s&filter=communist", url.QueryEscape(user.AvatarURL(""))))
+	_ = ctx.RespondText(fmt.Sprintf("https://api.lightning-bot.com/api/v3/imagegen/filter?url=%s&filter=communist", url.QueryEscape(user.AvatarURL(""))))
 }
 
 func (ImageCommands) snow(ctx *dgc.Ctx) {
@@ -2378,12 +2378,12 @@ func (ImageCommands) snow(ctx *dgc.Ctx) {
 	if !success {
 		user = ctx.Event.Author
 	}
-	_ = ctx.RespondText(fmt.Sprintf("https://lightning-bot.com/api/v3/imagegen/filter?url=%s&filter=snow", url.QueryEscape(user.AvatarURL(""))))
+	_ = ctx.RespondText(fmt.Sprintf("https://api.lightning-bot.com/api/v3/imagegen/filter?url=%s&filter=snow", url.QueryEscape(user.AvatarURL(""))))
 }
 
 func (ImageCommands) hub(ctx *dgc.Ctx) {
 	_ = ctx.RespondText(fmt.Sprintf(
-		"https://lightning-bot.com/api/v3/imagegen/pornhub?text1=%s&text2=%s",
+		"https://api.lightning-bot.com/api/v3/imagegen/pornhub?text1=%s&text2=%s",
 		url.QueryEscape(utils.Arguments["<\"text1\">"]),
 		url.QueryEscape(utils.Arguments["<\"text2\">"]),
 	))
@@ -2394,7 +2394,7 @@ func (ImageCommands) floor(ctx *dgc.Ctx) {
 	if !success {
 		user = ctx.Event.Author
 	}
-	_ = ctx.RespondText(fmt.Sprintf("https://lightning-bot.com/api/v3/imagegen/floor?url=%s&text=%s",
+	_ = ctx.RespondText(fmt.Sprintf("https://api.lightning-bot.com/api/v3/imagegen/floor?url=%s&text=%s",
 		url.QueryEscape(user.AvatarURL("")),
 		url.QueryEscape(utils.String.RemoveWords(ctx.Arguments.Raw(), 1)),
 	))
@@ -2405,7 +2405,7 @@ func (ImageCommands) jokeoverhead(ctx *dgc.Ctx) {
 	if !success {
 		user = ctx.Event.Author
 	}
-	_ = ctx.RespondText(fmt.Sprintf("https://lightning-bot.com/api/v3/imagegen/jokeoverhead?url=%s", url.QueryEscape(user.AvatarURL(""))))
+	_ = ctx.RespondText(fmt.Sprintf("https://api.lightning-bot.com/api/v3/imagegen/jokeoverhead?url=%s", url.QueryEscape(user.AvatarURL(""))))
 }
 
 func (ImageCommands) throwaway(ctx *dgc.Ctx) {
@@ -2413,7 +2413,7 @@ func (ImageCommands) throwaway(ctx *dgc.Ctx) {
 	if !success {
 		user = ctx.Event.Author
 	}
-	_ = ctx.RespondText(fmt.Sprintf("https://lightning-bot.com/api/v3/imagegen/trash?url=%s&trash_url=%s",
+	_ = ctx.RespondText(fmt.Sprintf("https://api.lightning-bot.com/api/v3/imagegen/trash?url=%s&trash_url=%s",
 		url.QueryEscape(user.AvatarURL("")),
 		url.QueryEscape(ctx.Event.Author.AvatarURL("")),
 	))
@@ -2424,11 +2424,11 @@ func (ImageCommands) salty(ctx *dgc.Ctx) {
 	if !success {
 		user = ctx.Event.Author
 	}
-	_ = ctx.RespondText(fmt.Sprintf("https://lightning-bot.com/api/v3/imagegen/salty?url=%s", url.QueryEscape(user.AvatarURL(""))))
+	_ = ctx.RespondText(fmt.Sprintf("https://api.lightning-bot.com/api/v3/imagegen/salty?url=%s", url.QueryEscape(user.AvatarURL(""))))
 }
 
 func (ImageCommands) scroll(ctx *dgc.Ctx) {
-	_ = ctx.RespondText(fmt.Sprintf("https://lightning-bot.com/api/v3/imagegen/scroll?text=%s", url.QueryEscape(ctx.Arguments.Raw())))
+	_ = ctx.RespondText(fmt.Sprintf("https://api.lightning-bot.com/api/v3/imagegen/scroll?text=%s", url.QueryEscape(ctx.Arguments.Raw())))
 }
 
 func (ImageCommands) shame(ctx *dgc.Ctx) {
@@ -2436,7 +2436,7 @@ func (ImageCommands) shame(ctx *dgc.Ctx) {
 	if !success {
 		user = ctx.Event.Author
 	}
-	_ = ctx.RespondText(fmt.Sprintf("https://lightning-bot.com/api/v3/imagegen/shame?url=%s", url.QueryEscape(user.AvatarURL(""))))
+	_ = ctx.RespondText(fmt.Sprintf("https://api.lightning-bot.com/api/v3/imagegen/shame?url=%s", url.QueryEscape(user.AvatarURL(""))))
 }
 
 func (ImageCommands) ship(ctx *dgc.Ctx) {
@@ -2449,7 +2449,7 @@ func (ImageCommands) ship(ctx *dgc.Ctx) {
 		user2 = ctx.Event.Author
 	}
 	_ = ctx.RespondText(fmt.Sprintf(
-		"https://lightning-bot.com/api/v3/imagegen/ship?url1=%s&url2=%s",
+		"https://api.lightning-bot.com/api/v3/imagegen/ship?url1=%s&url2=%s",
 		url.QueryEscape(user.AvatarURL("")),
 		url.QueryEscape(user2.AvatarURL("")),
 	))
@@ -2460,7 +2460,7 @@ func (ImageCommands) what(ctx *dgc.Ctx) {
 	if !success {
 		user = ctx.Event.Author
 	}
-	_ = ctx.RespondText(fmt.Sprintf("https://lightning-bot.com/api/v3/imagegen/what?url=%s", url.QueryEscape(user.AvatarURL(""))))
+	_ = ctx.RespondText(fmt.Sprintf("https://api.lightning-bot.com/api/v3/imagegen/what?url=%s", url.QueryEscape(user.AvatarURL(""))))
 }
 
 func (ImageCommands) adios(ctx *dgc.Ctx) {
