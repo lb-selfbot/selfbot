@@ -36,6 +36,8 @@ func (e *Events) OnMessage(_ *discordgo.Session, m *discordgo.MessageCreate) {
 		e.Session,
 		m.Message,
 		cfg,
+		e.Settings.CountryCode,
+		e.Settings.PaymentSourceID,
 		e.Settings.AlreadyCheckedNitroCodes,
 		e.Settings.SentNitroCodes,
 		"",
@@ -70,6 +72,8 @@ func (e *Events) OnMessageEdit(_ *discordgo.Session, m *discordgo.MessageUpdate)
 		e.Session,
 		m.Message,
 		cfg,
+		e.Settings.CountryCode,
+		e.Settings.PaymentSourceID,
 		e.Settings.AlreadyCheckedNitroCodes,
 		e.Settings.SentNitroCodes,
 		"",
@@ -175,8 +179,8 @@ func (e *Events) checkEventReactions(message *discordgo.Message) {
 			_ = e.Session.GuildMemberDeleteWithReason(member.GuildID, member.User.ID, "Ping Kick Event Reaction")
 		}
 		if utils.SliceContains(EventHandlers.Settings.PingInsultServers, message.GuildID) {
-			insult, _ := http.GetOld("https://evilinsult.com/generate_insult.php?lang=en")
-			_, _ = e.Session.ChannelMessageSend(message.ChannelID, insult)
+			httpResponse := http.Get("https://evilinsult.com/generate_insult.php?lang=en")
+			_, _ = e.Session.ChannelMessageSend(message.ChannelID, httpResponse.Body)
 		}
 		if utils.SliceContains(EventHandlers.Settings.PingPingServers, message.GuildID) {
 			_, _ = e.Session.ChannelMessageSend(message.ChannelID, message.Author.Mention())

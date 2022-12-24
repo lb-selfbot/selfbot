@@ -12,9 +12,9 @@ import (
 	"github.com/LightningDev1/LB-Selfbot/api"
 	"github.com/LightningDev1/LB-Selfbot/embed"
 	"github.com/LightningDev1/LB-Selfbot/http"
-	"github.com/LightningDev1/LB-Selfbot/json"
 	"github.com/LightningDev1/LB-Selfbot/utils"
 	"github.com/LightningDev1/dgc"
+	"github.com/bitly/go-simplejson"
 	"github.com/kkdai/youtube/v2"
 )
 
@@ -338,14 +338,14 @@ func (NetworkCommands) weather(ctx *dgc.Ctx) {
 
 func (NetworkCommands) tinyurl(ctx *dgc.Ctx) {
 	sourceUrl := ctx.Arguments.Raw()
-	tinyurl, err := http.GetOld(fmt.Sprintf("https://tinyurl.com/api-create.php?url=%s", sourceUrl))
-	if err != nil {
+	httpResponse := http.Get(fmt.Sprintf("https://tinyurl.com/api-create.php?url=%s", sourceUrl))
+	if httpResponse.Error != nil {
 		_ = ctx.RespondText("An error has occurred.")
 		return
 	}
 	embed.NewEmbed().
 		AddField("URL", sourceUrl).
-		AddField("TinyURL", tinyurl).
+		AddField("TinyURL", httpResponse.Body).
 		Send(ctx)
 }
 
@@ -479,47 +479,54 @@ func (NetworkCommands) hastebin(ctx *dgc.Ctx) {
 
 func (NetworkCommands) checktoken(ctx *dgc.Ctx) {
 	token := utils.Arguments["<token>"]
-	response, statusCode, err := http.GetJsonStatusCodeOld("https://discord.com/api/v10/users/@me", http.GetDiscordHeadersDEPRECATED(token))
+
+	response, err := api.GetTokenData(ctx.Session, token)
 	if err != nil {
 		_ = ctx.RespondText("An error has occurred.")
 		return
 	}
-	if statusCode != 200 {
-		embed.NewEmbed().
-			AddField("Status", "Invalid Token").
-			Send(ctx)
+
+	tokenData, err := simplejson.NewJson(response)
+	if err != nil {
+		_ = ctx.RespondText("An error has occurred.")
 		return
 	}
+
 	embed.NewEmbed().
 		AddField("Status", "Valid Token").
-		AddField("Username", fmt.Sprintf("%s#%s", response.Get("username").MustString(), response.Get("discriminator").MustString())).
-		AddField("ID", response.Get("id").MustString()).
-		AddField("Public Flags", fmt.Sprintf("%.f", response.Get("public_flags").MustFloat64())).
-		AddField("Flags", fmt.Sprintf("%.f", response.Get("flags").MustFloat64())).
-		AddField("Purchased Flags", fmt.Sprintf("%.f", response.Get("purchased_flags").MustFloat64())).
-		AddField("Banner", response.Get("banner").MustString()).
-		AddField("Banner Color", response.Get("banner_color").MustString()).
-		AddField("Bio", response.Get("bio").MustString()).
-		AddField("Locale", response.Get("locale").MustString()).
-		AddField("NSFW Allowed", utils.Misc.FormatBool(response.Get("nsfw_allowed").MustBool())).
-		AddField("2FA Enabled", utils.Misc.FormatBool(response.Get("mfa_enabled").MustBool())).
-		AddField("Email", response.Get("email").MustString()).
-		AddField("Verified", utils.Misc.FormatBool(response.Get("verified").MustBool())).
-		AddField("Phone", response.Get("phone").MustString()).
+		AddField("Username", fmt.Sprintf("%s#%s", tokenData.Get("username").MustString(), tokenData.Get("discriminator").MustString())).
+		AddField("ID", tokenData.Get("id").MustString()).
+		AddField("Public Flags", fmt.Sprintf("%.f", tokenData.Get("public_flags").MustFloat64())).
+		AddField("Flags", fmt.Sprintf("%.f", tokenData.Get("flags").MustFloat64())).
+		AddField("Purchased Flags", fmt.Sprintf("%.f", tokenData.Get("purchased_flags").MustFloat64())).
+		AddField("Banner", tokenData.Get("banner").MustString()).
+		AddField("Banner Color", tokenData.Get("banner_color").MustString()).
+		AddField("Bio", tokenData.Get("bio").MustString()).
+		AddField("Locale", tokenData.Get("locale").MustString()).
+		AddField("NSFW Allowed", utils.Misc.FormatBool(tokenData.Get("nsfw_allowed").MustBool())).
+		AddField("2FA Enabled", utils.Misc.FormatBool(tokenData.Get("mfa_enabled").MustBool())).
+		AddField("Email", tokenData.Get("email").MustString()).
+		AddField("Verified", utils.Misc.FormatBool(tokenData.Get("verified").MustBool())).
+		AddField("Phone", tokenData.Get("phone").MustString()).
 		Send(ctx)
 }
 
 func (NetworkCommands) resolve(ctx *dgc.Ctx) {
 	domain := utils.Arguments["<domain>"]
-	response, err := http.GetJsonOld(fmt.Sprintf("https://json.geoiplookup.io/%s", domain))
-	if err != nil {
+
+	httpResponse := http.Get(fmt.Sprintf("https://json.geoiplookup.io/%s", domain))
+	if httpResponse.Error != nil {
 		_ = ctx.RespondText("An error has occurred.")
 		return
 	}
+
+	response := httpResponse.Json()
+	
 	if response.Get("ip").MustString() == "" {
 		embed.NewEmbed().SetDescription("Invalid domain.").Send(ctx)
 		return
 	}
+
 	embed.NewEmbed().
 		AddField("Domain", domain).
 		AddField("IP", response.Get("ip").MustString()).
@@ -546,18 +553,18 @@ func (NetworkCommands) reversedns(ctx *dgc.Ctx) {
 
 func (NetworkCommands) reversemac(ctx *dgc.Ctx) {
 	mac := utils.Arguments["<mac>"]
-	response, err := http.GetOld(fmt.Sprintf("https://api.macvendors.com/%s", mac))
-	if err != nil {
+	httpResponse := http.Get(fmt.Sprintf("https://api.macvendors.com/%s", mac))
+	if httpResponse.Error != nil {
 		_ = ctx.RespondText("An error has occurred.")
 		return
 	}
-	if strings.Contains(response, "Not Found") {
+	if strings.Contains(httpResponse.Body, "Not Found") {
 		embed.NewEmbed().SetDescription("Invalid MAC Address.").Send(ctx)
 		return
 	}
 	embed.NewEmbed().
 		AddField("MAC Address", mac).
-		AddField("Vendor", response).
+		AddField("Vendor", httpResponse.Body).
 		Send(ctx)
 }
 
@@ -632,29 +639,28 @@ func (NetworkCommands) open(ctx *dgc.Ctx) {
 }
 
 func (NetworkCommands) searchcountry(ctx *dgc.Ctx) {
-	response, err := http.GetOld(fmt.Sprintf("https://restcountries.com/v3.1/name/%s?fullText=true", ctx.Arguments.Raw()))
-	countryList, err2 := json.SimpleUnmarshal(response)
-	if err != nil || err2 != nil {
-		_ = ctx.RespondText("Country not found.")
+	httpResponse := http.Get(fmt.Sprintf("https://restcountries.com/v3.1/name/%s?fullText=true", ctx.Arguments.Raw()))
+	if httpResponse.Error != nil {
+		_ = ctx.RespondText("An error has occurred.")
 		return
 	}
-	if status, ok := countryList.CheckGet("status"); ok {
-		if statusInt, err := status.Int(); err == nil && statusInt == 404 {
-			_ = ctx.RespondText("Country not found.")
-			return
-		}
-	}
+
+	countryList := httpResponse.Json()
+
 	country := countryList.GetIndex(0)
+
 	rawCurrencies := country.Get("currencies").Interface().(map[string]interface{})
 	var currencies []string
 	for shortName, ifa := range rawCurrencies {
 		currencies = append(currencies, fmt.Sprintf("%s (%s)", shortName, ifa.(map[string]interface{})["name"].(string)))
 	}
+
 	rawLanguages := country.Get("languages").Interface().(map[string]interface{})
 	var languages []string
 	for _, language := range rawLanguages {
 		languages = append(languages, language.(string))
 	}
+
 	embed.NewEmbed().
 		SetAuthor(fmt.Sprintf("%s - %s", country.GetPath("name", "common").MustString(), country.Get("cca2").MustString())).
 		AddField("Name", country.GetPath("name", "common").MustString()).
@@ -672,23 +678,28 @@ func (NetworkCommands) searchcountry(ctx *dgc.Ctx) {
 }
 
 func (NetworkCommands) randomcountry(ctx *dgc.Ctx) {
-	response, err := http.GetOld("https://restcountries.com/v3.1/all")
-	countryList, err2 := json.SimpleUnmarshal(response)
-	if err != nil || err2 != nil {
+	httpResponse := http.Get("https://restcountries.com/v3.1/all")
+	if httpResponse.Error != nil {
 		_ = ctx.RespondText("An error has occurred.")
 		return
 	}
+
+	countryList := httpResponse.Json()
+
 	country := countryList.GetIndex(utils.Random.Number(0, len(countryList.MustArray())))
+
 	rawCurrencies := country.Get("currencies").Interface().(map[string]interface{})
 	var currencies []string
 	for shortName, ifa := range rawCurrencies {
 		currencies = append(currencies, fmt.Sprintf("%s (%s)", shortName, ifa.(map[string]interface{})["name"].(string)))
 	}
+
 	rawLanguages := country.Get("languages").Interface().(map[string]interface{})
 	var languages []string
 	for _, language := range rawLanguages {
 		languages = append(languages, language.(string))
 	}
+
 	embed.NewEmbed().
 		SetAuthor(fmt.Sprintf("%s - %s", country.GetPath("name", "common").MustString(), country.Get("cca2").MustString())).
 		AddField("Name", country.GetPath("name", "common").MustString()).
@@ -706,14 +717,15 @@ func (NetworkCommands) randomcountry(ctx *dgc.Ctx) {
 }
 
 func (NetworkCommands) headers(ctx *dgc.Ctx) {
-	headers, err := http.GetHeadersStringOld(utils.Arguments["<url>"])
-	if err != nil {
+	httpResponse := http.Get(utils.Arguments["<url>"])
+	if httpResponse.Error != nil {
 		_ = ctx.RespondText("An error has occurred.")
 		return
 	}
+	
 	embed.NewEmbed().
 		AddField("URL", utils.Arguments["<url>"]).
-		AddField("Headers", headers).
+		AddField("Headers", httpResponse.Headers).
 		Send(ctx)
 }
 

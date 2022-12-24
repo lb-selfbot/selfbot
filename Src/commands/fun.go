@@ -9,7 +9,6 @@ import (
 	"github.com/LightningDev1/LB-Selfbot/api"
 	"github.com/LightningDev1/LB-Selfbot/embed"
 	"github.com/LightningDev1/LB-Selfbot/http"
-	"github.com/LightningDev1/LB-Selfbot/json"
 	"github.com/LightningDev1/LB-Selfbot/utils"
 	"github.com/LightningDev1/dgc"
 	"github.com/LightningDev1/discordgo"
@@ -816,14 +815,18 @@ func (FunCommands) capybarafact(ctx *dgc.Ctx) {
 }
 
 func (FunCommands) trivia(ctx *dgc.Ctx) {
-	rawJson, err1 := http.GetOld("https://opentdb.com/api.php?amount=1")
-	rawJson = strings.Replace(rawJson, "&quot;", "\"", -1)
-	rawJson = strings.Replace(rawJson, "&#039;", "'", -1)
-	trivia, err2 := json.SimpleUnmarshal(rawJson)
-	if err1 != nil || err2 != nil {
+	httpResponse := http.Get("https://opentdb.com/api.php?amount=1")
+	if httpResponse.StatusCode != 200 {
 		_ = ctx.RespondText("An error has occurred.")
 		return
 	}
+
+	httpResponse.Body = strings.Replace(httpResponse.Body, "&quot;", "\"", -1)
+	httpResponse.Body = strings.Replace(httpResponse.Body, "&#039;", "'", -1)
+	httpResponse.BodyBytes = []byte(httpResponse.Body)
+
+	trivia := httpResponse.Json()
+
 	trivia = trivia.Get("results").GetIndex(0)
 	answers := trivia.Get("incorrect_answers").MustStringArray()
 	answers = append(answers, trivia.Get("correct_answer").MustString())
@@ -893,14 +896,14 @@ func (FunCommands) poll(ctx *dgc.Ctx) {
 
 func (FunCommands) numberfact(ctx *dgc.Ctx) {
 	number := utils.Arguments["<number>"]
-	fact, err := http.GetOld(fmt.Sprintf("http://numbersapi.com/%s", number))
-	if err != nil {
+	httpResponse := http.Get(fmt.Sprintf("http://numbersapi.com/%s", number))
+	if httpResponse.Error != nil {
 		_ = ctx.RespondText("An error has occurred.")
 		return
 	}
 	embed.NewEmbed().
 		AddField("Number", number).
-		AddField("Fact", fact).
+		AddField("Fact", httpResponse.Body).
 		Send(ctx)
 }
 
@@ -1118,13 +1121,13 @@ func (FunCommands) quote(ctx *dgc.Ctx) {
 }
 
 func (FunCommands) evilinsult(ctx *dgc.Ctx) {
-	insult, err := http.GetOld("https://evilinsult.com/generate_insult.php?lang=en")
-	if err != nil {
+	httpResponse := http.Get("https://evilinsult.com/generate_insult.php?lang=en")
+	if httpResponse.Error != nil {
 		_ = ctx.RespondText("An error has occurred.")
 		return
 	}
 	embed.NewEmbed().
-		AddField("Evil Insult", insult).
+		AddField("Evil Insult", httpResponse.Body).
 		Send(ctx)
 }
 

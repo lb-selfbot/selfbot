@@ -80,6 +80,20 @@ func LeaveHypesquad(session *discordgo.Session) (err error) {
 	return err
 }
 
+var RedditHeaders = map[string]string{
+	"User-Agent":                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/93.0.4577.82 Safari/537.36",
+	"Accept":                    "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
+	"Accept-Encoding":           "gzip, deflate, br",
+	"Accept-Language":           "en-US,en;q=0.9",
+	"Sec-Ch-Ua":                 "\"Opera GX\";v=\"93\", \"Not\\A)Brand\";v=\"99\", \"Chromium\";v=\"93\"",
+	"Sec-Ch-Ua-Mobile":          "?0",
+	"Sec-Fetch-Dest":            "document",
+	"Sec-Fetch-Mode":            "navigate",
+	"Sec-Fetch-Site":            "none",
+	"Sec-Fetch-User":            "?1",
+	"Upgrade-Insecure-Requests": "1",
+}
+
 type RedditPost struct {
 	Title    string
 	ImageURL string
@@ -87,16 +101,17 @@ type RedditPost struct {
 
 func GetImageFromSubreddit(subreddit string) (*RedditPost, bool) {
 	sortBy := []string{"best", "new", "top", "hot"}[rand.Intn(4)]
-	rawSearch, statusCode, err := http.GetJsonStatusCodeOld(fmt.Sprintf("https://www.reddit.com/r/%s/%s.json?limit=20", subreddit, sortBy), map[string]string{
-		"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Safari/537.36 Edg/96.0.1054.62",
-	})
-	if err != nil {
+
+	httpResponse := http.Get(
+		fmt.Sprintf("https://www.reddit.com/r/%s/%s.json?limit=20", subreddit, sortBy),
+		RedditHeaders,
+	)
+
+	if httpResponse.Error != nil || httpResponse.StatusCode != 200 {
 		return nil, false
 	}
-	if statusCode != 200 {
-		return nil, false
-	}
-	return ExtractRedditURL(rawSearch, 0)
+
+	return ExtractRedditURL(httpResponse.Json(), 0)
 }
 
 func ExtractRedditURL(jsonData *simplejson.Json, tries int) (*RedditPost, bool) {
@@ -126,11 +141,9 @@ func ExtractRedditURL(jsonData *simplejson.Json, tries int) (*RedditPost, bool) 
 }
 
 func GetPublicIP() string {
-	ip, err := http.GetOld("https://ipinfo.io/ip")
-	if err != nil {
-		return "Error"
-	}
-	return ip
+	ip := http.Get("https://api.ipify.org").Body
+
+	return utils.Misc.Or(ip, "Error")
 }
 
 func GetLocalIP() string {
@@ -164,10 +177,9 @@ func GetMacAddress() string {
 	return "Error"
 }
 
-func TTS(text, language string) ([]byte, error) {
+func TTS(text, language string) *http.HttpResponse {
 	ttsUrl := fmt.Sprintf("https://translate.google.com/translate_tts?ie=UTF-8&total=1&idx=0&textlen=32&client=tw-ob&q=%s&tl=%s", url.QueryEscape(text), url.QueryEscape(language))
-	tts, _, err := http.GetBytesOld(ttsUrl)
-	return tts, err
+	return http.Get(ttsUrl)
 }
 
 type TranslateResult struct {
@@ -291,18 +303,24 @@ func GetStartParams() *simplejson.Json {
 	encryptedKey := []byte{78, 70, 57, 114, 89, 55, 75, 67, 112, 105, 57, 68, 102, 104, 71, 80, 121, 53, 107, 86, 53, 78, 76, 74, 104, 85, 70, 78, 74, 51, 77, 121, 102, 53, 88, 121, 56, 43, 48, 89, 106, 77, 111, 61, 58, 87, 97, 53, 113, 115, 76, 51, 99, 116, 107, 118, 110, 79, 120, 48, 102, 56, 86, 57, 70, 117, 103, 61, 61, 58, 102, 104, 105, 66, 105, 113, 48, 116, 79, 119, 80, 54, 87, 82, 101, 71, 113, 118, 102, 117, 66, 103, 43, 83, 102, 88, 111, 53, 106, 109, 68, 86, 90, 55, 99, 82, 71, 87, 57, 121, 109, 72, 120, 120, 113, 55, 78, 56, 98, 85, 121, 116, 74, 86, 117, 70, 104, 100, 49, 122, 43, 74, 43, 67, 69, 78, 68, 66, 82, 54, 55, 57, 57, 105, 99, 103, 74, 51, 90, 87, 103, 73, 57, 52, 66, 119, 61, 61}
 	key, _ := keyEncryption.Decrypt(encryptedKey)
 	Encryption := &encryption.AESCBC{Key: string(key)}
-	encryptedStartParams, _, err := http.GetBytesOld("https://lightning-bot.com/api/v3/selfbot-utils/startparams")
-	if err != nil {
+
+	httpResponse := http.Get("https://lightning-bot.com/api/v3/selfbot-utils/startparams")
+	if httpResponse.Error != nil {
 		return nil
 	}
+
+	encryptedStartParams := httpResponse.BodyBytes
+
 	decryptedStartParams, err := Encryption.Decrypt(encryptedStartParams)
 	if err != nil {
 		return nil
 	}
+
 	jsonStartParams, err := simplejson.NewJson(decryptedStartParams)
 	if err != nil {
 		return nil
 	}
+
 	return jsonStartParams
 }
 

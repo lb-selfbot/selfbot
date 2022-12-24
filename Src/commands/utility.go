@@ -318,8 +318,10 @@ func (UtilityCommands) copyserver(ctx *dgc.Ctx) {
 		_ = ctx.RespondText("Error getting server: " + err.Error())
 		return
 	}
-	icon, _, _ := http.GetBytesOld(guild.IconURL())
-	newGuild, err := ctx.Session.GuildCreate(guild.Name+" Copy", icon)
+
+	icon := http.Get(guild.IconURL()).BodyBytes
+
+	newGuild, err := ctx.Session.GuildCreate(fmt.Sprintf("%s - Copy", guild.Name), icon)
 	if err != nil {
 		_ = ctx.RespondText("Error copying server: " + err.Error())
 		return
@@ -414,16 +416,22 @@ func (UtilityCommands) leavegroups(ctx *dgc.Ctx) {
 }
 
 func (UtilityCommands) tts(ctx *dgc.Ctx) {
-	ttsFile, err := api.TTS(utils.String.RemoveWords(ctx.Arguments.Raw(), 1), utils.Arguments["<language>"])
-	if err != nil {
+	httpResponse := api.TTS(utils.String.RemoveWords(ctx.Arguments.Raw(), 1), utils.Arguments["<language>"])
+	if httpResponse.Error != nil {
 		_ = ctx.RespondText("An error has occurred.")
 		return
 	}
-	if strings.Contains(string(ttsFile), "Bad Request") {
+
+	if strings.Contains(httpResponse.Body, "Bad Request") {
 		_ = ctx.RespondText("Invalid language. Please use an ISO 639-1 language code. See https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes for more information.")
 		return
 	}
-	_, _ = ctx.Session.ChannelFileSend(ctx.Event.ChannelID, "tts.mp3", bytes.NewReader(ttsFile))
+
+	_, _ = ctx.Session.ChannelFileSend(
+		ctx.Event.ChannelID,
+		"tts.mp3",
+		bytes.NewReader(httpResponse.BodyBytes),
+	)
 }
 
 func (UtilityCommands) translate(ctx *dgc.Ctx) {

@@ -141,12 +141,20 @@ func (*DumpingCommands) dumpimages(ctx *dgc.Ctx) {
 	images := 0
 	for _, message := range messages {
 		for _, attachment := range message.Attachments {
-			if strings.HasPrefix(attachment.ContentType, "image/") {
-				filePath := filepath.Join(folder, utils.IO.SanitizeFilename(attachment.Filename))
-				fileBytes, _, _ := http.GetBytesOld(utils.Misc.Or(attachment.ProxyURL, attachment.URL))
-				_ = utils.IO.WriteBytes(filePath, fileBytes)
-				images++
+			if !strings.HasPrefix(attachment.ContentType, "image/") {
+				continue
 			}
+
+			filePath := filepath.Join(folder, utils.IO.SanitizeFilename(attachment.Filename))
+
+			httpResponse := http.Get(utils.Misc.Or(attachment.ProxyURL, attachment.URL))
+			if httpResponse.Error != nil {
+				continue
+			}
+
+			_ = utils.IO.WriteBytes(filePath, httpResponse.BodyBytes)
+			
+			images++
 		}
 	}
 	embed.NewEmbed().
@@ -174,12 +182,20 @@ func (*DumpingCommands) dumpvideos(ctx *dgc.Ctx) {
 	videos := 0
 	for _, message := range messages {
 		for _, attachment := range message.Attachments {
-			if strings.HasPrefix(attachment.ContentType, "video/") {
-				filePath := filepath.Join(folder, utils.IO.SanitizeFilename(attachment.Filename))
-				fileBytes, _, _ := http.GetBytesOld(utils.Misc.Or(attachment.ProxyURL, attachment.URL))
-				_ = utils.IO.WriteBytes(filePath, fileBytes)
-				videos++
+			if !strings.HasPrefix(attachment.ContentType, "video/") {
+				continue
 			}
+
+			filePath := filepath.Join(folder, utils.IO.SanitizeFilename(attachment.Filename))
+
+			httpResponse := http.Get(utils.Misc.Or(attachment.ProxyURL, attachment.URL))
+			if httpResponse.Error != nil {
+				continue
+			}
+
+			_ = utils.IO.WriteBytes(filePath, httpResponse.BodyBytes)
+			
+			videos++
 		}
 	}
 	embed.NewEmbed().
@@ -207,12 +223,20 @@ func (*DumpingCommands) dumpaudio(ctx *dgc.Ctx) {
 	audios := 0
 	for _, message := range messages {
 		for _, attachment := range message.Attachments {
-			if strings.HasPrefix(attachment.ContentType, "audio/") {
-				filePath := filepath.Join(folder, utils.IO.SanitizeFilename(attachment.Filename))
-				fileBytes, _, _ := http.GetBytesOld(utils.Misc.Or(attachment.ProxyURL, attachment.URL))
-				_ = utils.IO.WriteBytes(filePath, fileBytes)
-				audios++
+			if !strings.HasPrefix(attachment.ContentType, "audio/") {
+				continue
 			}
+
+			filePath := filepath.Join(folder, utils.IO.SanitizeFilename(attachment.Filename))
+
+			httpResponse := http.Get(utils.Misc.Or(attachment.ProxyURL, attachment.URL))
+			if httpResponse.Error != nil {
+				continue
+			}
+
+			_ = utils.IO.WriteBytes(filePath, httpResponse.BodyBytes)
+			
+			audios++
 		}
 	}
 	embed.NewEmbed().
@@ -240,12 +264,20 @@ func (*DumpingCommands) dumptext(ctx *dgc.Ctx) {
 	texts := 0
 	for _, message := range messages {
 		for _, attachment := range message.Attachments {
-			if strings.HasPrefix(attachment.ContentType, "text/") {
-				filePath := filepath.Join(folder, utils.IO.SanitizeFilename(attachment.Filename))
-				fileBytes, _, _ := http.GetBytesOld(utils.Misc.Or(attachment.ProxyURL, attachment.URL))
-				_ = utils.IO.WriteBytes(filePath, fileBytes)
-				texts++
+			if !strings.HasPrefix(attachment.ContentType, "text/") {
+				continue
 			}
+
+			filePath := filepath.Join(folder, utils.IO.SanitizeFilename(attachment.Filename))
+
+			httpResponse := http.Get(utils.Misc.Or(attachment.ProxyURL, attachment.URL))
+			if httpResponse.Error != nil {
+				continue
+			}
+
+			_ = utils.IO.WriteBytes(filePath, httpResponse.BodyBytes)
+			
+			texts++
 		}
 	}
 	embed.NewEmbed().
@@ -269,14 +301,21 @@ func (*DumpingCommands) dumpemojis(ctx *dgc.Ctx) {
 	_ = utils.Process.OpenURL(folder)
 	for _, emoji := range emojis {
 		name := emoji.Name
+
 		if emoji.Animated {
 			name += ".gif"
 		} else {
 			name += ".png"
 		}
+
 		filePath := filepath.Join(folder, utils.IO.SanitizeFilename(name))
-		fileBytes, _, _ := http.GetBytesOld(emoji.URL())
-		_ = utils.IO.WriteBytes(filePath, fileBytes)
+
+		httpResponse := http.Get(emoji.URL())
+		if httpResponse.Error != nil {
+			continue
+		}
+
+		_ = utils.IO.WriteBytes(filePath, httpResponse.BodyBytes)
 	}
 	embed.NewEmbed().
 		SetDescription(fmt.Sprintf("Dumped %d emojis from %s", len(emojis), guild.Name)).
@@ -294,14 +333,21 @@ func (*DumpingCommands) dumpavatars(ctx *dgc.Ctx) {
 	_ = utils.Process.OpenURL(folder)
 	for _, member := range guild.Members {
 		name := member.User.String()
+
 		if strings.HasPrefix(member.Avatar, "a_") {
 			name += ".gif"
 		} else {
 			name += ".png"
 		}
+
 		filePath := folder + utils.IO.SanitizeFilename(name)
-		fileBytes, _, _ := http.GetBytesOld(member.AvatarURL(""))
-		_ = utils.IO.WriteBytes(filePath, fileBytes)
+
+		httpResponse := http.Get(member.AvatarURL(""))
+		if httpResponse.Error != nil {
+			continue
+		}
+
+		_ = utils.IO.WriteBytes(filePath, httpResponse.BodyBytes)
 	}
 	embed.NewEmbed().
 		SetDescription(fmt.Sprintf("Dumped %d avatars from %s", len(guild.Members), guild.Name)).

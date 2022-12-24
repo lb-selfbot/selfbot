@@ -9,7 +9,6 @@ import (
 	"time"
 
 	"github.com/LightningDev1/LB-Selfbot/config"
-	"github.com/LightningDev1/LB-Selfbot/http"
 	"github.com/LightningDev1/LB-Selfbot/logging"
 	"github.com/LightningDev1/LB-Selfbot/utils"
 	"github.com/LightningDev1/discordgo"
@@ -37,6 +36,8 @@ func CheckNitroSniper(
 	session *discordgo.Session,
 	message *discordgo.Message,
 	cfg config.Config,
+	countryCode string,
+	paymentSourceID string,
 	alreadyCheckedNitroCodes []string,
 	sentNitroCodes map[string][]NitroCode,
 	account string,
@@ -64,33 +65,41 @@ func CheckNitroSniper(
 				return alreadyCheckedNitroCodes, sentNitroCodes
 			}
 		}
+
+		url := fmt.Sprintf("https://discord.com/api/v10/entitlements/gift-codes/%s/redeem", nitroCode)
+
 		start := time.Now()
-		jsonResult, err := http.PostJsonOld(fmt.Sprintf("https://discord.com/api/v10/entitlements/gift-codes/%s/redeem", nitroCode), "{}", http.GetDiscordHeadersDEPRECATED(cfg.Account.Discord.Token))
-		if err != nil {
-			return alreadyCheckedNitroCodes, sentNitroCodes
-		}
+
+		response, _ := session.Request("POST", url, map[string]any{
+			"country_code":           countryCode,
+			"payment_source_id":      paymentSourceID,
+			"with_application":       false,
+			"with_subscription_plan": true,
+		})
+
 		elapsed := time.Since(start)
 		redeemed := false
-		resultBytes, err := jsonResult.Encode()
-		if err != nil {
-			return alreadyCheckedNitroCodes, sentNitroCodes
-		}
-		result := string(resultBytes)
-		if strings.Contains(result, "This gift has been redeemed already.") {
+
+		responseString := string(response)
+
+		if strings.Contains(responseString, "This gift has been redeemed already.") {
 			logging.Logging.NitroSniper(session, message, elapsed, "Already Redeemed", nitroCode, account)
-		} else if strings.Contains(result, "Already purchased") {
+		} else if strings.Contains(responseString, "Already purchased") {
 			logging.Logging.NitroSniper(session, message, elapsed, "Already Purchased", nitroCode, account)
-		} else if strings.Contains(result, "subscription_plan") {
+		} else if strings.Contains(responseString, "subscription_plan") {
 			logging.Logging.NitroSniper(session, message, elapsed, "Redeemed Nitro", nitroCode, account)
 			redeemed = true
-		} else if strings.Contains(result, "Unknown Gift Code") {
+		} else if strings.Contains(responseString, "Unknown Gift Code") {
 			logging.Logging.NitroSniper(session, message, elapsed, "Unknown Code", nitroCode, account)
 		} else {
-			json, err := simplejson.NewJson([]byte(result))
-			if err == nil {
-				logging.Logging.NitroSniper(session, message, elapsed, utils.Misc.Or(json.Get("message").MustString(), "Unknown Status"), nitroCode, account)
+			json, err := simplejson.NewJson(response)
+			if err != nil {
+				json = simplejson.New()
 			}
+
+			logging.Logging.NitroSniper(session, message, elapsed, utils.Misc.Or(json.Get("message").MustString(), "Unknown Status"), nitroCode, account)
 		}
+
 		if !redeemed {
 			code := NitroCode{
 				Code: nitroCode,

@@ -283,11 +283,16 @@ Permission: View Guild Insights      | Value: %s`,
 }
 
 func (DiscordUtils) SendFileFromURL(ctx *dgc.Ctx, url string, fileName string, headers ...map[string]string) error {
-	bytes_, _, err := http.GetBytesOld(url, headers...)
-	if err != nil {
-		return err
+	httpResponse := http.Get(url, headers...)
+	if httpResponse.Error != nil {
+		return httpResponse.Error
 	}
-	_, err = ctx.Session.ChannelFileSend(ctx.Event.ChannelID, fileName, bytes.NewReader(bytes_))
+
+	_, err := ctx.Session.ChannelFileSend(
+		ctx.Event.ChannelID,
+		fileName,
+		bytes.NewReader(httpResponse.BodyBytes),
+	)
 	return err
 }
 

@@ -7,6 +7,7 @@ import (
 	"github.com/LightningDev1/LB-Selfbot/snipers"
 	"github.com/LightningDev1/dgc"
 	"github.com/LightningDev1/discordgo"
+	"github.com/bitly/go-simplejson"
 )
 
 type FriendRequest struct {
@@ -70,6 +71,9 @@ type EventHandlerSettings struct {
 	RemoveReactions []EventEntry
 	ForceDisconnect []EventEntry
 
+	CountryCode     string
+	PaymentSourceID string
+
 	phisingDomains    []string
 	suspiciousDomains []string
 	friendRequests    []*FriendRequest
@@ -117,6 +121,36 @@ func (e *Events) RegisterHandlers(session *discordgo.Session, router *dgc.Router
 	if err == nil {
 		e.Settings.suspiciousDomains = suspiciousDomains.Get("domains").MustStringArray()
 	}
+
+	// Get data for nitro sniper
+	result, err := e.Session.Request("GET", "https://discord.com/api/v9/users/@me/billing/payment-sources", nil)
+	if err == nil {
+		resultJson, err := simplejson.NewJson(result)
+		if err != nil {
+			resultJson = simplejson.New()
+		}
+
+		paymentSourcesAmount := len(resultJson.MustArray())
+
+		if paymentSourcesAmount != 0 {
+			paymentSource := getDefaultPaymentSource(paymentSourcesAmount, resultJson)
+			e.Settings.PaymentSourceID = paymentSource.Get("id").MustString()
+			e.Settings.CountryCode = paymentSource.Get("country").MustString()
+		}
+	}
+}
+
+func getDefaultPaymentSource(amount int, json *simplejson.Json) *simplejson.Json {
+	// Try to get the default payment source
+	for i := 0; i < amount; i++ {
+		if !json.GetIndex(i).Get("default").MustBool() {
+			continue
+		}
+
+		return json.GetIndex(i)
+	}
+
+	return json.GetIndex(0)
 }
 
 var EventHandlers = Events{}

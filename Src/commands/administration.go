@@ -1,7 +1,6 @@
 package commands
 
 import (
-	"encoding/json"
 	"fmt"
 	"net/url"
 	"sort"
@@ -959,19 +958,20 @@ func (*AdministrationCommands) webhookinfo(ctx *dgc.Ctx) {
 		_ = ctx.RespondText("Invalid webhook URL!")
 		return
 	}
+
 	if !strings.Contains(webhookUrl.Host, "discord.com") {
 		_ = ctx.RespondText("Invalid webhook URL!")
 		return
 	}
-	webhookInfo, statusCode, err := http.GetJsonStatusCodeOld(webhookUrl.String())
-	if err != nil {
+
+	httpResponse := http.Get(webhookUrl.String())
+	if httpResponse.Error != nil || httpResponse.StatusCode != 200 {
 		_ = ctx.RespondText("Invalid webhook URL!")
 		return
 	}
-	if statusCode != 200 {
-		_ = ctx.RespondText("Invalid webhook URL!")
-		return
-	}
+
+	webhookInfo := httpResponse.Json()
+
 	embed.NewEmbed().
 		AddField("Type", map[int]string{1: "Incoming", 2: "Channel Follower", 3: "Application"}[webhookInfo.Get("type").MustInt()]).
 		AddField("ID", webhookInfo.Get("id").MustString()).
@@ -990,15 +990,17 @@ func (*AdministrationCommands) webhooksend(ctx *dgc.Ctx) {
 		_ = ctx.RespondText("Invalid webhook URL!")
 		return
 	}
+
 	if !strings.Contains(webhookUrl.Host, "discord.com") {
 		_ = ctx.RespondText("Invalid webhook URL!")
 		return
 	}
-	data := struct {
-		Content string `json:"content"`
-	}{utils.Arguments["<\"message\">"]}
-	jsonData, _ := json.Marshal(data)
-	_, _ = http.PostOld(webhookUrl.String(), string(jsonData))
+
+	data := map[string]any{
+		"content": utils.Arguments["<\"message\">"],
+	}
+
+	_ = http.PostJson(webhookUrl.String(), data)
 }
 
 func (*AdministrationCommands) webhookdelete(ctx *dgc.Ctx) {

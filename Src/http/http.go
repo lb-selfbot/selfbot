@@ -28,42 +28,12 @@ func GetBytesOld(url string, headersList ...map[string]string) ([]byte, int, err
 	return resp.Body(), resp.StatusCode(), nil
 }
 
-func GetOld(url string, headersList ...map[string]string) (string, error) {
-	bytes, _, err := GetBytesOld(url, headersList...)
-	return string(bytes), err
-}
-
 func GetJsonOld(url string, headersList ...map[string]string) (*simplejson.Json, error) {
 	bytes, _, err := GetBytesOld(url, headersList...)
 	if err != nil {
 		return nil, err
 	}
 	return json.SimpleUnmarshal(string(bytes))
-}
-
-func GetJsonStatusCodeOld(url string, headersList ...map[string]string) (*simplejson.Json, int, error) {
-	bytes, statusCode, err := GetBytesOld(url, headersList...)
-	if err != nil {
-		return nil, -1, err
-	}
-	jsonData, err := json.SimpleUnmarshal(string(bytes))
-	return jsonData, statusCode, err
-}
-
-func GetHeadersStringOld(url string) (string, error) {
-	req := fasthttp.AcquireRequest()
-	resp := fasthttp.AcquireResponse()
-	defer fasthttp.ReleaseRequest(req)
-	defer fasthttp.ReleaseResponse(resp)
-
-	req.SetRequestURI(url)
-	req.Header.SetMethod("HEAD")
-	err := fasthttp.Do(req, resp)
-	if err != nil {
-		return "", err
-	}
-	return string(resp.Header.Header()), nil
-
 }
 
 func PostOld(url string, data string, headersList ...map[string]string) (string, error) {
@@ -271,6 +241,10 @@ func CustomMethodWithData(url, method string, data []byte, headersList ...map[st
 
 func Post(url string, data []byte, headersList ...map[string]string) *HttpResponse {
 	return CustomMethodWithData(url, "POST", data, headersList...)
+}
+
+func Put(url string, data []byte, headersList ...map[string]string) *HttpResponse {
+	return CustomMethodWithData(url, "PUT", data, headersList...)
 }
 
 func PostJson(url string, data map[string]any, headersList ...map[string]string) *HttpResponse {
