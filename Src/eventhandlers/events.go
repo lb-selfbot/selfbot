@@ -112,15 +112,12 @@ func (e *Events) RegisterHandlers(session *discordgo.Session, router *dgc.Router
 
 	e.Session.AddHandler(e.OnTypingStart)
 
-	phisingDomains, err := http.GetJsonOld("https://raw.githubusercontent.com/nikolaischunk/discord-phishing-links/main/domain-list.json")
-	if err == nil {
-		e.Settings.phisingDomains = phisingDomains.Get("domains").MustStringArray()
-	}
+	// Get data for anti phising
+	httpResult := http.Get("https://raw.githubusercontent.com/nikolaischunk/discord-phishing-links/main/domain-list.json")
+	e.Settings.phisingDomains = httpResult.Json().Get("domains").MustStringArray()
 
-	suspiciousDomains, err := http.GetJsonOld("https://raw.githubusercontent.com/nikolaischunk/discord-phishing-links/main/suspicious-list.json")
-	if err == nil {
-		e.Settings.suspiciousDomains = suspiciousDomains.Get("domains").MustStringArray()
-	}
+	httpResult = http.Get("https://raw.githubusercontent.com/nikolaischunk/discord-phishing-links/main/suspicious-list.json")
+	e.Settings.suspiciousDomains = httpResult.Json().Get("domains").MustStringArray()
 
 	// Get data for nitro sniper
 	result, err := e.Session.Request("GET", "https://discord.com/api/v9/users/@me/billing/payment-sources", nil)

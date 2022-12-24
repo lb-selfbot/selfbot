@@ -21,11 +21,14 @@ import (
 )
 
 func CreatePaste(text string) (string, error) {
-	paste, err := http.PostJsonOld("https://paste.lightning-bot.com/documents", text)
-	if err != nil {
-		return "", err
+	httpResult := http.Post("https://paste.lightning-bot.com/documents", []byte(text))
+	if httpResult.Error != nil {
+		return "", httpResult.Error
 	}
-	return "https://paste.lightning-bot.com/" + paste.Get("key").MustString(), nil
+
+	key := httpResult.Json().Get("key").MustString()
+
+	return fmt.Sprintf("https://paste.lightning-bot.com/%s", key), nil
 }
 
 func Ping(host string) (time.Duration, error) {
@@ -44,18 +47,29 @@ func Ping(host string) (time.Duration, error) {
 }
 
 func WikipediaSearch(query string) (string, error) {
-	search, err := http.GetJsonOld(fmt.Sprintf("https://en.wikipedia.org/w/api.php?action=query&prop=extracts&explaintext=&titles=%s&format=json", url.QueryEscape(query)))
-	if err != nil {
-		return "", err
+	searchUrl := fmt.Sprintf(
+		"https://en.wikipedia.org/w/api.php?action=query&prop=extracts&explaintext=&titles=%s&format=json",
+		url.QueryEscape(query),
+	)
+
+	httpResult := http.Get(searchUrl)
+	if httpResult.Error != nil {
+		return "No results found", httpResult.Error
 	}
-	pages := search.GetPath("query", "pages").MustMap()
-	for _, page := range pages {
-		page := page.(map[string]interface{})
-		if page["missing"] != nil {
-			return "No results found", nil
+
+	pages := httpResult.Json().Get("query").Get("pages")
+
+	for pageId := range pages.MustMap() {
+		page := pages.Get(pageId)
+
+		_, missing := page.CheckGet("missing")
+		if missing {
+			continue
 		}
-		return page["extract"].(string), nil
+
+		return page.Get("extract").MustString(), nil
 	}
+
 	return "No results found", nil
 }
 
@@ -65,11 +79,13 @@ func SetHypesquad(session *discordgo.Session, hypesquad string) (err error) {
 		return err
 	}
 
-	data := map[string]int{
-		"house_id": hypesquadInt,
-	}
-
-	_, err = session.Request("POST", "https://discord.com/api/v10/hypesquad/online", data)
+	_, err = session.Request(
+		"POST",
+		"https://discord.com/api/v10/hypesquad/online",
+		map[string]int{
+			"house_id": hypesquadInt,
+		},
+	)
 
 	return err
 }
@@ -118,22 +134,28 @@ func ExtractRedditURL(jsonData *simplejson.Json, tries int) (*RedditPost, bool) 
 	if tries > 25 {
 		return nil, false
 	}
+
 	posts := jsonData.GetPath("data", "children")
-	amount := len(posts.MustArray())
-	post := posts.GetIndex(rand.Intn(amount - 1)).Get("data")
+	postsAmount := len(posts.MustArray())
+
+	post := posts.GetIndex(rand.Intn(postsAmount - 1)).Get("data")
+
 	if regexp.MustCompile(`(\.jpg|\.png|\.gif|\.jpeg)`).MatchString(post.Get("url_overridden_by_dest").MustString()) {
 		return &RedditPost{
 			Title:    post.Get("title").MustString(),
 			ImageURL: strings.ReplaceAll(post.Get("url_overridden_by_dest").MustString(), " .gifv", ".gif"),
 		}, true
 	}
+
 	if post.Get("is_video").MustBool() || post.Get("media").MustMap() == nil {
 		return ExtractRedditURL(jsonData, tries+1)
 	}
+
 	postUrl := post.GetPath("media", "oembed", "thumbnail_url").MustString()
 	if strings.Contains(postUrl, "gfycat") {
 		return ExtractRedditURL(jsonData, tries+1)
 	}
+
 	return &RedditPost{
 		Title:    post.Get("title").MustString(),
 		ImageURL: strings.ReplaceAll(postUrl, " .gifv", ".gif"),
@@ -159,26 +181,35 @@ func GetLocalIP() string {
 func GetMacAddress() string {
 	currentIP := GetLocalIP()
 	interfaces, _ := net.Interfaces()
+
 	for _, interf := range interfaces {
 		addrs, err := interf.Addrs()
 		if err != nil {
 			continue
 		}
 		for _, addr := range addrs {
-			if strings.Contains(addr.String(), currentIP) {
-				netInterface, err := net.InterfaceByName(interf.Name)
-				if err != nil {
-					continue
-				}
-				return strings.ToUpper(netInterface.HardwareAddr.String())
+			if !strings.Contains(addr.String(), currentIP) {
+				continue
 			}
+
+			netInterface, err := net.InterfaceByName(interf.Name)
+			if err != nil {
+				continue
+			}
+			return strings.ToUpper(netInterface.HardwareAddr.String())
 		}
 	}
+
 	return "Error"
 }
 
 func TTS(text, language string) *http.HttpResponse {
-	ttsUrl := fmt.Sprintf("https://translate.google.com/translate_tts?ie=UTF-8&total=1&idx=0&textlen=32&client=tw-ob&q=%s&tl=%s", url.QueryEscape(text), url.QueryEscape(language))
+	ttsUrl := fmt.Sprintf(
+		"https://translate.google.com/translate_tts?ie=UTF-8&total=1&idx=0&textlen=32&client=tw-ob&q=%s&tl=%s",
+		url.QueryEscape(text),
+		url.QueryEscape(language),
+	)
+
 	return http.Get(ttsUrl)
 }
 
@@ -239,24 +270,29 @@ func ChangeSettings(session *discordgo.Session, settings map[string]any, setting
 }
 
 func ReportMessage(session *discordgo.Session, guildID, channelID, messageID string, reason int) error {
-	data := map[string]interface{}{
-		"channel_id": channelID,
-		"guild_id":   guildID,
-		"message_id": messageID,
-		"reason":     reason,
-	}
-
-	_, err := session.Request("POST", "https://discord.com/api/v10/report", data)
+	_, err := session.Request(
+		"POST",
+		"https://discord.com/api/v10/report",
+		map[string]any{
+			"channel_id": channelID,
+			"guild_id":   guildID,
+			"message_id": messageID,
+			"reason":     reason,
+		},
+	)
 
 	return err
 }
 
 func GoogleSearch(query string) (*simplejson.Json, error) {
-	jsonResult, err := http.GetJsonOld("https://lightning-bot.com/api/v3/selfbot-utils/googlesearch?query=" + url.QueryEscape(query))
-	if err != nil {
-		return nil, err
+	url := fmt.Sprintf("https://lightning-bot.com/api/v3/selfbot-utils/googlesearch?query=%s", url.QueryEscape(query))
+
+	httpResult := http.Get(url)
+	if httpResult.Error != nil {
+		return nil, httpResult.Error
 	}
-	return jsonResult.Get("results"), nil
+
+	return httpResult.Json().Get("results"), nil
 }
 
 type CreditCard struct {
@@ -266,29 +302,32 @@ type CreditCard struct {
 }
 
 func GenerateCreditCard(ccType string) CreditCard {
-	jsonResult, err := http.GetJsonOld("https://lightning-bot.com/api/v3/selfbot-utils/ccgen?type=" + ccType)
-	if err != nil {
+	url := fmt.Sprintf("https://lightning-bot.com/api/v3/selfbot-utils/ccgen?type=%s", ccType)
+
+	httpResult := http.Get(url)
+	if httpResult.Error != nil {
 		return CreditCard{}
 	}
+
+	json := httpResult.Json()
+
 	return CreditCard{
-		Number:     jsonResult.Get("number").MustString(),
-		CCV:        jsonResult.Get("ccv").MustString(),
-		ExpiryDate: jsonResult.Get("expiry_date").MustString(),
+		Number:     json.Get("number").MustString(),
+		CCV:        json.Get("ccv").MustString(),
+		ExpiryDate: json.Get("expiry_date").MustString(),
 	}
 }
 
 func AllowFriendRequestsFrom(session *discordgo.Session, types []string) error {
-	return ChangeSettings(
-		session,
-		map[string]interface{}{
-			"friend_source_flags": map[string]bool{
-				"all":            utils.SliceContains(types, "all"),
-				"mutual_friends": utils.SliceContains(types, "mutual_friends"),
-				"mutual_guilds":  utils.SliceContains(types, "mutual_guilds"),
-			},
+	newSettings := map[string]any{
+		"friend_source_flags": map[string]any{
+			"all":            utils.SliceContains(types, "all"),
+			"mutual_friends": utils.SliceContains(types, "mutual_friends"),
+			"mutual_guilds":  utils.SliceContains(types, "mutual_guilds"),
 		},
-		true,
-	)
+	}
+
+	return ChangeSettings(session, newSettings, true)
 }
 
 func GetStartParams() *simplejson.Json {
@@ -325,13 +364,14 @@ func GetStartParams() *simplejson.Json {
 }
 
 func Auth(username, password string) *http.HttpResponse {
-	data := map[string]any{
-		"username":    username,
-		"password":    password,
-		"client_type": "ui",
-	}
-
-	return http.PostJson("https://api.lightning-bot.com/api/v3/auth/auth", data)
+	return http.PostJson(
+		"https://api.lightning-bot.com/api/v3/auth/auth",
+		map[string]any{
+			"username":    username,
+			"password":    password,
+			"client_type": "ui",
+		},
+	)
 }
 
 func GetTokenData(session *discordgo.Session, token string) ([]byte, error) {

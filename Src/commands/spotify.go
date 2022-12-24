@@ -7,7 +7,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/LightningDev1/LB-Selfbot/config"
 	"github.com/LightningDev1/LB-Selfbot/embed"
 	"github.com/LightningDev1/LB-Selfbot/http"
 	"github.com/LightningDev1/LB-Selfbot/json"
@@ -106,37 +105,37 @@ func (s SpotifyCommands) RegisterCommands(router *dgc.Router) {
 	})
 }
 
-func (s SpotifyCommands) GetBearerToken() string {
-	cfg, err := config.GetConfig()
-	if err != nil {
-		return ""
-	}
+// func (s SpotifyCommands) GetBearerToken() string {
+// 	cfg, err := config.GetConfig()
+// 	if err != nil {
+// 		return ""
+// 	}
 
-	discordHeaders := http.GetDiscordHeadersDEPRECATED(cfg.Account.Discord.Token)
-	connections, err := http.GetJsonOld("https://discord.com/api/v10/users/@me/connections", discordHeaders)
-	if err != nil {
-		return ""
-	}
-	for _, connectionInterface := range connections.MustArray() {
-		connection := connectionInterface.(map[string]interface{})
-		if connType := connection["type"]; connType != nil && connType.(string) == "spotify" {
-			bearerToken := fmt.Sprintf("Bearer %s", connection["access_token"].(string))
-			res, err := http.GetJsonOld("https://api.spotify.com/v1/search?q=Despacito&type=track", map[string]string{"Authorization": bearerToken})
-			if err != nil {
-				return ""
-			}
-			if _, success := res.GetPath("tracks", "items").GetIndex(0).Get("external_urls").CheckGet("spotify"); success {
-				return bearerToken
-			}
-			res, err = http.GetJsonOld(fmt.Sprintf("https://discord.com/api/v10/users/@me/connections/spotify/%s/access-token", connection["name"].(string)), discordHeaders)
-			if err != nil {
-				return ""
-			}
-			return "Bearer " + res.Get("access_token").MustString()
-		}
-	}
-	return ""
-}
+// 	discordHeaders := http.GetDiscordHeadersDEPRECATED(cfg.Account.Discord.Token)
+// 	connections, err := http.GetJsonOld("https://discord.com/api/v10/users/@me/connections", discordHeaders)
+// 	if err != nil {
+// 		return ""
+// 	}
+// 	for _, connectionInterface := range connections.MustArray() {
+// 		connection := connectionInterface.(map[string]interface{})
+// 		if connType := connection["type"]; connType != nil && connType.(string) == "spotify" {
+// 			bearerToken := fmt.Sprintf("Bearer %s", connection["access_token"].(string))
+// 			res, err := http.GetJsonOld("https://api.spotify.com/v1/search?q=Despacito&type=track", map[string]string{"Authorization": bearerToken})
+// 			if err != nil {
+// 				return ""
+// 			}
+// 			if _, success := res.GetPath("tracks", "items").GetIndex(0).Get("external_urls").CheckGet("spotify"); success {
+// 				return bearerToken
+// 			}
+// 			res, err = http.GetJsonOld(fmt.Sprintf("https://discord.com/api/v10/users/@me/connections/spotify/%s/access-token", connection["name"].(string)), discordHeaders)
+// 			if err != nil {
+// 				return ""
+// 			}
+// 			return "Bearer " + res.Get("access_token").MustString()
+// 		}
+// 	}
+// 	return ""
+// }
 
 func (s SpotifyCommands) checkRequest(ctx *dgc.Ctx, httpResponse *http.HttpResponse) bool {
 	if httpResponse.Error != nil {
@@ -170,7 +169,7 @@ func (s SpotifyCommands) HandleRequest(ctx *dgc.Ctx, httpResponse *http.HttpResp
 }
 
 func (s SpotifyCommands) spause(ctx *dgc.Ctx) {
-	bearerToken := s.GetBearerToken()
+	bearerToken := utils.Spotify.GetBearerToken(ctx.Session)
 
 	if bearerToken == "" {
 		_ = ctx.RespondText("Could not find a Spotify connection. Please connect your Spotify account to your Discord.")
@@ -183,7 +182,7 @@ func (s SpotifyCommands) spause(ctx *dgc.Ctx) {
 }
 
 func (s SpotifyCommands) sresume(ctx *dgc.Ctx) {
-	bearerToken := s.GetBearerToken()
+	bearerToken := utils.Spotify.GetBearerToken(ctx.Session)
 
 	if bearerToken == "" {
 		_ = ctx.RespondText("Could not find a Spotify connection. Please connect your Spotify account to your Discord.")
@@ -196,7 +195,7 @@ func (s SpotifyCommands) sresume(ctx *dgc.Ctx) {
 }
 
 func (s SpotifyCommands) sprevious(ctx *dgc.Ctx) {
-	bearerToken := s.GetBearerToken()
+	bearerToken := utils.Spotify.GetBearerToken(ctx.Session)
 
 	if bearerToken == "" {
 		_ = ctx.RespondText("Could not find a Spotify connection. Please connect your Spotify account to your Discord.")
@@ -209,7 +208,7 @@ func (s SpotifyCommands) sprevious(ctx *dgc.Ctx) {
 }
 
 func (s SpotifyCommands) snext(ctx *dgc.Ctx) {
-	bearerToken := s.GetBearerToken()
+	bearerToken := utils.Spotify.GetBearerToken(ctx.Session)
 
 	if bearerToken == "" {
 		_ = ctx.RespondText("Could not find a Spotify connection. Please connect your Spotify account to your Discord.")
@@ -224,7 +223,7 @@ func (s SpotifyCommands) snext(ctx *dgc.Ctx) {
 func (s SpotifyCommands) splay(ctx *dgc.Ctx) {
 	songName := ctx.Arguments.Raw()
 
-	bearerToken := s.GetBearerToken()
+	bearerToken := utils.Spotify.GetBearerToken(ctx.Session)
 
 	if bearerToken == "" {
 		_ = ctx.RespondText("Could not find a Spotify connection. Please connect your Spotify account to your Discord.")
@@ -271,7 +270,7 @@ func (s SpotifyCommands) splay(ctx *dgc.Ctx) {
 func (s SpotifyCommands) squeue(ctx *dgc.Ctx) {
 	songName := ctx.Arguments.Raw()
 
-	bearerToken := s.GetBearerToken()
+	bearerToken := utils.Spotify.GetBearerToken(ctx.Session)
 
 	if bearerToken == "" {
 		_ = ctx.RespondText("Could not find a Spotify connection. Please connect your Spotify account to your Discord.")
@@ -316,7 +315,7 @@ func (s SpotifyCommands) squeue(ctx *dgc.Ctx) {
 }
 
 func (s SpotifyCommands) splaying(ctx *dgc.Ctx) {
-	bearerToken := s.GetBearerToken()
+	bearerToken := utils.Spotify.GetBearerToken(ctx.Session)
 
 	if bearerToken == "" {
 		_ = ctx.RespondText("Could not find a Spotify connection. Please connect your Spotify account to your Discord.")
@@ -354,7 +353,7 @@ func (s SpotifyCommands) splaying(ctx *dgc.Ctx) {
 }
 
 func (s SpotifyCommands) svolume(ctx *dgc.Ctx) {
-	bearerToken := s.GetBearerToken()
+	bearerToken := utils.Spotify.GetBearerToken(ctx.Session)
 
 	if bearerToken == "" {
 		_ = ctx.RespondText("Could not find a Spotify connection. Please connect your Spotify account to your Discord.")
@@ -440,7 +439,7 @@ func (s SpotifyCommands) spresence(ctx *dgc.Ctx) {
 }
 
 func (s SpotifyCommands) simageid(ctx *dgc.Ctx) {
-	bearerToken := s.GetBearerToken()
+	bearerToken := utils.Spotify.GetBearerToken(ctx.Session)
 
 	if bearerToken == "" {
 		_ = ctx.RespondText("Could not find a Spotify connection. Please connect your Spotify account to your Discord.")
@@ -470,7 +469,7 @@ func (s SpotifyCommands) simageid(ctx *dgc.Ctx) {
 }
 
 func (s SpotifyCommands) sshuffle(ctx *dgc.Ctx) {
-	bearerToken := s.GetBearerToken()
+	bearerToken := utils.Spotify.GetBearerToken(ctx.Session)
 
 	if bearerToken == "" {
 		_ = ctx.RespondText("Could not find a Spotify connection. Please connect your Spotify account to your Discord.")
@@ -496,7 +495,7 @@ func (s SpotifyCommands) sshuffle(ctx *dgc.Ctx) {
 }
 
 func (s SpotifyCommands) srepeat(ctx *dgc.Ctx) {
-	bearerToken := s.GetBearerToken()
+	bearerToken := utils.Spotify.GetBearerToken(ctx.Session)
 
 	if bearerToken == "" {
 		_ = ctx.RespondText("Could not find a Spotify connection. Please connect your Spotify account to your Discord.")
@@ -519,7 +518,7 @@ func (s SpotifyCommands) srepeat(ctx *dgc.Ctx) {
 }
 
 func (s SpotifyCommands) sseek(ctx *dgc.Ctx) {
-	bearerToken := s.GetBearerToken()
+	bearerToken := utils.Spotify.GetBearerToken(ctx.Session)
 
 	if bearerToken == "" {
 		_ = ctx.RespondText("Could not find a Spotify connection. Please connect your Spotify account to your Discord.")
@@ -542,7 +541,7 @@ func (s SpotifyCommands) sseek(ctx *dgc.Ctx) {
 }
 
 func (s SpotifyCommands) sbearertoken(ctx *dgc.Ctx) {
-	bearerToken := s.GetBearerToken()
+	bearerToken := utils.Spotify.GetBearerToken(ctx.Session)
 
 	if bearerToken == "" {
 		_ = ctx.RespondText("Could not find a Spotify connection. Please connect your Spotify account to your Discord.")

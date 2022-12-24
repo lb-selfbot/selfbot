@@ -14,11 +14,12 @@ import (
 type MiscUtils struct{}
 
 func (MiscUtils) GetImageUrlFromJson(url string, jsonQuery string) (string, error) {
-	json, err := http.GetJsonOld(url)
-	if err != nil {
-		return "", err
+	httpResult := http.Get(url)
+	if httpResult.Error != nil {
+		return "", httpResult.Error
 	}
-	return json.Get(jsonQuery).MustString(), nil
+
+	return httpResult.Json().Get(jsonQuery).MustString(), nil
 }
 
 func (MiscUtils) IsPortOpen(hostname string, port int) bool {
