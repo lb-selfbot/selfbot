@@ -1009,11 +1009,14 @@ func (*AdministrationCommands) webhookdelete(ctx *dgc.Ctx) {
 		_ = ctx.RespondText("Invalid webhook URL!")
 		return
 	}
+
 	if !strings.Contains(webhookUrl.Host, "discord.com") {
 		_ = ctx.RespondText("Invalid webhook URL!")
 		return
 	}
-	_, _ = http.DeleteOld(webhookUrl.String())
+
+	_ = http.CustomMethodWithData(webhookUrl.String(), "DELETE", nil)
+
 	embed.NewEmbed().
 		SetDescription("Successfully deleted webhook.").
 		Send(ctx)

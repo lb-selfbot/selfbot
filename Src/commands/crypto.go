@@ -76,14 +76,20 @@ func (CryptoCommands) generateFunc(element []string) func(ctx *dgc.Ctx) {
 	// If you put the function in the RegisterCommands function, the element
 	// variable will always be the last element in the command array.
 	return func(ctx *dgc.Ctx) {
-		json, err := http.GetJsonOld("https://min-api.cryptocompare.com/data/price?fsym=" + element[1] + "&tsyms=USD,EUR")
-		if err != nil {
+		url := fmt.Sprintf("https://min-api.cryptocompare.com/data/price?fsym=%s&tsyms=USD,EUR", element[1])
+
+		httpResponse := http.Get(url)
+		if httpResponse.Error != nil {
 			_ = ctx.RespondText("An error has occurred.")
+			return
 		}
+
+		json := httpResponse.Json()
 		usd := json.Get("USD").MustFloat64()
 		eur := json.Get("EUR").MustFloat64()
+
 		embed.NewEmbed().
-			SetDescription(fmt.Sprintf("USD: %.3f$\nEUR: %.3f€", usd, eur)).
+			SetDescription(fmt.Sprintf("USD: %.2f$\nEUR: %.2f€", usd, eur)).
 			SetAuthor(element[2], fmt.Sprintf("https://s2.coinmarketcap.com/static/img/coins/200x200/%s.png", element[3])).
 			Send(ctx)
 	}

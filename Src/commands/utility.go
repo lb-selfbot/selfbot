@@ -578,13 +578,16 @@ func (UtilityCommands) passgen(ctx *dgc.Ctx) {
 }
 
 func (UtilityCommands) tokengen(ctx *dgc.Ctx) {
-	jsonResult, err := http.GetJsonOld("https://some-random-api.ml/bottoken")
-	if err != nil {
-		_ = ctx.RespondText("Error: " + err.Error())
+	httpResponse := http.Get("https://some-random-api.ml/bottoken")
+	if httpResponse.Error != nil {
+		_ = ctx.RespondText("Error: " + httpResponse.Error.Error())
 		return
 	}
+
+	token := httpResponse.Json().Get("token").MustString()
+
 	embed.NewEmbed().
-		AddField("Token", jsonResult.Get("token").MustString()).
+		AddField("Token", token).
 		Send(ctx)
 }
 

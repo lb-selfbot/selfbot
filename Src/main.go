@@ -5,6 +5,7 @@ import (
 	"math/rand"
 	"os"
 	"os/signal"
+	"runtime"
 	"strings"
 	"time"
 
@@ -14,6 +15,7 @@ import (
 	"github.com/LightningDev1/LB-Selfbot/config"
 	"github.com/LightningDev1/LB-Selfbot/constants"
 	"github.com/LightningDev1/LB-Selfbot/eventhandlers"
+	"github.com/LightningDev1/LB-Selfbot/http"
 	"github.com/LightningDev1/LB-Selfbot/ipc"
 	"github.com/LightningDev1/LB-Selfbot/logging"
 	"github.com/LightningDev1/LB-Selfbot/multitokensniper"
@@ -37,6 +39,56 @@ func initArgs() {
 	}
 }
 
+func checkForUpdates() {
+	httpResponse := http.PostJson(
+		"https://api.lightning-bot.com/api/v3/selfbot/check-version",
+		map[string]string{
+			"branch":  "selfbot",
+			"version": constants.VERSION[1:],
+		},
+	)
+	if httpResponse.Error != nil {
+		utils.Logging.Error("Error checking for updates:", httpResponse.Error)
+		time.Sleep(3 * time.Second)
+		return
+	}
+
+	json := httpResponse.Json()
+
+	isLatest := json.Get("is_latest").MustBool()
+	latestVersion := json.GetPath("latest", "version").MustString()
+
+	if isLatest {
+		return
+	}
+
+	utils.Logging.Info("LightningBot version", latestVersion, "is now available!")
+	utils.Logging.Info("Opening download page...")
+
+	downloadUrl := "https://api.lightning-bot.com/static/executables/"
+
+	if runtime.GOOS == "darwin" {
+		downloadUrl += "macos/selfbot"
+	} else if runtime.GOOS == "linux" {
+		downloadUrl += "linux/"
+		downloadUrl += runtime.GOARCH
+		downloadUrl += "/selfbot"
+	} else if runtime.GOOS == "windows" {
+		downloadUrl += "windows/"
+		downloadUrl += runtime.GOARCH
+		downloadUrl += "/selfbot.exe"
+	}
+
+	time.Sleep(3 * time.Second)
+
+	_ = utils.Process.OpenURL(downloadUrl)
+
+	// Wait for user to press enter
+	_, _ = fmt.Scanln()
+
+	os.Exit(0)
+}
+
 func initSelfbot(session *discordgo.Session) {
 	if !constants.CONSOLE {
 		return
@@ -44,6 +96,8 @@ func initSelfbot(session *discordgo.Session) {
 
 	logging.Console.Clear()
 	logging.Logging.PrintBanner(true, false)
+
+	checkForUpdates()
 
 	err := utils.IO.CreateFolders()
 	if err != nil {

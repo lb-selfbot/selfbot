@@ -7,7 +7,6 @@ import (
 
 	"github.com/LightningDev1/LB-Selfbot/embed"
 	"github.com/LightningDev1/LB-Selfbot/http"
-	"github.com/LightningDev1/LB-Selfbot/json"
 	"github.com/LightningDev1/LB-Selfbot/utils"
 	"github.com/LightningDev1/dgc"
 )
@@ -98,21 +97,21 @@ func (g GameCommands) RegisterCommands(router *dgc.Router) {
 
 func (GameCommands) mcuuid(ctx *dgc.Ctx) {
 	username := utils.Arguments["<username>"]
-	res, err := http.PostJsonOld(
+
+	httpResponse := http.PostJson(
 		"https://api.mojang.com/profiles/minecraft",
-		fmt.Sprintf(`["%s"]`, json.Escape(username)),
+		[]string{username},
 	)
-	if err != nil {
+	if httpResponse.Error != nil {
 		_ = ctx.RespondText("An error has occurred.")
 		return
 	}
-	uuid := res.GetIndex(0).Get("id").MustString()
-	if uuid == "" {
-		uuid = "Not found"
-	}
+
+	uuid := httpResponse.Json().GetIndex(0).Get("id").MustString()
+
 	embed.NewEmbed().
 		AddField("Username", username).
-		AddField("UUID", uuid).
+		AddField("UUID", utils.Misc.Or(uuid, "Not Found")).
 		Send(ctx)
 }
 

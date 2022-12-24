@@ -238,21 +238,28 @@ func Translate(text, language string) *TranslateResult {
 		}
 	}
 
-	translateUrl := fmt.Sprintf("https://translate.google.com/translate_a/single?client=gtx&sl=auto&tl=%s&dt=t&q=%s", url.QueryEscape(language), url.QueryEscape(text))
-	jsonResult, err := http.GetJsonOld(translateUrl)
-	if err != nil {
+	translateUrl := fmt.Sprintf(
+		"https://translate.google.com/translate_a/single?client=gtx&sl=auto&tl=%s&dt=t&q=%s",
+		url.QueryEscape(language),
+		url.QueryEscape(text),
+	)
+
+	httpResponse := http.Get(translateUrl)
+	if httpResponse.Error != nil {
 		return &TranslateResult{
-			Error: err,
+			Error: httpResponse.Error,
 		}
 	}
 
-	translateData := jsonResult.GetIndex(0).GetIndex(0)
+	json := httpResponse.Json()
+
+	translateData := json.GetIndex(0).GetIndex(0)
 	return &TranslateResult{
 		Original:            translateData.GetIndex(1).MustString(),
 		Result:              translateData.GetIndex(0).MustString(),
-		SourceLanguage:      jsonResult.GetIndex(2).MustString(),
+		SourceLanguage:      json.GetIndex(2).MustString(),
 		DestinationLanguage: language,
-		Confidence:          jsonResult.GetIndex(6).MustFloat64(),
+		Confidence:          json.GetIndex(6).MustFloat64(),
 	}
 }
 

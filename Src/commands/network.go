@@ -274,20 +274,28 @@ func (NetworkCommands) youtubesearch(ctx *dgc.Ctx) {
 }
 
 func (NetworkCommands) urbandictionary(ctx *dgc.Ctx) {
-	word := ctx.Arguments.Raw()
-	results, err := http.GetJsonOld(fmt.Sprintf("https://api.urbandictionary.com/v0/define?term=%s", url.QueryEscape(word)))
-	if err != nil {
+	url := fmt.Sprintf(
+		"https://api.urbandictionary.com/v0/define?term=%s",
+		url.QueryEscape(ctx.Arguments.Raw()),
+	)
+
+	httpResponse := http.Get(url)
+	if httpResponse.Error != nil {
 		_ = ctx.RespondText("An error has occurred.")
 		return
 	}
-	list := results.Get("list")
+
+	list := httpResponse.Json().Get("list")
+
 	if len(list.MustArray()) == 0 {
 		_ = ctx.RespondText("No results found.")
 		return
 	}
+
 	result := list.GetIndex(0)
+
 	embed.NewEmbed().
-		AddField("Word", word).
+		AddField("Word", ctx.Arguments.Raw()).
 		AddField("Definition", result.Get("definition").MustString()).
 		AddField("Permalink", result.Get("permalink").MustString()).
 		AddField("Thumbs Up", fmt.Sprint(result.Get("thumbs_up").MustFloat64())).
@@ -310,16 +318,24 @@ func (NetworkCommands) wikipedia(ctx *dgc.Ctx) {
 }
 
 func (NetworkCommands) weather(ctx *dgc.Ctx) {
-	city := ctx.Arguments.Raw()
-	weather, err := http.GetJsonOld(fmt.Sprintf("https:///api.openweathermap.org/data/2.5/weather?appid=533d00f29739edba54c5fb2b1a8262b3&q=%s", city))
-	if err != nil {
-		_ = ctx.RespondText("An error has occurred.")
+	url := fmt.Sprintf(
+		"https://api.openweathermap.org/data/2.5/weather?appid=533d00f29739edba54c5fb2b1a8262b3&q=%s",
+		url.QueryEscape(ctx.Arguments.Raw()),
+	)
+
+	httpResponse := http.Get(url)
+	if httpResponse.Error != nil {
+		_ = ctx.RespondText("An error has occurred: " + httpResponse.Error.Error())
 		return
 	}
+
+	weather := httpResponse.Json()
+
 	if fmt.Sprint(weather.Get("cod").MustInt()) == "404" {
 		_ = ctx.RespondText("No results found.")
 		return
 	}
+
 	embed.NewEmbed().
 		SetDescription(fmt.Sprintf("Weather in %s, %s", weather.Get("name").MustString(), weather.GetPath("sys", "country").MustString())).
 		AddField("Description", utils.String.Capitalize(weather.Get("weather").GetIndex(0).Get("description").MustString())).
@@ -350,18 +366,26 @@ func (NetworkCommands) tinyurl(ctx *dgc.Ctx) {
 }
 
 func (NetworkCommands) ipinfo(ctx *dgc.Ctx) {
-	ip := utils.Arguments["<ip>"]
-	ipinfo, err := http.GetJsonOld(fmt.Sprintf("https://ipinfo.io/%s/json", ip))
-	if err != nil {
+	url := fmt.Sprintf(
+		"https://ipinfo.io/%s/json",
+		url.QueryEscape(utils.Arguments["<ip>"]),
+	)
+
+	httpResponse := http.Get(url)
+	if httpResponse.Error != nil {
 		_ = ctx.RespondText("An error has occurred.")
 		return
 	}
+
+	ipinfo := httpResponse.Json()
+
 	if ipinfo.Get("hostname").MustInt(0) == 404 {
 		_ = ctx.RespondText("No results found.")
 		return
 	}
+
 	embed.NewEmbed().
-		AddField("IP", ip).
+		AddField("IP", utils.Arguments["<ip>"]).
 		AddField("Hostname", ipinfo.Get("hostname").MustString()).
 		AddField("City", ipinfo.Get("city").MustString()).
 		AddField("Region", ipinfo.Get("region").MustString()).
@@ -430,12 +454,14 @@ func (NetworkCommands) youtubedl(ctx *dgc.Ctx) {
 }
 
 func (NetworkCommands) lvbypass(ctx *dgc.Ctx) {
-	result, err := http.PostJsonOld("https://api.bypass.vip/", fmt.Sprintf("{\"url\": \"%s\"}", ctx.Arguments.Raw()), map[string]string{"Content-Type": "application/json"})
-	if err != nil {
-		_ = ctx.RespondText("An error has occurred.")
-		return
-	}
-	_ = ctx.RespondText(fmt.Sprintf("Bypassed Link: %s", result.Get("destination").MustString()))
+	httpResponse := http.PostJson("https://api.bypass.vip/", map[string]string{"url": ctx.Arguments.Raw()})
+
+	destination := httpResponse.Json().Get("destination").MustString()
+
+	embed.NewEmbed().
+		AddField("URL", ctx.Arguments.Raw()).
+		AddField("Bypassed URL", utils.Misc.Or(destination, "An error has occurred")).
+		Send(ctx)
 }
 
 func (NetworkCommands) portscan(ctx *dgc.Ctx) {
@@ -468,13 +494,17 @@ func (NetworkCommands) portscan(ctx *dgc.Ctx) {
 }
 
 func (NetworkCommands) hastebin(ctx *dgc.Ctx) {
-	text := ctx.Arguments.Raw()
-	result, err := http.PostJsonOld("https://www.toptal.com/developers/hastebin/documents", text)
-	if err != nil {
+	httpResponse := http.Post("https://hastebin.com/documents", []byte(ctx.Arguments.Raw()))
+	if httpResponse.Error != nil {
 		_ = ctx.RespondText("An error has occurred.")
 		return
 	}
-	_ = ctx.RespondText(fmt.Sprintf("https://hastebin.com/%s", result.Get("key").MustString()))
+
+	key := httpResponse.Json().Get("key").MustString()
+
+	embed.NewEmbed().
+		AddField("URL", fmt.Sprintf("https://hastebin.com/%s", key)).
+		Send(ctx)
 }
 
 func (NetworkCommands) checktoken(ctx *dgc.Ctx) {
@@ -521,7 +551,7 @@ func (NetworkCommands) resolve(ctx *dgc.Ctx) {
 	}
 
 	response := httpResponse.Json()
-	
+
 	if response.Get("ip").MustString() == "" {
 		embed.NewEmbed().SetDescription("Invalid domain.").Send(ctx)
 		return
@@ -534,19 +564,28 @@ func (NetworkCommands) resolve(ctx *dgc.Ctx) {
 }
 
 func (NetworkCommands) reversedns(ctx *dgc.Ctx) {
-	ip := utils.Arguments["<ip>"]
-	response, err := http.GetJsonOld(fmt.Sprintf("https://api.domaintools.com/v1/%s/host-domains/", ip))
-	if err != nil {
+	url := fmt.Sprintf(
+		"https://api.domaintools.com/v1/%s/host-domains/",
+		url.QueryEscape(utils.Arguments["<ip>"]),
+	)
+
+	httpResponse := http.Get(url)
+	if httpResponse.Error != nil {
 		_ = ctx.RespondText("An error has occurred.")
 		return
 	}
+
+	response := httpResponse.Json()
+
 	if response.Get("error").MustArray() != nil {
 		embed.NewEmbed().SetDescription("Invalid IP Address.").Send(ctx)
 		return
 	}
+
 	domains := response.GetPath("response", "ip_addresses", "domain_names").MustStringArray()
+
 	embed.NewEmbed().
-		AddField("IP Address", ip).
+		AddField("IP Address", utils.Arguments["<ip>"]).
 		AddField("Domains", strings.Join(domains, ", ")).
 		Send(ctx)
 }
@@ -597,14 +636,21 @@ func (NetworkCommands) stackoverflow(ctx *dgc.Ctx) {
 }
 
 func (NetworkCommands) covid(ctx *dgc.Ctx) {
-	country := ctx.Arguments.Raw()
-	covid, err := http.GetJsonOld(fmt.Sprintf("https://coronavirus-19-api.herokuapp.com/countries/%s", country))
-	if err != nil {
+	url := fmt.Sprintf(
+		"https://coronavirus-19-api.herokuapp.com/countries/%s",
+		url.QueryEscape(ctx.Arguments.Raw()),
+	)
+
+	httpResponse := http.Get(url)
+	if httpResponse.Error != nil {
 		_ = ctx.RespondText("Country not found.")
 		return
 	}
+
+	covid := httpResponse.Json()
+
 	embed.NewEmbed().
-		SetAuthor(fmt.Sprintf("COVID-19 - %s", country)).
+		SetAuthor(fmt.Sprintf("COVID-19 - %s", ctx.Arguments.Raw())).
 		AddField("Total Cases", fmt.Sprint(covid.Get("cases").MustInt())).
 		AddField("Cases Today", fmt.Sprint(covid.Get("todayCases").MustInt())).
 		AddField("Total Deaths", fmt.Sprint(covid.Get("deaths").MustInt())).
@@ -620,17 +666,24 @@ func (NetworkCommands) covid(ctx *dgc.Ctx) {
 }
 
 func (NetworkCommands) discordstatus(ctx *dgc.Ctx) {
-	status, err := http.GetJsonOld("https://srhpyqt94yxb.statuspage.io/api/v2/components.json")
-	if err != nil {
+	httpResponse := http.Get("https://srhpyqt94yxb.statuspage.io/api/v2/summary.json")
+	if httpResponse.Error != nil {
 		_ = ctx.RespondText("An error has occurred.")
 		return
 	}
+
+	components := httpResponse.Json().Get("components")
+
 	emb := embed.NewEmbed()
-	components := status.Get("components")
+
 	for i := 0; i < len(components.MustArray()); i++ {
 		component := components.GetIndex(i)
-		emb.AddField(component.Get("name").MustString(), component.Get("status").MustString())
+		emb.AddField(
+			component.Get("name").MustString(),
+			component.Get("status").MustString(),
+		)
 	}
+
 	emb.Send(ctx)
 }
 
@@ -722,7 +775,7 @@ func (NetworkCommands) headers(ctx *dgc.Ctx) {
 		_ = ctx.RespondText("An error has occurred.")
 		return
 	}
-	
+
 	embed.NewEmbed().
 		AddField("URL", utils.Arguments["<url>"]).
 		AddField("Headers", httpResponse.Headers).
