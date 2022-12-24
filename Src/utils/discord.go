@@ -10,7 +10,6 @@ import (
 	"time"
 
 	"github.com/LightningDev1/LB-Selfbot/constants"
-	"github.com/LightningDev1/LB-Selfbot/error_handling"
 	"github.com/LightningDev1/LB-Selfbot/http"
 	"github.com/LightningDev1/dgc"
 	"github.com/LightningDev1/discordgo"
@@ -112,7 +111,7 @@ func (DiscordUtils) ParseInvite(invite string) string {
 
 func (DiscordUtils) CheckIfInServer(ctx *dgc.Ctx) bool {
 	if ctx.Event.GuildID == "" {
-		error_handling.OnError(ctx, error_handling.ServerOnlyCommand, ctx.Command.Name)
+		_ = ctx.RespondText(fmt.Sprintf("Error: The `%s` command is only available in a server.", ctx.Command.Name))
 	}
 	return ctx.Event.GuildID != ""
 }
@@ -135,7 +134,7 @@ func (DiscordUtils) GetArguments(ctx *dgc.Ctx) (map[string]string, bool) {
 		}
 
 		if arguments[arg] == "" && isRequired {
-			error_handling.OnError(ctx, error_handling.MissingRequiredArgument, arg)
+			_ = ctx.RespondText("Missing required argument: " + arg)
 			return map[string]string{}, false
 		}
 	}

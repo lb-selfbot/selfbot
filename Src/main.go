@@ -25,6 +25,8 @@ import (
 	"github.com/LightningDev1/LB-Selfbot/websocket"
 	"github.com/LightningDev1/dgc"
 	"github.com/LightningDev1/discordgo"
+
+	_websocket "nhooyr.io/websocket"
 )
 
 func initArgs() {
@@ -48,7 +50,7 @@ func checkForUpdates() {
 		},
 	)
 	if httpResponse.Error != nil {
-		utils.Logging.Error("Error checking for updates:", httpResponse.Error)
+		logging.UI.Error("Error checking for updates: " + httpResponse.Error.Error())
 		time.Sleep(3 * time.Second)
 		return
 	}
@@ -101,7 +103,7 @@ func initSelfbot(session *discordgo.Session) {
 
 	err := utils.IO.CreateFolders()
 	if err != nil {
-		utils.Logging.Error("Error creating folders: ", err)
+		logging.UI.Error("Error creating folders: " + err.Error())
 	}
 
 	isFirstLaunch := utils.IO.IsFirstLaunch()
@@ -127,8 +129,29 @@ func initSelfbot(session *discordgo.Session) {
 
 	err = cfg.Save()
 	if err != nil {
-		utils.Logging.Error("Error saving config:", err)
+		logging.UI.Error("Error saving config: " + err.Error())
 		os.Exit(1)
+	}
+}
+
+func onWebsocketError(err error) {
+	closeCode := _websocket.CloseStatus(err)
+
+	switch closeCode {
+	case 3004, 3010:
+		logging.UI.Error("Your LightningBot credentials are invalid! Please re-enter them in the Config tab.")
+		os.Exit(0)
+	case 3011:
+		logging.UI.Error("Your free trial has expired! Please purchase a license key to continue using LightningBot.")
+		os.Exit(0)
+	case 3003:
+		logging.UI.Error("WS Error 3003: " + err.Error())
+		os.Exit(0)
+	case 3006:
+		logging.UI.Error("Another selfbot has connected using your LightningBot account! This instance will now exit.")
+		os.Exit(0)
+	default:
+		logging.UI.Error("An unexpected error has occurred while connecting to the websocket: " + err.Error())
 	}
 }
 
@@ -147,22 +170,18 @@ func main() {
 
 	cfg, err := config.GetConfig()
 	if err != nil {
-		utils.Logging.Error(err)
-		if !constants.DEBUG {
-			os.Exit(0)
-		}
+		logging.UI.Error("Error loading config: " + err.Error())
+		os.Exit(0)
 	}
 
 	if !constants.CONSOLE {
 		ipc.IPC.Init()
 	}
 
-	err = websocket.Init(cfg.Account.LightningBot.Username, cfg.Account.LightningBot.Password)
+	err = websocket.Init(cfg.Account.LightningBot.Username, cfg.Account.LightningBot.Password, onWebsocketError)
 	if err != nil {
-		utils.Logging.Error(err)
-		if !constants.DEBUG {
-			os.Exit(0)
-		}
+		logging.UI.Error("Error connecting to websocket: " + err.Error())
+		os.Exit(0)
 	}
 
 	session.Token = cfg.Account.Discord.Token
@@ -227,14 +246,12 @@ func main() {
 	err = session.Open()
 	if err != nil {
 		if strings.Contains(err.Error(), "Authentication failed") {
-			utils.Logging.Error("Invalid token!")
+			logging.UI.Error("Your Discord token is invalid! Please enter a valid token in the Config tab.")
 		} else {
-			utils.Logging.Error(err)
+			logging.UI.Error("An unknown error has occured while connecting to Discord: " + err.Error())
 		}
 
-		if !constants.DEBUG {
-			os.Exit(0)
-		}
+		os.Exit(0)
 	}
 
 	multitokensniper.Init(cfg)

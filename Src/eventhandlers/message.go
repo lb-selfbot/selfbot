@@ -400,17 +400,18 @@ func (e *Events) checkNotifiersDelete(message *discordgo.Message, cfg *config.Co
 	}
 }
 
-func (e *Events) ensureUserEntry(userID string) SBDScore {
+func (e *Events) ensureUserEntry(userID string) *SBDScore {
 	if _, ok := e.Settings.SelfbotDetectionScore[userID]; !ok {
 		e.Settings.SelfbotDetectionScore[userID] = SBDScore{UserID: userID, Score: 0}
 	}
-	return e.Settings.SelfbotDetectionScore[userID]
+	a := e.Settings.SelfbotDetectionScore[userID]
+	return &a
 }
 
-func (e *Events) logSelfbotDetection(score SBDScore, message *discordgo.Message) {
+func (e *Events) logSelfbotDetection(score *SBDScore, message *discordgo.Message) {
 	if score.Score >= 15 && !score.Logged {
-		logging.Logging.SelfbotDetection(e.Session, message, "")
-		utils.Logging.Info("Selfbot detection triggered for user " + message.Author.String())
+		selfbot := utils.Misc.Or(score.Selfbot, "Unknown")
+		logging.Logging.SelfbotDetection(e.Session, message, selfbot)
 		score.Logged = true
 	}
 }
@@ -418,6 +419,11 @@ func (e *Events) logSelfbotDetection(score SBDScore, message *discordgo.Message)
 var sbDetectables = []SBDetectable{
 	{
 		String:  "[lightningbot]",
+		Selfbot: "LightningBot",
+		Score:   1,
+	},
+	{
+		String:  "[lightningbot free]",
 		Selfbot: "LightningBot",
 		Score:   1,
 	},
@@ -434,7 +440,7 @@ var sbDetectables = []SBDetectable{
 	{
 		String:  "nighty.one",
 		Selfbot: "Nighty",
-		Score:   2,
+		Score:   1,
 	},
 	{
 		String:  "<> is required",
@@ -457,18 +463,22 @@ func (e *Events) checkSelfbotDetection(message *discordgo.Message, cfg *config.C
 	if !cfg.Events.SelfbotDetection || message.Author.Bot { // check for state user
 		return
 	}
+
 	score := e.ensureUserEntry(message.Author.ID)
 	for _, detectable := range sbDetectables {
-		if strings.Contains(strings.ToLower(message.Content), detectable.String) {
-			score.Score += detectable.Score
-			score.Events = append(score.Events, SBDEvent{
-				Event:   "detectable",
-				Message: message,
-			})
-			score.Selfbot = utils.Misc.Or(detectable.Selfbot, score.Selfbot)
-			e.logSelfbotDetection(score, message)
+		if !strings.Contains(strings.ToLower(message.Content), detectable.String) {
+			continue
 		}
+
+		score.Score += detectable.Score
+		score.Events = append(score.Events, SBDEvent{
+			Event:   "detectable",
+			Message: message,
+		})
+		score.Selfbot = utils.Misc.Or(detectable.Selfbot, score.Selfbot)
+		e.logSelfbotDetection(score, message)
 	}
+	e.Settings.SelfbotDetectionScore[message.Author.ID] = *score
 }
 
 func (e *Events) checkSelfbotDetectionEdit(message *discordgo.Message, cfg *config.Config) {
@@ -489,5 +499,5 @@ func (e *Events) checkSelfbotDetectionDelete(message *discordgo.Message, cfg *co
 		score.Score += 0.5
 		e.logSelfbotDetection(score, message)
 	}
-	e.Settings.SelfbotDetectionScore[message.Author.ID] = score
+	e.Settings.SelfbotDetectionScore[message.Author.ID] = *score
 }

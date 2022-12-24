@@ -12,7 +12,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/LightningDev1/LB-Selfbot/error_handling"
 	"github.com/LightningDev1/LB-Selfbot/eventhandlers"
 	"github.com/LightningDev1/LB-Selfbot/ipc"
 	"github.com/shirou/gopsutil/cpu"
@@ -824,7 +823,7 @@ func (UtilityCommands) hypesquad(ctx *dgc.Ctx) {
 	house = strings.ReplaceAll(house, "brilliance", "2")
 	house = strings.ReplaceAll(house, "balance", "3")
 	if house != "1" && house != "2" && house != "3" {
-		error_handling.OnError(ctx, error_handling.InvalidArgument, "<bravery/brilliance/balance>")
+		_ = ctx.RespondText("Missing required argument: <bravery/brilliance/balance>")
 		return
 	}
 	_ = api.SetHypesquad(ctx.Session, house)
@@ -837,7 +836,7 @@ func (UtilityCommands) leavehypesquad(ctx *dgc.Ctx) {
 func (UtilityCommands) theme(ctx *dgc.Ctx) {
 	theme := strings.ToLower(utils.Arguments["<light/dark>"])
 	if theme != "light" && theme != "dark" {
-		error_handling.OnError(ctx, error_handling.InvalidArgument, "<light/dark> must be either \"light\" or \"dark\"")
+		_ = ctx.RespondText("Error: <light/dark> must be either \"light\" or \"dark\"")
 		return
 	}
 	_ = api.ChangeSettings(ctx.Session, map[string]interface{}{"theme": theme}, true)
@@ -846,7 +845,7 @@ func (UtilityCommands) theme(ctx *dgc.Ctx) {
 func (UtilityCommands) compact(ctx *dgc.Ctx) {
 	toggle := strings.ToLower(utils.Arguments["<on/off>"])
 	if toggle != "on" && toggle != "off" {
-		error_handling.OnError(ctx, error_handling.InvalidArgument, "<on/off> must be either \"on\" or \"off\"")
+		_ = ctx.RespondText("Error: <on/off> must be either \"on\" or \"off\"")
 		return
 	}
 	_ = api.ChangeSettings(ctx.Session, map[string]interface{}{"message_display_compact": toggle == "on"}, true)
@@ -855,7 +854,7 @@ func (UtilityCommands) compact(ctx *dgc.Ctx) {
 func (UtilityCommands) devmode(ctx *dgc.Ctx) {
 	toggle := strings.ToLower(utils.Arguments["<on/off>"])
 	if toggle != "on" && toggle != "off" {
-		error_handling.OnError(ctx, error_handling.InvalidArgument, "<on/off> must be either \"on\" or \"off\"")
+		_ = ctx.RespondText("Error: <on/off> must be either \"on\" or \"off\"")
 		return
 	}
 	_ = api.ChangeSettings(ctx.Session, map[string]interface{}{"developer_mode": toggle == "on"}, true)

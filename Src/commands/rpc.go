@@ -8,6 +8,7 @@ import (
 
 	"github.com/LightningDev1/LB-Selfbot/config"
 	"github.com/LightningDev1/LB-Selfbot/constants"
+	"github.com/LightningDev1/LB-Selfbot/logging"
 	"github.com/LightningDev1/LB-Selfbot/utils"
 	"github.com/LightningDev1/dgc"
 )
@@ -107,7 +108,7 @@ func (r RPCCommands) RegisterCommands(router *dgc.Router) {
 			time.Sleep(time.Second * 5)
 			cfg, err := config.GetConfig()
 			if err != nil {
-				utils.Logging.Error(err)
+				logging.UI.Error("Error getting config: " + err.Error())
 				continue
 			}
 			if cfg.RPC.Enabled {

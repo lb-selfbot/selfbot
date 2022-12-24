@@ -8,7 +8,7 @@ import (
 
 	"github.com/LightningDev1/LB-Selfbot/config"
 	"github.com/LightningDev1/LB-Selfbot/constants"
-	"github.com/LightningDev1/LB-Selfbot/utils"
+	"github.com/LightningDev1/LB-Selfbot/logging"
 	"github.com/LightningDev1/dgc"
 	"github.com/LightningDev1/discordgo"
 )
@@ -437,7 +437,7 @@ func (e *Embed) Send(ctx *dgc.Ctx) []*discordgo.Message {
 	for _, text := range e.ToString(commandMode) {
 		message, err := ctx.Session.ChannelMessageSend(ctx.Event.ChannelID, text)
 		if err != nil {
-			utils.Logging.Error("Error sending message: ", err)
+			logging.UI.Error("Error sending message: " + err.Error())
 			continue
 		}
 

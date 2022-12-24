@@ -2,8 +2,6 @@ package websocket
 
 import (
 	"encoding/json"
-	"errors"
-	"fmt"
 	"net/http"
 	"os"
 	"time"
@@ -39,7 +37,7 @@ type WsMessage struct {
 	Data WsData `json:"data,omitempty"`
 }
 
-func Init(username, password string) error {
+func Init(username, password string, onError func(err error)) error {
 	InitEncryption()
 
 	options := &websocket.DialOptions{
@@ -70,7 +68,7 @@ func Init(username, password string) error {
 		for {
 			_, msg, err := Conn.Read(Context)
 			if err != nil {
-				OnError(err)
+				onError(err)
 				if !constants.DEBUG {
 					os.Exit(0)
 				}
@@ -143,25 +141,7 @@ func OnRead(message WsMessage) {
 }
 
 func OnError(err error) {
-	var closeError websocket.CloseError
-	if !errors.As(err, &closeError) {
-		utils.Logging.Error(err)
-		return
-	}
 
-	switch closeError.Code {
-	case 3004:
-	case 3010:
-		fmt.Println("Invalid credentials!")
-	case 3011:
-		fmt.Println("Free trial expired!")
-	case 3003:
-		fmt.Println("Decryption error!")
-	case 3006:
-		fmt.Println("Another selfbot connected!")
-	default:
-		fmt.Println("Unknown error code", closeError.Code)
-	}
 }
 
 func Send(message WsMessage) error {

@@ -32,6 +32,19 @@ func (UILogging) Notification(message string) {
 	)
 }
 
+func (UILogging) Error(errText string) {
+	utils.Logging.Error(errText)
+
+	ipc.IPC.Write(ipc.JsonEvent{
+		Op: ipc.OP_Error,
+		Data: ipc.JsonEventData{
+			Text: errText,
+		},
+	})
+
+	UI.Append(UI.Colored(fmt.Sprintf("[ERROR] %s", errText), "#ff0000"))
+}
+
 func (UILogging) Colored(text string, color string) string {
 	return fmt.Sprintf("<text Color=\"%s\">%s</text>", utils.Misc.Or(color, "#ffffff"), text)
 }

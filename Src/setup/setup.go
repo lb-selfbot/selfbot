@@ -14,7 +14,7 @@ func GetLogin() (string, string) {
 
 	httpResponse := api.Auth(username, password)
 	if httpResponse.Error != nil {
-		utils.Logging.Error("Error logging in:", httpResponse.Error)
+		utils.Logging.Error("Error connecting to API:", httpResponse.Error)
 		os.Exit(1)
 	}
 
