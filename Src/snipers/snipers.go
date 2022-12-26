@@ -3,6 +3,8 @@ package snipers
 import (
 	"encoding/json"
 	"fmt"
+	"go/token"
+	"go/types"
 	"regexp"
 	"strconv"
 	"strings"
@@ -129,7 +131,60 @@ func CheckGiveawaySniper(session *discordgo.Session, message *discordgo.Message,
 	if !cfg.Snipers.GiveawaySniper.Enabled {
 		return
 	}
+
 	switch message.Author.ID {
+	case "676039466175168543": // ZAP-Hosting Bot#7133
+		if !strings.Contains(message.Content, "It's time for a Giveaway!") {
+			break
+		}
+
+		actionsRow, ok := message.Components[0].(*discordgo.ActionsRow)
+		if !ok {
+			break
+		}
+
+		button, ok := actionsRow.Components[0].(*discordgo.Button)
+		if !ok {
+			break
+		}
+
+		session.AddHandlerOnce(func(_ *discordgo.Session, modal *discordgo.InteractionModalCreate) {
+			actionsRow, ok := modal.Components[0].(*discordgo.ActionsRow)
+			if !ok {
+				return
+			}
+			textInput, ok := actionsRow.Components[0].(*discordgo.TextInput)
+			if !ok {
+				return
+			}
+
+			equation := strings.Split(textInput.Label, "\n")[1]
+			equation = strings.ReplaceAll(equation, "=", "")
+			equation = strings.ReplaceAll(equation, " ", "")
+
+			tv, err := types.Eval(token.NewFileSet(), nil, token.NoPos, equation)
+			if err != nil {
+				return
+			}
+
+			equationSolution := tv.Value.String()
+
+			time.Sleep(5 * time.Second)
+
+			err = session.InteractionSubmitModal(message, modal, textInput.CustomID, equationSolution)
+			if err != nil {
+				return
+			}
+		})
+
+		logging.Logging.GiveawayFound(session, message, "€20 worth of ZAP Coins", "ZAP-Hosting", "1 hour", account)
+
+		go func() {
+			time.Sleep(time.Second * time.Duration(cfg.Snipers.GiveawaySniper.Sleep))
+			_ = session.InteractionClick(button, message)
+		}()
+
+		_ = session.InteractionClick(button, message)
 	case "294882584201003009": // GiveawayBot#2381
 		// Entering
 		if len(message.Embeds) > 0 {
@@ -354,5 +409,24 @@ func CheckGiveawaySniper(session *discordgo.Session, message *discordgo.Message,
 				}()
 			}
 		}
+	}
+}
+
+func CheckGiveawaySniperEdit(session *discordgo.Session, message *discordgo.Message, cfg *config.Config, account string) {
+	if !cfg.Snipers.GiveawaySniper.Enabled {
+		return
+	}
+
+	switch message.Author.ID {
+	case "676039466175168543": // ZAP-Hosting Bot#7133
+		if !strings.Contains(message.Content, "This Giveaway has ended!") {
+			break
+		}
+
+		if !strings.Contains(message.Content, session.State.User.Mention()) {
+			break
+		}
+
+		logging.Logging.GiveawayWon(session, message, "€20 worth of ZAP Coins", account)
 	}
 }

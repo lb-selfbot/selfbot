@@ -3,11 +3,17 @@ package utils
 import (
 	"fmt"
 	"time"
+
+	"github.com/LightningDev1/LB-Selfbot/constants"
 )
 
 type LoggingUtils struct{}
 
 func (LoggingUtils) Debug(v ...any) {
+	if !constants.DEBUG {
+		return
+	}
+
 	t := time.Now().Local().Format("02/01/2006 15:04:05")
 	fmt.Printf("[\x1b[34;1m%s\x1b[0m] [\x1b[35;1mDEBUG\x1b[0m] ", t)
 	fmt.Println(v...)
