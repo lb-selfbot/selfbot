@@ -120,7 +120,7 @@ var (
 		"zu":    "zulu",
 	}
 	LANGUAGE_CODES = reverse(LANGUAGES)
-	DEBUG          = true
+	DEBUG          = false
 	CONSOLE        = false
 )
 

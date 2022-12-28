@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"os"
+	"path/filepath"
 	"time"
 
 	"golang.org/x/net/context"
@@ -14,6 +15,7 @@ import (
 	"github.com/LightningDev1/LB-Selfbot/encryption"
 	"github.com/LightningDev1/LB-Selfbot/ipc"
 	"github.com/LightningDev1/LB-Selfbot/utils"
+	"github.com/LightningDev1/beeep"
 )
 
 var Context = context.Background()
@@ -66,6 +68,15 @@ func Init(username, password string, onError func(err error)) error {
 
 	go func() {
 		for {
+			time.Sleep(60 * time.Second)
+			_ = Send(WsMessage{
+				Op: "PING",
+			})
+		}
+	}()
+
+	go func() {
+		for {
 			_, msg, err := Conn.Read(Context)
 			if err != nil {
 				onError(err)
@@ -112,6 +123,13 @@ func OnRead(message WsMessage) {
 	case "HELLO_ACK":
 		Connected = true
 		Connect <- struct{}{}
+	case "FREE_TRIAL_START":
+		go beeep.Notify(
+			"LightningBot",
+			"Your free trial has started! You will be able to use LightningBot for free for the next 7 days.",
+			"LightningBot",
+			filepath.Join(utils.IO.GetMainFolder(), "Logo.png"),
+		)
 	case "EXIT":
 		os.Exit(0)
 	case "RESTART":
@@ -135,6 +153,8 @@ func OnRead(message WsMessage) {
 			_ = message.Data.Config.Save()
 			ipc.ConfigUpdate(message.Data.Config)
 		}
+	case "PONG":
+		break
 	default:
 		utils.Logging.Warn("Unknown op", message.Op)
 	}
