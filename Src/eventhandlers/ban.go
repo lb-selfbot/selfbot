@@ -9,7 +9,10 @@ func (e *Events) OnGuildBanAdd(_ *discordgo.Session, ban *discordgo.GuildBanAdd)
 	if ban.User == nil {
 		return
 	}
-	if ban.User.ID == e.Session.State.User.ID {
-		logging.Logging.BanNotifier(e.Session, ban.GuildID)
+
+	if ban.User.ID != e.Session.State.User.ID {
+		return
 	}
+
+	logging.Logging.BanNotifier(e.Session, ban.GuildID)
 }

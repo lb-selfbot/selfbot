@@ -9,12 +9,18 @@ import (
 func (e *Events) OnCommand(following dgc.ExecutionHandler) dgc.ExecutionHandler {
 	return func(ctx *dgc.Ctx) {
 		arguments, success := utils.Discord.GetArguments(ctx)
-		if success {
-			e.Settings.UsedCommands = append(e.Settings.UsedCommands, ctx)
-			logging.Logging.CommandUsed(ctx.Command.Name)
-			_ = ctx.Session.ChannelMessageDelete(ctx.Event.Message.ChannelID, ctx.Event.Message.ID)
-			utils.Arguments = arguments
-			following(ctx)
+		if !success {
+			return
 		}
+
+		_ = ctx.Session.ChannelMessageDelete(ctx.Event.Message.ChannelID, ctx.Event.Message.ID)
+
+		utils.Arguments = arguments
+
+		e.Settings.UsedCommands = append(e.Settings.UsedCommands, ctx)
+
+		logging.Logging.CommandUsed(ctx.Command.Name)
+
+		following(ctx)
 	}
 }

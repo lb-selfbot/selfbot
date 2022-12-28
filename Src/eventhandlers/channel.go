@@ -8,16 +8,23 @@ import (
 )
 
 func (e *Events) OnChannelCreate(_ *discordgo.Session, channel *discordgo.ChannelCreate) {
-	if channel.Type == discordgo.ChannelTypeGuildText {
-		if !strings.Contains(channel.Name, "ticket") {
-			return
-		}
-		perms, err := e.Session.State.UserChannelPermissions(channel.ID, e.Session.State.User.ID)
-		if err != nil {
-			return
-		}
-		if perms&discordgo.PermissionSendMessages != 0 && perms&discordgo.PermissionViewChannel != 0 {
-			logging.Logging.TicketNotifier(e.Session, channel.Channel)
-		}
+	if channel.Type != discordgo.ChannelTypeGuildText {
+		return
+	}
+
+	if !strings.Contains(channel.Name, "ticket") {
+		return
+	}
+
+	perms, err := e.Session.State.UserChannelPermissions(channel.ID, e.Session.State.User.ID)
+	if err != nil {
+		return
+	}
+
+	canSendMessages := perms&discordgo.PermissionSendMessages != 0
+	canViewChannel := perms&discordgo.PermissionViewChannel != 0
+
+	if canSendMessages && canViewChannel {
+		logging.Logging.TicketNotifier(e.Session, channel.Channel)
 	}
 }

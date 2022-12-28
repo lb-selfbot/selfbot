@@ -390,4 +390,19 @@ func (DiscordUtils) GetUserName(session *discordgo.Session, userID string) strin
 	return Misc.Or(userName, "Unknown")
 }
 
+func (DiscordUtils) IsGuildInList(session *discordgo.Session, guildID string, guildsList []string) bool {
+	guild, err := Discord.GetGuild(session, guildID)
+	if err != nil {
+		return false
+	}
+
+	return SliceContains(guildsList, guild.ID) || SliceContains(guildsList, guild.Name)
+}
+
+func (DiscordUtils) IsUserInList(session *discordgo.Session, userID string, usersList []string) bool {
+	userName := Discord.GetUserName(session, userID)
+
+	return SliceContains(usersList, userID) || SliceContains(usersList, userName)
+}
+
 var Discord = &DiscordUtils{}
