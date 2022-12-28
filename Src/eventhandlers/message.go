@@ -489,7 +489,7 @@ func (e *Events) checkSelfbotDetectionEdit(message *discordgo.Message, cfg *conf
 }
 
 func (e *Events) checkSelfbotDetectionDelete(message *discordgo.Message, cfg *config.Config) {
-	if !cfg.Events.SelfbotDetection || message.Author.Bot { // check for state user
+	if !cfg.Events.SelfbotDetection || message.Author.Bot || message.Author.ID == e.Session.State.User.ID {
 		return
 	}
 	score := e.ensureUserEntry(message.Author.ID)
