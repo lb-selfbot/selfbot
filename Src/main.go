@@ -28,8 +28,6 @@ import (
 	"github.com/LightningDev1/LB-Selfbot/websocket"
 	"github.com/LightningDev1/dgc"
 	"github.com/LightningDev1/discordgo"
-
-	_websocket "nhooyr.io/websocket"
 )
 
 //go:embed assets/*
@@ -150,9 +148,7 @@ func initSelfbot(session *discordgo.Session) {
 	}
 }
 
-func onWebsocketError(err error) {
-	closeCode := _websocket.CloseStatus(err)
-
+func onWebsocketError(err error, closeCode int) {
 	switch closeCode {
 	case 3004, 3010:
 		logging.UI.Error("Your LightningBot credentials are invalid! Please re-enter them in the Config tab.")
@@ -165,6 +161,7 @@ func onWebsocketError(err error) {
 	default:
 		logging.UI.Error("An unexpected error has occurred while connecting to the websocket: " + err.Error())
 	}
+
 	os.Exit(0)
 }
 

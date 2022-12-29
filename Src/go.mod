@@ -16,13 +16,10 @@ require (
 	github.com/mr-tron/base58 v1.2.0
 	github.com/multiformats/go-base32 v0.1.0
 	github.com/multiformats/go-base36 v0.2.0
-	github.com/rgamba/evtwebsocket v0.0.0-20181029234908-48b8cd9f8616
 	github.com/shirou/gopsutil v3.21.11+incompatible
 	github.com/valyala/fasthttp v1.43.0
 	golang.org/x/text v0.5.0
 )
-
-require nhooyr.io/websocket v1.8.7 // indirect
 
 require (
 	github.com/LightningDev1/beeep v0.0.0-20221212160032-7204ef4397be
@@ -53,6 +50,6 @@ require (
 	github.com/karrick/tparse/v2 v2.8.2 // indirect
 	github.com/zekroTJA/timedmap v1.4.0 // indirect
 	golang.org/x/crypto v0.4.0
-	golang.org/x/sys v0.3.0
+	golang.org/x/sys v0.3.0 // indirect
 	golang.org/x/term v0.3.0
 )

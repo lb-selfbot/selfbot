@@ -7,10 +7,10 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"sync"
 	"time"
 
 	"github.com/gorilla/websocket"
-	_websocket "nhooyr.io/websocket"
 
 	"github.com/LightningDev1/beeep"
 
@@ -23,9 +23,7 @@ import (
 type WebsocketConnection struct {
 	Conn          *websocket.Conn
 	RequestHeader http.Header
-
-	_Conn        *_websocket.Conn
-	_DialOptions *_websocket.DialOptions
+	WriteMutex    *sync.Mutex
 
 	Context context.Context
 
@@ -36,7 +34,7 @@ type WebsocketConnection struct {
 	ReadyChannel chan struct{}
 
 	Errors   int
-	LogError func(err error)
+	LogError func(err error, closeCode int)
 
 	Username string
 	Password string
@@ -65,22 +63,16 @@ func (w *WebsocketConnection) Init(username, password string) error {
 	w.InitEncryption()
 
 	w.RequestHeader = http.Header{"Origin": []string{"http://localhost/"}}
-
-	w._DialOptions = &_websocket.DialOptions{
-		HTTPHeader:      http.Header{"Origin": []string{"http://localhost/"}},
-		CompressionMode: _websocket.CompressionDisabled,
-	}
-	w.Context = context.Background()
+	w.WriteMutex = &sync.Mutex{}
 
 	w.Connected = false
 	w.Ready = false
-	w.ReadyChannel = make(chan struct{})
+	w.ReadyChannel = make(chan struct{}, 128)
 
 	w.Username = username
 	w.Password = password
 	w.Hostname, _ = os.Hostname()
-	//w.URL = "wss://api.lightning-bot.com/api/v3/ws/selfbot"
-	w.URL = "ws://localhost:8000/api/v3/ws/selfbot"
+	w.URL = "wss://api.lightning-bot.com/api/v3/ws/selfbot"
 
 	go w.Listen()
 	go w.Ping()
@@ -94,10 +86,7 @@ func (w *WebsocketConnection) Connect() (err error) {
 		return err
 	}
 
-	// w._Conn, _, err = _websocket.Dial(w.Context, w.URL, w._DialOptions)
-	// if err != nil {
-	// 	return err
-	// }
+	w.Conn.SetCloseHandler(w.CloseHandler)
 
 	w.Connected = true
 
@@ -130,20 +119,20 @@ func (w *WebsocketConnection) Send(msg WsMessage) error {
 	jsonMsg, _ := json.Marshal(msg)
 	encrypted, _ := w.Encryption.Encrypt(jsonMsg)
 
-	if w._Conn != nil {
-		return w._Conn.Write(w.Context, _websocket.MessageText, encrypted)
+	if w.Conn != nil {
+		return w.Conn.WriteMessage(websocket.TextMessage, encrypted)
 	}
 
 	return fmt.Errorf("websocket connection is nil")
 }
 
 func (w *WebsocketConnection) Read() (msg WsMessage, err error) {
-	msgType, data, err := w._Conn.Read(w.Context)
+	msgType, data, err := w.Conn.ReadMessage()
 	if err != nil {
 		return msg, err
 	}
 
-	if msgType != _websocket.MessageText {
+	if msgType != websocket.TextMessage {
 		return msg, fmt.Errorf("received non-text message")
 	}
 
@@ -157,25 +146,28 @@ func (w *WebsocketConnection) Read() (msg WsMessage, err error) {
 }
 
 func (w *WebsocketConnection) Listen() {
-	w.WaitUntilConnected()
 	for {
-		msg, err := w.Read()
-		if err != nil {
-			//w.OnError(err)
+		w.WaitUntilConnected()
+
+		if !w.Connected {
 			continue
 		}
 
-		fmt.Println("received message:", msg)
+		msg, err := w.Read()
+		if err != nil {
+			w.OnError(err)
+			continue
+		}
 
-		w.OnMessage(msg)
+		utils.Logging.Debug("received message:", msg)
+
+		go w.OnMessage(msg)
 	}
 }
 
 func (w *WebsocketConnection) Ping() {
 	for {
 		w.WaitUntilConnected()
-
-		utils.Logging.Info("sending PING")
 
 		time.Sleep(60 * time.Second)
 
@@ -252,15 +244,27 @@ func (w *WebsocketConnection) OnMessage(msg WsMessage) {
 	}
 }
 
+func (w *WebsocketConnection) CloseHandler(code int, text string) error {
+	w.Connected = false
+
+	utils.Logging.Info("websocket closed", code, text)
+
+	err := w.Connect()
+	if err != nil {
+		w.LogError(err, -1)
+		return err
+	}
+	return nil
+}
+
 func (w *WebsocketConnection) OnError(err error) {
 	w.Connected = false
 
 	utils.Logging.Error(err)
 
-	closeCode := _websocket.CloseStatus(err)
-
-	if closeCode != -1 {
-		w.LogError(err)
+	closeError, ok := err.(*websocket.CloseError)
+	if ok {
+		w.LogError(err, closeError.Code)
 		return
 	}
 
@@ -271,12 +275,15 @@ func (w *WebsocketConnection) OnError(err error) {
 
 		utils.Logging.Debug("reconnecting...")
 
-		_ = w.Connect()
+		err = w.Connect()
+		if err != nil {
+			w.LogError(err, -1)
+		}
 
 		return
 	}
 
-	w.LogError(err)
+	w.LogError(err, -1)
 	os.Exit(1)
 }
 
