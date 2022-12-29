@@ -5,9 +5,12 @@ import (
 	"math/rand"
 	"os"
 	"os/signal"
+	"path/filepath"
 	"runtime"
 	"strings"
 	"time"
+
+	"embed"
 
 	"syscall"
 
@@ -28,6 +31,9 @@ import (
 
 	_websocket "nhooyr.io/websocket"
 )
+
+//go:embed assets/*
+var assets embed.FS
 
 func initArgs() {
 	args := strings.Join(os.Args, " ")
@@ -106,6 +112,16 @@ func initSelfbot(session *discordgo.Session) {
 		logging.UI.Error("Error creating folders: " + err.Error())
 	}
 
+	iconFile := filepath.Join(utils.IO.GetMainFolder(), "Logo.png")
+	if !utils.IO.Exists(iconFile) {
+		icon, err := assets.ReadFile("assets/Logo.png")
+		if err != nil {
+			logging.UI.Error("Error reading icon file: " + err.Error())
+		}
+
+		_ = utils.IO.WriteBytes(iconFile, icon)
+	}
+
 	isFirstLaunch := utils.IO.IsFirstLaunch()
 
 	if !isFirstLaunch {
@@ -140,19 +156,16 @@ func onWebsocketError(err error) {
 	switch closeCode {
 	case 3004, 3010:
 		logging.UI.Error("Your LightningBot credentials are invalid! Please re-enter them in the Config tab.")
-		os.Exit(0)
 	case 3011:
 		logging.UI.Error("Your free trial has expired! Please purchase a license key to continue using LightningBot.")
-		os.Exit(0)
 	case 3003:
 		logging.UI.Error("WS Error 3003: " + err.Error())
-		os.Exit(0)
 	case 3006:
 		logging.UI.Error("Another selfbot has connected using your LightningBot account! This instance will now exit.")
-		os.Exit(0)
 	default:
 		logging.UI.Error("An unexpected error has occurred while connecting to the websocket: " + err.Error())
 	}
+	os.Exit(0)
 }
 
 func main() {
@@ -178,7 +191,11 @@ func main() {
 		ipc.IPC.Init()
 	}
 
-	err = websocket.Init(cfg.Account.LightningBot.Username, cfg.Account.LightningBot.Password, onWebsocketError)
+	websocket.Websocket.LogError = onWebsocketError
+	err = websocket.Websocket.Init(
+		cfg.Account.LightningBot.Username,
+		cfg.Account.LightningBot.Password,
+	)
 	if err != nil {
 		logging.UI.Error("Error connecting to websocket: " + err.Error())
 		os.Exit(0)
@@ -240,7 +257,7 @@ func main() {
 		if !constants.CONSOLE {
 			ipc.IPC.WaitForConnection()
 		}
-		websocket.WaitForConnection()
+		websocket.Websocket.WaitUntilReady()
 	}
 
 	err = session.Open()

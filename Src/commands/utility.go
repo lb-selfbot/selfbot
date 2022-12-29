@@ -683,7 +683,24 @@ func (UtilityCommands) stopbot(*dgc.Ctx) {
 }
 
 func (UtilityCommands) changelog(ctx *dgc.Ctx) {
-	// TODO
+	httpResponse := http.PostJson(
+		"https://api.lightning-bot.com/api/v3/selfbot/check-version",
+		map[string]string{"branch": "selfbot", "version": ""},
+	)
+	if httpResponse.Error != nil {
+		_ = ctx.RespondText("An error has occurred: " + httpResponse.Error.Error())
+		return
+	}
+
+	json := httpResponse.Json()
+
+	latestVersion := json.GetPath("latest", "version").MustString()
+	changelog := json.GetPath("latest", "changelog").MustString()
+
+	embed.NewEmbed().
+		AddField("Latest Version", latestVersion).
+		AddField("Changelog", changelog).
+		Send(ctx)
 }
 
 func (UtilityCommands) uptime(ctx *dgc.Ctx) {

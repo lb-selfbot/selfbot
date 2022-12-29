@@ -7,27 +7,6 @@ import (
 	"github.com/valyala/fasthttp"
 )
 
-func GetJsonOld(url string, headersList ...map[string]string) (*simplejson.Json, error) {
-	req := fasthttp.AcquireRequest()
-	resp := fasthttp.AcquireResponse()
-	defer fasthttp.ReleaseRequest(req)
-	defer fasthttp.ReleaseResponse(resp)
-
-	req.SetRequestURI(url)
-	for _, headers := range headersList {
-		for k, v := range headers {
-			req.Header.Add(k, v)
-		}
-	}
-
-	err := fasthttp.Do(req, resp)
-	if err != nil {
-		return nil, err
-	}
-
-	return simplejson.NewJson(resp.Body())
-}
-
 type HttpResponse struct {
 	Success       bool
 	Error         error
@@ -86,6 +65,15 @@ func Get(url string, headersList ...map[string]string) *HttpResponse {
 		Headers:       resp.Header.String(),
 		InnerResponse: resp,
 	}
+}
+
+func GetJson(url string, headersList ...map[string]string) (*simplejson.Json, error) {
+	httpResponse := Get(url, headersList...)
+	if !httpResponse.Success {
+		return nil, httpResponse.Error
+	}
+
+	return httpResponse.Json(), nil
 }
 
 func CustomMethodWithData(url, method string, data []byte, headersList ...map[string]string) *HttpResponse {

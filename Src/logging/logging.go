@@ -330,7 +330,7 @@ func (_Logging) SessionConnected(id, os, client string) {
 		return
 	}
 
-	if !cfg.Events.SessionDisconnected {
+	if !cfg.Events.SessionConnected {
 		return
 	}
 

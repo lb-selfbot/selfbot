@@ -55,7 +55,7 @@ func (UILogging) Centered(text string, color string) string {
 
 func (UILogging) Append(text string) {
 	ipc.IPC.ConsoleAppend(text)
-	websocket.Send(websocket.WsMessage{
+	websocket.Websocket.Send(websocket.WsMessage{
 		Op: "CONSOLE_APPEND",
 		Data: websocket.WsData{
 			Text: text,
@@ -65,7 +65,7 @@ func (UILogging) Append(text string) {
 
 func (UILogging) Clear() {
 	ipc.IPC.ConsoleClear()
-	websocket.Send(websocket.WsMessage{
+	websocket.Websocket.Send(websocket.WsMessage{
 		Op:   "CONSOLE_CLEAR",
 		Data: websocket.WsData{},
 	})
