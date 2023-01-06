@@ -185,7 +185,7 @@ func CheckGiveawaySniper(session *discordgo.Session, message *discordgo.Message,
 			}
 		})
 
-		logging.Logging.GiveawayFound(session, message, "€20 worth of ZAP Coins", "ZAP-Hosting", "1 hour", account)
+		logging.Logging.GiveawayFound(session, message, "€10 worth of ZAP Coins", "ZAP-Hosting", "1 hour", account)
 
 		go func() {
 			time.Sleep(time.Second * time.Duration(cfg.Snipers.GiveawaySniper.Sleep))
