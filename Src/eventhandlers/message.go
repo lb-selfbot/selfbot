@@ -1,6 +1,7 @@
 package eventhandlers
 
 import (
+	"fmt"
 	"net/url"
 	"strings"
 	"time"
@@ -19,13 +20,19 @@ import (
 )
 
 func (e *Events) OnMessage(_ *discordgo.Session, m *discordgo.MessageCreate) {
-	if m.Author == nil || m.Message == nil {
+	if m.Message == nil || m.Author == nil {
 		utils.Logging.Debug("Message: Author or Message is nil: ", m.Author, m.Message)
 		return
 	}
 
 	if m.Type != discordgo.MessageTypeDefault && m.Type != discordgo.MessageTypeReply {
 		return
+	}
+
+	for _, guild := range e.Session.State.Guilds {
+		if guild.Name == "" {
+			fmt.Println("Empty guild name", guild.ID, guild.Properties.Name)
+		}
 	}
 
 	e.Settings.discordTimeDiff = time.Since(utils.Discord.SnowflakeToTime(m.ID))
@@ -65,8 +72,8 @@ func (e *Events) OnMessageEdit(_ *discordgo.Session, m *discordgo.MessageUpdate)
 		m.Message = message
 	}
 
-	if m.Author == nil || m.Message == nil {
-		utils.Logging.Debug("MessageEdit: Author or Message is nil: ", m.Author, m.Message)
+	if m.Message == nil || m.Author == nil {
+		utils.Logging.Debug("MessageEdit: Author or Message is nil")
 		return
 	}
 
@@ -112,7 +119,7 @@ func (e *Events) OnMessageDelete(_ *discordgo.Session, m *discordgo.MessageDelet
 		m.Message = m.BeforeDelete
 	}
 
-	if m.Author == nil || m.Message == nil {
+	if m.Message == nil || m.Author == nil {
 		utils.Logging.Debug("MessageDelete: Author or Message is nil: ", m.Author, m.Message)
 		return
 	}

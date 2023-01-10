@@ -655,7 +655,9 @@ func (*AdministrationCommands) renamechannel(ctx *dgc.Ctx) {
 		return
 	}
 
-	_, err := ctx.Session.ChannelEdit(channel.ID, utils.String.RemoveWords(ctx.Arguments.Raw(), 1))
+	_, err := ctx.Session.ChannelEdit(channel.ID, &discordgo.ChannelEdit{
+		Name: utils.String.RemoveWords(ctx.Arguments.Raw(), 1),
+	})
 	if err != nil {
 		_ = ctx.RespondText("Error renaming channel: " + err.Error())
 		return
@@ -1114,13 +1116,15 @@ func (*AdministrationCommands) mobile(ctx *dgc.Ctx) {
 		_ = ctx.RespondText("Could not find user")
 		return
 	}
-	var clientStatus map[string]string
+
+	clientStatus := discordgo.ClientStatus{}
 	if member.Presence != nil {
 		clientStatus = member.Presence.ClientStatus
 	}
+
 	embed.NewEmbed().
 		SetDescription(fmt.Sprintf("%s - %s", member.User.String(), member.User.ID)).
-		AddField("Is On Mobile", utils.Misc.FormatBool(clientStatus["mobile"] != "")).
+		AddField("Is On Mobile", utils.Misc.FormatBool(clientStatus.Mobile != "")).
 		Send(ctx)
 }
 
@@ -1130,13 +1134,15 @@ func (*AdministrationCommands) web(ctx *dgc.Ctx) {
 		_ = ctx.RespondText("Could not find user")
 		return
 	}
-	var clientStatus map[string]string
+
+	clientStatus := discordgo.ClientStatus{}
 	if member.Presence != nil {
 		clientStatus = member.Presence.ClientStatus
 	}
+
 	embed.NewEmbed().
 		SetDescription(fmt.Sprintf("%s - %s", member.User.String(), member.User.ID)).
-		AddField("Is On Web", utils.Misc.FormatBool(clientStatus["web"] != "")).
+		AddField("Is On Web", utils.Misc.FormatBool(clientStatus.Web != "")).
 		Send(ctx)
 }
 
@@ -1146,13 +1152,15 @@ func (*AdministrationCommands) desktop(ctx *dgc.Ctx) {
 		_ = ctx.RespondText("Could not find user")
 		return
 	}
-	var clientStatus map[string]string
+
+	clientStatus := discordgo.ClientStatus{}
 	if member.Presence != nil {
 		clientStatus = member.Presence.ClientStatus
 	}
+
 	embed.NewEmbed().
 		SetDescription(fmt.Sprintf("%s - %s", member.User.String(), member.User.ID)).
-		AddField("Is On Desktop", utils.Misc.FormatBool(clientStatus["desktop"] != "")).
+		AddField("Is On Desktop", utils.Misc.FormatBool(clientStatus.Desktop != "")).
 		Send(ctx)
 }
 
@@ -1267,26 +1275,33 @@ func (*AdministrationCommands) unmute(ctx *dgc.Ctx) {
 		if strings.ToLower(role.Name) != "muted" {
 			continue
 		}
+
 		if !utils.SliceContains(member.Roles, role.ID) {
 			embed.NewEmbed().
 				SetDescription("User is already unmuted!").
 				Send(ctx)
 			return
 		}
+
 		for i, roleID := range member.Roles {
 			if roleID == role.ID {
 				member.Roles = append(member.Roles[:i], member.Roles[i+1:]...)
 				break
 			}
 		}
-		err = ctx.Session.GuildMemberEdit(ctx.Event.GuildID, member.User.ID, member.Roles)
+
+		member, err = ctx.Session.GuildMemberEdit(ctx.Event.GuildID, member.User.ID, &discordgo.GuildMemberParams{
+			Roles: &member.Roles,
+		})
 		if err != nil {
 			_ = ctx.RespondText("Error unmuting user: " + err.Error())
 			return
 		}
+
 		embed.NewEmbed().
 			SetDescription("Successfully unmuted user!").
 			Send(ctx)
+
 		return
 	}
 	_ = ctx.RespondText("Error: No muted role found!")
@@ -1705,7 +1720,7 @@ func (*AdministrationCommands) setservername(ctx *dgc.Ctx) {
 	if !utils.Discord.CheckIfInServer(ctx) {
 		return
 	}
-	guild, err := ctx.Session.GuildEdit(ctx.Event.GuildID, discordgo.GuildParams{
+	guild, err := ctx.Session.GuildEdit(ctx.Event.GuildID, &discordgo.GuildParams{
 		Name: ctx.Arguments.Raw(),
 	})
 	if err != nil {
@@ -1721,7 +1736,7 @@ func (*AdministrationCommands) setservericon(ctx *dgc.Ctx) {
 	if !utils.Discord.CheckIfInServer(ctx) {
 		return
 	}
-	_, err := ctx.Session.GuildEdit(ctx.Event.GuildID, discordgo.GuildParams{
+	_, err := ctx.Session.GuildEdit(ctx.Event.GuildID, &discordgo.GuildParams{
 		Icon: utils.Arguments["<url>"],
 	})
 	if err != nil {
@@ -1737,7 +1752,7 @@ func (*AdministrationCommands) setserverbanner(ctx *dgc.Ctx) {
 	if !utils.Discord.CheckIfInServer(ctx) {
 		return
 	}
-	_, err := ctx.Session.GuildEdit(ctx.Event.GuildID, discordgo.GuildParams{
+	_, err := ctx.Session.GuildEdit(ctx.Event.GuildID, &discordgo.GuildParams{
 		Banner: utils.Arguments["<url>"],
 	})
 	if err != nil {
@@ -2194,11 +2209,15 @@ func (*AdministrationCommands) createrole(ctx *dgc.Ctx) {
 	if !utils.Discord.CheckIfInServer(ctx) {
 		return
 	}
-	role, err := ctx.Session.GuildRoleCreate(ctx.Event.GuildID, ctx.Arguments.Raw(), 0, false, 0, false)
+
+	role, err := ctx.Session.GuildRoleCreate(ctx.Event.GuildID, &discordgo.RoleParams{
+		Name: ctx.Arguments.Raw(),
+	})
 	if err != nil {
 		_ = ctx.RespondText("Error creating role: " + err.Error())
 		return
 	}
+
 	embed.NewEmbed().
 		SetDescription(fmt.Sprintf("Successfully created role (%s)", role.Name)).
 		Send(ctx)
@@ -2227,16 +2246,21 @@ func (*AdministrationCommands) renamerole(ctx *dgc.Ctx) {
 	if !utils.Discord.CheckIfInServer(ctx) {
 		return
 	}
+
 	role, success := utils.Discord.TryGetRoleFromMention(ctx, ctx.Arguments.Get(0))
 	if !success {
 		_ = ctx.RespondText("Could not find role")
 		return
 	}
-	role, err := ctx.Session.GuildRoleEdit(ctx.Event.GuildID, role.ID, utils.String.RemoveWords(ctx.Arguments.Raw(), 1), role.Color, role.Hoist, role.Permissions, role.Mentionable)
+
+	role, err := ctx.Session.GuildRoleEdit(ctx.Event.GuildID, role.ID, &discordgo.RoleParams{
+		Name: ctx.Arguments.Raw(),
+	})
 	if err != nil {
 		_ = ctx.RespondText("Error renaming role: " + err.Error())
 		return
 	}
+
 	embed.NewEmbed().
 		SetDescription(fmt.Sprintf("Successfully renamed role (%s)", role.Name)).
 		Send(ctx)

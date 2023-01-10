@@ -4,9 +4,9 @@ go 1.19
 
 require (
 	github.com/LightningDev1/dgc v1.1.3
-	github.com/LightningDev1/discordgo v0.26.0
+	github.com/LightningDev1/discordgo v0.26.1
 	github.com/bitly/go-simplejson v0.5.0
-	github.com/brianvoe/gofakeit/v6 v6.19.0
+	github.com/brianvoe/gofakeit/v6 v6.20.1
 	github.com/darkwyrm/b85 v0.0.0-20210908110113-bdd55eedeb3c
 	github.com/deadshot465/owoify-go v1.0.1
 	github.com/gen2brain/beeep v0.0.0-20220909211152-5a9ec94374f6
@@ -18,20 +18,20 @@ require (
 	github.com/multiformats/go-base36 v0.2.0
 	github.com/shirou/gopsutil v3.21.11+incompatible
 	github.com/valyala/fasthttp v1.43.0
-	golang.org/x/text v0.5.0
+	golang.org/x/text v0.6.0
 )
 
 require (
 	github.com/LightningDev1/beeep v0.0.0-20221212160032-7204ef4397be
 	github.com/andybalholm/brotli v1.0.4 // indirect
 	github.com/dlclark/regexp2 v1.7.0 // indirect
-	github.com/dop251/goja v0.0.0-20221118162653-d4bf6fde1b86 // indirect
+	github.com/dop251/goja v0.0.0-20221229151140-b95230a9dbad // indirect
 	github.com/go-ole/go-ole v1.2.6 // indirect
 	github.com/go-sourcemap/sourcemap v2.1.3+incompatible // indirect
 	github.com/go-toast/toast v0.0.0-20190211030409-01e6764cf0a4 // indirect
 	github.com/godbus/dbus/v5 v5.1.0 // indirect
 	github.com/google/uuid v1.3.0 // indirect
-	github.com/klauspost/compress v1.15.13 // indirect
+	github.com/klauspost/compress v1.15.14 // indirect
 	github.com/nu7hatch/gouuid v0.0.0-20131221200532-179d4d0c4d8d // indirect
 	github.com/stretchr/objx v0.5.0 // indirect
 	github.com/tadvi/systray v0.0.0-20190226123456-11a2b8fa57af // indirect
@@ -39,7 +39,7 @@ require (
 	github.com/tklauser/numcpus v0.6.0 // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	github.com/yusufpapurcu/wmi v1.2.2 // indirect
-	golang.org/x/net v0.4.0 // indirect
+	golang.org/x/net v0.5.0 // indirect
 	golang.org/x/sync v0.1.0 // indirect
 	gopkg.in/natefinch/npipe.v2 v2.0.0-20160621034901-c1b8fa8bdcce // indirect
 )
@@ -49,7 +49,7 @@ require (
 	github.com/gorilla/websocket v1.5.0
 	github.com/karrick/tparse/v2 v2.8.2 // indirect
 	github.com/zekroTJA/timedmap v1.4.0 // indirect
-	golang.org/x/crypto v0.4.0
-	golang.org/x/sys v0.3.0 // indirect
-	golang.org/x/term v0.3.0
+	golang.org/x/crypto v0.5.0
+	golang.org/x/sys v0.4.0 // indirect
+	golang.org/x/term v0.4.0
 )

@@ -322,10 +322,17 @@ func (DiscordUtils) MuteUser(session *discordgo.Session, member *discordgo.Membe
 		if strings.ToLower(role.Name) != "muted" {
 			continue
 		}
+
 		if SliceContains(member.Roles, role.ID) {
 			return fmt.Errorf("user is already muted")
 		}
-		return session.GuildMemberEdit(member.GuildID, member.User.ID, append(member.Roles, role.ID))
+
+		newRoles := append(member.Roles, role.ID)
+
+		_, err = session.GuildMemberEdit(member.GuildID, member.User.ID, &discordgo.GuildMemberParams{
+			Roles: &newRoles,
+		})
+		return err
 	}
 
 	channels, err := session.GuildChannels(member.GuildID)
@@ -333,7 +340,9 @@ func (DiscordUtils) MuteUser(session *discordgo.Session, member *discordgo.Membe
 		return err
 	}
 
-	role, err := session.GuildRoleCreate(member.GuildID, "Muted", 0, false, 0, false)
+	role, err := session.GuildRoleCreate(member.GuildID, &discordgo.RoleParams{
+		Name: "Muted",
+	})
 	if err != nil {
 		return err
 	}
@@ -347,7 +356,13 @@ func (DiscordUtils) MuteUser(session *discordgo.Session, member *discordgo.Membe
 		}
 	}
 
-	return session.GuildMemberEdit(member.GuildID, member.User.ID, append(member.Roles, role.ID))
+	newRoles := append(member.Roles, role.ID)
+
+	_, err = session.GuildMemberEdit(member.GuildID, member.User.ID, &discordgo.GuildMemberParams{
+		Roles: &newRoles,
+	})
+
+	return err
 }
 
 func (DiscordUtils) SleepWithTyping(session *discordgo.Session, channelID string, duration time.Duration) {

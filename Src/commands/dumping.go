@@ -5,13 +5,11 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
-	"time"
 
 	"github.com/LightningDev1/LB-Selfbot/embed"
 	"github.com/LightningDev1/LB-Selfbot/http"
 	"github.com/LightningDev1/LB-Selfbot/utils"
 	"github.com/LightningDev1/dgc"
-	"github.com/LightningDev1/discordgo"
 )
 
 type DumpingCommands struct{}
@@ -153,7 +151,7 @@ func (*DumpingCommands) dumpimages(ctx *dgc.Ctx) {
 			}
 
 			_ = utils.IO.WriteBytes(filePath, httpResponse.BodyBytes)
-			
+
 			images++
 		}
 	}
@@ -194,7 +192,7 @@ func (*DumpingCommands) dumpvideos(ctx *dgc.Ctx) {
 			}
 
 			_ = utils.IO.WriteBytes(filePath, httpResponse.BodyBytes)
-			
+
 			videos++
 		}
 	}
@@ -235,7 +233,7 @@ func (*DumpingCommands) dumpaudio(ctx *dgc.Ctx) {
 			}
 
 			_ = utils.IO.WriteBytes(filePath, httpResponse.BodyBytes)
-			
+
 			audios++
 		}
 	}
@@ -276,7 +274,7 @@ func (*DumpingCommands) dumptext(ctx *dgc.Ctx) {
 			}
 
 			_ = utils.IO.WriteBytes(filePath, httpResponse.BodyBytes)
-			
+
 			texts++
 		}
 	}
@@ -384,12 +382,7 @@ func (*DumpingCommands) dumpmembers(ctx *dgc.Ctx) {
 		_ = ctx.RespondText("Error getting server: " + err.Error())
 		return
 	}
-	guildSubscription := discordgo.GuildSubscription{
-		Session: ctx.Session,
-		GuildID: guild.ID,
-	}
-	guildSubscription.Subscribe()
-	time.Sleep(time.Second * 5)
+
 	logString := fmt.Sprintf("Amount of dumped members: %d\n\n", len(guild.Members))
 	for _, member := range guild.Members {
 		logString += fmt.Sprintf("%s - %s\n", member.User.String(), member.User.ID)

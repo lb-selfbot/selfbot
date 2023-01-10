@@ -318,25 +318,33 @@ func (UtilityCommands) copyserver(ctx *dgc.Ctx) {
 		return
 	}
 
-	icon := http.Get(guild.IconURL()).BodyBytes
+	icon := http.Get(guild.IconURL()).Body
 
-	newGuild, err := ctx.Session.GuildCreate(fmt.Sprintf("%s - Copy", guild.Name), icon)
+	newGuild, err := ctx.Session.GuildCreate(fmt.Sprintf("%s - Copy", guild.Name))
 	if err != nil {
 		_ = ctx.RespondText("Error copying server: " + err.Error())
 		return
 	}
-	_, _ = ctx.Session.GuildEdit(newGuild.ID, discordgo.GuildParams{
+	_, _ = ctx.Session.GuildEdit(newGuild.ID, &discordgo.GuildParams{
 		VerificationLevel:           &guild.VerificationLevel,
 		DefaultMessageNotifications: int(guild.DefaultMessageNotifications),
 		AfkChannelID:                guild.AfkChannelID,
 		AfkTimeout:                  guild.AfkTimeout,
+		Icon:                        icon,
 	})
 
 	for _, role := range guild.Roles {
 		if role.ID == guild.ID || role.Managed {
 			continue
 		}
-		_, err := ctx.Session.GuildRoleCreate(newGuild.ID, role.Name, role.Color, role.Hoist, role.Permissions, role.Mentionable)
+		
+		_, err := ctx.Session.GuildRoleCreate(newGuild.ID, &discordgo.RoleParams{
+			Name:        role.Name,
+			Color:       &role.Color,
+			Hoist:       &role.Hoist,
+			Permissions: &role.Permissions,
+			Mentionable: &role.Mentionable,
+		})
 		if err != nil {
 			_ = ctx.RespondText("Error copying server: " + err.Error())
 			return
