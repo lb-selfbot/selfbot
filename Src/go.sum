@@ -1,5 +1,9 @@
 github.com/LightningDev1/beeep v0.0.0-20221212160032-7204ef4397be h1:/R5bjZ5juq6zvugLitn6IJmn9CFcR9Wofuv32w4a+44=
 github.com/LightningDev1/beeep v0.0.0-20221212160032-7204ef4397be/go.mod h1:5I5+KZYn5WXYnj5q1g19omWxaQkkVxTqZR9AmoLE/tc=
+github.com/LightningDev1/beeep v0.0.0-20230111173237-4b7584ea01d4 h1:BsPtXe3B4cjibQyBf0PoGM6b3yNzHevNgr84bXGhy5c=
+github.com/LightningDev1/beeep v0.0.0-20230111173237-4b7584ea01d4/go.mod h1:5I5+KZYn5WXYnj5q1g19omWxaQkkVxTqZR9AmoLE/tc=
+github.com/LightningDev1/beeep v0.1.0 h1:1IEV1ydGFb+yvBcwkuCPClL8GP/d0BMTJUKLg9vyL/w=
+github.com/LightningDev1/beeep v0.1.0/go.mod h1:EA+kLCP2cK7DHMJpiFXshjYfYCdGvS+OfhcAOA8fuOw=
 github.com/LightningDev1/dgc v1.1.3 h1:EYvNA50780+PNk5BC89K2g0UuidWysG/NWKgst4O7U8=
 github.com/LightningDev1/dgc v1.1.3/go.mod h1:+Aq4v/Mk75ZkWQqDfu1pYHoTELT+iJMFM8EctWAp0nE=
 github.com/LightningDev1/discordgo v0.26.0 h1:yqhZxR2cSmnNhjq44hfnIf6/SPrL0VOPXPXd3NQBsIU=

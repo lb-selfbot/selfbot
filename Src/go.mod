@@ -22,7 +22,7 @@ require (
 )
 
 require (
-	github.com/LightningDev1/beeep v0.0.0-20221212160032-7204ef4397be
+	github.com/LightningDev1/beeep v0.1.0 // indirect
 	github.com/andybalholm/brotli v1.0.4 // indirect
 	github.com/dlclark/regexp2 v1.7.0 // indirect
 	github.com/dop251/goja v0.0.0-20230111111035-473251c96b4c // indirect
