@@ -4,7 +4,7 @@ go 1.19
 
 require (
 	github.com/LightningDev1/dgc v1.1.3
-	github.com/LightningDev1/discordgo v0.26.1
+	github.com/LightningDev1/discordgo v0.26.2
 	github.com/bitly/go-simplejson v0.5.0
 	github.com/brianvoe/gofakeit/v6 v6.20.1
 	github.com/darkwyrm/b85 v0.0.0-20210908110113-bdd55eedeb3c
@@ -17,7 +17,7 @@ require (
 	github.com/multiformats/go-base32 v0.1.0
 	github.com/multiformats/go-base36 v0.2.0
 	github.com/shirou/gopsutil v3.21.11+incompatible
-	github.com/valyala/fasthttp v1.43.0
+	github.com/valyala/fasthttp v1.44.0
 	golang.org/x/text v0.6.0
 )
 
@@ -25,7 +25,7 @@ require (
 	github.com/LightningDev1/beeep v0.0.0-20221212160032-7204ef4397be
 	github.com/andybalholm/brotli v1.0.4 // indirect
 	github.com/dlclark/regexp2 v1.7.0 // indirect
-	github.com/dop251/goja v0.0.0-20221229151140-b95230a9dbad // indirect
+	github.com/dop251/goja v0.0.0-20230111111035-473251c96b4c // indirect
 	github.com/go-ole/go-ole v1.2.6 // indirect
 	github.com/go-sourcemap/sourcemap v2.1.3+incompatible // indirect
 	github.com/go-toast/toast v0.0.0-20190211030409-01e6764cf0a4 // indirect
