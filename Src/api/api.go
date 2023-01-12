@@ -17,7 +17,6 @@ import (
 	"github.com/LightningDev1/LB-Selfbot/constants"
 	"github.com/LightningDev1/LB-Selfbot/http"
 	"github.com/bitly/go-simplejson"
-	"github.com/go-ping/ping"
 )
 
 func CreatePaste(text string) (string, error) {
@@ -32,18 +31,14 @@ func CreatePaste(text string) (string, error) {
 }
 
 func Ping(host string) (time.Duration, error) {
-	pinger, err := ping.NewPinger(host)
-	if err != nil {
-		return time.Duration(0), err
+	beforeRequest := time.Now()
+
+	httpResponse := http.CustomMethodWithData(host, "HEAD", nil)
+	if httpResponse.Error != nil {
+		return time.Duration(0), httpResponse.Error
 	}
-	pinger.Count = 3
-	pinger.SetPrivileged(true)
-	err = pinger.Run()
-	if err != nil {
-		return time.Duration(0), err
-	}
-	stats := pinger.Statistics()
-	return stats.AvgRtt, nil
+
+	return time.Since(beforeRequest), nil
 }
 
 func WikipediaSearch(query string) (string, error) {

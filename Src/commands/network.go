@@ -212,13 +212,13 @@ func (n NetworkCommands) RegisterCommands(router *dgc.Router) {
 
 func (NetworkCommands) ping(ctx *dgc.Ctx) {
 	emb := embed.NewEmbed()
-	time, err := api.Ping("lightning-bot.com")
+	time, err := api.Ping("https://lightning-bot.com")
 	if err != nil {
 		emb.AddField("Ping to LightningBot", "Error")
 	} else {
 		emb.AddField("Ping to LightningBot", fmt.Sprintf("%dms", time.Milliseconds()))
 	}
-	time, err = api.Ping("google.com")
+	time, err = api.Ping("https://google.com")
 	if err != nil {
 		emb.AddField("Ping to Google", "Error")
 	} else {
