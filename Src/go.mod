@@ -5,7 +5,7 @@ go 1.19
 require (
 	github.com/LightningDev1/beeep v0.1.0
 	github.com/LightningDev1/dgc v1.1.3
-	github.com/LightningDev1/discordgo v0.26.2
+	github.com/LightningDev1/discordgo v0.26.3
 	github.com/bitly/go-simplejson v0.5.0
 	github.com/brianvoe/gofakeit/v6 v6.20.1
 	github.com/darkwyrm/b85 v0.0.0-20210908110113-bdd55eedeb3c
@@ -23,8 +23,8 @@ require (
 
 require (
 	github.com/andybalholm/brotli v1.0.4 // indirect
-	github.com/dlclark/regexp2 v1.7.0 // indirect
-	github.com/dop251/goja v0.0.0-20230111111035-473251c96b4c // indirect
+	github.com/dlclark/regexp2 v1.8.0 // indirect
+	github.com/dop251/goja v0.0.0-20230113101057-bf9ef13dd7b1 // indirect
 	github.com/go-ole/go-ole v1.2.6 // indirect
 	github.com/go-sourcemap/sourcemap v2.1.3+incompatible // indirect
 	github.com/go-toast/toast v0.0.0-20190211030409-01e6764cf0a4 // indirect
