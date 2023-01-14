@@ -64,6 +64,7 @@ func (s *SniperInstance) Start() error {
 		if err != nil {
 			return
 		}
+		
 		eventhandlers.EventHandlers.Settings.AlreadyCheckedNitroCodes, eventhandlers.EventHandlers.Settings.SentNitroCodes = snipers.CheckNitroSniper(
 			s.Session,
 			m.Message,
@@ -74,7 +75,6 @@ func (s *SniperInstance) Start() error {
 			eventhandlers.EventHandlers.Settings.SentNitroCodes,
 			s.Session.State.User.String(),
 		)
-		snipers.CheckGiveawaySniper(s.Session, m.Message, &cfg, s.Session.State.User.String())
 	})
 
 	if err = s.Session.Open(); err == nil {
