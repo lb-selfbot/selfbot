@@ -78,12 +78,20 @@ func CheckNitroSniper(
 
 		start := time.Now()
 
-		response, _ := session.Request("POST", url, map[string]any{
-			"country_code":           countryCode,
-			"payment_source_id":      paymentSourceID,
+		payload := map[string]any{
 			"with_application":       false,
 			"with_subscription_plan": true,
-		})
+		}
+
+		if countryCode != "" {
+			payload["country_code"] = countryCode
+		}
+
+		if paymentSourceID != "" {
+			payload["payment_source_id"] = paymentSourceID
+		}
+
+		response, _ := session.Request("POST", url, payload)
 
 		elapsed := time.Since(start)
 
