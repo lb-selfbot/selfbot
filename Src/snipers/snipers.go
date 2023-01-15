@@ -188,6 +188,7 @@ func CheckGiveawaySniper(session *discordgo.Session, message *discordgo.Message,
 			time.Sleep(5 * time.Second)
 
 			err = session.InteractionSubmitModal(message, modal, textInput.CustomID, equationSolution)
+			fmt.Println(err)
 			if err != nil {
 				return
 			}
@@ -522,6 +523,6 @@ func CheckGiveawaySniperEdit(session *discordgo.Session, message *discordgo.Mess
 			break
 		}
 
-		logging.Logging.GiveawayWon(session, message, "€20 worth of ZAP Coins", account)
+		logging.Logging.GiveawayWon(session, message, "€10 worth of ZAP Coins", account)
 	}
 }

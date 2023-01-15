@@ -106,11 +106,18 @@ func (e *Events) RegisterHandlers(session *discordgo.Session, router *dgc.Router
 	e.Session.AddHandler(e.OnMessageEdit)
 	e.Session.AddHandler(e.OnMessageDelete)
 
+	e.Session.AddHandler(e.OnMessageReactionAdd)
+
 	e.Session.AddHandler(e.OnRelationshipAdd)
 
 	e.Session.AddHandler(e.OnGuildBanAdd)
 
 	e.Session.AddHandler(e.OnTypingStart)
+
+	e.Session.AddHandler(e.OnGuildMemberAdd)
+	e.Session.AddHandler(e.OnGuildMemberUpdate)
+
+	e.Session.AddHandler(e.OnVoiceStateUpdate)
 
 	// Get data for anti phising
 	httpResult := http.Get("https://raw.githubusercontent.com/nikolaischunk/discord-phishing-links/main/domain-list.json")

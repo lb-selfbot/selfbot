@@ -290,10 +290,15 @@ func (TrollingCommands) forcenick(ctx *dgc.Ctx) {
 			return
 		}
 	}
+
+	nick := utils.String.RemoveWords(ctx.Arguments.Raw(), 1)
+
+	ctx.Session.GuildMemberNickname(ctx.Event.GuildID, member.User.ID, nick)
+
 	eventhandlers.EventHandlers.Settings.ForceNick = append(eventhandlers.EventHandlers.Settings.ForceNick, eventhandlers.EventEntry{
 		GuildID:  ctx.Event.GuildID,
 		UserID:   member.User.ID,
-		Argument: utils.String.RemoveWords(ctx.Arguments.Raw(), 1),
+		Argument: nick,
 	})
 }
 
@@ -301,65 +306,76 @@ func (TrollingCommands) stopforcenick(ctx *dgc.Ctx) {
 	if !utils.Discord.CheckIfInServer(ctx) {
 		return
 	}
+
 	member, success := utils.Discord.TryGetMemberFromMention(ctx, ctx.Arguments.Get(0))
 	if !success {
 		_ = ctx.RespondText("Could not find user")
 		return
 	}
-	var entry_ *eventhandlers.EventEntry
+
+	newEntries := make([]eventhandlers.EventEntry, 0)
+
 	for _, entry := range eventhandlers.EventHandlers.Settings.ForceNick {
-		if entry.GuildID == ctx.Event.GuildID && entry.UserID == member.User.ID {
-			entry_ = &entry
+		isGuildOrChannel := entry.GuildID == ctx.Event.GuildID || entry.ChannelID == ctx.Event.ChannelID
+		isMember := isGuildOrChannel && entry.UserID == member.User.ID
+
+		if !isMember {
+			newEntries = append(newEntries, entry)
 		}
 	}
-	if entry_ == nil {
-		_ = ctx.RespondText("Users nickname is not being forced")
-		return
-	}
-	eventhandlers.EventHandlers.Settings.ForceNick = utils.RemoveSliceItem(eventhandlers.EventHandlers.Settings.ForceNick, *entry_)
+
+	eventhandlers.EventHandlers.Settings.ForceNick = newEntries
 }
 
 func (TrollingCommands) forcekick(ctx *dgc.Ctx) {
 	if !utils.Discord.CheckIfInServer(ctx) {
 		return
 	}
+
 	member, success := utils.Discord.TryGetMemberFromMention(ctx, ctx.Arguments.Get(0))
 	if !success {
 		_ = ctx.RespondText("Could not find user")
 		return
 	}
+
 	for _, entry := range eventhandlers.EventHandlers.Settings.ForceKick {
 		if entry.GuildID == ctx.Event.GuildID && entry.UserID == member.User.ID {
 			_ = ctx.RespondText("User is already being force kicked")
 			return
 		}
 	}
+
 	eventhandlers.EventHandlers.Settings.ForceKick = append(eventhandlers.EventHandlers.Settings.ForceKick, eventhandlers.EventEntry{
 		GuildID: ctx.Event.GuildID,
 		UserID:  member.User.ID,
 	})
+
+	_ = ctx.Session.GuildMemberDelete(ctx.Event.GuildID, member.User.ID)
 }
 
 func (TrollingCommands) stopforcekick(ctx *dgc.Ctx) {
 	if !utils.Discord.CheckIfInServer(ctx) {
 		return
 	}
+
 	member, success := utils.Discord.TryGetMemberFromMention(ctx, ctx.Arguments.Get(0))
 	if !success {
 		_ = ctx.RespondText("Could not find user")
 		return
 	}
-	var entry_ *eventhandlers.EventEntry
+
+	newEntries := make([]eventhandlers.EventEntry, 0)
+
 	for _, entry := range eventhandlers.EventHandlers.Settings.ForceKick {
-		if entry.GuildID == ctx.Event.GuildID && entry.UserID == member.User.ID {
-			entry_ = &entry
+		isGuildOrChannel := entry.GuildID == ctx.Event.GuildID || entry.ChannelID == ctx.Event.ChannelID
+		isMember := isGuildOrChannel && entry.UserID == member.User.ID
+
+		if !isMember {
+			newEntries = append(newEntries, entry)
 		}
 	}
-	if entry_ == nil {
-		_ = ctx.RespondText("User is not being force kicked")
-		return
-	}
-	eventhandlers.EventHandlers.Settings.ForceKick = utils.RemoveSliceItem(eventhandlers.EventHandlers.Settings.ForceKick, *entry_)
+
+	eventhandlers.EventHandlers.Settings.ForceKick = newEntries
 }
 
 func (TrollingCommands) noleave(ctx *dgc.Ctx) {
@@ -407,22 +423,25 @@ func (TrollingCommands) stopnoleave(ctx *dgc.Ctx) {
 	if !utils.Discord.CheckIfInServer(ctx) {
 		return
 	}
+
 	member, success := utils.Discord.TryGetMemberFromMention(ctx, ctx.Arguments.Get(0))
 	if !success {
 		_ = ctx.RespondText("Could not find user")
 		return
 	}
-	var entry_ *eventhandlers.EventEntry
+
+	newEntries := make([]eventhandlers.EventEntry, 0)
+
 	for _, entry := range eventhandlers.EventHandlers.Settings.NoLeave {
-		if entry.ChannelID == ctx.Event.ChannelID && entry.UserID == member.User.ID {
-			entry_ = &entry
+		isGuildOrChannel := entry.GuildID == ctx.Event.GuildID || entry.ChannelID == ctx.Event.ChannelID
+		isMember := isGuildOrChannel && entry.UserID == member.User.ID
+
+		if !isMember {
+			newEntries = append(newEntries, entry)
 		}
 	}
-	if entry_ == nil {
-		_ = ctx.RespondText("User is not being no leaved")
-		return
-	}
-	eventhandlers.EventHandlers.Settings.NoLeave = utils.RemoveSliceItem(eventhandlers.EventHandlers.Settings.NoLeave, *entry_)
+
+	eventhandlers.EventHandlers.Settings.NoLeave = newEntries
 }
 
 func (TrollingCommands) voicemove(ctx *dgc.Ctx) {
@@ -496,18 +515,19 @@ func (TrollingCommands) stopcopy(ctx *dgc.Ctx) {
 		_ = ctx.RespondText("Could not find user.")
 		return
 	}
-	var entry_ *eventhandlers.EventEntry
+
+	newEntries := make([]eventhandlers.EventEntry, 0)
+
 	for _, entry := range eventhandlers.EventHandlers.Settings.Copy {
-		if entry.UserID == user.ID && (entry.GuildID == ctx.Event.GuildID || entry.ChannelID == ctx.Event.ChannelID) {
-			entry_ = &entry
-			break
+		isGuildOrChannel := entry.GuildID == ctx.Event.GuildID || entry.ChannelID == ctx.Event.ChannelID
+		isMember := isGuildOrChannel && entry.UserID == user.ID
+
+		if !isMember {
+			newEntries = append(newEntries, entry)
 		}
 	}
-	if entry_ == nil {
-		_ = ctx.RespondText("User is not copied")
-		return
-	}
-	eventhandlers.EventHandlers.Settings.Copy = append(eventhandlers.EventHandlers.Settings.Copy, *entry_)
+
+	eventhandlers.EventHandlers.Settings.Copy = newEntries
 }
 
 func (TrollingCommands) mock(ctx *dgc.Ctx) {
@@ -531,18 +551,19 @@ func (TrollingCommands) stopmock(ctx *dgc.Ctx) {
 		_ = ctx.RespondText("Could not find user.")
 		return
 	}
-	var entry_ *eventhandlers.EventEntry
+
+	newEntries := make([]eventhandlers.EventEntry, 0)
+
 	for _, entry := range eventhandlers.EventHandlers.Settings.Mock {
-		if entry.UserID == user.ID && (entry.GuildID == ctx.Event.GuildID || entry.ChannelID == ctx.Event.ChannelID) {
-			entry_ = &entry
-			break
+		isGuildOrChannel := entry.GuildID == ctx.Event.GuildID || entry.ChannelID == ctx.Event.ChannelID
+		isMember := isGuildOrChannel && entry.UserID == user.ID
+
+		if !isMember {
+			newEntries = append(newEntries, entry)
 		}
 	}
-	if entry_ == nil {
-		_ = ctx.RespondText("User is not mocked")
-		return
-	}
-	eventhandlers.EventHandlers.Settings.Mock = append(eventhandlers.EventHandlers.Settings.Mock, *entry_)
+
+	eventhandlers.EventHandlers.Settings.Mock = newEntries
 }
 
 func (TrollingCommands) replycopy(ctx *dgc.Ctx) {
@@ -566,18 +587,19 @@ func (TrollingCommands) stopreplycopy(ctx *dgc.Ctx) {
 		_ = ctx.RespondText("Could not find user.")
 		return
 	}
-	var entry_ *eventhandlers.EventEntry
+
+	newEntries := make([]eventhandlers.EventEntry, 0)
+
 	for _, entry := range eventhandlers.EventHandlers.Settings.ReplyCopy {
-		if entry.UserID == user.ID && (entry.GuildID == ctx.Event.GuildID || entry.ChannelID == ctx.Event.ChannelID) {
-			entry_ = &entry
-			break
+		isGuildOrChannel := entry.GuildID == ctx.Event.GuildID || entry.ChannelID == ctx.Event.ChannelID
+		isMember := isGuildOrChannel && entry.UserID == user.ID
+
+		if !isMember {
+			newEntries = append(newEntries, entry)
 		}
 	}
-	if entry_ == nil {
-		_ = ctx.RespondText("User is not reply copied")
-		return
-	}
-	eventhandlers.EventHandlers.Settings.ReplyCopy = append(eventhandlers.EventHandlers.Settings.ReplyCopy, *entry_)
+
+	eventhandlers.EventHandlers.Settings.ReplyCopy = newEntries
 }
 
 func (TrollingCommands) pinspam(ctx *dgc.Ctx) {
@@ -601,18 +623,19 @@ func (TrollingCommands) stoppinspam(ctx *dgc.Ctx) {
 		_ = ctx.RespondText("Could not find user.")
 		return
 	}
-	var entry_ *eventhandlers.EventEntry
+
+	newEntries := make([]eventhandlers.EventEntry, 0)
+
 	for _, entry := range eventhandlers.EventHandlers.Settings.PinSpam {
-		if entry.UserID == user.ID && (entry.GuildID == ctx.Event.GuildID || entry.ChannelID == ctx.Event.ChannelID) {
-			entry_ = &entry
-			break
+		isGuildOrChannel := entry.GuildID == ctx.Event.GuildID || entry.ChannelID == ctx.Event.ChannelID
+		isMember := isGuildOrChannel && entry.UserID == user.ID
+
+		if !isMember {
+			newEntries = append(newEntries, entry)
 		}
 	}
-	if entry_ == nil {
-		_ = ctx.RespondText("User is not pin spammed")
-		return
-	}
-	eventhandlers.EventHandlers.Settings.PinSpam = append(eventhandlers.EventHandlers.Settings.PinSpam, *entry_)
+
+	eventhandlers.EventHandlers.Settings.PinSpam = newEntries
 }
 
 func (TrollingCommands) unpinspam(ctx *dgc.Ctx) {
@@ -642,18 +665,19 @@ func (TrollingCommands) stopdeletemessages(ctx *dgc.Ctx) {
 		_ = ctx.RespondText("Could not find user.")
 		return
 	}
-	var entry_ *eventhandlers.EventEntry
+
+	newEntries := make([]eventhandlers.EventEntry, 0)
+
 	for _, entry := range eventhandlers.EventHandlers.Settings.DeleteMessages {
-		if entry.UserID == user.ID && (entry.GuildID == ctx.Event.GuildID || entry.ChannelID == ctx.Event.ChannelID) {
-			entry_ = &entry
-			break
+		isGuildOrChannel := entry.GuildID == ctx.Event.GuildID || entry.ChannelID == ctx.Event.ChannelID
+		isMember := isGuildOrChannel && entry.UserID == user.ID
+
+		if !isMember {
+			newEntries = append(newEntries, entry)
 		}
 	}
-	if entry_ == nil {
-		_ = ctx.RespondText("User is not being deleted")
-		return
-	}
-	eventhandlers.EventHandlers.Settings.DeleteMessages = append(eventhandlers.EventHandlers.Settings.DeleteMessages, *entry_)
+
+	eventhandlers.EventHandlers.Settings.DeleteMessages = newEntries
 }
 
 func (TrollingCommands) reactuser(ctx *dgc.Ctx) {
@@ -662,13 +686,19 @@ func (TrollingCommands) reactuser(ctx *dgc.Ctx) {
 		_ = ctx.RespondText("Could not find user.")
 		return
 	}
+
 	for _, entry := range eventhandlers.EventHandlers.Settings.ReactUser {
 		if entry.UserID == user.ID && (entry.GuildID == ctx.Event.GuildID || entry.ChannelID == ctx.Event.ChannelID) {
 			_ = ctx.RespondText("User is already being reacted")
 			return
 		}
 	}
-	eventhandlers.EventHandlers.Settings.ReactUser = append(eventhandlers.EventHandlers.Settings.ReactUser, getEventEntry(ctx, user.ID, utils.Arguments["<emoji>"]))
+
+	emoji := utils.Arguments["<emoji>"]
+	emoji = strings.ReplaceAll(emoji, "<", "")
+	emoji = strings.ReplaceAll(emoji, ">", "")
+
+	eventhandlers.EventHandlers.Settings.ReactUser = append(eventhandlers.EventHandlers.Settings.ReactUser, getEventEntry(ctx, user.ID, emoji))
 }
 
 func (TrollingCommands) stopreactuser(ctx *dgc.Ctx) {
@@ -677,18 +707,19 @@ func (TrollingCommands) stopreactuser(ctx *dgc.Ctx) {
 		_ = ctx.RespondText("Could not find user.")
 		return
 	}
-	var entry_ *eventhandlers.EventEntry
+
+	newEntries := make([]eventhandlers.EventEntry, 0)
+
 	for _, entry := range eventhandlers.EventHandlers.Settings.ReactUser {
-		if entry.UserID == user.ID && (entry.GuildID == ctx.Event.GuildID || entry.ChannelID == ctx.Event.ChannelID) {
-			entry_ = &entry
-			break
+		isGuildOrChannel := entry.GuildID == ctx.Event.GuildID || entry.ChannelID == ctx.Event.ChannelID
+		isMember := isGuildOrChannel && entry.UserID == user.ID
+
+		if !isMember {
+			newEntries = append(newEntries, entry)
 		}
 	}
-	if entry_ == nil {
-		_ = ctx.RespondText("User is not being reacted")
-		return
-	}
-	eventhandlers.EventHandlers.Settings.ReactUser = append(eventhandlers.EventHandlers.Settings.ReactUser, *entry_)
+
+	eventhandlers.EventHandlers.Settings.ReactUser = newEntries
 }
 
 func (TrollingCommands) removereactions(ctx *dgc.Ctx) {
@@ -712,18 +743,19 @@ func (TrollingCommands) stopremovereactions(ctx *dgc.Ctx) {
 		_ = ctx.RespondText("Could not find user.")
 		return
 	}
-	var entry_ *eventhandlers.EventEntry
+
+	newEntries := make([]eventhandlers.EventEntry, 0)
+
 	for _, entry := range eventhandlers.EventHandlers.Settings.RemoveReactions {
-		if entry.UserID == user.ID && (entry.GuildID == ctx.Event.GuildID || entry.ChannelID == ctx.Event.ChannelID) {
-			entry_ = &entry
-			break
+		isGuildOrChannel := entry.GuildID == ctx.Event.GuildID || entry.ChannelID == ctx.Event.ChannelID
+		isMember := isGuildOrChannel && entry.UserID == user.ID
+
+		if !isMember {
+			newEntries = append(newEntries, entry)
 		}
 	}
-	if entry_ == nil {
-		_ = ctx.RespondText("Users reactions are not being removed")
-		return
-	}
-	eventhandlers.EventHandlers.Settings.RemoveReactions = append(eventhandlers.EventHandlers.Settings.RemoveReactions, *entry_)
+
+	eventhandlers.EventHandlers.Settings.RemoveReactions = newEntries
 }
 
 func (TrollingCommands) forcedisconnect(ctx *dgc.Ctx) {
@@ -747,18 +779,19 @@ func (TrollingCommands) stopforcedisconnect(ctx *dgc.Ctx) {
 		_ = ctx.RespondText("Could not find user.")
 		return
 	}
-	var entry_ *eventhandlers.EventEntry
+
+	newEntries := make([]eventhandlers.EventEntry, 0)
+
 	for _, entry := range eventhandlers.EventHandlers.Settings.ForceDisconnect {
-		if entry.UserID == user.ID && (entry.GuildID == ctx.Event.GuildID || entry.ChannelID == ctx.Event.ChannelID) {
-			entry_ = &entry
-			break
+		isGuildOrChannel := entry.GuildID == ctx.Event.GuildID || entry.ChannelID == ctx.Event.ChannelID
+		isMember := isGuildOrChannel && entry.UserID == user.ID
+
+		if !isMember {
+			newEntries = append(newEntries, entry)
 		}
 	}
-	if entry_ == nil {
-		_ = ctx.RespondText("User is not being force disconnected")
-		return
-	}
-	eventhandlers.EventHandlers.Settings.ForceDisconnect = append(eventhandlers.EventHandlers.Settings.ForceDisconnect, *entry_)
+
+	eventhandlers.EventHandlers.Settings.ForceDisconnect = newEntries
 }
 
 func (TrollingCommands) triggertyping(ctx *dgc.Ctx) {

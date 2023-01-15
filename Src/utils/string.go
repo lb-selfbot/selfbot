@@ -122,6 +122,18 @@ func (StringUtils) Capitalize(text string) string {
 	return strings.ToUpper(text[:1]) + text[1:]
 }
 
+func (StringUtils) Mock(text string) string {
+	mock := ""
+	for i, char := range text {
+		if i%2 == 0 {
+			mock += strings.ToUpper(string(char))
+		} else {
+			mock += strings.ToLower(string(char))
+		}
+	}
+	return mock
+}
+
 func (StringUtils) CenterWidth(text string, width int) string {
 	spaceCount := (width - len(text)) / 2
 	return strings.Repeat(" ", spaceCount) + text

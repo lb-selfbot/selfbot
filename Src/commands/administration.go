@@ -1290,7 +1290,7 @@ func (*AdministrationCommands) unmute(ctx *dgc.Ctx) {
 			}
 		}
 
-		member, err = ctx.Session.GuildMemberEdit(ctx.Event.GuildID, member.User.ID, &discordgo.GuildMemberParams{
+		_, err = ctx.Session.GuildMemberEdit(ctx.Event.GuildID, member.User.ID, &discordgo.GuildMemberParams{
 			Roles: &member.Roles,
 		})
 		if err != nil {

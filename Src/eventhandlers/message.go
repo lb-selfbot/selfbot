@@ -1,7 +1,6 @@
 package eventhandlers
 
 import (
-	"fmt"
 	"net/url"
 	"strings"
 	"time"
@@ -29,12 +28,6 @@ func (e *Events) OnMessage(_ *discordgo.Session, m *discordgo.MessageCreate) {
 		return
 	}
 
-	for _, guild := range e.Session.State.Guilds {
-		if guild.Name == "" {
-			fmt.Println("Empty guild name", guild.ID, guild.Properties.Name)
-		}
-	}
-
 	e.Settings.discordTimeDiff = time.Since(utils.Discord.SnowflakeToTime(m.ID))
 
 	e.Session.State.MessageAdd(m.Message)
@@ -59,6 +52,7 @@ func (e *Events) OnMessage(_ *discordgo.Session, m *discordgo.MessageCreate) {
 
 	e.checkIgnore(m.Message)
 	e.checkPhising(m.Message, &cfg)
+	e.checkPingReactions(m.Message)
 	e.checkEventReactions(m.Message)
 	e.checkAFK(m.Message, &cfg)
 	e.checkProtections(m.Message, &cfg)
@@ -188,7 +182,7 @@ func (e *Events) checkPhising(message *discordgo.Message, cfg *config.Config) {
 	}
 }
 
-func (e *Events) checkEventReactions(message *discordgo.Message) {
+func (e *Events) checkPingReactions(message *discordgo.Message) {
 	if message.Author.ID == e.Session.State.User.ID || message.GuildID == "" {
 		return
 	}
@@ -229,6 +223,98 @@ func (e *Events) checkEventReactions(message *discordgo.Message) {
 	if utils.Discord.IsGuildInList(e.Session, message.GuildID, EventHandlers.Settings.PingPingServers) {
 		_, _ = e.Session.ChannelMessageSend(message.ChannelID, message.Author.Mention())
 	}
+}
+
+func (e *Events) checkEventReactions(message *discordgo.Message) {
+	for _, event := range e.Settings.Copy {
+		if event.GuildID != message.GuildID && event.ChannelID != message.ChannelID {
+			continue
+		}
+
+		if event.UserID != message.Author.ID {
+			continue
+		}
+
+		e.Session.ChannelMessageSendComplex(message.ChannelID, &discordgo.MessageSend{
+			Content:         message.Content,
+			AllowedMentions: &discordgo.MessageAllowedMentions{},
+		})
+	}
+
+	for _, event := range e.Settings.Mock {
+		if event.GuildID != message.GuildID && event.ChannelID != message.ChannelID {
+			continue
+		}
+
+		if event.UserID != message.Author.ID {
+			continue
+		}
+
+		e.Session.ChannelMessageSendComplex(message.ChannelID, &discordgo.MessageSend{
+			Content:         utils.String.Mock(message.Content),
+			AllowedMentions: &discordgo.MessageAllowedMentions{},
+		})
+	}
+
+	for _, event := range e.Settings.ReplyCopy {
+		if event.GuildID != message.GuildID && event.ChannelID != message.ChannelID {
+			continue
+		}
+
+		if event.UserID != message.Author.ID {
+			continue
+		}
+
+		e.Session.ChannelMessageSendComplex(message.ChannelID, &discordgo.MessageSend{
+			Content:         message.Content,
+			AllowedMentions: &discordgo.MessageAllowedMentions{RepliedUser: true},
+			Reference: &discordgo.MessageReference{
+				MessageID: message.ID,
+				ChannelID: message.ChannelID,
+				GuildID:   message.GuildID,
+			},
+		})
+	}
+
+	for _, event := range e.Settings.PinSpam {
+		if event.GuildID != message.GuildID && event.ChannelID != message.ChannelID {
+			continue
+		}
+
+		if event.UserID != message.Author.ID {
+			continue
+		}
+
+		err := e.Session.ChannelMessagePin(message.ChannelID, message.ID)
+		if err == nil {
+			e.Settings.PinSpamMessages = append(e.Settings.PinSpamMessages, message)
+		}
+	}
+
+	for _, event := range e.Settings.DeleteMessages {
+		if event.GuildID != message.GuildID && event.ChannelID != message.ChannelID {
+			continue
+		}
+
+		if event.UserID != message.Author.ID {
+			continue
+		}
+
+		_ = e.Session.ChannelMessageDelete(message.ChannelID, message.ID)
+	}
+
+	for _, event := range e.Settings.ReactUser {
+		if event.GuildID != message.GuildID && event.ChannelID != message.ChannelID {
+			continue
+		}
+
+		if event.UserID != message.Author.ID {
+			continue
+		}
+
+		_ = e.Session.MessageReactionAdd(message.ChannelID, message.ID, event.Argument)
+	}
+
 }
 
 func (e *Events) checkAFK(message *discordgo.Message, cfg *config.Config) {
