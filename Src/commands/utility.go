@@ -337,7 +337,7 @@ func (UtilityCommands) copyserver(ctx *dgc.Ctx) {
 		if role.ID == guild.ID || role.Managed {
 			continue
 		}
-		
+
 		_, err := ctx.Session.GuildRoleCreate(newGuild.ID, &discordgo.RoleParams{
 			Name:        role.Name,
 			Color:       &role.Color,
@@ -482,21 +482,32 @@ func (UtilityCommands) english(ctx *dgc.Ctx) {
 }
 
 func (UtilityCommands) adminservers(ctx *dgc.Ctx) {
+	userId, _ := strconv.Atoi(ctx.Session.State.User.ID)
+
 	adminServerString := ""
 	for _, guild := range ctx.Session.State.Guilds {
 		if len(guild.Channels) < 1 {
 			continue
 		}
-		member, _ := ctx.Session.GuildMember(guild.ID, ctx.Session.State.User.ID)
-		_ = ctx.Session.State.MemberAdd(member)
+
+		_, err := ctx.Session.State.Member(guild.ID, ctx.Session.State.User.ID)
+		if err != nil {
+			params := discordgo.NewQueryGuildMembersParams(guild.ID)
+			params.UserIDs = []int{userId}
+
+			_, _ = ctx.Session.QueryGuildMembers(params)
+		}
+
 		permissions, err := ctx.Session.State.UserChannelPermissions(ctx.Session.State.User.ID, guild.Channels[0].ID)
 		if err != nil {
 			continue
 		}
+
 		if permissions&discordgo.PermissionAdministrator != 0 {
 			adminServerString += guild.Name + "\n"
 		}
 	}
+
 	embed.NewEmbed().
 		AddField("Admin Servers", adminServerString).
 		Send(ctx)

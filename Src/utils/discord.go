@@ -32,14 +32,24 @@ func (DiscordUtils) TryGetUserFromMention(session *discordgo.Session, mention *d
 }
 
 func (DiscordUtils) TryGetMemberFromMention(ctx *dgc.Ctx, mention *dgc.Argument) (*discordgo.Member, bool) {
-	userID := Misc.Or(mention.AsUserMentionID(), mention.Raw())
-	member, err := ctx.Session.State.Member(ctx.Event.GuildID, userID)
+	userId := Misc.Or(mention.AsUserMentionID(), mention.Raw())
+	member, err := ctx.Session.State.Member(ctx.Event.GuildID, userId)
 	if err != nil {
-		member, err = ctx.Session.GuildMember(ctx.Event.GuildID, Misc.Or(mention.AsUserMentionID(), mention.Raw()))
+		userIdInt, err := strconv.Atoi(userId)
+		if err != nil {
+			return nil, false
+		}
+
+		params := discordgo.NewQueryGuildMembersParams(ctx.Event.GuildID)
+		params.UserIDs = []int{userIdInt}
+
+		members, _ := ctx.Session.QueryGuildMembers(params)
+
+		if len(members) > 0 {
+			member = members[0]
+		}
 	}
-	if err != nil {
-		return nil, false
-	}
+
 	return member, true
 }
 

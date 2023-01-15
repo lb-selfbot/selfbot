@@ -64,7 +64,7 @@ func (s *SniperInstance) Start() error {
 		if err != nil {
 			return
 		}
-		
+
 		eventhandlers.EventHandlers.Settings.AlreadyCheckedNitroCodes, eventhandlers.EventHandlers.Settings.SentNitroCodes = snipers.CheckNitroSniper(
 			s.Session,
 			m.Message,
@@ -109,7 +109,7 @@ func Init(cfg config.Config) {
 
 	if len(SniperInstances) > 0 {
 		go func() {
-			time.Sleep(time.Second * 5)
+			time.Sleep(time.Second * 3)
 			logging.Logging.MultiTokenSniperConnected(len(SniperInstances))
 		}()
 	}

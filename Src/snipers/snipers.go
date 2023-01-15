@@ -188,7 +188,6 @@ func CheckGiveawaySniper(session *discordgo.Session, message *discordgo.Message,
 			time.Sleep(5 * time.Second)
 
 			err = session.InteractionSubmitModal(message, modal, textInput.CustomID, equationSolution)
-			fmt.Println(err)
 			if err != nil {
 				return
 			}
