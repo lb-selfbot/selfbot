@@ -77,7 +77,7 @@ func GetSessions(session *discordgo.Session) ([]*UserSessions, error) {
 		}
 	}
 
-	return sessionData.UserSessions, nil
+	return userSessions, nil
 }
 
 func CheckSessions(session *discordgo.Session) {

@@ -200,7 +200,6 @@ func main() {
 
 	session.Token = cfg.Account.Discord.Token
 	session.Identify.Token = cfg.Account.Discord.Token
-	session.ShouldSubscribeGuilds = false // TODO
 
 	router := dgc.Create(&dgc.Router{
 		PrefixFunc: func() []string {
