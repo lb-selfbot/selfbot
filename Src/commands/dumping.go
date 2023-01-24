@@ -10,6 +10,7 @@ import (
 	"github.com/LightningDev1/LB-Selfbot/http"
 	"github.com/LightningDev1/LB-Selfbot/utils"
 	"github.com/LightningDev1/dgc"
+	"github.com/LightningDev1/discordgo"
 )
 
 type DumpingCommands struct{}
@@ -382,6 +383,8 @@ func (*DumpingCommands) dumpmembers(ctx *dgc.Ctx) {
 		_ = ctx.RespondText("Error getting server: " + err.Error())
 		return
 	}
+
+	ctx.Session.FetchGuildMembers(discordgo.NewFetchGuildMembersParams(guild.ID))
 
 	logString := fmt.Sprintf("Amount of dumped members: %d\n\n", len(guild.Members))
 	for _, member := range guild.Members {
