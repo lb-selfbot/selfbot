@@ -8,7 +8,7 @@ import (
 
 	"github.com/LightningDev1/LB-Selfbot/config"
 	"github.com/LightningDev1/LB-Selfbot/constants"
-	"github.com/LightningDev1/LB-Selfbot/logging"
+	"github.com/LightningDev1/LB-Selfbot/http"
 	"github.com/LightningDev1/dgc"
 	"github.com/LightningDev1/discordgo"
 )
@@ -437,7 +437,6 @@ func (e *Embed) Send(ctx *dgc.Ctx) []*discordgo.Message {
 	for _, text := range e.ToString(commandMode) {
 		message, err := ctx.Session.ChannelMessageSend(ctx.Event.ChannelID, text)
 		if err != nil {
-			logging.UI.Error("Error sending message: " + err.Error())
 			continue
 		}
 
@@ -456,6 +455,14 @@ func (e *Embed) Send(ctx *dgc.Ctx) []*discordgo.Message {
 	}
 
 	return messages
+}
+
+func (e *Embed) SendWebhook(webhookUrl string) *http.HttpResponse {
+	return http.PostJson(webhookUrl, map[string]any{
+		"embeds":     []any{e},
+		"username":   "LightningBot Webhook Notifications",
+		"avatar_url": "https://lightning-bot.com/logo.png",
+	})
 }
 
 func getCommandMode(cfg config.Config) string {

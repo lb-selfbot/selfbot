@@ -6,13 +6,15 @@ import (
 	"time"
 
 	"github.com/LightningDev1/LB-Selfbot/constants"
+	"github.com/LightningDev1/LB-Selfbot/embed"
 	"github.com/LightningDev1/LB-Selfbot/utils"
 )
 
 type ConsoleMessage struct {
-	Title string
-	Color string
-	Info  *list.List
+	Title      string
+	Color      string
+	WebhookURL string
+	Info       *list.List
 }
 
 func (c *ConsoleMessage) SetTitle(title string) *ConsoleMessage {
@@ -22,6 +24,11 @@ func (c *ConsoleMessage) SetTitle(title string) *ConsoleMessage {
 
 func (c *ConsoleMessage) SetColor(color string) *ConsoleMessage {
 	c.Color = color
+	return c
+}
+
+func (c *ConsoleMessage) SetWebhookURL(webhookURL string) *ConsoleMessage {
+	c.WebhookURL = webhookURL
 	return c
 }
 
@@ -68,6 +75,21 @@ func (c *ConsoleMessage) Show() {
 	}
 
 	UI.Append(message)
+
+	if c.WebhookURL != "" {
+		emb := embed.NewEmbed().SetTitle(c.Title)
+
+		for e := c.Info.Front(); e != nil; e = e.Next() {
+			info := e.Value.([]string)
+			if info[0] != "" {
+				emb.AddField(info[0], info[1], false)
+			} else {
+				emb.AddField("Extra Info", info[1], false)
+			}
+		}
+
+		emb.SendWebhook(c.WebhookURL)
+	}
 }
 
 func NewConsoleMessage() *ConsoleMessage {

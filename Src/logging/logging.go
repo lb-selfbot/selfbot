@@ -81,6 +81,9 @@ func (_Logging) NitroSniperFake(session *discordgo.Session, message *discordgo.M
 	guildName := utils.Discord.GetGuildName(session, message.GuildID)
 	channelName := utils.Discord.GetChannelName(session, message.ChannelID)
 	UI.Notification(fmt.Sprintf("Nitro Sniper: Fake Code\nServer: %s\nChannel: %s\nAuthor: %s\nCode: %s", guildName, channelName, message.Author.String(), code))
+
+	cfg, _ := config.GetConfig()
+
 	NewConsoleMessage().
 		SetTitle("Nitro Sniper").
 		SetColor("#C1EFFF").
@@ -90,6 +93,7 @@ func (_Logging) NitroSniperFake(session *discordgo.Session, message *discordgo.M
 		AddInfo("Channel", channelName).
 		AddInfo("Code", code).
 		AddInfoConditional("On Account", account, account != "").
+		SetWebhookURL(cfg.Webhooks.NitroSniper).
 		Show()
 }
 
@@ -97,6 +101,7 @@ func (_Logging) NitroSniper(session *discordgo.Session, message *discordgo.Messa
 	guildName := utils.Discord.GetGuildName(session, message.GuildID)
 	channelName := utils.Discord.GetChannelName(session, message.ChannelID)
 	UI.Notification(fmt.Sprintf("Nitro Sniper: %s\nServer: %s\nChannel: %s\nAuthor: %s\nCode: %s", status, guildName, channelName, message.Author.String(), code))
+	cfg, _ := config.GetConfig()
 	NewConsoleMessage().
 		SetTitle("Nitro Sniper").
 		SetColor("#C1EFFF").
@@ -107,53 +112,64 @@ func (_Logging) NitroSniper(session *discordgo.Session, message *discordgo.Messa
 		AddInfo("Code", code).
 		AddInfo("Snipe Time", elapsed.String()).
 		AddInfoConditional("On Account", account, account != "").
+		SetWebhookURL(cfg.Webhooks.NitroSniper).
 		Show()
 }
 
 func (_Logging) BanNotifier(session *discordgo.Session, guildID string) {
 	guildName := utils.Discord.GetGuildName(session, guildID)
 	UI.Notification("Ban Notifier: You have been banned from " + guildName)
+	cfg, _ := config.GetConfig()
 	NewConsoleMessage().
 		SetTitle("Ban Notifier").
 		SetColor("#C1EFFF").
 		AddInfo("", "You have been banned from "+guildName).
+		SetWebhookURL(cfg.Webhooks.Notifiers).
 		Show()
 }
 
 func (_Logging) DMNotifier(message *discordgo.Message) {
 	UI.Notification("DM Notifier: New DM from " + message.Author.String())
+	cfg, _ := config.GetConfig()
 	NewConsoleMessage().
 		SetTitle("DM Notifier").
 		SetColor("#C1EFFF").
 		AddInfo("", "New DM from "+message.Author.String()).
+		SetWebhookURL(cfg.Webhooks.Notifiers).
 		Show()
 }
 
 func (_Logging) DMEditNotifier(message *discordgo.Message) {
 	UI.Notification("DM Edit Notifier: Edited DM from " + message.Author.String())
+	cfg, _ := config.GetConfig()
 	NewConsoleMessage().
 		SetTitle("DM Edit Notifier").
 		SetColor("#C1EFFF").
 		AddInfo("", "Edited DM from "+message.Author.String()).
+		SetWebhookURL(cfg.Webhooks.Notifiers).
 		Show()
 }
 
 func (_Logging) DMDeleteNotifier(message *discordgo.Message) {
 	UI.Notification("DM Delete Notifier: Deleted DM from " + message.Author.String())
+	cfg, _ := config.GetConfig()
 	NewConsoleMessage().
 		SetTitle("DM Delete Notifier").
 		SetColor("#C1EFFF").
 		AddInfo("", "Deleted DM from "+message.Author.String()).
 		AddInfo("Content", message.Content).
+		SetWebhookURL(cfg.Webhooks.Notifiers).
 		Show()
 }
 
 func (_Logging) DMTypingNotifier(userName string) {
 	UI.Notification("DM Typing Notifier: " + userName + " is typing")
+	cfg, _ := config.GetConfig()
 	NewConsoleMessage().
 		SetTitle("DM Typing Notifier").
 		SetColor("#C1EFFF").
 		AddInfo("", userName+" is typing").
+		SetWebhookURL(cfg.Webhooks.Notifiers).
 		Show()
 }
 
@@ -161,6 +177,7 @@ func (_Logging) MessageDeleteNotifier(session *discordgo.Session, message *disco
 	guildName := utils.Discord.GetGuildName(session, message.GuildID)
 	channelName := utils.Discord.GetChannelName(session, message.ChannelID)
 	UI.Notification("Message Delete Notifier: Deleted message from " + message.Author.String())
+	cfg, _ := config.GetConfig()
 	NewConsoleMessage().
 		SetTitle("Message Delete Notifier").
 		SetColor("#C1EFFF").
@@ -168,6 +185,7 @@ func (_Logging) MessageDeleteNotifier(session *discordgo.Session, message *disco
 		AddInfo("Content", message.Content).
 		AddInfo("Server", guildName).
 		AddInfo("Channel", channelName).
+		SetWebhookURL(cfg.Webhooks.Notifiers).
 		Show()
 }
 
@@ -175,12 +193,14 @@ func (_Logging) DiscordStaffDetection(session *discordgo.Session, message *disco
 	guildName := utils.Discord.GetGuildName(session, message.GuildID)
 	channelName := utils.Discord.GetChannelName(session, message.ChannelID)
 	UI.Notification("Discord Staff Detection: " + message.Author.String() + " is Discord staff")
+	cfg, _ := config.GetConfig()
 	NewConsoleMessage().
 		SetTitle("Discord Staff Detection").
 		SetColor("#C1EFFF").
 		AddInfo("", message.Author.String()+" is Discord staff").
 		AddInfo("Server", guildName).
 		AddInfo("Channel", channelName).
+		SetWebhookURL(cfg.Webhooks.StaffDetection).
 		Show()
 }
 
@@ -188,12 +208,14 @@ func (_Logging) GhostPingDetection(session *discordgo.Session, message *discordg
 	guildName := utils.Discord.GetGuildName(session, message.GuildID)
 	channelName := utils.Discord.GetChannelName(session, message.ChannelID)
 	UI.Notification("Ghostping Detection: " + message.Author.String() + " has pinged you")
+	cfg, _ := config.GetConfig()
 	NewConsoleMessage().
 		SetTitle("Ghostping Detection").
 		SetColor("#C1EFFF").
 		AddInfo("", message.Author.String()+" has pinged you").
 		AddInfo("Server", guildName).
 		AddInfo("Channel", channelName).
+		SetWebhookURL(cfg.Webhooks.PingDetection).
 		Show()
 }
 
@@ -201,6 +223,7 @@ func (_Logging) SelfbotDetection(session *discordgo.Session, message *discordgo.
 	guildName := utils.Discord.GetGuildName(session, message.GuildID)
 	channelName := utils.Discord.GetChannelName(session, message.ChannelID)
 	UI.Notification("Selfbot Detection: " + message.Author.String() + " was detected using a selfbot")
+	cfg, _ := config.GetConfig()
 	NewConsoleMessage().
 		SetTitle("Selfbot Detection").
 		SetColor("#C1EFFF").
@@ -208,12 +231,14 @@ func (_Logging) SelfbotDetection(session *discordgo.Session, message *discordgo.
 		AddInfo("Server", guildName).
 		AddInfo("Channel", channelName).
 		AddInfo("Selfbot", selfbot).
+		SetWebhookURL(cfg.Webhooks.SelfbotDetection).
 		Show()
 }
 
 func (_Logging) TicketNotifier(session *discordgo.Session, channel *discordgo.Channel) {
 	guildName := utils.Discord.GetGuildName(session, channel.GuildID)
 	channelName := utils.Discord.GetChannelName(session, channel.ID)
+	cfg, _ := config.GetConfig()
 	NewConsoleMessage().
 		SetTitle("Ticket Notifier").
 		SetColor("#C1EFFF").
@@ -221,6 +246,7 @@ func (_Logging) TicketNotifier(session *discordgo.Session, channel *discordgo.Ch
 		AddInfo("Server", guildName).
 		AddInfo("Channel", channelName).
 		AddInfo("Ticket", channelName).
+		SetWebhookURL(cfg.Webhooks.Notifiers).
 		Show()
 }
 
@@ -228,6 +254,7 @@ func (_Logging) PhisingDetected(session *discordgo.Session, message *discordgo.M
 	guildName := utils.Discord.GetGuildName(session, message.GuildID)
 	channelName := utils.Discord.GetChannelName(session, message.ChannelID)
 	UI.Notification(fmt.Sprintf("Protections: Phising Detected!\nDomain: %s\nAuthor: %s", domain, message.Author.String()))
+	cfg, _ := config.GetConfig()
 	NewConsoleMessage().
 		SetTitle("Protections").
 		SetColor("#C1EFFF").
@@ -236,26 +263,31 @@ func (_Logging) PhisingDetected(session *discordgo.Session, message *discordgo.M
 		AddInfo("Author", message.Author.String()).
 		AddInfo("Server", guildName).
 		AddInfo("Channel", channelName).
+		SetWebhookURL(cfg.Webhooks.Misc).
 		Show()
 }
 
 func (_Logging) MassDMBlocked() {
 	UI.Notification("Protections: Mass DM Blocked!\nDMs will be enabled again in 5 minutes.")
+	cfg, _ := config.GetConfig()
 	NewConsoleMessage().
 		SetTitle("Protections").
 		SetColor("#C1EFFF").
 		AddInfo("", "Mass DM Blocked!").
 		AddInfo("", "DMs will be enabled again in 5 minutes.").
+		SetWebhookURL(cfg.Webhooks.Misc).
 		Show()
 }
 
 func (_Logging) FriendRequestSpamBlocked() {
 	UI.Notification("Protections: Friend Request Spam Blocked!\nFriend Requests will be enabled again in 5 minutes.")
+	cfg, _ := config.GetConfig()
 	NewConsoleMessage().
 		SetTitle("Protections").
 		SetColor("#C1EFFF").
 		AddInfo("", "Friend Request Spam Blocked!").
 		AddInfo("", "Friend Requests will be enabled again in 5 minutes.").
+		SetWebhookURL(cfg.Webhooks.Misc).
 		Show()
 }
 
@@ -263,12 +295,14 @@ func (_Logging) AntiDelete(session *discordgo.Session, message *discordgo.Messag
 	guildName := utils.Discord.GetGuildName(session, message.GuildID)
 	channelName := utils.Discord.GetChannelName(session, message.ChannelID)
 	UI.Notification("Anti Delete: " + message.Author.String() + " deleted a message in " + guildName)
+	cfg, _ := config.GetConfig()
 	NewConsoleMessage().
 		SetTitle("Protections").
 		SetColor("#C1EFFF").
 		AddInfo("", message.Author.String()+" deleted a message").
 		AddInfo("Server", guildName).
 		AddInfo("Channel", channelName).
+		SetWebhookURL(cfg.Webhooks.Misc).
 		Show()
 }
 
@@ -279,6 +313,7 @@ func (_Logging) GiveawayFound(session *discordgo.Session, message *discordgo.Mes
 	if hostName == "Unknown" {
 		hostName = host
 	}
+	cfg, _ := config.GetConfig()
 	UI.Notification("Giveaway Sniper: Found a giveaway in " + guildName + "\nPrize: " + prize)
 	NewConsoleMessage().
 		SetTitle("Giveaway Sniper").
@@ -291,6 +326,7 @@ func (_Logging) GiveawayFound(session *discordgo.Session, message *discordgo.Mes
 		AddInfoConditional("Hosted By", hostName, hostName != "").
 		AddInfoConditional("Ends In", endsIn, endsIn != "").
 		AddInfoConditional("On Account", account, account != "").
+		SetWebhookURL(cfg.Webhooks.GiveawaySniper).
 		Show()
 }
 
@@ -298,6 +334,7 @@ func (_Logging) GiveawayWon(session *discordgo.Session, message *discordgo.Messa
 	guildName := utils.Discord.GetGuildName(session, message.GuildID)
 	channelName := utils.Discord.GetChannelName(session, message.ChannelID)
 	UI.Notification("Giveaway Sniper: Won a giveaway in " + guildName + "\nPrize: " + prize)
+	cfg, _ := config.GetConfig()
 	NewConsoleMessage().
 		SetTitle("Giveaway Sniper").
 		SetColor("#C1EFFF").
@@ -307,6 +344,7 @@ func (_Logging) GiveawayWon(session *discordgo.Session, message *discordgo.Messa
 		AddInfo("Bot", message.Author.String()).
 		AddInfoConditional("Prize", prize, prize != "").
 		AddInfoConditional("On Account", account, account != "").
+		SetWebhookURL(cfg.Webhooks.Notifiers).
 		Show()
 }
 
@@ -315,12 +353,15 @@ func (_Logging) MultiTokenSniperConnected(amount int) {
 	if amount > 1 {
 		info = strings.ReplaceAll(info, "Account", "Accounts")
 	}
-	
+
+	cfg, _ := config.GetConfig()
+
 	UI.Notification("Multi Token Sniper: " + info)
 	NewConsoleMessage().
 		SetTitle("Multi Token Sniper").
 		SetColor("#C1EFFF").
 		AddInfo("", info).
+		SetWebhookURL(cfg.Webhooks.Misc).
 		Show()
 }
 
@@ -341,6 +382,7 @@ func (_Logging) SessionConnected(id, os, client string) {
 		AddInfo("Session ID", id).
 		AddInfo("OS", os).
 		AddInfo("Client", client).
+		SetWebhookURL(cfg.Webhooks.Sessions).
 		Show()
 }
 
@@ -361,6 +403,7 @@ func (_Logging) SessionDisconnected(id, os, client string) {
 		AddInfo("Session ID", id).
 		AddInfo("OS", os).
 		AddInfo("Client", client).
+		SetWebhookURL(cfg.Webhooks.Sessions).
 		Show()
 }
 
