@@ -109,10 +109,17 @@ func (e *Events) OnMessageEdit(_ *discordgo.Session, m *discordgo.MessageUpdate)
 }
 
 func (e *Events) OnMessageDelete(_ *discordgo.Session, m *discordgo.MessageDelete) {
-	m.Message = m.BeforeDelete
+	if m.BeforeDelete != nil {
+		m.Message = m.BeforeDelete
+	}
 
-	if m.Message == nil || m.Author == nil {
-		utils.Logging.Debug("MessageDelete: Author or Message is nil: ", m.Author, m.Message)
+	if m.Message == nil {
+		utils.Logging.Debug("MessageDelete: Message is nil: ", m.Message)
+		return
+	}
+
+	if m.Author == nil {
+		utils.Logging.Debug("MessageDelete: Author is nil: ", m.Author)
 		return
 	}
 
