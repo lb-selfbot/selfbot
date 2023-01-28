@@ -188,7 +188,7 @@ func renderCategoryHelp(router *dgc.Router, category *dgc.Category, rawArgument 
 func renderDefaultGeneralHelpEmbed(router *dgc.Router) *embed.Embed {
 	cfg, _ := config.GetConfig()
 	categoriesString := ""
-	if !cfg.Selfbot.MobileFriendly {
+	if !cfg.Selfbot.MobileFriendly && cfg.Selfbot.CommandMode == "Text" {
 		categoriesString = "ansi\n\x1B[1;31m"
 	}
 	for _, category := range router.Categories {
