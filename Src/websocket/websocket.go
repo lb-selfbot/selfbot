@@ -182,7 +182,7 @@ func (w *WebsocketConnection) Ping() {
 func (w *WebsocketConnection) WaitUntilConnected() {
 	// We can't use a channel here because we need this to work in multiple goroutines
 	for !w.Connected {
-		time.Sleep(50 * time.Millisecond)
+		time.Sleep(20 * time.Millisecond)
 	}
 }
 
@@ -239,6 +239,9 @@ func (w *WebsocketConnection) OnMessage(msg WsMessage) {
 		ipc.ConfigUpdate(msg.Data.Config)
 	case "PONG":
 		break
+	case "ANOTHER_SELFBOT_CONNECTED":
+		// handled by error handler
+		break
 	default:
 		utils.Logging.Warn("Unknown op", msg.Op)
 	}
@@ -247,23 +250,18 @@ func (w *WebsocketConnection) OnMessage(msg WsMessage) {
 func (w *WebsocketConnection) CloseHandler(code int, text string) error {
 	w.Connected = false
 
-	utils.Logging.Info("websocket closed", code, text)
+	utils.Logging.Error("websocket closed", code, text)
 
-	err := w.Connect()
-	if err != nil {
-		w.LogError(err, -1)
-		return err
-	}
 	return nil
 }
 
 func (w *WebsocketConnection) OnError(err error) {
 	w.Connected = false
 
-	utils.Logging.Error(err)
+	utils.Logging.Error("websocket error:", err)
 
 	closeError, ok := err.(*websocket.CloseError)
-	if ok {
+	if ok && closeError.Code > 3000 {
 		w.LogError(err, closeError.Code)
 		return
 	}
@@ -277,7 +275,7 @@ func (w *WebsocketConnection) OnError(err error) {
 
 		err = w.Connect()
 		if err != nil {
-			w.LogError(err, -1)
+			w.OnError(err)
 		}
 
 		return
