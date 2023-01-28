@@ -33,7 +33,12 @@ type WebsocketConnection struct {
 	Ready        bool
 	ReadyChannel chan struct{}
 
-	Errors   int
+	// Sliding window for errors
+	Errors      int
+	MaxErrors   int
+	ErrorStart  time.Time
+	ErrorWindow time.Duration
+
 	LogError func(err error, closeCode int)
 
 	Username string
@@ -68,6 +73,10 @@ func (w *WebsocketConnection) Init(username, password string) error {
 	w.Connected = false
 	w.Ready = false
 	w.ReadyChannel = make(chan struct{}, 128)
+
+	w.MaxErrors = 5
+	w.ErrorStart = time.Now()
+	w.ErrorWindow = 15 * time.Second
 
 	w.Username = username
 	w.Password = password
@@ -268,21 +277,24 @@ func (w *WebsocketConnection) OnError(err error) {
 
 	w.Errors++
 
-	if w.Errors < 5 {
-		time.Sleep(1 * time.Second)
-
-		utils.Logging.Debug("reconnecting...")
-
-		err = w.Connect()
-		if err != nil {
-			w.OnError(err)
-		}
-
-		return
+	if time.Since(w.ErrorStart) > w.ErrorWindow {
+		w.ErrorStart = time.Now()
+		w.Errors = 1
 	}
 
-	w.LogError(err, -1)
-	os.Exit(1)
+	if w.Errors > w.MaxErrors {
+		w.LogError(err, -1)
+		os.Exit(1)
+	}
+
+	time.Sleep(2 * time.Second)
+
+	utils.Logging.Info("reconnecting websocket...")
+
+	err = w.Connect()
+	if err != nil {
+		w.OnError(err)
+	}
 }
 
 var Websocket = &WebsocketConnection{}
