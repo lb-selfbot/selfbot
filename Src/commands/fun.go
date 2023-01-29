@@ -428,6 +428,30 @@ func (f FunCommands) RegisterCommands(router *dgc.Router) {
 		Usage:       "[p]lyrics <song name>",
 		Handler:     f.lyrics,
 	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "breakingbadquote",
+		Description: "Send a random Breaking Badquote",
+		Usage:       "[p]breakingbadquote",
+		Handler:     f.breakingbadquote,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "gameofthronesquote",
+		Description: "Send a random Game of Thrones quote",
+		Usage:       "[p]gameofthronesquote",
+		Handler:     f.gameofthronesquote,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "luciferquote",
+		Description: "Send a random Lucifer quote",
+		Usage:       "[p]luciferquote",
+		Handler:     f.luciferquote,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "strangerthingsquote",
+		Description: "Send a random Stranger Things quote",
+		Usage:       "[p]strangerthingsquote",
+		Handler:     f.strangerthingsquote,
+	})
 }
 
 func (FunCommands) eightball(ctx *dgc.Ctx) {
@@ -1222,5 +1246,53 @@ func (FunCommands) lyrics(ctx *dgc.Ctx) {
 		AddField("Artist", lyrics.Get("author").MustString()).
 		AddField("Title", lyrics.Get("title").MustString()).
 		AddField("Lyrics", lyrics.Get("lyrics").MustString()).
+		Send(ctx)
+}
+
+func (FunCommands) breakingbadquote(ctx *dgc.Ctx) {
+	quote, err := http.GetJson("https://api.lightning-bot.com/api/v3/misc/breaking-bad-quote")
+	if err != nil {
+		_ = ctx.RespondText("An error has occurred.")
+		return
+	}
+	embed.NewEmbed().
+		AddField("Quote", quote.Get("quote").MustString()).
+		AddField("Author", quote.Get("author").MustString()).
+		Send(ctx)
+}
+
+func (FunCommands) gameofthronesquote(ctx *dgc.Ctx) {
+	quote, err := http.GetJson("https://api.lightning-bot.com/api/v3/misc/game-of-thrones-quote")
+	if err != nil {
+		_ = ctx.RespondText("An error has occurred.")
+		return
+	}
+	embed.NewEmbed().
+		AddField("Quote", quote.Get("quote").MustString()).
+		AddField("Author", quote.Get("author").MustString()).
+		Send(ctx)
+}
+
+func (FunCommands) strangerthingsquote(ctx *dgc.Ctx) {
+	quote, err := http.GetJson("https://api.lightning-bot.com/api/v3/misc/stranger-things-quote")
+	if err != nil {
+		_ = ctx.RespondText("An error has occurred.")
+		return
+	}
+	embed.NewEmbed().
+		AddField("Quote", quote.Get("quote").MustString()).
+		AddField("Author", quote.Get("author").MustString()).
+		Send(ctx)
+}
+
+func (FunCommands) luciferquote(ctx *dgc.Ctx) {
+	quote, err := http.GetJson("https://api.lightning-bot.com/api/v3/misc/lucifer-quote")
+	if err != nil {
+		_ = ctx.RespondText("An error has occurred.")
+		return
+	}
+	embed.NewEmbed().
+		AddField("Quote", quote.Get("quote").MustString()).
+		AddField("Author", quote.Get("author").MustString()).
 		Send(ctx)
 }
