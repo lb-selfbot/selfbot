@@ -452,6 +452,18 @@ func (f FunCommands) RegisterCommands(router *dgc.Router) {
 		Usage:       "[p]strangerthingsquote",
 		Handler:     f.strangerthingsquote,
 	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "xkcd",
+		Description: "Send the current XKCD comic",
+		Usage:       "[p]xkcd",
+		Handler:     f.xkcd,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "boredactivity",
+		Description: "Send a random activity to do when bored",
+		Usage:       "[p]boredactivity",
+		Handler:     f.boredactivity,
+	})
 }
 
 func (FunCommands) eightball(ctx *dgc.Ctx) {
@@ -1294,5 +1306,37 @@ func (FunCommands) luciferquote(ctx *dgc.Ctx) {
 	embed.NewEmbed().
 		AddField("Quote", quote.Get("quote").MustString()).
 		AddField("Author", quote.Get("author").MustString()).
+		Send(ctx)
+}
+
+func (FunCommands) xkcd(ctx *dgc.Ctx) {
+	json, err := http.GetJson("https://xkcd.com/info.0.json")
+	if err != nil {
+		_ = ctx.RespondText("An error has occurred.")
+		return
+	}
+
+	date := json.Get("day").MustString() + "/" + json.Get("month").MustString() + "/" + json.Get("year").MustString()
+
+	embed.NewEmbed().
+		AddField("Title", json.Get("title").MustString()).
+		AddField("Date", date).
+		SetImage(json.Get("img").MustString()).
+		Send(ctx)
+}
+
+func (FunCommands) boredactivity(ctx *dgc.Ctx) {
+	json, err := http.GetJson("https://www.boredapi.com/api/activity")
+	if err != nil {
+		_ = ctx.RespondText("An error has occurred.")
+		return
+	}
+
+	activityType := utils.String.Capitalize(json.Get("type").MustString())
+
+	embed.NewEmbed().
+		AddField("Activity", json.Get("activity").MustString()).
+		AddField("Type", activityType).
+		SetImage(json.Get("img").MustString()).
 		Send(ctx)
 }
