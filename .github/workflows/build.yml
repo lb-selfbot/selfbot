@@ -26,6 +26,10 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-golang-
       
+      - name: Install dependencies
+        run: |
+          sudo apt-get install gcc-multilib
+      
       - name: Create directories
         run: |
           mkdir ${{ github.workspace }}/executables
