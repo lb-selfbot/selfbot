@@ -3,6 +3,7 @@ package commands
 import (
 	"strings"
 
+	"github.com/LightningDev1/LB-Selfbot/api"
 	"github.com/LightningDev1/LB-Selfbot/config"
 	"github.com/LightningDev1/LB-Selfbot/utils"
 	"github.com/LightningDev1/dgc"
@@ -65,6 +66,30 @@ func (p ProtectionsCommands) RegisterCommands(router *dgc.Router) {
 		Description: "Turn anti delete on or off",
 		Usage:       "[p]antidelete <on/off>",
 		Handler:     p.antidelete,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "closedm",
+		Description: "Close your DMs",
+		Usage:       "[p]closedm",
+		Handler:     p.closedm,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "opendm",
+		Description: "Allow DMs from everyone",
+		Usage:       "[p]opendm",
+		Handler:     p.opendm,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "enablefriendrequests",
+		Description: "Enable friend requests",
+		Usage:       "[p]enablefriendrequests",
+		Handler:     p.enablefriendrequests,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "disablefriendrequests",
+		Description: "Disable friend requests",
+		Usage:       "[p]disablefriendrequests",
+		Handler:     p.disablefriendrequests,
 	})
 }
 
@@ -173,4 +198,25 @@ func (p ProtectionsCommands) antidelete(ctx *dgc.Ctx) {
 	cfg, _ := config.GetConfig()
 	cfg.Protections.ServerProtections.AntiDelete = toggle == "on"
 	_ = cfg.Save()
+}
+
+func (ProtectionsCommands) opendm(ctx *dgc.Ctx) {
+	_ = api.ChangeSettings(ctx.Session, map[string]any{"restricted_guilds": []any{}}, true)
+}
+
+func (ProtectionsCommands) closedm(ctx *dgc.Ctx) {
+	var guildIDs []string
+	for _, g := range ctx.Session.State.Guilds {
+		guildIDs = append(guildIDs, g.ID)
+	}
+
+	_ = api.ChangeSettings(ctx.Session, map[string]any{"restricted_guilds": guildIDs}, true)
+}
+
+func (ProtectionsCommands) enablefriendrequests(ctx *dgc.Ctx) {
+	_ = api.AllowFriendRequestsFrom(ctx.Session, []string{"all"})
+}
+
+func (ProtectionsCommands) disablefriendrequests(ctx *dgc.Ctx) {
+	_ = api.AllowFriendRequestsFrom(ctx.Session, []string{})
 }
