@@ -24,35 +24,6 @@ type HelpMessage struct {
 
 // RegisterHelpCommand registers the help command to the router
 func (h *HelpCommand) RegisterHelpCommand(router *dgc.Router, session *discordgo.Session) {
-	// Initialize the help messages storage
-	router.InitializeStorage("helpMessages")
-
-	// Initialize the reaction add listener
-	session.AddHandler(func(session *discordgo.Session, event *discordgo.MessageReactionRemove) {
-		// Define useful variables
-		channelID := event.ChannelID
-		messageID := event.MessageID
-		userID := event.UserID
-
-		// Check whether the reaction was added by the current user
-		if event.UserID != session.State.User.ID && router.SelfBot {
-			return
-		}
-
-		// Check whether the message is a help message
-		rawPage, ok := router.Storage["helpMessages"].Get(channelID + ":" + messageID + ":" + userID)
-		if !ok {
-			return
-		}
-		page := rawPage.(int)
-		if page <= 0 {
-			return
-		}
-
-		// Update the stores page
-		router.Storage["helpMessages"].Set(channelID+":"+messageID+":"+event.UserID, page)
-	})
-
 	// Register the default help command
 	router.StopCategory()
 	router.RegisterCmd(&dgc.Command{
