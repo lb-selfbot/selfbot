@@ -99,6 +99,18 @@ func (g GameCommands) RegisterCommands(router *dgc.Router) {
 		Usage:       "[p]gtastatus",
 		Handler:     g.gtastatus,
 	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "fivemplayers",
+		Description: "Get the amount of players on a FiveM server",
+		Usage:       "[p]fivemplayers <ip:port>",
+		Handler:     g.fivemplayers,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "fiveminfo",
+		Description: "Get info about a FiveM server",
+		Usage:       "[p]fiveminfo <ip:port>",
+		Handler:     g.fiveminfo,
+	})
 }
 
 func (GameCommands) mcuuid(ctx *dgc.Ctx) {
@@ -387,4 +399,39 @@ func (GameCommands) gtastatus(ctx *dgc.Ctx) {
 		emb.AddField(platform.Get("name").MustString(), platform.Get("service_status").Get("status").MustString())
 	}
 	emb.Send(ctx)
+}
+
+func (GameCommands) fivemplayers(ctx *dgc.Ctx) {
+	httpResponse := http.Get("http://" + utils.Arguments["<ip:port>"] + "/dynamic.json")
+	if httpResponse.Error != nil {
+		_ = ctx.RespondText("An error has occurred.")
+		return
+	}
+
+	json := httpResponse.Json()
+
+	embed.NewEmbed().
+		AddField("Host", utils.Arguments["<ip:port>"]).
+		AddField("Players", fmt.Sprint(json.Get("clients").MustInt())).
+		AddField("Max Players", json.Get("sv_maxclients").MustString()).
+		Send(ctx)
+}
+
+func (GameCommands) fiveminfo(ctx *dgc.Ctx) {
+	httpResponse := http.Get("http://" + utils.Arguments["<ip:port>"] + "/dynamic.json")
+	if httpResponse.Error != nil {
+		_ = ctx.RespondText("An error has occurred.")
+		return
+	}
+
+	json := httpResponse.Json()
+
+	embed.NewEmbed().
+		AddField("Host", utils.Arguments["<ip:port>"]).
+		AddField("Server Name", json.Get("hostname").MustString()).
+		AddField("Game Type", json.Get("gametype").MustString()).
+		AddField("Map", json.Get("mapname").MustString()).
+		AddField("Players", fmt.Sprint(json.Get("clients").MustInt())).
+		AddField("Max Players", json.Get("sv_maxclients").MustString()).
+		Send(ctx)
 }

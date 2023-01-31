@@ -189,6 +189,12 @@ func (u UtilityCommands) RegisterCommands(router *dgc.Router) {
 		Handler:     u.changelog,
 	})
 	router.RegisterCmd(&dgc.Command{
+		Name:        "version",
+		Description: "See the current LightningBot version",
+		Usage:       "[p]version",
+		Handler:     u.version,
+	})
+	router.RegisterCmd(&dgc.Command{
 		Name:        "uptime",
 		Description: "See how long the bot has been running for",
 		Usage:       "[p]uptime",
@@ -719,6 +725,26 @@ func (UtilityCommands) changelog(ctx *dgc.Ctx) {
 	embed.NewEmbed().
 		AddField("Latest Version", latestVersion).
 		AddField("Changelog", changelog).
+		Send(ctx)
+}
+
+func (UtilityCommands) version(ctx *dgc.Ctx) {
+	httpResponse := http.PostJson(
+		"https://api.lightning-bot.com/api/v3/selfbot/check-version",
+		map[string]string{"branch": "selfbot", "version": ""},
+	)
+	if httpResponse.Error != nil {
+		_ = ctx.RespondText("An error has occurred: " + httpResponse.Error.Error())
+		return
+	}
+
+	json := httpResponse.Json()
+
+	latestVersion := json.GetPath("latest", "version").MustString()
+
+	embed.NewEmbed().
+		AddField("Current Version", constants.VERSION[1:]).
+		AddField("Latest Version", latestVersion).
 		Send(ctx)
 }
 
