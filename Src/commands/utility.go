@@ -937,7 +937,7 @@ func (UtilityCommands) sessionid(ctx *dgc.Ctx) {
 }
 
 func (UtilityCommands) screenshot(ctx *dgc.Ctx) {
-	img, err := screenshot.CaptureScreen() // *image.RGBA
+	img, err := screenshot.CaptureScreen()
 	if err != nil {
 		_ = ctx.RespondText("Error capturing screenshot")
 		return
