@@ -70,6 +70,12 @@ func (g GameCommands) RegisterCommands(router *dgc.Router) {
 		Handler:     g.fnrandomcosmetic,
 	})
 	router.RegisterCmd(&dgc.Command{
+		Name:        "fnstatus",
+		Description: "Get the current Fortnite status",
+		Usage:       "[p]fnstatus",
+		Handler:     g.fnstatus,
+	})
+	router.RegisterCmd(&dgc.Command{
 		Name:        "alstatus",
 		Description: "Get the Apex legends status",
 		Usage:       "[p]alstatus",
@@ -267,6 +273,20 @@ func (GameCommands) fnrandomcosmetic(ctx *dgc.Ctx) {
 		AddField("Rarity", cosmetic.GetPath("rarity", "displayValue").MustString("None")).
 		AddField("Added", cosmetic.GetPath("added").MustString("None")).
 		SetImage(image).
+		Send(ctx)
+}
+
+func (GameCommands) fnstatus(ctx *dgc.Ctx) {
+	httpResponse := http.Get("https://status.epicgames.com/api/v2/status.json")
+	if httpResponse.Error != nil {
+		_ = ctx.RespondText("An error has occurred.")
+		return
+	}
+
+	json := httpResponse.Json()
+
+	embed.NewEmbed().
+		AddField("Fortnite Status", json.GetPath("status", "description").MustString("Error")).
 		Send(ctx)
 }
 

@@ -54,6 +54,15 @@ func (r RedditCommands) RegisterCommands(router *dgc.Router) {
 		"tumblr",
 		"wholesomememes",
 		"atbge",
+		"europe",
+		"funnyanimals",
+		"holup",
+		"dndmemes",
+		"gifs",
+		"technicallythetruth",
+		"meirl",
+		"oldschoolcool",
+		"pcmasterrace",
 	}
 	for _, subreddit := range subreddits {
 		router.RegisterCmd(&dgc.Command{
