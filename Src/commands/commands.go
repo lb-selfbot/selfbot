@@ -14,6 +14,7 @@ type CommandRegistrar struct {
 	TrollingCommands       TrollingCommands
 	EventReactionsCommands EventReactionsCommands
 	ImageCommands          ImageCommands
+	MemeGenCommands        MemeGenCommands
 	NetworkCommands        NetworkCommands
 	AdministrationCommands AdministrationCommands
 	UtilityCommands        UtilityCommands
@@ -41,6 +42,7 @@ func (c CommandRegistrar) RegisterCommands(session *discordgo.Session, router *d
 	c.TrollingCommands.RegisterCommands(router)
 	c.EventReactionsCommands.RegisterCommands(router)
 	c.ImageCommands.RegisterCommands(router)
+	c.MemeGenCommands.RegisterCommands(router)
 	c.NetworkCommands.RegisterCommands(router)
 	c.AdministrationCommands.RegisterCommands(router)
 	c.UtilityCommands.RegisterCommands(router)

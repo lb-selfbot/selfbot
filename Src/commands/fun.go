@@ -51,6 +51,12 @@ func (f FunCommands) RegisterCommands(router *dgc.Router) {
 		Handler:     f.ego,
 	})
 	router.RegisterCmd(&dgc.Command{
+		Name:        "iqtest",
+		Description: "Test a person's IQ",
+		Usage:       "[p]iqtest <user>",
+		Handler:     f.iqtest,
+	})
+	router.RegisterCmd(&dgc.Command{
 		Name:        "hack",
 		Description: "Fake hack a person",
 		Usage:       "[p]hack <user>",
@@ -533,6 +539,14 @@ func (FunCommands) ego(ctx *dgc.Ctx) {
 	embed.NewEmbed().
 		AddField("User", user.String()).
 		AddField("Ego", utils.Random.Percentage()).
+		Send(ctx)
+}
+
+func (FunCommands) iqtest(ctx *dgc.Ctx) {
+	user, _ := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
+	embed.NewEmbed().
+		AddField("User", user.String()).
+		AddField("IQ", fmt.Sprint(utils.Random.Number(1, 200))).
 		Send(ctx)
 }
 
