@@ -42,6 +42,28 @@ func (h *HelpCommand) RegisterHelpCommand(router *dgc.Router, session *discordgo
 		Description: "Repeat the last used command",
 		Handler:     h.repeat,
 	})
+
+	for _, category := range router.Categories {
+		name := strings.Trim(strings.ToLower(category.Name), " ")
+
+		router.RegisterCmd(&dgc.Command{
+			Name:        name,
+			Usage:       "[p]" + name,
+			Description: fmt.Sprintf("Get help for the %s category", category.Name),
+			Handler: generateCategoryHelpFunc(category),
+		})
+	}
+}
+
+func generateCategoryHelpFunc(category *dgc.Category) dgc.ExecutionHandler {
+	return func(ctx *dgc.Ctx) {
+		oldName := strings.ToLower(ctx.Arguments.Get(0).Raw())
+		name := getNameFromArgument(oldName)
+
+		page, _ := ctx.Arguments.Get(1).AsInt()
+
+		renderCategoryHelp(ctx.Router, category, name, page).Send(ctx)
+	}
 }
 
 // generalHelpCommand handles the general help command
@@ -56,51 +78,61 @@ func generalHelpCommand(ctx *dgc.Ctx) {
 	renderDefaultGeneralHelpEmbed(ctx.Router).Send(ctx)
 }
 
+func getNameFromArgument(arg string) string {
+	arg = strings.ReplaceAll(arg, "eventreactions", "Event Reactions")
+	arg = strings.ReplaceAll(arg, "eventreaction", "Event Reactions")
+	return strings.ReplaceAll(arg, "nsfw", "NSFW")
+}
+
 // specificHelpCommand handles the specific help command
 func specificHelpCommand(ctx *dgc.Ctx) {
 	oldName := strings.ToLower(ctx.Arguments.Get(0).Raw())
-	name := strings.ReplaceAll(oldName, "eventreactions", "Event Reactions")
-	name = strings.ReplaceAll(name, "eventreaction", "Event Reactions")
-	name = strings.ReplaceAll(name, "nsfw", "NSFW")
+	name := getNameFromArgument(oldName)
 	page, _ := ctx.Arguments.Get(1).AsInt()
 	prefix := ctx.Router.GetPrefixes()[0]
 
+	if category := ctx.Router.GetCategory(utils.String.Capitalize(name)); category != nil {
+		renderCategoryHelp(ctx.Router, category, oldName, page).Send(ctx)
+		return
+	}
+
 	if command := ctx.Router.GetCmd(name); command != nil {
 		renderCommandHelp(ctx.Router, command).Send(ctx)
-	} else {
-		if category := ctx.Router.GetCategory(utils.String.Capitalize(name)); category != nil {
-			renderCategoryHelp(ctx.Router, category, oldName, page).Send(ctx)
-		} else {
-			var closeCommands []string
-			for _, command := range ctx.Router.Commands {
-				if len(closeCommands) >= 5 {
-					break
-				}
-				distance := utils.Misc.GetDistance(command.Name, name)
-				if distance < 2 || strings.Contains(command.Name, name) {
-					closeCommands = append(closeCommands, strings.ReplaceAll(command.Usage, "[p]", prefix)+" - "+command.Description)
-				}
-			}
-			var closeCategories []string
-			for _, category := range ctx.Router.Categories {
-				if len(closeCategories) >= 5 {
-					break
-				}
-				distance := utils.Misc.GetDistance(category.Name, utils.String.Capitalize(name))
-				if distance < 2 || strings.Contains(category.Name, utils.String.Capitalize(name)) {
-					closeCategories = append(closeCategories, category.Name+" - "+category.Description)
-				}
-			}
-			description := fmt.Sprintf("`%s` is not a command or category!", name)
-			if len(closeCommands) > 0 {
-				description += "\n\nDid you mean one of these commands?\n\n" + strings.Join(closeCommands, "\n")
-			}
-			if len(closeCategories) > 0 {
-				description += "\n\nDid you mean one of these categories?\n\n" + strings.Join(closeCategories, "\n")
-			}
-			embed.NewEmbed().SetDescription(description).Send(ctx)
+		return
+	}
+
+	// get close commands and categories
+	var closeCommands []string
+	for _, command := range ctx.Router.Commands {
+		if len(closeCommands) >= 5 {
+			break
+		}
+		distance := utils.Misc.GetDistance(command.Name, name)
+		if distance < 2 || strings.Contains(command.Name, name) {
+			closeCommands = append(closeCommands, strings.ReplaceAll(command.Usage, "[p]", prefix)+" - "+command.Description)
 		}
 	}
+
+	var closeCategories []string
+	for _, category := range ctx.Router.Categories {
+		if len(closeCategories) >= 5 {
+			break
+		}
+		distance := utils.Misc.GetDistance(category.Name, utils.String.Capitalize(name))
+		if distance < 2 || strings.Contains(category.Name, utils.String.Capitalize(name)) {
+			closeCategories = append(closeCategories, category.Name+" - "+category.Description)
+		}
+	}
+
+	description := fmt.Sprintf("`%s` is not a command or category!", name)
+	if len(closeCommands) > 0 {
+		description += "\n\nDid you mean one of these commands?\n\n" + strings.Join(closeCommands, "\n")
+	}
+	if len(closeCategories) > 0 {
+		description += "\n\nDid you mean one of these categories?\n\n" + strings.Join(closeCategories, "\n")
+	}
+
+	embed.NewEmbed().SetDescription(description).Send(ctx)
 }
 
 func renderCommandHelp(router *dgc.Router, command *dgc.Command) *embed.Embed {
@@ -109,10 +141,12 @@ func renderCommandHelp(router *dgc.Router, command *dgc.Command) *embed.Embed {
 	for _, category := range router.Categories {
 		category = router.GetCategory(category.Name)
 		for _, cmd := range category.Commands {
-			if cmd.Name == command.Name {
-				categoryName = category.Name
-				break
+			if cmd.Name != command.Name {
+				continue
 			}
+
+			categoryName = category.Name
+			break
 		}
 	}
 	return embed.NewEmbed().
@@ -138,7 +172,7 @@ func renderCategoryHelp(router *dgc.Router, category *dgc.Category, rawArgument 
 		}
 		helpPages[currentPage] += helpText
 	}
-	page = int(math.Max(0, float64(page-1)))
+	page = int(math.Max(0, float64(page - 1)))
 
 	emb := embed.NewEmbed().
 		SetDescription(fmt.Sprintf("<> is required, [] is optional\n\nAmount of %s commands: %d", category.Name, len(category.Commands))).
