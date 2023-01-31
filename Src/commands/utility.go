@@ -3,6 +3,7 @@ package commands
 import (
 	"bytes"
 	"fmt"
+	"image/png"
 	"math"
 	"net/url"
 	"os"
@@ -18,6 +19,7 @@ import (
 	"github.com/shirou/gopsutil/disk"
 	"github.com/shirou/gopsutil/host"
 	"github.com/shirou/gopsutil/mem"
+	"github.com/vova616/screenshot"
 
 	"github.com/LightningDev1/LB-Selfbot/api"
 	"github.com/LightningDev1/LB-Selfbot/constants"
@@ -307,6 +309,12 @@ func (u UtilityCommands) RegisterCommands(router *dgc.Router) {
 		Description: "See LightningBot's Discord session ID",
 		Usage:       "[p]sessionid",
 		Handler:     u.sessionid,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "screenshot",
+		Description: "Make a screenshot",
+		Usage:       "[p]screenshot",
+		Handler:     u.screenshot,
 	})
 }
 
@@ -926,4 +934,23 @@ func (UtilityCommands) sessionid(ctx *dgc.Ctx) {
 	embed.NewEmbed().
 		AddField("Session ID", ctx.Session.State.SessionID).
 		Send(ctx)
+}
+
+func (UtilityCommands) screenshot(ctx *dgc.Ctx) {
+	img, err := screenshot.CaptureScreen() // *image.RGBA
+	if err != nil {
+		_ = ctx.RespondText("Error capturing screenshot")
+		return
+	}
+
+	buf := new(bytes.Buffer)
+
+	err = png.Encode(buf, img)
+
+	if err != nil {
+		_ = ctx.RespondText("Error encoding image")
+		return
+	}
+
+	_, _ = ctx.Session.ChannelFileSend(ctx.Event.ChannelID, "screenshot.png", buf)
 }

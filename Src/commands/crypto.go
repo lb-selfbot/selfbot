@@ -2,6 +2,7 @@ package commands
 
 import (
 	"fmt"
+	"net/url"
 
 	"github.com/LightningDev1/LB-Selfbot/embed"
 	"github.com/LightningDev1/LB-Selfbot/http"
@@ -12,6 +13,20 @@ type CryptoCommands struct{}
 
 func (c CryptoCommands) RegisterCommands(router *dgc.Router) {
 	router.StartCategory("Crypto", "Check cryptocurrency prices")
+
+	router.RegisterCmd(&dgc.Command{
+		Name:        "btcaddressinfo",
+		Description: "Get information about a Bitcoin address",
+		Usage:       "[p]btcaddressinfo <address>",
+		Handler:     c.btcaddressinfo,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "ethaddressinfo",
+		Description: "Get information about an Ethereum address",
+		Usage:       "[p]ethaddressinfo <address>",
+		Handler:     c.ethaddressinfo,
+	})
+
 	cryptoCommands := [][]string{
 		{"btc", "BTC", "Bitcoin", "1"},
 		{"eth", "ETH", "Ethereum", "1027"},
@@ -93,4 +108,66 @@ func (CryptoCommands) generateFunc(element []string) func(ctx *dgc.Ctx) {
 			SetAuthor(element[2], fmt.Sprintf("https://s2.coinmarketcap.com/static/img/coins/200x200/%s.png", element[3])).
 			Send(ctx)
 	}
+}
+
+func (CryptoCommands) btcaddressinfo(ctx *dgc.Ctx) {
+	address := ctx.Arguments.Get(0).Raw()
+	if address == "" {
+		_ = ctx.RespondText("Please provide an address.")
+		return
+	}
+
+	url := fmt.Sprintf("https://api.blockcypher.com/v1/btc/main/addrs/%s", url.PathEscape(address))
+
+	httpResponse := http.Get(url)
+	if httpResponse.Error != nil {
+		_ = ctx.RespondText("An error has occurred.")
+		return
+	}
+
+	json := httpResponse.Json()
+	balance := json.Get("final_balance").MustInt64()
+	transactions := json.Get("final_n_tx").MustInt64()
+	totalReceived := json.Get("total_received").MustInt64()
+	totalSent := json.Get("total_sent").MustInt64()
+
+	embed.NewEmbed().
+		SetDescription("Bitcoin Address Info").
+		AddField("Address", address, true).
+		AddField("Balance", fmt.Sprintf("%.8f BTC", float64(balance)/100000000), true).
+		AddField("Transactions", fmt.Sprintf("%d", transactions), true).
+		AddField("Total Received", fmt.Sprintf("%.8f BTC", float64(totalReceived)/100000000), true).
+		AddField("Total Sent", fmt.Sprintf("%.8f BTC", float64(totalSent)/100000000), true).
+		Send(ctx)
+}
+
+func (CryptoCommands) ethaddressinfo(ctx *dgc.Ctx) {
+	address := ctx.Arguments.Get(0).Raw()
+	if address == "" {
+		_ = ctx.RespondText("Please provide an address.")
+		return
+	}
+
+	url := fmt.Sprintf("https://api.blockcypher.com/v1/eth/main/addrs/%s", url.PathEscape(address))
+
+	httpResponse := http.Get(url)
+	if httpResponse.Error != nil {
+		_ = ctx.RespondText("An error has occurred.")
+		return
+	}
+
+	json := httpResponse.Json()
+	balance := json.Get("final_balance").MustInt64()
+	transactions := json.Get("final_n_tx").MustInt64()
+	totalReceived := json.Get("total_received").MustInt64()
+	totalSent := json.Get("total_sent").MustInt64()
+
+	embed.NewEmbed().
+		SetDescription("Ethereum Address Info").
+		AddField("Address", address, true).
+		AddField("Balance", fmt.Sprintf("%.8f ETH", float64(balance)/1000000000000000000), true).
+		AddField("Transactions", fmt.Sprintf("%d", transactions), true).
+		AddField("Total Received", fmt.Sprintf("%.8f ETH", float64(totalReceived)/1000000000000000000), true).
+		AddField("Total Sent", fmt.Sprintf("%.8f ETH", float64(totalSent)/1000000000000000000), true).
+		Send(ctx)
 }
