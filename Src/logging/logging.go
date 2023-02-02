@@ -21,7 +21,7 @@ func (_Logging) PrintBanner(console bool, ui bool) {
 
 	if ui {
 		message := "<image Source=\"assets/Banner.png\" Width=\"650\" Height=\"150\" Centered />"
-		UI.Append(message)
+		UI.Set(message)
 	}
 }
 
@@ -73,8 +73,7 @@ func (_Logging) OnReady(router *dgc.Router, event *discordgo.Ready) {
 		UI.Centered(bannerTextUpper, "#C1EFFF") + "\n" +
 		UI.Centered(bannerTextLower, "#C1EFFF") + "\n"
 
-	UI.Clear()
-	UI.Append(message)
+	UI.Set(message)
 }
 
 func (_Logging) NitroSniperFake(session *discordgo.Session, message *discordgo.Message, code, account string) {

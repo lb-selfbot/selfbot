@@ -71,4 +71,14 @@ func (UILogging) Clear() {
 	})
 }
 
+func (UILogging) Set(text string) {
+	ipc.IPC.ConsoleSet(text)
+	websocket.Websocket.Send(websocket.WsMessage{
+		Op: "CONSOLE_SET",
+		Data: websocket.WsData{
+			Text: text,
+		},
+	})
+}
+
 var UI = UILogging{}
