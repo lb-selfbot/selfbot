@@ -2,7 +2,6 @@ package commands
 
 import (
 	"fmt"
-	"reflect"
 	"strconv"
 	"strings"
 
@@ -400,45 +399,47 @@ func (ConfigCommands) removegsniperbot(ctx *dgc.Ctx) {
 	_ = cfg.Save()
 }
 
+func createWebhookChannel(ctx *dgc.Ctx, serverID, categoryID, name string) (string, error) {
+	channel, err := ctx.Session.GuildChannelCreateComplex(serverID, discordgo.GuildChannelCreateData{
+		Type:     discordgo.ChannelTypeGuildText,
+		ParentID: categoryID,
+		Name:     name,
+	})
+	if err != nil {
+		return "", err
+	}
+
+	webhook, err := ctx.Session.WebhookCreate(channel.ID, name, "")
+	if err != nil {
+		return "", err
+	}
+
+	return fmt.Sprintf("https://discord.com/api/webhooks/%s/%s", webhook.ID, webhook.Token), nil
+}
+
 func (ConfigCommands) setupwebhooks(ctx *dgc.Ctx) {
 	serverID := ctx.Event.GuildID
 	if utils.Arguments["[server id]"] != "" {
 		serverID = utils.Arguments["[server id]"]
 	}
-	channels := map[string]string{
-		"nitrosniper":      "NitroSniper",
-		"giveawaysniper":   "GiveawaySniper",
-		"selfbotdetection": "SelfbotDetection",
-		"staffdetection":   "StaffDetection",
-		"notifiers":        "Notifiers",
-		"pingdetection":    "PingDetection",
-		"misc":             "Misc",
-		"sessions":         "Sessions",
-	}
+
 	cfg, _ := config.GetConfig()
+
 	category, err := ctx.Session.GuildChannelCreate(serverID, "LightningBot", discordgo.ChannelTypeGuildCategory)
 	if err != nil {
-		_ = ctx.RespondText("Failed to create channel: " + err.Error())
+		_ = ctx.RespondText("Failed to create category: " + err.Error())
 		return
 	}
-	for channelName, configName := range channels {
-		channel, err := ctx.Session.GuildChannelCreateComplex(serverID, discordgo.GuildChannelCreateData{
-			Type:     discordgo.ChannelTypeGuildText,
-			ParentID: category.ID,
-			Name:     channelName,
-		})
-		if err != nil {
-			_ = ctx.RespondText("Failed to create channel: " + err.Error())
-			return
-		}
-		webhook, err := ctx.Session.WebhookCreate(channel.ID, channelName, "")
-		if err != nil {
-			_ = ctx.RespondText("Failed to create webhook: " + err.Error())
-			return
-		}
-		f := reflect.Indirect(reflect.ValueOf(cfg.Webhooks)).FieldByName(configName)
-		f.SetString(fmt.Sprintf("https://discord.com/api/webhooks/%s/%s", webhook.ID, webhook.Token))
-	}
+
+	cfg.Webhooks.NitroSniper, _ = createWebhookChannel(ctx, serverID, category.ID, "nitrosniper")
+	cfg.Webhooks.GiveawaySniper, _ = createWebhookChannel(ctx, serverID, category.ID, "giveawaysniper")
+	cfg.Webhooks.SelfbotDetection, _ = createWebhookChannel(ctx, serverID, category.ID, "selfbotdetection")
+	cfg.Webhooks.StaffDetection, _ = createWebhookChannel(ctx, serverID, category.ID, "staffdetection")
+	cfg.Webhooks.Notifiers, _ = createWebhookChannel(ctx, serverID, category.ID, "notifiers")
+	cfg.Webhooks.PingDetection, _ = createWebhookChannel(ctx, serverID, category.ID, "pingdetection")
+	cfg.Webhooks.Misc, _ = createWebhookChannel(ctx, serverID, category.ID, "misc")
+	cfg.Webhooks.Sessions, _ = createWebhookChannel(ctx, serverID, category.ID, "sessions")
+
 	_ = cfg.Save()
 }
 
