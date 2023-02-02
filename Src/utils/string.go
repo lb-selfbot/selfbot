@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"math"
 	"os"
 	"strings"
 
@@ -136,6 +137,8 @@ func (StringUtils) Mock(text string) string {
 
 func (StringUtils) CenterWidth(text string, width int) string {
 	spaceCount := (width - len(text)) / 2
+	spaceCount = int(math.Max(float64(spaceCount), 0))
+	
 	return strings.Repeat(" ", spaceCount) + text
 }
 
@@ -147,7 +150,6 @@ func (StringUtils) Center(text string) string {
 	}
 	return String.CenterWidth(text, w)
 }
-
 
 func (StringUtils) CenterSlices(rows []string) string {
 	fd := int(os.Stdout.Fd())
@@ -166,6 +168,8 @@ func (StringUtils) CenterSlices(rows []string) string {
 
 	// Center the rows
 	spaceCount := (w - max) / 2
+	spaceCount = int(math.Max(float64(spaceCount), 0))
+
 	spaces := strings.Repeat(" ", spaceCount)
 
 	for i, row := range rows {
