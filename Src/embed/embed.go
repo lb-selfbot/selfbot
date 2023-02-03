@@ -408,6 +408,49 @@ func (e *Embed) ToURLEmbed() []string {
 	return []string{"Not implemented"}
 }
 
+func (e *Embed) ToIndent() []string {
+	str := ""
+	if e.Author != nil {
+		str += fmt.Sprintf("%s\n\n", e.Author.Name)
+	}
+	if e.Title != "" {
+		str += fmt.Sprintf("```ini\n[%s]```\n\n", e.Title)
+	}
+	if e.Description != "" {
+		str += fmt.Sprintf("%s\n\n", e.Description)
+	}
+	if len(e.Fields) > 0 {
+		for _, v := range e.Fields {
+			if v.Inline {
+				v.Value = "```" + v.Value + "```"
+			}
+			str += fmt.Sprintf("> **%s**\n%s\n\n", v.Name, v.Value)
+		}
+	}
+	if e.Subtext != "" {
+		str += fmt.Sprintf("```ansi\n%s\n```", e.Subtext)
+	}
+	if e.Footer != nil {
+		str += fmt.Sprintf("\n```css\n[%s]```\n", e.Footer.Text)
+	}
+	var strings_ []string
+	newStr := ""
+	for _, line := range strings.Split(str, "\n") {
+		if len(newStr+line)+1 > 2000 {
+			strings_ = append(strings_, newStr)
+			newStr = ""
+		}
+		newStr += line + "\n"
+	}
+	strings_ = append(strings_, newStr)
+	
+	for i, s := range strings_ {
+		strings_[i] = strings.ReplaceAll(s, "\n", "\n> ")
+	}
+
+	return strings_
+}
+
 func (e *Embed) ToString(commandMode string) []string {
 	switch commandMode {
 	case "Codeblock":
@@ -416,6 +459,8 @@ func (e *Embed) ToString(commandMode string) []string {
 		return e.ToText()
 	case "URLEmbed":
 		return e.ToURLEmbed()
+	case "Indent":
+		return e.ToIndent()
 	case "load":
 		cfg, _ := config.GetConfig()
 

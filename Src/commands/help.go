@@ -50,17 +50,14 @@ func (h *HelpCommand) RegisterHelpCommand(router *dgc.Router, session *discordgo
 			Name:        name,
 			Usage:       "[p]" + name,
 			Description: fmt.Sprintf("Get help for the %s category", category.Name),
-			Handler: generateCategoryHelpFunc(category),
+			Handler: generateCategoryHelpFunc(category, name),
 		})
 	}
 }
 
-func generateCategoryHelpFunc(category *dgc.Category) dgc.ExecutionHandler {
+func generateCategoryHelpFunc(category *dgc.Category, name string) dgc.ExecutionHandler {
 	return func(ctx *dgc.Ctx) {
-		oldName := strings.ToLower(ctx.Arguments.Get(0).Raw())
-		name := getNameFromArgument(oldName)
-
-		page, _ := ctx.Arguments.Get(1).AsInt()
+		page, _ := ctx.Arguments.Get(0).AsInt()
 
 		renderCategoryHelp(ctx.Router, category, name, page).Send(ctx)
 	}
