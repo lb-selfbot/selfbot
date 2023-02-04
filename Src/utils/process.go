@@ -56,4 +56,28 @@ func (ProcessUtils) RestartPC() error {
 	}
 }
 
+func (ProcessUtils) SleepPC() error {
+	if runtime.GOOS == "windows" {
+		powrprof, err := syscall.LoadLibrary("powrprof.dll")
+		if err != nil {
+			return err
+		}
+
+		defer syscall.FreeLibrary(powrprof)
+
+		setSuspendState, err := syscall.GetProcAddress(powrprof, "SetSuspendState")
+		if err != nil {
+			return err
+		}
+
+		_, _, err = syscall.SyscallN(uintptr(setSuspendState), 2, 0, 1, 0)
+
+		return err
+	} else if runtime.GOOS == "darwin" {
+		return exec.Command("pmset", "displaysleepnow").Start()
+	} else {
+		return exec.Command("systemctl", "suspend").Start()
+	}
+}
+
 var Process = &ProcessUtils{}

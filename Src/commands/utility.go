@@ -131,16 +131,22 @@ func (u UtilityCommands) RegisterCommands(router *dgc.Router) {
 		Handler:     u.nickscan,
 	})
 	router.RegisterCmd(&dgc.Command{
-		Name:        "shudownpc",
+		Name:        "shutdownpc",
 		Description: "Shut your PC down",
-		Usage:       "[p]shudownpc",
-		Handler:     u.shudownpc,
+		Usage:       "[p]shutdownpc",
+		Handler:     u.shutdownpc,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "restartpc",
 		Description: "Restart your PC",
 		Usage:       "[p]restartpc",
 		Handler:     u.restartpc,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "sleeppc",
+		Description: "Put your PC to sleep",
+		Usage:       "[p]sleeppc",
+		Handler:     u.sleeppc,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "snipe",
@@ -315,6 +321,18 @@ func (u UtilityCommands) RegisterCommands(router *dgc.Router) {
 		Description: "Make a screenshot",
 		Usage:       "[p]screenshot",
 		Handler:     u.screenshot,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "timezones",
+		Description: "Get a list of timezones for a continent",
+		Usage:       "[p]timezones <continent>",
+		Handler:     u.timezones,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "timezone",
+		Description: "Get information about a timezone",
+		Usage:       "[p]timezone <timezone>",
+		Handler:     u.timezone,
 	})
 }
 
@@ -642,12 +660,16 @@ func (UtilityCommands) nickscan(ctx *dgc.Ctx) {
 		Send(ctx)
 }
 
-func (UtilityCommands) shudownpc(ctx *dgc.Ctx) {
+func (UtilityCommands) shutdownpc(ctx *dgc.Ctx) {
 	_ = utils.Process.ShutdownPC()
 }
 
 func (UtilityCommands) restartpc(ctx *dgc.Ctx) {
 	_ = utils.Process.RestartPC()
+}
+
+func (UtilityCommands) sleeppc(ctx *dgc.Ctx) {
+	_ = utils.Process.SleepPC()
 }
 
 func (UtilityCommands) snipe(ctx *dgc.Ctx) {
@@ -953,4 +975,46 @@ func (UtilityCommands) screenshot(ctx *dgc.Ctx) {
 	}
 
 	_, _ = ctx.Session.ChannelFileSend(ctx.Event.ChannelID, "screenshot.png", buf)
+}
+
+func (UtilityCommands) timezones(ctx *dgc.Ctx) {
+	httpResponse := http.Get("http://worldtimeapi.org/api/timezone/" + url.PathEscape(utils.Arguments["<continent>"]))
+	if httpResponse.Error != nil {
+		_ = ctx.RespondText("Error getting timezones: " + httpResponse.Error.Error())
+		return
+	}
+
+	json := httpResponse.Json()
+
+	if err := json.Get("error").MustString(); err != "" {
+		_ = ctx.RespondText("Error getting timezones: " + err)
+		return
+	}
+
+	embed.NewEmbed().
+		AddField("Continent", utils.String.Capitalize(utils.Arguments["<continent>"])).
+		AddField("Timezones", strings.Join(json.MustStringArray(), ", ")).
+		Send(ctx)
+}
+
+func (UtilityCommands) timezone(ctx *dgc.Ctx) {
+	httpResponse := http.Get("http://worldtimeapi.org/api/timezone/" + utils.Arguments["<timezone>"])
+	if httpResponse.Error != nil {
+		_ = ctx.RespondText("Error getting timezones: " + httpResponse.Error.Error())
+		return
+	}
+
+	json := httpResponse.Json()
+
+	if err := json.Get("error").MustString(); err != "" {
+		_ = ctx.RespondText("Error getting timezones: " + err)
+		return
+	}
+
+	embed.NewEmbed().
+		AddField("Timezone", json.Get("timezone").MustString()).
+		AddField("Abbreviation", json.Get("abbreviation").MustString()).
+		AddField("UTC Offset", json.Get("utc_offset").MustString()).
+		AddField("Current Time", json.Get("datetime").MustString()).
+		Send(ctx)
 }

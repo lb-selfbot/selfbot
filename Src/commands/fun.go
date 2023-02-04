@@ -470,6 +470,12 @@ func (f FunCommands) RegisterCommands(router *dgc.Router) {
 		Usage:       "[p]boredactivity",
 		Handler:     f.boredactivity,
 	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "ermahgerd",
+		Description: "Translate text to ERMAHGERD",
+		Usage:       "[p]ermahgerd <text>",
+		Handler:     f.ermahgerd,
+	})
 }
 
 func (FunCommands) eightball(ctx *dgc.Ctx) {
@@ -1353,4 +1359,8 @@ func (FunCommands) boredactivity(ctx *dgc.Ctx) {
 		AddField("Type", activityType).
 		SetImage(json.Get("img").MustString()).
 		Send(ctx)
+}
+
+func (FunCommands) ermahgerd(ctx *dgc.Ctx) {
+	ctx.RespondText(utils.String.Ermahgerd(ctx.Arguments.Raw()))
 }
