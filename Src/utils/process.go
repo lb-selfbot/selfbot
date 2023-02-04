@@ -58,21 +58,7 @@ func (ProcessUtils) RestartPC() error {
 
 func (ProcessUtils) SleepPC() error {
 	if runtime.GOOS == "windows" {
-		powrprof, err := syscall.LoadLibrary("powrprof.dll")
-		if err != nil {
-			return err
-		}
-
-		defer syscall.FreeLibrary(powrprof)
-
-		setSuspendState, err := syscall.GetProcAddress(powrprof, "SetSuspendState")
-		if err != nil {
-			return err
-		}
-
-		_, _, err = syscall.SyscallN(uintptr(setSuspendState), 2, 0, 1, 0)
-
-		return err
+		return Process.RunDllFunc("powrprof.dll", "SetSuspendState", 2, 0, 1, 0)
 	} else if runtime.GOOS == "darwin" {
 		return exec.Command("pmset", "displaysleepnow").Start()
 	} else {
@@ -82,21 +68,7 @@ func (ProcessUtils) SleepPC() error {
 
 func (ProcessUtils) LockPC() error {
 	if runtime.GOOS == "windows" {
-		user32, err := syscall.LoadLibrary("user32.dll")
-		if err != nil {
-			return err
-		}
-
-		defer syscall.FreeLibrary(user32)
-
-		lockWorkStation, err := syscall.GetProcAddress(user32, "LockWorkStation")
-		if err != nil {
-			return err
-		}
-
-		_, _, err = syscall.SyscallN(uintptr(lockWorkStation))
-
-		return err
+		return Process.RunDllFunc("user32.dll", "LockWorkStation")
 	} else if runtime.GOOS == "darwin" {
 		return exec.Command("pmset", "displaysleepnow").Start()
 	} else {
