@@ -59,16 +59,16 @@ func (c ConversionCommands) RegisterCommands(router *dgc.Router) {
 
 func (ConversionCommands) checkIfUnitValid(ctx *dgc.Ctx, unit string, validUnits []string) bool {
 	isValid := utils.SliceContains(validUnits, strings.ToLower(unit))
-	if !isValid {
-		embed.NewEmbed().
-			AddField("Error", "Invalid unit").
-			AddField("Valid units", strings.Join(validUnits, ", ")).
-			Send(ctx)
-
-		return false
+	if isValid {
+		return true
 	}
 
-	return true
+	embed.NewEmbed().
+		AddField("Error", "Invalid unit").
+		AddField("Valid units", strings.Join(validUnits, ", ")).
+		Send(ctx)
+
+	return false
 }
 
 func (c ConversionCommands) convertvelocity(ctx *dgc.Ctx) {
