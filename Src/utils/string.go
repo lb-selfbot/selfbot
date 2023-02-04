@@ -3,6 +3,7 @@ package utils
 import (
 	"math"
 	"os"
+	"regexp"
 	"strings"
 
 	"golang.org/x/term"
@@ -138,7 +139,7 @@ func (StringUtils) Mock(text string) string {
 func (StringUtils) CenterWidth(text string, width int) string {
 	spaceCount := (width - len(text)) / 2
 	spaceCount = int(math.Max(float64(spaceCount), 0))
-	
+
 	return strings.Repeat(" ", spaceCount) + text
 }
 
@@ -177,6 +178,153 @@ func (StringUtils) CenterSlices(rows []string) string {
 	}
 
 	return strings.Join(rows, "\n")
+}
+
+func (StringUtils) RegexReplace(regex, replaceWith string, s *string) {
+	r := regexp.MustCompile(regex)
+
+	*s = r.ReplaceAllString(*s, replaceWith)
+}
+
+
+func (StringUtils) RemoveDuplicateChars(word string) string {
+	var last rune
+
+	return strings.Map(func(r rune) rune {
+		if r != last {
+			last = r
+
+			return r
+		}
+
+		// Negative value discards the letter
+		return -1
+	}, word)
+}
+
+func (StringUtils) ParseErhmahgerd(word string) string {
+	// Word is too short to translate
+	if len(word) < 2 {
+		return word
+	}
+
+	// Common words that already have a direct translation
+	switch word {
+	case "AWESOME":
+		return "ERSUM"
+	case "BANANA":
+		return "BERNERNER"
+	case "BAYOU":
+		return "BERU"
+	case "FAVORITE", "FAVOURITE":
+		return "FRAVRIT"
+	case "GOOSEBUMPS":
+		return "GERSBERMS"
+	case "LONG":
+		return "LERNG"
+	case "MY":
+		return "MAH"
+	case "THE":
+		return "DA"
+	case "THEY":
+		return "DEY"
+	case "WE'RE":
+		return "WER"
+	case "YOU":
+		return "U"
+	case "YOU'RE":
+		return "YER"
+	}
+
+	original := word
+
+	// Remove vowels that occur at the end of the word
+	// Only for words whose length is greater than 2 to prevent single character words
+	if len(original) > 2 {
+		String.RegexReplace(`[AEIOU]$`, "", &word)
+	}
+
+	// Reduce duplicate letters
+	word = String.RemoveDuplicateChars(word)
+
+	// Reduce consecutive vowels (and Y) to just one
+	String.RegexReplace(`[AEIOUY]{2,}`, "E", &word)
+
+	// Retain a single 'Y'
+	String.RegexReplace(`Y{2,}`, "Y", &word)
+
+	// DOWN -> DERN
+	String.RegexReplace(`OW`, "ER", &word)
+
+	// PANCAKES -> PERNKERKS
+	String.RegexReplace(`AKES`, "ERKS", &word)
+
+	// Replace vowels (and Y) with ER
+	String.RegexReplace(`[AEIOUY]`, "ER", &word)
+
+	// Other conversions that are direct
+	String.RegexReplace(`ERH`, "ER", &word)
+	String.RegexReplace(`MER`, "MAH", &word)
+	String.RegexReplace(`ERNG`, "IN", &word)
+	String.RegexReplace(`ERPERD`, "ERPED", &word)
+	String.RegexReplace(`MAHM`, "MERM", &word)
+
+	// If the word begins with Y, retain it
+	if original[0] == 89 {
+		word = "Y" + word
+	}
+
+	// Reduce any duplicate letters (again)
+	word = String.RemoveDuplicateChars(word)
+
+	r := regexp.MustCompile(`LOW$`)
+	l := regexp.MustCompile(`LER$`)
+
+	if r.MatchString(original) && l.MatchString(word) {
+		String.RegexReplace(`LER`, "LO", &word)
+	}
+
+	return word
+}
+
+func (StringUtils) Ermahgerd(text string) string {
+	var translatedWords []string
+	prefix := regexp.MustCompile(`^\W+`)
+	suffix := regexp.MustCompile(`\W+$`)
+
+	text = strings.ToUpper(text)
+
+	words := strings.Split(text, " ")
+
+	for _, word := range words {
+		wordCopy := word
+
+		String.RegexReplace(`^\W+`, "", &word)
+		String.RegexReplace(`\W+$`, "", &word)
+
+		if len(word) > 0 {
+			// Ensure that we do not lose out on any non alphabet character
+			// (exclamation, question marks etc)
+			beginString := prefix.FindAllString(wordCopy, 1)
+			endString := suffix.FindAllString(wordCopy, 1)
+
+			word = String.ParseErhmahgerd(word)
+
+			if beginString != nil {
+				word = beginString[0] + word
+			}
+
+			if endString != nil {
+				word = word + endString[0]
+			}
+		} else {
+			word = String.ParseErhmahgerd(word)
+		}
+
+		translatedWords = append(translatedWords, word)
+	}
+
+	return strings.Join(translatedWords, " ")
 }
 
 var String = &StringUtils{}
