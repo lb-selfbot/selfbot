@@ -13,6 +13,7 @@ import (
 type ConversionCommands struct{}
 
 func (c ConversionCommands) RegisterCommands(router *dgc.Router) {
+	router.StartCategory("Conversion", "Unit conversion commands")
 	router.RegisterCmd(&dgc.Command{
 		Name:        "convertvelocity",
 		Description: "Convert velocity from one unit to another",
