@@ -8,6 +8,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"time"
 
 	"github.com/LightningDev1/LB-Selfbot/api"
 	"github.com/LightningDev1/LB-Selfbot/embed"
@@ -207,6 +208,12 @@ func (n NetworkCommands) RegisterCommands(router *dgc.Router) {
 		Description: "Create a paste from a file",
 		Usage:       "[p]pastefile <filepath>",
 		Handler:     n.pastefile,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "flightinfo",
+		Description: "Get info about a flight",
+		Usage:       "[p]flightinfo <flight number>",
+		Handler:     n.flightinfo,
 	})
 }
 
@@ -822,4 +829,39 @@ func (NetworkCommands) pastefile(ctx *dgc.Ctx) {
 	} else {
 		_ = ctx.RespondText("That file does not exist.")
 	}
+}
+
+func (NetworkCommands) flightinfo(ctx *dgc.Ctx) {
+	uri := fmt.Sprintf(
+		"https://api.flightradar24.com/common/v1/flight/list.json?query=%s&fetchBy=flight&page=1",
+		url.QueryEscape(utils.Arguments["<flight number>"]),
+	)
+
+	httpResponse := http.Get(uri)
+	if httpResponse.Error != nil {
+		_ = ctx.RespondText("An error has occurred.")
+		return
+	}
+
+	json := httpResponse.Json()
+
+	if _, exists := json.CheckGet("errors"); exists {
+		_ = ctx.RespondText("That flight does not exist or an error has occurred.")
+		return
+	}
+
+	data := json.GetPath("result", "response", "data").GetIndex(0)
+
+	departureTime := data.GetPath("time", "scheduled", "departure").MustInt64()
+	arrivalTime := data.GetPath("time", "scheduled", "arrival").MustInt64()
+
+	embed.NewEmbed().
+		AddField("Flight Number", data.GetPath("identification", "number", "default").MustString()).
+		AddField("Airline", data.GetPath("airline", "name").MustString()).
+		AddField("Departure Airport", data.GetPath("airport", "origin", "name").MustString()).
+		AddField("Departure Time", time.Unix(departureTime, 0).Format("2006-01-02 15:04:05")).
+		AddField("Arrival Airport", data.GetPath("airport", "destination", "name").MustString()).
+		AddField("Arrival Time", time.Unix(arrivalTime, 0).Format("2006-01-02 15:04:05")).
+		AddField("Status", data.GetPath("status", "text").MustString()).
+		Send(ctx)
 }
