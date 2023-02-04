@@ -149,6 +149,12 @@ func (u UtilityCommands) RegisterCommands(router *dgc.Router) {
 		Handler:     u.sleeppc,
 	})
 	router.RegisterCmd(&dgc.Command{
+		Name:        "lockpc",
+		Description: "Lock your PC",
+		Usage:       "[p]lockpc",
+		Handler:     u.lockpc,
+	})
+	router.RegisterCmd(&dgc.Command{
 		Name:        "snipe",
 		Description: "See the last deleted message in this channel",
 		Usage:       "[p]snipe",
@@ -670,6 +676,10 @@ func (UtilityCommands) restartpc(ctx *dgc.Ctx) {
 
 func (UtilityCommands) sleeppc(ctx *dgc.Ctx) {
 	_ = utils.Process.SleepPC()
+}
+
+func (UtilityCommands) lockpc(ctx *dgc.Ctx) {
+	_ = utils.Process.LockPC()
 }
 
 func (UtilityCommands) snipe(ctx *dgc.Ctx) {

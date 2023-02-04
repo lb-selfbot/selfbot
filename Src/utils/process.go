@@ -80,4 +80,28 @@ func (ProcessUtils) SleepPC() error {
 	}
 }
 
+func (ProcessUtils) LockPC() error {
+	if runtime.GOOS == "windows" {
+		user32, err := syscall.LoadLibrary("user32.dll")
+		if err != nil {
+			return err
+		}
+
+		defer syscall.FreeLibrary(user32)
+
+		lockWorkStation, err := syscall.GetProcAddress(user32, "LockWorkStation")
+		if err != nil {
+			return err
+		}
+
+		_, _, err = syscall.SyscallN(uintptr(lockWorkStation))
+
+		return err
+	} else if runtime.GOOS == "darwin" {
+		return exec.Command("pmset", "displaysleepnow").Start()
+	} else {
+		return exec.Command("systemctl", "suspend").Start()
+	}
+}
+
 var Process = &ProcessUtils{}
