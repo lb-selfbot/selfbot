@@ -164,7 +164,7 @@ func renderCategoryHelp(router *dgc.Router, category *dgc.Category, rawArgument 
 			usage = " " + splitUsage[1]
 		}
 		helpText := fmt.Sprintf("%s%s%s - %s\n", router.GetPrefixes()[0], command.Name, usage, command.Description)
-		if len(helpPages[currentPage])+len(helpText) > 1700 {
+		if len(helpPages[currentPage])+len(helpText) > 1650 {
 			currentPage++
 		}
 		helpPages[currentPage] += helpText

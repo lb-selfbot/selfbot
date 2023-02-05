@@ -424,7 +424,7 @@ func (e *Embed) ToIndent() []string {
 			if v.Inline {
 				v.Value = "```" + v.Value + "```"
 			}
-			str += fmt.Sprintf("> **%s**\n%s\n\n", v.Name, v.Value)
+			str += fmt.Sprintf("**%s**\n%s\n\n", v.Name, v.Value)
 		}
 	}
 	if e.Subtext != "" {
@@ -433,22 +433,44 @@ func (e *Embed) ToIndent() []string {
 	if e.Footer != nil {
 		str += fmt.Sprintf("\n```css\n[%s]```\n", e.Footer.Text)
 	}
+
+	splitted := strings.Split(str, "\n")
+
 	var strings_ []string
-	newStr := ""
-	for _, line := range strings.Split(str, "\n") {
+	var newStr string
+
+	for i, line := range splitted {
+		if i == len(splitted)-1 {
+			continue
+		}
+
 		if len(newStr+line)+1 > 2000 {
 			strings_ = append(strings_, newStr)
 			newStr = ""
 		}
-		newStr += line + "\n"
-	}
-	strings_ = append(strings_, newStr)
-	
-	for i, s := range strings_ {
-		strings_[i] = strings.ReplaceAll(s, "\n", "\n> ")
+
+		newStr += "> " + line + "\n"
 	}
 
-	return strings_
+	return append(strings_, newStr)
+
+	// var strings_ []string
+	// newStr := ""
+	// for _, line := range strings.Split(str, "\n") {
+	// 	if len(newStr+line)+1 > 2000 {
+	// 		strings_ = append(strings_, newStr)
+	// 		newStr = ""
+	// 	}
+
+	// 	newStr += line + "\n"
+	// }
+	// strings_ = append(strings_, newStr)
+
+	// for i, s := range strings_ {
+	// 	strings_[i] = "> " + strings.ReplaceAll(s, "\n", "\n> ")
+	// }
+
+	// return strings_
 }
 
 func (e *Embed) ToString(commandMode string) []string {
