@@ -2,13 +2,7 @@ package json
 
 import (
 	"encoding/json"
-
-	"github.com/bitly/go-simplejson"
 )
-
-func SimpleUnmarshal(jsonString string) (*simplejson.Json, error) {
-	return simplejson.NewJson([]byte(jsonString))
-}
 
 func Escape(i string) string {
 	b, err := json.Marshal(i)
