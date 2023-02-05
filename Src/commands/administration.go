@@ -1771,21 +1771,26 @@ func (*AdministrationCommands) lockserver(ctx *dgc.Ctx) {
 		return
 	}
 
+	overwrites := []*discordgo.PermissionOverwrite{
+		{
+			ID:   guild.ID,
+			Type: discordgo.PermissionOverwriteTypeRole,
+			Deny: discordgo.PermissionSendMessages,
+		},
+	}
+
 	for _, channel := range guild.Channels {
-		if channel.Type == discordgo.ChannelTypeGuildText {
-			_, err := ctx.Session.ChannelEditComplex(channel.ID, &discordgo.ChannelEdit{
-				PermissionOverwrites: []*discordgo.PermissionOverwrite{
-					{
-						ID:   guild.ID,
-						Type: discordgo.PermissionOverwriteTypeRole,
-						Deny: discordgo.PermissionSendMessages,
-					},
-				},
-			})
-			if err != nil {
-				_ = ctx.RespondText("Error locking server: " + err.Error())
-				return
-			}
+		if channel.Type != discordgo.ChannelTypeGuildText {
+			continue
+		}
+
+		_, err = ctx.Session.ChannelEditComplex(channel.ID, &discordgo.ChannelEdit{
+			PermissionOverwrites: overwrites,
+		})
+
+		if err != nil {
+			_ = ctx.RespondText("Error locking server: " + err.Error())
+			return
 		}
 	}
 
@@ -1801,21 +1806,26 @@ func (*AdministrationCommands) unlockserver(ctx *dgc.Ctx) {
 		return
 	}
 
+	overwrites := []*discordgo.PermissionOverwrite{
+		{
+			ID:   guild.ID,
+			Type: discordgo.PermissionOverwriteTypeRole,
+			Deny: 0,
+		},
+	}
+
 	for _, channel := range guild.Channels {
-		if channel.Type == discordgo.ChannelTypeGuildText {
-			_, err := ctx.Session.ChannelEditComplex(channel.ID, &discordgo.ChannelEdit{
-				PermissionOverwrites: []*discordgo.PermissionOverwrite{
-					{
-						ID:   guild.ID,
-						Type: discordgo.PermissionOverwriteTypeRole,
-						Deny: 0,
-					},
-				},
-			})
-			if err != nil {
-				_ = ctx.RespondText("Error locking server: " + err.Error())
-				return
-			}
+		if channel.Type != discordgo.ChannelTypeGuildText {
+			continue
+		}
+
+		_, err = ctx.Session.ChannelEditComplex(channel.ID, &discordgo.ChannelEdit{
+			PermissionOverwrites: overwrites,
+		})
+
+		if err != nil {
+			_ = ctx.RespondText("Error locking server: " + err.Error())
+			return
 		}
 	}
 

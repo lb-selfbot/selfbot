@@ -463,7 +463,7 @@ func CheckGiveawaySniper(session *discordgo.Session, message *discordgo.Message,
 
 		isNewGiveaway := strings.Contains(messageJson, "react with") ||
 			strings.Contains(messageJson, "to enter") ||
-			strings.Contains(messageJson, "new giveaway")
+			strings.Contains(messageJson, "giveaway")
 
 		if !isNewGiveaway {
 			return
