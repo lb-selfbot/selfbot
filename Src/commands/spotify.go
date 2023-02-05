@@ -9,7 +9,6 @@ import (
 
 	"github.com/LightningDev1/LB-Selfbot/embed"
 	"github.com/LightningDev1/LB-Selfbot/http"
-	"github.com/LightningDev1/LB-Selfbot/json"
 	"github.com/LightningDev1/LB-Selfbot/utils"
 	"github.com/LightningDev1/dgc"
 	"github.com/LightningDev1/discordgo"
@@ -353,7 +352,7 @@ func (s SpotifyCommands) spresence(ctx *dgc.Ctx) {
 		return
 	}
 
-	imageID := json.Escape(utils.Arguments["[\"image_id\"]"])
+	imageID := utils.Json.Escape(utils.Arguments["[\"image_id\"]"])
 	if imageID == "" {
 		imageID = "ab67616d0000b2735755e164993798e0c9ef7d7a"
 	}
@@ -392,9 +391,9 @@ func (s SpotifyCommands) spresence(ctx *dgc.Ctx) {
 	}`,
 		time.Now().Unix()-4140000,
 		time.Now().Unix()-3880000,
-		json.Escape(utils.Arguments["[\"artist\"]"]),
-		json.Escape(utils.Arguments["[\"song\"]"]),
-		json.Escape(utils.Arguments["[\"album\"]"]),
+		utils.Json.Escape(utils.Arguments["[\"artist\"]"]),
+		utils.Json.Escape(utils.Arguments["[\"song\"]"]),
+		utils.Json.Escape(utils.Arguments["[\"album\"]"]),
 		imageID,
 	)
 
