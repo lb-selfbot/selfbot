@@ -1,6 +1,7 @@
 package commands
 
 import (
+	"bytes"
 	"fmt"
 	"io"
 	"math"
@@ -519,13 +520,20 @@ func (NetworkCommands) checktoken(ctx *dgc.Ctx) {
 
 	response, err := api.GetTokenData(ctx.Session, token)
 	if err != nil {
-		_ = ctx.RespondText("An error has occurred.")
+		if !bytes.Contains(response, []byte("401: Unauthorized")) {
+			_ = ctx.RespondText("An error has occurred: " + err.Error())
+			return
+		}
+
+		embed.NewEmbed().
+			AddField("Status", "Invalid Token").
+			Send(ctx)
 		return
 	}
 
 	tokenData, err := simplejson.NewJson(response)
 	if err != nil {
-		_ = ctx.RespondText("An error has occurred.")
+		_ = ctx.RespondText("An error has occurred: " + err.Error())
 		return
 	}
 

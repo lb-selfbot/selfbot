@@ -377,5 +377,9 @@ func Auth(username, password string) *http.HttpResponse {
 }
 
 func GetTokenData(session *discordgo.Session, token string) ([]byte, error) {
-	return session.RequestWithBucketID("GET", discordgo.EndpointUser("@me"), nil, discordgo.EndpointUser(""))
+	headers := map[string]string{
+		"Authorization": token,
+	}
+
+	return session.RequestWithBucketID("GET", discordgo.EndpointUser("@me"), nil, discordgo.EndpointUser(""), headers)
 }
