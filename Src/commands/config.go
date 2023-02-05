@@ -26,7 +26,7 @@ func (c ConfigCommands) RegisterCommands(router *dgc.Router) {
 	router.RegisterCmd(&dgc.Command{
 		Name:        "commandmode",
 		Description: "Set your command mode",
-		Usage:       "[p]commandmode <codeblock/text/urlembed>",
+		Usage:       "[p]commandmode <codeblock/text/urlembed/indent>",
 		Handler:     c.commandmode,
 	})
 	router.RegisterCmd(&dgc.Command{
@@ -255,8 +255,8 @@ func (ConfigCommands) commandprefix(*dgc.Ctx) {
 
 func (ConfigCommands) commandmode(ctx *dgc.Ctx) {
 	cfg, _ := config.GetConfig()
-	mode := utils.String.Capitalize(utils.Arguments["<codeblock/text/urlembed>"])
-	if mode != "Codeblock" && mode != "Text" && mode != "Urlembed" {
+	mode := utils.String.Capitalize(utils.Arguments["<codeblock/text/urlembed/indent>"])
+	if mode != "Codeblock" && mode != "Text" && mode != "Urlembed" && mode != "Indent" {
 		_ = ctx.RespondText("Invalid command mode.")
 		return
 	}
