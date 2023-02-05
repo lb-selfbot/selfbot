@@ -162,7 +162,7 @@ func onWebsocketError(err error, closeCode int) {
 		logging.UI.Error("An unexpected error has occurred while connecting to the websocket: " + err.Error())
 	}
 
-	os.Exit(0)
+	os.Exit(1)
 }
 
 func main() {
