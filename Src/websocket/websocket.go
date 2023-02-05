@@ -125,14 +125,14 @@ func (w *WebsocketConnection) SendHello() error {
 }
 
 func (w *WebsocketConnection) Send(msg WsMessage) error {
+	if w.Encryption == nil || w.Conn == nil {
+		return fmt.Errorf("websocket connection is not initialized")
+	}
+
 	jsonMsg, _ := json.Marshal(msg)
 	encrypted, _ := w.Encryption.Encrypt(jsonMsg)
 
-	if w.Conn != nil {
-		return w.Conn.WriteMessage(websocket.TextMessage, encrypted)
-	}
-
-	return fmt.Errorf("websocket connection is nil")
+	return w.Conn.WriteMessage(websocket.TextMessage, encrypted)
 }
 
 func (w *WebsocketConnection) Read() (msg WsMessage, err error) {
