@@ -56,6 +56,7 @@ jobs:
       - name: Build for Linux
         env:
           GOPROXY: "https://proxy.golang.org"
+          CGO_ENABLED: 0
           GOOS: "linux"
         run: |
           cd Src
