@@ -264,7 +264,7 @@ func (a *ActivityCommands) setActivity(session *discordgo.Session, activityType,
 				Details: text,
 				URL:     a.StreamingURL,
 				Type:    discordgo.ActivityTypeStreaming,
-				Assets:  discordgo.Assets{},
+				Assets:  &discordgo.Assets{},
 			},
 		})
 	case "competing":
@@ -352,7 +352,7 @@ func (ActivityCommands) rickrollactivity(ctx *dgc.Ctx) {
 			Details: "Never Gonna Give You Up",
 			URL:     "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
 			Type:    discordgo.ActivityTypeListening,
-			Assets: discordgo.Assets{
+			Assets: &discordgo.Assets{
 				LargeImageID: "spotify:ab67616d0000b2735755e164993798e0c9ef7d7a",
 				LargeText:    "Rick Astley",
 			},
@@ -367,7 +367,7 @@ func (ActivityCommands) youtubeactivity(ctx *dgc.Ctx) {
 			Details: ctx.Arguments.Raw(),
 			Type:    discordgo.ActivityTypeWatching,
 			Flags:   0,
-			Assets: discordgo.Assets{
+			Assets: &discordgo.Assets{
 				LargeImageID: "spotify:ab67706c0000bebb7d1c495e63620a99f3cbcbf5",
 				LargeText:    "YouTube",
 			},
@@ -382,7 +382,7 @@ func (ActivityCommands) twitchactivity(ctx *dgc.Ctx) {
 			Details: ctx.Arguments.Raw(),
 			Type:    discordgo.ActivityTypeWatching,
 			Flags:   0,
-			Assets: discordgo.Assets{
+			Assets: &discordgo.Assets{
 				LargeImageID: "spotify:ab67706c0000bebb4081b043d43093915cb73114",
 				LargeText:    "Twitch",
 			},
@@ -398,7 +398,7 @@ func (ActivityCommands) discordactivity(ctx *dgc.Ctx) {
 			State:   ctx.Arguments.Raw(),
 			Type:    discordgo.ActivityTypeWatching,
 			Flags:   0,
-			Assets: discordgo.Assets{
+			Assets: &discordgo.Assets{
 				LargeImageID: "spotify:ab67616d0000b273db20400815ca2a9481bd255e",
 			},
 		},
