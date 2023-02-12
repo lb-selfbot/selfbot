@@ -377,7 +377,8 @@ func GetStartParams() *simplejson.Json {
 	newHashStr := base64.StdEncoding.EncodeToString(newHash)
 
 	if httpResponse.Headers["cf-ray-id"] != newHashStr {
-		os.Exit(0)
+		utils.Logging.Error("Error checking for updates")
+		os.Exit(1)
 	}
 
 	jsonStartParams, err := simplejson.NewJson(decryptedStartParams)
