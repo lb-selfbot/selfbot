@@ -102,6 +102,12 @@ func (s SpotifyCommands) RegisterCommands(router *dgc.Router) {
 		Usage:       "[p]sbearertoken",
 		Handler:     s.sbearertoken,
 	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "slistenalong",
+		Description: "Send a listen along invite",
+		Usage:       "[p]slistenalong [content]",
+		Handler:     s.slistenalong,
+	})
 }
 
 func (s SpotifyCommands) GetBearerToken(ctx *dgc.Ctx) (string, bool) {
@@ -509,4 +515,62 @@ func (s SpotifyCommands) sbearertoken(ctx *dgc.Ctx) {
 		AddField("Spotify Account", httpResponse.Json().Get("display_name").MustString()).
 		AddField("Bearer Token", bearerToken).
 		Send(ctx)
+}
+
+func (s SpotifyCommands) slistenalong(ctx *dgc.Ctx) {
+	session, err := discordgo.New(ctx.Session.Identify.Token)
+	if err != nil {
+		return
+	}
+
+	session.StateEnabled = false
+	session.ShouldSubscribeGuilds = false
+
+	session.AddHandler(func(_ *discordgo.Session, r *discordgo.Ready) {
+		r.Sessions = utils.Filter(r.Sessions, func(s *discordgo.DiscordSession) bool {
+			if s.SessionID == "all" {
+				return false
+			}
+
+			if len(s.Activities) == 0 {
+				return false
+			}
+
+			if s.Activities[0].Type != discordgo.ActivityTypeListening {
+				return false
+			}
+
+			if s.Activities[0].Name != "Spotify" {
+				return false
+			}
+
+			return true
+		})
+
+		for _, s := range r.Sessions {
+			_, err = ctx.Session.ChannelMessageSendComplex(ctx.Event.ChannelID, &discordgo.MessageSend{
+				Content: ctx.Arguments.Raw(),
+				Activity: &discordgo.MessageActivity{
+					Type:      discordgo.MessageActivityTypeListen,
+					SessionID: s.SessionID,
+					PartyID:   s.Activities[0].Party.ID,
+				},
+				Nonce: discordgo.GenerateNonce(),
+				Flags: 0,
+			})
+
+			if err == nil {
+				break
+			}
+		}
+
+		time.Sleep(time.Second * 5)
+
+		session.Close()
+	})
+
+	err = session.Open()
+	if err != nil {
+		return
+	}
 }

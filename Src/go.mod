@@ -5,7 +5,7 @@ go 1.19
 require (
 	github.com/LightningDev1/beeep v0.1.0
 	github.com/LightningDev1/dgc v1.1.3
-	github.com/LightningDev1/discordgo v0.26.6-0.20230207134518-871610696485
+	github.com/LightningDev1/discordgo v0.26.6-0.20230212091538-5018f1a6505b
 	github.com/bitly/go-simplejson v0.5.0
 	github.com/brianvoe/gofakeit/v6 v6.20.1
 	github.com/darkwyrm/b85 v0.0.0-20210908110113-bdd55eedeb3c
