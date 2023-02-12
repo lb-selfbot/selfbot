@@ -47,6 +47,10 @@ func CheckNitroSniper(
 		return alreadyCheckedNitroCodes, sentNitroCodes
 	}
 
+	if utils.SliceContains(cfg.Snipers.ServerBlacklist, message.GuildID) {
+		return alreadyCheckedNitroCodes, sentNitroCodes
+	}
+
 	nitroLinks := nitroRegex.FindAllString(message.Content, -1)
 
 	for _, nitroLink := range nitroLinks {
@@ -145,6 +149,10 @@ func isPrizeBlacklisted(prize string, cfg *config.Config) bool {
 
 func CheckGiveawaySniper(session *discordgo.Session, message *discordgo.Message, cfg *config.Config, account string) {
 	if !cfg.Snipers.GiveawaySniper.Enabled {
+		return
+	}
+
+	if utils.SliceContains(cfg.Snipers.ServerBlacklist, message.GuildID) {
 		return
 	}
 

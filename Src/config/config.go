@@ -43,8 +43,9 @@ type Config struct {
 		Enabled bool `json:"Enabled"`
 	} `json:"Notifications"`
 	Snipers struct {
-		Blacklist      []string `json:"Blacklist"`
-		GiveawaySniper struct {
+		Blacklist       []string `json:"Blacklist"`
+		ServerBlacklist []string `json:"ServerBlacklist"`
+		GiveawaySniper  struct {
 			Sleep      int      `json:"Sleep"`
 			Enabled    bool     `json:"Enabled"`
 			CustomBots []string `json:"CustomBots"`
@@ -270,6 +271,7 @@ func GetDefaultConfig() Config {
 		},
 		"Snipers": {
 			"Blacklist": [],
+			"ServerBlacklist": [],
 			"GiveawaySniper": {
 				"CustomBots": [],
 				"Sleep": 600,
@@ -297,6 +299,6 @@ func GetDefaultConfig() Config {
 
 	var defaultConfig Config
 	_ = json.Unmarshal([]byte(defaultConfigJson), &defaultConfig)
-	
+
 	return defaultConfig
 }
