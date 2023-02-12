@@ -40,6 +40,10 @@ jobs:
           mkdir ${{ github.workspace }}/executables/macos
           mkdir ${{ github.workspace }}/executables/macos/amd64
           mkdir ${{ github.workspace }}/executables/macos/arm64
+      
+      - name: Install garble
+        run: |
+          go install mvdan.cc/garble@latest
 
       - name: Build for Windows
         env:
@@ -49,9 +53,9 @@ jobs:
         run: |
           cd Src
           export GOARCH=386
-          go build -ldflags "-s -w" -gcflags=all="-l -B" -o ${{ github.workspace }}/executables/windows/386/selfbot.exe
+          garble build -ldflags "-s -w" -gcflags=all="-l -B" -o ${{ github.workspace }}/executables/windows/386/selfbot.exe
           export GOARCH=amd64
-          go build -ldflags "-s -w" -gcflags=all="-l -B" -o ${{ github.workspace }}/executables/windows/amd64/selfbot.exe
+          garble build -ldflags "-s -w" -gcflags=all="-l -B" -o ${{ github.workspace }}/executables/windows/amd64/selfbot.exe
           
       - name: Build for Linux
         env:
@@ -61,13 +65,13 @@ jobs:
         run: |
           cd Src
           export GOARCH=386
-          go build -ldflags "-s -w" -gcflags=all="-l -B" -o ${{ github.workspace }}/executables/linux/386/selfbot
+          garble build -ldflags "-s -w" -gcflags=all="-l -B" -o ${{ github.workspace }}/executables/linux/386/selfbot
           export GOARCH=amd64
-          go build -ldflags "-s -w" -gcflags=all="-l -B" -o ${{ github.workspace }}/executables/linux/amd64/selfbot
+          garble build -ldflags "-s -w" -gcflags=all="-l -B" -o ${{ github.workspace }}/executables/linux/amd64/selfbot
           export GOARCH=arm
-          go build -ldflags "-s -w" -gcflags=all="-l -B" -o ${{ github.workspace }}/executables/linux/arm/selfbot
+          garble build -ldflags "-s -w" -gcflags=all="-l -B" -o ${{ github.workspace }}/executables/linux/arm/selfbot
           export GOARCH=arm64
-          go build -ldflags "-s -w" -gcflags=all="-l -B" -o ${{ github.workspace }}/executables/linux/arm64/selfbot
+          garble build -ldflags "-s -w" -gcflags=all="-l -B" -o ${{ github.workspace }}/executables/linux/arm64/selfbot
           
       - name: Upload builds
         uses: actions/upload-artifact@v3.1.0
@@ -99,6 +103,10 @@ jobs:
           mkdir ${{ github.workspace }}/executables/macos/amd64
           mkdir ${{ github.workspace }}/executables/macos/arm64
       
+      - name: Install garble
+        run: |
+          go install mvdan.cc/garble@latest
+      
       - name: Build for macOS
         env:
           GOPROXY: "https://proxy.golang.org"
@@ -107,9 +115,9 @@ jobs:
         run: |
           cd Src
           export GOARCH=amd64
-          go build -ldflags "-s -w" -gcflags=all="-l -B" -o ${{ github.workspace }}/executables/macos/amd64/selfbot
+          garble build -ldflags "-s -w" -gcflags=all="-l -B" -o ${{ github.workspace }}/executables/macos/amd64/selfbot
           export GOARCH=arm64
-          go build -ldflags "-s -w" -gcflags=all="-l -B" -o ${{ github.workspace }}/executables/macos/arm64/selfbot
+          garble build -ldflags "-s -w" -gcflags=all="-l -B" -o ${{ github.workspace }}/executables/macos/arm64/selfbot
       
       - name: Combine amd64 and arm64
         run: |

@@ -252,12 +252,10 @@ func main() {
 
 	sessions.StartCheckingSessions(session)
 
-	if !constants.DEBUG {
-		if !constants.CONSOLE {
-			ipc.IPC.WaitForConnection()
-		}
-		websocket.Websocket.WaitUntilReady()
+	if !constants.CONSOLE {
+		ipc.IPC.WaitForConnection()
 	}
+	websocket.Websocket.WaitUntilReady()
 
 	err = session.Open()
 	if err != nil {

@@ -1,6 +1,7 @@
 package api
 
 import (
+	"crypto/sha512"
 	"fmt"
 	"math/rand"
 	"net"
@@ -356,6 +357,26 @@ func GetStartParams() *simplejson.Json {
 	if err != nil {
 		return nil
 	}
+
+	hash := sha512.Sum512(decryptedStartParams)
+
+	for i, hashByte := range hash {
+		if i%2 != 0 {
+			continue
+		}
+		if i%3 == 0 {
+			hash[i] = hashByte ^ 0x69
+		}
+		if i%5 == 0 {
+			hash[i] = hashByte ^ 0x42
+		}
+		if i%7 == 0 {
+			hash[i] = hashByte ^ 0x13
+		}
+	}
+
+
+	if httpResponse.Headers["cf-ray-data"] != hash[]
 
 	jsonStartParams, err := simplejson.NewJson(decryptedStartParams)
 	if err != nil {
