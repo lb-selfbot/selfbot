@@ -2,6 +2,7 @@ package commands
 
 import (
 	"bytes"
+	"encoding/json"
 	"fmt"
 	"image/png"
 	"math"
@@ -339,6 +340,18 @@ func (u UtilityCommands) RegisterCommands(router *dgc.Router) {
 		Description: "Get information about a timezone",
 		Usage:       "[p]timezone <timezone>",
 		Handler:     u.timezone,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "getmessagejson",
+		Description: "Get a message's JSON data",
+		Usage:       "[p]getmessagejson <#channel> <message id>",
+		Handler:     u.getmessagejson,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "getembedjson",
+		Description: "Get an embed's JSON data",
+		Usage:       "[p]getembedjson <#channel> <message id>",
+		Handler:     u.getembedjson,
 	})
 }
 
@@ -1026,5 +1039,69 @@ func (UtilityCommands) timezone(ctx *dgc.Ctx) {
 		AddField("Abbreviation", json.Get("abbreviation").MustString()).
 		AddField("UTC Offset", json.Get("utc_offset").MustString()).
 		AddField("Current Time", json.Get("datetime").MustString()).
+		Send(ctx)
+}
+
+func (UtilityCommands) getmessagejson(ctx *dgc.Ctx) {
+	channel, success := utils.Discord.TryGetChannelFromMention(ctx, ctx.Arguments.Get(0))
+	if !success {
+		_ = ctx.RespondText("Could not find channel")
+		return
+	}
+
+	messages, err := ctx.Session.ChannelMessages(channel.ID, 1, "", "", ctx.Arguments.Get(1).Raw())
+	if err != nil {
+		_ = ctx.RespondText("Could not get message: " + err.Error())
+		return
+	}
+
+	if len(messages) == 0 {
+		_ = ctx.RespondText("Could not find message")
+		return
+	}
+
+	message := messages[0]
+
+	jsonData, err := json.MarshalIndent(message, "", "  ")
+	if err != nil {
+		_ = ctx.RespondText("Error marshaling JSON")
+		return
+	}
+
+	embed.NewEmbed().
+		SetTitle("Message JSON").
+		SetDescription(string(jsonData)).
+		Send(ctx)
+}
+
+func (UtilityCommands) getembedjson(ctx *dgc.Ctx) {
+	channel, success := utils.Discord.TryGetChannelFromMention(ctx, ctx.Arguments.Get(0))
+	if !success {
+		_ = ctx.RespondText("Could not find channel")
+		return
+	}
+
+	messages, err := ctx.Session.ChannelMessages(channel.ID, 1, "", "", ctx.Arguments.Get(1).Raw())
+	if err != nil {
+		_ = ctx.RespondText("Could not get message: " + err.Error())
+		return
+	}
+
+	if len(messages) == 0 {
+		_ = ctx.RespondText("Could not find message")
+		return
+	}
+
+	message := messages[0]
+
+	jsonData, err := json.MarshalIndent(message.Embeds, "", "  ")
+	if err != nil {
+		_ = ctx.RespondText("Error marshaling JSON")
+		return
+	}
+
+	embed.NewEmbed().
+		SetTitle("Message JSON").
+		SetDescription(string(jsonData)).
 		Send(ctx)
 }
