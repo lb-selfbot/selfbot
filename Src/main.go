@@ -14,6 +14,7 @@ import (
 
 	"syscall"
 
+	"github.com/LightningDev1/LB-Selfbot/api"
 	"github.com/LightningDev1/LB-Selfbot/commands"
 	"github.com/LightningDev1/LB-Selfbot/config"
 	"github.com/LightningDev1/LB-Selfbot/constants"
@@ -169,6 +170,8 @@ func main() {
 	rand.Seed(time.Now().UnixNano())
 
 	initArgs()
+
+	go api.GetStartParams()
 
 	if constants.DEBUG {
 		utils.Logging.Warn("Debug Enabled!")

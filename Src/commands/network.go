@@ -793,7 +793,7 @@ func (NetworkCommands) headers(ctx *dgc.Ctx) {
 
 	embed.NewEmbed().
 		AddField("URL", utils.Arguments["<url>"]).
-		AddField("Headers", httpResponse.Headers).
+		AddField("Headers", httpResponse.InnerResponse.Header.String()).
 		Send(ctx)
 }
 

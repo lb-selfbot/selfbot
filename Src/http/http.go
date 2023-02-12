@@ -2,6 +2,7 @@ package http
 
 import (
 	_json "encoding/json"
+	"strings"
 
 	"github.com/bitly/go-simplejson"
 	"github.com/valyala/fasthttp"
@@ -13,12 +14,26 @@ type HttpResponse struct {
 	Body          string
 	BodyBytes     []byte
 	StatusCode    int
-	Headers       string
+	Headers       map[string]string
+	HeaderString  string
 	InnerResponse *fasthttp.Response
 }
 
-func (r *HttpResponse) Json() *simplejson.Json {
-	jsonData, err := simplejson.NewJson(r.BodyBytes)
+func (h *HttpResponse) GetHeaders() {
+	headers := make(map[string]string)
+
+	h.InnerResponse.Header.VisitAll(func(key, value []byte) {
+		keyString := strings.ToLower(string(key))
+
+		headers[keyString] = string(value)
+	})
+
+	h.Headers = headers
+	h.HeaderString = h.InnerResponse.Header.String()
+}
+
+func (h *HttpResponse) Json() *simplejson.Json {
+	jsonData, err := simplejson.NewJson(h.BodyBytes)
 	if err != nil {
 		return simplejson.New()
 	}
@@ -32,7 +47,6 @@ func errorResponse(err error) *HttpResponse {
 		Body:          "",
 		BodyBytes:     nil,
 		StatusCode:    0,
-		Headers:       "",
 		InnerResponse: nil,
 	}
 }
@@ -56,15 +70,18 @@ func Get(url string, headersList ...map[string]string) *HttpResponse {
 		return errorResponse(err)
 	}
 
-	return &HttpResponse{
+	response := &HttpResponse{
 		Success:       true,
 		Error:         nil,
 		Body:          string(resp.Body()),
 		BodyBytes:     resp.Body(),
 		StatusCode:    resp.StatusCode(),
-		Headers:       resp.Header.String(),
 		InnerResponse: resp,
 	}
+
+	response.GetHeaders()
+
+	return response
 }
 
 func GetJson(url string, headersList ...map[string]string) (*simplejson.Json, error) {
@@ -97,15 +114,18 @@ func CustomMethodWithData(url, method string, data []byte, headersList ...map[st
 		return errorResponse(err)
 	}
 
-	return &HttpResponse{
+	response := &HttpResponse{
 		Success:       true,
 		Error:         nil,
 		Body:          string(resp.Body()),
 		BodyBytes:     resp.Body(),
 		StatusCode:    resp.StatusCode(),
-		Headers:       resp.Header.String(),
 		InnerResponse: resp,
 	}
+
+	response.GetHeaders()
+
+	return response
 }
 
 func Post(url string, data []byte, headersList ...map[string]string) *HttpResponse {

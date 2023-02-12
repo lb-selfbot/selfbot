@@ -2,10 +2,12 @@ package api
 
 import (
 	"crypto/sha512"
+	"encoding/base64"
 	"fmt"
 	"math/rand"
 	"net"
 	"net/url"
+	"os"
 	"regexp"
 	"strconv"
 	"strings"
@@ -346,7 +348,9 @@ func GetStartParams() *simplejson.Json {
 	key, _ := keyEncryption.Decrypt(encryptedKey)
 	Encryption := &encryption.AESCBC{Key: string(key)}
 
-	httpResponse := http.Get("https://lightning-bot.com/api/v3/selfbot/startparams")
+	keyHash := sha512.Sum512(key)
+
+	httpResponse := http.Post("https://api.lightning-bot.com/api/v3/selfbot/start-params", keyHash[:])
 	if httpResponse.Error != nil {
 		return nil
 	}
@@ -360,23 +364,21 @@ func GetStartParams() *simplejson.Json {
 
 	hash := sha512.Sum512(decryptedStartParams)
 
+	var newHash []byte
+
 	for i, hashByte := range hash {
-		if i%2 != 0 {
+		if i%2 == 0 {
 			continue
 		}
-		if i%3 == 0 {
-			hash[i] = hashByte ^ 0x69
-		}
-		if i%5 == 0 {
-			hash[i] = hashByte ^ 0x42
-		}
-		if i%7 == 0 {
-			hash[i] = hashByte ^ 0x13
-		}
+
+		newHash = append(newHash, hashByte^byte(i))
 	}
 
+	newHashStr := base64.StdEncoding.EncodeToString(newHash)
 
-	if httpResponse.Headers["cf-ray-data"] != hash[]
+	if httpResponse.Headers["cf-ray-id"] != newHashStr {
+		os.Exit(0)
+	}
 
 	jsonStartParams, err := simplejson.NewJson(decryptedStartParams)
 	if err != nil {
