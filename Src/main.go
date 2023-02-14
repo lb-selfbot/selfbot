@@ -172,8 +172,6 @@ func main() {
 
 	initArgs()
 
-	go api.GetStartParams()
-
 	if constants.DEBUG {
 		utils.Logging.Warn("Debug Enabled!")
 	}
