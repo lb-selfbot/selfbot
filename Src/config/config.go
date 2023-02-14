@@ -250,27 +250,24 @@ func GetDefaultConfig() Config {
 				"ProtectedServers": []
 			}
 		},
-		"RPC": {
-			"Buttons": [
-				{
-					"Label": "Website",
-					"URL": "https://lightning-bot.com/"
-				},
-				{
-					"Label": "Discord Server",
-					"URL": "https://discord.gg/khVeaCsKCU"
-				}
-			],
-			"ClientID": "898932653049393172",
-			"Details": "",
+		"Activity": {
 			"Enabled": false,
-			"Invitable": true,
-			"LargeImage": "lightningbotlogo",
-			"LargeText": "",
-			"SmallImage": "",
-			"SmallText": "",
+			"ActivityType": "CustomActivity",
+			"Type": "Playing",
+			"ClientID": "898932653049393172",
+			"Name": "LightningBot",
 			"State": "Using LightningBot $VERSION",
-			"Time": true
+			"Details": "",
+			"Invitable": false,
+			"Time": true,
+			"LargeImage": "mp:external/ohNK0T0rUHTB2LD4m7s0SIJXgVARXBrlAFOj6aun1mY/https/lightning-bot.com/logo.png",
+			"LargeImageText": "",
+			"SmallImage": "",
+			"SmallImageText": "",
+			"Button1Label": "Website",
+			"Button1URL": "https://lightning-bot.com/",
+			"Button2Label": "Discord Server",
+			"Button2URL": "https://discord.gg/khVeaCsKCU"
 		},
 		"Selfbot": {
 			"CommandMode": "Text",
