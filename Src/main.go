@@ -23,6 +23,7 @@ import (
 	"github.com/LightningDev1/LB-Selfbot/ipc"
 	"github.com/LightningDev1/LB-Selfbot/logging"
 	"github.com/LightningDev1/LB-Selfbot/multitokensniper"
+	"github.com/LightningDev1/LB-Selfbot/rpc"
 	"github.com/LightningDev1/LB-Selfbot/sessions"
 	"github.com/LightningDev1/LB-Selfbot/setup"
 	"github.com/LightningDev1/LB-Selfbot/utils"
@@ -254,6 +255,7 @@ func main() {
 	router.Initialize(session)
 
 	sessions.StartCheckingSessions(session)
+	rpc.StartRPC(session)
 
 	if !constants.CONSOLE {
 		ipc.IPC.WaitForConnection()

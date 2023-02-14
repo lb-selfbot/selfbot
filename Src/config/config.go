@@ -78,8 +78,27 @@ type Config struct {
 		SessionConnected      bool `json:"SessionConnected"`
 		SessionDisconnected   bool `json:"SessionDisconnected"`
 	} `json:"Events"`
-	RPC RPCData `json:"RPC"`
-	UI  struct {
+	RPC      RPCData `json:"RPC"`
+	Activity struct {
+		Enabled        bool   `json:"Enabled"`
+		ActivityType   string `json:"ActivityType"`
+		Type           string `json:"Type"`
+		ClientID       string `json:"ClientID"`
+		Name           string `json:"Name"`
+		State          string `json:"State"`
+		Details        string `json:"Details"`
+		Invitable      bool   `json:"Invitable"`
+		Time           bool   `json:"Time"`
+		LargeImage     string `json:"LargeImage"`
+		LargeImageText string `json:"LargeImageText"`
+		SmallImage     string `json:"SmallImage"`
+		SmallImageText string `json:"SmallImageText"`
+		Button1Label   string `json:"Button1Label"`
+		Button1URL     string `json:"Button1URL"`
+		Button2Label   string `json:"Button2Label"`
+		Button2URL     string `json:"Button2URL"`
+	} `json:"Activity"`
+	UI struct {
 		Theme            string `json:"Theme"`
 		HideToSystemTray bool   `json:"HideToSystemTray"`
 	} `json:"UI"`

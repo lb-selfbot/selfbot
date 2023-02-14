@@ -78,7 +78,16 @@ func generalHelpCommand(ctx *dgc.Ctx) {
 func getNameFromArgument(arg string) string {
 	arg = strings.ReplaceAll(arg, "eventreactions", "Event Reactions")
 	arg = strings.ReplaceAll(arg, "eventreaction", "Event Reactions")
-	return strings.ReplaceAll(arg, "nsfw", "NSFW")
+
+	arg =  strings.ReplaceAll(arg, "nsfw", "NSFW")
+
+	arg = strings.ReplaceAll(arg, "customactivity", "Custom Activity")
+
+	if arg == "admin" {
+		arg = "Admininstration"
+	}
+
+	return arg
 }
 
 // specificHelpCommand handles the specific help command

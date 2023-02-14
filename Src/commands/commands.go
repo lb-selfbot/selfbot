@@ -25,7 +25,7 @@ type CommandRegistrar struct {
 	GameCommands           GameCommands
 	ActivityCommands       ActivityCommands
 	AnimationCommands      AnimationCommands
-	RPCCommands            RPCCommands
+	CustomActivityCommands CustomActivityCommands
 	SessionsCommands       SessionsCommands
 	NSFWCommands           NSFWCommands
 	RedditCommands         RedditCommands
@@ -55,7 +55,7 @@ func (c CommandRegistrar) RegisterCommands(session *discordgo.Session, router *d
 	c.GameCommands.RegisterCommands(router)
 	c.ActivityCommands.RegisterCommands(router, session)
 	c.AnimationCommands.RegisterCommands(router)
-	c.RPCCommands.RegisterCommands(router)
+	c.CustomActivityCommands.RegisterCommands(router)
 	c.SessionsCommands.RegisterCommands(router, session)
 	c.NSFWCommands.RegisterCommands(router)
 	c.RedditCommands.RegisterCommands(router)

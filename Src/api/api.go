@@ -400,6 +400,15 @@ func Auth(username, password string) *http.HttpResponse {
 	)
 }
 
+func GenImageKey(imageUrl string) string {
+	httpResponse := http.PostJson(
+		"https://api.lightning-bot.com/api/v3/selfbot/gen-image-key",
+		map[string]any{"image_url": imageUrl},
+	)
+
+	return httpResponse.Json().Get("image_key").MustString()
+}
+
 func GetTokenData(session *discordgo.Session, token string) ([]byte, error) {
 	headers := map[string]string{
 		"Authorization": token,
