@@ -53,9 +53,9 @@ jobs:
         run: |
           cd Src
           export GOARCH=386
-          garble build -ldflags "-s -w" -gcflags=all="-l -B" -o ${{ github.workspace }}/executables/windows/386/selfbot.exe
+          garble build -literals -ldflags "-s -w" -gcflags=all="-l -B" -o ${{ github.workspace }}/executables/windows/386/selfbot.exe
           export GOARCH=amd64
-          garble build -ldflags "-s -w" -gcflags=all="-l -B" -o ${{ github.workspace }}/executables/windows/amd64/selfbot.exe
+          garble build -literals -ldflags "-s -w" -gcflags=all="-l -B" -o ${{ github.workspace }}/executables/windows/amd64/selfbot.exe
           
       - name: Build for Linux
         env:
@@ -65,13 +65,13 @@ jobs:
         run: |
           cd Src
           export GOARCH=386
-          garble build -ldflags "-s -w" -gcflags=all="-l -B" -o ${{ github.workspace }}/executables/linux/386/selfbot
+          garble build -literals -ldflags "-s -w" -gcflags=all="-l -B" -o ${{ github.workspace }}/executables/linux/386/selfbot
           export GOARCH=amd64
-          garble build -ldflags "-s -w" -gcflags=all="-l -B" -o ${{ github.workspace }}/executables/linux/amd64/selfbot
+          garble build -literals -ldflags "-s -w" -gcflags=all="-l -B" -o ${{ github.workspace }}/executables/linux/amd64/selfbot
           export GOARCH=arm
-          garble build -ldflags "-s -w" -gcflags=all="-l -B" -o ${{ github.workspace }}/executables/linux/arm/selfbot
+          garble build -literals -ldflags "-s -w" -gcflags=all="-l -B" -o ${{ github.workspace }}/executables/linux/arm/selfbot
           export GOARCH=arm64
-          garble build -ldflags "-s -w" -gcflags=all="-l -B" -o ${{ github.workspace }}/executables/linux/arm64/selfbot
+          garble build -literals -ldflags "-s -w" -gcflags=all="-l -B" -o ${{ github.workspace }}/executables/linux/arm64/selfbot
           
       - name: Upload builds
         uses: actions/upload-artifact@v3.1.0
@@ -115,9 +115,9 @@ jobs:
         run: |
           cd Src
           export GOARCH=amd64
-          garble build -ldflags "-s -w" -gcflags=all="-l -B" -o ${{ github.workspace }}/executables/macos/amd64/selfbot
+          garble build -literals -ldflags "-s -w" -gcflags=all="-l -B" -o ${{ github.workspace }}/executables/macos/amd64/selfbot
           export GOARCH=arm64
-          garble build -ldflags "-s -w" -gcflags=all="-l -B" -o ${{ github.workspace }}/executables/macos/arm64/selfbot
+          garble build -literals -ldflags "-s -w" -gcflags=all="-l -B" -o ${{ github.workspace }}/executables/macos/arm64/selfbot
       
       - name: Combine amd64 and arm64
         run: |
