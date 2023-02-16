@@ -105,7 +105,7 @@ func (m *AdministrationCommands) RegisterCommands(router *dgc.Router) {
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "removeslowmode",
-		Description: "Remove clowmode",
+		Description: "Remove slowmode",
 		Usage:       "[p]removeslowmode <channel>",
 		Handler:     m.removeslowmode,
 	})

@@ -363,47 +363,113 @@ func (s SpotifyCommands) spresence(ctx *dgc.Ctx) {
 		imageID = "ab67616d0000b2735755e164993798e0c9ef7d7a"
 	}
 
-	data := fmt.Sprintf(`{
-		"op": 3,
-		"d": {
-			"status": "",
-			"since": 0,
-			"afk": false,
-			"activities": [
-				{
-					"type": 2,
-					"timestamps": {
-						"start": %d,
-						"end": %d
-					},
-					"sync_id": "0ydLMgK66rwPhJusUeJpou",
-					"state": "%s",
-					"session_id": "8175592baa82669363f6ce10ea908c0e",
-					"party": {
-						"id": "spotify:733933799859028009"
-					},
-					"name": "Spotify",
-					"id": "spotify:1",
-					"flags": 48,
-					"details": "%s",
-					"created_at": 0,
-					"assets": {
-						"large_text": "%s",
-						"large_image": "spotify:%s"
-					}
-				}
-			]
-		}
-	}`,
-		time.Now().Unix()-4140000,
-		time.Now().Unix()-3880000,
-		utils.Json.Escape(utils.Arguments["[\"artist\"]"]),
-		utils.Json.Escape(utils.Arguments["[\"song\"]"]),
-		utils.Json.Escape(utils.Arguments["[\"album\"]"]),
-		imageID,
-	)
+	err := ctx.Session.UpdateStatusComplex(discordgo.UpdateStatusData{
+		Activities: []*discordgo.Activity{
+			{
+				Type: discordgo.ActivityType(2),
+				Name: "Spotify",
+				Assets: &discordgo.Assets{
+					LargeImageID: "spotify:ab67616d0000b2731675d50a0ba7919b5e5797fe",
+					LargeText:  "Wild West",
+				},
+				Details: "Commitment Issues",
+				State:   "Central Cee",
+				Timestamps: &discordgo.TimeStamps{
+					StartTimestamp: time.Now().Unix() - 4140000,
+					EndTimestamp:   time.Now().Unix() - 3880000,
+				},
+				Party: &discordgo.Party{
+					ID: "spotify:733933799859028008",
+				},
+				SyncID: "0UCKUJU94sx8XBQnaNsRkB",
+				Flags:  48,
+			},
+		},
+	})
 
-	_ = ctx.Session.SendWsData(data)
+	fmt.Println(err)
+
+	// data := fmt.Sprintf(`{
+	// 	"op": 3,
+	// 	"d": {
+	// 		"status": "dnd",
+	// 		"since": 0,
+	// 		"activities": [
+	// 			{
+	// 				"type": 2,
+	// 				"name": "Spotify",
+	// 				"assets": {
+	// 					"large_image": "spotify:ab67616d0000b2731675d50a0ba7919b5e5797fe",
+	// 					"large_text": "Wild West"
+	// 				},
+	// 				"details": "Commitment Issues",
+	// 				"state": "Central Cee",
+	// 				"timestamps": {
+	// 					"start": %d,
+	// 					"end": %d
+	// 				},
+	// 				"party": {
+	// 					"id": "spotify:733933799859028008"
+	// 				},
+	// 				"sync_id": "0UCKUJU94sx8XBQnaNsRkB",
+	// 				"flags": 48,
+	// 				"metadata": {
+	// 					"album_id": "0aAVMtHuK9wX1mQozWvdSZ",
+	// 					"artist_ids": [
+	// 						"5H4yInM5zmHqpKIoMNAx4r"
+	// 					]
+	// 				}
+	// 			}
+	// 		],
+	// 		"afk": false
+	// 	}
+	// }`,
+	// 	time.Now().Unix()-4140000,
+	// 	time.Now().Unix()-3880000,
+	// )
+
+	// data := fmt.Sprintf(`{
+	// 	"op": 3,
+	// 	"d": {
+	// 		"status": "dnd",
+	// 		"since": 0,
+	// 		"afk": false,
+	// 		"activities": [
+	// 			{
+	// 				"type": 2,
+	// 				"timestamps": {
+	// 					"start": %d,
+	// 					"end": %d
+	// 				},
+	// 				"sync_id": "",
+	// 				"state": "%s",
+	// 				"session_id": "%s",
+	// 				"party": {
+	// 					"id": "spotify:733933799859028009"
+	// 				},
+	// 				"name": "Spotify",
+	// 				"id": "spotify:1",
+	// 				"flags": 48,
+	// 				"details": "%s",
+	// 				"created_at": 0,
+	// 				"assets": {
+	// 					"large_text": "%s",
+	// 					"large_image": "spotify:%s"
+	// 				}
+	// 			}
+	// 		]
+	// 	}
+	// }`,
+	// 	time.Now().Unix()-4140000,
+	// 	time.Now().Unix()-3880000,
+	// 	utils.Json.Escape(utils.Arguments["[\"artist\"]"]),
+	// 	ctx.Session.State.SessionID,
+	// 	utils.Json.Escape(utils.Arguments["[\"song\"]"]),
+	// 	utils.Json.Escape(utils.Arguments["[\"album\"]"]),
+	// 	imageID,
+	// )
+
+	// _ = ctx.Session.SendWsData(data)
 }
 
 func (s SpotifyCommands) simageid(ctx *dgc.Ctx) {
@@ -420,7 +486,8 @@ func (s SpotifyCommands) simageid(ctx *dgc.Ctx) {
 	json := httpResponse.Json()
 
 	song := json.GetPath("tracks", "items").GetIndex(0)
-	imageUrl := song.Get("url").MustString()
+
+	imageUrl := song.Get("album").Get("images").GetIndex(0).Get("url").MustString()
 	if httpResponse.Error != nil || imageUrl == "" {
 		_ = ctx.RespondText("A Spotify error occured: Song not found.")
 		return

@@ -4,6 +4,8 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"go/token"
+	"go/types"
 	"image/png"
 	"math"
 	"net/url"
@@ -352,6 +354,12 @@ func (u UtilityCommands) RegisterCommands(router *dgc.Router) {
 		Description: "Get an embed's JSON data",
 		Usage:       "[p]getembedjson <#channel> <message id>",
 		Handler:     u.getembedjson,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "calculate",
+		Description: "Calculate something",
+		Usage:       "[p]calculate <expression>",
+		Handler:     u.calculate,
 	})
 }
 
@@ -1103,5 +1111,23 @@ func (UtilityCommands) getembedjson(ctx *dgc.Ctx) {
 	embed.NewEmbed().
 		SetTitle("Message JSON").
 		SetDescription(string(jsonData)).
+		Send(ctx)
+}
+
+func (UtilityCommands) calculate(ctx *dgc.Ctx) {
+	tv, err := types.Eval(token.NewFileSet(), nil, token.NoPos, utils.Arguments["<expression>"])
+	if err != nil {
+		_ = ctx.RespondText("Error evaluating expression: " + err.Error())
+		return
+	}
+
+	if tv.Value == nil {
+		_ = ctx.RespondText("Error evaluating expression: nil value")
+		return
+	}
+
+	embed.NewEmbed().
+		AddField("Expression", utils.Arguments["<expression>"]).
+		AddField("Solution", tv.Value.String()).
 		Send(ctx)
 }
