@@ -43,7 +43,7 @@ func (ConsoleLogging) Colored(text string, r, g, b int, bold bool) string {
 }
 
 func (ConsoleLogging) Clear() {
-	// fmt.Print("\033[H\033[2J")
+	fmt.Print("\033[H\033[2J")
 }
 
 func (ConsoleLogging) PrintBanner() {

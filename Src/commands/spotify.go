@@ -358,118 +358,33 @@ func (s SpotifyCommands) spresence(ctx *dgc.Ctx) {
 		return
 	}
 
-	imageID := utils.Json.Escape(utils.Arguments["[\"image_id\"]"])
+	imageID := utils.Json.Escape(utils.Arguments["[image id]"])
 	if imageID == "" {
 		imageID = "ab67616d0000b2735755e164993798e0c9ef7d7a"
 	}
 
-	err := ctx.Session.UpdateStatusComplex(discordgo.UpdateStatusData{
+	_ = ctx.Session.UpdateStatusComplex(discordgo.UpdateStatusData{
 		Activities: []*discordgo.Activity{
 			{
 				Type: discordgo.ActivityType(2),
 				Name: "Spotify",
 				Assets: &discordgo.Assets{
-					LargeImageID: "spotify:ab67616d0000b2731675d50a0ba7919b5e5797fe",
-					LargeText:  "Wild West",
+					LargeImageID: "spotify:" + imageID,
+					LargeText:  utils.Arguments["[\"album\"]"],
 				},
-				Details: "Commitment Issues",
-				State:   "Central Cee",
+				Details: utils.Arguments["[\"song\"]"],
+				State:   utils.Arguments["[\"artist\"]"],
 				Timestamps: &discordgo.TimeStamps{
 					StartTimestamp: time.Now().Unix() - 4140000,
 					EndTimestamp:   time.Now().Unix() - 3880000,
 				},
 				Party: &discordgo.Party{
-					ID: "spotify:733933799859028008",
+					ID: "spotify:" + ctx.Session.State.User.ID,
 				},
-				SyncID: "0UCKUJU94sx8XBQnaNsRkB",
 				Flags:  48,
 			},
 		},
 	})
-
-	fmt.Println(err)
-
-	// data := fmt.Sprintf(`{
-	// 	"op": 3,
-	// 	"d": {
-	// 		"status": "dnd",
-	// 		"since": 0,
-	// 		"activities": [
-	// 			{
-	// 				"type": 2,
-	// 				"name": "Spotify",
-	// 				"assets": {
-	// 					"large_image": "spotify:ab67616d0000b2731675d50a0ba7919b5e5797fe",
-	// 					"large_text": "Wild West"
-	// 				},
-	// 				"details": "Commitment Issues",
-	// 				"state": "Central Cee",
-	// 				"timestamps": {
-	// 					"start": %d,
-	// 					"end": %d
-	// 				},
-	// 				"party": {
-	// 					"id": "spotify:733933799859028008"
-	// 				},
-	// 				"sync_id": "0UCKUJU94sx8XBQnaNsRkB",
-	// 				"flags": 48,
-	// 				"metadata": {
-	// 					"album_id": "0aAVMtHuK9wX1mQozWvdSZ",
-	// 					"artist_ids": [
-	// 						"5H4yInM5zmHqpKIoMNAx4r"
-	// 					]
-	// 				}
-	// 			}
-	// 		],
-	// 		"afk": false
-	// 	}
-	// }`,
-	// 	time.Now().Unix()-4140000,
-	// 	time.Now().Unix()-3880000,
-	// )
-
-	// data := fmt.Sprintf(`{
-	// 	"op": 3,
-	// 	"d": {
-	// 		"status": "dnd",
-	// 		"since": 0,
-	// 		"afk": false,
-	// 		"activities": [
-	// 			{
-	// 				"type": 2,
-	// 				"timestamps": {
-	// 					"start": %d,
-	// 					"end": %d
-	// 				},
-	// 				"sync_id": "",
-	// 				"state": "%s",
-	// 				"session_id": "%s",
-	// 				"party": {
-	// 					"id": "spotify:733933799859028009"
-	// 				},
-	// 				"name": "Spotify",
-	// 				"id": "spotify:1",
-	// 				"flags": 48,
-	// 				"details": "%s",
-	// 				"created_at": 0,
-	// 				"assets": {
-	// 					"large_text": "%s",
-	// 					"large_image": "spotify:%s"
-	// 				}
-	// 			}
-	// 		]
-	// 	}
-	// }`,
-	// 	time.Now().Unix()-4140000,
-	// 	time.Now().Unix()-3880000,
-	// 	utils.Json.Escape(utils.Arguments["[\"artist\"]"]),
-	// 	ctx.Session.State.SessionID,
-	// 	utils.Json.Escape(utils.Arguments["[\"song\"]"]),
-	// 	utils.Json.Escape(utils.Arguments["[\"album\"]"]),
-	// 	imageID,
-	// )
-
-	// _ = ctx.Session.SendWsData(data)
 }
 
 func (s SpotifyCommands) simageid(ctx *dgc.Ctx) {
