@@ -56,6 +56,12 @@ func (t TrollingCommands) RegisterCommands(router *dgc.Router) {
 		Handler:     t.fakenitro,
 	})
 	router.RegisterCmd(&dgc.Command{
+		Name:        "hiddentext",
+		Description: "Hide text behind other text",
+		Usage:       "[p]hiddentext <\"text\"> <\"hidden\">",
+		Handler:     t.hiddentext,
+	})
+	router.RegisterCmd(&dgc.Command{
 		Name:        "hiddeninvite",
 		Description: "Hide an invite behind text",
 		Usage:       "[p]hiddeninvite <invite> <text>",
@@ -64,14 +70,26 @@ func (t TrollingCommands) RegisterCommands(router *dgc.Router) {
 	router.RegisterCmd(&dgc.Command{
 		Name:        "hiddenping",
 		Description: "Hide a ping behind text",
-		Usage:       "[p]hiddenping <user> <text>",
+		Usage:       "[p]hiddenping <userid> <text>",
 		Handler:     t.hiddenping,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "hiddenroleping",
+		Description: "Hide a role ping behind text",
+		Usage:       "[p]hiddenroleping <roleid> <text>",
+		Handler:     t.hiddenroleping,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "hiddeneveryone",
 		Description: "Hide an everyone ping behind text",
 		Usage:       "[p]hiddeneveryone <text>",
 		Handler:     t.hiddeneveryone,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "hiddenhere",
+		Description: "Hide a here ping behind text",
+		Usage:       "[p]hiddenhere <text>",
+		Handler:     t.hiddenhere,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "forcenick",
@@ -261,6 +279,15 @@ func (TrollingCommands) fakenitro(ctx *dgc.Ctx) {
 	}
 }
 
+func (TrollingCommands) hiddentext(ctx *dgc.Ctx) {
+	_ = ctx.RespondText(fmt.Sprintf(
+		"%s %s %s",
+		utils.Arguments["<\"text\">"],
+		constants.INVISIBLE_TEXT,
+		utils.Arguments["<\"hidden\">"],
+	))
+}
+
 func (TrollingCommands) hiddeninvite(ctx *dgc.Ctx) {
 	text := utils.String.RemoveWords(ctx.Arguments.Raw(), 1)
 	_ = ctx.RespondText(fmt.Sprintf("%s %s %s", text, constants.INVISIBLE_TEXT, utils.Arguments["<invite>"]))
@@ -268,11 +295,20 @@ func (TrollingCommands) hiddeninvite(ctx *dgc.Ctx) {
 
 func (TrollingCommands) hiddenping(ctx *dgc.Ctx) {
 	text := utils.String.RemoveWords(ctx.Arguments.Raw(), 1)
-	_ = ctx.RespondText(fmt.Sprintf("%s %s %s", text, constants.INVISIBLE_TEXT, utils.Arguments["<user>"]))
+	_ = ctx.RespondText(fmt.Sprintf("%s %s <@%s>", text, constants.INVISIBLE_TEXT, utils.Arguments["<userid>"]))
+}
+
+func (TrollingCommands) hiddenroleping(ctx *dgc.Ctx) {
+	text := utils.String.RemoveWords(ctx.Arguments.Raw(), 1)
+	_ = ctx.RespondText(fmt.Sprintf("%s %s <@&%s>", text, constants.INVISIBLE_TEXT, utils.Arguments["<roleid>"]))
 }
 
 func (TrollingCommands) hiddeneveryone(ctx *dgc.Ctx) {
 	_ = ctx.RespondText(fmt.Sprintf("%s %s @everyone", ctx.Arguments.Raw(), constants.INVISIBLE_TEXT))
+}
+
+func (TrollingCommands) hiddenhere(ctx *dgc.Ctx) {
+	_ = ctx.RespondText(fmt.Sprintf("%s %s @here", ctx.Arguments.Raw(), constants.INVISIBLE_TEXT))
 }
 
 func (TrollingCommands) forcenick(ctx *dgc.Ctx) {

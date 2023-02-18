@@ -124,6 +124,26 @@ func (w *WebsocketConnection) SendHello() error {
 	})
 }
 
+func (w *WebsocketConnection) SendConfigUpdate() error {
+	cfg, _ := config.GetConfig()
+
+	password := cfg.Account.LightningBot.Password
+	token := cfg.Account.Discord.Token
+
+	cfg.Account.LightningBot.Password = "redacted"
+	cfg.Account.Discord.Token = "redacted"
+
+	err := w.Send(WsMessage{
+		Op:   "CONFIG_UPDATE",
+		Data: WsData{Config: &cfg},
+	})
+
+	cfg.Account.LightningBot.Password = password
+	cfg.Account.Discord.Token = token
+
+	return err
+}
+
 func (w *WebsocketConnection) Send(msg WsMessage) error {
 	if w.Encryption == nil || w.Conn == nil {
 		return fmt.Errorf("websocket connection is not initialized")
@@ -209,12 +229,7 @@ func (w *WebsocketConnection) OnMessage(msg WsMessage) {
 		w.Ready = true
 		w.ReadyChannel <- struct{}{}
 
-		cfg, _ := config.GetConfig()
-
-		_ = w.Send(WsMessage{
-			Op:   "CONFIG_UPDATE",
-			Data: WsData{Config: &cfg},
-		})
+		w.SendConfigUpdate()
 	case "FREE_TRIAL_START":
 		go beeep.Notify(
 			"LightningBot",
@@ -232,16 +247,15 @@ func (w *WebsocketConnection) OnMessage(msg WsMessage) {
 			Data: WsData{Text: ipc.Console},
 		})
 
-		cfg, _ := config.GetConfig()
-
-		_ = w.Send(WsMessage{
-			Op:   "CONFIG_UPDATE",
-			Data: WsData{Config: &cfg},
-		})
+		w.SendConfigUpdate()
 	case "CONFIG_UPDATE":
 		if msg.Data.Config == nil {
 			break
 		}
+
+		cfg, _ := config.GetConfig()
+
+		msg.Data.Config.Account = cfg.Account
 
 		_ = msg.Data.Config.Save()
 

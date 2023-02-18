@@ -2,6 +2,7 @@ package sessions
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"time"
 
@@ -11,6 +12,11 @@ import (
 )
 
 var Sessions []*UserSessions
+
+var Errors = 0
+var MaxErrors = 5
+var ErrorStart = time.Now()
+var ErrorWindow = 10 * time.Minute
 
 type ClientInfo struct {
 	OS       string `json:"os"`
@@ -54,8 +60,19 @@ type SessionData struct {
 }
 
 func GetSessions(session *discordgo.Session) ([]*UserSessions, error) {
+	if time.Since(ErrorStart) > ErrorWindow {
+		Errors = 0
+		ErrorStart = time.Now()
+	}
+
+	if Errors > MaxErrors {
+		return nil, errors.New("too many errors")
+	}
+
 	response, err := session.Request("GET", "https://discord.com/api/v10/auth/sessions", nil)
 	if err != nil {
+		Errors++
+
 		return nil, err
 	}
 

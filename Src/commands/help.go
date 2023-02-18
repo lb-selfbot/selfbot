@@ -44,7 +44,7 @@ func (h *HelpCommand) RegisterHelpCommand(router *dgc.Router, session *discordgo
 	})
 
 	for _, category := range router.Categories {
-		name := strings.Trim(strings.ToLower(category.Name), " ")
+		name := strings.ReplaceAll(strings.ToLower(category.Name), " ", "")
 
 		router.RegisterCmd(&dgc.Command{
 			Name:        name,
