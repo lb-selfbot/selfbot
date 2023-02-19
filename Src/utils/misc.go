@@ -116,6 +116,22 @@ func (MiscUtils) HexToRGB(hex string) (int, int, int) {
 	return int(r), int(g), int(b)
 }
 
+func (MiscUtils) CreateSawtoothWave(width, iterations int) []int {
+	var list []int
+	for i := 0; i < iterations; i++ {
+		for j := 0; j <= width; j++ {
+			if j == width {
+				for k := width - 1; k >= 0; k-- {
+					list = append(list, k)
+				}
+			} else {
+				list = append(list, j)
+			}
+		}
+	}
+	return list
+}
+
 var Misc = &MiscUtils{}
 
 // SliceContains checks if a slice has a certain item

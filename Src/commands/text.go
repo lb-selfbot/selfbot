@@ -158,6 +158,18 @@ func (t TextCommands) RegisterCommands(router *dgc.Router) {
 		Usage:       "[p]unfliptext <text>",
 		Handler:     t.unfliptext,
 	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "wave",
+		Description: "Sends text in a wave",
+		Usage:       "[p]wave <text>",
+		Handler:     t.wave,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "customwave",
+		Description: "Sends text in a wave with custom parameters",
+		Usage:       "[p]customwave <width> <iterations> <text>",
+		Handler:     t.customwave,
+	})
 }
 
 func (TextCommands) empty(ctx *dgc.Ctx) {
@@ -383,4 +395,51 @@ func (TextCommands) fliptext(ctx *dgc.Ctx) {
 func (TextCommands) unfliptext(ctx *dgc.Ctx) {
 	text := utils.String.Flip(ctx.Arguments.Raw(), true)
 	_ = ctx.RespondText(text)
+}
+
+func (TextCommands) wave(ctx *dgc.Ctx) {
+	sawtoothWave := utils.Misc.CreateSawtoothWave(8, 6)
+
+	wave := ""
+
+	for _, i := range sawtoothWave {
+		wave += strings.Repeat(" ", i) + ctx.Arguments.Raw() + "\n"
+	}
+
+	_ = ctx.RespondText(wave)
+}
+
+func (TextCommands) customwave(ctx *dgc.Ctx) {
+	width, err := ctx.Arguments.Get(0).AsInt()
+	if err != nil {
+		_ = ctx.RespondText("Width must be a number!")
+		return
+	}
+
+	if width <= 0 {
+		_ = ctx.RespondText("Width must be a positive number!")
+		return
+	}
+
+	iterations, err := ctx.Arguments.Get(1).AsInt()
+	if err != nil {
+		_ = ctx.RespondText("Iterations must be a number!")
+	}
+
+	if iterations <= 0 {
+		_ = ctx.RespondText("Iterations must be a positive number!")
+		return
+	}
+
+	sawtoothWave := utils.Misc.CreateSawtoothWave(width, iterations)
+
+	text := utils.String.RemoveWords(ctx.Arguments.Raw(), 2)
+
+	wave := ""
+
+	for _, i := range sawtoothWave {
+		wave += strings.Repeat(" ", i) + text + "\n"
+	}
+
+	_ = ctx.RespondText(wave)
 }

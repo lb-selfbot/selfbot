@@ -54,6 +54,12 @@ func (d *DumpingCommands) RegisterCommands(router *dgc.Router) {
 		Handler:     d.dumpemojis,
 	})
 	router.RegisterCmd(&dgc.Command{
+		Name:        "dumpstickers",
+		Description: "Dump all stickers in a server",
+		Usage:       "[p]dumpstickers [server id]",
+		Handler:     d.dumpstickers,
+	})
+	router.RegisterCmd(&dgc.Command{
 		Name:        "dumpavatars",
 		Description: "Dump all avatars from members in a server",
 		Usage:       "[p]dumpavatars [server id]",
@@ -318,6 +324,45 @@ func (*DumpingCommands) dumpemojis(ctx *dgc.Ctx) {
 	}
 	embed.NewEmbed().
 		SetDescription(fmt.Sprintf("Dumped %d emojis from %s", len(emojis), guild.Name)).
+		Send(ctx)
+}
+
+func (*DumpingCommands) dumpstickers(ctx *dgc.Ctx) {
+	guild, err := utils.Discord.GetGuild(ctx.Session, utils.Misc.Or(utils.Arguments["[server id]"], ctx.Event.GuildID))
+	if err != nil {
+		_ = ctx.RespondText("Error getting server: " + err.Error())
+		return
+	}
+	folder := filepath.Join(utils.IO.GetMainFolder(), "Dumping", "Stickers", utils.IO.SanitizeFilename(guild.Name))
+	_ = os.MkdirAll(folder, os.ModePerm)
+	_ = utils.Process.OpenURL(folder)
+	for _, sticker := range guild.Stickers {
+		var format string
+
+		switch sticker.FormatType {
+		case discordgo.StickerFormatTypePNG:
+			format = ".png"
+		case discordgo.StickerFormatTypeAPNG:
+			format = ".apng"
+		case discordgo.StickerFormatTypeLottie:
+			format = ".json"
+		case discordgo.StickerFormatTypeGIF:
+			format = ".gif"
+		}
+
+		fileName := fmt.Sprintf("%s%s", sticker.Name, format)
+
+		filePath := filepath.Join(folder, utils.IO.SanitizeFilename(fileName))
+
+		httpResponse := http.Get(fmt.Sprintf("https://media.discordapp.net/stickers/%s%s", sticker.ID, format))
+		if httpResponse.Error != nil {
+			continue
+		}
+
+		_ = utils.IO.WriteBytes(filePath, httpResponse.BodyBytes)
+	}
+	embed.NewEmbed().
+		SetDescription(fmt.Sprintf("Dumped %d stickers from %s", len(guild.Stickers), guild.Name)).
 		Send(ctx)
 }
 

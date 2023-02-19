@@ -553,11 +553,9 @@ func (e *Events) checkNotifiersDelete(message *discordgo.Message, cfg *config.Co
 }
 
 func (e *Events) ensureUserEntry(userID string) *SBDScore {
-	if _, ok := e.Settings.SelfbotDetectionScore[userID]; !ok {
-		e.Settings.SelfbotDetectionScore[userID] = SBDScore{UserID: userID, Score: 0}
-	}
-	a := e.Settings.SelfbotDetectionScore[userID]
-	return &a
+	rawScore, _ := e.Settings.SelfbotDetectionScore.LoadOrStore(userID, SBDScore{UserID: userID, Score: 0})
+	score := rawScore.(SBDScore)
+	return &score
 }
 
 func (e *Events) logSelfbotDetection(score *SBDScore, message *discordgo.Message) {
@@ -632,7 +630,8 @@ func (e *Events) checkSelfbotDetection(message *discordgo.Message, cfg *config.C
 		score.Selfbot = utils.Misc.Or(detectable.Selfbot, score.Selfbot)
 		e.logSelfbotDetection(score, message)
 	}
-	e.Settings.SelfbotDetectionScore[message.Author.ID] = *score
+
+	e.Settings.SelfbotDetectionScore.Store(message.Author.ID, *score)
 }
 
 func (e *Events) checkSelfbotDetectionEdit(message *discordgo.Message, cfg *config.Config) {
@@ -655,5 +654,6 @@ func (e *Events) checkSelfbotDetectionDelete(message *discordgo.Message, cfg *co
 		score.Score += 0.5
 		e.logSelfbotDetection(score, message)
 	}
-	e.Settings.SelfbotDetectionScore[message.Author.ID] = *score
+
+	e.Settings.SelfbotDetectionScore.Store(message.Author.ID, *score)
 }

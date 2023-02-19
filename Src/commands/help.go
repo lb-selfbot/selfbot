@@ -50,7 +50,7 @@ func (h *HelpCommand) RegisterHelpCommand(router *dgc.Router, session *discordgo
 			Name:        name,
 			Usage:       "[p]" + name,
 			Description: fmt.Sprintf("Get help for the %s category", category.Name),
-			Handler: generateCategoryHelpFunc(category, name),
+			Handler:     generateCategoryHelpFunc(category, name),
 		})
 	}
 }
@@ -79,7 +79,7 @@ func getNameFromArgument(arg string) string {
 	arg = strings.ReplaceAll(arg, "eventreactions", "Event Reactions")
 	arg = strings.ReplaceAll(arg, "eventreaction", "Event Reactions")
 
-	arg =  strings.ReplaceAll(arg, "nsfw", "NSFW")
+	arg = strings.ReplaceAll(arg, "nsfw", "NSFW")
 
 	arg = strings.ReplaceAll(arg, "customactivity", "Custom Activity")
 
@@ -178,19 +178,29 @@ func renderCategoryHelp(router *dgc.Router, category *dgc.Category, rawArgument 
 		}
 		helpPages[currentPage] += helpText
 	}
-	page = int(math.Max(0, float64(page - 1)))
+	page = int(math.Max(0, float64(page-1)))
 
 	emb := embed.NewEmbed().
 		SetDescription(fmt.Sprintf("<> is required, [] is optional\n\nAmount of %s commands: %d", category.Name, len(category.Commands))).
 		SetSubtext(fmt.Sprintf("Page: %d/%d", page+1, len(helpPages)))
 
+	cfg, _ := config.GetConfig()
+
 	if page < len(helpPages) {
-		emb.AddField("Commands", helpPages[page], true, true)
+		if cfg.Selfbot.CommandMode == "WebhookEmbed" {
+			emb.Description += "\n\n**Commands**\n" + helpPages[page]
+		} else {
+			emb.AddField("Commands", helpPages[page], true, true)
+		}
 	} else {
 		return embed.NewEmbed().SetDescription(fmt.Sprintf("That page does not exist! %s has %d pages.", category.Name, len(helpPages)))
 	}
 	if len(helpPages) > 1 {
-		emb.SetSubtext(fmt.Sprintf("Page: %d/%d\n\nUse \x1b[34;1m%shelp %s <page>\x1b[0m to go to the next page", page+1, len(helpPages), router.GetPrefixes()[0], rawArgument))
+		if cfg.Selfbot.CommandMode == "WebhookEmbed" {
+			emb.SetSubtext(fmt.Sprintf("Page: %d/%d\n\nUse %shelp %s <page> to go to the next page", page+1, len(helpPages), router.GetPrefixes()[0], rawArgument))
+		} else {
+			emb.SetSubtext(fmt.Sprintf("Page: %d/%d\n\nUse \x1b[34;1m%shelp %s <page>\x1b[0m to go to the next page", page+1, len(helpPages), router.GetPrefixes()[0], rawArgument))
+		}
 	}
 	return emb
 }
@@ -199,25 +209,35 @@ func renderCategoryHelp(router *dgc.Router, category *dgc.Category, rawArgument 
 func renderDefaultGeneralHelpEmbed(router *dgc.Router) *embed.Embed {
 	cfg, _ := config.GetConfig()
 	categoriesString := ""
-	if !cfg.Selfbot.MobileFriendly && cfg.Selfbot.CommandMode == "Text" {
-		categoriesString = "ansi\n\x1B[1;31m"
-	}
+
 	for _, category := range router.Categories {
 		// Get the commands in the category, will be empty otherwise
 		category = router.GetCategory(category.Name)
 		categoriesString += fmt.Sprintf("%s - %s\n", category.Name+strings.Repeat(" ", 15-len(category.Name)), category.Description)
 	}
+
 	prefix := router.GetPrefixes()[0]
-	return embed.NewEmbed().
-		SetDescription(fmt.Sprintf("LightningBot %s Help\nAmount of Commands: %d, <> is required, [] is optional\n", constants.VERSION, len(router.Commands))).
-		AddField("Categories", categoriesString, true, true).
-		SetSubtext(fmt.Sprintf(
-			"Use \x1b[34;1m%shelp <category name>\x1b[0m or \x1b[34;1m%shelp <command name>\x1b[0m to get more info.\nUse \x1b[34;1m%ssearch <query>\x1b[0m to search commands.\nUse \x1b[34;1m%srepeat\x1b[0m to repeat the last command.",
-			prefix,
-			prefix,
-			prefix,
+
+	emb := embed.NewEmbed().
+		SetDescription(fmt.Sprintf("LightningBot %s Help\nAmount of Commands: %d, <> is required, [] is optional\n", constants.VERSION, len(router.Commands)))
+
+	if cfg.Selfbot.CommandMode == "WebhookEmbed" {
+		emb.Description += "\n\n**Categories**\n" + categoriesString
+		emb.SetSubtext(strings.ReplaceAll(
+			"Use [p]help <category name> or [p]help <command name> to get more info.\nUse [p]search <query> to search commands.\nUse [p]repeat to repeat the last command.",
+			"[p]",
 			prefix,
 		))
+	} else {
+		emb.AddField("Categories", categoriesString, true, true)
+		emb.SetSubtext(strings.ReplaceAll(
+			"Use \x1b[34;1m[p]help <category name>\x1b[0m or \x1b[34;1m[p]help <command name>\x1b[0m to get more info.\nUse \x1b[34;1m[p]search <query>\x1b[0m to search commands.\nUse \x1b[34;1m[p]repeat\x1b[0m to repeat the last command.",
+			"[p]",
+			prefix,
+		))
+	}
+
+	return emb
 }
 
 func (HelpCommand) search(ctx *dgc.Ctx) {

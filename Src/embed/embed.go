@@ -2,6 +2,7 @@ package embed
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"strings"
 	"time"
@@ -404,10 +405,6 @@ func (e *Embed) ToText() []string {
 	return strings_
 }
 
-func (e *Embed) ToURLEmbed() []string {
-	return []string{"Not implemented"}
-}
-
 func (e *Embed) ToIndent() []string {
 	str := ""
 	if e.Author != nil {
@@ -453,24 +450,17 @@ func (e *Embed) ToIndent() []string {
 	}
 
 	return append(strings_, newStr)
+}
 
-	// var strings_ []string
-	// newStr := ""
-	// for _, line := range strings.Split(str, "\n") {
-	// 	if len(newStr+line)+1 > 2000 {
-	// 		strings_ = append(strings_, newStr)
-	// 		newStr = ""
-	// 	}
+func (e *Embed) ToEmbed() *discordgo.MessageEmbed {
+	if e.Subtext != "" {
+		e.AddField("Subtext", e.Subtext)
+	}
 
-	// 	newStr += line + "\n"
-	// }
-	// strings_ = append(strings_, newStr)
+	e.Truncate()
+	e.SetColor(0x3990c1)
 
-	// for i, s := range strings_ {
-	// 	strings_[i] = "> " + strings.ReplaceAll(s, "\n", "\n> ")
-	// }
-
-	// return strings_
+	return e.MessageEmbed
 }
 
 func (e *Embed) ToString(commandMode string) []string {
@@ -479,8 +469,6 @@ func (e *Embed) ToString(commandMode string) []string {
 		return e.ToCodeblock()
 	case "Text":
 		return e.ToText()
-	case "URLEmbed":
-		return e.ToURLEmbed()
 	case "Indent":
 		return e.ToIndent()
 	case "load":
@@ -498,6 +486,16 @@ func (e *Embed) Send(ctx *dgc.Ctx) []*discordgo.Message {
 	cfg, _ := config.GetConfig()
 
 	commandMode := getCommandMode(cfg)
+
+	if commandMode == "WebhookEmbed" {
+		err := e.sendWebhookEmbed(ctx)
+		if err == nil {
+			return nil
+		}
+
+		// If the webhook embed fails, fallback to the default embed
+		commandMode = "Codeblock"
+	}
 
 	messages := []*discordgo.Message{}
 
@@ -522,6 +520,45 @@ func (e *Embed) Send(ctx *dgc.Ctx) []*discordgo.Message {
 	}
 
 	return messages
+}
+
+func (e *Embed) sendWebhookEmbed(ctx *dgc.Ctx) error {
+	if ctx.Event.GuildID == "" {
+		return errors.New("cannot send webhook embed in DMs")
+	}
+
+	webhooks, err := ctx.Session.ChannelWebhooks(ctx.Event.ChannelID)
+	if err != nil {
+		return err
+	}
+
+	var webhook *discordgo.Webhook
+
+	for _, wh := range webhooks {
+		if wh.Name != "LightningBot" {
+			continue
+		}
+
+		webhook = wh
+		break
+	}
+
+	if webhook == nil {
+		webhook, err = ctx.Session.WebhookCreate(ctx.Event.ChannelID, "LightningBot", "https://lightning-bot.com/logo.png")
+		if err != nil {
+			return err
+		}
+	}
+
+	_, err = ctx.Session.WebhookExecute(webhook.ID, webhook.Token, true, &discordgo.WebhookParams{
+		Username:  "LightningBot",
+		AvatarURL: "https://lightning-bot.com/logo.png",
+		Embeds: []*discordgo.MessageEmbed{
+			e.ToEmbed(),
+		},
+	})
+
+	return err
 }
 
 func (e *Embed) SendWebhook(webhookUrl string) *http.HttpResponse {

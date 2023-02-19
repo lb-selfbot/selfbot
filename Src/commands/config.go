@@ -26,7 +26,7 @@ func (c ConfigCommands) RegisterCommands(router *dgc.Router) {
 	router.RegisterCmd(&dgc.Command{
 		Name:        "commandmode",
 		Description: "Set your command mode",
-		Usage:       "[p]commandmode <codeblock/text/urlembed/indent>",
+		Usage:       "[p]commandmode <codeblock/text/webhookembed/indent>",
 		Handler:     c.commandmode,
 	})
 	router.RegisterCmd(&dgc.Command{
@@ -255,12 +255,12 @@ func (ConfigCommands) commandprefix(*dgc.Ctx) {
 
 func (ConfigCommands) commandmode(ctx *dgc.Ctx) {
 	cfg, _ := config.GetConfig()
-	mode := utils.String.Capitalize(utils.Arguments["<codeblock/text/urlembed/indent>"])
-	if mode != "Codeblock" && mode != "Text" && mode != "Urlembed" && mode != "Indent" {
+	mode := utils.String.Capitalize(utils.Arguments["<codeblock/text/webhookembed/indent>"])
+	if mode != "Codeblock" && mode != "Text" && mode != "Webhookembed" && mode != "Indent" {
 		_ = ctx.RespondText("Invalid command mode.")
 		return
 	}
-	cfg.Selfbot.CommandMode = strings.ReplaceAll(mode, "Urlembed", "URLEmbed")
+	cfg.Selfbot.CommandMode = strings.ReplaceAll(mode, "Webhookembed", "WebhookEmbed")
 	_ = cfg.Save()
 }
 

@@ -1,6 +1,7 @@
 package eventhandlers
 
 import (
+	"sync"
 	"time"
 
 	"github.com/LightningDev1/LB-Selfbot/http"
@@ -50,7 +51,7 @@ type EventHandlerSettings struct {
 	EditedMessages           map[string][]*discordgo.Message
 	AlreadyCheckedNitroCodes []string
 	SentNitroCodes           map[string][]snipers.NitroCode
-	SelfbotDetectionScore    map[string]SBDScore
+	SelfbotDetectionScore    sync.Map
 
 	PingMuteServers    []string
 	PingTimeoutServers []string
@@ -96,7 +97,7 @@ func (e *Events) RegisterHandlers(session *discordgo.Session, router *dgc.Router
 	e.Settings.DeletedMessages = map[string][]*discordgo.Message{}
 	e.Settings.EditedMessages = map[string][]*discordgo.Message{}
 	e.Settings.SentNitroCodes = map[string][]snipers.NitroCode{}
-	e.Settings.SelfbotDetectionScore = map[string]SBDScore{}
+	e.Settings.SelfbotDetectionScore = sync.Map{}
 
 	e.Router.RegisterMiddleware(e.OnCommand)
 
