@@ -734,7 +734,8 @@ func (UtilityCommands) editsnipe(ctx *dgc.Ctx) {
 			emb.AddField("Author", message.Author.String()+" | "+message.Author.ID)
 		}
 		emb.AddField("Sent At", utils.Discord.SnowflakeToTime(message.ID).Format(time.RFC1123))
-		emb.AddField("Content", message.Content)
+		emb.AddField("Old Content", message.BeforeUpdate.Content)
+		emb.AddField("New Content", message.Content)
 		emb.Send(ctx)
 	}
 }

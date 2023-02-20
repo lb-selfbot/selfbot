@@ -100,11 +100,15 @@ func (e *Events) OnMessageEdit(_ *discordgo.Session, m *discordgo.MessageUpdate)
 	e.checkNotifiersEdit(m.Message, &cfg)
 	e.checkSelfbotDetectionEdit(m.Message, &cfg)
 
+	if strings.HasPrefix(m.Message.Content, cfg.Selfbot.CommandPrefix) {
+		return
+	}
+
 	messages, ok := e.Settings.EditedMessages[m.ChannelID]
 	if ok {
-		e.Settings.EditedMessages[m.ChannelID] = append(messages, m.Message)
+		e.Settings.EditedMessages[m.ChannelID] = append(messages, m)
 	} else {
-		e.Settings.EditedMessages[m.ChannelID] = []*discordgo.Message{m.Message}
+		e.Settings.EditedMessages[m.ChannelID] = []*discordgo.MessageUpdate{m}
 	}
 }
 
@@ -135,6 +139,10 @@ func (e *Events) OnMessageDelete(_ *discordgo.Session, m *discordgo.MessageDelet
 	e.checkProtectionsDelete(m.Message, &cfg)
 	e.checkNotifiersDelete(m.Message, &cfg)
 	e.checkSelfbotDetectionDelete(m.Message, &cfg)
+
+	if strings.HasPrefix(m.Message.Content, cfg.Selfbot.CommandPrefix) {
+		return
+	}
 
 	messages, ok := e.Settings.DeletedMessages[m.ChannelID]
 	if ok {

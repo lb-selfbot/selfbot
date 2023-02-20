@@ -48,7 +48,7 @@ type EventHandlerSettings struct {
 	UsedCommands             []*dgc.Ctx
 	PinSpamMessages          []*discordgo.Message
 	DeletedMessages          map[string][]*discordgo.Message
-	EditedMessages           map[string][]*discordgo.Message
+	EditedMessages           map[string][]*discordgo.MessageUpdate
 	AlreadyCheckedNitroCodes []string
 	SentNitroCodes           map[string][]snipers.NitroCode
 	SelfbotDetectionScore    sync.Map
@@ -95,7 +95,7 @@ func (e *Events) RegisterHandlers(session *discordgo.Session, router *dgc.Router
 	e.Settings = &EventHandlerSettings{}
 	e.StartTime = time.Now()
 	e.Settings.DeletedMessages = map[string][]*discordgo.Message{}
-	e.Settings.EditedMessages = map[string][]*discordgo.Message{}
+	e.Settings.EditedMessages = map[string][]*discordgo.MessageUpdate{}
 	e.Settings.SentNitroCodes = map[string][]snipers.NitroCode{}
 	e.Settings.SelfbotDetectionScore = sync.Map{}
 
