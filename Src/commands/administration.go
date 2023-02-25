@@ -1387,7 +1387,7 @@ func (*AdministrationCommands) ban(ctx *dgc.Ctx) {
 
 	member, success := utils.Discord.TryGetMemberFromMention(ctx, ctx.Arguments.Get(0))
 	memberID := ctx.Arguments.Get(0).Raw()
-	if success && member != nil && member.User != nil {
+	if success {
 		memberID = member.User.ID
 	}
 
