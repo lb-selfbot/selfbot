@@ -43,11 +43,18 @@ func (DiscordUtils) TryGetMemberFromMention(ctx *dgc.Ctx, mention *dgc.Argument)
 		params := discordgo.NewQueryGuildMembersParams(ctx.Event.GuildID)
 		params.UserIDs = []int{userIdInt}
 
-		members, _ := ctx.Session.QueryGuildMembers(params)
+		members, err := ctx.Session.QueryGuildMembers(params)
+		if err != nil {
+			return nil, false
+		}
 
 		if len(members) > 0 {
 			member = members[0]
 		}
+	}
+
+	if member == nil {
+		return nil, false
 	}
 
 	return member, true
