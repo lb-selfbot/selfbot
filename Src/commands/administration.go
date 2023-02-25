@@ -134,9 +134,9 @@ func (m *AdministrationCommands) RegisterCommands(router *dgc.Router) {
 		Handler:     m.purgeself,
 	})
 	router.RegisterCmd(&dgc.Command{
-		Name:        "purgeself",
+		Name:        "purgeuser",
 		Description: "Delete a users messages in a channel",
-		Usage:       "[p]purgeself <amount> <user> [channel]",
+		Usage:       "[p]purgeuser <amount> <user> [channel]",
 		Handler:     m.purgeuser,
 	})
 	router.RegisterCmd(&dgc.Command{
@@ -1387,7 +1387,7 @@ func (*AdministrationCommands) ban(ctx *dgc.Ctx) {
 
 	member, success := utils.Discord.TryGetMemberFromMention(ctx, ctx.Arguments.Get(0))
 	memberID := ctx.Arguments.Get(0).Raw()
-	if success {
+	if success && member != nil && member.User != nil {
 		memberID = member.User.ID
 	}
 
