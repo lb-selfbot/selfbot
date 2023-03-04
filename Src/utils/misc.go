@@ -32,11 +32,18 @@ func (MiscUtils) IsPortOpen(hostname string, port int) bool {
 	return true
 }
 
-func (MiscUtils) FormatBool(b bool) string {
+func (MiscUtils) FormatBoolYesNo(b bool) string {
 	if b {
 		return "Yes"
 	}
 	return "No"
+}
+
+func (MiscUtils) FormatBoolOnOff(b bool) string {
+	if b {
+		return "On"
+	}
+	return "Off"
 }
 
 // Or returns `a` if it isn't empty, else it returns `b`

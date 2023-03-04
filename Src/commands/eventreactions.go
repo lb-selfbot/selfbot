@@ -517,7 +517,7 @@ func (EventReactionsCommands) afkdelay(ctx *dgc.Ctx) {
 func (EventReactionsCommands) afkignoreserver(ctx *dgc.Ctx) {
 	guild, err := utils.Discord.GetGuild(ctx.Session, utils.Misc.Or(utils.Arguments["<server id>"], ctx.Event.GuildID))
 	if err != nil {
-		_ = ctx.RespondText("Could not find user.")
+		_ = ctx.RespondText("Could not find server.")
 		return
 	}
 	cfg, _ := config.GetConfig()
@@ -532,7 +532,7 @@ func (EventReactionsCommands) afkignoreserver(ctx *dgc.Ctx) {
 func (EventReactionsCommands) afkunignoreserver(ctx *dgc.Ctx) {
 	guild, err := utils.Discord.GetGuild(ctx.Session, utils.Misc.Or(utils.Arguments["<server id>"], ctx.Event.GuildID))
 	if err != nil {
-		_ = ctx.RespondText("Could not find user.")
+		_ = ctx.RespondText("Could not find server.")
 		return
 	}
 	cfg, _ := config.GetConfig()

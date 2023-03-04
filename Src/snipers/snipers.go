@@ -24,9 +24,9 @@ type NitroCode struct {
 
 var nitroRegex = regexp.MustCompile(`(discord\.gift|discord\.com/gifts|discordapp\.com/gifts|promos\.discord\.gg/)/(\w{0,25})`)
 
-func getCodesInLast10Seconds(codes []NitroCode) []NitroCode {
+func getCodesInLast30Seconds(codes []NitroCode) []NitroCode {
 	return utils.Filter(codes, func(code NitroCode) bool {
-		return time.Since(code.Time) < 10*time.Second
+		return time.Since(code.Time) < 30*time.Second
 	})
 }
 
@@ -73,7 +73,7 @@ func CheckNitroSniper(
 
 		// Author is spamming codes
 		if codes, ok := sentNitroCodes[message.Author.ID]; ok {
-			if len(getCodesInLast10Seconds(codes)) >= 5 {
+			if len(getCodesInLast30Seconds(codes)) >= 5 {
 				return alreadyCheckedNitroCodes, sentNitroCodes
 			}
 		}

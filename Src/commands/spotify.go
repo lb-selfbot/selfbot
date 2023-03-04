@@ -302,7 +302,7 @@ func (s SpotifyCommands) splaying(ctx *dgc.Ctx) {
 	songArtists := utils.Spotify.GetSongArtists(song)
 	songArtistsString := strings.Join(songArtists, ", ")
 	songReleaseDate := song.GetPath("album", "release_date").MustString("Unknown")
-	songExplicit := utils.Misc.FormatBool(song.Get("explicit").MustBool(false))
+	songExplicit := utils.Misc.FormatBoolYesNo(song.Get("explicit").MustBool(false))
 	songDuration := fmt.Sprintf(
 		"%d:%02d",
 		int(song.Get("duration_ms").MustInt(0))/1000/60,
@@ -370,7 +370,7 @@ func (s SpotifyCommands) spresence(ctx *dgc.Ctx) {
 				Name: "Spotify",
 				Assets: &discordgo.Assets{
 					LargeImageID: "spotify:" + imageID,
-					LargeText:  utils.Arguments["[\"album\"]"],
+					LargeText:    utils.Arguments["[\"album\"]"],
 				},
 				Details: utils.Arguments["[\"song\"]"],
 				State:   utils.Arguments["[\"artist\"]"],
@@ -381,7 +381,7 @@ func (s SpotifyCommands) spresence(ctx *dgc.Ctx) {
 				Party: &discordgo.Party{
 					ID: "spotify:" + ctx.Session.State.User.ID,
 				},
-				Flags:  48,
+				Flags: 48,
 			},
 		},
 	})

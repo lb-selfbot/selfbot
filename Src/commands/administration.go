@@ -533,7 +533,7 @@ func (*AdministrationCommands) channelinfo(ctx *dgc.Ctx) {
 		AddField("ID", channel.ID).
 		AddField("Topic", channel.Topic).
 		AddField("Category ID", channel.ParentID).
-		AddField("Is NSFW", utils.Misc.FormatBool(channel.NSFW)).
+		AddField("Is NSFW", utils.Misc.FormatBoolYesNo(channel.NSFW)).
 		AddField("Created At", utils.Discord.SnowflakeToTime(channel.ID).Format(time.RFC1123)).
 		AddField("Slowmode Delay", fmt.Sprint(channel.RateLimitPerUser)+" seconds").
 		AddField("Position", fmt.Sprint(channel.Position)).
@@ -1124,7 +1124,7 @@ func (*AdministrationCommands) mobile(ctx *dgc.Ctx) {
 
 	embed.NewEmbed().
 		SetDescription(fmt.Sprintf("%s - %s", member.User.String(), member.User.ID)).
-		AddField("Is On Mobile", utils.Misc.FormatBool(clientStatus.Mobile != "")).
+		AddField("Is On Mobile", utils.Misc.FormatBoolYesNo(clientStatus.Mobile != "")).
 		Send(ctx)
 }
 
@@ -1142,7 +1142,7 @@ func (*AdministrationCommands) web(ctx *dgc.Ctx) {
 
 	embed.NewEmbed().
 		SetDescription(fmt.Sprintf("%s - %s", member.User.String(), member.User.ID)).
-		AddField("Is On Web", utils.Misc.FormatBool(clientStatus.Web != "")).
+		AddField("Is On Web", utils.Misc.FormatBoolYesNo(clientStatus.Web != "")).
 		Send(ctx)
 }
 
@@ -1160,7 +1160,7 @@ func (*AdministrationCommands) desktop(ctx *dgc.Ctx) {
 
 	embed.NewEmbed().
 		SetDescription(fmt.Sprintf("%s - %s", member.User.String(), member.User.ID)).
-		AddField("Is On Desktop", utils.Misc.FormatBool(clientStatus.Desktop != "")).
+		AddField("Is On Desktop", utils.Misc.FormatBoolYesNo(clientStatus.Desktop != "")).
 		Send(ctx)
 }
 
@@ -2158,8 +2158,8 @@ func (*AdministrationCommands) roleinfo(ctx *dgc.Ctx) {
 		AddField("Color", fmt.Sprintf("#%x", role.Color)).
 		AddField("Created at", utils.Discord.GetTimestamp(&createdAt, "Error")).
 		AddField("Position", fmt.Sprint(role.Position)).
-		AddField("Is Hoist", utils.Misc.FormatBool(role.Hoist)).
-		AddField("Is Mentionable", utils.Misc.FormatBool(role.Mentionable)).
+		AddField("Is Hoist", utils.Misc.FormatBoolYesNo(role.Hoist)).
+		AddField("Is Mentionable", utils.Misc.FormatBoolYesNo(role.Mentionable)).
 		AddField("Members With Role", fmt.Sprint(memberCount)).
 		AddField("Permissions", perms).
 		Send(ctx)

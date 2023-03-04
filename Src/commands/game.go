@@ -261,7 +261,7 @@ func (GameCommands) fncreatorcode(ctx *dgc.Ctx) {
 		AddField("Account Name", res.GetPath("account", "name").MustString("None")).
 		AddField("ID", res.GetPath("account", "id").MustString("None")).
 		AddField("Status", res.GetPath("status").MustString("None")).
-		AddField("Verified", utils.Misc.FormatBool(res.GetPath("verified").MustBool())).
+		AddField("Verified", utils.Misc.FormatBoolYesNo(res.GetPath("verified").MustBool())).
 		Send(ctx)
 }
 

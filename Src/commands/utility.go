@@ -159,14 +159,14 @@ func (u UtilityCommands) RegisterCommands(router *dgc.Router) {
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "snipe",
-		Description: "See the last deleted message in this channel",
-		Usage:       "[p]snipe",
+		Description: "See the last deleted message in a channel",
+		Usage:       "[p]snipe [channel]",
 		Handler:     u.snipe,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "editsnipe",
-		Description: "See the last edited message in this channel",
-		Usage:       "[p]editsnipe",
+		Description: "See the last edited message in a channel",
+		Usage:       "[p]editsnipe [channel]",
 		Handler:     u.editsnipe,
 	})
 	router.RegisterCmd(&dgc.Command{
@@ -704,7 +704,16 @@ func (UtilityCommands) lockpc(ctx *dgc.Ctx) {
 }
 
 func (UtilityCommands) snipe(ctx *dgc.Ctx) {
-	messages, ok := eventhandlers.EventHandlers.Settings.DeletedMessages[ctx.Event.ChannelID]
+	channel, success := utils.Discord.TryGetChannelFromMention(ctx, ctx.Arguments.Get(0))
+	if !success {
+		channel, _ = ctx.Session.State.Channel(ctx.Event.ChannelID)
+		if channel == nil {
+			_ = ctx.RespondText("Could not find channel")
+			return
+		}
+	}
+
+	messages, ok := eventhandlers.EventHandlers.Settings.DeletedMessages[channel.ID]
 	if !ok || len(messages) == 0 {
 		embed.NewEmbed().
 			SetDescription("No deleted message was found in this channel!").
@@ -722,7 +731,16 @@ func (UtilityCommands) snipe(ctx *dgc.Ctx) {
 }
 
 func (UtilityCommands) editsnipe(ctx *dgc.Ctx) {
-	messages, ok := eventhandlers.EventHandlers.Settings.EditedMessages[ctx.Event.ChannelID]
+	channel, success := utils.Discord.TryGetChannelFromMention(ctx, ctx.Arguments.Get(0))
+	if !success {
+		channel, _ = ctx.Session.State.Channel(ctx.Event.ChannelID)
+		if channel == nil {
+			_ = ctx.RespondText("Could not find channel")
+			return
+		}
+	}
+	
+	messages, ok := eventhandlers.EventHandlers.Settings.EditedMessages[channel.ID]
 	if !ok || len(messages) == 0 {
 		embed.NewEmbed().
 			SetDescription("No deleted message was found in this channel!").

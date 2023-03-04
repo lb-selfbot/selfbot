@@ -548,10 +548,10 @@ func (NetworkCommands) checktoken(ctx *dgc.Ctx) {
 		AddField("Banner Color", tokenData.Get("banner_color").MustString()).
 		AddField("Bio", tokenData.Get("bio").MustString()).
 		AddField("Locale", tokenData.Get("locale").MustString()).
-		AddField("NSFW Allowed", utils.Misc.FormatBool(tokenData.Get("nsfw_allowed").MustBool())).
-		AddField("2FA Enabled", utils.Misc.FormatBool(tokenData.Get("mfa_enabled").MustBool())).
+		AddField("NSFW Allowed", utils.Misc.FormatBoolYesNo(tokenData.Get("nsfw_allowed").MustBool())).
+		AddField("2FA Enabled", utils.Misc.FormatBoolYesNo(tokenData.Get("mfa_enabled").MustBool())).
 		AddField("Email", tokenData.Get("email").MustString()).
-		AddField("Verified", utils.Misc.FormatBool(tokenData.Get("verified").MustBool())).
+		AddField("Verified", utils.Misc.FormatBoolYesNo(tokenData.Get("verified").MustBool())).
 		AddField("Phone", tokenData.Get("phone").MustString()).
 		Send(ctx)
 }
