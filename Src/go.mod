@@ -4,7 +4,7 @@ go 1.20
 
 require (
 	github.com/LightningDev1/beeep v0.1.0
-	github.com/LightningDev1/dgc v1.1.4-0.20230225190307-76bb7c9f8a60
+	github.com/LightningDev1/dgc v1.1.4-0.20230327145349-fd063e2b2054
 	github.com/LightningDev1/discordgo v0.26.6-0.20230219102729-25e400e8ab7e
 	github.com/bitly/go-simplejson v0.5.0
 	github.com/brianvoe/gofakeit/v6 v6.20.1

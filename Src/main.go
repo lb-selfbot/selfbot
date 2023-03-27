@@ -1,8 +1,8 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
-	"math/rand"
 	"os"
 	"os/signal"
 	"path/filepath"
@@ -42,6 +42,22 @@ func initArgs() {
 
 	if strings.Contains(args, "-v") {
 		fmt.Println(constants.VERSION[1:])
+		os.Exit(0)
+	}
+
+	if strings.Contains(args, "-featurelist") {
+		session, _ := discordgo.New("")
+		router := dgc.Create(&dgc.Router{})
+
+		commands.Commands.RegisterCommands(session, router)
+
+		data := map[string]any{
+			"categories": router.Categories,
+			"commands":   router.Commands,
+		}
+
+		_ = json.NewEncoder(os.Stdout).Encode(data)
+
 		os.Exit(0)
 	}
 }
@@ -167,8 +183,6 @@ func onWebsocketError(err error, closeCode int) {
 }
 
 func main() {
-	rand.Seed(time.Now().UnixNano())
-
 	initArgs()
 
 	if constants.DEBUG {
