@@ -10,10 +10,9 @@ import (
 	"strings"
 	"time"
 
-	"embed"
-
 	"syscall"
 
+	"github.com/LightningDev1/LB-Selfbot/assets"
 	"github.com/LightningDev1/LB-Selfbot/commands"
 	"github.com/LightningDev1/LB-Selfbot/config"
 	"github.com/LightningDev1/LB-Selfbot/constants"
@@ -30,9 +29,6 @@ import (
 	"github.com/LightningDev1/dgc"
 	"github.com/LightningDev1/discordgo"
 )
-
-//go:embed assets/*
-var assets embed.FS
 
 func initArgs() {
 	args := strings.Join(os.Args, " ")
@@ -129,7 +125,7 @@ func initSelfbot(session *discordgo.Session) {
 
 	iconFile := filepath.Join(utils.IO.GetMainFolder(), "Logo.png")
 	if !utils.IO.Exists(iconFile) {
-		icon, err := assets.ReadFile("assets/Logo.png")
+		icon, err := assets.Assets.ReadFile("Logo.png")
 		if err != nil {
 			logging.UI.Error("Error reading icon file: " + err.Error())
 		}

@@ -7,6 +7,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/LightningDev1/LB-Selfbot/assets"
 	"github.com/LightningDev1/LB-Selfbot/utils"
 )
 
@@ -152,169 +153,74 @@ var (
 func (c Config) Save() error {
 	configMutex.Lock()
 	defer configMutex.Unlock()
+	
 	configFile, err := os.OpenFile(filepath.Join(utils.IO.GetMainFolder(), "Config", "config.json"), os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0644)
 	if err != nil {
 		return err
 	}
+	
 	defer configFile.Close()
+
 	configBytes, err := json.MarshalIndent(c, "", "  ")
 	if err != nil {
 		return err
 	}
+
 	_, err = configFile.Write(configBytes)
 	if err != nil {
 		return err
 	}
+
 	lastConfig = &c
 	lastConfigTime = time.Now()
+
 	return nil
 }
 
 func GetConfig() (config Config, err error) {
 	configMutex.Lock()
 	defer configMutex.Unlock()
+
 	// Check if the config is already loaded in the last 10 seconds
 	if lastConfig != nil && time.Since(lastConfigTime) < time.Second*10 {
 		return *lastConfig, nil
 	}
+
 	configFile, err := os.Open(filepath.Join(utils.IO.GetMainFolder(), "Config", "config.json"))
 	if err != nil {
 		return config, err
 	}
+
 	defer configFile.Close()
+
 	err = json.NewDecoder(configFile).Decode(&config)
 	if err != nil {
 		return config, err
 	}
+
 	lastConfig = &config
 	lastConfigTime = time.Now()
+
 	return config, nil
 }
 
 func SaveConfigFromUI(config *Config) {
 	configMutex.Lock()
 	defer configMutex.Unlock()
+
 	lastConfig = config
 	lastConfigTime = time.Now()
 }
 
 func GetDefaultConfig() Config {
-	defaultConfigJson := `
-	{
-		"AFK": {
-			"Delay": 10,
-			"Enabled": false,
-			"IgnoredServers": [],
-			"IgnoredUsers": [],
-			"Message": "I am currently AFK",
-			"OnDM": true,
-			"OnPing": true,
-			"Reply": true,
-			"Typing": true
-		},
-		"Account": {
-			"Discord": {
-				"Token": ""
-			},
-			"LightningBot": {
-				"Password": "",
-				"Username": ""
-			}
-		},
-		"Events": {
-			"BanNotifier": false,
-			"DMDeleteNotifier": false,
-			"DMEditNotifier": false,
-			"DMNotifier": false,
-			"DMTypingNotifier": false,
-			"DiscordStaffDetection": false,
-			"GhostPingDetection": false,
-			"MessageDeleteNotifier": false,
-			"SelfbotDetection": false,
-			"TicketNotifier": false,
-			"SessionConnected": false,
-			"SessionDisconnected": false
-		},
-		"Notifications": {
-			"Enabled": true
-		},
-		"Protections": {
-			"AntiFriendRequest": false,
-			"AntiMassDM": false,
-			"AntiPhising": false,
-			"ServerProtections": {
-				"AntiDelete": false,
-				"AntiInvite": false,
-				"AntiSpam": false,
-				"AntiUpper": false,
-				"ProtectedServers": []
-			}
-		},
-		"Activity": {
-			"Enabled": false,
-			"ActivityType": "CustomActivity",
-			"Type": "Playing",
-			"ClientID": "898932653049393172",
-			"Name": "LightningBot",
-			"State": "Using LightningBot $VERSION",
-			"Details": "",
-			"Invitable": false,
-			"Time": true,
-			"LargeImage": "mp:external/ohNK0T0rUHTB2LD4m7s0SIJXgVARXBrlAFOj6aun1mY/https/lightning-bot.com/logo.png",
-			"LargeImageText": "",
-			"SmallImage": "",
-			"SmallImageText": "",
-			"Button1Label": "Website",
-			"Button1URL": "https://lightning-bot.com/",
-			"Button2Label": "Discord Server",
-			"Button2URL": "https://discord.gg/khVeaCsKCU"
-		},
-		"Selfbot": {
-			"CommandMode": "Text",
-			"CommandPrefix": "!",
-			"DeleteCommands": true,
-			"DeleteResponses": true,
-			"DeleteResponsesDelay": 300,
-			"Footer": "LightningBot $VERSION",
-			"MobileFriendly": false,
-			"Title": "LightningBot"
-		},
-		"Sharing": {
-			"ShareAll": false,
-			"SharedCategories": [],
-			"SharedCommands": [],
-			"SharedUsers": []
-		},
-		"Snipers": {
-			"Blacklist": [],
-			"ServerBlacklist": [],
-			"GiveawaySniper": {
-				"CustomBots": [],
-				"Sleep": 600,
-				"Enabled": true
-			},
-			"MultiTokenSniper": false,
-			"NitroSniper": true,
-			"Tokens": []
-		},
-		"UI": {
-			"HideToSystemTray": false,
-			"Theme": "Dark"
-		},
-		"Webhooks": {
-			"GiveawaySniper": "",
-			"Misc": "",
-			"NitroSniper": "",
-			"Notifiers": "",
-			"PingDetection": "",
-			"SelfbotDetection": "",
-			"StaffDetection": "",
-			"Sessions": ""
-		}
-	}`
-
 	var defaultConfig Config
-	_ = json.Unmarshal([]byte(defaultConfigJson), &defaultConfig)
+
+	defaultConfigBytes, err := assets.Assets.ReadFile("defaultConfig.json")
+	if err != nil {
+		return defaultConfig
+	}
+
+	_ = json.Unmarshal(defaultConfigBytes, &defaultConfig)
 
 	return defaultConfig
 }
