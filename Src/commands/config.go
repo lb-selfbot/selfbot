@@ -11,7 +11,6 @@ import (
 	"github.com/LightningDev1/LB-Selfbot/utils"
 	"github.com/LightningDev1/dgc"
 	"github.com/LightningDev1/discordgo"
-	"github.com/gen2brain/beeep"
 )
 
 type ConfigCommands struct{}
@@ -852,7 +851,6 @@ func (ConfigCommands) notifications(ctx *dgc.Ctx) {
 }
 
 func (ConfigCommands) examplenotification(ctx *dgc.Ctx) {
-	_ = beeep.Notify("Title", "Message body", "assets/information.png")
 	logging.UI.Notification("This is an example notification.")
 }
 
