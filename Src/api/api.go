@@ -3,6 +3,7 @@ package api
 import (
 	"crypto/sha512"
 	"encoding/base64"
+	"encoding/json"
 	"fmt"
 	"math/rand"
 	"net"
@@ -13,6 +14,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/LightningDev1/LB-Selfbot/encodings"
 	"github.com/LightningDev1/LB-Selfbot/encryption"
 	"github.com/LightningDev1/LB-Selfbot/utils"
 	"github.com/LightningDev1/discordgo"
@@ -415,4 +417,42 @@ func GetTokenData(session *discordgo.Session, token string) ([]byte, error) {
 	}
 
 	return session.RequestWithBucketID("GET", discordgo.EndpointUser("@me"), nil, discordgo.EndpointUser(""), headers)
+}
+
+func CreateGuild(session *discordgo.Session, name, icon, guildTemplateCode string) (*discordgo.Guild, error) {
+	var iconData *string
+	if icon != "" {
+		encoded := encodings.Base64(icon, false)
+		iconData = &encoded
+	}
+
+	if guildTemplateCode != "" {
+		guildTemplateCode = "2TffvPucqHkN"
+	}
+
+	headers := map[string]string{"Authorization": session.Identify.Token}
+
+	for k, v := range session.Headers {
+		headers[k] = v
+	}
+
+	res := http.PostJson("https://discord.com/api/v9/guilds", map[string]any{
+		"name":                name,
+		"icon":                iconData,
+		"channels":            []any{},
+		"system_channel_id":   nil,
+		"guild_template_code": guildTemplateCode,
+	}, headers)
+	if res.Error != nil {
+		return nil, res.Error
+	}
+
+	guild := &discordgo.Guild{}
+
+	err := json.Unmarshal(res.BodyBytes, guild)
+	if err != nil {
+		return nil, err
+	}
+
+	return guild, nil
 }

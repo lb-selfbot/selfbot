@@ -379,7 +379,7 @@ func (UtilityCommands) copyserver(ctx *dgc.Ctx) {
 
 	icon := http.Get(guild.IconURL()).Body
 
-	newGuild, err := ctx.Session.GuildCreate(fmt.Sprintf("%s - Copy", guild.Name))
+	newGuild, err := api.CreateGuild(ctx.Session, fmt.Sprintf("%s - Copy", guild.Name), icon, "") //ctx.Session.GuildCreate(fmt.Sprintf("%s - Copy", guild.Name))
 	if err != nil {
 		_ = ctx.RespondText("Error copying server: " + err.Error())
 		return
@@ -739,7 +739,7 @@ func (UtilityCommands) editsnipe(ctx *dgc.Ctx) {
 			return
 		}
 	}
-	
+
 	messages, ok := eventhandlers.EventHandlers.Settings.EditedMessages[channel.ID]
 	if !ok || len(messages) == 0 {
 		embed.NewEmbed().
