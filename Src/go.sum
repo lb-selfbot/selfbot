@@ -30,6 +30,10 @@ github.com/LightningDev1/discordgo v0.26.6-0.20230426081906-1b2c273cddff h1:n+ID
 github.com/LightningDev1/discordgo v0.26.6-0.20230426081906-1b2c273cddff/go.mod h1:R6gbyLTe1tO2IbPFyBSrHbyvNF3XMhK/YGPAqutqhCg=
 github.com/LightningDev1/discordgo v0.26.6-0.20230426082127-50ac9e8e32f2 h1:w6rummeAKu1pTTStXVtupALtG+PtNAAyfaYor6lM9Gg=
 github.com/LightningDev1/discordgo v0.26.6-0.20230426082127-50ac9e8e32f2/go.mod h1:R6gbyLTe1tO2IbPFyBSrHbyvNF3XMhK/YGPAqutqhCg=
+github.com/LightningDev1/discordgo v0.26.6-0.20230427184053-8013609a2a5e h1:MybpYJEkMKjsAAEwg+pPUi62xz0a07AY5VP+vHMn7ec=
+github.com/LightningDev1/discordgo v0.26.6-0.20230427184053-8013609a2a5e/go.mod h1:R6gbyLTe1tO2IbPFyBSrHbyvNF3XMhK/YGPAqutqhCg=
+github.com/LightningDev1/discordgo v0.26.6-0.20230427184322-f0a1923de49a h1:OqO65oI1iO1LpSBxJENgT85FwfY0qylGdUTrdlURM8Q=
+github.com/LightningDev1/discordgo v0.26.6-0.20230427184322-f0a1923de49a/go.mod h1:R6gbyLTe1tO2IbPFyBSrHbyvNF3XMhK/YGPAqutqhCg=
 github.com/andybalholm/brotli v1.0.4 h1:V7DdXeJtZscaqfNuAdSRuRFzuiKlHSC/Zh3zl9qY3JY=
 github.com/andybalholm/brotli v1.0.4/go.mod h1:fO7iG3H7G2nSZ7m0zPUDn85XEX2GTukHGRSepvi9Eig=
 github.com/andybalholm/brotli v1.0.5 h1:8uQZIdzKmjc/iuPu7O2ioW48L81FgatrcpfFmiq/cCs=
