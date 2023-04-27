@@ -9,6 +9,7 @@ import (
 
 	"github.com/LightningDev1/LB-Selfbot/assets"
 	"github.com/LightningDev1/LB-Selfbot/utils"
+	"github.com/LightningDev1/discordgo"
 )
 
 type RPCButton struct {
@@ -112,6 +113,7 @@ type Config struct {
 		DeleteResponsesDelay int    `json:"DeleteResponsesDelay"`
 		DeleteCommands       bool   `json:"DeleteCommands"`
 		MobileFriendly       bool   `json:"MobileFriendly"`
+		Client               string `json:"Client"`
 	}
 	Protections struct {
 		AntiPhising       bool `json:"AntiPhising"`
@@ -150,15 +152,28 @@ var (
 	configMutex    = &sync.Mutex{}
 )
 
+func (c Config) GetClient() discordgo.Identify {
+	switch c.Selfbot.Client {
+	case "Mobile":
+		return discordgo.IdentifyMobile
+	case "Web":
+		return discordgo.IdentifyWeb
+	case "Desktop":
+		return discordgo.IdentifyDiscordClient
+	}
+
+	return discordgo.IdentifyDiscordClient
+}
+
 func (c Config) Save() error {
 	configMutex.Lock()
 	defer configMutex.Unlock()
-	
+
 	configFile, err := os.OpenFile(filepath.Join(utils.IO.GetMainFolder(), "Config", "config.json"), os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0644)
 	if err != nil {
 		return err
 	}
-	
+
 	defer configFile.Close()
 
 	configBytes, err := json.MarshalIndent(c, "", "  ")

@@ -75,7 +75,8 @@
     "DeleteResponsesDelay": 300,
     "Footer": "LightningBot $VERSION",
     "MobileFriendly": false,
-    "Title": "LightningBot"
+    "Title": "LightningBot",
+    "Client": "Desktop"
   },
   "Sharing": {
     "ShareAll": false,

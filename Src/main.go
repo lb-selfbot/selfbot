@@ -208,11 +208,10 @@ func main() {
 		logging.UI.Error("Error connecting to websocket: " + err.Error())
 		os.Exit(0)
 	}
-
-	session.Identify.Token = cfg.Account.Discord.Token
 	session.Token = cfg.Account.Discord.Token
 	session.ShouldSubscribeGuilds = false
 	session.State.MaxMessageCount = 200
+	session.SetIdentify(cfg.GetClient())
 
 	router := dgc.Create(&dgc.Router{
 		PrefixFunc: func() []string {

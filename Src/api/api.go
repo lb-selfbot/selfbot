@@ -436,20 +436,20 @@ func CreateGuild(session *discordgo.Session, name, icon, guildTemplateCode strin
 		headers[k] = v
 	}
 
-	res := http.PostJson("https://discord.com/api/v9/guilds", map[string]any{
+	httpResponse := http.PostJson("https://discord.com/api/v9/guilds", map[string]any{
 		"name":                name,
 		"icon":                iconData,
 		"channels":            []any{},
 		"system_channel_id":   nil,
 		"guild_template_code": guildTemplateCode,
 	}, headers)
-	if res.Error != nil {
-		return nil, res.Error
+	if httpResponse.Error != nil {
+		return nil, httpResponse.Error
 	}
 
 	guild := &discordgo.Guild{}
 
-	err := json.Unmarshal(res.BodyBytes, guild)
+	err := json.Unmarshal(httpResponse.BodyBytes, guild)
 	if err != nil {
 		return nil, err
 	}
