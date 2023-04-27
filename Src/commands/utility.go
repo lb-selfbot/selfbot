@@ -361,6 +361,12 @@ func (u UtilityCommands) RegisterCommands(router *dgc.Router) {
 		Usage:       "[p]calculate <expression>",
 		Handler:     u.calculate,
 	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "sendinterval",
+		Description: "Send a message every x seconds (flags: DELETE, INSTANT_DEL)",
+		Usage:       "[p]sendinterval <interval> <amount> <\"message\"> [flags]",
+		Handler:     u.sendinterval,
+	})
 }
 
 func getChannelType(channelType discordgo.ChannelType) discordgo.ChannelType {
@@ -1149,4 +1155,50 @@ func (UtilityCommands) calculate(ctx *dgc.Ctx) {
 		AddField("Expression", utils.Arguments["<expression>"]).
 		AddField("Solution", tv.Value.String()).
 		Send(ctx)
+}
+
+func (UtilityCommands) sendinterval(ctx *dgc.Ctx) {
+	interval, err := strconv.Atoi(utils.Arguments["<interval>"])
+	if err != nil {
+		_ = ctx.RespondText("Error parsing interval: " + err.Error())
+		return
+	}
+
+	if interval < 1 {
+		_ = ctx.RespondText("Error parsing interval: interval must be at least 1 second")
+		return
+	}
+
+	amount, err := strconv.Atoi(utils.Arguments["<amount>"])
+	if err != nil {
+		_ = ctx.RespondText("Error parsing amount: " + err.Error())
+		return
+	}
+
+	if amount < 1 {
+		_ = ctx.RespondText("Error parsing amount: amount must be at least 1")
+		return
+	}
+
+	message := utils.Arguments["<\"message\">"]
+	flags := utils.Arguments["[flags]"]
+
+	for i := 0; i < amount; i++ {
+		msg, err := ctx.Session.ChannelMessageSend(ctx.Event.ChannelID, message)
+		if err != nil {
+			return
+		}
+
+		if strings.Contains(flags, "INSTANT_DEL") {
+			_ = ctx.Session.ChannelMessageDelete(ctx.Event.ChannelID, msg.ID)
+		} else if strings.Contains(flags, "DELETE") {
+			go func() {
+				time.Sleep(time.Duration(interval) * time.Second)
+				_ = ctx.Session.ChannelMessageDelete(ctx.Event.ChannelID, msg.ID)
+			}()
+		}
+
+		time.Sleep(time.Duration(interval) * time.Second)
+	}
+
 }
