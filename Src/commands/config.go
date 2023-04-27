@@ -123,6 +123,19 @@ func (c ConfigCommands) RegisterCommands(router *dgc.Router) {
 	})
 
 	router.RegisterCmd(&dgc.Command{
+		Name:        "getclient",
+		Description: "Get your current client setting",
+		Usage:       "[p]getclient",
+		Handler:     c.getclient,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "client",
+		Description: "Set your client settings",
+		Usage:       "[p]mobilefriendly <desktop/web/mobile>",
+		Handler:     c.client,
+	})
+
+	router.RegisterCmd(&dgc.Command{
 		Name:        "getnotifications",
 		Description: "Get your current notifications setting",
 		Usage:       "[p]getnotifications",
@@ -814,6 +827,39 @@ func (ConfigCommands) mobilefriendly(ctx *dgc.Ctx) {
 
 	embed.NewEmbed().
 		SetDescription("Turned " + toggle + " mobile friendly").
+		Send(ctx)
+}
+
+func (ConfigCommands) getclient(ctx *dgc.Ctx) {
+	cfg, err := config.GetConfig()
+	if err != nil {
+		_ = ctx.RespondText("Error getting config")
+		return
+	}
+
+	embed.NewEmbed().
+		AddField("Client", cfg.Selfbot.Client).
+		Send(ctx)
+}
+
+func (ConfigCommands) client(ctx *dgc.Ctx) {
+	cfg, err := config.GetConfig()
+	if err != nil {
+		_ = ctx.RespondText("Error getting config")
+		return
+	}
+
+	client := utils.String.Capitalize(utils.Arguments["<desktop/web/mobile>"])
+	if !utils.SliceContains([]string{"Desktop", "Web", "Mobile"}, client) {
+		_ = ctx.RespondText("Invalid client.")
+		return
+	}
+
+	cfg.Selfbot.CommandMode = client
+	_ = cfg.Save()
+
+	embed.NewEmbed().
+		SetDescription("Client set to " + cfg.Selfbot.CommandMode).
 		Send(ctx)
 }
 
