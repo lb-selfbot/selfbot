@@ -76,7 +76,7 @@ func (w *WebsocketConnection) Init(username, password string) error {
 
 	w.MaxErrors = 5
 	w.ErrorStart = time.Now()
-	w.ErrorWindow = 15 * time.Second
+	w.ErrorWindow = 30 * time.Second
 
 	w.Username = username
 	w.Password = password
