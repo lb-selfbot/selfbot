@@ -216,6 +216,12 @@ func (n NetworkCommands) RegisterCommands(router *dgc.Router) {
 		Usage:       "[p]flightinfo <flight number>",
 		Handler:     n.flightinfo,
 	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "clydeai",
+		Description: "Talk to the Clyde AI (OpenAI)",
+		Usage:       "[p]clydeai <message>",
+		Handler:     n.clydeai,
+	})
 }
 
 func (NetworkCommands) ping(ctx *dgc.Ctx) {
@@ -871,5 +877,21 @@ func (NetworkCommands) flightinfo(ctx *dgc.Ctx) {
 		AddField("Arrival Airport", data.GetPath("airport", "destination", "name").MustString()).
 		AddField("Arrival Time", time.Unix(arrivalTime, 0).Format("2006-01-02 15:04:05")).
 		AddField("Status", data.GetPath("status", "text").MustString()).
+		Send(ctx)
+}
+
+func (NetworkCommands) clydeai(ctx *dgc.Ctx) {
+	response, err := api.ClydeAI(ctx.Arguments.Raw())
+	if err != nil {
+		_ = ctx.RespondText("Error getting response: " + err.Error())
+		return
+	}
+
+	response = strings.ReplaceAll(response, "1101230589195079822", ctx.Session.State.User.ID)
+
+	embed.NewEmbed().
+		SetTitle("Clyde AI").
+		AddField("Message", ctx.Arguments.Raw()).
+		AddField("Response", response).
 		Send(ctx)
 }
