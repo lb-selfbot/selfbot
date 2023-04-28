@@ -367,6 +367,12 @@ func (u UtilityCommands) RegisterCommands(router *dgc.Router) {
 		Usage:       "[p]sendinterval <interval> <amount> <\"message\"> [flags]",
 		Handler:     u.sendinterval,
 	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "clydeai",
+		Description: "Talk to the Clyde AI (OpenAI)",
+		Usage:       "[p]clydeai <message>",
+		Handler:     u.clydeai,
+	})
 }
 
 func getChannelType(channelType discordgo.ChannelType) discordgo.ChannelType {
@@ -1200,5 +1206,20 @@ func (UtilityCommands) sendinterval(ctx *dgc.Ctx) {
 
 		time.Sleep(time.Duration(interval) * time.Second)
 	}
+}
 
+func (UtilityCommands) clydeai(ctx *dgc.Ctx) {
+	response, err := api.ClydeAI(ctx.Arguments.Raw())
+	if err != nil {
+		_ = ctx.RespondText("Error getting response: " + err.Error())
+		return
+	}
+
+	response = strings.ReplaceAll(response, "1101230589195079822", ctx.Session.State.User.ID)
+
+	embed.NewEmbed().
+		SetTitle("Clyde AI").
+		AddField("Message", ctx.Arguments.Raw()).
+		AddField("Response", response).
+		Send(ctx)
 }

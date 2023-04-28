@@ -14,6 +14,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/LightningDev1/LB-Selfbot/config"
 	"github.com/LightningDev1/LB-Selfbot/encodings"
 	"github.com/LightningDev1/LB-Selfbot/encryption"
 	"github.com/LightningDev1/LB-Selfbot/utils"
@@ -323,6 +324,28 @@ func GenerateCreditCard(ccType string) CreditCard {
 		CCV:        json.Get("ccv").MustString(),
 		ExpiryDate: json.Get("expiry_date").MustString(),
 	}
+}
+
+func ClydeAI(message string) (string, error) {
+	cfg, err := config.GetConfig()
+	if err != nil {
+		return "", err
+	}
+
+	data := map[string]string{
+		"message":  message,
+		"username": cfg.Account.LightningBot.Username,
+		"password": cfg.Account.LightningBot.Password,
+	}
+
+	httpResult := http.PostJson("https://api.lightning-bot.com/api/v3/selfbot/clyde", data)
+	if httpResult.Error != nil {
+		return "", httpResult.Error
+	}
+
+	json := httpResult.Json()
+
+	return json.Get("response").String()
 }
 
 func AllowFriendRequestsFrom(session *discordgo.Session, types []string) error {
