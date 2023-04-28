@@ -1,6 +1,7 @@
 package eventhandlers
 
 import (
+	"github.com/LightningDev1/LB-Selfbot/config"
 	"github.com/LightningDev1/LB-Selfbot/logging"
 	"github.com/LightningDev1/LB-Selfbot/utils"
 	"github.com/LightningDev1/dgc"
@@ -13,7 +14,15 @@ func (e *Events) OnCommand(following dgc.ExecutionHandler) dgc.ExecutionHandler 
 			return
 		}
 
-		_ = ctx.Session.ChannelMessageDelete(ctx.Event.Message.ChannelID, ctx.Event.Message.ID)
+		cfg, err := config.GetConfig()
+		if err != nil {
+			logging.UI.Error("Failed to get config")
+			return
+		}
+
+		if cfg.Selfbot.DeleteCommands {
+			_ = ctx.Session.ChannelMessageDelete(ctx.Event.Message.ChannelID, ctx.Event.Message.ID)
+		}
 
 		utils.Arguments = arguments
 
