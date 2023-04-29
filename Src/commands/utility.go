@@ -615,14 +615,15 @@ func (UtilityCommands) joinvc(ctx *dgc.Ctx) {
 }
 
 func (UtilityCommands) optionpoll(ctx *dgc.Ctx) {
-	message := embed.NewEmbed().
+	messages := embed.NewEmbed().
 		SetDescription("Poll: "+utils.Arguments["<\"question\">"]).
 		AddField("👍", utils.Arguments["<\"option1\">"]).
 		AddField("👎", utils.Arguments["<\"option2\">"]).
-		Send(ctx)[0]
-	if message != nil {
-		_ = ctx.Session.MessageReactionAdd(ctx.Event.ChannelID, message.ID, "👍")
-		_ = ctx.Session.MessageReactionAdd(ctx.Event.ChannelID, message.ID, "👎")
+		Send(ctx)
+
+	if len(messages) != 0  {
+		_ = ctx.Session.MessageReactionAdd(ctx.Event.ChannelID, messages[0].ID, "👍")
+		_ = ctx.Session.MessageReactionAdd(ctx.Event.ChannelID, messages[0].ID, "👎")
 	}
 }
 

@@ -942,12 +942,15 @@ func (FunCommands) choose(ctx *dgc.Ctx) {
 }
 
 func (FunCommands) poll(ctx *dgc.Ctx) {
-	message := embed.NewEmbed().
+	messages := embed.NewEmbed().
 		SetDescription("Answer to this poll by reacting with :thumbsup: or :thumbsdown:").
 		AddField("Question", ctx.Arguments.Raw()).
-		Send(ctx)[0]
-	_ = ctx.Session.MessageReactionAdd(ctx.Event.ChannelID, message.ID, "👍")
-	_ = ctx.Session.MessageReactionAdd(ctx.Event.ChannelID, message.ID, "👎")
+		Send(ctx)
+
+	if len(messages) != 0 {
+		_ = ctx.Session.MessageReactionAdd(ctx.Event.ChannelID, messages[0].ID, "👍")
+		_ = ctx.Session.MessageReactionAdd(ctx.Event.ChannelID, messages[0].ID, "👎")
+	}
 }
 
 func (FunCommands) numberfact(ctx *dgc.Ctx) {
