@@ -92,6 +92,12 @@ func (u UtilityCommands) RegisterCommands(router *dgc.Router) {
 		Handler:     u.admingroups,
 	})
 	router.RegisterCmd(&dgc.Command{
+		Name:        "joinvc",
+		Description: "Join a voice channel",
+		Usage:       "[p]joinvc <channel id>",
+		Handler:     u.joinvc,
+	})
+	router.RegisterCmd(&dgc.Command{
 		Name:        "optionpoll",
 		Description: "Create a poll with options",
 		Usage:       "[p]optionpoll <\"question\"> <\"option1\"> <\"option2\">",
@@ -590,6 +596,22 @@ func (UtilityCommands) admingroups(ctx *dgc.Ctx) {
 	embed.NewEmbed().
 		AddField("Admin Groups", adminGroupsString).
 		Send(ctx)
+}
+
+func (UtilityCommands) joinvc(ctx *dgc.Ctx) {
+	channel, success := utils.Discord.TryGetChannelFromMention(ctx, ctx.Arguments.Get(0))
+	if !success {
+		_ = ctx.RespondText("Could not find channel")
+		return
+	}
+
+	_, err := ctx.Session.ChannelVoiceJoin(channel.GuildID, channel.ID, false, false)
+	if err != nil {
+		_ = ctx.RespondText("Could not join channel")
+		return
+	}
+
+	_ = ctx.RespondText("Joined channel " + channel.Name)
 }
 
 func (UtilityCommands) optionpoll(ctx *dgc.Ctx) {

@@ -486,36 +486,66 @@ func (TrollingCommands) voicemove(ctx *dgc.Ctx) {
 		_ = ctx.RespondText("Error getting server: " + err.Error())
 		return
 	}
+
 	amount, err := strconv.Atoi(utils.Arguments["<amount>"])
 	if err != nil {
 		_ = ctx.RespondText("Argument <amount> must be a number.")
 		return
 	}
-	var voiceChannels []*discordgo.Channel
-	for _, channel := range guild.Channels {
-		if channel.Type == discordgo.ChannelTypeGuildVoice {
-			voiceChannels = append(voiceChannels, channel)
-		}
+
+	if conn, ok := ctx.Session.VoiceConnections[ctx.Event.GuildID]; ok {
+		_ = conn.Disconnect()
 	}
-	if len(voiceChannels) == 0 {
+
+	channels := utils.Filter(guild.Channels, func(channel *discordgo.Channel) bool {
+		if channel.Type != discordgo.ChannelTypeGuildVoice {
+			return false
+		}
+
+		perms, err := ctx.Session.UserChannelPermissions(ctx.Session.State.User.ID, channel.ID)
+		if err != nil {
+			return false
+		}
+
+		if perms&discordgo.PermissionVoiceConnect == 0 {
+			return false
+		}
+
+		return true
+	})
+
+	if len(channels) == 0 {
 		_ = ctx.RespondText("No voice channels found")
 		return
 	}
-	var voiceConnection *discordgo.VoiceConnection
-	for i := 0; i < amount; i++ {
-		channel := utils.RandomChoice(voiceChannels)
-		if voiceConnection != nil {
-			if voiceConnection.ChannelID == channel.ID {
-				i--
-				continue
-			}
+
+	i := 0
+
+	for {
+		if i >= amount {
+			break
 		}
-		voice, err := ctx.Session.ChannelVoiceJoin(ctx.Event.GuildID, channel.ID, false, false)
-		if err == nil {
-			time.Sleep(time.Second * 2)
-			_ = voice.Disconnect()
-			voiceConnection = voice
+
+		channel := utils.RandomChoice(channels)
+		currentChannel := ctx.Session.VoiceConnections[ctx.Event.GuildID]
+
+		if currentChannel != nil && currentChannel.ChannelID == channel.ID {
+			continue
 		}
+
+		_, err := ctx.Session.ChannelVoiceJoin(ctx.Event.GuildID, channel.ID, false, true)
+		if err != nil {
+			_ = ctx.RespondText("Error joining voice channel: " + err.Error())
+			return
+		}
+
+		time.Sleep(time.Second * 1)
+
+		i++
+	}
+
+	if voice, ok := ctx.Session.VoiceConnections[ctx.Event.GuildID]; ok {
+		_ = voice.Disconnect()
 	}
 }
 
