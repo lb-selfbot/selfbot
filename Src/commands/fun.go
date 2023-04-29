@@ -614,8 +614,8 @@ func (FunCommands) wouldyourather(ctx *dgc.Ctx) {
 	}
 	embed.NewEmbed().
 		SetDescription("Would you rather...").
-		AddField("A", wyrJson.Get("question_a").MustString()).
-		AddField("B", wyrJson.Get("question_b").MustString()).
+		AddField("A", wyrJson.GetPath("question", "a").MustString()).
+		AddField("B", wyrJson.Get("question", "b").MustString()).
 		Send(ctx)
 }
 
