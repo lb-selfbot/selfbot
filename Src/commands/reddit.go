@@ -80,10 +80,11 @@ func (RedditCommands) generateFunc(subreddit string) func(ctx *dgc.Ctx) {
 	// variable will always be the last element in the command array.
 	return func(ctx *dgc.Ctx) {
 		post, success := api.GetImageFromSubreddit(subreddit)
-		if !success {
+		if !success || post == nil {
 			_ = ctx.RespondText("That subreddit is invalid.")
 			return
 		}
+		
 		embed.NewEmbed().
 			AddField("Subreddit", subreddit).
 			AddField("Title", post.Title).
@@ -95,7 +96,7 @@ func (RedditCommands) generateFunc(subreddit string) func(ctx *dgc.Ctx) {
 func (RedditCommands) subreddit(ctx *dgc.Ctx) {
 	subreddit := utils.Arguments["<subreddit>"]
 	post, success := api.GetImageFromSubreddit(subreddit)
-	if !success {
+	if !success || post == nil {
 		_ = ctx.RespondText("That subreddit is invalid.")
 		return
 	}
