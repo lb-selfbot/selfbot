@@ -347,8 +347,8 @@ func (_Logging) GiveawayWon(session *discordgo.Session, message *discordgo.Messa
 		Show()
 }
 
-func (_Logging) MultiTokenSniperConnected(amount int) {
-	info := fmt.Sprintf("%d Account Connected", amount)
+func (_Logging) MultiTokenSniperConnected(amount, guilds int) {
+	info := fmt.Sprintf("%d Account Connected, sniping in %d servers", amount, guilds)
 	if amount > 1 {
 		info = strings.ReplaceAll(info, "Account", "Accounts")
 	}

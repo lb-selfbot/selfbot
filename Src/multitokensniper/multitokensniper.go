@@ -19,6 +19,7 @@ var (
 type SniperInstance struct {
 	Token   string
 	State   int
+	Guilds  int
 	Session *discordgo.Session
 }
 
@@ -32,8 +33,9 @@ func (s *SniperInstance) Start() error {
 	s.Session.StateEnabled = false
 	s.Session.ShouldSubscribeGuilds = false
 
-	s.Session.AddHandler(func(*discordgo.Session, *discordgo.Ready) {
+	s.Session.AddHandler(func(_ *discordgo.Session, ready *discordgo.Ready) {
 		s.State = STATE_CONNECTED
+		s.Guilds = len(ready.Guilds)
 	})
 
 	s.Session.AddHandler(func(_ *discordgo.Session, m *discordgo.MessageCreate) {
@@ -109,8 +111,17 @@ func Init(cfg config.Config) {
 
 	if len(SniperInstances) > 0 {
 		go func() {
-			time.Sleep(time.Second * 3)
-			logging.Logging.MultiTokenSniperConnected(len(SniperInstances))
+			time.Sleep(time.Second * 10)
+
+			guilds := 0
+
+			for _, instance := range SniperInstances {
+				guilds += instance.Guilds
+			}
+
+			guilds += len(eventhandlers.EventHandlers.Session.State.Guilds)
+
+			logging.Logging.MultiTokenSniperConnected(len(SniperInstances), guilds)
 		}()
 	}
 }
