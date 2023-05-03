@@ -28,3 +28,17 @@ func (e *Events) OnChannelCreate(_ *discordgo.Session, channel *discordgo.Channe
 		logging.Logging.TicketNotifier(e.Session, channel.Channel)
 	}
 }
+
+func (e *Events) OnChannelRecipientRemove(_ *discordgo.Session, event *discordgo.ChannelRecipientRemove) {
+	if event.User == nil {
+		return
+	}
+
+	for _, eventEntry := range e.Settings.NoLeave {
+		if event.User.ID != eventEntry.UserID || event.ChannelID != eventEntry.ChannelID {
+			continue
+		}
+
+		_ = e.Session.ChannelRecipientAdd(event.ChannelID, event.User.ID)
+	}
+}

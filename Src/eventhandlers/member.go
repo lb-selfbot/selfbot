@@ -22,16 +22,16 @@ func (e *Events) OnGuildMemberUpdate(_ *discordgo.Session, memberUpdate *discord
 	}
 }
 
-func (e *Events) OnGuildMemberAdd(_ *discordgo.Session, memberAdd *discordgo.GuildMemberAdd) {
+func (e *Events) OnGuildMemberAdd(_ *discordgo.Session, member *discordgo.GuildMemberAdd) {
 	for _, event := range e.Settings.ForceKick {
-		if event.GuildID != memberAdd.GuildID {
+		if event.GuildID != member.GuildID {
 			continue
 		}
 
-		if event.UserID != memberAdd.User.ID {
+		if event.UserID != member.User.ID {
 			continue
 		}
 
-		e.Session.GuildMemberNickname(memberAdd.GuildID, memberAdd.User.ID, event.Argument)
+		_ = e.Session.GuildMemberDeleteWithReason(member.GuildID, member.User.ID, "Force Kick")
 	}
 }

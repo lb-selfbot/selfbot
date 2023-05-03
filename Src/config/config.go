@@ -128,15 +128,17 @@ type Config struct {
 		}
 	} `json:"Protections"`
 	AFK struct {
-		Enabled        bool     `json:"Enabled"`
-		OnPing         bool     `json:"OnPing"`
-		OnDM           bool     `json:"OnDM"`
-		Message        string   `json:"Message"`
-		Reply          bool     `json:"Reply"`
-		Typing         bool     `json:"Typing"`
-		Delay          int      `json:"Delay"`
-		IgnoredServers []string `json:"IgnoredServers"`
-		IgnoredUsers   []string `json:"IgnoredUsers"`
+		Enabled         bool     `json:"Enabled"`
+		Delay           int      `json:"Delay"`
+		OnDM            bool     `json:"OnDM"`
+		OnPing          bool     `json:"OnPing"`
+		MustBeInactive  bool     `json:"MustBeInactive"` // new
+		InactiveTimeout int      `json:"InactiveTimeout"` // new
+		Reply           bool     `json:"Reply"`
+		Typing          bool     `json:"Typing"`
+		IgnoredUsers    []string `json:"IgnoredUsers"`
+		IgnoredServers  []string `json:"IgnoredServers"`
+		Message         string   `json:"Message"`
 	} `json:"AFK"`
 	Sharing struct {
 		SharedUsers      []string `json:"SharedUsers"`

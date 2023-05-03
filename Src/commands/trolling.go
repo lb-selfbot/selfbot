@@ -434,7 +434,7 @@ func (TrollingCommands) noleave(ctx *dgc.Ctx) {
 	}
 	isFriend := false
 	for _, rel := range ctx.Session.State.Relationships {
-		if rel.Type == 1 && rel.User.ID == user.ID {
+		if rel.Type == 1 && rel.ID == user.ID {
 			isFriend = true
 			break
 		}
@@ -445,7 +445,7 @@ func (TrollingCommands) noleave(ctx *dgc.Ctx) {
 	}
 	for _, entry := range eventhandlers.EventHandlers.Settings.NoLeave {
 		if entry.GuildID == ctx.Event.GuildID && entry.UserID == user.ID {
-			_ = ctx.RespondText("User is already being force kicked")
+			_ = ctx.RespondText("User is already not allowed to leave!")
 			return
 		}
 	}
