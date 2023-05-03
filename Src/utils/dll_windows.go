@@ -2,20 +2,24 @@ package utils
 
 import "syscall"
 
-func (ProcessUtils) RunDllFunc(dllName string, funcName string, args ...uintptr) error {
+func (SystemUtils) RunDllFunc(dllName string, funcName string, args ...uintptr) (uintptr, uintptr, error) {
 	user32, err := syscall.LoadLibrary(dllName)
 	if err != nil {
-		return err
+		return 0, 0, err
 	}
 
 	defer syscall.FreeLibrary(user32)
 
-	lockWorkStation, err := syscall.GetProcAddress(user32, funcName)
+	procAddress, err := syscall.GetProcAddress(user32, funcName)
 	if err != nil {
-		return err
+		return 0, 0, err
 	}
 
-	_, _, err = syscall.SyscallN(uintptr(lockWorkStation), args...)
+	r1, r2, winError := syscall.SyscallN(uintptr(procAddress), args...)
 
-	return err
+	if winError != 0 {
+		return r1, r2, err
+	}
+
+	return r1, r2, nil
 }

@@ -621,7 +621,7 @@ func (UtilityCommands) optionpoll(ctx *dgc.Ctx) {
 		AddField("👎", utils.Arguments["<\"option2\">"]).
 		Send(ctx)
 
-	if len(messages) != 0  {
+	if len(messages) != 0 {
 		_ = ctx.Session.MessageReactionAdd(ctx.Event.ChannelID, messages[0].ID, "👍")
 		_ = ctx.Session.MessageReactionAdd(ctx.Event.ChannelID, messages[0].ID, "👎")
 	}
@@ -717,19 +717,19 @@ func (UtilityCommands) nickscan(ctx *dgc.Ctx) {
 }
 
 func (UtilityCommands) shutdownpc(ctx *dgc.Ctx) {
-	_ = utils.Process.ShutdownPC()
+	_ = utils.System.ShutdownPC()
 }
 
 func (UtilityCommands) restartpc(ctx *dgc.Ctx) {
-	_ = utils.Process.RestartPC()
+	_ = utils.System.RestartPC()
 }
 
 func (UtilityCommands) sleeppc(ctx *dgc.Ctx) {
-	_ = utils.Process.SleepPC()
+	_ = utils.System.SleepPC()
 }
 
 func (UtilityCommands) lockpc(ctx *dgc.Ctx) {
-	_ = utils.Process.LockPC()
+	_ = utils.System.LockPC()
 }
 
 func (UtilityCommands) snipe(ctx *dgc.Ctx) {
@@ -801,11 +801,11 @@ func (UtilityCommands) history(ctx *dgc.Ctx) {
 }
 
 func (UtilityCommands) website(*dgc.Ctx) {
-	_ = utils.Process.OpenURL("https://lightning-bot.com/")
+	_ = utils.System.OpenURL("https://lightning-bot.com/")
 }
 
 func (UtilityCommands) dashboard(*dgc.Ctx) {
-	_ = utils.Process.OpenURL("https://lightning-bot.com/dashboard")
+	_ = utils.System.OpenURL("https://lightning-bot.com/dashboard")
 }
 
 func (UtilityCommands) restartbot(*dgc.Ctx) {

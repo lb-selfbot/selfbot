@@ -100,7 +100,7 @@ func checkForUpdates() {
 
 	time.Sleep(3 * time.Second)
 
-	_ = utils.Process.OpenURL(downloadUrl)
+	_ = utils.System.OpenURL(downloadUrl)
 
 	// Wait for user to press enter
 	_, _ = fmt.Scanln()

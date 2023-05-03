@@ -120,7 +120,7 @@ func (*DumpingCommands) dumpall(ctx *dgc.Ctx) {
 	_ = os.MkdirAll(folder, os.ModePerm)
 	filePath := filepath.Join(folder, utils.IO.SanitizeFilename(channel.Name+".txt"))
 	_ = utils.IO.Write(filePath, logString)
-	_ = utils.Process.OpenURL(filePath)
+	_ = utils.System.OpenURL(filePath)
 	embed.NewEmbed().
 		SetDescription(fmt.Sprintf("Dumped %d messages from %s", len(messages), channel.Name)).
 		Send(ctx)
@@ -142,7 +142,7 @@ func (*DumpingCommands) dumpimages(ctx *dgc.Ctx) {
 	}
 	folder := filepath.Join(utils.IO.GetMainFolder(), "Dumping", "Images", utils.IO.SanitizeFilename(channel.Name))
 	_ = os.MkdirAll(folder, os.ModePerm)
-	_ = utils.Process.OpenURL(folder)
+	_ = utils.System.OpenURL(folder)
 	images := 0
 	for _, message := range messages {
 		for _, attachment := range message.Attachments {
@@ -183,7 +183,7 @@ func (*DumpingCommands) dumpvideos(ctx *dgc.Ctx) {
 	}
 	folder := filepath.Join(utils.IO.GetMainFolder(), "Dumping", "Videos", utils.IO.SanitizeFilename(channel.Name))
 	_ = os.MkdirAll(folder, os.ModePerm)
-	_ = utils.Process.OpenURL(folder)
+	_ = utils.System.OpenURL(folder)
 	videos := 0
 	for _, message := range messages {
 		for _, attachment := range message.Attachments {
@@ -224,7 +224,7 @@ func (*DumpingCommands) dumpaudio(ctx *dgc.Ctx) {
 	}
 	folder := filepath.Join(utils.IO.GetMainFolder(), "Dumping", "Audio", utils.IO.SanitizeFilename(channel.Name))
 	_ = os.MkdirAll(folder, os.ModePerm)
-	_ = utils.Process.OpenURL(folder)
+	_ = utils.System.OpenURL(folder)
 	audios := 0
 	for _, message := range messages {
 		for _, attachment := range message.Attachments {
@@ -265,7 +265,7 @@ func (*DumpingCommands) dumptext(ctx *dgc.Ctx) {
 	}
 	folder := filepath.Join(utils.IO.GetMainFolder(), "Dumping", "Text", utils.IO.SanitizeFilename(channel.Name))
 	_ = os.MkdirAll(folder, os.ModePerm)
-	_ = utils.Process.OpenURL(folder)
+	_ = utils.System.OpenURL(folder)
 	texts := 0
 	for _, message := range messages {
 		for _, attachment := range message.Attachments {
@@ -303,7 +303,7 @@ func (*DumpingCommands) dumpemojis(ctx *dgc.Ctx) {
 	}
 	folder := filepath.Join(utils.IO.GetMainFolder(), "Dumping", "Emojis", utils.IO.SanitizeFilename(guild.Name))
 	_ = os.MkdirAll(folder, os.ModePerm)
-	_ = utils.Process.OpenURL(folder)
+	_ = utils.System.OpenURL(folder)
 	for _, emoji := range emojis {
 		name := emoji.Name
 
@@ -335,7 +335,7 @@ func (*DumpingCommands) dumpstickers(ctx *dgc.Ctx) {
 	}
 	folder := filepath.Join(utils.IO.GetMainFolder(), "Dumping", "Stickers", utils.IO.SanitizeFilename(guild.Name))
 	_ = os.MkdirAll(folder, os.ModePerm)
-	_ = utils.Process.OpenURL(folder)
+	_ = utils.System.OpenURL(folder)
 	for _, sticker := range guild.Stickers {
 		var format string
 
@@ -374,7 +374,7 @@ func (*DumpingCommands) dumpavatars(ctx *dgc.Ctx) {
 	}
 	folder := filepath.Join(utils.IO.GetMainFolder(), "Dumping", "Avatars", utils.IO.SanitizeFilename(guild.Name))
 	_ = os.MkdirAll(folder, os.ModePerm)
-	_ = utils.Process.OpenURL(folder)
+	_ = utils.System.OpenURL(folder)
 	for _, member := range guild.Members {
 		name := member.User.String()
 
@@ -416,7 +416,7 @@ func (*DumpingCommands) dumpchannels(ctx *dgc.Ctx) {
 	_ = os.MkdirAll(folder, os.ModePerm)
 	filePath := filepath.Join(folder, utils.IO.SanitizeFilename(guild.Name)+".txt")
 	_ = utils.IO.Write(filePath, logString)
-	_ = utils.Process.OpenURL(filePath)
+	_ = utils.System.OpenURL(filePath)
 	embed.NewEmbed().
 		SetDescription(fmt.Sprintf("Dumped %d channels from %s", len(guild.Channels), guild.Name)).
 		Send(ctx)
@@ -439,7 +439,7 @@ func (*DumpingCommands) dumpmembers(ctx *dgc.Ctx) {
 	_ = os.MkdirAll(folder, os.ModePerm)
 	filePath := filepath.Join(folder, utils.IO.SanitizeFilename(guild.Name)+".txt")
 	_ = utils.IO.Write(filePath, logString)
-	_ = utils.Process.OpenURL(filePath)
+	_ = utils.System.OpenURL(filePath)
 	embed.NewEmbed().
 		SetDescription(fmt.Sprintf("Dumped %d members from %s", len(guild.Members), guild.Name)).
 		Send(ctx)

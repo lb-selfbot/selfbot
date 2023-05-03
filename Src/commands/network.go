@@ -460,7 +460,7 @@ func (NetworkCommands) youtubedl(ctx *dgc.Ctx) {
 			return
 		}
 
-		_ = utils.Process.OpenURL(downloadPath)
+		_ = utils.System.OpenURL(downloadPath)
 		_ = ctx.RespondText(fmt.Sprintf("Successfully downloaded %s", video.Title))
 
 		break
@@ -709,7 +709,7 @@ func (NetworkCommands) discordstatus(ctx *dgc.Ctx) {
 }
 
 func (NetworkCommands) open(ctx *dgc.Ctx) {
-	_ = utils.Process.OpenURL(ctx.Arguments.Raw())
+	_ = utils.System.OpenURL(ctx.Arguments.Raw())
 }
 
 func (NetworkCommands) searchcountry(ctx *dgc.Ctx) {

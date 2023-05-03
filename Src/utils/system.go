@@ -5,11 +5,13 @@ import (
 	"os/exec"
 	"runtime"
 	"syscall"
+	"time"
+	"unsafe"
 )
 
-type ProcessUtils struct{}
+type SystemUtils struct{}
 
-func (ProcessUtils) OpenURL(url string) error {
+func (SystemUtils) OpenURL(url string) error {
 	if runtime.GOOS == "windows" {
 		return exec.Command("explorer", url).Start()
 	} else if runtime.GOOS == "darwin" {
@@ -19,7 +21,7 @@ func (ProcessUtils) OpenURL(url string) error {
 	}
 }
 
-func (ProcessUtils) Restart() error {
+func (SystemUtils) Restart() error {
 	self, err := os.Executable()
 	if err != nil {
 		return err
@@ -40,7 +42,7 @@ func (ProcessUtils) Restart() error {
 	return syscall.Exec(self, os.Args, env)
 }
 
-func (ProcessUtils) ShutdownPC() error {
+func (SystemUtils) ShutdownPC() error {
 	if runtime.GOOS == "windows" {
 		return exec.Command("shutdown", "/s", "/t", "0").Start()
 	} else {
@@ -48,7 +50,7 @@ func (ProcessUtils) ShutdownPC() error {
 	}
 }
 
-func (ProcessUtils) RestartPC() error {
+func (SystemUtils) RestartPC() error {
 	if runtime.GOOS == "windows" {
 		return exec.Command("shutdown", "/r", "/t", "0").Start()
 	} else {
@@ -56,9 +58,10 @@ func (ProcessUtils) RestartPC() error {
 	}
 }
 
-func (ProcessUtils) SleepPC() error {
+func (SystemUtils) SleepPC() error {
 	if runtime.GOOS == "windows" {
-		return Process.RunDllFunc("powrprof.dll", "SetSuspendState", 2, 0, 1, 0)
+		_, _, err := System.RunDllFunc("powrprof.dll", "SetSuspendState", 2, 0, 1, 0)
+		return err
 	} else if runtime.GOOS == "darwin" {
 		return exec.Command("pmset", "displaysleepnow").Start()
 	} else {
@@ -66,9 +69,10 @@ func (ProcessUtils) SleepPC() error {
 	}
 }
 
-func (ProcessUtils) LockPC() error {
+func (SystemUtils) LockPC() error {
 	if runtime.GOOS == "windows" {
-		return Process.RunDllFunc("user32.dll", "LockWorkStation")
+		_, _, err := System.RunDllFunc("user32.dll", "LockWorkStation")
+		return err
 	} else if runtime.GOOS == "darwin" {
 		return exec.Command("pmset", "displaysleepnow").Start()
 	} else {
@@ -76,4 +80,37 @@ func (ProcessUtils) LockPC() error {
 	}
 }
 
-var Process = &ProcessUtils{}
+func (SystemUtils) GetIdleTime() (time.Duration, error) {
+	if runtime.GOOS != "windows" {
+		return 0, nil
+	}
+	
+	var lastInputInfo struct {
+		cbSize uint32
+		dwTime uint32
+	}
+	lastInputInfo.cbSize = uint32(unsafe.Sizeof(lastInputInfo))
+
+	_, _, err := System.RunDllFunc("user32.dll", "GetLastInputInfo", uintptr(unsafe.Pointer(&lastInputInfo)))
+	if err != nil {
+		return 0, err
+	}
+
+	tickCount, _, err := System.RunDllFunc("kernel32.dll", "GetTickCount")
+	if err != nil {
+		return 0, err
+	}
+
+	tickCount32 := uint32(tickCount)
+
+	if tickCount32 < lastInputInfo.dwTime {
+		const kMaxDWORD = uint32(0xFFFFFFFF)
+		timeBeforeWrap := kMaxDWORD - lastInputInfo.dwTime
+		timeAfterWrap := tickCount32
+		return time.Duration(timeBeforeWrap+timeAfterWrap) * time.Millisecond, nil
+	} else {
+		return time.Duration(tickCount32-lastInputInfo.dwTime) * time.Millisecond, nil
+	}
+}
+
+var System = &SystemUtils{}

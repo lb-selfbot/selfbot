@@ -2,6 +2,7 @@ package eventhandlers
 
 import (
 	"net/url"
+	"runtime"
 	"strings"
 	"time"
 	"unicode"
@@ -349,6 +350,15 @@ func (e *Events) checkAFK(message *discordgo.Message, cfg *config.Config) {
 
 	if !activatedOnPing && !activatedOnDM {
 		return
+	}
+
+	if runtime.GOOS == "windows" /* && cfg.AFK.OnSystemIdle */ {
+		idleTimeout := time.Duration(30/* cfg.AFK.IdleTimeout */) * time.Second
+
+		idleTime, err := utils.System.GetIdleTime()
+		if err != nil || idleTime < idleTimeout {
+			return
+		}
 	}
 
 	_ = e.Session.MessageAck(message.ChannelID, message.ID)
