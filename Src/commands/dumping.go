@@ -48,6 +48,12 @@ func (d *DumpingCommands) RegisterCommands(router *dgc.Router) {
 		Handler:     d.dumptext,
 	})
 	router.RegisterCmd(&dgc.Command{
+		Name:        "dumpattachments",
+		Description: "Dump all attachments in a channel",
+		Usage:       "[p]dumpattachments [channel]",
+		Handler:     d.dumpattachments,
+	})
+	router.RegisterCmd(&dgc.Command{
 		Name:        "dumpemojis",
 		Description: "Dump all emojis in a server",
 		Usage:       "[p]dumpemojis [server id]",
@@ -287,6 +293,43 @@ func (*DumpingCommands) dumptext(ctx *dgc.Ctx) {
 	}
 	embed.NewEmbed().
 		SetDescription(fmt.Sprintf("Dumped %d texts from %s", texts, channel.Name)).
+		Send(ctx)
+}
+
+func (*DumpingCommands) dumpattachments(ctx *dgc.Ctx) {
+	channel, success := utils.Discord.TryGetChannelFromMention(ctx, ctx.Arguments.Get(0))
+	if !success {
+		channel, _ = utils.Discord.GetChannel(ctx.Session, ctx.Event.ChannelID)
+	}
+	if channel == nil {
+		_ = ctx.RespondText("Error getting channel")
+		return
+	}
+	messages, err := utils.Discord.GetChannelMessages(ctx.Session, channel.ID, 1000)
+	if err != nil {
+		_ = ctx.RespondText("Error getting messages")
+		return
+	}
+	folder := filepath.Join(utils.IO.GetMainFolder(), "Dumping", "Attachments", utils.IO.SanitizeFilename(channel.Name))
+	_ = os.MkdirAll(folder, os.ModePerm)
+	_ = utils.System.OpenURL(folder)
+	attachments := 0
+	for _, message := range messages {
+		for _, attachment := range message.Attachments {
+			filePath := filepath.Join(folder, utils.IO.SanitizeFilename(attachment.Filename))
+
+			httpResponse := http.Get(utils.Misc.Or(attachment.ProxyURL, attachment.URL))
+			if httpResponse.Error != nil {
+				continue
+			}
+
+			_ = utils.IO.WriteBytes(filePath, httpResponse.BodyBytes)
+
+			attachments++
+		}
+	}
+	embed.NewEmbed().
+		SetDescription(fmt.Sprintf("Dumped %d attachments from %s", attachments, channel.Name)).
 		Send(ctx)
 }
 
