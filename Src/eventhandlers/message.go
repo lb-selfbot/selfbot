@@ -352,8 +352,8 @@ func (e *Events) checkAFK(message *discordgo.Message, cfg *config.Config) {
 		return
 	}
 
-	if runtime.GOOS == "windows" /* && cfg.AFK.OnSystemIdle */ {
-		idleTimeout := time.Duration(30 /* cfg.AFK.IdleTimeout */) * time.Second
+	if runtime.GOOS == "windows" && cfg.AFK.MustBeInactive {
+		idleTimeout := time.Duration(cfg.AFK.InactiveTimeout) * time.Second
 
 		idleTime, err := utils.System.GetIdleTime()
 		if err != nil || idleTime < idleTimeout {

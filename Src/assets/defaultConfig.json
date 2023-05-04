@@ -7,6 +7,8 @@
     "Message": "I am currently AFK",
     "OnDM": true,
     "OnPing": true,
+    "MustBeInactive": true,
+    "InactiveTimeout": 300,
     "Reply": true,
     "Typing": true
   },
