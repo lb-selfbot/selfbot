@@ -343,7 +343,7 @@ func (_Logging) GiveawayWon(session *discordgo.Session, message *discordgo.Messa
 		AddInfo("Bot", message.Author.String()).
 		AddInfoConditional("Prize", prize, prize != "").
 		AddInfoConditional("On Account", account, account != "").
-		SetWebhookURL(cfg.Webhooks.Notifiers).
+		SetWebhookURL(cfg.Webhooks.GiveawaySniper).
 		Show()
 }
 

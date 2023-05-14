@@ -456,6 +456,52 @@ func CheckGiveawaySniper(session *discordgo.Session, message *discordgo.Message,
 			time.Sleep(time.Second * time.Duration(cfg.Snipers.GiveawaySniper.Sleep))
 			_ = session.InteractionClick(button, message)
 		}()
+	case "651627261782523926": // Giveaways#8717
+		// Win check
+
+		prizeList := regexp.MustCompile(fmt.Sprintf(`Congratulations <@!%s>, you won \*\*(.*?)\*\*`, session.State.User.ID)).FindStringSubmatch(message.Content)
+		if len(prizeList) > 1 {
+			logging.Logging.GiveawayWon(session, message, prizeList[1], account)
+		}
+
+		// Entering
+
+		if len(message.Embeds) == 0 {
+			break
+		}
+
+		emb := message.Embeds[0]
+
+		if !strings.Contains(emb.Description, "Click the reaction below to enter!") {
+			return
+		}
+
+		var endsUnix int64
+		var hostID string
+
+		hostIDList := regexp.MustCompile(`Host: <@!(.*?)>`).FindStringSubmatch(message.Embeds[0].Description)
+		if len(hostIDList) > 1 {
+			hostID = hostIDList[1]
+		}
+
+		endsUnixList := regexp.MustCompile(`Ends <t:(.*?):R>`).FindStringSubmatch(message.Embeds[0].Description)
+		if len(endsUnixList) > 1 {
+			endsUnix, _ = strconv.ParseInt(endsUnixList[1], 10, 64)
+		}
+		endsIn := utils.Misc.FormatDuration(time.Until(time.Unix(endsUnix, 0)))
+
+		prize := message.Embeds[0].Title
+
+		if isPrizeBlacklisted(prize, cfg) {
+			return
+		}
+
+		logging.Logging.GiveawayFound(session, message, prize, hostID, endsIn, account)
+
+		go func() {
+			time.Sleep(time.Second * time.Duration(cfg.Snipers.GiveawaySniper.Sleep))
+			_ = session.MessageReactionAdd(message.ChannelID, message.ID, "🎉")
+		}()
 	default:
 		isCustomBot := utils.Discord.IsUserInList(session, message.Author.ID, cfg.Snipers.GiveawaySniper.CustomBots)
 
