@@ -133,7 +133,7 @@ func (p ProtectionsCommands) protectserver(ctx *dgc.Ctx) {
 		return
 	}
 	cfg, _ := config.GetConfig()
-	if utils.SliceContains(cfg.AFK.IgnoredServers, guild.ID) {
+	if utils.SliceContains(cfg.Protections.ServerProtections.ProtectedServers, guild.ID) {
 		_ = ctx.RespondText("Server is already ignored.")
 		return
 	}
@@ -148,7 +148,7 @@ func (p ProtectionsCommands) unprotectserver(ctx *dgc.Ctx) {
 		return
 	}
 	cfg, _ := config.GetConfig()
-	if !utils.SliceContains(cfg.AFK.IgnoredServers, guild.ID) {
+	if !utils.SliceContains(cfg.Protections.ServerProtections.ProtectedServers, guild.ID) {
 		_ = ctx.RespondText("Server is already not ignored.")
 		return
 	}

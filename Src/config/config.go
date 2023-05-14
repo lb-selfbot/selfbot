@@ -31,6 +31,30 @@ type RPCData struct {
 	Buttons    []RPCButton `json:"Buttons"`
 }
 
+type TriggerList struct {
+	Type    string   `json:"Type"`
+	Users   []string `json:"Users"`
+	Servers []string `json:"Servers"`
+}
+
+func (t *TriggerList) IsTriggered(session *discordgo.Session, userID string, guildID string) bool {
+	if t.Type == "Global" {
+		return true
+	}
+
+	isUserInList := utils.Discord.IsUserInList(session, userID, t.Users)
+	isGuildInList := utils.Discord.IsGuildInList(session, guildID, t.Servers)
+
+	switch t.Type {
+	case "Whitelist":
+		return isUserInList || isGuildInList
+	case "Blacklist":
+		return !isUserInList && !isGuildInList
+	default:
+		return false
+	}
+}
+
 type Config struct {
 	Account struct {
 		LightningBot struct {
@@ -128,17 +152,18 @@ type Config struct {
 		}
 	} `json:"Protections"`
 	AFK struct {
-		Enabled         bool     `json:"Enabled"`
-		Delay           int      `json:"Delay"`
-		OnDM            bool     `json:"OnDM"`
-		OnPing          bool     `json:"OnPing"`
-		MustBeInactive  bool     `json:"MustBeInactive"` // new
-		InactiveTimeout int      `json:"InactiveTimeout"` // new
-		Reply           bool     `json:"Reply"`
-		Typing          bool     `json:"Typing"`
-		IgnoredUsers    []string `json:"IgnoredUsers"`
-		IgnoredServers  []string `json:"IgnoredServers"`
-		Message         string   `json:"Message"`
+		Enabled         bool        `json:"Enabled"`
+		Delay           int         `json:"Delay"`
+		OnDM            bool        `json:"OnDM"`
+		OnPing          bool        `json:"OnPing"`
+		MustBeInactive  bool        `json:"MustBeInactive"`  // new
+		InactiveTimeout int         `json:"InactiveTimeout"` // new
+		Reply           bool        `json:"Reply"`
+		Typing          bool        `json:"Typing"`
+		TriggerList     TriggerList `json:"TriggerList"`
+		// IgnoredUsers    []string `json:"IgnoredUsers"`
+		// IgnoredServers  []string `json:"IgnoredServers"`
+		Message string `json:"Message"`
 	} `json:"AFK"`
 	Sharing struct {
 		SharedUsers      []string `json:"SharedUsers"`

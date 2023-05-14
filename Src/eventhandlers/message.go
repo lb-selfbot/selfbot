@@ -336,10 +336,7 @@ func (e *Events) checkAFK(message *discordgo.Message, cfg *config.Config) {
 		return
 	}
 
-	isUserIgnored := utils.Discord.IsUserInList(e.Session, message.Author.ID, cfg.AFK.IgnoredUsers)
-	isGuildIgnored := utils.Discord.IsGuildInList(e.Session, message.GuildID, cfg.AFK.IgnoredServers)
-
-	if isUserIgnored || isGuildIgnored {
+	if !cfg.AFK.TriggerList.IsTriggered(e.Session, message.Author.ID, message.GuildID) {
 		return
 	}
 

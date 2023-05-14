@@ -208,6 +208,7 @@ func CheckGiveawaySniper(session *discordgo.Session, message *discordgo.Message,
 			_ = session.InteractionClick(button, message)
 		}()
 	case "294882584201003009": // GiveawayBot#2381
+	case "1041302711750119504": // LightningBot#1992
 		// Win check
 
 		if message.Type == discordgo.MessageTypeReply {
@@ -459,7 +460,7 @@ func CheckGiveawaySniper(session *discordgo.Session, message *discordgo.Message,
 		isCustomBot := utils.Discord.IsUserInList(session, message.Author.ID, cfg.Snipers.GiveawaySniper.CustomBots)
 
 		if !isCustomBot {
-			return
+			break
 		}
 
 		messageJsonBytes, err := json.Marshal(message)
@@ -511,6 +512,82 @@ func CheckGiveawaySniper(session *discordgo.Session, message *discordgo.Message,
 			time.Sleep(time.Second * time.Duration(cfg.Snipers.GiveawaySniper.Sleep))
 
 			_ = session.MessageReactionAdd(message.ChannelID, message.ID, emoji)
+		}()
+	}
+
+	// Dyno#3861
+	isDynoWebhook := message.Author.Username == "Dyno" && message.Author.Discriminator == "0000" && message.WebhookID != ""
+	isDynoBot := message.Author.ID == "1106879904676597780"
+	if isDynoWebhook || isDynoBot {
+		// Win check
+
+		pattern := fmt.Sprintf(`Congratulations %s, you won (.*?)!`, session.State.User.Mention())
+
+		prizeList := regexp.MustCompile(pattern).FindStringSubmatch(message.Content)
+		if len(prizeList) > 1 {
+			logging.Logging.GiveawayWon(session, message, prizeList[1], account)
+		}
+
+		// Entering
+
+		if len(message.Embeds) == 0 {
+			return
+		}
+
+		emb := message.Embeds[0]
+
+		if len(emb.Fields) != 2 {
+			return
+		}
+
+		if emb.Image == nil {
+			return
+		}
+
+		if emb.Footer == nil {
+			return
+		}
+
+		if !strings.HasPrefix(emb.URL, "https://dyno.gg/giveaway/") {
+			return
+		}
+
+		if emb.Image.URL != "https://cdn.dyno.gg/giveaway/banner.jpeg" {
+			return
+		}
+
+		component, ok := message.Components[0].(*discordgo.ActionsRow)
+		if !ok {
+			return
+		}
+
+		button, ok := component.Components[0].(*discordgo.Button)
+		if !ok {
+			return
+		}
+
+		prize := emb.Title
+
+		if isPrizeBlacklisted(prize, cfg) {
+			return
+		}
+
+		endsInList := regexp.MustCompile(`<t:(.*?):R>`).FindStringSubmatch(emb.Fields[0].Value)
+		hostIDList := regexp.MustCompile("<@(.*?)>").FindStringSubmatch(emb.Fields[1].Value)
+
+		if len(endsInList) < 2 || len(hostIDList) < 2 {
+			return
+		}
+
+		endsUnix, _ := strconv.ParseInt(endsInList[1], 10, 64)
+
+		endsIn := utils.Misc.FormatDuration(time.Until(time.Unix(endsUnix, 0)))
+
+		logging.Logging.GiveawayFound(session, message, prize, hostIDList[1], endsIn, account)
+
+		go func() {
+			time.Sleep(time.Second * time.Duration(cfg.Snipers.GiveawaySniper.Sleep))
+			_ = session.InteractionClick(button, message)
 		}()
 	}
 }

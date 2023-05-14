@@ -144,28 +144,34 @@ func (e *EventReactionsCommands) RegisterCommands(router *dgc.Router) {
 		Handler:     e.afkdelay,
 	})
 	router.RegisterCmd(&dgc.Command{
-		Name:        "afkignoreserver",
-		Description: "Ignore messages from a server",
-		Usage:       "[p]afkignoreserver <server id>",
-		Handler:     e.afkignoreserver,
+		Name:        "afktriggertype",
+		Description: "Set the AFK trigger type",
+		Usage:       "[p]afktriggertype <type>",
+		Handler:     e.afktriggertype,
 	})
 	router.RegisterCmd(&dgc.Command{
-		Name:        "afkunignoreserver",
-		Description: "Unignore messages from a server",
-		Usage:       "[p]afkunignoreserver <server id>",
-		Handler:     e.afkunignoreserver,
+		Name:        "afkaddserver",
+		Description: "Add a server to the AFK trigger list",
+		Usage:       "[p]afkaddserver <server id>",
+		Handler:     e.afkaddserver,
 	})
 	router.RegisterCmd(&dgc.Command{
-		Name:        "afkignoreuser",
-		Description: "Ignore messages from a user",
-		Usage:       "[p]afkignoreuser <<user>",
-		Handler:     e.afkignoreuser,
+		Name:        "afkremoveserver",
+		Description: "Remove a server from the AFK trigger list",
+		Usage:       "[p]afkremoveserver <server id>",
+		Handler:     e.afkremoveserver,
 	})
 	router.RegisterCmd(&dgc.Command{
-		Name:        "afkunignoreuser",
-		Description: "Unignore messages from a user",
-		Usage:       "[p]afkunignoreuser <user>",
-		Handler:     e.afkunignoreuser,
+		Name:        "afkadduser",
+		Description: "Add a user to the AFK trigger list",
+		Usage:       "[p]afkadduser <<user>",
+		Handler:     e.afkadduser,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "afkremoveuser",
+		Description: "Remove a user from the AFK trigger list",
+		Usage:       "[p]afkremoveuser <user>",
+		Handler:     e.afkremoveuser,
 	})
 }
 
@@ -514,62 +520,74 @@ func (EventReactionsCommands) afkdelay(ctx *dgc.Ctx) {
 	_ = cfg.Save()
 }
 
-func (EventReactionsCommands) afkignoreserver(ctx *dgc.Ctx) {
+func (EventReactionsCommands) afktriggertype(ctx *dgc.Ctx) {
+	arg := strings.ToLower(utils.Arguments["<type>"])
+	if !utils.SliceContains([]string{"global", "whitelist", "blacklist"}, arg) {
+		_ = ctx.RespondText("Invalid value. Use `Global`, `Whitelist`, or `Blacklist`.")
+		return
+	}
+
+	cfg, _ := config.GetConfig()
+	cfg.AFK.TriggerList.Type = utils.String.Capitalize(arg)
+	_ = cfg.Save()
+}
+
+func (EventReactionsCommands) afkaddserver(ctx *dgc.Ctx) {
 	guild, err := utils.Discord.GetGuild(ctx.Session, utils.Misc.Or(utils.Arguments["<server id>"], ctx.Event.GuildID))
 	if err != nil {
 		_ = ctx.RespondText("Could not find server.")
 		return
 	}
 	cfg, _ := config.GetConfig()
-	if utils.SliceContains(cfg.AFK.IgnoredServers, guild.ID) {
-		_ = ctx.RespondText("Server is already ignored.")
+	if utils.SliceContains(cfg.AFK.TriggerList.Servers, guild.ID) {
+		_ = ctx.RespondText("Server is already added.")
 		return
 	}
-	cfg.AFK.IgnoredServers = append(cfg.AFK.IgnoredServers, guild.ID)
+	cfg.AFK.TriggerList.Servers = append(cfg.AFK.TriggerList.Servers, guild.ID)
 	_ = cfg.Save()
 }
 
-func (EventReactionsCommands) afkunignoreserver(ctx *dgc.Ctx) {
+func (EventReactionsCommands) afkremoveserver(ctx *dgc.Ctx) {
 	guild, err := utils.Discord.GetGuild(ctx.Session, utils.Misc.Or(utils.Arguments["<server id>"], ctx.Event.GuildID))
 	if err != nil {
 		_ = ctx.RespondText("Could not find server.")
 		return
 	}
 	cfg, _ := config.GetConfig()
-	if !utils.SliceContains(cfg.AFK.IgnoredServers, guild.ID) {
-		_ = ctx.RespondText("Server is already not ignored.")
+	if !utils.SliceContains(cfg.AFK.TriggerList.Servers, guild.ID) {
+		_ = ctx.RespondText("Server is already removed.")
 		return
 	}
-	cfg.AFK.IgnoredServers = utils.RemoveSliceItem(cfg.AFK.IgnoredServers, guild.ID)
+	cfg.AFK.TriggerList.Servers = utils.RemoveSliceItem(cfg.AFK.TriggerList.Servers, guild.ID)
 	_ = cfg.Save()
 }
 
-func (EventReactionsCommands) afkignoreuser(ctx *dgc.Ctx) {
+func (EventReactionsCommands) afkadduser(ctx *dgc.Ctx) {
 	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
 		_ = ctx.RespondText("Could not find user.")
 		return
 	}
 	cfg, _ := config.GetConfig()
-	if utils.SliceContains(cfg.AFK.IgnoredUsers, user.ID) {
-		_ = ctx.RespondText("User is already ignored.")
+	if utils.SliceContains(cfg.AFK.TriggerList.Users, user.ID) {
+		_ = ctx.RespondText("User is already added.")
 		return
 	}
-	cfg.AFK.IgnoredUsers = append(cfg.AFK.IgnoredUsers, user.ID)
+	cfg.AFK.TriggerList.Users = append(cfg.AFK.TriggerList.Users, user.ID)
 	_ = cfg.Save()
 }
 
-func (EventReactionsCommands) afkunignoreuser(ctx *dgc.Ctx) {
+func (EventReactionsCommands) afkremoveuser(ctx *dgc.Ctx) {
 	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
 		_ = ctx.RespondText("Could not find user.")
 		return
 	}
 	cfg, _ := config.GetConfig()
-	if !utils.SliceContains(cfg.AFK.IgnoredUsers, user.ID) {
-		_ = ctx.RespondText("User is already not ignored.")
+	if !utils.SliceContains(cfg.AFK.TriggerList.Users, user.ID) {
+		_ = ctx.RespondText("User is already removed.")
 		return
 	}
-	cfg.AFK.IgnoredUsers = utils.RemoveSliceItem(cfg.AFK.IgnoredUsers, user.ID)
+	cfg.AFK.TriggerList.Users = utils.RemoveSliceItem(cfg.AFK.TriggerList.Users, user.ID)
 	_ = cfg.Save()
 }
