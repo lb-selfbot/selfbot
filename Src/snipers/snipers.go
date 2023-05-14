@@ -162,9 +162,17 @@ func CheckGiveawaySniper(session *discordgo.Session, message *discordgo.Message,
 			break
 		}
 
+		if len(message.Components) == 0 {
+			return
+		}
+
 		actionsRow, ok := message.Components[0].(*discordgo.ActionsRow)
 		if !ok {
 			break
+		}
+
+		if len(actionsRow.Components) == 0 {
+			return
 		}
 
 		button, ok := actionsRow.Components[0].(*discordgo.Button)
@@ -224,9 +232,17 @@ func CheckGiveawaySniper(session *discordgo.Session, message *discordgo.Message,
 			break
 		}
 
+		if len(message.Components) == 0 {
+			return
+		}
+
 		component, ok := message.Components[0].(*discordgo.ActionsRow)
 		if !ok {
 			break
+		}
+
+		if len(component.Components) == 0 {
+			return
 		}
 
 		button, ok := component.Components[0].(*discordgo.Button)
@@ -426,9 +442,17 @@ func CheckGiveawaySniper(session *discordgo.Session, message *discordgo.Message,
 			break
 		}
 
+		if len(message.Components) == 0 {
+			return
+		}
+
 		component, ok := message.Components[0].(*discordgo.ActionsRow)
 		if !ok {
 			break
+		}
+
+		if len(component.Components) == 0 {
+			return
 		}
 
 		button, ok := component.Components[0].(*discordgo.Button)
@@ -525,17 +549,38 @@ func CheckGiveawaySniper(session *discordgo.Session, message *discordgo.Message,
 		}
 
 		// Check if there is a button to enter the giveaway
-		if component, ok := message.Components[0].(*discordgo.ActionsRow); ok {
-			if button, ok := component.Components[0].(*discordgo.Button); ok {
-				logging.Logging.GiveawayFound(session, message, "", "", "", account)
 
-				go func() {
-					time.Sleep(time.Second * time.Duration(cfg.Snipers.GiveawaySniper.Sleep))
-					_ = session.InteractionClick(button, message)
-				}()
-
-				return
+		hasComponent := func() bool {
+			if len(message.Components) == 0 {
+				return false
 			}
+
+			component, ok := message.Components[0].(*discordgo.ActionsRow)
+			if !ok {
+				return false
+			}
+
+			if len(component.Components) == 0 {
+				return false
+			}
+
+			button, ok := component.Components[0].(*discordgo.Button)
+			if !ok {
+				return false
+			}
+
+			logging.Logging.GiveawayFound(session, message, "", "", "", account)
+
+			go func() {
+				time.Sleep(time.Second * time.Duration(cfg.Snipers.GiveawaySniper.Sleep))
+				_ = session.InteractionClick(button, message)
+			}()
+
+			return true
+		}()
+
+		if hasComponent {
+			return
 		}
 
 		go func() {
@@ -602,8 +647,16 @@ func CheckGiveawaySniper(session *discordgo.Session, message *discordgo.Message,
 			return
 		}
 
+		if len(message.Components) == 0 {
+			return
+		}
+
 		component, ok := message.Components[0].(*discordgo.ActionsRow)
 		if !ok {
+			return
+		}
+
+		if len(component.Components) == 0 {
 			return
 		}
 
