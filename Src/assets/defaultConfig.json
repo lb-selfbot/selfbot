@@ -100,8 +100,10 @@
     "Tokens": []
   },
   "UI": {
+    "Theme": "Dark",
     "HideToSystemTray": false,
-    "Theme": "Dark"
+    "RunOnStartup": false,
+    "RunSelfbotOnStartup": false
   },
   "Webhooks": {
     "GiveawaySniper": "",
