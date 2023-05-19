@@ -125,8 +125,10 @@ type Config struct {
 		Button2URL     string `json:"Button2URL"`
 	} `json:"Activity"`
 	UI struct {
-		Theme            string `json:"Theme"`
-		HideToSystemTray bool   `json:"HideToSystemTray"`
+		Theme               string `json:"Theme"`
+		HideToSystemTray    bool   `json:"HideToSystemTray"`
+		RunOnStartup        bool   `json:"RunOnStartup"`
+		RunSelfbotOnStartup bool   `json:"RunSelfbotOnStartup"`
 	} `json:"UI"`
 	Selfbot struct {
 		CommandPrefix        string `json:"CommandPrefix"`

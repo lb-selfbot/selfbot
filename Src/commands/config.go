@@ -582,6 +582,32 @@ func (c ConfigCommands) RegisterCommands(router *dgc.Router) {
 		Usage:       "[p]hidetosystray <on/off>",
 		Handler:     c.hidetosystray,
 	})
+
+	router.RegisterCmd(&dgc.Command{
+		Name:        "getrunonstartup",
+		Description: "Get the current run on startup value",
+		Usage:       "[p]getrunonstartup",
+		Handler:     c.getrunonstartup,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "runonstartup",
+		Description: "Turn run on startup on or off",
+		Usage:       "[p]runonstartup <on/off>",
+		Handler:     c.runonstartup,
+	})
+
+	router.RegisterCmd(&dgc.Command{
+		Name:        "getrunsbonstartup",
+		Description: "Get the current run selfbot on startup value",
+		Usage:       "[p]getrunsbonstartup",
+		Handler:     c.getrunsbonstartup,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "runsbonstartup",
+		Description: "Turn run selfbot on startup on or off",
+		Usage:       "[p]runsbonstartup <on/off>",
+		Handler:     c.runsbonstartup,
+	})
 }
 
 func (ConfigCommands) getcommandprefix(ctx *dgc.Ctx) {
@@ -2014,5 +2040,69 @@ func (ConfigCommands) hidetosystray(ctx *dgc.Ctx) {
 
 	embed.NewEmbed().
 		SetDescription("Turned " + toggle + " hide to system tray").
+		Send(ctx)
+}
+
+func (ConfigCommands) getrunonstartup(ctx *dgc.Ctx) {
+	cfg, err := config.GetConfig()
+	if err != nil {
+		_ = ctx.RespondText("Error getting config")
+		return
+	}
+
+	embed.NewEmbed().
+		AddField("Run On Startup", utils.Misc.FormatBoolOnOff(cfg.UI.RunOnStartup)).
+		Send(ctx)
+}
+
+func (ConfigCommands) runonstartup(ctx *dgc.Ctx) {
+	toggle := strings.ToLower(utils.Arguments["<on/off>"])
+	if toggle != "on" && toggle != "off" {
+		_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
+		return
+	}
+	cfg, err := config.GetConfig()
+	if err != nil {
+		_ = ctx.RespondText("Error getting config")
+		return
+	}
+
+	cfg.UI.RunOnStartup = toggle == "on"
+	_ = cfg.Save()
+
+	embed.NewEmbed().
+		SetDescription("Turned " + toggle + " run on startup").
+		Send(ctx)
+}
+
+func (ConfigCommands) getrunsbonstartup(ctx *dgc.Ctx) {
+	cfg, err := config.GetConfig()
+	if err != nil {
+		_ = ctx.RespondText("Error getting config")
+		return
+	}
+
+	embed.NewEmbed().
+		AddField("Run Selfbot On Startup", utils.Misc.FormatBoolOnOff(cfg.UI.RunSelfbotOnStartup)).
+		Send(ctx)
+}
+
+func (ConfigCommands) runsbonstartup(ctx *dgc.Ctx) {
+	toggle := strings.ToLower(utils.Arguments["<on/off>"])
+	if toggle != "on" && toggle != "off" {
+		_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
+		return
+	}
+	cfg, err := config.GetConfig()
+	if err != nil {
+		_ = ctx.RespondText("Error getting config")
+		return
+	}
+
+	cfg.UI.RunSelfbotOnStartup = toggle == "on"
+	_ = cfg.Save()
+
+	embed.NewEmbed().
+		SetDescription("Turned " + toggle + " run selfbot on startup").
 		Send(ctx)
 }
