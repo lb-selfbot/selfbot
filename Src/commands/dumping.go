@@ -158,7 +158,7 @@ func (*DumpingCommands) dumpimages(ctx *dgc.Ctx) {
 
 			filePath := filepath.Join(folder, utils.IO.SanitizeFilename(attachment.Filename))
 
-			httpResponse := http.Get(utils.Misc.Or(attachment.ProxyURL, attachment.URL))
+			httpResponse := http.Get(utils.Misc.Or(attachment.URL, attachment.ProxyURL))
 			if httpResponse.Error != nil {
 				continue
 			}
@@ -199,7 +199,7 @@ func (*DumpingCommands) dumpvideos(ctx *dgc.Ctx) {
 
 			filePath := filepath.Join(folder, utils.IO.SanitizeFilename(attachment.Filename))
 
-			httpResponse := http.Get(utils.Misc.Or(attachment.ProxyURL, attachment.URL))
+			httpResponse := http.Get(utils.Misc.Or(attachment.URL, attachment.ProxyURL))
 			if httpResponse.Error != nil {
 				continue
 			}
@@ -240,7 +240,7 @@ func (*DumpingCommands) dumpaudio(ctx *dgc.Ctx) {
 
 			filePath := filepath.Join(folder, utils.IO.SanitizeFilename(attachment.Filename))
 
-			httpResponse := http.Get(utils.Misc.Or(attachment.ProxyURL, attachment.URL))
+			httpResponse := http.Get(utils.Misc.Or(attachment.URL, attachment.ProxyURL))
 			if httpResponse.Error != nil {
 				continue
 			}
@@ -281,7 +281,7 @@ func (*DumpingCommands) dumptext(ctx *dgc.Ctx) {
 
 			filePath := filepath.Join(folder, utils.IO.SanitizeFilename(attachment.Filename))
 
-			httpResponse := http.Get(utils.Misc.Or(attachment.ProxyURL, attachment.URL))
+			httpResponse := http.Get(utils.Misc.Or(attachment.URL, attachment.ProxyURL))
 			if httpResponse.Error != nil {
 				continue
 			}
@@ -318,7 +318,7 @@ func (*DumpingCommands) dumpattachments(ctx *dgc.Ctx) {
 		for _, attachment := range message.Attachments {
 			filePath := filepath.Join(folder, utils.IO.SanitizeFilename(attachment.Filename))
 
-			httpResponse := http.Get(utils.Misc.Or(attachment.ProxyURL, attachment.URL))
+			httpResponse := http.Get(utils.Misc.Or(attachment.URL, attachment.ProxyURL))
 			if httpResponse.Error != nil {
 				continue
 			}
