@@ -86,8 +86,8 @@ func (*IOUtils) WriteBytes(filePath string, data []byte) error {
 	return nil
 }
 
-func (f *IOUtils) Write(filePath, content string) error {
-	return f.WriteBytes(filePath, []byte(content))
+func (i *IOUtils) Write(filePath, content string) error {
+	return i.WriteBytes(filePath, []byte(content))
 }
 
 func (*IOUtils) GetMainFolder() string {
