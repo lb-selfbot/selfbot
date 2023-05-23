@@ -260,6 +260,11 @@ func CheckGiveawaySniper(session *discordgo.Session, message *discordgo.Message,
 		if len(endsUnixList) > 1 {
 			endsUnix, _ = strconv.ParseInt(endsUnixList[1], 10, 64)
 		}
+
+		if endsUnix == 0 {
+			break
+		}
+
 		endsIn := utils.Misc.FormatDuration(time.Until(time.Unix(endsUnix, 0)))
 		prize := message.Embeds[0].Title
 		if isPrizeBlacklisted(prize, cfg) {
