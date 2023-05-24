@@ -566,8 +566,6 @@ func (UtilityCommands) copychannel(ctx *dgc.Ctx) {
 
 		time.Sleep(750 * time.Millisecond)
 
-		fmt.Println(i, err)
-
 		requests++
 
 		if requests >= rateLimit && time.Since(start).Seconds() < 60 {
