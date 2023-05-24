@@ -538,7 +538,7 @@ func (UtilityCommands) copychannel(ctx *dgc.Ctx) {
 	rateLimit := 30
 	start := time.Now()
 
-	for i, message := range messages {
+	for _, message := range messages {
 		attachmentList := []string{}
 
 		for _, attachment := range message.Attachments {
