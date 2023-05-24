@@ -12,6 +12,7 @@ import (
 	"os"
 	"os/exec"
 	"runtime"
+	"sort"
 	"strconv"
 	"strings"
 	"time"
@@ -42,6 +43,12 @@ func (u UtilityCommands) RegisterCommands(router *dgc.Router) {
 		Description: "Make an exact copy of a server",
 		Usage:       "[p]copyserver [server id]",
 		Handler:     u.copyserver,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "copychannel",
+		Description: "Make an exact copy of a channel",
+		Usage:       "[p]copychannel <source channel> <dest channel> [limit]",
+		Handler:     u.copychannel,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "leaveservers",
@@ -477,6 +484,98 @@ func (UtilityCommands) copyserver(ctx *dgc.Ctx) {
 	embed.NewEmbed().
 		SetDescription("Server copied successfully!").
 		Send(ctx)
+}
+
+func (UtilityCommands) copychannel(ctx *dgc.Ctx) {
+	sourceChannel, success := utils.Discord.TryGetChannelFromMention(ctx, ctx.Arguments.Get(0))
+	if !success {
+		_ = ctx.RespondText("Could not find channel")
+		return
+	}
+
+	destChannel, success := utils.Discord.TryGetChannelFromMention(ctx, ctx.Arguments.Get(1))
+	if !success {
+		_ = ctx.RespondText("Could not find channel")
+		return
+	}
+
+	limit, err := ctx.Arguments.Get(2).AsInt()
+	if err != nil {
+		limit = 100
+	}
+
+	if limit < 1 {
+		_ = ctx.RespondText("Limit must be greater than 0")
+		return
+	}
+
+	messages, err := utils.Discord.GetChannelMessages(ctx.Session, sourceChannel.ID, limit)
+	if err != nil {
+		_ = ctx.RespondText("Error getting source messages: " + err.Error())
+		return
+	}
+
+	sort.Slice(messages, func(i, j int) bool {
+		timeI := utils.Discord.SnowflakeToTime(messages[i].ID)
+		timeJ := utils.Discord.SnowflakeToTime(messages[j].ID)
+		
+		return timeI.Before(timeJ)
+	})
+
+	_ = ctx.RespondText(fmt.Sprintf(
+		"Copying %d messages...\n\nEstimated time required: %s",
+		len(messages),
+		time.Duration(len(messages)*2)*time.Second,
+	))
+
+	webhook, err := ctx.Session.WebhookCreate(destChannel.ID, "LightningBot - Copy Channel", "")
+	if err != nil {
+		_ = ctx.RespondText("Error creating destination webhook: " + err.Error())
+		return
+	}
+
+	requests := 0
+	rateLimit := 30
+	start := time.Now()
+
+	for i, message := range messages {
+		attachmentList := []string{}
+
+		for _, attachment := range message.Attachments {
+			attachmentList = append(attachmentList, attachment.URL)
+		}
+
+		attachments := "\n" + strings.Join(attachmentList, "\n")
+		
+		maxLength := 2000-len(attachments)
+		length := int(math.Min(float64(len(message.Content)), float64(maxLength)))
+
+		content := message.Content[:length] + "\n" + attachments
+
+		_, err := ctx.Session.WebhookExecute(webhook.ID, webhook.Token, false, &discordgo.WebhookParams{
+			Content:    content,
+			Username:   message.Author.Username,
+			AvatarURL:  message.Author.AvatarURL(""),
+			TTS:        message.TTS,
+			Components: message.Components,
+			Embeds:     message.Embeds,
+		})
+		if err != nil {
+			_ = ctx.RespondText("Error sending message: " + err.Error())
+		}
+
+		time.Sleep(750 * time.Millisecond)
+
+		fmt.Println(i, err)
+
+		requests++
+
+		if requests >= rateLimit && time.Since(start).Seconds() < 60 {
+			time.Sleep(time.Duration(60-time.Since(start).Seconds()) * time.Second)
+			requests = 0
+			start = time.Now()
+		}
+	}
 }
 
 func (UtilityCommands) leaveservers(ctx *dgc.Ctx) {

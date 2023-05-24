@@ -7,6 +7,7 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/LightningDev1/LB-Selfbot/constants"
@@ -17,17 +18,35 @@ import (
 
 var Arguments = make(map[string]string)
 
+var Users = sync.Map{}
+var nilUser = &discordgo.User{}
+
 type DiscordUtils struct{}
 
 func (DiscordUtils) TryGetUserFromMention(session *discordgo.Session, mention *dgc.Argument) (*discordgo.User, bool) {
 	userID := Misc.Or(mention.AsUserMentionID(), mention.Raw())
+
+	if user, ok := Users.Load(userID); ok {
+		if user == nilUser {
+			return nil, false
+		}
+
+		return user.(*discordgo.User), true
+	}
+
 	user, err := session.State.GetUser(userID)
 	if err != nil {
+		var err error
+
 		user, err = session.User(userID)
+		if err != nil {
+			Users.Store(userID, nilUser)
+			return nil, false
+		}
 	}
-	if err != nil {
-		return nil, false
-	}
+
+	Users.Store(userID, user)
+
 	return user, true
 }
 
