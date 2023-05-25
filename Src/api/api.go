@@ -333,9 +333,9 @@ func ClydeAI(message string) (string, error) {
 	}
 
 	data := map[string]string{
-		"message":  message,
 		"username": cfg.Account.LightningBot.Username,
 		"password": cfg.Account.LightningBot.Password,
+		"message":  message,
 	}
 
 	httpResult := http.PostJson("https://api.lightning-bot.com/api/v3/selfbot/clyde", data)
@@ -346,6 +346,28 @@ func ClydeAI(message string) (string, error) {
 	json := httpResult.Json()
 
 	return json.Get("response").String()
+}
+
+func OCR(image string) (string, error) {
+	cfg, err := config.GetConfig()
+	if err != nil {
+		return "", err
+	}
+
+	data := map[string]string{
+		"username": cfg.Account.LightningBot.Username,
+		"password": cfg.Account.LightningBot.Password,
+		"image":    image,
+	}
+
+	httpResult := http.PostJson("https://api.lightning-bot.com/api/v3/selfbot/ocr", data)
+	if httpResult.Error != nil {
+		return "", httpResult.Error
+	}
+
+	json := httpResult.Json()
+
+	return json.Get("text").String()
 }
 
 func AllowFriendRequestsFrom(session *discordgo.Session, types []string) error {

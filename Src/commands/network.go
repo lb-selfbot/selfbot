@@ -222,6 +222,18 @@ func (n NetworkCommands) RegisterCommands(router *dgc.Router) {
 		Usage:       "[p]clydeai <message>",
 		Handler:     n.clydeai,
 	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "ocrlink",
+		Description: "Extract text from an image URL",
+		Usage:       "[p]ocrlink <link>",
+		Handler:     n.ocrlink,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "ocrfile",
+		Description: "Extract text from an image file",
+		Usage:       "[p]ocrfile [attachment]",
+		Handler:     n.ocrfile,
+	})
 }
 
 func (NetworkCommands) ping(ctx *dgc.Ctx) {
@@ -893,5 +905,40 @@ func (NetworkCommands) clydeai(ctx *dgc.Ctx) {
 		SetTitle("Clyde AI").
 		AddField("Message", ctx.Arguments.Raw()).
 		AddField("Response", response).
+		Send(ctx)
+}
+
+func (NetworkCommands) ocrlink(ctx *dgc.Ctx) {
+	text, err := api.OCR(ctx.Arguments.Raw())
+	if err != nil {
+		_ = ctx.RespondText("Error getting response: " + err.Error())
+		return
+	}
+
+	embed.NewEmbed().
+		SetTitle("OCR").
+		AddField("URL", ctx.Arguments.Raw()).
+		AddField("Extracted Text", text).
+		Send(ctx)
+}
+
+func (NetworkCommands) ocrfile(ctx *dgc.Ctx) {
+	attachments := ctx.Event.Message.Attachments
+
+	if len(attachments) == 0 {
+		_ = ctx.RespondText("Error: you must provide an image as an attachment.")
+		return
+	}
+
+	text, err := api.OCR(attachments[0].URL)
+	if err != nil {
+		_ = ctx.RespondText("Error getting response: " + err.Error())
+		return
+	}
+
+	embed.NewEmbed().
+		SetTitle("OCR").
+		AddField("URL", attachments[0].URL).
+		AddField("Extracted Text", text).
 		Send(ctx)
 }
