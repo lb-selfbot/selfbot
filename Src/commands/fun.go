@@ -673,7 +673,7 @@ func (FunCommands) advice(ctx *dgc.Ctx) {
 }
 
 func (FunCommands) catfact(ctx *dgc.Ctx) {
-	fact, err := http.GetJson("https://some-random-api.ml/facts/cat")
+	fact, err := http.GetJson("https://some-random-api.com/facts/cat")
 	if err != nil {
 		_ = ctx.RespondText("An error has occurred.")
 		return
@@ -684,7 +684,7 @@ func (FunCommands) catfact(ctx *dgc.Ctx) {
 }
 
 func (FunCommands) dogfact(ctx *dgc.Ctx) {
-	fact, err := http.GetJson("https://some-random-api.ml/facts/dog")
+	fact, err := http.GetJson("https://some-random-api.com/facts/dog")
 	if err != nil {
 		_ = ctx.RespondText("An error has occurred.")
 		return
@@ -695,7 +695,7 @@ func (FunCommands) dogfact(ctx *dgc.Ctx) {
 }
 
 func (FunCommands) pandafact(ctx *dgc.Ctx) {
-	fact, err := http.GetJson("https://some-random-api.ml/facts/panda")
+	fact, err := http.GetJson("https://some-random-api.com/facts/panda")
 	if err != nil {
 		_ = ctx.RespondText("An error has occurred.")
 		return
@@ -706,7 +706,7 @@ func (FunCommands) pandafact(ctx *dgc.Ctx) {
 }
 
 func (FunCommands) foxfact(ctx *dgc.Ctx) {
-	fact, err := http.GetJson("https://some-random-api.ml/facts/fox")
+	fact, err := http.GetJson("https://some-random-api.com/facts/fox")
 	if err != nil {
 		_ = ctx.RespondText("An error has occurred.")
 		return
@@ -717,7 +717,7 @@ func (FunCommands) foxfact(ctx *dgc.Ctx) {
 }
 
 func (FunCommands) koalafact(ctx *dgc.Ctx) {
-	fact, err := http.GetJson("https://some-random-api.ml/facts/koala")
+	fact, err := http.GetJson("https://some-random-api.com/facts/koala")
 	if err != nil {
 		_ = ctx.RespondText("An error has occurred.")
 		return
@@ -1090,7 +1090,7 @@ func (FunCommands) feed(ctx *dgc.Ctx) {
 }
 
 func (FunCommands) wink(ctx *dgc.Ctx) {
-	url, err := utils.Misc.GetImageUrlFromJson("https://some-random-api.ml/animu/wink", "link")
+	url, err := utils.Misc.GetImageUrlFromJson("https://some-random-api.com/animu/wink", "link")
 	if err != nil {
 		_ = ctx.RespondText("An error has occurred.")
 		return
@@ -1268,7 +1268,7 @@ func (FunCommands) randomquestion(ctx *dgc.Ctx) {
 }
 
 func (FunCommands) lyrics(ctx *dgc.Ctx) {
-	lyrics, err := http.GetJson("https://some-random-api.ml/lyrics?title=" + url.QueryEscape(ctx.Arguments.Raw()))
+	lyrics, err := http.GetJson("https://some-random-api.com/lyrics?title=" + url.QueryEscape(ctx.Arguments.Raw()))
 	if err != nil {
 		_ = ctx.RespondText("An error has occurred.")
 		return

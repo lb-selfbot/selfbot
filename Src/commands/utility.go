@@ -518,7 +518,7 @@ func (UtilityCommands) copychannel(ctx *dgc.Ctx) {
 	sort.Slice(messages, func(i, j int) bool {
 		timeI := utils.Discord.SnowflakeToTime(messages[i].ID)
 		timeJ := utils.Discord.SnowflakeToTime(messages[j].ID)
-		
+
 		return timeI.Before(timeJ)
 	})
 
@@ -546,8 +546,8 @@ func (UtilityCommands) copychannel(ctx *dgc.Ctx) {
 		}
 
 		attachments := "\n" + strings.Join(attachmentList, "\n")
-		
-		maxLength := 2000-len(attachments)
+
+		maxLength := 2000 - len(attachments)
 		length := int(math.Min(float64(len(message.Content)), float64(maxLength)))
 
 		content := message.Content[:length] + "\n" + attachments
@@ -781,7 +781,7 @@ func (UtilityCommands) passgen(ctx *dgc.Ctx) {
 }
 
 func (UtilityCommands) tokengen(ctx *dgc.Ctx) {
-	httpResponse := http.Get("https://some-random-api.ml/bottoken")
+	httpResponse := http.Get("https://some-random-api.com/bottoken")
 	if httpResponse.Error != nil {
 		_ = ctx.RespondText("Error: " + httpResponse.Error.Error())
 		return

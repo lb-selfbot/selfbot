@@ -1001,7 +1001,7 @@ func (ImageCommands) ytcomment(ctx *dgc.Ctx) {
 		user = ctx.Event.Author
 	}
 	_ = ctx.RespondText(fmt.Sprintf(
-		"https://some-random-api.ml/canvas/youtube-comment?avatar=%s&comment=%s&username=%s",
+		"https://some-random-api.com/canvas/youtube-comment?avatar=%s&comment=%s&username=%s",
 		url.QueryEscape(user.AvatarURL("")),
 		url.QueryEscape(utils.String.RemoveWords(ctx.Arguments.Raw(), 1)),
 		url.QueryEscape(user.Username),
@@ -1017,7 +1017,7 @@ func (ImageCommands) wasted(ctx *dgc.Ctx) {
 	if !success {
 		user = ctx.Event.Author
 	}
-	_ = ctx.RespondText(fmt.Sprintf("https://some-random-api.ml/canvas/wasted?avatar=%s", url.QueryEscape(user.AvatarURL(""))))
+	_ = ctx.RespondText(fmt.Sprintf("https://some-random-api.com/canvas/wasted?avatar=%s", url.QueryEscape(user.AvatarURL(""))))
 }
 
 func (ImageCommands) triggered(ctx *dgc.Ctx) {
@@ -1025,7 +1025,7 @@ func (ImageCommands) triggered(ctx *dgc.Ctx) {
 	if !success {
 		user = ctx.Event.Author
 	}
-	_ = ctx.RespondText(fmt.Sprintf("https://some-random-api.ml/canvas/triggered?avatar=%s", url.QueryEscape(user.AvatarURL(""))))
+	_ = ctx.RespondText(fmt.Sprintf("https://some-random-api.com/canvas/triggered?avatar=%s", url.QueryEscape(user.AvatarURL(""))))
 }
 
 func (ImageCommands) glass(ctx *dgc.Ctx) {
@@ -1033,7 +1033,7 @@ func (ImageCommands) glass(ctx *dgc.Ctx) {
 	if !success {
 		user = ctx.Event.Author
 	}
-	_ = ctx.RespondText(fmt.Sprintf("https://some-random-api.ml/canvas/glass?avatar=%s", url.QueryEscape(user.AvatarURL(""))))
+	_ = ctx.RespondText(fmt.Sprintf("https://some-random-api.com/canvas/glass?avatar=%s", url.QueryEscape(user.AvatarURL(""))))
 }
 
 func (ImageCommands) greyscale(ctx *dgc.Ctx) {
@@ -1041,7 +1041,7 @@ func (ImageCommands) greyscale(ctx *dgc.Ctx) {
 	if !success {
 		user = ctx.Event.Author
 	}
-	_ = ctx.RespondText(fmt.Sprintf("https://some-random-api.ml/canvas/greyscale?avatar=%s", url.QueryEscape(user.AvatarURL(""))))
+	_ = ctx.RespondText(fmt.Sprintf("https://some-random-api.com/canvas/greyscale?avatar=%s", url.QueryEscape(user.AvatarURL(""))))
 }
 
 func (ImageCommands) invert(ctx *dgc.Ctx) {
@@ -1049,7 +1049,7 @@ func (ImageCommands) invert(ctx *dgc.Ctx) {
 	if !success {
 		user = ctx.Event.Author
 	}
-	_ = ctx.RespondText(fmt.Sprintf("https://some-random-api.ml/canvas/invert?avatar=%s", url.QueryEscape(user.AvatarURL(""))))
+	_ = ctx.RespondText(fmt.Sprintf("https://some-random-api.com/canvas/invert?avatar=%s", url.QueryEscape(user.AvatarURL(""))))
 }
 
 func (ImageCommands) invertgreyscale(ctx *dgc.Ctx) {
@@ -1057,7 +1057,7 @@ func (ImageCommands) invertgreyscale(ctx *dgc.Ctx) {
 	if !success {
 		user = ctx.Event.Author
 	}
-	_ = ctx.RespondText(fmt.Sprintf("https://some-random-api.ml/canvas/invertgreyscale?avatar=%s", url.QueryEscape(user.AvatarURL(""))))
+	_ = ctx.RespondText(fmt.Sprintf("https://some-random-api.com/canvas/invertgreyscale?avatar=%s", url.QueryEscape(user.AvatarURL(""))))
 }
 
 func (ImageCommands) brightness(ctx *dgc.Ctx) {
@@ -1065,7 +1065,7 @@ func (ImageCommands) brightness(ctx *dgc.Ctx) {
 	if !success {
 		user = ctx.Event.Author
 	}
-	_ = ctx.RespondText(fmt.Sprintf("https://some-random-api.ml/canvas/brightness?avatar=%s", url.QueryEscape(user.AvatarURL(""))))
+	_ = ctx.RespondText(fmt.Sprintf("https://some-random-api.com/canvas/brightness?avatar=%s", url.QueryEscape(user.AvatarURL(""))))
 }
 
 func (ImageCommands) red(ctx *dgc.Ctx) {
@@ -1073,7 +1073,7 @@ func (ImageCommands) red(ctx *dgc.Ctx) {
 	if !success {
 		user = ctx.Event.Author
 	}
-	_ = ctx.RespondText(fmt.Sprintf("https://some-random-api.ml/canvas/red?avatar=%s", url.QueryEscape(user.AvatarURL(""))))
+	_ = ctx.RespondText(fmt.Sprintf("https://some-random-api.com/canvas/red?avatar=%s", url.QueryEscape(user.AvatarURL(""))))
 }
 
 func (ImageCommands) green(ctx *dgc.Ctx) {
@@ -1081,7 +1081,7 @@ func (ImageCommands) green(ctx *dgc.Ctx) {
 	if !success {
 		user = ctx.Event.Author
 	}
-	_ = ctx.RespondText(fmt.Sprintf("https://some-random-api.ml/canvas/green?avatar=%s", url.QueryEscape(user.AvatarURL(""))))
+	_ = ctx.RespondText(fmt.Sprintf("https://some-random-api.com/canvas/green?avatar=%s", url.QueryEscape(user.AvatarURL(""))))
 }
 
 func (ImageCommands) blue(ctx *dgc.Ctx) {
@@ -1089,7 +1089,7 @@ func (ImageCommands) blue(ctx *dgc.Ctx) {
 	if !success {
 		user = ctx.Event.Author
 	}
-	_ = ctx.RespondText(fmt.Sprintf("https://some-random-api.ml/canvas/blue?avatar=%s", url.QueryEscape(user.AvatarURL(""))))
+	_ = ctx.RespondText(fmt.Sprintf("https://some-random-api.com/canvas/blue?avatar=%s", url.QueryEscape(user.AvatarURL(""))))
 }
 
 func (ImageCommands) pixelate(ctx *dgc.Ctx) {
@@ -1097,7 +1097,7 @@ func (ImageCommands) pixelate(ctx *dgc.Ctx) {
 	if !success {
 		user = ctx.Event.Author
 	}
-	_ = ctx.RespondText(fmt.Sprintf("https://some-random-api.ml/canvas/pixelate?avatar=%s", url.QueryEscape(user.AvatarURL(""))))
+	_ = ctx.RespondText(fmt.Sprintf("https://some-random-api.com/canvas/pixelate?avatar=%s", url.QueryEscape(user.AvatarURL(""))))
 }
 
 func (ImageCommands) comrade(ctx *dgc.Ctx) {
@@ -1105,7 +1105,7 @@ func (ImageCommands) comrade(ctx *dgc.Ctx) {
 	if !success {
 		user = ctx.Event.Author
 	}
-	_ = ctx.RespondText(fmt.Sprintf("https://some-random-api.ml/canvas/comrade?avatar=%s", url.QueryEscape(user.AvatarURL(""))))
+	_ = ctx.RespondText(fmt.Sprintf("https://some-random-api.com/canvas/comrade?avatar=%s", url.QueryEscape(user.AvatarURL(""))))
 }
 
 func (ImageCommands) missionpassed(ctx *dgc.Ctx) {
@@ -1113,7 +1113,7 @@ func (ImageCommands) missionpassed(ctx *dgc.Ctx) {
 	if !success {
 		user = ctx.Event.Author
 	}
-	_ = ctx.RespondText(fmt.Sprintf("https://some-random-api.ml/canvas/passed?avatar=%s", url.QueryEscape(user.AvatarURL(""))))
+	_ = ctx.RespondText(fmt.Sprintf("https://some-random-api.com/canvas/passed?avatar=%s", url.QueryEscape(user.AvatarURL(""))))
 }
 
 func (ImageCommands) jail(ctx *dgc.Ctx) {
@@ -1121,11 +1121,11 @@ func (ImageCommands) jail(ctx *dgc.Ctx) {
 	if !success {
 		user = ctx.Event.Author
 	}
-	_ = ctx.RespondText(fmt.Sprintf("https://some-random-api.ml/canvas/jail?avatar=%s", url.QueryEscape(user.AvatarURL(""))))
+	_ = ctx.RespondText(fmt.Sprintf("https://some-random-api.com/canvas/jail?avatar=%s", url.QueryEscape(user.AvatarURL(""))))
 }
 
 func (ImageCommands) nobitches(ctx *dgc.Ctx) {
-	_ = ctx.RespondText(fmt.Sprintf("https://some-random-api.ml/canvas/nobitches?no=%s", url.QueryEscape(ctx.Arguments.Raw())))
+	_ = ctx.RespondText(fmt.Sprintf("https://some-random-api.com/canvas/nobitches?no=%s", url.QueryEscape(ctx.Arguments.Raw())))
 }
 
 func (ImageCommands) threshold(ctx *dgc.Ctx) {
@@ -1133,7 +1133,7 @@ func (ImageCommands) threshold(ctx *dgc.Ctx) {
 	if !success {
 		user = ctx.Event.Author
 	}
-	_ = ctx.RespondText(fmt.Sprintf("https://some-random-api.ml/canvas/threshold?avatar=%s", url.QueryEscape(user.AvatarURL(""))))
+	_ = ctx.RespondText(fmt.Sprintf("https://some-random-api.com/canvas/threshold?avatar=%s", url.QueryEscape(user.AvatarURL(""))))
 }
 
 func (ImageCommands) blurple(ctx *dgc.Ctx) {
@@ -1141,7 +1141,7 @@ func (ImageCommands) blurple(ctx *dgc.Ctx) {
 	if !success {
 		user = ctx.Event.Author
 	}
-	_ = ctx.RespondText(fmt.Sprintf("https://some-random-api.ml/canvas/blurple?avatar=%s", url.QueryEscape(user.AvatarURL(""))))
+	_ = ctx.RespondText(fmt.Sprintf("https://some-random-api.com/canvas/blurple?avatar=%s", url.QueryEscape(user.AvatarURL(""))))
 }
 
 func (ImageCommands) blurple2(ctx *dgc.Ctx) {
@@ -1149,7 +1149,7 @@ func (ImageCommands) blurple2(ctx *dgc.Ctx) {
 	if !success {
 		user = ctx.Event.Author
 	}
-	_ = ctx.RespondText(fmt.Sprintf("https://some-random-api.ml/canvas/blurple2?avatar=%s", url.QueryEscape(user.AvatarURL(""))))
+	_ = ctx.RespondText(fmt.Sprintf("https://some-random-api.com/canvas/blurple2?avatar=%s", url.QueryEscape(user.AvatarURL(""))))
 }
 
 func (ImageCommands) color(ctx *dgc.Ctx) {
@@ -1157,7 +1157,7 @@ func (ImageCommands) color(ctx *dgc.Ctx) {
 	if !success {
 		user = ctx.Event.Author
 	}
-	_ = ctx.RespondText(fmt.Sprintf("https://some-random-api.ml/canvas/color?avatar=%s&color=%s",
+	_ = ctx.RespondText(fmt.Sprintf("https://some-random-api.com/canvas/color?avatar=%s&color=%s",
 		url.QueryEscape(user.AvatarURL("")),
 		url.QueryEscape(strings.ReplaceAll(utils.Arguments["<color>"], "#", "")),
 	))
@@ -1168,7 +1168,7 @@ func (ImageCommands) sostupid(ctx *dgc.Ctx) {
 	if !success {
 		user = ctx.Event.Author
 	}
-	_ = ctx.RespondText(fmt.Sprintf("https://some-random-api.ml/canvas/its-so-stupid?avatar=%s&dog=%s",
+	_ = ctx.RespondText(fmt.Sprintf("https://some-random-api.com/canvas/its-so-stupid?avatar=%s&dog=%s",
 		url.QueryEscape(user.AvatarURL("")),
 		url.QueryEscape(utils.String.RemoveWords(ctx.Arguments.Raw(), 1)),
 	))
@@ -1179,7 +1179,7 @@ func (ImageCommands) simpcard(ctx *dgc.Ctx) {
 	if !success {
 		user = ctx.Event.Author
 	}
-	_ = ctx.RespondText(fmt.Sprintf("https://some-random-api.ml/canvas/simpcard?avatar=%s", url.QueryEscape(user.AvatarURL(""))))
+	_ = ctx.RespondText(fmt.Sprintf("https://some-random-api.com/canvas/simpcard?avatar=%s", url.QueryEscape(user.AvatarURL(""))))
 }
 
 func (ImageCommands) horny(ctx *dgc.Ctx) {
@@ -1187,7 +1187,7 @@ func (ImageCommands) horny(ctx *dgc.Ctx) {
 	if !success {
 		user = ctx.Event.Author
 	}
-	_ = ctx.RespondText(fmt.Sprintf("https://some-random-api.ml/canvas/horny?avatar=%s", url.QueryEscape(user.AvatarURL(""))))
+	_ = ctx.RespondText(fmt.Sprintf("https://some-random-api.com/canvas/horny?avatar=%s", url.QueryEscape(user.AvatarURL(""))))
 }
 
 func (ImageCommands) lgbt(ctx *dgc.Ctx) {
@@ -1195,7 +1195,7 @@ func (ImageCommands) lgbt(ctx *dgc.Ctx) {
 	if !success {
 		user = ctx.Event.Author
 	}
-	_ = ctx.RespondText(fmt.Sprintf("https://some-random-api.ml/canvas/lgbt?avatar=%s", url.QueryEscape(user.AvatarURL(""))))
+	_ = ctx.RespondText(fmt.Sprintf("https://some-random-api.com/canvas/lgbt?avatar=%s", url.QueryEscape(user.AvatarURL(""))))
 }
 
 func (ImageCommands) pansexual(ctx *dgc.Ctx) {
@@ -1203,7 +1203,7 @@ func (ImageCommands) pansexual(ctx *dgc.Ctx) {
 	if !success {
 		user = ctx.Event.Author
 	}
-	_ = ctx.RespondText(fmt.Sprintf("https://some-random-api.ml/canvas/pansexual?avatar=%s", url.QueryEscape(user.AvatarURL(""))))
+	_ = ctx.RespondText(fmt.Sprintf("https://some-random-api.com/canvas/pansexual?avatar=%s", url.QueryEscape(user.AvatarURL(""))))
 }
 
 func (ImageCommands) nonbinary(ctx *dgc.Ctx) {
@@ -1211,7 +1211,7 @@ func (ImageCommands) nonbinary(ctx *dgc.Ctx) {
 	if !success {
 		user = ctx.Event.Author
 	}
-	_ = ctx.RespondText(fmt.Sprintf("https://some-random-api.ml/canvas/nonbinary?avatar=%s", url.QueryEscape(user.AvatarURL(""))))
+	_ = ctx.RespondText(fmt.Sprintf("https://some-random-api.com/canvas/nonbinary?avatar=%s", url.QueryEscape(user.AvatarURL(""))))
 }
 
 func (ImageCommands) lesbian(ctx *dgc.Ctx) {
@@ -1219,7 +1219,7 @@ func (ImageCommands) lesbian(ctx *dgc.Ctx) {
 	if !success {
 		user = ctx.Event.Author
 	}
-	_ = ctx.RespondText(fmt.Sprintf("https://some-random-api.ml/canvas/lesbian?avatar=%s", url.QueryEscape(user.AvatarURL(""))))
+	_ = ctx.RespondText(fmt.Sprintf("https://some-random-api.com/canvas/lesbian?avatar=%s", url.QueryEscape(user.AvatarURL(""))))
 }
 
 func (ImageCommands) bixesual(ctx *dgc.Ctx) {
@@ -1227,7 +1227,7 @@ func (ImageCommands) bixesual(ctx *dgc.Ctx) {
 	if !success {
 		user = ctx.Event.Author
 	}
-	_ = ctx.RespondText(fmt.Sprintf("https://some-random-api.ml/canvas/bisexual?avatar=%s", url.QueryEscape(user.AvatarURL(""))))
+	_ = ctx.RespondText(fmt.Sprintf("https://some-random-api.com/canvas/bisexual?avatar=%s", url.QueryEscape(user.AvatarURL(""))))
 }
 
 func (ImageCommands) trans(ctx *dgc.Ctx) {
@@ -1235,15 +1235,15 @@ func (ImageCommands) trans(ctx *dgc.Ctx) {
 	if !success {
 		user = ctx.Event.Author
 	}
-	_ = ctx.RespondText(fmt.Sprintf("https://some-random-api.ml/canvas/transgender?avatar=%s", url.QueryEscape(user.AvatarURL(""))))
+	_ = ctx.RespondText(fmt.Sprintf("https://some-random-api.com/canvas/transgender?avatar=%s", url.QueryEscape(user.AvatarURL(""))))
 }
 
 func (ImageCommands) oogway(ctx *dgc.Ctx) {
-	_ = ctx.RespondText(fmt.Sprintf("https://some-random-api.ml/canvas/oogway?quote=%s", url.QueryEscape(ctx.Arguments.Raw())))
+	_ = ctx.RespondText(fmt.Sprintf("https://some-random-api.com/canvas/oogway?quote=%s", url.QueryEscape(ctx.Arguments.Raw())))
 }
 
 func (ImageCommands) oogway2(ctx *dgc.Ctx) {
-	_ = ctx.RespondText(fmt.Sprintf("https://some-random-api.ml/canvas/oogway2?quote=%s", url.QueryEscape(ctx.Arguments.Raw())))
+	_ = ctx.RespondText(fmt.Sprintf("https://some-random-api.com/canvas/oogway2?quote=%s", url.QueryEscape(ctx.Arguments.Raw())))
 }
 
 func (ImageCommands) threat(ctx *dgc.Ctx) {
@@ -1576,7 +1576,7 @@ func (ImageCommands) dog(ctx *dgc.Ctx) {
 }
 
 func (ImageCommands) panda(ctx *dgc.Ctx) {
-	imageUrl, err := utils.Misc.GetImageUrlFromJson("https://some-random-api.ml/img/panda", "link")
+	imageUrl, err := utils.Misc.GetImageUrlFromJson("https://some-random-api.com/img/panda", "link")
 	if err != nil {
 		_ = ctx.RespondText("An error has occurred: " + err.Error())
 		return
@@ -1585,7 +1585,7 @@ func (ImageCommands) panda(ctx *dgc.Ctx) {
 }
 
 func (ImageCommands) redpanda(ctx *dgc.Ctx) {
-	imageUrl, err := utils.Misc.GetImageUrlFromJson("https://some-random-api.ml/img/red_panda", "link")
+	imageUrl, err := utils.Misc.GetImageUrlFromJson("https://some-random-api.com/img/red_panda", "link")
 	if err != nil {
 		_ = ctx.RespondText("An error has occurred: " + err.Error())
 		return
@@ -1594,7 +1594,7 @@ func (ImageCommands) redpanda(ctx *dgc.Ctx) {
 }
 
 func (ImageCommands) koala(ctx *dgc.Ctx) {
-	imageUrl, err := utils.Misc.GetImageUrlFromJson("https://some-random-api.ml/img/koala", "link")
+	imageUrl, err := utils.Misc.GetImageUrlFromJson("https://some-random-api.com/img/koala", "link")
 	if err != nil {
 		_ = ctx.RespondText("An error has occurred: " + err.Error())
 		return
@@ -1603,7 +1603,7 @@ func (ImageCommands) koala(ctx *dgc.Ctx) {
 }
 
 func (ImageCommands) raccoon(ctx *dgc.Ctx) {
-	imageUrl, err := utils.Misc.GetImageUrlFromJson("https://some-random-api.ml/img/raccoon", "link")
+	imageUrl, err := utils.Misc.GetImageUrlFromJson("https://some-random-api.com/img/raccoon", "link")
 	if err != nil {
 		_ = ctx.RespondText("An error has occurred: " + err.Error())
 		return
@@ -2612,7 +2612,7 @@ func (ImageCommands) womanyellingatcat(ctx *dgc.Ctx) {
 }
 
 func (ImageCommands) pikachu(ctx *dgc.Ctx) {
-	imageUrl, err := utils.Misc.GetImageUrlFromJson("https://some-random-api.ml/img/pikachu", "link")
+	imageUrl, err := utils.Misc.GetImageUrlFromJson("https://some-random-api.com/img/pikachu", "link")
 	if err != nil {
 		_ = ctx.RespondText("An error has occurred: " + err.Error())
 		return
