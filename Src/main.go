@@ -12,6 +12,8 @@ import (
 
 	"syscall"
 
+	_websocket "github.com/gorilla/websocket"
+
 	"github.com/LightningDev1/LB-Selfbot/assets"
 	"github.com/LightningDev1/LB-Selfbot/commands"
 	"github.com/LightningDev1/LB-Selfbot/config"
@@ -205,8 +207,12 @@ func main() {
 		cfg.Account.LightningBot.Password,
 	)
 	if err != nil {
+		if closeError, ok := err.(*_websocket.CloseError); ok {
+			onWebsocketError(err, closeError.Code)
+		}
+
 		logging.UI.Error("Error connecting to websocket: " + err.Error())
-		os.Exit(0)
+		os.Exit(1)
 	}
 	session.Token = cfg.Account.Discord.Token
 	session.ShouldSubscribeGuilds = false
