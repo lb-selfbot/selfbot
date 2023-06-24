@@ -25,12 +25,14 @@ type SniperInstance struct {
 
 func (s *SniperInstance) Start() error {
 	s.State = STATE_DISCONNECTED
+
 	session, err := discordgo.New(s.Token)
 	if err != nil {
 		return err
 	}
+
 	s.Session = session
-	s.Session.StateEnabled = false
+	s.Session.SetIdentify(discordgo.IdentifyDiscordClient)
 	s.Session.ShouldSubscribeGuilds = false
 
 	s.Session.AddHandler(func(_ *discordgo.Session, ready *discordgo.Ready) {
@@ -56,6 +58,8 @@ func (s *SniperInstance) Start() error {
 			eventhandlers.EventHandlers.Settings.SentNitroCodes,
 			s.Session.State.User.String(),
 		)
+
+		snipers.CheckGiveawaySniper(s.Session, m.Message, &cfg, s.Session.State.User.String())
 	})
 
 	s.Session.AddHandler(func(_ *discordgo.Session, m *discordgo.MessageUpdate) {
@@ -77,11 +81,14 @@ func (s *SniperInstance) Start() error {
 			eventhandlers.EventHandlers.Settings.SentNitroCodes,
 			s.Session.State.User.String(),
 		)
+
+		snipers.CheckGiveawaySniperEdit(s.Session, m.Message, &cfg, s.Session.State.User.String())
 	})
 
 	if err = s.Session.Open(); err == nil {
 		s.State = STATE_CONNECTING
 	}
+
 	return nil
 }
 
@@ -111,7 +118,7 @@ func Init(cfg config.Config) {
 
 	if len(SniperInstances) > 0 {
 		go func() {
-			time.Sleep(time.Second * 10)
+			time.Sleep(time.Second * 15)
 
 			guilds := 0
 

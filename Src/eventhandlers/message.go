@@ -25,7 +25,7 @@ func (e *Events) OnMessage(_ *discordgo.Session, m *discordgo.MessageCreate) {
 		return
 	}
 
-	if m.Type != discordgo.MessageTypeDefault && m.Type != discordgo.MessageTypeReply {
+	if m.Type != discordgo.MessageTypeDefault && m.Type != discordgo.MessageTypeReply && m.Type != discordgo.MessageTypeChatInputCommand {
 		return
 	}
 
@@ -81,7 +81,7 @@ func (e *Events) OnMessageEdit(_ *discordgo.Session, m *discordgo.MessageUpdate)
 		m.BeforeUpdate = message
 	}
 
-	if m.Type != discordgo.MessageTypeDefault && m.Type != discordgo.MessageTypeReply {
+	if m.Type != discordgo.MessageTypeDefault && m.Type != discordgo.MessageTypeReply && m.Type != discordgo.MessageTypeChatInputCommand {
 		return
 	}
 
@@ -100,6 +100,8 @@ func (e *Events) OnMessageEdit(_ *discordgo.Session, m *discordgo.MessageUpdate)
 		e.Settings.SentNitroCodes,
 		"",
 	)
+	
+	snipers.CheckGiveawaySniperEdit(e.Session, m.Message, &cfg, "")
 
 	e.checkIgnore(m.Message)
 	e.checkPhising(m.Message, &cfg)

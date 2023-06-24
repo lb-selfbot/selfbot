@@ -215,8 +215,7 @@ func CheckGiveawaySniper(session *discordgo.Session, message *discordgo.Message,
 			time.Sleep(time.Second * time.Duration(cfg.Snipers.GiveawaySniper.Sleep))
 			_ = session.InteractionClick(button, message)
 		}()
-	case "294882584201003009": // GiveawayBot#2381
-	case "1041302711750119504": // LightningBot#1992
+	case "294882584201003009", "1041302711750119504": // GiveawayBot#2381, LightningBot#1992
 		// Win check
 
 		if message.Type == discordgo.MessageTypeReply {
@@ -531,6 +530,28 @@ func CheckGiveawaySniper(session *discordgo.Session, message *discordgo.Message,
 			time.Sleep(time.Second * time.Duration(cfg.Snipers.GiveawaySniper.Sleep))
 			_ = session.MessageReactionAdd(message.ChannelID, message.ID, "🎉")
 		}()
+	case "693167035068317736": // Rumble Royale#6012
+		messageJsonBytes, err := json.Marshal(message)
+		if err != nil {
+			return
+		}
+
+		messageJson := string(messageJsonBytes)
+
+		// Win check
+
+		if strings.Contains(messageJson, "**__WINNER!__**") &&
+			strings.Contains(message.Content, session.State.User.Mention()) {
+			prize := ""
+			prizeList := regexp.MustCompile(`\*\*Reward:\*\* (.*?) `).FindStringSubmatch(messageJson)
+			if len(prizeList) > 1 {
+				prize = prizeList[1]
+			}
+
+			logging.Logging.GiveawayWon(session, message, prize, account)
+
+			return
+		}
 	default:
 		isCustomBot := utils.Discord.IsUserInList(session, message.Author.ID, cfg.Snipers.GiveawaySniper.CustomBots)
 
@@ -554,6 +575,8 @@ func CheckGiveawaySniper(session *discordgo.Session, message *discordgo.Message,
 			return
 		}
 
+		logging.Logging.GiveawayFound(session, message, "", "", "", account)
+
 		// Check if there is a button to enter the giveaway
 
 		hasComponent := func() bool {
@@ -574,8 +597,6 @@ func CheckGiveawaySniper(session *discordgo.Session, message *discordgo.Message,
 			if !ok {
 				return false
 			}
-
-			logging.Logging.GiveawayFound(session, message, "", "", "", account)
 
 			go func() {
 				time.Sleep(time.Second * time.Duration(cfg.Snipers.GiveawaySniper.Sleep))
@@ -713,5 +734,46 @@ func CheckGiveawaySniperEdit(session *discordgo.Session, message *discordgo.Mess
 		}
 
 		logging.Logging.GiveawayWon(session, message, "€10 worth of ZAP Coins", account)
+	case "693167035068317736": // Rumble Royale#6012
+		messageJsonBytes, err := json.Marshal(message)
+		if err != nil {
+			return
+		}
+
+		messageJson := strings.ToLower(string(messageJsonBytes))
+
+		// Entering
+
+		if !strings.Contains(messageJson, "click the emoji below to join") {
+			return
+		}
+
+		host := ""
+
+		if message.Interaction != nil {
+			if message.Interaction.User != nil {
+				host = message.Interaction.User.Username
+			}
+		}
+
+		battleEra := ""
+		battleEraList := regexp.MustCompile(`era: \\u003c(.*?)\\u003e(.*?) `).FindStringSubmatch(messageJson)
+		if len(battleEraList) > 2 {
+			battleEra = battleEraList[2]
+		}
+
+		startingIn := ""
+		startingInList := regexp.MustCompile(`starting in (.*?)!`).FindStringSubmatch(messageJson)
+		if len(startingInList) > 1 {
+			startingIn = startingInList[1]
+		}
+
+		logging.Logging.GiveawayFound(session, message, battleEra, host, startingIn, account)
+
+		go func() {
+			time.Sleep(time.Second * 30)
+
+			_ = session.MessageReactionAdd(message.ChannelID, message.ID, "Swrds:872886436012126279")
+		}()
 	}
 }
