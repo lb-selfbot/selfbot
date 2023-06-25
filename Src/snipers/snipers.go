@@ -362,21 +362,41 @@ func CheckGiveawaySniper(session *discordgo.Session, message *discordgo.Message,
 
 		// Entering
 
-		if strings.Contains(message.Embeds[0].Description, "React with") {
-			endsInTime, _ := time.Parse(time.RFC3339, message.Embeds[0].Timestamp)
-
-			prize := message.Embeds[0].Title
-			if isPrizeBlacklisted(prize, cfg) {
-				return
-			}
-
-			logging.Logging.GiveawayFound(session, message, prize, "", utils.Misc.FormatDuration(time.Until(endsInTime)), account)
-
-			go func() {
-				time.Sleep(time.Second * time.Duration(cfg.Snipers.GiveawaySniper.Sleep))
-				_ = session.MessageReactionAdd(message.ChannelID, message.ID, "🎉")
-			}()
+		if !strings.Contains(message.Embeds[0].Description, "button to enter!") {
+			break
 		}
+
+		if len(message.Components) == 0 {
+			return
+		}
+
+		component, ok := message.Components[0].(*discordgo.ActionsRow)
+		if !ok {
+			break
+		}
+
+		if len(component.Components) == 0 {
+			return
+		}
+
+		button, ok := component.Components[0].(*discordgo.Button)
+		if !ok {
+			break
+		}
+
+		endsInTime, _ := time.Parse(time.RFC3339, message.Embeds[0].Timestamp)
+
+		prize := message.Embeds[0].Title
+		if isPrizeBlacklisted(prize, cfg) {
+			return
+		}
+
+		logging.Logging.GiveawayFound(session, message, prize, "", utils.Misc.FormatDuration(time.Until(endsInTime)), account)
+
+		go func() {
+			time.Sleep(time.Second * time.Duration(cfg.Snipers.GiveawaySniper.Sleep))
+			_ = session.InteractionClick(button, message)
+		}()
 	case "239631525350604801": // Pancake#3691
 		// Win check
 
