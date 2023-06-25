@@ -13,7 +13,7 @@ import (
 type CustomActivityCommands struct{}
 
 func (r CustomActivityCommands) RegisterCommands(router *dgc.Router) {
-	router.StartCategory("Custom Activity", "Commands to set a custom Discord activity")
+	router.StartCategory("CustomActivity", "Commands to set a custom Discord activity")
 	router.RegisterCmd(&dgc.Command{
 		Name:        "caenabled",
 		Description: "Turn Custom Activity on or off",

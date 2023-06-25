@@ -76,12 +76,12 @@ func generalHelpCommand(ctx *dgc.Ctx) {
 }
 
 func getNameFromArgument(arg string) string {
-	arg = strings.ReplaceAll(arg, "eventreactions", "Event Reactions")
-	arg = strings.ReplaceAll(arg, "eventreaction", "Event Reactions")
+	arg = strings.ReplaceAll(arg, "eventreactions", "EventReactions")
+	arg = strings.ReplaceAll(arg, "eventreaction", "EventReactions")
 
 	arg = strings.ReplaceAll(arg, "nsfw", "NSFW")
 
-	arg = strings.ReplaceAll(arg, "customactivity", "Custom Activity")
+	arg = strings.ReplaceAll(arg, "customactivity", "CustomActivity")
 
 	if arg == "admin" {
 		arg = "Admininstration"

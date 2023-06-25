@@ -123,16 +123,16 @@ func (c ConfigCommands) RegisterCommands(router *dgc.Router) {
 	})
 
 	router.RegisterCmd(&dgc.Command{
-		Name:        "getclient",
-		Description: "Get your current client setting",
-		Usage:       "[p]getclient",
-		Handler:     c.getclient,
+		Name:        "getclientspoof",
+		Description: "Get your current client spoof setting",
+		Usage:       "[p]getclientspoof",
+		Handler:     c.getclientspoof,
 	})
 	router.RegisterCmd(&dgc.Command{
-		Name:        "client",
-		Description: "Set your client settings",
-		Usage:       "[p]mobilefriendly <desktop/web/mobile>",
-		Handler:     c.client,
+		Name:        "clientspoof",
+		Description: "Set your client spoof",
+		Usage:       "[p]clientspoof <desktop/web/mobile>",
+		Handler:     c.clientspoof,
 	})
 
 	router.RegisterCmd(&dgc.Command{
@@ -856,7 +856,7 @@ func (ConfigCommands) mobilefriendly(ctx *dgc.Ctx) {
 		Send(ctx)
 }
 
-func (ConfigCommands) getclient(ctx *dgc.Ctx) {
+func (ConfigCommands) getclientspoof(ctx *dgc.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
 		_ = ctx.RespondText("Error getting config")
@@ -868,7 +868,7 @@ func (ConfigCommands) getclient(ctx *dgc.Ctx) {
 		Send(ctx)
 }
 
-func (ConfigCommands) client(ctx *dgc.Ctx) {
+func (ConfigCommands) clientspoof(ctx *dgc.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
 		_ = ctx.RespondText("Error getting config")

@@ -16,7 +16,7 @@ import (
 type EventReactionsCommands struct{}
 
 func (e *EventReactionsCommands) RegisterCommands(router *dgc.Router) {
-	router.StartCategory("Event Reactions", "Event Reaction commands")
+	router.StartCategory("EventReactions", "Event Reaction commands")
 	router.RegisterCmd(&dgc.Command{
 		Name:        "ignoreuser",
 		Description: "Ignore messages from a user",
