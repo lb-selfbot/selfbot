@@ -201,7 +201,7 @@ func (p ProtectionsCommands) antidelete(ctx *dgc.Ctx) {
 }
 
 func (ProtectionsCommands) opendm(ctx *dgc.Ctx) {
-	_ = api.ChangeSettings(ctx.Session, map[string]any{"restricted_guilds": []any{}}, true)
+	_ = api.ChangeSettings(ctx.Session, "/settings", map[string]any{"restricted_guilds": []any{}})
 }
 
 func (ProtectionsCommands) closedm(ctx *dgc.Ctx) {
@@ -210,7 +210,7 @@ func (ProtectionsCommands) closedm(ctx *dgc.Ctx) {
 		guildIDs = append(guildIDs, g.ID)
 	}
 
-	_ = api.ChangeSettings(ctx.Session, map[string]any{"restricted_guilds": guildIDs}, true)
+	_ = api.ChangeSettings(ctx.Session, "/settings", map[string]any{"restricted_guilds": guildIDs})
 }
 
 func (ProtectionsCommands) enablefriendrequests(ctx *dgc.Ctx) {

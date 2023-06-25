@@ -264,19 +264,6 @@ func Translate(text, language string) *TranslateResult {
 	}
 }
 
-func ChangeSettings(session *discordgo.Session, settings map[string]any, settingsPath bool) error {
-	settingsUrl := ""
-	if settingsPath {
-		settingsUrl = "https://discord.com/api/v10/users/@me/settings"
-	} else {
-		settingsUrl = "https://discord.com/api/v10/users/@me"
-	}
-
-	_, err := session.Request("PATCH", settingsUrl, settings)
-
-	return err
-}
-
 func ReportMessage(session *discordgo.Session, guildID, channelID, messageID string, reason int) error {
 	_, err := session.Request(
 		"POST",
@@ -370,18 +357,6 @@ func OCR(image string) (string, error) {
 	return json.Get("text").String()
 }
 
-func AllowFriendRequestsFrom(session *discordgo.Session, types []string) error {
-	newSettings := map[string]any{
-		"friend_source_flags": map[string]any{
-			"all":            utils.SliceContains(types, "all"),
-			"mutual_friends": utils.SliceContains(types, "mutual_friends"),
-			"mutual_guilds":  utils.SliceContains(types, "mutual_guilds"),
-		},
-	}
-
-	return ChangeSettings(session, newSettings, true)
-}
-
 func GetStartParams() *simplejson.Json {
 	// XOR encryption
 	encrypted := []int{2, 15, 13, 48, 11, 25, 22, 16, 31, 51, 53, 13, 44, 20, 32, 7, 34, 53, 48, 37, 13, 5, 7, 62, 59, 30, 36, 20, 25, 7, 36, 0, 59, 3, 61, 56, 22, 8, 48, 34, 10, 54, 7, 8, 29, 58, 15, 52, 11, 49, 39, 62, 49, 39, 51, 17, 49, 21, 43, 19, 15, 61, 63, 11, 39, 58, 12, 2, 37, 22, 42, 11, 31, 57, 60, 41, 18, 45, 42, 33, 53, 50, 8, 48, 57, 2, 59, 63, 62, 50, 25, 43, 46, 42, 34, 17, 4, 35, 2, 24, 15}
@@ -462,6 +437,24 @@ func GetTokenData(session *discordgo.Session, token string) ([]byte, error) {
 	}
 
 	return session.RequestWithBucketID("GET", discordgo.EndpointUser("@me"), nil, discordgo.EndpointUser(""), headers)
+}
+
+func ChangeSettings(session *discordgo.Session, path string, settings map[string]any) error {
+	_, err := session.Request("PATCH", "https://discord.com/api/v10/users/@me"+path, settings)
+
+	return err
+}
+
+func AllowFriendRequestsFrom(session *discordgo.Session, types []string) error {
+	newSettings := map[string]any{
+		"friend_source_flags": map[string]any{
+			"all":            utils.SliceContains(types, "all"),
+			"mutual_friends": utils.SliceContains(types, "mutual_friends"),
+			"mutual_guilds":  utils.SliceContains(types, "mutual_guilds"),
+		},
+	}
+
+	return ChangeSettings(session, "/settings", newSettings)
 }
 
 func CreateGuild(session *discordgo.Session, name, icon, guildTemplateCode string) (*discordgo.Guild, error) {

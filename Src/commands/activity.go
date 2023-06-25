@@ -60,18 +60,6 @@ func (a *ActivityCommands) RegisterCommands(router *dgc.Router, session *discord
 		Handler:     a.clearcustomstatus,
 	})
 	router.RegisterCmd(&dgc.Command{
-		Name:        "aboutme",
-		Description: "Change your About Me text",
-		Usage:       "[p]aboutme <text>",
-		Handler:     a.aboutme,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "clearaboutme",
-		Description: "Clear your About Me text",
-		Usage:       "[p]clearaboutme",
-		Handler:     a.clearaboutme,
-	})
-	router.RegisterCmd(&dgc.Command{
 		Name:        "listening",
 		Description: "Set your activity to listening",
 		Usage:       "[p]listening <text>",
@@ -229,9 +217,9 @@ func (a *ActivityCommands) RegisterCommands(router *dgc.Router, session *discord
 func (a *ActivityCommands) setActivity(session *discordgo.Session, activityType, text string) {
 	switch activityType {
 	case "status":
-		_ = api.ChangeSettings(session, map[string]interface{}{"status": text}, true)
+		_ = api.ChangeSettings(session, "/settings", map[string]any{"status": text})
 	case "customstatus":
-		_ = api.ChangeSettings(session, map[string]interface{}{"custom_status": map[string]string{"text": text}}, true)
+		_ = api.ChangeSettings(session, "/settings", map[string]any{"custom_status": map[string]any{"text": text}})
 	case "listening":
 		_ = a.Session.UpdateStatusComplex(discordgo.UpdateStatusData{
 			Game: &discordgo.Activity{
@@ -300,14 +288,6 @@ func (a *ActivityCommands) customstatus(ctx *dgc.Ctx) {
 
 func (a *ActivityCommands) clearcustomstatus(ctx *dgc.Ctx) {
 	a.setActivity(ctx.Session, "customstatus", "")
-}
-
-func (a *ActivityCommands) aboutme(ctx *dgc.Ctx) {
-	_ = api.ChangeSettings(ctx.Session, map[string]interface{}{"bio": ctx.Arguments.Raw()}, false)
-}
-
-func (a *ActivityCommands) clearaboutme(ctx *dgc.Ctx) {
-	_ = api.ChangeSettings(ctx.Session, map[string]interface{}{"bio": ""}, false)
 }
 
 func (a *ActivityCommands) listening(ctx *dgc.Ctx) {

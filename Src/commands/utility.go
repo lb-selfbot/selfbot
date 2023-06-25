@@ -339,6 +339,42 @@ func (u UtilityCommands) RegisterCommands(router *dgc.Router) {
 		Handler:     u.sessionid,
 	})
 	router.RegisterCmd(&dgc.Command{
+		Name:        "aboutme",
+		Description: "Change your About Me text",
+		Usage:       "[p]aboutme <text>",
+		Handler:     u.aboutme,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "clearaboutme",
+		Description: "Clear your About Me text",
+		Usage:       "[p]clearaboutme",
+		Handler:     u.clearaboutme,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "displayname",
+		Description: "Change your display name",
+		Usage:       "[p]displayname <text>",
+		Handler:     u.displayname,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "cleardisplayname",
+		Description: "Clear your display name",
+		Usage:       "[p]cleardisplayname",
+		Handler:     u.cleardisplayname,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "pronouns",
+		Description: "Change your pronouns",
+		Usage:       "[p]pronouns <text>",
+		Handler:     u.pronouns,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "clearpronouns",
+		Description: "Clear your pronouns",
+		Usage:       "[p]clearpronouns",
+		Handler:     u.clearpronouns,
+	})
+	router.RegisterCmd(&dgc.Command{
 		Name:        "screenshot",
 		Description: "Make a screenshot",
 		Usage:       "[p]screenshot",
@@ -1107,7 +1143,7 @@ func (UtilityCommands) theme(ctx *dgc.Ctx) {
 		_ = ctx.RespondText("Error: <light/dark> must be either \"light\" or \"dark\"")
 		return
 	}
-	_ = api.ChangeSettings(ctx.Session, map[string]interface{}{"theme": theme}, true)
+	_ = api.ChangeSettings(ctx.Session, "/settings", map[string]any{"theme": theme})
 }
 
 func (UtilityCommands) compact(ctx *dgc.Ctx) {
@@ -1116,7 +1152,7 @@ func (UtilityCommands) compact(ctx *dgc.Ctx) {
 		_ = ctx.RespondText("Error: <on/off> must be either \"on\" or \"off\"")
 		return
 	}
-	_ = api.ChangeSettings(ctx.Session, map[string]interface{}{"message_display_compact": toggle == "on"}, true)
+	_ = api.ChangeSettings(ctx.Session, "/settings", map[string]any{"message_display_compact": toggle == "on"})
 }
 
 func (UtilityCommands) devmode(ctx *dgc.Ctx) {
@@ -1125,13 +1161,37 @@ func (UtilityCommands) devmode(ctx *dgc.Ctx) {
 		_ = ctx.RespondText("Error: <on/off> must be either \"on\" or \"off\"")
 		return
 	}
-	_ = api.ChangeSettings(ctx.Session, map[string]interface{}{"developer_mode": toggle == "on"}, true)
+	_ = api.ChangeSettings(ctx.Session, "/settings", map[string]any{"developer_mode": toggle == "on"})
 }
 
 func (UtilityCommands) sessionid(ctx *dgc.Ctx) {
 	embed.NewEmbed().
 		AddField("Session ID", ctx.Session.State.SessionID).
 		Send(ctx)
+}
+
+func (UtilityCommands) aboutme(ctx *dgc.Ctx) {
+	_ = api.ChangeSettings(ctx.Session, "", map[string]any{"bio": ctx.Arguments.Raw()})
+}
+
+func (UtilityCommands) clearaboutme(ctx *dgc.Ctx) {
+	_ = api.ChangeSettings(ctx.Session, "", map[string]any{"bio": ""})
+}
+
+func (UtilityCommands) displayname(ctx *dgc.Ctx) {
+	_ = api.ChangeSettings(ctx.Session, "", map[string]any{"global_name": ctx.Arguments.Raw()})
+}
+
+func (UtilityCommands) cleardisplayname(ctx *dgc.Ctx) {
+	_ = api.ChangeSettings(ctx.Session, "", map[string]any{"global_name": ""})
+}
+
+func (UtilityCommands) pronouns(ctx *dgc.Ctx) {
+	_ = api.ChangeSettings(ctx.Session, "/profile", map[string]any{"pronouns": ctx.Arguments.Raw()})
+}
+
+func (UtilityCommands) clearpronouns(ctx *dgc.Ctx) {
+	_ = api.ChangeSettings(ctx.Session, "/profile", map[string]any{"pronouns": ""})
 }
 
 func (UtilityCommands) screenshot(ctx *dgc.Ctx) {

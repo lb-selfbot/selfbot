@@ -419,7 +419,7 @@ func (e *Events) checkProtections(message *discordgo.Message, cfg *config.Config
 			guildIDs = append(guildIDs, g.ID)
 		}
 
-		_ = api.ChangeSettings(e.Session, map[string]any{"restricted_guilds": guildIDs}, true)
+		_ = api.ChangeSettings(e.Session, "/settings", map[string]any{"restricted_guilds": guildIDs})
 
 		logging.Logging.MassDMBlocked()
 
@@ -427,7 +427,7 @@ func (e *Events) checkProtections(message *discordgo.Message, cfg *config.Config
 			// Enable DMs after 5 minutes
 			time.Sleep(5 * 60)
 
-			_ = api.ChangeSettings(e.Session, map[string]any{"restricted_guilds": []any{}}, true)
+			_ = api.ChangeSettings(e.Session, "/settings", map[string]any{"restricted_guilds": []any{}})
 		}()
 	}
 

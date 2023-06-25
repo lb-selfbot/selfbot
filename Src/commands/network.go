@@ -735,13 +735,13 @@ func (NetworkCommands) searchcountry(ctx *dgc.Ctx) {
 
 	country := countryList.GetIndex(0)
 
-	rawCurrencies := country.Get("currencies").Interface().(map[string]interface{})
+	rawCurrencies := country.Get("currencies").Interface().(map[string]any)
 	var currencies []string
 	for shortName, ifa := range rawCurrencies {
-		currencies = append(currencies, fmt.Sprintf("%s (%s)", shortName, ifa.(map[string]interface{})["name"].(string)))
+		currencies = append(currencies, fmt.Sprintf("%s (%s)", shortName, ifa.(map[string]any)["name"].(string)))
 	}
 
-	rawLanguages := country.Get("languages").Interface().(map[string]interface{})
+	rawLanguages := country.Get("languages").Interface().(map[string]any)
 	var languages []string
 	for _, language := range rawLanguages {
 		languages = append(languages, language.(string))
@@ -774,13 +774,13 @@ func (NetworkCommands) randomcountry(ctx *dgc.Ctx) {
 
 	country := countryList.GetIndex(utils.Random.Number(0, len(countryList.MustArray())))
 
-	rawCurrencies := country.Get("currencies").Interface().(map[string]interface{})
+	rawCurrencies := country.Get("currencies").Interface().(map[string]any)
 	var currencies []string
 	for shortName, ifa := range rawCurrencies {
-		currencies = append(currencies, fmt.Sprintf("%s (%s)", shortName, ifa.(map[string]interface{})["name"].(string)))
+		currencies = append(currencies, fmt.Sprintf("%s (%s)", shortName, ifa.(map[string]any)["name"].(string)))
 	}
 
-	rawLanguages := country.Get("languages").Interface().(map[string]interface{})
+	rawLanguages := country.Get("languages").Interface().(map[string]any)
 	var languages []string
 	for _, language := range rawLanguages {
 		languages = append(languages, language.(string))
