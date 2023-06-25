@@ -45,17 +45,21 @@ func (_Logging) OnReady(router *dgc.Router, event *discordgo.Ready) {
 	}
 
 	// Count friends
-	friends := 0
-	for _, rel := range event.Relationships {
-		if rel.Type == 1 {
-			friends++
-		}
-	}
+	friends := utils.Filter(event.Relationships, func(rel *discordgo.Relationship) bool {
+		return rel.Type == 1
+	})
 
 	UI.Notification(fmt.Sprintf("Connected to %s", event.User.String()))
 
-	bannerTextUpper := fmt.Sprintf("LightningBot %s | %s | Prefix: %s", constants.VERSION, event.User.String(), cfg.Selfbot.CommandPrefix)
-	bannerTextLower := fmt.Sprintf("%d Commands | %d Servers | %d Friends", len(router.Commands), len(event.Guilds), friends)
+	userText := event.User.Username
+	if event.User.DisplayName != "" {
+		userText = event.User.DisplayName + " | " + event.User.Username
+	} else if event.User.Discriminator != "0" {
+		userText = event.User.Username + "#" + event.User.Discriminator
+	}
+
+	bannerTextUpper := fmt.Sprintf("LightningBot %s | %s | Prefix: %s", constants.VERSION, userText, cfg.Selfbot.CommandPrefix)
+	bannerTextLower := fmt.Sprintf("%d Commands | %d Servers | %d Friends", len(router.Commands), len(event.Guilds), len(friends))
 
 	if constants.CONSOLE {
 		Console.Clear()
