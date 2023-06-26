@@ -195,6 +195,25 @@ func (c ConfigCommands) RegisterCommands(router *dgc.Router) {
 	})
 
 	router.RegisterCmd(&dgc.Command{
+		Name:        "getcustombots",
+		Description: "Get a list of current custom bots",
+		Usage:       "[p]getcustombots",
+		Handler:     c.getcustombots,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "addcustombot",
+		Description: "Add a custom bot for the giveaway sniper",
+		Usage:       "[p]addcustombot <user>",
+		Handler:     c.addcustombot,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "removecustombot",
+		Description: "Remove a custom bot",
+		Usage:       "[p]removecustombot <user>",
+		Handler:     c.removecustombot,
+	})
+
+	router.RegisterCmd(&dgc.Command{
 		Name:        "getsniperblacklist",
 		Description: "Get the list of sniper blacklist entries",
 		Usage:       "[p]getsniperblacklist",
@@ -1023,6 +1042,63 @@ func (ConfigCommands) gsnipersleep(ctx *dgc.Ctx) {
 	embed.NewEmbed().
 		SetDescription(fmt.Sprintf("Giveaway sniper sleep set to %d seconds", cfg.Snipers.GiveawaySniper.Sleep)).
 		Send(ctx)
+}
+
+func (ConfigCommands) getcustombots(ctx *dgc.Ctx) {
+	cfg, _ := config.GetConfig()
+
+	botString := ""
+	for _, userID := range cfg.Snipers.GiveawaySniper.CustomBots {
+		user, ok := utils.Discord.GetUser(ctx.Session, userID)
+		if !ok {
+			botString += fmt.Sprintf("%s - %s\n", "Unknown", userID)
+			continue
+		}
+
+		botString += fmt.Sprintf("%s - %s\n", user.Username, userID)
+	}
+
+	embed.NewEmbed().
+		AddField("Custom Bots", botString).
+		Send(ctx)
+}
+
+func (ConfigCommands) addcustombot(ctx *dgc.Ctx) {
+	user, ok := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
+	if !ok {
+		_ = ctx.RespondText("Could not find bot.")
+		return
+	}
+
+	cfg, _ := config.GetConfig()
+
+	if utils.SliceContains(cfg.Snipers.GiveawaySniper.CustomBots, user.ID) {
+		_ = ctx.RespondText("Bot is already in the custom bots list.")
+		return
+	}
+
+	cfg.Snipers.GiveawaySniper.CustomBots = append(cfg.Snipers.GiveawaySniper.CustomBots, user.ID)
+
+	_ = cfg.Save()
+}
+
+func (ConfigCommands) removecustombot(ctx *dgc.Ctx) {
+	user, ok := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
+	if !ok {
+		_ = ctx.RespondText("Could not find bot.")
+		return
+	}
+
+	cfg, _ := config.GetConfig()
+
+	if !utils.SliceContains(cfg.Snipers.GiveawaySniper.CustomBots, user.ID) {
+		_ = ctx.RespondText("Bot is already not in the custom bots list.")
+		return
+	}
+
+	cfg.Snipers.GiveawaySniper.CustomBots = utils.RemoveSliceItem(cfg.Snipers.GiveawaySniper.CustomBots, user.ID)
+
+	_ = cfg.Save()
 }
 
 func (ConfigCommands) getsniperblacklist(ctx *dgc.Ctx) {

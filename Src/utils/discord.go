@@ -435,6 +435,11 @@ func (DiscordUtils) GetChannelName(session *discordgo.Session, channelID string)
 	return channelName
 }
 
+func (DiscordUtils) GetUser(session *discordgo.Session, userID string) (*discordgo.User, bool) {
+	arg := &dgc.Argument{}
+	return Discord.TryGetUserFromMention(session, arg.SetRaw(userID))
+}
+
 func (DiscordUtils) GetUserName(session *discordgo.Session, userID string) string {
 	arg := &dgc.Argument{}
 	userName, _ := Discord.TryGetUsernameFromMention(session, arg.SetRaw(userID))
