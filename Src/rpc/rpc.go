@@ -119,20 +119,41 @@ func setRPC(session *discordgo.Session, cfg *config.Config, startTime time.Time)
 	case "CustomActivity":
 		client.Logout()
 
+		buttons := []string{}
+		buttonUrls := []string{}
+
+		if cfg.Activity.Button1Label != "" {
+			buttons = append(buttons, cfg.Activity.Button1Label)
+			buttonUrls = append(buttonUrls, cfg.Activity.Button1URL)
+		}
+
+		if cfg.Activity.Button2Label != "" {
+			buttons = append(buttons, cfg.Activity.Button2Label)
+			buttonUrls = append(buttonUrls, cfg.Activity.Button2URL)
+		}
+
+		activity := &discordgo.Activity{
+			Name:    parseText(cfg.Activity.Name),
+			State:   parseText(cfg.Activity.State),
+			Details: parseText(cfg.Activity.Details),
+			Type:    getActivityType(cfg.Activity.Type),
+			Assets: &discordgo.Assets{
+				LargeImageID: cfg.Activity.LargeImage,
+				LargeText:    parseText(cfg.Activity.LargeImageText),
+				SmallImageID: cfg.Activity.SmallImage,
+				SmallText:    parseText(cfg.Activity.SmallImageText),
+			},
+			Buttons: buttons,
+			Metadata: &discordgo.ActivityMetadata{
+				ButtonURLs: buttonUrls,
+			},
+		}
+
 		return session.UpdateStatusComplex(discordgo.UpdateStatusData{
 			Activities: []*discordgo.Activity{},
-			Game: &discordgo.Activity{
-				Name:    parseText(cfg.Activity.Name),
-				State:   parseText(cfg.Activity.State),
-				Details: parseText(cfg.Activity.Details),
-				Type:    getActivityType(cfg.Activity.Type),
-				Assets: &discordgo.Assets{
-					LargeImageID: cfg.Activity.LargeImage,
-					LargeText:    parseText(cfg.Activity.LargeImageText),
-					SmallImageID: cfg.Activity.SmallImage,
-					SmallText:    parseText(cfg.Activity.SmallImageText),
-				},
-			},
+			Game:       activity,
+			AFK:        true,
+			Status:     "unknown",
 		})
 	default:
 		return nil

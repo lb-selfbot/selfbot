@@ -83,6 +83,9 @@ func getNameFromArgument(arg string) string {
 
 	arg = strings.ReplaceAll(arg, "customactivity", "CustomActivity")
 
+	arg = strings.ReplaceAll(arg, "slashcommands", "SlashCommands")
+	arg = strings.ReplaceAll(arg, "slashcommand", "SlashCommands")
+
 	if arg == "admin" {
 		arg = "Admininstration"
 	}
