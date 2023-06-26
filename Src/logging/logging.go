@@ -44,12 +44,16 @@ func (_Logging) OnReady(router *dgc.Router, event *discordgo.Ready) {
 		return
 	}
 
+	if event.User.Discriminator == "0" {
+		UI.Notification(fmt.Sprintf("Connected to %s (%s)", event.User.DisplayName, event.User.Username))
+	} else {
+		UI.Notification(fmt.Sprintf("Connected to %s", event.User.String()))
+	}
+
 	// Count friends
 	friends := utils.Filter(event.Relationships, func(rel *discordgo.Relationship) bool {
 		return rel.Type == 1
 	})
-
-	UI.Notification(fmt.Sprintf("Connected to %s", event.User.String()))
 
 	userText := event.User.Username
 	if event.User.DisplayName != "" {
