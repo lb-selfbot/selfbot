@@ -30,12 +30,12 @@ func (e *Events) OnRelationshipAdd(_ *discordgo.Session, m *discordgo.Relationsh
 		return
 	}
 
-	_ = e.Session.UserRelationshipsDelete(m.User.ID)
+	_ = e.Session.UserRelationshipDelete(m.User.ID)
 
 	_ = api.AllowFriendRequestsFrom(e.Session, []string{})
 
 	logging.Logging.FriendRequestSpamBlocked()
-	
+
 	go func() {
 		time.Sleep(5 * 60)
 		_ = api.AllowFriendRequestsFrom(e.Session, []string{"all"})

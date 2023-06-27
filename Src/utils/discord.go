@@ -461,4 +461,18 @@ func (DiscordUtils) IsUserInList(session *discordgo.Session, userID string, user
 	return SliceContains(usersList, userID) || SliceContains(usersList, userName)
 }
 
+func (DiscordUtils) UserChannelPermissions(session *discordgo.Session, guildID string, channelID string, userID string) (apermissions int64, err error) {
+	userId, _ := strconv.Atoi(userID)
+
+	_, err = session.State.Member(guildID, userID)
+	if err != nil {
+		params := discordgo.NewQueryGuildMembersParams(guildID)
+		params.UserIDs = []int{userId}
+
+		_, _ = session.QueryGuildMembers(params)
+	}
+
+	return session.State.UserChannelPermissions(userID, channelID)
+}
+
 var Discord = &DiscordUtils{}

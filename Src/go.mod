@@ -5,7 +5,7 @@ go 1.20
 require (
 	github.com/LightningDev1/beeep v0.1.0
 	github.com/LightningDev1/dgc v1.1.4-0.20230327145349-fd063e2b2054
-	github.com/LightningDev1/discordgo v0.26.6-0.20230626183931-3b7e314e6d3b
+	github.com/LightningDev1/discordgo v0.26.6-0.20230627205615-7a286a3e0161
 	github.com/bitly/go-simplejson v0.5.0
 	github.com/brianvoe/gofakeit/v6 v6.20.2
 	github.com/darkwyrm/b85 v0.0.0-20210908110113-bdd55eedeb3c
@@ -24,6 +24,9 @@ require (
 require (
 	github.com/BurntSushi/xgb v0.0.0-20210121224620-deaf085860bc // indirect
 	github.com/andybalholm/brotli v1.0.5 // indirect
+	github.com/bogdanfinn/fhttp v0.5.23 // indirect
+	github.com/bogdanfinn/tls-client v1.4.0 // indirect
+	github.com/bogdanfinn/utls v1.5.16 // indirect
 	github.com/dlclark/regexp2 v1.9.0 // indirect
 	github.com/dop251/goja v0.0.0-20230402114112-623f9dda9079 // indirect
 	github.com/go-ole/go-ole v1.2.6 // indirect
@@ -35,10 +38,12 @@ require (
 	github.com/nu7hatch/gouuid v0.0.0-20131221200532-179d4d0c4d8d // indirect
 	github.com/stretchr/objx v0.5.0 // indirect
 	github.com/tadvi/systray v0.0.0-20190226123456-11a2b8fa57af // indirect
+	github.com/tam7t/hpkp v0.0.0-20160821193359-2b70b4024ed5 // indirect
 	github.com/tklauser/go-sysconf v0.3.11 // indirect
 	github.com/tklauser/numcpus v0.6.0 // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	github.com/yusufpapurcu/wmi v1.2.2 // indirect
+	golang.org/x/net v0.9.0 // indirect
 	gopkg.in/natefinch/npipe.v2 v2.0.0-20160621034901-c1b8fa8bdcce // indirect
 )
 
