@@ -16,30 +16,47 @@ func (s *SessionsCommands) RegisterCommands(router *dgc.Router, mainSession *dis
 	router.StartCategory("Sessions", "Discord session commands")
 
 	router.RegisterCmd(&dgc.Command{
-		Name:        "viewsessions",
-		Description: "View all your logged in sessions",
-		Usage:       "[p]viewsessions",
-		Handler:     s.viewsessions,
+		Name:        "viewgatewaysessions",
+		Description: "View all your gateway sessions (active devices)",
+		Usage:       "[p]viewgatewaysessions",
+		Handler:     s.viewgatewaysessions,
+	})
+
+	router.RegisterCmd(&dgc.Command{
+		Name:        "viewloginsessions",
+		Description: "View all your login sessions (tokens)",
+		Usage:       "[p]viewloginsessions",
+		Handler:     s.viewloginsessions,
 	})
 }
 
-func (s *SessionsCommands) viewsessions(ctx *dgc.Ctx) {
-	sessionsList, err := sessions.GetSessions(ctx.Session)
-	if err != nil {
-		ctx.RespondText("Failed to get sessions: " + err.Error())
-		return
-	}
-
+func (s *SessionsCommands) viewgatewaysessions(ctx *dgc.Ctx) {
 	emb := embed.NewEmbed().SetDescription("Sessions")
-	for index, session := range sessionsList {
+	for index, session := range sessions.GatewaySessions {
 		emb.AddField(
 			fmt.Sprintf("Session %d", index+1),
 			fmt.Sprintf(
-				"Session ID: %s\nOS: %s\nClient: %s\nLast Used: %s",
+				"Session ID: %s\nOS: %s\nClient: %s",
+				session.SessionID,
+				utils.String.Capitalize(session.ClientInfo.OS),
+				utils.String.Capitalize(session.ClientInfo.Client),
+			),
+		)
+	}
+	emb.Send(ctx)
+}
+
+func (s *SessionsCommands) viewloginsessions(ctx *dgc.Ctx) {
+	emb := embed.NewEmbed().SetDescription("Sessions")
+	for index, session := range sessions.LoginSessions {
+		emb.AddField(
+			fmt.Sprintf("Session %d", index+1),
+			fmt.Sprintf(
+				"Session ID: %s\nOS: %s\nPlatform: %s\nLast Used: %s",
 				session.IDHash,
 				utils.String.Capitalize(session.ClientInfo.OS),
 				utils.String.Capitalize(session.ClientInfo.Platform),
-				sessions.ParseLastUsedTime(session.LastUsedTime),
+				session.LastUsedTime.Format("2006-01-02 15:04:05"),
 			),
 		)
 	}

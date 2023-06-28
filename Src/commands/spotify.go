@@ -9,6 +9,7 @@ import (
 
 	"github.com/LightningDev1/LB-Selfbot/embed"
 	"github.com/LightningDev1/LB-Selfbot/http"
+	"github.com/LightningDev1/LB-Selfbot/sessions"
 	"github.com/LightningDev1/LB-Selfbot/utils"
 	"github.com/LightningDev1/dgc"
 	"github.com/LightningDev1/discordgo"
@@ -104,7 +105,7 @@ func (s SpotifyCommands) RegisterCommands(router *dgc.Router) {
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "slistenalong",
-		Description: "Send a listen along invite",
+		Description: "Send a Spotify listen along invite",
 		Usage:       "[p]slistenalong [content]",
 		Handler:     s.slistenalong,
 	})
@@ -500,59 +501,24 @@ func (s SpotifyCommands) sbearertoken(ctx *dgc.Ctx) {
 }
 
 func (s SpotifyCommands) slistenalong(ctx *dgc.Ctx) {
-	session, err := discordgo.New(ctx.Session.Identify.Token)
-	if err != nil {
-		return
-	}
-
-	session.StateEnabled = false
-	session.ShouldSubscribeGuilds = false
-
-	session.AddHandler(func(_ *discordgo.Session, r *discordgo.Ready) {
-		r.Sessions = utils.Filter(r.Sessions, func(s *discordgo.DiscordSession) bool {
-			if s.SessionID == "all" {
-				return false
-			}
-
-			if len(s.Activities) == 0 {
-				return false
-			}
-
-			if s.Activities[0].Type != discordgo.ActivityTypeListening {
-				return false
-			}
-
-			if s.Activities[0].Name != "Spotify" {
-				return false
-			}
-
-			return true
-		})
-
-		for _, s := range r.Sessions {
-			_, err = ctx.Session.ChannelMessageSendComplex(ctx.Event.ChannelID, &discordgo.MessageSend{
-				Content: ctx.Arguments.Raw(),
-				Activity: &discordgo.MessageActivity{
-					Type:      discordgo.MessageActivityTypeListen,
-					SessionID: s.SessionID,
-					PartyID:   s.Activities[0].Party.ID,
-				},
-				Nonce: discordgo.GenerateNonce(),
-				Flags: 0,
-			})
-
-			if err == nil {
-				break
-			}
+	for _, s := range sessions.GatewaySessions {
+		if len(s.Activities) == 0 || s.Activities[0].Name != "Spotify" {
+			continue
 		}
 
-		time.Sleep(time.Second * 5)
+		_, err := ctx.Session.ChannelMessageSendComplex(ctx.Event.ChannelID, &discordgo.MessageSend{
+			Content: ctx.Arguments.Raw(),
+			Activity: &discordgo.MessageActivity{
+				Type:      discordgo.MessageActivityTypeListen,
+				SessionID: s.SessionID,
+				PartyID:   s.Activities[0].Party.ID,
+			},
+			Nonce: discordgo.GenerateNonce(),
+			Flags: 0,
+		})
 
-		session.Close()
-	})
-
-	err = session.Open()
-	if err != nil {
-		return
+		if err == nil {
+			break
+		}
 	}
 }
