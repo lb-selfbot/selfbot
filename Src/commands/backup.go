@@ -8,6 +8,8 @@ import (
 	"path"
 	"path/filepath"
 	"strconv"
+	"strings"
+	"time"
 
 	"github.com/LightningDev1/LB-Selfbot/api"
 	"github.com/LightningDev1/LB-Selfbot/embed"
@@ -77,6 +79,24 @@ func (b BackupCommands) RegisterCommands(router *dgc.Router) {
 		Usage:       "[p]restoresettings [backup name]",
 		Handler:     b.restoresettings,
 	})
+}
+
+func (b BackupCommands) isPhoneVerified(session *discordgo.Session) bool {
+	user, err := session.User("@me")
+	if err != nil {
+		user = session.State.User
+	}
+
+	return user.Phone != ""
+}
+
+func (b BackupCommands) checkPhoneVerified(ctx *dgc.Ctx) bool {
+	if !b.isPhoneVerified(ctx.Session) {
+		ctx.RespondText("You must have a verified phone number to use this command.")
+		return false
+	}
+
+	return true
 }
 
 func (b BackupCommands) saveBackup(backup any, filename string) error {
@@ -150,6 +170,10 @@ func (b BackupCommands) relationshipToUser(rel *discordgo.Relationship) map[stri
 }
 
 func (b BackupCommands) backuprelationships(ctx *dgc.Ctx) {
+	if !b.checkPhoneVerified(ctx) {
+		return
+	}
+
 	relationships, err := ctx.Session.UserRelationships()
 	if err != nil {
 		ctx.RespondText("Error creating backup: " + err.Error())
@@ -205,6 +229,10 @@ func (b BackupCommands) findInvitableChannel(session *discordgo.Session, guild *
 }
 
 func (b BackupCommands) backupservers(ctx *dgc.Ctx) {
+	if !b.checkPhoneVerified(ctx) {
+		return
+	}
+
 	guilds := ctx.Session.State.Guilds
 
 	backup := []any{}
@@ -235,10 +263,11 @@ func (b BackupCommands) backupservers(ctx *dgc.Ctx) {
 			})
 
 			if err != nil {
-				inviteCode = "ERROR"
-			} else {
-				inviteCode = invite.Code
+				ctx.RespondText(fmt.Sprintf("Error backup up %s (%s): Couldn't create invite: %s", guild.Name, guild.ID, err.Error()))
+				continue
 			}
+
+			inviteCode = invite.Code
 		}
 
 		backup = append(backup, map[string]any{
@@ -261,6 +290,10 @@ func (b BackupCommands) backupservers(ctx *dgc.Ctx) {
 }
 
 func (b BackupCommands) backupaccount(ctx *dgc.Ctx) {
+	if !b.checkPhoneVerified(ctx) {
+		return
+	}
+
 	err := b.saveBackup(ctx.Session.State.User, "account"+b.getSuffix()+".json")
 	if err != nil {
 		ctx.RespondText("Error creating backup: " + err.Error())
@@ -274,7 +307,7 @@ func (b BackupCommands) backupaccount(ctx *dgc.Ctx) {
 	}
 
 	avatarFileName := utils.IO.SanitizeFilename("avatar" + b.getSuffix() + ".png")
-	avatarFilePath := path.Join(utils.IO.GetMainFolder(), avatarFileName)
+	avatarFilePath := path.Join(utils.IO.GetMainFolder(), "Backups", avatarFileName)
 
 	err = utils.IO.WriteBytes(avatarFilePath, httpResponse.BodyBytes)
 	if err != nil {
@@ -289,6 +322,10 @@ func (b BackupCommands) backupaccount(ctx *dgc.Ctx) {
 }
 
 func (b BackupCommands) backupsettings(ctx *dgc.Ctx) {
+	if !b.checkPhoneVerified(ctx) {
+		return
+	}
+
 	settings, err := ctx.Session.UserSettings()
 	if err != nil {
 		ctx.RespondText("Error creating backup: " + err.Error())
@@ -308,6 +345,10 @@ func (b BackupCommands) backupsettings(ctx *dgc.Ctx) {
 }
 
 func (b BackupCommands) restorerelationships(ctx *dgc.Ctx) {
+	if !b.checkPhoneVerified(ctx) {
+		return
+	}
+
 	rawBackup, err := b.restoreBackup("relationships" + b.getSuffix() + ".json")
 	if err != nil {
 		ctx.RespondText("Error restoring backup: " + err.Error())
@@ -323,6 +364,8 @@ func (b BackupCommands) restorerelationships(ctx *dgc.Ctx) {
 		if err != nil {
 			ctx.RespondText(fmt.Sprintf("Error blocking user %s (continuing restore): %s", user["username"], err.Error()))
 		}
+
+		time.Sleep(time.Second * 3)
 	}
 
 	for _, user := range backup["friends"].([]any) {
@@ -344,6 +387,8 @@ func (b BackupCommands) restorerelationships(ctx *dgc.Ctx) {
 		if err != nil {
 			ctx.RespondText(fmt.Sprintf("Error adding user %s as friend (continuing restore): %s", user["username"], err.Error()))
 		}
+
+		time.Sleep(time.Second * 3)
 	}
 
 	embed.NewEmbed().
@@ -353,10 +398,61 @@ func (b BackupCommands) restorerelationships(ctx *dgc.Ctx) {
 }
 
 func (b BackupCommands) restoreservers(ctx *dgc.Ctx) {
+	if !b.checkPhoneVerified(ctx) {
+		return
+	}
 
+	rawBackup, err := b.restoreBackup("servers" + b.getSuffix() + ".json")
+	if err != nil {
+		ctx.RespondText("Error restoring backup: " + err.Error())
+		return
+	}
+
+	backup := rawBackup.([]any)
+
+	failed := []string{}
+	success := 0
+
+	for _, guild := range backup {
+		guild := guild.(map[string]any)
+
+		inviteCode := guild["invite"].(string)
+		inviteLink := "https://discord.gg/" + inviteCode
+
+		if len(failed) > 5 {
+			failed = append(failed, fmt.Sprintf("%s - %s", guild["name"], inviteLink))
+			continue
+		}
+
+		invite, err := ctx.Session.InviteComplex(inviteCode, "", inviteLink, true, true)
+		if err != nil {
+			failed = append(failed, fmt.Sprintf("%s - %s", guild["name"], inviteLink))
+			continue
+		}
+
+		_, err = ctx.Session.InviteAccept(invite.Code, invite.Guild.ID, invite.Channel.ID, int(invite.Channel.Type))
+		if err != nil {
+			failed = append(failed, fmt.Sprintf("%s - %s", guild["name"], inviteLink))
+			continue
+		}
+
+		success++
+
+		time.Sleep(time.Second * 3)
+	}
+
+	embed.NewEmbed().
+		SetTitle("Backup restored").
+		SetDescription(fmt.Sprintf("Restored %d servers", success)).
+		AddField("Failed", strings.Join(failed, "\n")).
+		Send(ctx)
 }
 
 func (b BackupCommands) restoreaccount(ctx *dgc.Ctx) {
+	if !b.checkPhoneVerified(ctx) {
+		return
+	}
+
 	rawBackup, err := b.restoreBackup("account" + b.getSuffix() + ".json")
 	if err != nil {
 		ctx.RespondText("Error restoring backup: " + err.Error())
@@ -365,7 +461,8 @@ func (b BackupCommands) restoreaccount(ctx *dgc.Ctx) {
 
 	backupMap := rawBackup.(map[string]any)
 
-	avatarPath := path.Join(utils.IO.GetMainFolder(), "Backups", "avatar"+b.getSuffix()+".png")
+	avatarFileName := utils.IO.SanitizeFilename("avatar" + b.getSuffix() + ".png")
+	avatarPath := path.Join(utils.IO.GetMainFolder(), "Backups", avatarFileName)
 	avatar, err := os.ReadFile(avatarPath)
 	if err != nil {
 		ctx.RespondText("Error restoring backup: " + err.Error())
@@ -393,6 +490,10 @@ func (b BackupCommands) restoreaccount(ctx *dgc.Ctx) {
 }
 
 func (b BackupCommands) restoresettings(ctx *dgc.Ctx) {
+	if !b.checkPhoneVerified(ctx) {
+		return
+	}
+
 	backup, err := b.restoreBackup("settings" + b.getSuffix() + ".json")
 	if err != nil {
 		ctx.RespondText("Error restoring backup: " + err.Error())
