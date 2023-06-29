@@ -1,8 +1,6 @@
 package sessions
 
 import (
-	"fmt"
-
 	"github.com/LightningDev1/LB-Selfbot/logging"
 	"github.com/LightningDev1/LB-Selfbot/utils"
 	"github.com/LightningDev1/discordgo"
@@ -12,7 +10,6 @@ var GatewaySessions []*discordgo.GatewaySession
 var LoginSessions []*discordgo.LoginSession
 
 func RegisterSessionHandler(session *discordgo.Session) {
-	fmt.Println(session.State.Sessions)
 	GatewaySessions = session.State.Sessions
 	refreshLoginSessions(session)
 
