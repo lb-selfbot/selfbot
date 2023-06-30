@@ -31,7 +31,7 @@ type Job struct {
 	RawArguments string `json:"raw_arguments"`
 
 	// The interval to execute the command at
-	Interval time.Duration `json:"interval"`
+	IntervalSec int `json:"interval"`
 
 	//////////////////////////////////////////////////////////////////
 	// The following fields are initialized when the job is started //
@@ -45,6 +45,9 @@ type Job struct {
 
 	// The arguments to execute the command with
 	Arguments *dgc.Arguments
+
+	// The interval to execute the command at
+	Interval time.Duration
 }
 
 func (j *Job) CalculateID() string {
@@ -69,10 +72,6 @@ func (j *Job) GetCommand(session *discordgo.Session) (*discordgo.ApplicationComm
 	})
 	if err != nil {
 		return nil, err
-	}
-
-	for _, command := range commands {
-		fmt.Println(*command)
 	}
 
 	if len(commands) == 0 {
@@ -106,18 +105,17 @@ func (j *Job) Load(session *discordgo.Session) error {
 
 	j.Command.Options = options
 
+	j.Interval = time.Duration(j.IntervalSec) * time.Second
+
 	return nil
 }
 
 func (j *Job) ExecuteInteraction(session *discordgo.Session) error {
-	d := discordgo.InteractData{
+	return session.Interact(&discordgo.InteractData{
 		Type:          int(discordgo.InteractionApplicationCommand),
 		Data:          j.Command,
 		ChannelID:     j.ChannelID,
 		GuildID:       j.GuildID,
 		ApplicationID: j.Command.ApplicationID,
-	}
-
-	fmt.Println(d)
-	return session.Interact(&d)
+	})
 }
