@@ -18,9 +18,23 @@ type jobFileFormat struct {
 	Jobs []*Job `json:"jobs"`
 }
 
+func ensureFileExists() error {
+	path := filepath.Join(utils.IO.GetMainFolder(), "SlashCommands", "jobs.json")
+	if !utils.IO.Exists(path) {
+		return utils.IO.WriteBytes(path, []byte("{}"))
+	}
+
+	return nil
+}
+
 func LoadJobs(session *discordgo.Session) error {
 	jobsMutex.Lock()
 	defer jobsMutex.Unlock()
+
+	err := ensureFileExists()
+	if err != nil {
+		return err
+	}
 
 	path := filepath.Join(utils.IO.GetMainFolder(), "SlashCommands", "jobs.json")
 	jobsFile, err := os.Open(path)
@@ -49,6 +63,11 @@ func LoadJobs(session *discordgo.Session) error {
 func SaveJobs() error {
 	jobsMutex.Lock()
 	defer jobsMutex.Unlock()
+
+	err := ensureFileExists()
+	if err != nil {
+		return err
+	}
 
 	jobs := jobFileFormat{Jobs: Jobs}
 

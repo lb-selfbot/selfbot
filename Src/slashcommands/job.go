@@ -15,8 +15,11 @@ var commandCache = make(map[string]*discordgo.ApplicationCommand)
 // The jobs are stored in a JSON file and are loaded on startup.
 // The jobs are then executed by the job handler.
 type Job struct {
-	// The ID of the application command
-	CommandID string `json:"command_id"`
+	// The name of the application command
+	CommandName string `json:"command_name"`
+
+	// The ID of the application
+	ApplicationID string `json:"application_id"`
 
 	// The ID of the channel
 	ChannelID string `json:"channel_id"`
@@ -45,7 +48,7 @@ type Job struct {
 }
 
 func (j *Job) CalculateID() string {
-	stringRepresentation := j.CommandID + j.ChannelID + j.RawArguments + j.Interval.String()
+	stringRepresentation := j.CommandName + j.ChannelID + j.RawArguments + j.Interval.String()
 
 	hash := md5.Sum([]byte(stringRepresentation))
 
@@ -58,13 +61,18 @@ func (j *Job) GetCommand(session *discordgo.Session) (*discordgo.ApplicationComm
 	}
 
 	commands, _, err := session.ChannelApplicationCommandsSearch(&discordgo.ApplicationCommandsSearchParams{
-		ChannelID:  j.ChannelID,
-		Type:       1,
-		Limit:      1,
-		CommandIDs: []string{j.CommandID},
+		ChannelID:           j.ChannelID,
+		Type:                1,
+		Query:               j.CommandName,
+		Limit:               20,
+		IncludeApplications: false,
 	})
 	if err != nil {
 		return nil, err
+	}
+
+	for _, command := range commands {
+		fmt.Println(*command)
 	}
 
 	if len(commands) == 0 {
@@ -91,15 +99,25 @@ func (j *Job) Load(session *discordgo.Session) error {
 
 	j.Command = command
 
+	options, err := ArgumentsToCommandOptions(j.Command.Options, j.Arguments, 0)
+	if err != nil {
+		return err
+	}
+
+	j.Command.Options = options
+
 	return nil
 }
 
 func (j *Job) ExecuteInteraction(session *discordgo.Session) error {
-	return session.Interact(&discordgo.InteractData{
+	d := discordgo.InteractData{
 		Type:          int(discordgo.InteractionApplicationCommand),
 		Data:          j.Command,
 		ChannelID:     j.ChannelID,
 		GuildID:       j.GuildID,
 		ApplicationID: j.Command.ApplicationID,
-	})
+	}
+
+	fmt.Println(d)
+	return session.Interact(&d)
 }

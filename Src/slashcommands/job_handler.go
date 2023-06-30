@@ -30,10 +30,15 @@ func (j *JobHandler) ExecuteJobHandler(session *discordgo.Session) error {
 		case <-j.Stop:
 			return nil
 		case <-time.After(j.Job.Interval):
+			fmt.Println("Executing job " + j.Job.ID + "..." + j.Job.Interval.String())
+			
 			err := j.Job.ExecuteInteraction(session)
 			if err != nil {
+				fmt.Println("Failed to execute job " + j.Job.ID + ": " + err.Error())
 				return err
 			}
+
+			fmt.Println("Executed job " + j.Job.ID)
 		}
 	}
 }

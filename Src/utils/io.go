@@ -14,6 +14,8 @@ var folders = []string{
 	filepath.Join(mainFolder, "Config"),
 	filepath.Join(mainFolder, "Animations"),
 	filepath.Join(mainFolder, "Dumping"),
+	filepath.Join(mainFolder, "Backups"),
+	filepath.Join(mainFolder, "SlashCommands"),
 	filepath.Join(mainFolder, "Downloads"),
 	filepath.Join(mainFolder, "Executables"),
 	filepath.Join(mainFolder, "Executables", "windows"),
