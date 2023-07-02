@@ -132,6 +132,7 @@ func (w *WebsocketConnection) SendConfigUpdate() error {
 
 	cfg.Account.LightningBot.Password = "redacted"
 	cfg.Account.Discord.Token = "redacted"
+	cfg.Snipers.Tokens = []string{}
 
 	err := w.Send(WsMessage{
 		Op:   "CONFIG_UPDATE",
