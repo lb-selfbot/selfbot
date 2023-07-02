@@ -446,7 +446,7 @@ func CheckGiveawaySniper(session *discordgo.Session, message *discordgo.Message,
 			time.Sleep(time.Second * time.Duration(cfg.Snipers.GiveawaySniper.Sleep))
 			_ = session.MessageReactionAdd(message.ChannelID, message.ID, "🎁")
 		}()
-	case "570338970261782559": // GiveawayBot#8109
+	case "570338970261782559": // GiftCord#8109
 		// Win check
 
 		pattern := fmt.Sprintf(`Congratulations, %s! You won \*\*(.*?)\*\*!`, session.State.User.Mention())
@@ -655,7 +655,7 @@ func CheckGiveawaySniper(session *discordgo.Session, message *discordgo.Message,
 
 	// Dyno#3861
 	isDynoWebhook := message.Author.Username == "Dyno" && message.Author.Discriminator == "0000" && message.WebhookID != ""
-	isDynoBot := message.Author.ID == "1106879904676597780"
+	isDynoBot := message.Author.ID == "155149108183695360"
 	if isDynoWebhook || isDynoBot {
 		// Win check
 
