@@ -54,7 +54,10 @@ func LoadJobs(session *discordgo.Session) error {
 	Jobs = jobs.Jobs
 
 	for _, job := range Jobs {
-		job.Load(session)
+		err = job.Load(session)
+		if err != nil {
+			utils.Logging.Error("Failed to load job:", err.Error())
+		}
 	}
 
 	return nil
@@ -78,4 +81,31 @@ func SaveJobs() error {
 
 	path := filepath.Join(utils.IO.GetMainFolder(), "SlashCommands", "jobs.json")
 	return utils.IO.WriteBytes(path, jobBytes)
+}
+
+func GetJobByID(id string) *Job {
+	for _, job := range Jobs {
+		if job.ID == id {
+			return job
+		}
+	}
+
+	return nil
+}
+
+func AddJob(job *Job) error {
+	Jobs = append(Jobs, job)
+
+	return SaveJobs()
+}
+
+func RemoveJob(job *Job) error {
+	for i, j := range Jobs {
+		if j.ID == job.ID {
+			Jobs = append(Jobs[:i], Jobs[i+1:]...)
+			break
+		}
+	}
+
+	return SaveJobs()
 }

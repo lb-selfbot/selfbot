@@ -214,7 +214,6 @@ func main() {
 		os.Exit(1)
 	}
 	session.Token = cfg.Account.Discord.Token
-	session.ShouldSubscribeGuilds = false
 	session.State.MaxMessageCount = 200
 	session.SetIdentify(cfg.GetClient())
 

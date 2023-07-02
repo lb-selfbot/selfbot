@@ -63,7 +63,7 @@ func (e *Events) OnMessage(_ *discordgo.Session, m *discordgo.MessageCreate) {
 
 func (e *Events) OnMessageEdit(_ *discordgo.Session, m *discordgo.MessageUpdate) {
 	message, err := e.Session.State.Message(m.Message.ChannelID, m.Message.ID)
-	if err != nil {
+	if err == nil {
 		m.Message = message
 	}
 

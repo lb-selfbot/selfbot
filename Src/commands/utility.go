@@ -19,6 +19,7 @@ import (
 
 	"github.com/LightningDev1/LB-Selfbot/eventhandlers"
 	"github.com/LightningDev1/LB-Selfbot/ipc"
+	"github.com/LightningDev1/LB-Selfbot/logging"
 	"github.com/shirou/gopsutil/cpu"
 	"github.com/shirou/gopsutil/disk"
 	"github.com/shirou/gopsutil/host"
@@ -997,7 +998,7 @@ func (UtilityCommands) uptime(ctx *dgc.Ctx) {
 }
 
 func (UtilityCommands) cls(*dgc.Ctx) {
-	ipc.IPC.ConsoleClear()
+	logging.UI.Clear()
 }
 
 func (UtilityCommands) mastercard(ctx *dgc.Ctx) {

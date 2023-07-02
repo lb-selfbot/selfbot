@@ -2,30 +2,33 @@ package slashcommands
 
 import (
 	"fmt"
-	"sync"
+	"sync/atomic"
 	"time"
 
+	"github.com/LightningDev1/LB-Selfbot/logging"
 	"github.com/LightningDev1/LB-Selfbot/utils"
 	"github.com/LightningDev1/discordgo"
 )
 
 var jobHandlers = make(map[string]*JobHandler)
+var errAlreadyRunning = fmt.Errorf("job is already running")
 
 type JobHandler struct {
-	Job   *Job
-	Mutex *sync.Mutex
-	Stop  chan bool
+	Job             *Job
+	Locker          atomic.Uint32
+	NextInteraction time.Time
+	Stop            chan bool
 }
 
 func (j *JobHandler) ExecuteJobHandler(session *discordgo.Session) error {
-	locked := j.Mutex.TryLock()
-	if !locked {
-		return fmt.Errorf("job is already running")
+	if !j.Locker.CompareAndSwap(0, 1) {
+		return errAlreadyRunning
 	}
-
-	defer j.Mutex.Unlock()
+	defer j.Locker.Store(0)
 
 	for {
+		j.NextInteraction = time.Now().Add(j.Job.Interval)
+
 		select {
 		case <-j.Stop:
 			return nil
@@ -38,6 +41,15 @@ func (j *JobHandler) ExecuteJobHandler(session *discordgo.Session) error {
 	}
 }
 
+func (j *JobHandler) TimeUntilNextInteraction() time.Duration {
+	return time.Until(j.NextInteraction)
+}
+
+func (j *JobHandler) IsJobRunning() bool {
+	// Check if the job is locked
+	return j.Locker.Load() == 1
+}
+
 func (j *JobHandler) StopJobHandler() {
 	j.Stop <- true
 }
@@ -48,9 +60,9 @@ func GetHandlerForJob(job *Job) *JobHandler {
 	}
 
 	handler := &JobHandler{
-		Job:   job,
-		Mutex: &sync.Mutex{},
-		Stop:  make(chan bool),
+		Job:    job,
+		Locker: atomic.Uint32{},
+		Stop:   make(chan bool),
 	}
 
 	jobHandlers[job.ID] = handler
@@ -59,6 +71,8 @@ func GetHandlerForJob(job *Job) *JobHandler {
 }
 
 func StartJobs(session *discordgo.Session) {
+	hasLogged := false
+
 	for {
 		err := LoadJobs(session)
 		if err != nil {
@@ -71,7 +85,16 @@ func StartJobs(session *discordgo.Session) {
 		for _, job := range Jobs {
 			handler := GetHandlerForJob(job)
 
-			go handler.ExecuteJobHandler(session)
+			if handler.IsJobRunning() {
+				continue
+			}
+
+			go func() {
+				ret := handler.ExecuteJobHandler(session)
+				if ret != nil {
+					utils.Logging.Error("Error executing job handler: " + ret.Error())
+				}
+			}()
 		}
 
 		// Remove handlers for jobs that no longer exist
@@ -87,6 +110,11 @@ func StartJobs(session *discordgo.Session) {
 
 				delete(jobHandlers, handler.Job.ID)
 			}
+		}
+
+		if !hasLogged {
+			logging.Logging.SlashCommandJobs(len(Jobs))
+			hasLogged = true
 		}
 
 		time.Sleep(time.Second * 5)

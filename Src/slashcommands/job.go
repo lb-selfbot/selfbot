@@ -5,27 +5,33 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/LightningDev1/LB-Selfbot/utils"
 	"github.com/LightningDev1/dgc"
 	"github.com/LightningDev1/discordgo"
 )
 
 var commandCache = make(map[string]*discordgo.ApplicationCommand)
 
+type DiscordObject struct {
+	Name string `json:"name"`
+	ID   string `json:"id"`
+}
+
 // Job represents a job to execute a slash command at a certain interval.
 // The jobs are stored in a JSON file and are loaded on startup.
 // The jobs are then executed by the job handler.
 type Job struct {
-	// The name of the application command
-	CommandName string `json:"command_name"`
+	// The name and ID of the application command
+	CommandObject DiscordObject `json:"command"`
 
-	// The ID of the application
-	ApplicationID string `json:"application_id"`
+	// The name and ID of the application
+	ApplicationObject DiscordObject `json:"application"`
 
-	// The ID of the channel
-	ChannelID string `json:"channel_id"`
+	// The name and ID of the channel
+	ChannelObject DiscordObject `json:"channel"`
 
-	// The ID of the guild
-	GuildID string `json:"guild_id"`
+	// The name and ID of the guild
+	GuildObject DiscordObject `json:"guild"`
 
 	// The raw arguments to execute the command with
 	RawArguments string `json:"raw_arguments"`
@@ -38,24 +44,29 @@ type Job struct {
 	//////////////////////////////////////////////////////////////////
 
 	// The ID of the job (calculated from the MD5 hash)
-	ID string
+	ID string `json:"-"`
 
 	// The application command to execute
-	Command *discordgo.ApplicationCommand
+	Command *discordgo.ApplicationCommand `json:"-"`
 
 	// The arguments to execute the command with
-	Arguments *dgc.Arguments
+	Arguments *dgc.Arguments `json:"-"`
 
 	// The interval to execute the command at
-	Interval time.Duration
+	Interval time.Duration `json:"-"`
 }
 
 func (j *Job) CalculateID() string {
-	stringRepresentation := j.CommandName + j.ChannelID + j.RawArguments + j.Interval.String()
+	cID := j.CommandObject.ID
+	aID := j.ApplicationObject.ID
+	chID := j.ChannelObject.ID
+	gID := j.GuildObject.ID
+	args := j.RawArguments
+	interval := fmt.Sprint(j.IntervalSec)
 
-	hash := md5.Sum([]byte(stringRepresentation))
+	byteRepresentation := []byte(cID + aID + chID + gID + args + interval)
 
-	return fmt.Sprintf("%x", hash)
+	return fmt.Sprintf("%x", md5.Sum(byteRepresentation))
 }
 
 func (j *Job) GetCommand(session *discordgo.Session) (*discordgo.ApplicationCommand, error) {
@@ -64,9 +75,9 @@ func (j *Job) GetCommand(session *discordgo.Session) (*discordgo.ApplicationComm
 	}
 
 	commands, _, err := session.ChannelApplicationCommandsSearch(&discordgo.ApplicationCommandsSearchParams{
-		ChannelID:           j.ChannelID,
+		ChannelID:           j.ChannelObject.ID,
 		Type:                1,
-		Query:               j.CommandName,
+		Query:               j.CommandObject.Name,
 		Limit:               20,
 		IncludeApplications: false,
 	})
@@ -74,13 +85,17 @@ func (j *Job) GetCommand(session *discordgo.Session) (*discordgo.ApplicationComm
 		return nil, err
 	}
 
-	if len(commands) == 0 {
+	rightCommands := utils.Filter(commands, func(command *discordgo.ApplicationCommand) bool {
+		return command.Name == j.CommandObject.Name && command.ApplicationID == j.ApplicationObject.ID
+	})
+
+	if len(rightCommands) == 0 {
 		return nil, fmt.Errorf("no commands found")
 	}
 
-	commandCache[j.ID] = commands[0]
+	commandCache[j.ID] = rightCommands[0]
 
-	return commands[0], nil
+	return rightCommands[0], nil
 }
 
 func (j *Job) GetArguments() *dgc.Arguments {
@@ -91,12 +106,14 @@ func (j *Job) Load(session *discordgo.Session) error {
 	j.ID = j.CalculateID()
 	j.Arguments = j.GetArguments()
 
-	command, err := j.GetCommand(session)
-	if err != nil {
-		return err
-	}
+	if j.Command == nil {
+		command, err := j.GetCommand(session)
+		if err != nil {
+			return err
+		}
 
-	j.Command = command
+		j.Command = command
+	}
 
 	options, err := ArgumentsToCommandOptions(j.Command.Options, j.Arguments, 0)
 	if err != nil {
@@ -111,11 +128,15 @@ func (j *Job) Load(session *discordgo.Session) error {
 }
 
 func (j *Job) ExecuteInteraction(session *discordgo.Session) error {
+	if j.Command == nil {
+		return fmt.Errorf("command is nil")
+	}
+
 	return session.Interact(&discordgo.InteractData{
 		Type:          int(discordgo.InteractionApplicationCommand),
 		Data:          j.Command,
-		ChannelID:     j.ChannelID,
-		GuildID:       j.GuildID,
+		ChannelID:     j.ChannelObject.ID,
+		GuildID:       j.GuildObject.ID,
 		ApplicationID: j.Command.ApplicationID,
 	})
 }

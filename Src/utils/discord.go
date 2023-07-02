@@ -456,9 +456,7 @@ func (DiscordUtils) IsGuildInList(session *discordgo.Session, guildID string, gu
 }
 
 func (DiscordUtils) IsUserInList(session *discordgo.Session, userID string, usersList []string) bool {
-	userName := Discord.GetUserName(session, userID)
-
-	return SliceContains(usersList, userID) || SliceContains(usersList, userName)
+	return SliceContains(usersList, userID)
 }
 
 func (DiscordUtils) UserChannelPermissions(session *discordgo.Session, guildID string, channelID string, userID string) (apermissions int64, err error) {

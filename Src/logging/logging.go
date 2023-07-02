@@ -414,4 +414,24 @@ func (_Logging) SessionDisconnected(id, os, client string) {
 		Show()
 }
 
+func (_Logging) SlashCommandJobs(amount int) {
+	cfg, err := config.GetConfig()
+	if err != nil {
+		return
+	}
+
+	info := fmt.Sprintf("Started %d slash command job", amount)
+
+	if amount > 1 {
+		info += "s"
+	}
+
+	NewConsoleMessage().
+		SetTitle("Slash Commands").
+		SetColor("#C1EFFF").
+		AddInfo("", info).
+		SetWebhookURL(cfg.Webhooks.Misc).
+		Show()
+}
+
 var Logging = _Logging{}
