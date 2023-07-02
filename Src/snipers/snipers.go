@@ -129,7 +129,7 @@ func CheckNitroSniper(
 			}
 			_, ok := sentNitroCodes[message.Author.ID]
 			if ok {
-				sentNitroCodes[message.Author.ID] = append(sentNitroCodes[message.Author.ID], NitroCode{})
+				sentNitroCodes[message.Author.ID] = append(sentNitroCodes[message.Author.ID], code)
 			} else {
 				sentNitroCodes[message.Author.ID] = []NitroCode{code}
 			}
