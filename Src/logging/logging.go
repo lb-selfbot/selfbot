@@ -65,21 +65,15 @@ func (_Logging) OnReady(router *dgc.Router, event *discordgo.Ready) {
 	bannerTextUpper := fmt.Sprintf("LightningBot %s | %s | Prefix: %s", constants.VERSION, userText, cfg.Selfbot.CommandPrefix)
 	bannerTextLower := fmt.Sprintf("%d Commands | %d Servers | %d Friends", len(router.Commands), len(event.Guilds), len(friends))
 
+	message := Console.Colored(
+		utils.String.Center(bannerTextUpper)+"\n"+utils.String.Center(bannerTextLower), 0, 203, 255, false,
+	)
+
 	if constants.CONSOLE {
 		Console.Clear()
-
 		Logging.PrintBanner(true, false)
-
-		message := Console.Colored(
-			utils.String.Center(bannerTextUpper)+"\n"+utils.String.Center(bannerTextLower), 0, 203, 255, false,
-		)
-
 		fmt.Println(message)
 	}
-
-	message := "<image Source=\"assets/Banner.png\" Width=\"650\" Height=\"150\" Centered />\n" +
-		UI.Centered(bannerTextUpper, "#C1EFFF") + "\n" +
-		UI.Centered(bannerTextLower, "#C1EFFF") + "\n"
 
 	UI.Set(message)
 }
