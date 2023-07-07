@@ -65,17 +65,23 @@ func (_Logging) OnReady(router *dgc.Router, event *discordgo.Ready) {
 	bannerTextUpper := fmt.Sprintf("LightningBot %s | %s | Prefix: %s", constants.VERSION, userText, cfg.Selfbot.CommandPrefix)
 	bannerTextLower := fmt.Sprintf("%d Commands | %d Servers | %d Friends", len(router.Commands), len(event.Guilds), len(friends))
 
-	message := Console.Colored(
-		utils.String.Center(bannerTextUpper)+"\n"+utils.String.Center(bannerTextLower), 0, 203, 255, false,
-	)
+	// Console
 
 	if constants.CONSOLE {
+		upper := Console.Colored(utils.String.Center(bannerTextUpper), 0, 203, 255, false)
+		lower := Console.Colored(utils.String.Center(bannerTextLower), 0, 203, 255, false)
+
 		Console.Clear()
 		Logging.PrintBanner(true, false)
-		fmt.Println(message)
+		fmt.Println(upper + "\n" + lower + "\n")
 	}
 
-	UI.Set(message)
+	// UI
+
+	upper := Console.Colored(bannerTextUpper, 0, 203, 255, false)
+	lower := Console.Colored(bannerTextLower, 0, 203, 255, false)
+
+	UI.Set("ALIGN_CENTER" + upper + "\nALIGN_CENTER" + lower + "\n")
 }
 
 func (_Logging) NitroSniperFake(session *discordgo.Session, message *discordgo.Message, code, account string) {

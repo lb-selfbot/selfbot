@@ -42,18 +42,12 @@ func (UILogging) Error(errText string) {
 		},
 	})
 
-	UI.Append(UI.Colored(fmt.Sprintf("[ERROR] %s", errText), "#ff0000"))
-}
-
-func (UILogging) Colored(text string, color string) string {
-	return fmt.Sprintf("<text Color=\"%s\">%s</text>", utils.Misc.Or(color, "#ffffff"), text)
-}
-
-func (UILogging) Centered(text string, color string) string {
-	return fmt.Sprintf("<text Color=\"%s\" Centered>%s</text>", utils.Misc.Or(color, "#ffffff"), text)
+	UI.Append(Console.Colored(fmt.Sprintf("[ERROR] %s", errText), 255, 100, 100, true))
 }
 
 func (UILogging) Append(text string) {
+	text = "\n" + utils.Logging.AnsiToHtml(text)
+
 	ipc.IPC.ConsoleAppend(text)
 	websocket.Websocket.Send(websocket.WsMessage{
 		Op: "CONSOLE_APPEND",
@@ -72,6 +66,8 @@ func (UILogging) Clear() {
 }
 
 func (UILogging) Set(text string) {
+	text = utils.Logging.AnsiToHtml(text)
+
 	ipc.IPC.ConsoleSet(text)
 	websocket.Websocket.Send(websocket.WsMessage{
 		Op: "CONSOLE_SET",

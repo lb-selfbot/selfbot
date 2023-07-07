@@ -36,6 +36,7 @@ require (
 	github.com/google/pprof v0.0.0-20230406165453-00490a63f317 // indirect
 	github.com/klauspost/compress v1.16.4 // indirect
 	github.com/nu7hatch/gouuid v0.0.0-20131221200532-179d4d0c4d8d // indirect
+	github.com/robert-nix/ansihtml v1.0.1 // indirect
 	github.com/stretchr/objx v0.5.0 // indirect
 	github.com/tadvi/systray v0.0.0-20190226123456-11a2b8fa57af // indirect
 	github.com/tam7t/hpkp v0.0.0-20160821193359-2b70b4024ed5 // indirect

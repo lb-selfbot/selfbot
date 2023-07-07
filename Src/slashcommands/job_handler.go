@@ -113,7 +113,10 @@ func StartJobs(session *discordgo.Session) {
 		}
 
 		if !hasLogged {
-			logging.Logging.SlashCommandJobs(len(Jobs))
+			if len(Jobs) > 0 {
+				logging.Logging.SlashCommandJobs(len(Jobs))
+			}
+
 			hasLogged = true
 		}
 
