@@ -78,7 +78,7 @@ func CheckNitroSniper(
 			}
 		}
 
-		url := fmt.Sprintf("https://discord.com/api/v10/entitlements/gift-codes/%s/redeem", nitroCode)
+		url := fmt.Sprintf("https://discord.com/api/v9/entitlements/gift-codes/%s/redeem", nitroCode)
 
 		start := time.Now()
 
