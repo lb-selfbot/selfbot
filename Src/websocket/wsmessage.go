@@ -10,6 +10,7 @@ type WsData struct {
 	ConsoleText  string         `json:"console_text,omitempty"`
 	Text         string         `json:"text,omitempty"`
 	Config       *config.Config `json:"config,omitempty"`
+	Nonce        string         `json:"nonce,omitempty"`
 }
 
 type WsMessage struct {

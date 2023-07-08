@@ -10,16 +10,22 @@ var GatewaySessions []*discordgo.GatewaySession
 var LoginSessions []*discordgo.LoginSession
 
 func RegisterSessionHandler(session *discordgo.Session) {
-	GatewaySessions = session.State.Sessions
+	GatewaySessions = filterSessions(session.State.Sessions)
 	refreshLoginSessions(session)
 
 	session.AddHandler(onSessionsReplace)
 }
 
 func onSessionsReplace(session *discordgo.Session, replace *discordgo.SessionsReplace) {
-	GatewaySessions = replace.Sessions
+	GatewaySessions = filterSessions(replace.Sessions)
 
 	refreshLoginSessions(session)
+}
+
+func filterSessions(sessions []*discordgo.GatewaySession) []*discordgo.GatewaySession {
+	return utils.Filter(sessions, func(session *discordgo.GatewaySession) bool {
+		return session.SessionID != "all"
+	})
 }
 
 func refreshLoginSessions(session *discordgo.Session) error {

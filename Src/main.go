@@ -271,6 +271,8 @@ func main() {
 	}
 	websocket.Websocket.WaitUntilReady()
 
+	websocket.Websocket.CheckNonce()
+
 	err = session.Open()
 	if err != nil {
 		if strings.Contains(err.Error(), "Authentication failed") {

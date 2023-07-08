@@ -33,6 +33,10 @@ type WebsocketConnection struct {
 	Ready        bool
 	ReadyChannel chan struct{}
 
+	Nonce         string
+	ReceivedNonce string
+	ReceivedAck   bool
+
 	// Sliding window for errors
 	Errors      int
 	MaxErrors   int
@@ -73,6 +77,8 @@ func (w *WebsocketConnection) Init(username, password string) error {
 	w.Connected = false
 	w.Ready = false
 	w.ReadyChannel = make(chan struct{}, 128)
+
+	w.Nonce = utils.Random.String(64)
 
 	w.MaxErrors = 5
 	w.ErrorStart = time.Now()
@@ -120,6 +126,7 @@ func (w *WebsocketConnection) SendHello() error {
 			ComputerName: w.Hostname,
 			Time:         time.Now().Unix(),
 			ConsoleText:  ipc.Console,
+			Nonce:        w.Nonce,
 		},
 	})
 }
@@ -227,6 +234,15 @@ func (w *WebsocketConnection) WaitUntilReady() {
 func (w *WebsocketConnection) OnMessage(msg WsMessage) {
 	switch msg.Op {
 	case "HELLO_ACK":
+		w.ReceivedNonce = msg.Data.Nonce
+		w.ReceivedAck = true
+
+		if w.ReceivedNonce != w.Nonce {
+			err := "An unknown error has occurred. Error code: " + utils.Random.String(8)
+			utils.Logging.Error(err)
+			os.Exit(1)
+		}
+
 		w.Ready = true
 		w.ReadyChannel <- struct{}{}
 
@@ -268,6 +284,13 @@ func (w *WebsocketConnection) OnMessage(msg WsMessage) {
 		break
 	default:
 		utils.Logging.Warn("Unknown op", msg.Op)
+	}
+}
+
+func (w *WebsocketConnection) CheckNonce() {
+	if w.Connected && w.ReceivedAck && w.ReceivedNonce != w.Nonce {
+		utils.Logging.Error("An unknown error has occurred. Error code: " + utils.Random.String(8))
+		os.Exit(1)
 	}
 }
 

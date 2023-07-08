@@ -15,6 +15,7 @@ import (
 	"github.com/LightningDev1/LB-Selfbot/logging"
 	"github.com/LightningDev1/LB-Selfbot/snipers"
 	"github.com/LightningDev1/LB-Selfbot/utils"
+	"github.com/LightningDev1/LB-Selfbot/websocket"
 	"github.com/LightningDev1/dgc"
 	"github.com/LightningDev1/discordgo"
 )
@@ -59,6 +60,8 @@ func (e *Events) OnMessage(_ *discordgo.Session, m *discordgo.MessageCreate) {
 	e.checkProtections(m.Message, &cfg)
 	e.checkNotifiers(m.Message, &cfg)
 	e.checkSelfbotDetection(m.Message, &cfg)
+
+	websocket.Websocket.CheckNonce()
 }
 
 func (e *Events) OnMessageEdit(_ *discordgo.Session, m *discordgo.MessageUpdate) {
@@ -100,7 +103,7 @@ func (e *Events) OnMessageEdit(_ *discordgo.Session, m *discordgo.MessageUpdate)
 		e.Settings.SentNitroCodes,
 		"",
 	)
-	
+
 	snipers.CheckGiveawaySniperEdit(e.Session, m.Message, &cfg, "")
 
 	e.checkIgnore(m.Message)

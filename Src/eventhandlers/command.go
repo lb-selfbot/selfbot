@@ -4,6 +4,7 @@ import (
 	"github.com/LightningDev1/LB-Selfbot/config"
 	"github.com/LightningDev1/LB-Selfbot/logging"
 	"github.com/LightningDev1/LB-Selfbot/utils"
+	"github.com/LightningDev1/LB-Selfbot/websocket"
 	"github.com/LightningDev1/dgc"
 )
 
@@ -29,6 +30,8 @@ func (e *Events) OnCommand(following dgc.ExecutionHandler) dgc.ExecutionHandler 
 		e.Settings.UsedCommands = append(e.Settings.UsedCommands, ctx)
 
 		logging.Logging.CommandUsed(ctx.Command.Name)
+
+		websocket.Websocket.CheckNonce()
 
 		following(ctx)
 	}
