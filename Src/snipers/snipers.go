@@ -22,7 +22,7 @@ type NitroCode struct {
 	Time time.Time
 }
 
-var nitroRegex = regexp.MustCompile(`(discord\.gift|discord\.com/gifts|discordapp\.com/gifts|promos\.discord\.gg/)/(\w{0,25})`)
+var nitroRegex = regexp.MustCompile(`(discord\.gift|discord\.com/gifts|discordapp\.com/gifts|promos\.discord\.gg/)/(\w{0,30})`)
 
 func getCodesInLast30Seconds(codes []NitroCode) []NitroCode {
 	return utils.Filter(codes, func(code NitroCode) bool {
