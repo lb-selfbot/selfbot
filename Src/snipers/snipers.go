@@ -572,6 +572,117 @@ func CheckGiveawaySniper(session *discordgo.Session, message *discordgo.Message,
 
 			return
 		}
+	case "368521195940741122": // Lawliet#5480
+		if len(message.Embeds) == 0 {
+			break
+		}
+
+		emb := message.Embeds[0]
+
+		// Win check
+
+		if strings.Contains(message.Content, session.State.User.Mention()) && // Mention in content
+			strings.Contains(emb.Description, "You just won in the giveaway!") { // Winning text
+
+			prize := strings.ReplaceAll(emb.Title, "🎆 ", "")
+
+			logging.Logging.GiveawayWon(session, message, prize, account)
+		}
+
+		// Entering
+
+		if !strings.Contains(emb.Description, "React with 🎉 to enter") {
+			return
+		}
+
+		var endsUnix int64
+
+		endsUnixList := regexp.MustCompile(`<t:(.*?):R>`).FindStringSubmatch(emb.Description)
+		if len(endsUnixList) > 1 {
+			endsUnix, _ = strconv.ParseInt(endsUnixList[1], 10, 64)
+		}
+
+		endsIn := utils.Misc.FormatDuration(time.Until(time.Unix(endsUnix, 0)))
+
+		prize := strings.ReplaceAll(emb.Title, "🎆 ", "")
+
+		if isPrizeBlacklisted(prize, cfg) {
+			return
+		}
+
+		logging.Logging.GiveawayFound(session, message, prize, "", endsIn, account)
+
+		go func() {
+			time.Sleep(time.Second * time.Duration(cfg.Snipers.GiveawaySniper.Sleep))
+			_ = session.MessageReactionAdd(message.ChannelID, message.ID, "🎉")
+		}()
+	case "159985870458322944": // MEE6#4876
+		if len(message.Embeds) == 0 {
+			break
+		}
+
+		emb := message.Embeds[0]
+
+		// Win check
+
+		if strings.Contains(message.Content, session.State.User.Mention()) && // Mention in content
+			strings.Contains(emb.Description, "Congratulations") { // Winning text
+			prize := ""
+
+			if len(emb.Fields) > 0 {
+				prize = emb.Fields[0].Value
+			}
+
+			logging.Logging.GiveawayWon(session, message, prize, account)
+		}
+
+		// Entering
+
+		if len(message.Components) == 0 {
+			break
+		}
+
+		component, ok := message.Components[0].(*discordgo.ActionsRow)
+		if !ok {
+			break
+		}
+
+		if len(component.Components) != 2 {
+			break
+		}
+
+		enterButton, ok := component.Components[0].(*discordgo.Button)
+		if !ok {
+			break
+		}
+
+		timeButton, ok := component.Components[0].(*discordgo.Button)
+		if !ok {
+			break
+		}
+
+		if enterButton.Emoji.Name != "🎉" || !strings.Contains(enterButton.Label, "Participate") {
+			break
+		}
+
+		// End time
+		layout := "Ends on Mon _2 Jan 2006 at 15:04 (MST)"
+
+		endsIn := ""
+
+		endTime, err := time.Parse(layout, timeButton.Label)
+		if err == nil {
+			endsIn = utils.Misc.FormatDuration(time.Until(endTime))
+		}
+
+		fmt.Println(endTime, err)
+
+		logging.Logging.GiveawayFound(session, message, "", "", endsIn, account)
+
+		go func() {
+			time.Sleep(time.Second * time.Duration(cfg.Snipers.GiveawaySniper.Sleep))
+			_ = session.InteractionClick(enterButton, message)
+		}()
 	default:
 		isCustomBot := utils.Discord.IsUserInList(session, message.Author.ID, cfg.Snipers.GiveawaySniper.CustomBots)
 
@@ -757,7 +868,7 @@ func CheckGiveawaySniperEdit(session *discordgo.Session, message *discordgo.Mess
 	case "693167035068317736": // Rumble Royale#6012
 		messageJsonBytes, err := json.Marshal(message)
 		if err != nil {
-			return
+			break
 		}
 
 		messageJson := strings.ToLower(string(messageJsonBytes))
@@ -765,7 +876,7 @@ func CheckGiveawaySniperEdit(session *discordgo.Session, message *discordgo.Mess
 		// Entering
 
 		if !strings.Contains(messageJson, "click the emoji below to join") {
-			return
+			break
 		}
 
 		host := ""
@@ -795,5 +906,21 @@ func CheckGiveawaySniperEdit(session *discordgo.Session, message *discordgo.Mess
 
 			_ = session.MessageReactionAdd(message.ChannelID, message.ID, "Swrds:872886436012126279")
 		}()
+	case "368521195940741122": // Lawliet#5480
+		// Win check
+		if len(message.Embeds) == 0 {
+			break
+		}
+
+		emb := message.Embeds[0]
+
+		if !strings.Contains(message.Content, session.State.User.Mention()) || // Mention in content
+			!strings.Contains(emb.Description, "You just won in the giveaway!") { // Winning text
+			break
+		}
+
+		prize := strings.ReplaceAll(emb.Title, "🎆 ", "")
+
+		logging.Logging.GiveawayWon(session, message, prize, account)
 	}
 }
