@@ -656,7 +656,7 @@ func CheckGiveawaySniper(session *discordgo.Session, message *discordgo.Message,
 			break
 		}
 
-		timeButton, ok := component.Components[0].(*discordgo.Button)
+		timeButton, ok := component.Components[1].(*discordgo.Button)
 		if !ok {
 			break
 		}
@@ -666,16 +666,14 @@ func CheckGiveawaySniper(session *discordgo.Session, message *discordgo.Message,
 		}
 
 		// End time
-		layout := "Ends on Mon _2 Jan 2006 at 15:04 (MST)"
+		label := regexp.MustCompile(`\((.*?)\)`).ReplaceAllLiteralString(timeButton.Label, "")
 
 		endsIn := ""
 
-		endTime, err := time.Parse(layout, timeButton.Label)
+		endTime, err := time.Parse("Ends on Mon _2 Jan 2006 at 15:04 ", label)
 		if err == nil {
 			endsIn = utils.Misc.FormatDuration(time.Until(endTime))
 		}
-
-		fmt.Println(endTime, err)
 
 		logging.Logging.GiveawayFound(session, message, "", "", endsIn, account)
 
