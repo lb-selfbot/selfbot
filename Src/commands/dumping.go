@@ -520,6 +520,9 @@ func (*DumpingCommands) dumpavatars(ctx *dgc.Ctx) {
 		_ = ctx.RespondText("Error getting server: " + err.Error())
 		return
 	}
+
+	ctx.Session.FetchGuildMembers(discordgo.NewFetchGuildMembersParams(guild.ID))
+
 	folder := filepath.Join(utils.IO.GetMainFolder(), "Dumping", "Avatars", utils.IO.SanitizeFilename(guild.Name))
 	_ = os.MkdirAll(folder, os.ModePerm)
 	_ = utils.System.OpenURL(folder)
@@ -532,10 +535,11 @@ func (*DumpingCommands) dumpavatars(ctx *dgc.Ctx) {
 			name += ".png"
 		}
 
-		filePath := folder + utils.IO.SanitizeFilename(name)
+		filePath := filepath.Join(folder, utils.IO.SanitizeFilename(name))
 
 		httpResponse := http.Get(member.AvatarURL(""))
 		if httpResponse.Error != nil {
+			fmt.Println(httpResponse.Error.Error())
 			continue
 		}
 
