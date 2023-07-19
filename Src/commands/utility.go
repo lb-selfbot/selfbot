@@ -42,7 +42,7 @@ func (u UtilityCommands) RegisterCommands(router *dgc.Router) {
 	router.RegisterCmd(&dgc.Command{
 		Name:        "copyserver",
 		Description: "Make an exact copy of a server",
-		Usage:       "[p]copyserver [server id]",
+		Usage:       "[p]copyserver [server id] [delay]",
 		Handler:     u.copyserver,
 	})
 	router.RegisterCmd(&dgc.Command{
@@ -427,6 +427,8 @@ func getChannelType(channelType discordgo.ChannelType) discordgo.ChannelType {
 }
 
 func (UtilityCommands) copyserver(ctx *dgc.Ctx) {
+	duration, _ := time.ParseDuration(utils.Arguments["[delay]"])
+
 	guild, err := utils.Discord.GetGuild(ctx.Session, utils.Misc.Or(utils.Arguments["[server id]"], ctx.Event.GuildID))
 	if err != nil {
 		_ = ctx.RespondText("Error getting server: " + err.Error())
@@ -464,6 +466,8 @@ func (UtilityCommands) copyserver(ctx *dgc.Ctx) {
 			_ = ctx.RespondText("Error copying server: " + err.Error())
 			return
 		}
+
+		time.Sleep(duration)
 	}
 
 	newChannels, err := ctx.Session.GuildChannels(newGuild.ID)
@@ -478,6 +482,8 @@ func (UtilityCommands) copyserver(ctx *dgc.Ctx) {
 			_ = ctx.RespondText("Error copying server: " + err.Error())
 			return
 		}
+
+		time.Sleep(duration)
 	}
 
 	channels, err := ctx.Session.GuildChannels(guild.ID)
@@ -499,6 +505,7 @@ func (UtilityCommands) copyserver(ctx *dgc.Ctx) {
 			_ = ctx.RespondText("Error copying server: " + err.Error())
 			return
 		}
+
 		for _, channel := range categoryChannels[category.ID] {
 			_, err = ctx.Session.GuildChannelCreateComplex(newGuild.ID, discordgo.GuildChannelCreateData{
 				Name:                 channel.Name,
@@ -516,6 +523,8 @@ func (UtilityCommands) copyserver(ctx *dgc.Ctx) {
 				_ = ctx.RespondText("Error copying server: " + err.Error())
 				return
 			}
+
+			time.Sleep(duration)
 		}
 	}
 	embed.NewEmbed().
@@ -1197,9 +1206,8 @@ func (UtilityCommands) clearpronouns(ctx *dgc.Ctx) {
 
 func (UtilityCommands) screenshot(ctx *dgc.Ctx) {
 	duration, _ := time.ParseDuration(utils.Arguments["[delay]"])
-
 	time.Sleep(duration)
-	
+
 	img, err := screenshot.CaptureScreen()
 	if err != nil {
 		_ = ctx.RespondText("Error capturing screenshot")
@@ -1215,7 +1223,6 @@ func (UtilityCommands) screenshot(ctx *dgc.Ctx) {
 	}
 
 	_, _ = ctx.Session.ChannelFileSend(ctx.Event.ChannelID, "screenshot.png", buf)
-
 }
 
 func (UtilityCommands) timezones(ctx *dgc.Ctx) {
