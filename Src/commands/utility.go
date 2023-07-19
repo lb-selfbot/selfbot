@@ -378,7 +378,7 @@ func (u UtilityCommands) RegisterCommands(router *dgc.Router) {
 	router.RegisterCmd(&dgc.Command{
 		Name:        "screenshot",
 		Description: "Make a screenshot",
-		Usage:       "[p]screenshot",
+		Usage:       "[p]screenshot [delay]",
 		Handler:     u.screenshot,
 	})
 	router.RegisterCmd(&dgc.Command{
@@ -1196,6 +1196,10 @@ func (UtilityCommands) clearpronouns(ctx *dgc.Ctx) {
 }
 
 func (UtilityCommands) screenshot(ctx *dgc.Ctx) {
+	duration, _ := time.ParseDuration(utils.Arguments["[delay]"])
+
+	time.Sleep(duration)
+	
 	img, err := screenshot.CaptureScreen()
 	if err != nil {
 		_ = ctx.RespondText("Error capturing screenshot")
