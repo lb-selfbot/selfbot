@@ -20,11 +20,11 @@ import (
 	"github.com/LightningDev1/LB-Selfbot/eventhandlers"
 	"github.com/LightningDev1/LB-Selfbot/ipc"
 	"github.com/LightningDev1/LB-Selfbot/logging"
+	"github.com/LightningDev1/screenshot"
 	"github.com/shirou/gopsutil/cpu"
 	"github.com/shirou/gopsutil/disk"
 	"github.com/shirou/gopsutil/host"
 	"github.com/shirou/gopsutil/mem"
-	"github.com/vova616/screenshot"
 
 	"github.com/LightningDev1/LB-Selfbot/api"
 	"github.com/LightningDev1/LB-Selfbot/constants"
@@ -1205,13 +1205,13 @@ func (UtilityCommands) screenshot(ctx *dgc.Ctx) {
 	buf := new(bytes.Buffer)
 
 	err = png.Encode(buf, img)
-
 	if err != nil {
 		_ = ctx.RespondText("Error encoding image")
 		return
 	}
 
 	_, _ = ctx.Session.ChannelFileSend(ctx.Event.ChannelID, "screenshot.png", buf)
+
 }
 
 func (UtilityCommands) timezones(ctx *dgc.Ctx) {
