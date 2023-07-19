@@ -32,7 +32,7 @@ var TimeUnits = []string{
 
 var TemperatureUnits = []string{"C", "F", "K"}
 
-var WeightUnits = []string{
+var MassUnits = []string{
 	"kg",
 	"g",
 	"mg",

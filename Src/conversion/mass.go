@@ -1,6 +1,6 @@
 package conversion
 
-var weightConverters = map[string]map[string]func(float64) float64{
+var massConverters = map[string]map[string]func(float64) float64{
 	"kg": {
 		"kg": func(val float64) float64 { return val },
 		"g": func(val float64) float64 { return val * 1000 },
@@ -38,12 +38,12 @@ var weightConverters = map[string]map[string]func(float64) float64{
 	},
 }
 
-func ConvertWeight(from string, to string, val float64) (float64, error) {
-	if _, ok := weightConverters[from]; !ok {
+func ConvertMass(from string, to string, val float64) (float64, error) {
+	if _, ok := massConverters[from]; !ok {
 		return 0, ErrUnknownUnit
 	}
-	if _, ok := weightConverters[from][to]; !ok {
+	if _, ok := massConverters[from][to]; !ok {
 		return 0, ErrUnknownUnit
 	}
-	return weightConverters[from][to](val), nil
+	return massConverters[from][to](val), nil
 }

@@ -51,10 +51,10 @@ func (c ConversionCommands) RegisterCommands(router *dgc.Router) {
 		Handler:     c.convertvolume,
 	})
 	router.RegisterCmd(&dgc.Command{
-		Name:        "convertweight",
-		Description: "Convert weight from one unit to another",
-		Usage:       "[p]convertweight <value> <source unit> <destination unit>",
-		Handler:     c.convertweight,
+		Name:        "convertmass",
+		Description: "Convert mass from one unit to another",
+		Usage:       "[p]convertmass <value> <source unit> <destination unit>",
+		Handler:     c.convertmass,
 	})
 }
 
@@ -222,7 +222,7 @@ func (c ConversionCommands) convertvolume(ctx *dgc.Ctx) {
 		Send(ctx)
 }
 
-func (c ConversionCommands) convertweight(ctx *dgc.Ctx) {
+func (c ConversionCommands) convertmass(ctx *dgc.Ctx) {
 	value, err := strconv.ParseFloat(utils.Arguments["<value>"], 64)
 	if err != nil {
 		ctx.RespondText("Invalid value")
@@ -232,11 +232,11 @@ func (c ConversionCommands) convertweight(ctx *dgc.Ctx) {
 	sourceUnit := utils.Arguments["<source unit>"]
 	destinationUnit := utils.Arguments["<destination unit>"]
 
-	if !c.checkIfUnitValid(ctx, sourceUnit, conversion.WeightUnits) || !c.checkIfUnitValid(ctx, destinationUnit, conversion.WeightUnits) {
+	if !c.checkIfUnitValid(ctx, sourceUnit, conversion.MassUnits) || !c.checkIfUnitValid(ctx, destinationUnit, conversion.MassUnits) {
 		return
 	}
 
-	result, err := conversion.ConvertWeight(sourceUnit, destinationUnit, value)
+	result, err := conversion.ConvertMass(sourceUnit, destinationUnit, value)
 	if err != nil {
 		ctx.RespondText("Error converting value: " + err.Error())
 	}
