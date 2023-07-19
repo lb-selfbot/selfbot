@@ -31,6 +31,13 @@ func (s SlashCommands) RegisterCommands(router *dgc.Router) {
 	})
 
 	router.RegisterCmd(&dgc.Command{
+		Name:        "slashcommandjobhelp",
+		Description: "More information about slash command jobs",
+		Usage:       "[p]slashcommandjobhelp",
+		Handler:     s.slashcommandjobhelp,
+	})
+
+	router.RegisterCmd(&dgc.Command{
 		Name:        "listscjobs",
 		Description: "List all slash command jobs",
 		Usage:       "[p]listscjobs",
@@ -180,6 +187,16 @@ func (s SlashCommands) executeslash(ctx *dgc.Ctx) {
 		ctx.RespondText("An error occurred while executing the command: " + err.Error())
 		return
 	}
+}
+
+func (s SlashCommands) slashcommandjobhelp(ctx *dgc.Ctx) {
+	embed.NewEmbed().
+		SetDescription(
+			"Slash command jobs are jobs that run slash commands on a set interval. " +
+				"To get more information and examples, read the documentation at " +
+				"https://docs.lightning-bot.com/commands/slash-commands",
+		).
+		Send(ctx)
 }
 
 func (s SlashCommands) listscjobs(ctx *dgc.Ctx) {

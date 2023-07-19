@@ -57,6 +57,23 @@ func initArgs() {
 
 		os.Exit(0)
 	}
+
+	if strings.Contains(args, "-docgen") {
+		session, _ := discordgo.New("")
+		router := dgc.Create(&dgc.Router{})
+
+		commands.Commands.RegisterCommands(session, router)
+
+		data := map[string]any{}
+
+		for _, category := range router.Categories {
+			data[category.Name] = category.Commands
+		}
+
+		_ = json.NewEncoder(os.Stdout).Encode(data)
+
+		os.Exit(0)
+	}
 }
 
 func checkForUpdates() {
