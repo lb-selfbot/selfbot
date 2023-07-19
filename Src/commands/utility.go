@@ -450,12 +450,16 @@ func (UtilityCommands) copyserver(ctx *dgc.Ctx) {
 		Icon:                        icon,
 	})
 
+	IDs := map[string]string{
+		guild.ID: newGuild.ID,
+	}
+
 	for _, role := range guild.Roles {
 		if role.ID == guild.ID || role.Managed {
 			continue
 		}
 
-		_, err := ctx.Session.GuildRoleCreate(newGuild.ID, &discordgo.RoleParams{
+		newRole, err := ctx.Session.GuildRoleCreate(newGuild.ID, &discordgo.RoleParams{
 			Name:        role.Name,
 			Color:       &role.Color,
 			Hoist:       &role.Hoist,
@@ -466,6 +470,8 @@ func (UtilityCommands) copyserver(ctx *dgc.Ctx) {
 			_ = ctx.RespondText("Error copying server: " + err.Error())
 			return
 		}
+
+		IDs[role.ID] = newRole.ID
 
 		time.Sleep(duration)
 	}
@@ -495,11 +501,13 @@ func (UtilityCommands) copyserver(ctx *dgc.Ctx) {
 	categories, categoryChannels := utils.Discord.MapCategories(channels)
 
 	for _, category := range categories {
+		overwrites := utils.Discord.MapPermissionOverwrites(category.PermissionOverwrites, IDs)
+
 		newCategory, err := ctx.Session.GuildChannelCreateComplex(newGuild.ID, discordgo.GuildChannelCreateData{
 			Name:                 category.Name,
 			Type:                 discordgo.ChannelTypeGuildCategory,
 			Position:             category.Position,
-			PermissionOverwrites: category.PermissionOverwrites,
+			PermissionOverwrites: overwrites,
 		})
 		if err != nil {
 			_ = ctx.RespondText("Error copying server: " + err.Error())
@@ -507,6 +515,8 @@ func (UtilityCommands) copyserver(ctx *dgc.Ctx) {
 		}
 
 		for _, channel := range categoryChannels[category.ID] {
+			overwrites := utils.Discord.MapPermissionOverwrites(channel.PermissionOverwrites, IDs)
+
 			_, err = ctx.Session.GuildChannelCreateComplex(newGuild.ID, discordgo.GuildChannelCreateData{
 				Name:                 channel.Name,
 				Type:                 getChannelType(channel.Type),
@@ -515,7 +525,7 @@ func (UtilityCommands) copyserver(ctx *dgc.Ctx) {
 				UserLimit:            channel.UserLimit,
 				RateLimitPerUser:     channel.RateLimitPerUser,
 				Position:             channel.Position,
-				PermissionOverwrites: channel.PermissionOverwrites,
+				PermissionOverwrites: overwrites,
 				ParentID:             newCategory.ID,
 				NSFW:                 channel.NSFW,
 			})

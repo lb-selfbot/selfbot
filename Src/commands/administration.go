@@ -1935,7 +1935,12 @@ func (*AdministrationCommands) deleteserver(ctx *dgc.Ctx) {
 		_ = ctx.RespondText("Error getting server: " + err.Error())
 		return
 	}
-	_, _ = ctx.Session.GuildDelete(guild.ID)
+
+	_, err = ctx.Session.GuildDelete(guild.ID)
+	if err != nil {
+		_ = ctx.RespondText("Error deleting server: " + err.Error())
+		return
+	}
 }
 
 // Invite Control
