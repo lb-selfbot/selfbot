@@ -275,6 +275,10 @@ func main() {
 
 		f.Close()
 
+		if msgL == discordgo.LogError {
+			utils.Logging.Error("DGC error:", msg)
+		}
+
 	}
 
 	router := dgc.Create(&dgc.Router{
