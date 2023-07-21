@@ -28,7 +28,6 @@ require (
 	github.com/bogdanfinn/fhttp v0.5.23 // indirect
 	github.com/bogdanfinn/tls-client v1.4.0 // indirect
 	github.com/bogdanfinn/utls v1.5.16 // indirect
-	github.com/chzyer/readline v1.5.1 // indirect
 	github.com/dlclark/regexp2 v1.10.0 // indirect
 	github.com/dop251/goja v0.0.0-20230707174833-636fdf960de1 // indirect
 	github.com/go-ole/go-ole v1.2.6 // indirect
@@ -36,7 +35,6 @@ require (
 	github.com/go-toast/toast v0.0.0-20190211030409-01e6764cf0a4 // indirect
 	github.com/godbus/dbus/v5 v5.1.0 // indirect
 	github.com/google/pprof v0.0.0-20230705174524-200ffdc848b8 // indirect
-	github.com/ianlancetaylor/demangle v0.0.0-20230524184225-eabc099b10ab // indirect
 	github.com/klauspost/compress v1.16.7 // indirect
 	github.com/nu7hatch/gouuid v0.0.0-20131221200532-179d4d0c4d8d // indirect
 	github.com/stretchr/objx v0.5.0 // indirect

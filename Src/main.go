@@ -31,6 +31,8 @@ import (
 	"github.com/LightningDev1/discordgo"
 )
 
+var discordgoDebug = false
+
 func initArgs() {
 	args := strings.Join(os.Args, " ")
 
@@ -73,6 +75,10 @@ func initArgs() {
 		_ = json.NewEncoder(os.Stdout).Encode(data)
 
 		os.Exit(0)
+	}
+
+	if strings.Contains(args, "-debug") {
+		discordgoDebug = true
 	}
 }
 
@@ -233,6 +239,43 @@ func main() {
 	session.Token = cfg.Account.Discord.Token
 	session.State.MaxMessageCount = 200
 	session.SetIdentify(cfg.GetClient())
+
+	session.LogLevel = discordgo.LogWarning
+
+	if discordgoDebug {
+		session.LogLevel = discordgo.LogDebug
+	}
+
+	logPath := filepath.Join(utils.IO.GetMainFolder(), "LB.log")
+
+	// Remove log file if it exists
+	_ = os.Remove(logPath)
+
+	discordgo.Logger = func(msgL, caller int, format string, a ...interface{}) {
+		pc, file, line, _ := runtime.Caller(caller + 1)
+
+		files := strings.Split(file, "/")
+		file = files[len(files)-1]
+
+		name := runtime.FuncForPC(pc).Name()
+		fns := strings.Split(name, ".")
+		name = fns[len(fns)-1]
+
+		msg := fmt.Sprintf(format, a...)
+
+		msg = fmt.Sprintf("[DG%d] %s:%d:%s() %s\n", msgL, file, line, name, msg)
+
+		// Write log to file
+		f, err := os.OpenFile(logPath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0666)
+		if err != nil {
+			return
+		}
+
+		_, _ = f.WriteString(msg)
+
+		f.Close()
+
+	}
 
 	router := dgc.Create(&dgc.Router{
 		PrefixFunc: func() []string {
