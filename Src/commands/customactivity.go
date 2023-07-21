@@ -241,7 +241,13 @@ func (CustomActivityCommands) catime(ctx *dgc.Ctx) {
 }
 
 func (CustomActivityCommands) cacreateimagekey(ctx *dgc.Ctx) {
-	imageKey := api.GenImageKey(utils.Arguments["<image url>"])
+	url := utils.Arguments["<image url>"]
+
+	if strings.Contains(url, "discordapp.com") {
+		_ = ctx.RespondText("Your image seems to be hosted on Discord. Please use a different link to create an image key, as this might not work. You can try uploading it to a free image hoster like Imgur or ImgBB (but make sure to use the direct link to the image if you do. The URL should end with .png, .jpg or .gif).")
+	}
+
+	imageKey := api.GenImageKey(url)
 
 	embed.NewEmbed().
 		AddField("Image URL", utils.Arguments["<image url>"]).
