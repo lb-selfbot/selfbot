@@ -77,6 +77,7 @@ type Config struct {
 			CustomBots []string `json:"CustomBots"`
 		} `json:"GiveawaySniper"`
 		NitroSniper      bool     `json:"NitroSniper"`
+		PrivnoteSniper   bool     `json:"PrivnoteSniper"`
 		MultiTokenSniper bool     `json:"MultiTokenSniper"`
 		Tokens           []string `json:"Tokens"`
 	} `json:"Snipers"`

@@ -24,6 +24,7 @@ require (
 
 require (
 	github.com/BurntSushi/xgb v0.0.0-20210121224620-deaf085860bc // indirect
+	github.com/LightningDev1/go-privnote v0.1.0 // indirect
 	github.com/andybalholm/brotli v1.0.5 // indirect
 	github.com/bogdanfinn/fhttp v0.5.23 // indirect
 	github.com/bogdanfinn/tls-client v1.4.0 // indirect

@@ -97,6 +97,7 @@
     },
     "MultiTokenSniper": false,
     "NitroSniper": true,
+    "PrivnoteSniper": true,
     "Tokens": []
   },
   "UI": {
