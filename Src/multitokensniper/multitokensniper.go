@@ -59,6 +59,8 @@ func (s *SniperInstance) Start() error {
 			s.Session.State.User.String(),
 		)
 
+		snipers.CheckPrivnoteSniper(s.Session, m.Message, &cfg, s.Session.State.User.String())
+
 		snipers.CheckGiveawaySniper(s.Session, m.Message, &cfg, s.Session.State.User.String())
 	})
 
@@ -81,6 +83,8 @@ func (s *SniperInstance) Start() error {
 			eventhandlers.EventHandlers.Settings.SentNitroCodes,
 			s.Session.State.User.String(),
 		)
+
+		snipers.CheckPrivnoteSniper(s.Session, m.Message, &cfg, s.Session.State.User.String())
 
 		snipers.CheckGiveawaySniperEdit(s.Session, m.Message, &cfg, s.Session.State.User.String())
 	})

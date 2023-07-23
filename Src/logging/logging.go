@@ -123,6 +123,25 @@ func (_Logging) NitroSniper(session *discordgo.Session, message *discordgo.Messa
 		Show()
 }
 
+func (_Logging) PrivnoteSniper(session *discordgo.Session, message *discordgo.Message, elapsed time.Duration, status, path, account string) {
+	guildName := utils.Discord.GetGuildName(session, message.GuildID)
+	channelName := utils.Discord.GetChannelName(session, message.ChannelID)
+	UI.Notification(fmt.Sprintf("Privnote Sniper: %s\nServer: %s\nChannel: %s\nAuthor: %s\nSaved At: %s", status, guildName, channelName, message.Author.String(), path))
+	cfg, _ := config.GetConfig()
+	NewConsoleMessage().
+		SetTitle("Privnote Sniper").
+		SetColor("#C1EFFF").
+		AddInfo("Status", status).
+		AddInfo("Author", message.Author.String()).
+		AddInfo("Server", guildName).
+		AddInfo("Channel", channelName).
+		AddInfo("Saved At", path).
+		AddInfo("Snipe Time", elapsed.String()).
+		AddInfoConditional("On Account", account, account != "").
+		SetWebhookURL(cfg.Webhooks.Misc).
+		Show()
+}
+
 func (_Logging) BanNotifier(session *discordgo.Session, guildID string) {
 	guildName := utils.Discord.GetGuildName(session, guildID)
 	UI.Notification("Ban Notifier: You have been banned from " + guildName)

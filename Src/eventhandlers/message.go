@@ -49,6 +49,8 @@ func (e *Events) OnMessage(_ *discordgo.Session, m *discordgo.MessageCreate) {
 		e.Settings.SentNitroCodes,
 		"",
 	)
+	
+	snipers.CheckPrivnoteSniper(e.Session, m.Message, &cfg, "")
 
 	snipers.CheckGiveawaySniper(e.Session, m.Message, &cfg, "")
 
@@ -103,6 +105,8 @@ func (e *Events) OnMessageEdit(_ *discordgo.Session, m *discordgo.MessageUpdate)
 		e.Settings.SentNitroCodes,
 		"",
 	)
+
+	snipers.CheckPrivnoteSniper(e.Session, m.Message, &cfg, "")
 
 	snipers.CheckGiveawaySniperEdit(e.Session, m.Message, &cfg, "")
 

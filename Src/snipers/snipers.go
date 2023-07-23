@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"go/token"
 	"go/types"
+	"path/filepath"
 	"regexp"
 	"strconv"
 	"strings"
@@ -14,6 +15,7 @@ import (
 	"github.com/LightningDev1/LB-Selfbot/logging"
 	"github.com/LightningDev1/LB-Selfbot/utils"
 	"github.com/LightningDev1/discordgo"
+	"github.com/LightningDev1/go-privnote"
 	"github.com/bitly/go-simplejson"
 )
 
@@ -23,6 +25,7 @@ type NitroCode struct {
 }
 
 var nitroRegex = regexp.MustCompile(`(discord\.gift|discord\.com/gifts|discordapp\.com/gifts|promos\.discord\.gg/)/(\w{0,30})`)
+var privnoteRegex = regexp.MustCompile(`privnote.com/([a-zA-Z0-9_#]{18,18})`)
 
 func getCodesInLast30Seconds(codes []NitroCode) []NitroCode {
 	return utils.Filter(codes, func(code NitroCode) bool {
@@ -136,6 +139,53 @@ func CheckNitroSniper(
 		}
 	}
 	return alreadyCheckedNitroCodes, sentNitroCodes
+}
+
+func CheckPrivnoteSniper(session *discordgo.Session, message *discordgo.Message, cfg *config.Config, account string) {
+	if !cfg.Snipers.PrivnoteSniper {
+		return
+	}
+
+	if utils.SliceContains(cfg.Snipers.ServerBlacklist, message.GuildID) {
+		return
+	}
+
+	privnoteCodes := privnoteRegex.FindAllString(message.Content, -1)
+
+	for _, privnoteCode := range privnoteCodes {
+		link := "https://" + privnoteCode
+
+		client := privnote.NewClient()
+
+		start := time.Now()
+
+		note, err := client.ReadNoteFromLink(link)
+		if err != nil {
+			continue
+		}
+
+		elapsed := time.Since(start)
+
+		split := strings.Split(link, "/")
+		if len(split) < 2 {
+			continue
+		}
+
+		id := split[len(split)-1]
+
+		fileName := utils.IO.SanitizeFilename("privnote-" + id + ".txt")
+		filePath := filepath.Join(utils.IO.GetMainFolder(), fileName)
+
+		err = utils.IO.Write(filePath, note)
+		if err != nil {
+			continue
+		}
+
+		_ = utils.System.OpenURL(filePath)
+
+		logging.Logging.PrivnoteSniper(session, message, elapsed, "Saved Note", filePath, account)
+	}
+
 }
 
 func isPrizeBlacklisted(prize string, cfg *config.Config) bool {
