@@ -284,6 +284,19 @@ func (c ConfigCommands) RegisterCommands(router *dgc.Router) {
 	})
 
 	router.RegisterCmd(&dgc.Command{
+		Name:        "getprivnotesniper",
+		Description: "Get your current Privnote sniper setting",
+		Usage:       "[p]getprivnotesniper",
+		Handler:     c.getprivnotesniper,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "privnotesniper",
+		Description: "Turn the Privnote sniper on or off",
+		Usage:       "[p]privnotesniper <on/off>",
+		Handler:     c.privnotesniper,
+	})
+
+	router.RegisterCmd(&dgc.Command{
 		Name:        "getsnipertokens",
 		Description: "Get list of multi token sniper tokens",
 		Usage:       "[p]getsnipertokens",
@@ -1282,6 +1295,39 @@ func (ConfigCommands) removegsniperbot(ctx *dgc.Ctx) {
 
 	embed.NewEmbed().
 		SetDescription(fmt.Sprintf("Removed %s from the custom giveaway sniper bot list.", user.String())).
+		Send(ctx)
+}
+
+func (ConfigCommands) getprivnotesniper(ctx *dgc.Ctx) {
+	cfg, err := config.GetConfig()
+	if err != nil {
+		_ = ctx.RespondText("Error getting config")
+		return
+	}
+
+	embed.NewEmbed().
+		AddField("Privnote Sniper", utils.Misc.FormatBoolOnOff(cfg.Snipers.PrivnoteSniper)).
+		Send(ctx)
+}
+
+func (ConfigCommands) privnotesniper(ctx *dgc.Ctx) {
+	cfg, err := config.GetConfig()
+	if err != nil {
+		_ = ctx.RespondText("Error getting config")
+		return
+	}
+
+	toggle := strings.ToLower(utils.Arguments["<on/off>"])
+	if toggle != "on" && toggle != "off" {
+		_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
+		return
+	}
+
+	cfg.Snipers.PrivnoteSniper = toggle == "on"
+	_ = cfg.Save()
+
+	embed.NewEmbed().
+		SetDescription("Turned " + toggle + " Privnote sniper").
 		Send(ctx)
 }
 

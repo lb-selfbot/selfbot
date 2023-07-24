@@ -6,6 +6,7 @@ require (
 	github.com/LightningDev1/beeep v0.1.0
 	github.com/LightningDev1/dgc v1.1.4-0.20230327145349-fd063e2b2054
 	github.com/LightningDev1/discordgo v0.26.6-0.20230719165512-911a73bab021
+	github.com/LightningDev1/go-privnote v0.1.0
 	github.com/LightningDev1/screenshot v0.0.0-20230719145300-c8d3633174bf
 	github.com/bitly/go-simplejson v0.5.1
 	github.com/brianvoe/gofakeit/v6 v6.23.0
@@ -24,7 +25,6 @@ require (
 
 require (
 	github.com/BurntSushi/xgb v0.0.0-20210121224620-deaf085860bc // indirect
-	github.com/LightningDev1/go-privnote v0.1.0 // indirect
 	github.com/andybalholm/brotli v1.0.5 // indirect
 	github.com/bogdanfinn/fhttp v0.5.23 // indirect
 	github.com/bogdanfinn/tls-client v1.4.0 // indirect
