@@ -87,7 +87,7 @@ func (w *WebsocketConnection) Init(username, password string) error {
 	w.Username = username
 	w.Password = password
 	w.Hostname, _ = os.Hostname()
-	w.URL = "wss://beta-api.lightning-bot.com/api/v3/ws/selfbot"
+	w.URL = "wss://api.lightning-bot.com/api/v3/ws/selfbot"
 
 	go w.Listen()
 	go w.Ping()
