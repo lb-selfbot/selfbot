@@ -1,6 +1,7 @@
 package api
 
 import (
+	"bytes"
 	"crypto/sha512"
 	"encoding/base64"
 	"encoding/json"
@@ -493,4 +494,203 @@ func CreateGuild(session *discordgo.Session, name, icon, guildTemplateCode strin
 	}
 
 	return guild, nil
+}
+
+// AI
+
+func GPT3(instructions, message string) string {
+	headers := map[string]string{"Authorization": "Bearer ak-chatgptorguk"}
+
+	httpResponse := http.PostJson("https://gpt4.xunika.uk/api/openai/v1/chat/completions", map[string]any{
+		"model":       "gpt-3.5-turbo-16k-0613",
+		"temperature": 0.75,
+		"messages": []any{
+			map[string]any{"role": "system", "content": instructions},
+			map[string]any{"role": "user", "content": message},
+		},
+	}, headers)
+	if httpResponse.Error != nil {
+		return "An error has occurred: " + httpResponse.Error.Error()
+	}
+
+	content := httpResponse.Json().Get("choices").GetIndex(0).GetPath("message", "content").MustString()
+
+	return utils.Misc.Or(content, "An error has occurred")
+}
+
+var DefaultStyles = map[string]string{
+	"anime":        "anime atmospheric, atmospheric anime, anime character; full body art, digital anime art, beautiful anime art style, anime picture, anime arts, beautiful anime style, digital advanced anime art, anime painting, anime artwork, beautiful anime art, detailed digital anime art, anime epic artwork",
+	"space":        "in cosmic atmosphere, humanitys cosmic future,  space art concept, space landscape, scene in space, cosmic space, beautiful space star planet, background in space, realistic, cinematic, breathtaking view",
+	"comic":        "comic book, john romita senior, inspired by Alton Tobey, by Alan Davis, arachnophobia, by Alton Tobey, as a panel of a marvel comic, marvel comic",
+	"dystopian":    "cifi world, cybernetic civilizations, peter gric and dan mumford,   brutalist dark futuristic, dystopian brutalist atmosphere, dark dystopian world, cinematic 8k, end of the world, doomsday",
+	"surrealism":   "salvador dali painting, highly detailed surrealist art, surrealist conceptual art,  masterpiece surrealism, surreal architecture, surrealistic digital artwork, whimsical surrealism, bizarre art",
+	"graffiti":     "graffiti background, colorful graffiti, graffiti art style, colorful mural, ravi supa, symbolic mural, juxtapoz, pablo picasso, street art",
+	"medieval":     "movie still from game of thrones, powerful fantasy epic, middle ages, lush green landscape, olden times, roman empire, 1400 ce, highly detailed background, cinematic lighting, 8k render, high quality, bright colours",
+	"fantasy":      "fantasy matte painting,  fantasy landscape, ( ( thomas kinkade ) ), whimsical, dreamy, alice in wonderland, daydreaming, epic scene, high exposure, highly detailed, tim white, michael whelan",
+	"abstract":     "vibrant, editorial, abstract elements, colorful, color splatter, realism, Inspired by the style of Ryan Hewett, dynamic realism, soft lighting and intricate details",
+	"painting":     "atmospheric dreamscape painting, by Mac Conner, vibrant gouache painting scenery, vibrant painting, vivid painting, a beautiful painting, dream scenery art, instagram art, psychedelic painting, lofi art, bright art",
+	"icon":         "single vector graphics icon, ios icon, smooth shape, vector",
+	"render":       "isometric, polaroid octane render, 3 d render 1 5 0 mm lens, keyshot product render, rendered, keyshot product render pinterest, 3 d product render, 3 d cgi render, 3d cgi render, ultra wide angle isometric view",
+	"cyberpunk":    "synthwave image, (neotokyo), dreamy colorful cyberpunk colors, cyberpunk blade runner art, retrofuturism, cyberpunk, beautiful cyberpunk style, cgsociety 9",
+	"landscape":    "landscape 4k, beautiful landscapes, nature wallpaper, 8k photography",
+	"architecture": "modern architecture design, luxury architecture, bright, very beautiful, trending on unsplash, breath taking",
+	"retro":        "retro futuristic illustration, featured on illustrationx, art deco illustration, beautiful retro art, stylized digital illustration, highly detailed vector art, ( ( mads berg ) ), automotive design art, epic smooth illustration, by mads berg, stylized illustration, ash thorp khyzyl saleem, clean vector art",
+	"vibrant":      "Psychedelic, water colors spots, vibrant color scheme, highly detailed, romanticism style, cinematic, artstation, greg rutkowski",
+	"futuristic":   "futuristic, elegant atmosphere, glowing lights, highly detailed, digital painting, artstation, concept art, smooth sharp focus, illustration, mars ravelo, gereg rutkowski",
+}
+
+var DefaultModels = map[string]string{
+	"Analog V1":                      "analog-diffusion-1.0.ckpt [9ca13f02]",
+	"Anything V3":                    "anythingv3_0-pruned.ckpt [2700c435]",
+	"Anything V4.5":                  "anything-v4.5-pruned.ckpt [65745d25]",
+	"Anything V5":                    "anythingV5_PrtRE.safetensors [893e49b9]",
+	"AbyssOrangeMix V3":              "AOM3A3_orangemixs.safetensors [9600da17]",
+	"Deliberate V2":                  "deliberate_v2.safetensors [10ec4b29]",
+	"Dreamlike Diffusion V1":         "dreamlike-diffusion-1.0.safetensors [5c9fd6e0]",
+	"Dreamlike Diffusion V2":         "dreamlike-diffusion-2.0.safetensors [fdcf65e7]",
+	"Dreamshaper 5 baked vae":        "dreamshaper_5BakedVae.safetensors [a3fbf318]",
+	"Dreamshaper 6 baked vae":        "dreamshaper_6BakedVae.safetensors [114c8abb]",
+	"Dreamshaper 7":                  "dreamshaper_7.safetensors [5cf5ae06]",
+	"Eimis Anime Diffusion V1.0":     "EimisAnimeDiffusion_V1.ckpt [4f828a15]",
+	"Elldreth's Vivid":               "elldreths-vivid-mix.safetensors [342d9d26]",
+	"Lyriel V1.5":                    "lyriel_v15.safetensors [65d547c5]",
+	"Lyriel V1.6":                    "lyriel_v16.safetensors [68fceea2]",
+	"MechaMix V1.0":                  "mechamix_v10.safetensors [ee685731]",
+	"MeinaMix Meina V9":              "meinamix_meinaV9.safetensors [2ec66ab0]",
+	"MeinaMix Meina V11":             "meinamix_meinaV11.safetensors [b56ce717]",
+	"Openjourney V4":                 "openjourney_V4.ckpt [ca2f377f]",
+	"Portrait+ V1":                   "portraitplus_V1.0.safetensors [1400e684]",
+	"Realistic Vision V1.4":          "Realistic_Vision_V1.4-pruned-fp16.safetensors [8d21810b]",
+	"Realistic Vision V2.0":          "Realistic_Vision_V2.0.safetensors [79587710]",
+	"Realistic Vision V4.0":          "Realistic_Vision_V4.0.safetensors [29a7afaa]",
+	"Redshift Diffusion V1.0":        "redshift_diffusion-V10.safetensors [1400e684]",
+	"ReV Animated V1.2.2":            "revAnimated_v122.safetensors [3f4fefd9]",
+	"SD V1.4":                        "sdv1_4.ckpt [7460a6fa]",
+	"SD V1.5":                        "v1-5-pruned-emaonly.ckpt [81761151]",
+	"Shonin's Beautiful People V1.0": "shoninsBeautiful_v10.safetensors [25d8c546]",
+	"TheAlly's Mix II":               "theallys-mix-ii-churned.safetensors [5d9225a4]",
+	"Timeless V1":                    "timeless-1.0.ckpt [7c4971d4]",
+}
+
+func GetImageModels() map[string]string {
+	httpResponse := http.Get("https://app.prodia.com")
+	if httpResponse.Error != nil {
+		return DefaultModels
+	}
+
+	script := regexp.MustCompile(`<script defer="defer" src="\/js\/app.(.*?).js"><\/script>`).FindStringSubmatch(httpResponse.Body)
+	if len(script) < 2 {
+		return DefaultModels
+	}
+
+	scriptUrl := fmt.Sprintf("https://app.prodia.com/js/app.%s.js", script[1])
+
+	httpResponse = http.Get(scriptUrl)
+	if httpResponse.Error != nil {
+		return DefaultModels
+	}
+
+	models := regexp.MustCompile(`VUE_APP_AI_MODELS:'(.*?)'`).FindStringSubmatch(httpResponse.Body)
+	if len(models) < 2 {
+		return DefaultModels
+	}
+
+	_ = json.Unmarshal([]byte(models[1]+"a"), &DefaultModels)
+
+	return DefaultModels
+}
+
+func CreateImageJob(prompt, negPrompt, model string) (string, error) {
+	seed := rand.Intn(1000000)
+
+	params := url.Values{
+		"new":             {"true"},
+		"prompt":          {prompt},
+		"model":           {model},
+		"negative_prompt": {negPrompt},
+		"steps":           {"30"},
+		"cfg":             {"9.5"},
+		"seed":            {strconv.Itoa(seed)},
+		"sampler":         {"Euler"},
+		"aspect_ratio":    {"square"},
+	}
+
+	headers := map[string]string{
+		"authority":          "api.prodia.com",
+		"accept":             "*/*",
+		"accept-language":    "en-US,en;q=0.6",
+		"dnt":                "1",
+		"origin":             "https://app.prodia.com",
+		"referer":            "https://app.prodia.com/",
+		"sec-ch-ua":          "\"Brave\";v=\"113\", \"Chromium\";v=\"113\", \"Not-A.Brand\";v=\"24\"",
+		"sec-ch-ua-mobile":   "?0",
+		"sec-ch-ua-platform": "\"Linux\"",
+		"sec-fetch-dest":     "empty",
+		"sec-fetch-mode":     "cors",
+		"sec-fetch-site":     "same-site",
+		"sec-gpc":            "1",
+		"user-agent":         "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/113.0.0.0 Safari/537.36",
+	}
+
+	httpResponse := http.Get("https://api.prodia.com/generate?"+params.Encode(), headers)
+	if httpResponse.Error != nil {
+		return "", httpResponse.Error
+	}
+
+	job := httpResponse.Json().Get("job").MustString()
+	if job == "" {
+		return "", fmt.Errorf("could not create job: %s", httpResponse.Body)
+	}
+
+	return job, nil
+}
+
+func GenerateImage(prompt, negPrompt, model string) (*bytes.Reader, error) {
+	if negPrompt == "" {
+		negPrompt = "porn, nsfw, verybadimagenegative_v1.3, ng_deepnegative_v1_75t, ugly face, caricature, body horror, mutant, facebook, youtube, food"
+	}
+
+	if model == "" {
+		model = "Realistic_Vision_V2.0.safetensors [79587710]"
+	}
+
+	job, err := CreateImageJob(prompt, negPrompt, model)
+	if err != nil {
+		return nil, err
+	}
+
+	headers := map[string]string{
+		"authority": "api.prodia.com",
+		"accept":    "*/*",
+	}
+
+	start := time.Now()
+	maxDuration := 20 * time.Second
+
+	for {
+		time.Sleep(500 * time.Millisecond)
+		httpResponse := http.Get("https://api.prodia.com/job/"+job, headers)
+		if httpResponse.Error != nil {
+			return nil, httpResponse.Error
+		}
+
+		status := httpResponse.Json().Get("status").MustString()
+
+		if status == "succeeded" {
+			break
+		}
+
+		if time.Since(start) > maxDuration {
+			return nil, fmt.Errorf("timed out")
+		}
+	}
+
+	imageUrl := fmt.Sprintf("https://images.prodia.xyz/%s.png?download=1", job)
+
+	httpResponse := http.Get(imageUrl)
+	if httpResponse.Error != nil {
+		return nil, httpResponse.Error
+	}
+
+	return bytes.NewReader(httpResponse.BodyBytes), nil
 }

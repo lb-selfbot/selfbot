@@ -86,6 +86,8 @@ func getNameFromArgument(arg string) string {
 	arg = strings.ReplaceAll(arg, "slashcommands", "SlashCommands")
 	arg = strings.ReplaceAll(arg, "slashcommand", "SlashCommands")
 
+	arg = strings.ReplaceAll(arg, "ai", "AI")
+
 	if arg == "admin" {
 		arg = "Admininstration"
 	}
