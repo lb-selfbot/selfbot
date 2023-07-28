@@ -651,7 +651,7 @@ func GenerateImage(prompt, negPrompt, model string) (*bytes.Reader, error) {
 	}
 
 	if model == "" {
-		model = "Realistic_Vision_V2.0.safetensors [79587710]"
+		model = "Realistic_Vision_V5.0.safetensors [614d1063]"
 	}
 
 	job, err := CreateImageJob(prompt, negPrompt, model)

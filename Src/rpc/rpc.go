@@ -150,7 +150,7 @@ func setRPC(session *discordgo.Session, cfg *config.Config, startTime time.Time)
 		}
 
 		return session.UpdateStatusComplex(discordgo.UpdateStatusData{
-			Activities: []*discordgo.Activity{},
+			Activities: []*discordgo.Activity{activity},
 			Game:       activity,
 			AFK:        true,
 			Status:     "unknown",
