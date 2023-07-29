@@ -429,10 +429,10 @@ func (u UtilityCommands) RegisterCommands(router *dgc.Router) {
 		Handler:     u.listdestinations,
 	})
 	router.RegisterCmd(&dgc.Command{
-		Name:        "uploadsc",
+		Name:        "uploadss",
 		Description: "Upload a screenshot",
-		Usage:       "[p]uploadsc <destination> [delay]",
-		Handler:     u.uploadsc,
+		Usage:       "[p]uploadss <destination> [delay]",
+		Handler:     u.uploadss,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "uploadfile",
@@ -1469,7 +1469,7 @@ func (UtilityCommands) listdestinations(ctx *dgc.Ctx) {
 		Send(ctx)
 }
 
-func (UtilityCommands) uploadsc(ctx *dgc.Ctx) {
+func (UtilityCommands) uploadss(ctx *dgc.Ctx) {
 	dest, ok := destinations.Destinations[utils.Arguments["<destination>"]]
 	if !ok {
 		_ = ctx.RespondText("Error: invalid destination\n\nUse the `listdestinations` command to view all destinations")
