@@ -556,14 +556,20 @@ func (*DumpingCommands) dumpchannels(ctx *dgc.Ctx) {
 		_ = ctx.RespondText("Error getting server: " + err.Error())
 		return
 	}
-	categories, categoryChannels := utils.Discord.MapCategories(guild.Channels)
+	categories, categoryChannels, looseChannels := utils.Discord.MapCategories(guild.Channels)
 	logString := ""
+
+	for _, channel := range looseChannels {
+		logString += fmt.Sprintf("%s\n", channel.Name)
+	}
+
 	for _, category := range categories {
 		logString += fmt.Sprintf("\n\nCategory: %s\n\n", category.Name)
 		for _, channel := range categoryChannels[category.ID] {
 			logString += fmt.Sprintf("\t%s\n", channel.Name)
 		}
 	}
+	
 	folder := filepath.Join(utils.IO.GetMainFolder(), "Dumping", "Channels")
 	_ = os.MkdirAll(folder, os.ModePerm)
 	filePath := filepath.Join(folder, utils.IO.SanitizeFilename(guild.ID+"_"+guild.Name+".txt"))

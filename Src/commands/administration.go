@@ -1841,8 +1841,15 @@ func (*AdministrationCommands) channels(ctx *dgc.Ctx) {
 		return
 	}
 
-	categories, categoryChannels := utils.Discord.MapCategories(guild.Channels)
+	categories, categoryChannels, looseChannels := utils.Discord.MapCategories(guild.Channels)
 	emb := embed.NewEmbed().SetDescription(fmt.Sprintf("Server Channels - %s", guild.Name))
+
+	looseString := ""
+	for _, channel := range looseChannels {
+		looseString += channel.Mention() + "\n"
+	}
+	emb.AddField("Channels (No Category)", looseString)
+
 	for _, category := range categories {
 		channelsString := ""
 		for _, channel := range categoryChannels[category.ID] {

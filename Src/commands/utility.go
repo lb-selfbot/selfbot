@@ -479,9 +479,7 @@ func (UtilityCommands) copyserver(ctx *dgc.Ctx) {
 		Icon:                        icon,
 	})
 
-	IDs := map[string]string{
-		guild.ID: newGuild.ID,
-	}
+	IDs := map[string]string{guild.ID: newGuild.ID}
 
 	for _, role := range guild.Roles {
 		if role.ID == guild.ID || role.Managed {
@@ -527,7 +525,29 @@ func (UtilityCommands) copyserver(ctx *dgc.Ctx) {
 		return
 	}
 
-	categories, categoryChannels := utils.Discord.MapCategories(channels)
+	categories, categoryChannels, looseChannels := utils.Discord.MapCategories(channels)
+
+	for _, channel := range looseChannels {
+		overwrites := utils.Discord.MapPermissionOverwrites(channel.PermissionOverwrites, IDs)
+
+		_, err = ctx.Session.GuildChannelCreateComplex(newGuild.ID, discordgo.GuildChannelCreateData{
+			Name:                 channel.Name,
+			Type:                 getChannelType(channel.Type),
+			Topic:                channel.Topic,
+			Bitrate:              int(math.Min(float64(channel.Bitrate), 96000)),
+			UserLimit:            channel.UserLimit,
+			RateLimitPerUser:     channel.RateLimitPerUser,
+			Position:             channel.Position,
+			PermissionOverwrites: overwrites,
+			NSFW:                 channel.NSFW,
+		})
+		if err != nil {
+			_ = ctx.RespondText("Error copying server: " + err.Error())
+			return
+		}
+
+		time.Sleep(duration)
+	}
 
 	for _, category := range categories {
 		overwrites := utils.Discord.MapPermissionOverwrites(category.PermissionOverwrites, IDs)

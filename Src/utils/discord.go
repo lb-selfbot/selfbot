@@ -331,7 +331,7 @@ func (DiscordUtils) SendFileFromURL(ctx *dgc.Ctx, url string, fileName string, h
 	return err
 }
 
-func (DiscordUtils) MapCategories(channels []*discordgo.Channel) (categories []*discordgo.Channel, categoryChannels map[string][]*discordgo.Channel) {
+func (DiscordUtils) MapCategories(channels []*discordgo.Channel) (categories []*discordgo.Channel, categoryChannels map[string][]*discordgo.Channel, looseChannels []*discordgo.Channel) {
 	categoryChannels = make(map[string][]*discordgo.Channel)
 
 	for _, channel := range channels {
@@ -347,7 +347,12 @@ func (DiscordUtils) MapCategories(channels []*discordgo.Channel) (categories []*
 			}
 		}
 	}
-	return categories, categoryChannels
+
+	looseChannels = Filter(channels, func(channel *discordgo.Channel) bool {
+		return channel.Type != discordgo.ChannelTypeGuildCategory && channel.ParentID == ""
+	})
+
+	return categories, categoryChannels, looseChannels
 }
 
 func (DiscordUtils) MapPermissionOverwrites(overwrites []*discordgo.PermissionOverwrite, roleIDs map[string]string) []*discordgo.PermissionOverwrite {
