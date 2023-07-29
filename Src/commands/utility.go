@@ -8,9 +8,11 @@ import (
 	"go/types"
 	"image/png"
 	"math"
+	nethttp "net/http"
 	"net/url"
 	"os"
 	"os/exec"
+	"path"
 	"runtime"
 	"sort"
 	"strconv"
@@ -20,6 +22,7 @@ import (
 	"github.com/LightningDev1/LB-Selfbot/eventhandlers"
 	"github.com/LightningDev1/LB-Selfbot/ipc"
 	"github.com/LightningDev1/LB-Selfbot/logging"
+	"github.com/LightningDev1/LB-Selfbot/uploaders/destinations"
 	"github.com/LightningDev1/screenshot"
 	"github.com/shirou/gopsutil/cpu"
 	"github.com/shirou/gopsutil/disk"
@@ -376,12 +379,6 @@ func (u UtilityCommands) RegisterCommands(router *dgc.Router) {
 		Handler:     u.clearpronouns,
 	})
 	router.RegisterCmd(&dgc.Command{
-		Name:        "screenshot",
-		Description: "Make a screenshot",
-		Usage:       "[p]screenshot [delay]",
-		Handler:     u.screenshot,
-	})
-	router.RegisterCmd(&dgc.Command{
 		Name:        "timezones",
 		Description: "Get a list of timezones for a continent",
 		Usage:       "[p]timezones <continent>",
@@ -416,6 +413,38 @@ func (u UtilityCommands) RegisterCommands(router *dgc.Router) {
 		Description: "Send a message every x seconds (flags: DELETE, INSTANT_DEL)",
 		Usage:       "[p]sendinterval <interval> <amount> <\"message\"> [flags]",
 		Handler:     u.sendinterval,
+	})
+
+	// Uploading
+	router.RegisterCmd(&dgc.Command{
+		Name:        "screenshot",
+		Description: "Make a screenshot",
+		Usage:       "[p]screenshot [delay]",
+		Handler:     u.screenshot,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "listdestinations",
+		Description: "List all upload destinations",
+		Usage:       "[p]listdestinations",
+		Handler:     u.listdestinations,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "uploadsc",
+		Description: "Upload a screenshot",
+		Usage:       "[p]uploadsc <destination> [delay]",
+		Handler:     u.uploadsc,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "uploadfile",
+		Description: "Upload a file",
+		Usage:       "[p]uploadfile <destination> [attachment]",
+		Handler:     u.uploadfile,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "uploadlink",
+		Description: "Upload a link",
+		Usage:       "[p]uploadlink <destination> <link>",
+		Handler:     u.uploadlink,
 	})
 }
 
@@ -1214,27 +1243,6 @@ func (UtilityCommands) clearpronouns(ctx *dgc.Ctx) {
 	_ = api.ChangeSettings(ctx.Session, "/profile", map[string]any{"pronouns": ""})
 }
 
-func (UtilityCommands) screenshot(ctx *dgc.Ctx) {
-	duration, _ := time.ParseDuration(utils.Arguments["[delay]"])
-	time.Sleep(duration)
-
-	img, err := screenshot.CaptureScreen()
-	if err != nil {
-		_ = ctx.RespondText("Error capturing screenshot")
-		return
-	}
-
-	buf := new(bytes.Buffer)
-
-	err = png.Encode(buf, img)
-	if err != nil {
-		_ = ctx.RespondText("Error encoding image")
-		return
-	}
-
-	_, _ = ctx.Session.ChannelFileSend(ctx.Event.ChannelID, "screenshot.png", buf)
-}
-
 func (UtilityCommands) timezones(ctx *dgc.Ctx) {
 	httpResponse := http.Get("http://worldtimeapi.org/api/timezone/" + url.PathEscape(utils.Arguments["<continent>"]))
 	if httpResponse.Error != nil {
@@ -1402,4 +1410,164 @@ func (UtilityCommands) sendinterval(ctx *dgc.Ctx) {
 
 		time.Sleep(time.Duration(interval) * time.Second)
 	}
+}
+
+func (UtilityCommands) screenshot(ctx *dgc.Ctx) {
+	duration, _ := time.ParseDuration(utils.Arguments["[delay]"])
+	time.Sleep(duration)
+
+	img, err := screenshot.CaptureScreen()
+	if err != nil {
+		_ = ctx.RespondText("Error capturing screenshot: " + err.Error())
+		return
+	}
+
+	buf := new(bytes.Buffer)
+
+	err = png.Encode(buf, img)
+	if err != nil {
+		_ = ctx.RespondText("Error encoding image: " + err.Error())
+		return
+	}
+
+	_, _ = ctx.Session.ChannelFileSend(ctx.Event.ChannelID, "screenshot.png", buf)
+}
+
+func (UtilityCommands) listdestinations(ctx *dgc.Ctx) {
+	destinationsString := []string{}
+
+	for name, dest := range destinations.Destinations {
+		desc := fmt.Sprintf("`%s`  - Supports all file types: **%s**", name, utils.Misc.FormatBoolYesNo(dest.SupportsAllFiles()))
+
+		destinationsString = append(destinationsString, desc)
+	}
+
+	sort.Strings(destinationsString)
+
+	embed.NewEmbed().
+		AddField("Destinations", strings.Join(destinationsString, "\n")).
+		Send(ctx)
+}
+
+func (UtilityCommands) uploadsc(ctx *dgc.Ctx) {
+	dest, ok := destinations.Destinations[utils.Arguments["<destination>"]]
+	if !ok {
+		_ = ctx.RespondText("Error: invalid destination\n\nUse the `listdestinations` command to view all destinations")
+		return
+	}
+
+	duration, _ := time.ParseDuration(utils.Arguments["[delay]"])
+	time.Sleep(duration)
+
+	img, err := screenshot.CaptureScreen()
+	if err != nil {
+		_ = ctx.RespondText("Error capturing screenshot: " + err.Error())
+		return
+	}
+
+	buf := new(bytes.Buffer)
+
+	err = png.Encode(buf, img)
+	if err != nil {
+		_ = ctx.RespondText("Error encoding image: " + err.Error())
+		return
+	}
+
+	result, err := dest.Upload(buf, "screenshot.png")
+	if err != nil {
+		_ = ctx.RespondText("Error uploading screenshot: " + err.Error())
+		return
+	}
+
+	embed.NewEmbed().
+		SetDescription("Screenshot").
+		AddField("URL", result.URL).
+		AddField("Direct URL", result.DirectURL).
+		Send(ctx)
+}
+
+func (UtilityCommands) uploadfile(ctx *dgc.Ctx) {
+	dest, ok := destinations.Destinations[utils.Arguments["<destination>"]]
+	if !ok {
+		_ = ctx.RespondText("Error: invalid destination\n\nUse the `listdestinations` command to view all destinations")
+		return
+	}
+
+	attachments := ctx.Event.Message.Attachments
+
+	if len(attachments) == 0 {
+		_ = ctx.RespondText("Error: you must provide a file as an attachment.")
+		return
+	}
+
+	resp, err := nethttp.Get(attachments[0].URL)
+	if err != nil {
+		_ = ctx.RespondText("Error downloading file: " + err.Error())
+		return
+	}
+	defer resp.Body.Close()
+
+	buf := new(bytes.Buffer)
+
+	_, err = buf.ReadFrom(resp.Body)
+	if err != nil {
+		_ = ctx.RespondText("Error reading file body: " + err.Error())
+		return
+	}
+
+	result, err := dest.Upload(buf, attachments[0].Filename)
+	if err != nil {
+		_ = ctx.RespondText("Error uploading file: " + err.Error())
+		return
+	}
+
+	embed.NewEmbed().
+		SetDescription("Uploaded file: "+attachments[0].Filename).
+		AddField("URL", result.URL).
+		AddField("Direct URL", result.DirectURL).
+		Send(ctx)
+}
+
+func (UtilityCommands) uploadlink(ctx *dgc.Ctx) {
+	dest, ok := destinations.Destinations[utils.Arguments["<destination>"]]
+	if !ok {
+		_ = ctx.RespondText("Error: invalid destination\n\nUse the `listdestinations` command to view all destinations")
+		return
+	}
+
+	link := utils.Arguments["<link>"]
+	parsedURL, err := url.ParseRequestURI(link)
+	if err != nil {
+		_ = ctx.RespondText("Error: invalid link: " + err.Error())
+		return
+	}
+
+	fileName := path.Base(parsedURL.Path)
+
+	resp, err := nethttp.Get(link)
+	if err != nil {
+		_ = ctx.RespondText("Error downloading file: " + err.Error())
+		return
+	}
+	defer resp.Body.Close()
+
+	buf := new(bytes.Buffer)
+
+	_, err = buf.ReadFrom(resp.Body)
+	if err != nil {
+		_ = ctx.RespondText("Error reading file body: " + err.Error())
+		return
+	}
+
+	result, err := dest.Upload(buf, fileName)
+	if err != nil {
+		_ = ctx.RespondText("Error uploading file: " + err.Error())
+		return
+	}
+
+	embed.NewEmbed().
+		SetDescription("Uploaded file: "+fileName).
+		AddField("URL", result.URL).
+		AddField("Direct URL", result.DirectURL).
+		Send(ctx)
 }
