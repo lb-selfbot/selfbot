@@ -83,8 +83,6 @@ func CheckNitroSniper(
 
 		url := fmt.Sprintf("https://discord.com/api/v9/entitlements/gift-codes/%s/redeem", nitroCode)
 
-		start := time.Now()
-
 		payload := map[string]any{
 			"with_application":       false,
 			"with_subscription_plan": true,
@@ -97,6 +95,8 @@ func CheckNitroSniper(
 		if paymentSourceID != "" {
 			payload["payment_source_id"] = paymentSourceID
 		}
+
+		start := time.Now()
 
 		response, _ := session.Request("POST", url, payload)
 
