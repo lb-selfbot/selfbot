@@ -646,11 +646,11 @@ func CreateImageJob(prompt, negPrompt, model string) (string, error) {
 }
 
 func GenerateImage(prompt, negPrompt, model string) (*bytes.Reader, error) {
-	if negPrompt == "" {
+	if strings.TrimSpace(negPrompt) == "" {
 		negPrompt = "porn, nsfw, verybadimagenegative_v1.3, ng_deepnegative_v1_75t, ugly face, caricature, body horror, mutant, facebook, youtube, food"
 	}
 
-	if model == "" {
+	if strings.TrimSpace(model) == "" {
 		model = "Realistic_Vision_V5.0.safetensors [614d1063]"
 	}
 

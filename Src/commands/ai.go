@@ -46,7 +46,7 @@ func (a *AICommands) RegisterCommands(router *dgc.Router) {
 	router.RegisterCmd(&dgc.Command{
 		Name:        "imagine",
 		Description: "Generate an image from text",
-		Usage:       "[p]imagine <\"prompt\"> [\"negative prompt\"] [\"style\"] [\"model\"]",
+		Usage:       "[p]imagine <\"prompt\"> [\"negative prompt\"] [\"model\"] [\"style\"]",
 		Handler:     a.imagine,
 	})
 
@@ -125,17 +125,20 @@ func (AICommands) imaginemodels(ctx *dgc.Ctx) {
 }
 
 func (AICommands) imagine(ctx *dgc.Ctx) {
-	prompt, negPrompt, style, model := utils.Arguments["<\"prompt\">"], utils.Arguments["[\"negative prompt\"]"], utils.Arguments["[\"style\"]"], utils.Arguments["[\"model\"]"]
+	prompt := utils.Arguments["<\"prompt\">"]
 
-	if styleValue, ok := api.DefaultStyles[strings.ToLower(style)]; ok {
+	style := strings.ToLower(utils.Arguments["[\"style\"]"])
+	if styleValue, ok := api.DefaultStyles[style]; ok {
 		prompt += ", " + styleValue
 	}
+
+	var model string
 
 	if modelValue, ok := api.DefaultModels[model]; ok {
 		model = modelValue
 	}
 
-	image, err := api.GenerateImage(prompt, negPrompt, model)
+	image, err := api.GenerateImage(prompt, utils.Arguments["[\"negative prompt\"]"], model)
 	if err != nil {
 		_ = ctx.RespondText("Error getting response: " + err.Error())
 		return
