@@ -338,7 +338,7 @@ func (AnimationCommands) customanimation(ctx *dgc.Ctx) {
 	name := utils.Arguments["<name>"]
 	folder := filepath.Join(utils.IO.GetMainFolder(), "Animations")
 	_ = os.MkdirAll(folder, os.ModePerm)
-	path := folder + utils.IO.SanitizeFilename(name+".txt")
+	path :=  filepath.Join(folder, utils.IO.SanitizeFilename(name+".txt"))
 	if _, err := os.Stat(path); os.IsNotExist(err) {
 		_ = ctx.RespondText("Animation does not exist.")
 		return
