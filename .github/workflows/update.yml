@@ -24,6 +24,8 @@ jobs:
       
       - name: Update dependencies
         run: |
+          cd Src
+          
           go get -u
           go mod tidy
 
