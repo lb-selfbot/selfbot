@@ -24,4 +24,5 @@ var Destinations = map[string]Destination{
 	"suleu":     suleu.SulEU{},
 	"anonfiles": anonfiles.Anonfiles{},
 	"sxcu":      sxcu.SXCU{},
+	"catbox":    catbox.Catbox{},
 }
