@@ -62,7 +62,7 @@ func (i ImgBB) Upload(file *bytes.Buffer, filename string) (*uploaders.UploadRes
 	}
 
 	if resp.StatusCode != 200 || json.Get("status_code").MustInt() != 200 {
-		return nil, fmt.Errorf("invalid Imgur response: %s", json.MustMap())
+		return nil, fmt.Errorf("invalid ImgBB response: %s", json.MustMap())
 	}
 
 	result := &uploaders.UploadResult{
