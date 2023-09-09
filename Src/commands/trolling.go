@@ -23,222 +23,259 @@ func (t TrollingCommands) RegisterCommands(router *dgc.Router) {
 		Name:        "purgehack",
 		Description: "Purge a chat without permissions",
 		Usage:       "[p]purgehack",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     t.purgehack,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "ghostping",
 		Description: "Ghostping a user",
 		Usage:       "[p]ghostping <user>",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     t.ghostping,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "gprole",
 		Description: "Ghostping a role",
 		Usage:       "[p]gprole <role>",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     t.gprole,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "token",
 		Description: "Send the first part of someones token",
 		Usage:       "[p]token <user>",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     t.token,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "trollnitro",
 		Description: "Send a fake nitro link with an image",
 		Usage:       "[p]trollnitro",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     t.trollnitro,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "fakenitro",
 		Description: "Generate fake nitro codes",
 		Usage:       "[p]fakenitro <amount>",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     t.fakenitro,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "hiddentext",
 		Description: "Hide text behind other text",
 		Usage:       "[p]hiddentext <\"text\"> <\"hidden\">",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     t.hiddentext,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "hiddeninvite",
 		Description: "Hide an invite behind text",
 		Usage:       "[p]hiddeninvite <invite> <text>",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     t.hiddeninvite,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "hiddenping",
 		Description: "Hide a ping behind text",
 		Usage:       "[p]hiddenping <userid> <text>",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     t.hiddenping,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "hiddenroleping",
 		Description: "Hide a role ping behind text",
 		Usage:       "[p]hiddenroleping <roleid> <text>",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     t.hiddenroleping,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "hiddeneveryone",
 		Description: "Hide an everyone ping behind text",
 		Usage:       "[p]hiddeneveryone <text>",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     t.hiddeneveryone,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "hiddenhere",
 		Description: "Hide a here ping behind text",
 		Usage:       "[p]hiddenhere <text>",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     t.hiddenhere,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "forcenick",
 		Description: "Force a users nickname",
 		Usage:       "[p]forcenick <user> <nick>",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     t.forcenick,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "stopforcenick",
 		Description: "Stop forcing a users nickname",
 		Usage:       "[p]stopforcenick <user>",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     t.stopforcenick,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "forcekick",
 		Description: "Force kick a user",
 		Usage:       "[p]forcekick <user>",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     t.forcekick,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "stopforcekick",
 		Description: "Stop force kicking a user",
 		Usage:       "[p]stopforcekick <user>",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     t.stopforcekick,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "noleave",
 		Description: "Stop user from leaving a group chat",
 		Usage:       "[p]noleave <user>",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     t.noleave,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "stopnoleave",
 		Description: "Stop no leave",
 		Usage:       "[p]stopnoleave <user>",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     t.stopnoleave,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "voicemove",
 		Description: "Move to random voice channels",
 		Usage:       "[p]voicemove <amount>",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     t.voicemove,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "copy",
 		Description: "Copy a users messages",
 		Usage:       "[p]copy <user>",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     t.copy,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "stopcopy",
 		Description: "Stop copying a user",
 		Usage:       "[p]stopcopy <user>",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     t.stopcopy,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "mock",
 		Description: "Mock a users messages",
 		Usage:       "[p]mock <user>",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     t.mock,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "stopmock",
 		Description: "Stop mocking a user",
 		Usage:       "[p]stopmock <user>",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     t.stopmock,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "replycopy",
 		Description: "Copy a users messages with reply",
 		Usage:       "[p]replycopy <user>",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     t.replycopy,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "stopreplycopy",
 		Description: "Stop reply copying a user",
 		Usage:       "[p]stopreplycopy <user>",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     t.stopreplycopy,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "pinspam",
 		Description: "Pin every message a user sends",
 		Usage:       "[p]pinspam <user>",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     t.pinspam,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "stoppinspam",
 		Description: "Stop pin spam",
 		Usage:       "[p]stoppinspam <user>",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     t.stoppinspam,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "unpinspam",
 		Description: "Unpin messages pinned by pinspam",
 		Usage:       "[p]unpinspam",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     t.unpinspam,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "deletemessages",
 		Description: "Delete every message a user sends",
 		Usage:       "[p]deletemessages <user>",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     t.deletemessages,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "stopdeletemessages",
 		Description: "Stop deleting messages",
 		Usage:       "[p]stopdeletemessages <user>",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     t.stopdeletemessages,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "reactuser",
 		Description: "React to every message a user sends",
 		Usage:       "[p]reactuser <user> <emoji>",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     t.reactuser,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "stopreactuser",
 		Description: "Stop react user",
 		Usage:       "[p]stopreactuser <user>",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     t.stopreactuser,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "removereactions",
 		Description: "Delete every reaction a user makes",
 		Usage:       "[p]removereactions <user>",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     t.removereactions,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "stopremovereactions",
 		Description: "Stop removing reactions",
 		Usage:       "[p]stopremovereactions <user>",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     t.stopremovereactions,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "forcedisconnect",
 		Description: "Force disconnect user from voice channels",
 		Usage:       "[p]forcedisconnect <user>",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     t.forcedisconnect,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "stopforcedisconnect",
 		Description: "Stop force disconnecting",
 		Usage:       "[p]stopforcedisconnect <user>",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     t.stopforcedisconnect,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "triggertyping",
 		Description: "Fake \"User is typing\" message",
 		Usage:       "[p]triggertyping <seconds> [channel]",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     t.triggertyping,
 	})
 }

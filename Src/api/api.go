@@ -292,9 +292,10 @@ func GoogleSearch(query string) (*simplejson.Json, error) {
 }
 
 type CreditCard struct {
-	Number     string
-	CCV        string
-	ExpiryDate string
+	Number        string
+	CVV           string
+	ExpiryDate    string
+	Visualisation string
 }
 
 func GenerateCreditCard(ccType string) CreditCard {
@@ -308,9 +309,10 @@ func GenerateCreditCard(ccType string) CreditCard {
 	json := httpResult.Json()
 
 	return CreditCard{
-		Number:     json.Get("number").MustString(),
-		CCV:        json.Get("ccv").MustString(),
-		ExpiryDate: json.Get("expiry_date").MustString(),
+		Number:        json.Get("number").MustString(),
+		CVV:           json.Get("cvv").MustString(),
+		ExpiryDate:    json.Get("expiry_date").MustString(),
+		Visualisation: json.Get("visualisation").MustString(),
 	}
 }
 
@@ -432,6 +434,20 @@ func GenImageKey(imageUrl string) string {
 	return httpResponse.Json().Get("image_key").MustString()
 }
 
+func Obfuscate(lang, code string) string {
+	httpResponse := http.PostJson(
+		"https://api.lightning-bot.com/api/v3/selfbot/obfuscate",
+		map[string]any{"lang": lang, "code": code},
+	)
+
+	obf := httpResponse.Json().Get("code").MustString()
+	if obf == "" {
+		return "An error has occurred: " + httpResponse.Body
+	}
+
+	return obf
+}
+
 func GetTokenData(session *discordgo.Session, token string) ([]byte, error) {
 	headers := map[string]string{
 		"Authorization": token,
@@ -499,7 +515,7 @@ func CreateGuild(session *discordgo.Session, name, icon, guildTemplateCode strin
 // AI
 
 func GPT3(instructions, message string) string {
-	headers := map[string]string{"Authorization": "Bearer ak-chatgptorguk"}
+	headers := map[string]string{"Authorization": "Bearer nk-wwwchatgptorguk"}
 
 	httpResponse := http.PostJson("https://gpt4.xunika.uk/api/openai/v1/chat/completions", map[string]any{
 		"model":       "gpt-3.5-turbo-16k-0613",

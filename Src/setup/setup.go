@@ -9,6 +9,12 @@ import (
 )
 
 func GetLogin() (string, string) {
+	if username, ok := os.LookupEnv("LB_USERNAME"); ok {
+		if password, ok := os.LookupEnv("LB_PASSWORD"); ok {
+			return username, password
+		}
+	}
+
 	username := utils.Input.GetString("Please enter your LightningBot username")
 	password := utils.Input.GetString("Please enter your LightningBot password")
 
@@ -34,6 +40,10 @@ func GetLogin() (string, string) {
 }
 
 func GetToken(session *discordgo.Session) string {
+	if token, ok := os.LookupEnv("LB_TOKEN"); ok {
+		return token
+	}
+	
 	token := utils.Input.GetString("Please enter your Discord token")
 
 	session.Token = token

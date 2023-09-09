@@ -75,7 +75,7 @@ type EventHandlerSettings struct {
 	CountryCode     string
 	PaymentSourceID string
 
-	phisingDomains    []string
+	phishingDomains   []string
 	suspiciousDomains []string
 	friendRequests    []*FriendRequest
 	newDMs            []*discordgo.Message
@@ -122,9 +122,9 @@ func (e *Events) RegisterHandlers(session *discordgo.Session, router *dgc.Router
 
 	e.Session.AddHandler(e.OnChannelRecipientRemove)
 
-	// Get data for anti phising
+	// Get data for anti phishing
 	httpResult := http.Get("https://raw.githubusercontent.com/nikolaischunk/discord-phishing-links/main/domain-list.json")
-	e.Settings.phisingDomains = httpResult.Json().Get("domains").MustStringArray()
+	e.Settings.phishingDomains = httpResult.Json().Get("domains").MustStringArray()
 
 	httpResult = http.Get("https://raw.githubusercontent.com/nikolaischunk/discord-phishing-links/main/suspicious-list.json")
 	e.Settings.suspiciousDomains = httpResult.Json().Get("domains").MustStringArray()

@@ -166,6 +166,7 @@ func (n NetworkCommands) RegisterCommands(router *dgc.Router) {
 		Name:        "open",
 		Description: "Open a URL in the browser",
 		Usage:       "[p]open <url>",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     n.open,
 	})
 	router.RegisterCmd(&dgc.Command{
@@ -190,6 +191,7 @@ func (n NetworkCommands) RegisterCommands(router *dgc.Router) {
 		Name:        "interface",
 		Description: "See your public/local ip and MAC address",
 		Usage:       "[p]interface",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     n._interface,
 	})
 	router.RegisterCmd(&dgc.Command{

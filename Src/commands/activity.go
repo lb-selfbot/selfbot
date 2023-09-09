@@ -174,10 +174,10 @@ func (a *ActivityCommands) RegisterCommands(router *dgc.Router, session *discord
 		Handler:     a.timestatus,
 	})
 	router.RegisterCmd(&dgc.Command{
-		Name:        "getuseractivity",
+		Name:        "getactivityjson",
 		Description: "Get a users activity in JSON format",
-		Usage:       "[p]getuseractivity <user>",
-		Handler:     a.getuseractivity,
+		Usage:       "[p]getactivityjson <user>",
+		Handler:     a.getactivityjson,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "setactivityjson",
@@ -452,7 +452,7 @@ func (a *ActivityCommands) timestatus(ctx *dgc.Ctx) {
 	a.CycleMode = "timestatus"
 }
 
-func (a *ActivityCommands) getuseractivity(ctx *dgc.Ctx) {
+func (a *ActivityCommands) getactivityjson(ctx *dgc.Ctx) {
 	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
 		_ = ctx.RespondText("Could not find user")
@@ -497,5 +497,5 @@ func (a *ActivityCommands) setactivityjson(ctx *dgc.Ctx) {
 		_ = ctx.RespondText("Invalid activity JSON! " + err.Error())
 		return
 	}
-	_ = ctx.Session.UpdateStatusComplex(discordgo.UpdateStatusData{Game: &activity})
+	_ = ctx.Session.UpdateStatusComplex(discordgo.UpdateStatusData{Activities: []*discordgo.Activity{&activity}})
 }

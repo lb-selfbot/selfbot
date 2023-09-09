@@ -20,6 +20,7 @@ func (s SlashCommands) RegisterCommands(router *dgc.Router) {
 		Name:        "searchslash",
 		Description: "Search a slash command",
 		Usage:       "[p]searchslash <#channel> <query>",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     s.searchslash,
 	})
 
@@ -27,6 +28,7 @@ func (s SlashCommands) RegisterCommands(router *dgc.Router) {
 		Name:        "executeslash",
 		Description: "Run a slash command",
 		Usage:       "[p]executeslash <#channel> <@bot> <command> [options...]",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     s.executeslash,
 	})
 
@@ -34,6 +36,7 @@ func (s SlashCommands) RegisterCommands(router *dgc.Router) {
 		Name:        "slashcommandjobhelp",
 		Description: "More information about slash command jobs",
 		Usage:       "[p]slashcommandjobhelp",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     s.slashcommandjobhelp,
 	})
 
@@ -41,6 +44,7 @@ func (s SlashCommands) RegisterCommands(router *dgc.Router) {
 		Name:        "listscjobs",
 		Description: "List all slash command jobs",
 		Usage:       "[p]listscjobs",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     s.listscjobs,
 	})
 
@@ -48,6 +52,7 @@ func (s SlashCommands) RegisterCommands(router *dgc.Router) {
 		Name:        "getscjob",
 		Description: "Get info about a slash command job",
 		Usage:       "[p]getscjob <job id>",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     s.getscjob,
 	})
 
@@ -55,6 +60,7 @@ func (s SlashCommands) RegisterCommands(router *dgc.Router) {
 		Name:        "createscjob",
 		Description: "Create a slash command job",
 		Usage:       "[p]createscjob <#channel> <@bot> <interval> <command> [options...]",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     s.createscjob,
 	})
 
@@ -62,6 +68,7 @@ func (s SlashCommands) RegisterCommands(router *dgc.Router) {
 		Name:        "deletescjob",
 		Description: "Delete a slash command job",
 		Usage:       "[p]deletescjob <job id>",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     s.deletescjob,
 	})
 
@@ -69,6 +76,7 @@ func (s SlashCommands) RegisterCommands(router *dgc.Router) {
 		Name:        "setscjobcommand",
 		Description: "Set a job's command",
 		Usage:       "[p]setscjobcommand <job id> <@bot> <command> [options...]",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     s.setscjobcommand,
 	})
 
@@ -76,6 +84,7 @@ func (s SlashCommands) RegisterCommands(router *dgc.Router) {
 		Name:        "setscjobchannel",
 		Description: "Set a job's channel",
 		Usage:       "[p]setscjobcommand <job id> <#channel>",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     s.setscjobchannel,
 	})
 
@@ -83,6 +92,7 @@ func (s SlashCommands) RegisterCommands(router *dgc.Router) {
 		Name:        "setscjobinterval",
 		Description: "Set a job's interval (in seconds)",
 		Usage:       "[p]setscjobinterval <job id> <interval>",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     s.setscjobinterval,
 	})
 }
@@ -101,7 +111,7 @@ func (s SlashCommands) searchslash(ctx *dgc.Ctx) {
 		Type:                1,
 		Query:               query,
 		Limit:               20,
-		IncludeApplications: false,
+		IncludeApplications: true,
 	})
 	if err != nil {
 		ctx.RespondText("An error occurred while getting commands from Discord: " + err.Error())
@@ -118,7 +128,7 @@ func (s SlashCommands) searchslash(ctx *dgc.Ctx) {
 	for _, cmd := range commands {
 		botName := "Unknown"
 
-		bot, ok := utils.Discord.GetUser(ctx.Session, cmd.ApplicationID)
+		bot, ok := utils.Discord.GetUser(ctx.Session, cmd.BotUserID)
 		if ok {
 			botName = bot.Username
 		}
@@ -150,7 +160,7 @@ func (s SlashCommands) executeslash(ctx *dgc.Ctx) {
 		Type:                1,
 		Query:               utils.Arguments["<command>"],
 		Limit:               20,
-		IncludeApplications: false,
+		IncludeApplications: true,
 	})
 	if err != nil {
 		ctx.RespondText("An error occurred while getting commands from Discord: " + err.Error())
@@ -158,7 +168,7 @@ func (s SlashCommands) executeslash(ctx *dgc.Ctx) {
 	}
 
 	rightCommands := utils.Filter(commands, func(command *discordgo.ApplicationCommand) bool {
-		return command.Name == utils.Arguments["<command>"] && command.ApplicationID == bot.ID
+		return command.Name == utils.Arguments["<command>"] && command.BotUserID == bot.ID
 	})
 
 	if len(rightCommands) == 0 {
@@ -287,7 +297,7 @@ func (s SlashCommands) createscjob(ctx *dgc.Ctx) {
 		Type:                1,
 		Query:               commandName,
 		Limit:               20,
-		IncludeApplications: false,
+		IncludeApplications: true,
 	})
 	if err != nil {
 		ctx.RespondText("An error occurred while getting commands from Discord: " + err.Error())
@@ -295,7 +305,7 @@ func (s SlashCommands) createscjob(ctx *dgc.Ctx) {
 	}
 
 	rightCommands := utils.Filter(commands, func(command *discordgo.ApplicationCommand) bool {
-		return command.Name == commandName && command.ApplicationID == bot.ID
+		return command.Name == commandName && command.BotUserID == bot.ID
 	})
 
 	if len(rightCommands) == 0 {
@@ -320,7 +330,7 @@ func (s SlashCommands) createscjob(ctx *dgc.Ctx) {
 		},
 		ApplicationObject: slashcommands.DiscordObject{
 			Name: bot.Username,
-			ID:   bot.ID,
+			ID:   command.ApplicationID,
 		},
 		ChannelObject: slashcommands.DiscordObject{
 			Name: channel.Name,
@@ -398,7 +408,7 @@ func (s SlashCommands) setscjobcommand(ctx *dgc.Ctx) {
 		Type:                1,
 		Query:               commandName,
 		Limit:               20,
-		IncludeApplications: false,
+		IncludeApplications: true,
 	})
 	if err != nil {
 		ctx.RespondText("An error occurred while getting commands from Discord: " + err.Error())
@@ -406,7 +416,7 @@ func (s SlashCommands) setscjobcommand(ctx *dgc.Ctx) {
 	}
 
 	rightCommands := utils.Filter(commands, func(command *discordgo.ApplicationCommand) bool {
-		return command.Name == commandName && command.ApplicationID == bot.ID
+		return command.Name == commandName && command.BotUserID == bot.ID
 	})
 
 	if len(rightCommands) == 0 {
@@ -431,7 +441,7 @@ func (s SlashCommands) setscjobcommand(ctx *dgc.Ctx) {
 
 	job.ApplicationObject = slashcommands.DiscordObject{
 		Name: bot.Username,
-		ID:   bot.ID,
+		ID:   command.ApplicationID,
 	}
 
 	job.RawArguments = utils.String.RemoveWords(ctx.Arguments.Raw(), 3)

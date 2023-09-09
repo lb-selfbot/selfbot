@@ -276,15 +276,15 @@ func (_Logging) TicketNotifier(session *discordgo.Session, channel *discordgo.Ch
 		Show()
 }
 
-func (_Logging) PhisingDetected(session *discordgo.Session, message *discordgo.Message, domain string) {
+func (_Logging) PhishingDetected(session *discordgo.Session, message *discordgo.Message, domain string) {
 	guildName := utils.Discord.GetGuildName(session, message.GuildID)
 	channelName := utils.Discord.GetChannelName(session, message.ChannelID)
-	UI.Notification(fmt.Sprintf("Protections: Phising Detected!\nDomain: %s\nAuthor: %s", domain, message.Author.String()))
+	UI.Notification(fmt.Sprintf("Protections: Phishing Detected!\nDomain: %s\nAuthor: %s", domain, message.Author.String()))
 	cfg, _ := config.GetConfig()
 	NewConsoleMessage().
 		SetTitle("Protections").
 		SetColor("#C1EFFF").
-		AddInfo("", "Phising Detected!").
+		AddInfo("", "Phishing Detected!").
 		AddInfo("Domain", domain).
 		AddInfo("Author", message.Author.String()).
 		AddInfo("Server", guildName).
@@ -447,6 +447,22 @@ func (_Logging) SlashCommandJobs(amount int) {
 
 	NewConsoleMessage().
 		SetTitle("Slash Commands").
+		SetColor("#C1EFFF").
+		AddInfo("", info).
+		SetWebhookURL(cfg.Webhooks.Misc).
+		Show()
+}
+
+func (_Logging) BlockedDangerousCommand(user *discordgo.User, command string) {
+	cfg, err := config.GetConfig()
+	if err != nil {
+		return
+	}
+
+	info := fmt.Sprintf("Blocked %s from using a dangerous command (%s)", user.DisplayName, command)
+
+	NewConsoleMessage().
+		SetTitle("Sharing").
 		SetColor("#C1EFFF").
 		AddInfo("", info).
 		SetWebhookURL(cfg.Webhooks.Misc).

@@ -22,12 +22,14 @@ func (c ConfigCommands) RegisterCommands(router *dgc.Router) {
 		Name:        "getcommandprefix",
 		Description: "Get your current command prefix",
 		Usage:       "[p]getcommandprefix",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     c.getcommandprefix,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "commandprefix",
 		Description: "Set your command prefix",
 		Usage:       "[p]commandprefix <prefix>",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     c.commandprefix,
 	})
 
@@ -35,12 +37,14 @@ func (c ConfigCommands) RegisterCommands(router *dgc.Router) {
 		Name:        "getcommandmode",
 		Description: "Get your current command mode",
 		Usage:       "[p]getcommandmode",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     c.getcommandmode,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "commandmode",
 		Description: "Set your command mode",
 		Usage:       "[p]commandmode <codeblock/text/webhookembed/indent>",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     c.commandmode,
 	})
 
@@ -48,12 +52,14 @@ func (c ConfigCommands) RegisterCommands(router *dgc.Router) {
 		Name:        "gettitle",
 		Description: "Get your current title",
 		Usage:       "[p]gettitle",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     c.gettitle,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "title",
 		Description: "Set your title",
 		Usage:       "[p]title <title>",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     c.title,
 	})
 
@@ -61,12 +67,14 @@ func (c ConfigCommands) RegisterCommands(router *dgc.Router) {
 		Name:        "getfooter",
 		Description: "Get your current footer",
 		Usage:       "[p]getfooter",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     c.getfooter,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "footer",
 		Description: "Set your footer",
 		Usage:       "[p]footer <footer>",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     c.footer,
 	})
 
@@ -74,12 +82,14 @@ func (c ConfigCommands) RegisterCommands(router *dgc.Router) {
 		Name:        "getdelresponses",
 		Description: "Get your current delete responses setting",
 		Usage:       "[p]getdelresponses",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     c.getdelresponses,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "delresponses",
 		Description: "Set if the bot should delete responses to commands",
 		Usage:       "[p]delresponses <on/off>",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     c.delresponses,
 	})
 
@@ -87,12 +97,14 @@ func (c ConfigCommands) RegisterCommands(router *dgc.Router) {
 		Name:        "getdelresponsesdelay",
 		Description: "Get your current delete responses delay",
 		Usage:       "[p]getdelresponsesdelay",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     c.getdelresponsesdelay,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "delresponsesdelay",
 		Description: "Set the delay before deleting responses",
 		Usage:       "[p]delresponsesdelay <seconds>",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     c.delresponsesdelay,
 	})
 
@@ -100,12 +112,14 @@ func (c ConfigCommands) RegisterCommands(router *dgc.Router) {
 		Name:        "getdelcommands",
 		Description: "Get your current delete commands setting",
 		Usage:       "[p]getdelcommands",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     c.getdelcommands,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "delcommands",
 		Description: "Set if the bot should delete commands",
 		Usage:       "[p]delcommands <on/off>",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     c.delcommands,
 	})
 
@@ -113,12 +127,14 @@ func (c ConfigCommands) RegisterCommands(router *dgc.Router) {
 		Name:        "getmobilefriendly",
 		Description: "Get your current mobile friendly setting",
 		Usage:       "[p]getmobilefriendly",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     c.getmobilefriendly,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "mobilefriendly",
 		Description: "Make the embeds mobile friendly",
 		Usage:       "[p]mobilefriendly <on/off>",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     c.mobilefriendly,
 	})
 
@@ -126,12 +142,14 @@ func (c ConfigCommands) RegisterCommands(router *dgc.Router) {
 		Name:        "getclientspoof",
 		Description: "Get your current client spoof setting",
 		Usage:       "[p]getclientspoof",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     c.getclientspoof,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "clientspoof",
 		Description: "Set your client spoof",
 		Usage:       "[p]clientspoof <desktop/web/mobile>",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     c.clientspoof,
 	})
 
@@ -139,12 +157,14 @@ func (c ConfigCommands) RegisterCommands(router *dgc.Router) {
 		Name:        "getnotifications",
 		Description: "Get your current notifications setting",
 		Usage:       "[p]getnotifications",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     c.getnotifications,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "notifications",
 		Description: "Turn toast notifications on or off",
 		Usage:       "[p]notifications <on/off>",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     c.notifications,
 	})
 
@@ -152,6 +172,7 @@ func (c ConfigCommands) RegisterCommands(router *dgc.Router) {
 		Name:        "examplenotification",
 		Description: "Show an example notification",
 		Usage:       "[p]examplenotification",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     c.examplenotification,
 	})
 
@@ -159,12 +180,14 @@ func (c ConfigCommands) RegisterCommands(router *dgc.Router) {
 		Name:        "getnitrosniper",
 		Description: "Get your current nitro sniper setting",
 		Usage:       "[p]getnitrosniper",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     c.getnitrosniper,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "nitrosniper",
 		Description: "Turn the nitro sniper on or off",
 		Usage:       "[p]nitrosniper <on/off>",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     c.nitrosniper,
 	})
 
@@ -172,12 +195,14 @@ func (c ConfigCommands) RegisterCommands(router *dgc.Router) {
 		Name:        "getgiveawaysniper",
 		Description: "Get your current giveaway sniper setting",
 		Usage:       "[p]getgiveawaysniper",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     c.getgiveawaysniper,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "giveawaysniper",
 		Description: "Turn the giveaway sniper on or off",
 		Usage:       "[p]giveawaysniper <on/off>",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     c.giveawaysniper,
 	})
 
@@ -185,12 +210,14 @@ func (c ConfigCommands) RegisterCommands(router *dgc.Router) {
 		Name:        "getgsnipersleep",
 		Description: "Get your current giveaway sniper sleep",
 		Usage:       "[p]getgsnipersleep",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     c.getgsnipersleep,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "gsnipersleep",
 		Description: "Set the delay before the bot enters a giveaway",
 		Usage:       "[p]gsnipersleep <seconds>",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     c.gsnipersleep,
 	})
 
@@ -198,18 +225,21 @@ func (c ConfigCommands) RegisterCommands(router *dgc.Router) {
 		Name:        "getcustombots",
 		Description: "Get a list of current custom bots",
 		Usage:       "[p]getcustombots",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     c.getcustombots,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "addcustombot",
 		Description: "Add a custom bot for the giveaway sniper",
 		Usage:       "[p]addcustombot <user>",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     c.addcustombot,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "removecustombot",
 		Description: "Remove a custom bot",
 		Usage:       "[p]removecustombot <user>",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     c.removecustombot,
 	})
 
@@ -217,18 +247,21 @@ func (c ConfigCommands) RegisterCommands(router *dgc.Router) {
 		Name:        "getsniperblacklist",
 		Description: "Get the list of sniper blacklist entries",
 		Usage:       "[p]getsniperblacklist",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     c.getsniperblacklist,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "addsniperblacklist",
 		Description: "Add to the sniper blacklist",
 		Usage:       "[p]addsniperblacklist <text>",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     c.addsniperblacklist,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "rmsniperblacklist",
 		Description: "Remove from the sniper blacklist",
 		Usage:       "[p]rmsniperblacklist <text>",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     c.rmsniperblacklist,
 	})
 
@@ -236,18 +269,21 @@ func (c ConfigCommands) RegisterCommands(router *dgc.Router) {
 		Name:        "getsniperserverbl",
 		Description: "Get the list of sniper server blacklist entries",
 		Usage:       "[p]getsniperserverbl",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     c.getsniperserverbl,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "addsniperserverbl",
 		Description: "Add a server to the sniper blacklist",
 		Usage:       "[p]addsniperserverbl <server id>",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     c.addsniperserverbl,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "rmsniperserverbl",
 		Description: "Remove a server from the sniper blacklist",
 		Usage:       "[p]rmsniperserverbl <server id>",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     c.rmsniperserverbl,
 	})
 
@@ -255,18 +291,21 @@ func (c ConfigCommands) RegisterCommands(router *dgc.Router) {
 		Name:        "getgsniperbots",
 		Description: "Get the list of custom giveaway sniper bots",
 		Usage:       "[p]getgsniperbots",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     c.getgsniperbots,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "addgsniperbot",
 		Description: "Add a bot to the custom bot list",
 		Usage:       "[p]addgsniperbot <user>",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     c.addgsniperbot,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "removegsniperbot",
 		Description: "Remove a bot from the custom bot list",
 		Usage:       "[p]removegsniperbot <user>",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     c.removegsniperbot,
 	})
 
@@ -274,12 +313,14 @@ func (c ConfigCommands) RegisterCommands(router *dgc.Router) {
 		Name:        "getmultitokensniper",
 		Description: "Get your current multi token sniper setting",
 		Usage:       "[p]getmultitokensniper",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     c.getmultitokensniper,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "multitokensniper",
 		Description: "Turn the multi token sniper on or off",
 		Usage:       "[p]multitokensniper <on/off>",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     c.multitokensniper,
 	})
 
@@ -287,12 +328,14 @@ func (c ConfigCommands) RegisterCommands(router *dgc.Router) {
 		Name:        "getprivnotesniper",
 		Description: "Get your current Privnote sniper setting",
 		Usage:       "[p]getprivnotesniper",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     c.getprivnotesniper,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "privnotesniper",
 		Description: "Turn the Privnote sniper on or off",
 		Usage:       "[p]privnotesniper <on/off>",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     c.privnotesniper,
 	})
 
@@ -300,18 +343,21 @@ func (c ConfigCommands) RegisterCommands(router *dgc.Router) {
 		Name:        "getsnipertokens",
 		Description: "Get list of multi token sniper tokens",
 		Usage:       "[p]getsnipertokens",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     c.getsnipertokens,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "addsnipertoken",
 		Description: "Add a token to the multi token sniper",
 		Usage:       "[p]addsnipertoken <token>",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     c.addsnipertoken,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "rmsnipertoken",
 		Description: "Remove a token from the multi token sniper",
 		Usage:       "[p]rmsnipertoken <token>",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     c.rmsnipertoken,
 	})
 
@@ -319,6 +365,7 @@ func (c ConfigCommands) RegisterCommands(router *dgc.Router) {
 		Name:        "setupwebhooks",
 		Description: "Automatically set up all webhooks",
 		Usage:       "[p]setupwebhooks [server id]",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     c.setupwebhooks,
 	})
 
@@ -326,6 +373,7 @@ func (c ConfigCommands) RegisterCommands(router *dgc.Router) {
 		Name:        "wall",
 		Description: "Set all webhooks at once",
 		Usage:       "[p]wall <webhook url>",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     c.wall,
 	})
 
@@ -333,12 +381,14 @@ func (c ConfigCommands) RegisterCommands(router *dgc.Router) {
 		Name:        "getwnitro",
 		Description: "Get the current nitro sniper webhook",
 		Usage:       "[p]getwnitro",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     c.getwnitro,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "wnitro",
 		Description: "Set the nitro sniper webhook",
 		Usage:       "[p]wnitro <webhook url>",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     c.wnitro,
 	})
 
@@ -346,12 +396,14 @@ func (c ConfigCommands) RegisterCommands(router *dgc.Router) {
 		Name:        "getwgiveaway",
 		Description: "Get the current giveaway sniper webhook",
 		Usage:       "[p]getwgiveaway",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     c.getwgiveaway,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "wgiveaway",
 		Description: "Set the giveaway sniper webhook",
 		Usage:       "[p]wgiveaway <webhook url>",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     c.wgiveaway,
 	})
 
@@ -359,12 +411,14 @@ func (c ConfigCommands) RegisterCommands(router *dgc.Router) {
 		Name:        "getwselfbotdetection",
 		Description: "Get the current selfbot detection webhook",
 		Usage:       "[p]getwselfbotdetection",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     c.getwselfbotdetection,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "wselfbotdetection",
 		Description: "Set the selfbot detection webhook",
 		Usage:       "[p]wselfbotdetection <webhook url>",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     c.wselfbotdetection,
 	})
 
@@ -372,12 +426,14 @@ func (c ConfigCommands) RegisterCommands(router *dgc.Router) {
 		Name:        "getwstaffdetection",
 		Description: "Get the current staff detection webhook",
 		Usage:       "[p]getwstaffdetection",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     c.getwstaffdetection,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "wstaffdetection",
 		Description: "Set the staff detection webhook",
 		Usage:       "[p]wstaffdetection <webhook url>",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     c.wstaffdetection,
 	})
 
@@ -385,12 +441,14 @@ func (c ConfigCommands) RegisterCommands(router *dgc.Router) {
 		Name:        "getwnotifiers",
 		Description: "Get the current notifiers webhook",
 		Usage:       "[p]getwnotifiers",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     c.getwnotifiers,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "wnotifiers",
 		Description: "Set the notifiers webhook",
 		Usage:       "[p]wnotifiers <webhook url>",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     c.wnotifiers,
 	})
 
@@ -398,12 +456,14 @@ func (c ConfigCommands) RegisterCommands(router *dgc.Router) {
 		Name:        "getwpingdetection",
 		Description: "Get the current ping detection webhook",
 		Usage:       "[p]getwpingdetection",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     c.getwpingdetection,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "wpingdetection",
 		Description: "Set the ping detection webhook",
 		Usage:       "[p]wpingdetection <webhook url>",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     c.wpingdetection,
 	})
 
@@ -411,12 +471,14 @@ func (c ConfigCommands) RegisterCommands(router *dgc.Router) {
 		Name:        "getwmisc",
 		Description: "Get the current misc webhook",
 		Usage:       "[p]getwmisc",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     c.getwmisc,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "wmisc",
 		Description: "Set the misc webhook",
 		Usage:       "[p]wmisc <webhook url>",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     c.wmisc,
 	})
 
@@ -424,12 +486,14 @@ func (c ConfigCommands) RegisterCommands(router *dgc.Router) {
 		Name:        "getwsessions",
 		Description: "Get the current sessions webhook",
 		Usage:       "[p]getwsessions",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     c.getwsessions,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "wsessions",
 		Description: "Set the sessions webhook",
 		Usage:       "[p]wsessions <webhook url>",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     c.wsessions,
 	})
 
@@ -437,12 +501,14 @@ func (c ConfigCommands) RegisterCommands(router *dgc.Router) {
 		Name:        "getbannotifier",
 		Description: "Get the current ban notifier value",
 		Usage:       "[p]getbannotifier",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     c.getbannotifier,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "bannotifier",
 		Description: "Turn ban notifier on or off",
 		Usage:       "[p]bannotifier <on/off>",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     c.bannotifier,
 	})
 
@@ -450,12 +516,14 @@ func (c ConfigCommands) RegisterCommands(router *dgc.Router) {
 		Name:        "getstaffdetection",
 		Description: "Get the current staff detection value",
 		Usage:       "[p]getstaffdetection",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     c.getstaffdetection,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "staffdetection",
 		Description: "Turn staff detection on or off",
 		Usage:       "[p]staffdetection <on/off>",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     c.staffdetection,
 	})
 
@@ -463,12 +531,14 @@ func (c ConfigCommands) RegisterCommands(router *dgc.Router) {
 		Name:        "getpingdetection",
 		Description: "Get the current ping detection value",
 		Usage:       "[p]getpingdetection",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     c.getpingdetection,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "pingdetection",
 		Description: "Turn ping detection on or off",
 		Usage:       "[p]pingdetection <on/off>",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     c.pingdetection,
 	})
 
@@ -476,12 +546,14 @@ func (c ConfigCommands) RegisterCommands(router *dgc.Router) {
 		Name:        "getticketnotifier",
 		Description: "Get the current ticket notifier value",
 		Usage:       "[p]getticketnotifier",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     c.getticketnotifier,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "ticketnotifier",
 		Description: "Turn ticket notifier on or off",
 		Usage:       "[p]ticketnotifier <on/off>",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     c.ticketnotifier,
 	})
 
@@ -489,12 +561,14 @@ func (c ConfigCommands) RegisterCommands(router *dgc.Router) {
 		Name:        "getsessionconnect",
 		Description: "Get the current session connected value",
 		Usage:       "[p]getsessionconnect",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     c.getsessionconnect,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "sessionconnect",
 		Description: "Turn session connected notifier on or off",
 		Usage:       "[p]sessionconnect <on/off>",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     c.sessionconnect,
 	})
 
@@ -502,12 +576,14 @@ func (c ConfigCommands) RegisterCommands(router *dgc.Router) {
 		Name:        "getsessiondisconnect",
 		Description: "Get the current session disconnected value",
 		Usage:       "[p]getsessiondisconnect",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     c.getsessiondisconnect,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "sessiondisconnect",
 		Description: "Turn session disconnected notifier on or off",
 		Usage:       "[p]sessiondisconnect <on/off>",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     c.sessiondisconnect,
 	})
 
@@ -515,12 +591,14 @@ func (c ConfigCommands) RegisterCommands(router *dgc.Router) {
 		Name:        "getselfbotdetection",
 		Description: "Get the current selfbot detection value",
 		Usage:       "[p]getselfbotdetection",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     c.getselfbotdetection,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "selfbotdetection",
 		Description: "Turn selfbot detection on or off",
 		Usage:       "[p]selfbotdetection <on/off>",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     c.selfbotdetection,
 	})
 
@@ -528,12 +606,14 @@ func (c ConfigCommands) RegisterCommands(router *dgc.Router) {
 		Name:        "getdmtypingnotifier",
 		Description: "Get the current DM typing notifier value",
 		Usage:       "[p]getdmtypingnotifier",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     c.getdmtypingnotifier,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "dmtypingnotifier",
 		Description: "Turn the DM typing notifier on or off",
 		Usage:       "[p]dmtypingnotifier <on/off>",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     c.dmtypingnotifier,
 	})
 
@@ -541,12 +621,14 @@ func (c ConfigCommands) RegisterCommands(router *dgc.Router) {
 		Name:        "getdmnotifier",
 		Description: "Get the current DM notifier value",
 		Usage:       "[p]getdmnotifier",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     c.getdmnotifier,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "dmnotifier",
 		Description: "Turn the DM notifier on or off",
 		Usage:       "[p]dmnotifier <on/off>",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     c.dmnotifier,
 	})
 
@@ -554,12 +636,14 @@ func (c ConfigCommands) RegisterCommands(router *dgc.Router) {
 		Name:        "getdmeditnotifier",
 		Description: "Get the current DM edit notifier value",
 		Usage:       "[p]getdmeditnotifier",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     c.getdmeditnotifier,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "dmeditnotifier",
 		Description: "Turn the DM edit notifier on or off",
 		Usage:       "[p]dmeditnotifier <on/off>",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     c.dmeditnotifier,
 	})
 
@@ -567,12 +651,14 @@ func (c ConfigCommands) RegisterCommands(router *dgc.Router) {
 		Name:        "getdmdeletenotifier",
 		Description: "Get the current DM delete notifier value",
 		Usage:       "[p]getdmdeletenotifier",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     c.getdmdeletenotifier,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "dmdeletenotifier",
 		Description: "Turn the DM delete notifier on or off",
 		Usage:       "[p]dmdeletenotifier <on/off>",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     c.dmdeletenotifier,
 	})
 
@@ -580,12 +666,14 @@ func (c ConfigCommands) RegisterCommands(router *dgc.Router) {
 		Name:        "getmsgdeletenotifier",
 		Description: "Get the current message delete notifier value",
 		Usage:       "[p]getmsgdeletenotifier",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     c.getmsgdeletenotifier,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "messagedeletenotifier",
 		Description: "Turn the message delete notifier on or off",
 		Usage:       "[p]messagedeletenotifier <on/off>",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     c.messagedeletenotifier,
 	})
 
@@ -593,12 +681,14 @@ func (c ConfigCommands) RegisterCommands(router *dgc.Router) {
 		Name:        "getuitheme",
 		Description: "Get the current UI theme",
 		Usage:       "[p]getuitheme",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     c.getuitheme,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "uitheme",
 		Description: "Change the UI theme",
 		Usage:       "[p]uitheme <light/dark>",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     c.uitheme,
 	})
 
@@ -606,12 +696,14 @@ func (c ConfigCommands) RegisterCommands(router *dgc.Router) {
 		Name:        "gethidetosystray",
 		Description: "Get the current hide to system tray value",
 		Usage:       "[p]gethidetosystray",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     c.gethidetosystray,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "hidetosystray",
 		Description: "Turn hide to system tray on or off",
 		Usage:       "[p]hidetosystray <on/off>",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     c.hidetosystray,
 	})
 
@@ -619,12 +711,14 @@ func (c ConfigCommands) RegisterCommands(router *dgc.Router) {
 		Name:        "getrunonstartup",
 		Description: "Get the current run on startup value",
 		Usage:       "[p]getrunonstartup",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     c.getrunonstartup,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "runonstartup",
 		Description: "Turn run on startup on or off",
 		Usage:       "[p]runonstartup <on/off>",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     c.runonstartup,
 	})
 
@@ -632,12 +726,14 @@ func (c ConfigCommands) RegisterCommands(router *dgc.Router) {
 		Name:        "getrunsbonstartup",
 		Description: "Get the current run selfbot on startup value",
 		Usage:       "[p]getrunsbonstartup",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     c.getrunsbonstartup,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "runsbonstartup",
 		Description: "Turn run selfbot on startup on or off",
 		Usage:       "[p]runsbonstartup <on/off>",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     c.runsbonstartup,
 	})
 }

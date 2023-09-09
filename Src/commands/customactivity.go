@@ -65,19 +65,19 @@ func (r CustomActivityCommands) RegisterCommands(router *dgc.Router) {
 	router.RegisterCmd(&dgc.Command{
 		Name:        "caname",
 		Description: "Set the Custom Activity name",
-		Usage:       "[p]caname <text>",
+		Usage:       "[p]caname [text]",
 		Handler:     r.caname,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "castate",
 		Description: "Set the Custom Activity state",
-		Usage:       "[p]castate <text>",
+		Usage:       "[p]castate [text]",
 		Handler:     r.castate,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "cadetails",
 		Description: "Set the Custom Activity details",
-		Usage:       "[p]cadetails <text>",
+		Usage:       "[p]cadetails [text]",
 		Handler:     r.cadetails,
 	})
 	router.RegisterCmd(&dgc.Command{
@@ -101,49 +101,49 @@ func (r CustomActivityCommands) RegisterCommands(router *dgc.Router) {
 	router.RegisterCmd(&dgc.Command{
 		Name:        "calargeimage",
 		Description: "Set the Custom Activity large image key",
-		Usage:       "[p]calargeimage <image>",
+		Usage:       "[p]calargeimage [image]",
 		Handler:     r.calargeimage,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "calargetext",
 		Description: "Set the Custom Activity large image text",
-		Usage:       "[p]calargetext <text>",
+		Usage:       "[p]calargetext [text]",
 		Handler:     r.calargetext,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "casmallimage",
 		Description: "Set the Custom Activity small image",
-		Usage:       "[p]casmallimage <image>",
+		Usage:       "[p]casmallimage [image]",
 		Handler:     r.casmallimage,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "casmalltext",
 		Description: "Set the Custom Activity small image text",
-		Usage:       "[p]casmalltext <text>",
+		Usage:       "[p]casmalltext [text]",
 		Handler:     r.casmalltext,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "cabutton1text",
 		Description: "Set the RPC first button text",
-		Usage:       "[p]cabutton1text <text>",
+		Usage:       "[p]cabutton1text [text]",
 		Handler:     r.cabutton1text,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "cabutton1url",
 		Description: "Set the RPC first button url",
-		Usage:       "[p]cabutton1url <url>",
+		Usage:       "[p]cabutton1url [url]",
 		Handler:     r.cabutton1url,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "cabutton2text",
 		Description: "Set the RPC second button text",
-		Usage:       "[p]cabutton2text <text>",
+		Usage:       "[p]cabutton2text [text]",
 		Handler:     r.cabutton2text,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "cabutton2url",
 		Description: "Set the RPC second button url",
-		Usage:       "[p]cabutton2url <url>",
+		Usage:       "[p]cabutton2url [url]",
 		Handler:     r.cabutton2url,
 	})
 }
@@ -211,21 +211,21 @@ func (CustomActivityCommands) caclientid(*dgc.Ctx) {
 	_ = cfg.Save()
 }
 
-func (CustomActivityCommands) caname(*dgc.Ctx) {
+func (CustomActivityCommands) caname(ctx *dgc.Ctx) {
 	cfg, _ := config.GetConfig()
-	cfg.Activity.Name = utils.Arguments["<text>"]
+	cfg.Activity.Name = ctx.Arguments.Raw()
 	_ = cfg.Save()
 }
 
-func (CustomActivityCommands) castate(*dgc.Ctx) {
+func (CustomActivityCommands) castate(ctx *dgc.Ctx) {
 	cfg, _ := config.GetConfig()
-	cfg.Activity.State = utils.Arguments["<text>"]
+	cfg.Activity.State = ctx.Arguments.Raw()
 	_ = cfg.Save()
 }
 
-func (CustomActivityCommands) cadetails(*dgc.Ctx) {
+func (CustomActivityCommands) cadetails(ctx *dgc.Ctx) {
 	cfg, _ := config.GetConfig()
-	cfg.Activity.Details = utils.Arguments["<text>"]
+	cfg.Activity.Details = ctx.Arguments.Raw()
 	_ = cfg.Save()
 }
 
@@ -266,50 +266,50 @@ func (CustomActivityCommands) cainvitable(ctx *dgc.Ctx) {
 	_ = cfg.Save()
 }
 
-func (CustomActivityCommands) calargeimage(*dgc.Ctx) {
+func (CustomActivityCommands) calargeimage(ctx *dgc.Ctx) {
 	cfg, _ := config.GetConfig()
-	cfg.Activity.LargeImage = utils.Arguments["<image>"]
+	cfg.Activity.LargeImage = ctx.Arguments.Raw()
 	_ = cfg.Save()
 }
 
-func (CustomActivityCommands) calargetext(*dgc.Ctx) {
+func (CustomActivityCommands) calargetext(ctx *dgc.Ctx) {
 	cfg, _ := config.GetConfig()
-	cfg.Activity.LargeImageText = utils.Arguments["<text>"]
+	cfg.Activity.LargeImageText = ctx.Arguments.Raw()
 	_ = cfg.Save()
 }
 
-func (CustomActivityCommands) casmallimage(*dgc.Ctx) {
+func (CustomActivityCommands) casmallimage(ctx *dgc.Ctx) {
 	cfg, _ := config.GetConfig()
-	cfg.Activity.SmallImage = utils.Arguments["<image>"]
+	cfg.Activity.SmallImage = ctx.Arguments.Raw()
 	_ = cfg.Save()
 }
 
-func (CustomActivityCommands) casmalltext(*dgc.Ctx) {
+func (CustomActivityCommands) casmalltext(ctx *dgc.Ctx) {
 	cfg, _ := config.GetConfig()
-	cfg.Activity.SmallImageText = utils.Arguments["<text>"]
+	cfg.Activity.SmallImageText = ctx.Arguments.Raw()
 	_ = cfg.Save()
 }
 
-func (CustomActivityCommands) cabutton1text(*dgc.Ctx) {
+func (CustomActivityCommands) cabutton1text(ctx *dgc.Ctx) {
 	cfg, _ := config.GetConfig()
-	cfg.Activity.Button1Label = utils.Arguments["<text>"]
+	cfg.Activity.Button1Label = ctx.Arguments.Raw()
 	_ = cfg.Save()
 }
 
-func (CustomActivityCommands) cabutton1url(*dgc.Ctx) {
+func (CustomActivityCommands) cabutton1url(ctx *dgc.Ctx) {
 	cfg, _ := config.GetConfig()
-	cfg.Activity.Button1URL = utils.Arguments["<url>"]
+	cfg.Activity.Button1URL = ctx.Arguments.Raw()
 	_ = cfg.Save()
 }
 
-func (CustomActivityCommands) cabutton2text(*dgc.Ctx) {
+func (CustomActivityCommands) cabutton2text(ctx *dgc.Ctx) {
 	cfg, _ := config.GetConfig()
-	cfg.Activity.Button2Label = utils.Arguments["<text>"]
+	cfg.Activity.Button2Label = ctx.Arguments.Raw()
 	_ = cfg.Save()
 }
 
-func (CustomActivityCommands) cabutton2url(*dgc.Ctx) {
+func (CustomActivityCommands) cabutton2url(ctx *dgc.Ctx) {
 	cfg, _ := config.GetConfig()
-	cfg.Activity.Button2URL = utils.Arguments["<url>"]
+	cfg.Activity.Button2URL = ctx.Arguments.Raw()
 	_ = cfg.Save()
 }

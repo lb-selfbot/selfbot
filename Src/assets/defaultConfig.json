@@ -42,7 +42,7 @@
   "Protections": {
     "AntiFriendRequest": false,
     "AntiMassDM": false,
-    "AntiPhising": false,
+    "AntiPhishing": false,
     "ServerProtections": {
       "AntiDelete": false,
       "AntiInvite": false,
@@ -83,6 +83,7 @@
   },
   "Sharing": {
     "ShareAll": false,
+    "BlockDangerousCommands": true,
     "SharedCategories": [],
     "SharedCommands": [],
     "SharedUsers": []

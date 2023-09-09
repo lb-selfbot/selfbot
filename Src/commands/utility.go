@@ -154,24 +154,28 @@ func (u UtilityCommands) RegisterCommands(router *dgc.Router) {
 		Name:        "shutdownpc",
 		Description: "Shut your PC down",
 		Usage:       "[p]shutdownpc",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     u.shutdownpc,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "restartpc",
 		Description: "Restart your PC",
 		Usage:       "[p]restartpc",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     u.restartpc,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "sleeppc",
 		Description: "Put your PC to sleep",
 		Usage:       "[p]sleeppc",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     u.sleeppc,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "lockpc",
 		Description: "Lock your PC",
 		Usage:       "[p]lockpc",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     u.lockpc,
 	})
 	router.RegisterCmd(&dgc.Command{
@@ -208,12 +212,14 @@ func (u UtilityCommands) RegisterCommands(router *dgc.Router) {
 		Name:        "restartbot",
 		Description: "Restart LightningBot",
 		Usage:       "[p]restartbot",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     u.restartbot,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "stopbot",
 		Description: "Stop LightningBot",
 		Usage:       "[p]stopbot",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     u.stopbot,
 	})
 	router.RegisterCmd(&dgc.Command{
@@ -238,7 +244,14 @@ func (u UtilityCommands) RegisterCommands(router *dgc.Router) {
 		Name:        "cls",
 		Description: "Clear UI console",
 		Usage:       "[p]cls",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     u.cls,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "openfolder",
+		Description: "Open the LightningBot folder",
+		Usage:       "[p]openfolder",
+		Handler:     u.openfolder,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "mastercard",
@@ -292,12 +305,14 @@ func (u UtilityCommands) RegisterCommands(router *dgc.Router) {
 		Name:        "calc",
 		Description: "Open the calculator",
 		Usage:       "[p]calc",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     u.calc,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "notepad",
 		Description: "Open notepad",
 		Usage:       "[p]notepad",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     u.notepad,
 	})
 	router.RegisterCmd(&dgc.Command{
@@ -420,6 +435,7 @@ func (u UtilityCommands) RegisterCommands(router *dgc.Router) {
 		Name:        "screenshot",
 		Description: "Make a screenshot",
 		Usage:       "[p]screenshot [delay]",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     u.screenshot,
 	})
 	router.RegisterCmd(&dgc.Command{
@@ -432,6 +448,7 @@ func (u UtilityCommands) RegisterCommands(router *dgc.Router) {
 		Name:        "uploadss",
 		Description: "Upload a screenshot",
 		Usage:       "[p]uploadss <destination> [delay]",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     u.uploadss,
 	})
 	router.RegisterCmd(&dgc.Command{
@@ -445,6 +462,26 @@ func (u UtilityCommands) RegisterCommands(router *dgc.Router) {
 		Description: "Upload a link",
 		Usage:       "[p]uploadlink <destination> <link>",
 		Handler:     u.uploadlink,
+	})
+
+	// Obfuscation
+	router.RegisterCmd(&dgc.Command{
+		Name:        "obfuscatepython",
+		Description: "Obfuscate a Python script",
+		Usage:       "[p]obfuscatepython [script/attachment]",
+		Handler:     u.obfuscateFunc("python", "py"),
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "obfuscatelua",
+		Description: "Obfuscate a Lua script",
+		Usage:       "[p]obfuscatelua [script/attachment]",
+		Handler:     u.obfuscateFunc("lua", "lua"),
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "obfuscatejs",
+		Description: "Obfuscate a JS script",
+		Usage:       "[p]obfuscatejs [script/attachment]",
+		Handler:     u.obfuscateFunc("javascript", "js"),
 	})
 }
 
@@ -535,7 +572,7 @@ func (UtilityCommands) copyserver(ctx *dgc.Ctx) {
 			Type:                 getChannelType(channel.Type),
 			Topic:                channel.Topic,
 			Bitrate:              int(math.Min(float64(channel.Bitrate), 96000)),
-			UserLimit:            channel.UserLimit,
+			UserLimit:            int(math.Min(float64(channel.UserLimit), 99)),
 			RateLimitPerUser:     channel.RateLimitPerUser,
 			Position:             channel.Position,
 			PermissionOverwrites: overwrites,
@@ -1069,13 +1106,18 @@ func (UtilityCommands) cls(*dgc.Ctx) {
 	logging.UI.Clear()
 }
 
+func (UtilityCommands) openfolder(*dgc.Ctx) {
+	_ = utils.System.OpenURL(utils.IO.GetMainFolder())
+}
+
 func (UtilityCommands) mastercard(ctx *dgc.Ctx) {
 	creditCard := api.GenerateCreditCard("mastercard")
 	embed.NewEmbed().
 		AddField("Card Type", "Mastercard").
 		AddField("Card Number", creditCard.Number).
-		AddField("CCV", creditCard.CCV).
+		AddField("CVV", creditCard.CVV).
 		AddField("Expiry Date", creditCard.ExpiryDate).
+		SetImage(creditCard.Visualisation).
 		Send(ctx)
 }
 
@@ -1084,8 +1126,9 @@ func (UtilityCommands) visa16(ctx *dgc.Ctx) {
 	embed.NewEmbed().
 		AddField("Card Type", "Visa").
 		AddField("Card Number", creditCard.Number).
-		AddField("CCV", creditCard.CCV).
+		AddField("CVV", creditCard.CVV).
 		AddField("Expiry Date", creditCard.ExpiryDate).
+		SetImage(creditCard.Visualisation).
 		Send(ctx)
 }
 
@@ -1094,8 +1137,9 @@ func (UtilityCommands) visa13(ctx *dgc.Ctx) {
 	embed.NewEmbed().
 		AddField("Card Type", "Visa").
 		AddField("Card Number", creditCard.Number).
-		AddField("CCV", creditCard.CCV).
+		AddField("CVV", creditCard.CVV).
 		AddField("Expiry Date", creditCard.ExpiryDate).
+		SetImage(creditCard.Visualisation).
 		Send(ctx)
 }
 
@@ -1104,8 +1148,9 @@ func (UtilityCommands) amex(ctx *dgc.Ctx) {
 	embed.NewEmbed().
 		AddField("Card Type", "American Express").
 		AddField("Card Number", creditCard.Number).
-		AddField("CCV", creditCard.CCV).
+		AddField("CVV", creditCard.CVV).
 		AddField("Expiry Date", creditCard.ExpiryDate).
+		SetImage(creditCard.Visualisation).
 		Send(ctx)
 }
 
@@ -1114,8 +1159,9 @@ func (UtilityCommands) discover(ctx *dgc.Ctx) {
 	embed.NewEmbed().
 		AddField("Card Type", "Discover").
 		AddField("Card Number", creditCard.Number).
-		AddField("CCV", creditCard.CCV).
+		AddField("CVV", creditCard.CVV).
 		AddField("Expiry Date", creditCard.ExpiryDate).
+		SetImage(creditCard.Visualisation).
 		Send(ctx)
 }
 
@@ -1124,8 +1170,9 @@ func (UtilityCommands) diners(ctx *dgc.Ctx) {
 	embed.NewEmbed().
 		AddField("Card Type", "Diners").
 		AddField("Card Number", creditCard.Number).
-		AddField("CCV", creditCard.CCV).
+		AddField("CVV", creditCard.CVV).
 		AddField("Expiry Date", creditCard.ExpiryDate).
+		SetImage(creditCard.Visualisation).
 		Send(ctx)
 }
 
@@ -1134,8 +1181,9 @@ func (UtilityCommands) jcb(ctx *dgc.Ctx) {
 	embed.NewEmbed().
 		AddField("Card Type", "JCB").
 		AddField("Card Number", creditCard.Number).
-		AddField("CCV", creditCard.CCV).
+		AddField("CVV", creditCard.CVV).
 		AddField("Expiry Date", creditCard.ExpiryDate).
+		SetImage(creditCard.Visualisation).
 		Send(ctx)
 }
 
@@ -1186,7 +1234,7 @@ func (UtilityCommands) firstmessage(ctx *dgc.Ctx) {
 		SetDescription("First Message").
 		AddField("Author", messages[0].Author.String()).
 		AddField("Message", messages[0].Content).
-		AddField("Jump URL", fmt.Sprintf("https://discord.com/channels/%s/%s/%s", channel.GuildID, channel.ID, messages[0].ID)).
+		AddField("Jump URL", fmt.Sprintf("https://discord.com/channels/%s/%s/%s", utils.Misc.Or(channel.GuildID, "@me"), channel.ID, messages[0].ID)).
 		Send(ctx)
 }
 
@@ -1590,4 +1638,42 @@ func (UtilityCommands) uploadlink(ctx *dgc.Ctx) {
 		AddField("URL", result.URL).
 		AddField("Direct URL", result.DirectURL).
 		Send(ctx)
+}
+
+func (UtilityCommands) obfuscateFunc(lang, ext string) func(ctx *dgc.Ctx) {
+	return func(ctx *dgc.Ctx) {
+		script := utils.Arguments["[script/attachment]"]
+
+		if script == "" && len(ctx.Event.Message.Attachments) > 0 {
+			httpResponse := http.Get(ctx.Event.Message.Attachments[0].URL)
+			if httpResponse.Error != nil {
+				_ = ctx.RespondText("Error getting script: " + httpResponse.Error.Error())
+				return
+			}
+
+			script = httpResponse.Body
+		}
+
+		if script == "" {
+			_ = ctx.RespondText("Error: you must provide a script as an attachment or argument.")
+			return
+		}
+
+		obf := api.Obfuscate(lang, script)
+		if strings.HasPrefix(obf, "An error") {
+			_ = ctx.RespondText(obf)
+			return
+		}
+
+		_, _ = ctx.Session.ChannelMessageSendComplex(ctx.Event.ChannelID, &discordgo.MessageSend{
+			Content: "Obfuscated Script",
+			Files: []*discordgo.File{
+				{
+					Name:        "script." + ext,
+					ContentType: "text/plain",
+					Reader:      strings.NewReader(obf),
+				},
+			},
+		})
+	}
 }

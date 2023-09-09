@@ -539,7 +539,6 @@ func (*DumpingCommands) dumpavatars(ctx *dgc.Ctx) {
 
 		httpResponse := http.Get(member.AvatarURL(""))
 		if httpResponse.Error != nil {
-			fmt.Println(httpResponse.Error.Error())
 			continue
 		}
 
@@ -587,7 +586,9 @@ func (*DumpingCommands) dumpmembers(ctx *dgc.Ctx) {
 		return
 	}
 
-	ctx.Session.FetchGuildMembers(discordgo.NewFetchGuildMembersParams(guild.ID))
+	x:= discordgo.NewFetchGuildMembersParams(guild.ID)
+	x.ForceScraping=true
+	ctx.Session.FetchGuildMembers(x)
 
 	logString := fmt.Sprintf("Amount of dumped members: %d\n\n", len(guild.Members))
 	for _, member := range guild.Members {

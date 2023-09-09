@@ -147,6 +147,7 @@ func setRPC(session *discordgo.Session, cfg *config.Config, startTime time.Time)
 			Metadata: &discordgo.ActivityMetadata{
 				ButtonURLs: buttonUrls,
 			},
+			ApplicationID: "898932653049393172",
 		}
 
 		return session.UpdateStatusComplex(discordgo.UpdateStatusData{

@@ -14,93 +14,106 @@ type ProtectionsCommands struct{}
 func (p ProtectionsCommands) RegisterCommands(router *dgc.Router) {
 	router.StartCategory("Protections", "Protection commands")
 	router.RegisterCmd(&dgc.Command{
-		Name:        "antiphising",
-		Description: "Turn anti phising on or off",
-		Usage:       "[p]antiphising <on/off>",
-		Handler:     p.antiphising,
+		Name:        "antiphishing",
+		Description: "Turn anti phishing on or off",
+		Usage:       "[p]antiphishing <on/off>",
+		Flags:       []string{"DANGEROUS"},
+		Handler:     p.antiphishing,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "antifriendrequest",
 		Description: "Turn anti friend request spam on or off",
 		Usage:       "[p]antifriendrequest <on/off>",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     p.antifriendrequest,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "antimassdm",
 		Description: "Turn anti mass DM on or off",
 		Usage:       "[p]antimassmd <on/off>",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     p.antimassdm,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "protectserver",
 		Description: "Protect a server",
 		Usage:       "[p]protectserver <server id>",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     p.protectserver,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "unprotectserver",
 		Description: "Protect a server",
 		Usage:       "[p]protectserver <server id>",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     p.unprotectserver,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "antiinvite",
 		Description: "Turn anti invite on or off",
 		Usage:       "[p]antiinvite <on/off>",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     p.antiinvite,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "antispam",
 		Description: "Turn anti spam on or off",
 		Usage:       "[p]antispam <on/off>",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     p.antispam,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "antiupper",
 		Description: "Turn anti upper on or off",
 		Usage:       "[p]antiupper <on/off>",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     p.antiupper,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "antidelete",
 		Description: "Turn anti delete on or off",
 		Usage:       "[p]antidelete <on/off>",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     p.antidelete,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "closedm",
 		Description: "Close your DMs",
 		Usage:       "[p]closedm",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     p.closedm,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "opendm",
 		Description: "Allow DMs from everyone",
 		Usage:       "[p]opendm",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     p.opendm,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "enablefriendrequests",
 		Description: "Enable friend requests",
 		Usage:       "[p]enablefriendrequests",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     p.enablefriendrequests,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "disablefriendrequests",
 		Description: "Disable friend requests",
 		Usage:       "[p]disablefriendrequests",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     p.disablefriendrequests,
 	})
 }
 
-func (p ProtectionsCommands) antiphising(ctx *dgc.Ctx) {
+func (p ProtectionsCommands) antiphishing(ctx *dgc.Ctx) {
 	toggle := strings.ToLower(utils.Arguments["<on/off>"])
 	if toggle != "on" && toggle != "off" {
 		_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
 		return
 	}
 	cfg, _ := config.GetConfig()
-	cfg.Protections.AntiPhising = toggle == "on"
+	cfg.Protections.AntiPhishing = toggle == "on"
 	_ = cfg.Save()
 }
 

@@ -21,156 +21,182 @@ func (e *EventReactionsCommands) RegisterCommands(router *dgc.Router) {
 		Name:        "ignoreuser",
 		Description: "Ignore messages from a user",
 		Usage:       "[p]ignoreuser <user>",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     e.ignoreuser,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "unignoreuser",
 		Description: "Unignore a user",
 		Usage:       "[p]unignoreuser <user>",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     e.unignoreuser,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "userignorelist",
 		Description: "See all ignored users",
 		Usage:       "[p]userignorelist",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     e.userignorelist,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "clearuserignorelist",
 		Description: "Clear the list of ignored users",
 		Usage:       "[p]clearuserignorelist",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     e.clearuserignorelist,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "ignoreserver",
 		Description: "Ignore messages from a server",
 		Usage:       "[p]ignoreserver [server id]",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     e.ignoreserver,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "unignoreserver",
 		Description: "Unignore a server",
 		Usage:       "[p]unignoreserver [server id]",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     e.unignoreserver,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "serverignorelist",
 		Description: "See all ignored servers",
 		Usage:       "[p]serverignorelist",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     e.serverignorelist,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "clearserverignorelist",
 		Description: "Clear the list of ignored servers",
 		Usage:       "[p]clearserverignorelist",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     e.clearserverignorelist,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "pingmute",
 		Description: "Mute a user when they ping you",
 		Usage:       "[p]pingmute <on/off>",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     e.pingmute,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "pingtimeout",
 		Description: "Time a user out when they ping you",
 		Usage:       "[p]pingtimeout <on/off>",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     e.pingtimeout,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "pingban",
 		Description: "Ban a user when they ping you",
 		Usage:       "[p]pingban <on/off>",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     e.pingban,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "pingkick",
 		Description: "Kick a user when they ping you",
 		Usage:       "[p]pingkick <on/off>",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     e.pingkick,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "pinginsult",
 		Description: "Insult a user when they ping you",
 		Usage:       "[p]pinginsult <on/off>",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     e.pinginsult,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "pingping",
 		Description: "Ping a user back when they ping you",
 		Usage:       "[p]pingping <on/off>",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     e.pingping,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "afkenabled",
 		Description: "Turn AFK mode on or off",
 		Usage:       "[p]afkenabled <on/off>",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     e.afkenabled,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "afkonping",
 		Description: "Set if an AFK message should be sent on ping",
 		Usage:       "[p]afkonping <on/off>",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     e.afkonping,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "afkondm",
 		Description: "Set if an AFK message should be sent on DM",
 		Usage:       "[p]afkondm <on/off>",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     e.afkondm,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "afkmessage",
 		Description: "Set the AFK message",
 		Usage:       "[p]afkmessage <text>",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     e.afkmessage,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "afkreply",
 		Description: "Set if the AFK message should be a reply",
 		Usage:       "[p]afkreply <on/off>",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     e.afkreply,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "afktyping",
 		Description: "Set if the bot should show typing before sending message",
 		Usage:       "[p]afktyping <on/off>",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     e.afktyping,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "afkdelay",
 		Description: "Set delay before sending AFK message",
 		Usage:       "[p]afkdelay <seconds>",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     e.afkdelay,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "afktriggertype",
 		Description: "Set the AFK trigger type",
 		Usage:       "[p]afktriggertype <type>",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     e.afktriggertype,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "afkaddserver",
 		Description: "Add a server to the AFK trigger list",
 		Usage:       "[p]afkaddserver <server id>",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     e.afkaddserver,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "afkremoveserver",
 		Description: "Remove a server from the AFK trigger list",
 		Usage:       "[p]afkremoveserver <server id>",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     e.afkremoveserver,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "afkadduser",
 		Description: "Add a user to the AFK trigger list",
 		Usage:       "[p]afkadduser <<user>",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     e.afkadduser,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "afkremoveuser",
 		Description: "Remove a user from the AFK trigger list",
 		Usage:       "[p]afkremoveuser <user>",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     e.afkremoveuser,
 	})
 }

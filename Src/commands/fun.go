@@ -65,7 +65,7 @@ func (f FunCommands) RegisterCommands(router *dgc.Router) {
 	router.RegisterCmd(&dgc.Command{
 		Name:        "insult",
 		Description: "Insult a person",
-		Usage:       "[p]insult <user>",
+		Usage:       "[p]insult",
 		Handler:     f.insult,
 	})
 	router.RegisterCmd(&dgc.Command{
@@ -574,13 +574,12 @@ func (FunCommands) hack(ctx *dgc.Ctx) {
 }
 
 func (FunCommands) insult(ctx *dgc.Ctx) {
-	user, _ := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
-	insult, err := http.GetJson(fmt.Sprintf("https://lightning-bot.com/api/v2/selfbot/roast?mention=%s", user.String()))
-	if err != nil {
+	httpResponse := http.Get("https://insult.mattbas.org/api/insult")
+	if httpResponse.Error != nil {
 		_ = ctx.RespondText("An error has occurred.")
 	}
 	embed.NewEmbed().
-		AddField("Insult", insult.Get("roast").MustString()).
+		AddField("Insult", httpResponse.Body).
 		Send(ctx)
 }
 

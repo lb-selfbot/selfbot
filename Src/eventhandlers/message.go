@@ -49,13 +49,13 @@ func (e *Events) OnMessage(_ *discordgo.Session, m *discordgo.MessageCreate) {
 		e.Settings.SentNitroCodes,
 		"",
 	)
-	
+
 	snipers.CheckPrivnoteSniper(e.Session, m.Message, &cfg, "")
 
 	snipers.CheckGiveawaySniper(e.Session, m.Message, &cfg, "")
 
 	e.checkIgnore(m.Message)
-	e.checkPhising(m.Message, &cfg)
+	e.checkPhishing(m.Message, &cfg)
 	e.checkPingReactions(m.Message)
 	e.checkEventReactions(m.Message)
 	e.checkAFK(m.Message, &cfg)
@@ -111,7 +111,7 @@ func (e *Events) OnMessageEdit(_ *discordgo.Session, m *discordgo.MessageUpdate)
 	snipers.CheckGiveawaySniperEdit(e.Session, m.Message, &cfg, "")
 
 	e.checkIgnore(m.Message)
-	e.checkPhising(m.Message, &cfg)
+	e.checkPhishing(m.Message, &cfg)
 	e.checkNotifiersEdit(m.Message, &cfg)
 	e.checkSelfbotDetectionEdit(m.Message, &cfg)
 
@@ -187,8 +187,8 @@ func (e *Events) checkIgnore(message *discordgo.Message) {
 	}
 }
 
-func (e *Events) checkPhising(message *discordgo.Message, cfg *config.Config) {
-	if !cfg.Protections.AntiPhising {
+func (e *Events) checkPhishing(message *discordgo.Message, cfg *config.Config) {
+	if !cfg.Protections.AntiPhishing {
 		return
 	}
 
@@ -200,12 +200,12 @@ func (e *Events) checkPhising(message *discordgo.Message, cfg *config.Config) {
 
 		hostname := link.Hostname()
 
-		isPhising := utils.SliceContains(e.Settings.phisingDomains, hostname)
+		isPhishing := utils.SliceContains(e.Settings.phishingDomains, hostname)
 		isSuspicious := utils.SliceContains(e.Settings.suspiciousDomains, hostname)
 
-		if isPhising || isSuspicious {
+		if isPhishing || isSuspicious {
 			_ = e.Session.MessageAck(message.ChannelID, message.ID)
-			logging.Logging.PhisingDetected(e.Session, message, hostname)
+			logging.Logging.PhishingDetected(e.Session, message, hostname)
 		}
 	}
 }

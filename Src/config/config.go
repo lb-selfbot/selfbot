@@ -143,7 +143,7 @@ type Config struct {
 		Client               string `json:"Client"`
 	}
 	Protections struct {
-		AntiPhising       bool `json:"AntiPhising"`
+		AntiPhishing      bool `json:"AntiPhishing"`
 		AntiFriendRequest bool `json:"AntiFriendRequest"`
 		AntiMassDM        bool `json:"AntiMassDM"`
 		ServerProtections struct {
@@ -169,10 +169,11 @@ type Config struct {
 		Message string `json:"Message"`
 	} `json:"AFK"`
 	Sharing struct {
-		SharedUsers      []string `json:"SharedUsers"`
-		SharedCategories []string `json:"SharedCategories"`
-		SharedCommands   []string `json:"SharedCommands"`
-		ShareAll         bool     `json:"ShareAll"`
+		SharedUsers            []string `json:"SharedUsers"`
+		SharedCategories       []string `json:"SharedCategories"`
+		SharedCommands         []string `json:"SharedCommands"`
+		ShareAll               bool     `json:"ShareAll"`
+		BlockDangerousCommands bool     `json:"BlockDangerousCommands"`
 	}
 }
 

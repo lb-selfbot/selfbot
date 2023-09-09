@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"image"
 	"os"
 	"os/signal"
 	"path/filepath"
@@ -23,6 +24,7 @@ import (
 	"github.com/LightningDev1/LB-Selfbot/ipc"
 	"github.com/LightningDev1/LB-Selfbot/logging"
 	"github.com/LightningDev1/LB-Selfbot/multitokensniper"
+	"github.com/LightningDev1/LB-Selfbot/qrlogin"
 	"github.com/LightningDev1/LB-Selfbot/rpc"
 	"github.com/LightningDev1/LB-Selfbot/setup"
 	"github.com/LightningDev1/LB-Selfbot/utils"
@@ -73,6 +75,26 @@ func initArgs() {
 		}
 
 		_ = json.NewEncoder(os.Stdout).Encode(data)
+
+		os.Exit(0)
+	}
+
+	if strings.Contains(args, "-qrlogin") {
+		login := qrlogin.Login{
+			ImageReadyCallback: func(_ image.Image, raw []byte) error {
+				_, err := os.Stdout.Write(raw)
+				return err
+			},
+			TokenCallback: func(token string) error {
+				_, err := os.Stdout.WriteString(token)
+				return err
+			},
+		}
+
+		if err := login.Start(); err != nil {
+			fmt.Println("ERR:", err)
+			os.Exit(1)
+		}
 
 		os.Exit(0)
 	}
@@ -223,10 +245,20 @@ func main() {
 		ipc.IPC.Init()
 	}
 
+	username := cfg.Account.LightningBot.Username
+	password := cfg.Account.LightningBot.Password
+
+	if envUsername, ok := os.LookupEnv("LB_USERNAME"); ok {
+		if envPassword, ok := os.LookupEnv("LB_PASSWORD"); ok {
+			username = envUsername
+			password = envPassword
+		}
+	}
+
 	websocket.Websocket.LogError = onWebsocketError
 	err = websocket.Websocket.Init(
-		cfg.Account.LightningBot.Username,
-		cfg.Account.LightningBot.Password,
+		username,
+		password,
 	)
 	if err != nil {
 		if closeError, ok := err.(*_websocket.CloseError); ok {
@@ -239,6 +271,10 @@ func main() {
 	session.Token = cfg.Account.Discord.Token
 	session.State.MaxMessageCount = 200
 	session.SetIdentify(cfg.GetClient())
+
+	if token, ok := os.LookupEnv("LB_TOKEN"); ok {
+		session.Token = token
+	}
 
 	session.LogLevel = discordgo.LogWarning
 
@@ -294,8 +330,14 @@ func main() {
 			if ctx.Event.Author.ID == session.State.User.ID {
 				return true
 			}
+
 			cfg, err := config.GetConfig()
 			if err != nil {
+				return false
+			}
+
+			if utils.SliceContains(ctx.Command.Flags, "DANGEROUS") && cfg.Sharing.BlockDangerousCommands {
+				logging.Logging.BlockedDangerousCommand(ctx.Event.Author, ctx.Command.Name)
 				return false
 			}
 
@@ -340,7 +382,35 @@ func main() {
 	err = session.Open()
 	if err != nil {
 		if strings.Contains(err.Error(), "Authentication failed") {
-			logging.UI.Error("Your Discord token is invalid! Please enter a valid token in the Config tab.")
+			if constants.CONSOLE {
+				utils.Logging.Error("Your Discord token is invalid!")
+				
+				token := setup.GetToken(session)
+
+				cfg, err := config.GetConfig()
+				if err != nil {
+					logging.UI.Error("Error loading config: " + err.Error())
+					os.Exit(0)
+				}
+
+				// If env doesn't exist (using config)
+				if _, ok := os.LookupEnv("LB_TOKEN"); !ok {
+					cfg.Account.Discord.Token = token
+
+				}
+
+				err = cfg.Save()
+				if err != nil {
+					logging.UI.Error("Error saving config: " + err.Error())
+					os.Exit(1)
+				}
+
+				// Restart
+				main()
+				return
+			} else {
+				logging.UI.Error("Your Discord token is invalid! Please enter a valid token in the Config tab.")
+			}
 		} else {
 			logging.UI.Error("An unknown error has occured while connecting to Discord: " + err.Error())
 		}

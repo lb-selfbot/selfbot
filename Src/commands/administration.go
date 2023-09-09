@@ -47,102 +47,119 @@ func (m *AdministrationCommands) RegisterCommands(router *dgc.Router) {
 		Name:        "textchannel",
 		Description: "Create a text channel",
 		Usage:       "[p]textchannel <name>",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     m.textchannel,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "voicechannel",
 		Description: "Create a voice channel",
 		Usage:       "[p]voicechannel <name>",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     m.voicechannel,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "stagechannel",
 		Description: "Create a stage channel",
 		Usage:       "[p]stagechannel <name>",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     m.stagechannel,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "newschannel",
 		Description: "Create a news channel",
 		Usage:       "[p]newschannel <name>",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     m.newschannel,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "thread",
 		Description: "Create a thread",
 		Usage:       "[p]thread <name>",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     m.thread,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "category",
 		Description: "Create a category",
 		Usage:       "[p]category <name>",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     m.category,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "deletecategory",
 		Description: "Delete a category",
 		Usage:       "[p]deletecategory <category id>",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     m.deletecategory,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "renamechannel",
 		Description: "Rename a channel",
 		Usage:       "[p]renamechannel <channel> <name>",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     m.renamechannel,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "deletechannel",
 		Description: "Delete a channel",
 		Usage:       "[p]deletechannel <channel>",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     m.deletechannel,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "slowmode",
 		Description: "Change slowmode amount",
 		Usage:       "[p]slowmode <channel> <seconds>",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     m.slowmode,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "removeslowmode",
 		Description: "Remove slowmode",
 		Usage:       "[p]removeslowmode <channel>",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     m.removeslowmode,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "lockchannel",
 		Description: "Lock a channel",
 		Usage:       "[p]lockchannel <channel>",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     m.lockchannel,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "unlockchannel",
 		Description: "Unlock a channel",
 		Usage:       "[p]unlockchannel <channel>",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     m.unlockchannel,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "purge",
 		Description: "Delete messages in a channel",
 		Usage:       "[p]purge <amount> [channel]",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     m.purge,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "purgeself",
 		Description: "Delete your own messages in a channel",
 		Usage:       "[p]purgeself <amount> [channel]",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     m.purgeself,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "purgeuser",
 		Description: "Delete a users messages in a channel",
 		Usage:       "[p]purgeuser <amount> <user> [channel]",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     m.purgeuser,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "nuke",
 		Description: "Nuke a channel",
 		Usage:       "[p]nuke [channel]",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     m.nuke,
 	})
 	router.RegisterCmd(&dgc.Command{
@@ -233,72 +250,84 @@ func (m *AdministrationCommands) RegisterCommands(router *dgc.Router) {
 		Name:        "report",
 		Description: "Report a message",
 		Usage:       "[p]report <message link> <reason>",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     m.report,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "mute",
 		Description: "Mute a user",
 		Usage:       "[p]mute <user>",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     m.mute,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "unmute",
 		Description: "Unmute a user",
 		Usage:       "[p]unmute <user>",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     m.unmute,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "timeout",
 		Description: "Timeout a user",
 		Usage:       "[p]timeout <user> <seconds>",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     m.timeout,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "removetimeout",
 		Description: "Remove a timeout",
 		Usage:       "[p]removetimeout <user>",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     m.removetimeout,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "kick",
 		Description: "Kick a user",
 		Usage:       "[p]kick <user> [reason]",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     m.kick,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "ban",
 		Description: "Ban a user",
 		Usage:       "[p]ban <user> [reason]",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     m.ban,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "hackban",
 		Description: "Ban a user that's not in the server",
 		Usage:       "[p]hackban <user id> [reason]",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     m.ban,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "softban",
 		Description: "Ban and instantly unban a user",
 		Usage:       "[p]softban <user> [reason]",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     m.softban,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "unban",
 		Description: "Ban and instantly unban a user",
 		Usage:       "[p]unban <user id>",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     m.unban,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "banlist",
 		Description: "Get a list of banned users",
 		Usage:       "[p]banlist [server id]",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     m.banlist,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "copybans",
 		Description: "Copy bans from one server to another",
 		Usage:       "[p]copybans <source server id> [dest server id]",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     m.copybans,
 	})
 	router.RegisterCmd(&dgc.Command{
@@ -311,12 +340,14 @@ func (m *AdministrationCommands) RegisterCommands(router *dgc.Router) {
 		Name:        "nickuser",
 		Description: "Change a users nickname",
 		Usage:       "[p]nickuser <user> <text>",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     m.nickuser,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "clearnick",
 		Description: "Clear a users nickname",
 		Usage:       "[p]clearnick [user]",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     m.clearnick,
 	})
 	router.RegisterCmd(&dgc.Command{
@@ -377,30 +408,35 @@ func (m *AdministrationCommands) RegisterCommands(router *dgc.Router) {
 		Name:        "setservername",
 		Description: "Set a servers name",
 		Usage:       "[p]setservername <name>",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     m.setservername,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "setservericon",
 		Description: "Set a servers icon",
 		Usage:       "[p]setservericon <url>",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     m.setservericon,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "setserverbanner",
 		Description: "Set a servers banner",
 		Usage:       "[p]setserverbanner <url>",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     m.setserverbanner,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "lockserver",
 		Description: "Lock a server",
 		Usage:       "[p]lockserver [server id]",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     m.lockserver,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "unlockserver",
 		Description: "Unlock a server",
 		Usage:       "[p]unlockserver [server id]",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     m.unlockserver,
 	})
 	router.RegisterCmd(&dgc.Command{
@@ -431,12 +467,14 @@ func (m *AdministrationCommands) RegisterCommands(router *dgc.Router) {
 		Name:        "leaveserver",
 		Description: "Leave a server",
 		Usage:       "[p]leaveserver [server id]",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     m.leaveserver,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "deleteserver",
 		Description: "Delete a server",
 		Usage:       "[p]deleteserver [server id]",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     m.deleteserver,
 	})
 	router.RegisterCmd(&dgc.Command{
@@ -461,6 +499,7 @@ func (m *AdministrationCommands) RegisterCommands(router *dgc.Router) {
 		Name:        "deleteinvite",
 		Description: "Delete an invite",
 		Usage:       "[p]deleteinvite <invite>",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     m.deleteinvite,
 	})
 	router.RegisterCmd(&dgc.Command{
@@ -491,30 +530,35 @@ func (m *AdministrationCommands) RegisterCommands(router *dgc.Router) {
 		Name:        "giverole",
 		Description: "Give a role to a user",
 		Usage:       "[p]giverole <user> <role>",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     m.giverole,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "removerole",
 		Description: "Remove a role from a user",
 		Usage:       "[p]removerole <user> <role>",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     m.removerole,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "createrole",
 		Description: "Create a role",
 		Usage:       "[p]createrole <name>",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     m.createrole,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "deleterole",
 		Description: "Delete a role",
 		Usage:       "[p]deleterole <role>",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     m.deleterole,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "renamerole",
 		Description: "Rename a role",
 		Usage:       "[p]renamerole <role> <name>",
+		Flags:       []string{"DANGEROUS"},
 		Handler:     m.renamerole,
 	})
 }
@@ -1955,7 +1999,7 @@ func (*AdministrationCommands) deleteserver(ctx *dgc.Ctx) {
 func (*AdministrationCommands) invite(ctx *dgc.Ctx) {
 	channel, success := utils.Discord.TryGetChannelFromMention(ctx, ctx.Arguments.Get(0))
 	channelID := ctx.Event.ChannelID
-	if !success {
+	if success {
 		channelID = channel.ID
 	}
 
