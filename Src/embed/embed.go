@@ -19,7 +19,8 @@ import (
 // Embed ...
 type Embed struct {
 	*discordgo.MessageEmbed
-	Subtext string
+	FooterStr string
+	Subtext   string
 }
 
 var (
@@ -33,7 +34,7 @@ var (
 
 // NewEmbed returns a new embed object
 func NewEmbed() *Embed {
-	embed := &Embed{&discordgo.MessageEmbed{}, ""}
+	embed := &Embed{&discordgo.MessageEmbed{}, "", ""}
 	cfg, err := config.GetConfig()
 	if err != nil {
 		return embed
@@ -148,6 +149,8 @@ func (e *Embed) SetFooter(args ...string) *Embed {
 		Text:         text,
 		ProxyIconURL: proxyURL,
 	}
+
+	e.FooterStr = text
 
 	return e
 }
@@ -303,7 +306,8 @@ func (e *Embed) TruncateTitle() *Embed {
 
 // TruncateFooter ...
 func (e *Embed) TruncateFooter() *Embed {
-	if e.Footer != nil && len(e.Footer.Text) > LimitFooter {
+	if e.FooterStr != "" && len(e.FooterStr) > LimitFooter {
+		e.FooterStr = e.FooterStr[:LimitFooter]
 		e.Footer.Text = e.Footer.Text[:LimitFooter]
 	}
 	return e
@@ -353,8 +357,8 @@ func (e *Embed) ToCodeblock() []string {
 	if e.Subtext != "" {
 		embedString += fmt.Sprintf("```ansi\n%s\n```", e.Subtext)
 	}
-	if e.Footer != nil {
-		footerString := fmt.Sprintf("```css\n[%s]```", e.Footer.Text)
+	if e.FooterStr != "" {
+		footerString := fmt.Sprintf("```css\n[%s]```", e.FooterStr)
 		if len(embedString+footerString) > 2000 {
 			embedList = append(embedList, embedString)
 			embedString = ""
@@ -389,8 +393,8 @@ func (e *Embed) ToText() []string {
 	if e.Subtext != "" {
 		str += fmt.Sprintf("```ansi\n%s\n```", e.Subtext)
 	}
-	if e.Footer != nil {
-		str += fmt.Sprintf("\n```css\n[%s]```\n", e.Footer.Text)
+	if e.FooterStr != "" {
+		str += fmt.Sprintf("\n```css\n[%s]```\n", e.FooterStr)
 	}
 	var strings_ []string
 	newStr := ""
@@ -427,8 +431,8 @@ func (e *Embed) ToIndent() []string {
 	if e.Subtext != "" {
 		str += fmt.Sprintf("```ansi\n%s\n```", e.Subtext)
 	}
-	if e.Footer != nil {
-		str += fmt.Sprintf("\n```css\n[%s]```\n", e.Footer.Text)
+	if e.FooterStr != "" {
+		str += fmt.Sprintf("\n```css\n[%s]```", e.FooterStr)
 	}
 
 	splitted := strings.Split(str, "\n")
@@ -436,11 +440,7 @@ func (e *Embed) ToIndent() []string {
 	var strings_ []string
 	var newStr string
 
-	for i, line := range splitted {
-		if i == len(splitted)-1 {
-			continue
-		}
-
+	for _, line := range splitted {
 		if len(newStr+line)+1 > 2000 {
 			strings_ = append(strings_, newStr)
 			newStr = ""
