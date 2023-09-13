@@ -80,7 +80,7 @@ jobs:
       - name: Build for Android
         env:
           GOPROXY: "https://proxy.golang.org"
-          CGO_ENABLED: 1
+          CGO_ENABLED: 0
           GOOS: "android"
         run: |
           cd Src
