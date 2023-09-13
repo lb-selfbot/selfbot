@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  build-win-linux-android:
+  build-win-linux:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -41,9 +41,6 @@ jobs:
           mkdir ${{ github.workspace }}/executables/macos
           mkdir ${{ github.workspace }}/executables/macos/amd64
           mkdir ${{ github.workspace }}/executables/macos/arm64
-          mkdir ${{ github.workspace }}/executables/android
-          mkdir ${{ github.workspace }}/executables/android/arm
-          mkdir ${{ github.workspace }}/executables/android/arm64
       
       - name: Install garble
         run: |
@@ -76,19 +73,6 @@ jobs:
           garble build -ldflags "-s -w" -gcflags=all="-l -B" -o ${{ github.workspace }}/executables/linux/arm/selfbot
           export GOARCH=arm64
           garble build -ldflags "-s -w" -gcflags=all="-l -B" -o ${{ github.workspace }}/executables/linux/arm64/selfbot
-
-      - name: Build for Android
-        env:
-          GOPROXY: "https://proxy.golang.org"
-          CGO_ENABLED: 0
-          GOOS: "android"
-        run: |
-          cd Src
-          export GOARCH=arm
-          garble build -ldflags "-s -w" -gcflags=all="-l -B" -o ${{ github.workspace }}/executables/android/arm/selfbot
-          export GOARCH=arm64
-          garble build -ldflags "-s -w" -gcflags=all="-l -B" -o ${{ github.workspace }}/executables/android/arm64/selfbot
-
           
       - name: Upload builds
         uses: actions/upload-artifact@v3.1.0
