@@ -42,6 +42,7 @@ func initArgs() {
 
 	// constants.Console must be true if "-l" flag is not set
 	constants.CONSOLE = !strings.Contains(args, "-l")
+	constants.PORTABLE = strings.Contains(args, "-portable")
 
 	if strings.Contains(args, "-v") {
 		fmt.Println(constants.VERSION[1:])

@@ -5,29 +5,9 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/LightningDev1/LB-Selfbot/constants"
 	"golang.org/x/text/unicode/norm"
 )
-
-var mainFolder = IO.GetMainFolder()
-
-var folders = []string{
-	filepath.Join(mainFolder, "Config"),
-	filepath.Join(mainFolder, "Animations"),
-	filepath.Join(mainFolder, "Dumping"),
-	filepath.Join(mainFolder, "Backups"),
-	filepath.Join(mainFolder, "SlashCommands"),
-	filepath.Join(mainFolder, "Downloads"),
-	filepath.Join(mainFolder, "Executables"),
-	filepath.Join(mainFolder, "Executables", "windows"),
-	filepath.Join(mainFolder, "Executables", "windows", "amd64"),
-	filepath.Join(mainFolder, "Executables", "windows", "386"),
-	filepath.Join(mainFolder, "Executables", "linux"),
-	filepath.Join(mainFolder, "Executables", "linux", "amd64"),
-	filepath.Join(mainFolder, "Executables", "linux", "386"),
-	filepath.Join(mainFolder, "Executables", "linux", "arm64"),
-	filepath.Join(mainFolder, "Executables", "linux", "arm"),
-	filepath.Join(mainFolder, "Executables", "macos"),
-}
 
 type IOUtils struct{}
 
@@ -93,14 +73,49 @@ func (i *IOUtils) Write(filePath, content string) error {
 }
 
 func (*IOUtils) GetMainFolder() string {
-	configDir, err := os.UserConfigDir()
-	if err != nil {
-		return ""
+	var mainPath string
+	var err error
+
+	if constants.PORTABLE {
+		mainPath, err = os.Executable()
+		if err != nil {
+			return "./LightningBot"
+		}
+
+		mainPath = filepath.Dir(mainPath)
+	} else {
+		var err error
+		mainPath, err = os.UserConfigDir()
+		if err != nil {
+			return "./LightningBot"
+		}
 	}
-	return filepath.Join(configDir, "LightningBot")
+
+	return filepath.Join(mainPath, "LightningBot")
 }
 
 func (*IOUtils) CreateFolders() error {
+	mainFolder := IO.GetMainFolder()
+
+	folders := []string{
+		filepath.Join(mainFolder, "Config"),
+		filepath.Join(mainFolder, "Animations"),
+		filepath.Join(mainFolder, "Dumping"),
+		filepath.Join(mainFolder, "Backups"),
+		filepath.Join(mainFolder, "SlashCommands"),
+		filepath.Join(mainFolder, "Downloads"),
+		filepath.Join(mainFolder, "Executables"),
+		filepath.Join(mainFolder, "Executables", "windows"),
+		filepath.Join(mainFolder, "Executables", "windows", "amd64"),
+		filepath.Join(mainFolder, "Executables", "windows", "386"),
+		filepath.Join(mainFolder, "Executables", "linux"),
+		filepath.Join(mainFolder, "Executables", "linux", "amd64"),
+		filepath.Join(mainFolder, "Executables", "linux", "386"),
+		filepath.Join(mainFolder, "Executables", "linux", "arm64"),
+		filepath.Join(mainFolder, "Executables", "linux", "arm"),
+		filepath.Join(mainFolder, "Executables", "macos"),
+	}
+
 	for _, folder := range folders {
 		err := os.MkdirAll(folder, 0755)
 		if err != nil {
@@ -119,7 +134,7 @@ func (*IOUtils) Exists(path string) bool {
 
 func (*IOUtils) IsFirstLaunch() bool {
 	// Check if config file exists
-	return !IO.Exists(filepath.Join(mainFolder, "Config", "config.json"))
+	return !IO.Exists(filepath.Join(IO.GetMainFolder(), "Config", "config.json"))
 }
 
 var IO = &IOUtils{}
