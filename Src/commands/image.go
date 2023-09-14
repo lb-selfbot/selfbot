@@ -967,7 +967,7 @@ func (i ImageCommands) RegisterCommands(router *dgc.Router) {
 	router.RegisterCmd(&dgc.Command{
 		Name:        "speechbubble",
 		Description: "Add a speech bubble to an image",
-		Usage:       "[p]speechbubble [link/attachment]",
+		Usage:       "[p]speechbubble [link/attachment] [force GIF: on/off]",
 		Handler:     i.speechbubble,
 	})
 }
@@ -2637,5 +2637,25 @@ func (ImageCommands) speechbubble(ctx *dgc.Ctx) {
 		}
 	}
 
-	_ = ctx.RespondText(fmt.Sprintf("https://api.lightning-bot.com/api/v3/imagegen/speechbubble?url=%s", url.QueryEscape(link)))
+	forceGIF := strings.ToLower(utils.Arguments["[force GIF: on/off]"])
+	if forceGIF != "" && forceGIF != "on" && forceGIF != "off" {
+		_ = ctx.RespondText("Invalid force GIF value. Use `on` or `off`.")
+		return
+	}
+
+	format := "png"
+
+	if forceGIF == "on" {
+		format = "gif"
+	}
+
+	url := fmt.Sprintf("https://api.lightning-bot.com/api/v3/imagegen/speechbubble?url=%s&format=%s", url.QueryEscape(link), format)
+
+	httpResponse := http.Get(url)
+	if httpResponse.Error != nil {
+		_ = ctx.RespondText("An error has occurred: " + httpResponse.Error.Error())
+		return
+	}
+
+	_ = ctx.RespondText("https://api.lightning-bot.com" + httpResponse.Headers["location"])
 }
