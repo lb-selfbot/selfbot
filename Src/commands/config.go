@@ -58,7 +58,7 @@ func (c ConfigCommands) RegisterCommands(router *dgc.Router) {
 	router.RegisterCmd(&dgc.Command{
 		Name:        "title",
 		Description: "Set your title",
-		Usage:       "[p]title <title>",
+		Usage:       "[p]title [title]",
 		Flags:       []string{"DANGEROUS"},
 		Handler:     c.title,
 	})
@@ -73,7 +73,7 @@ func (c ConfigCommands) RegisterCommands(router *dgc.Router) {
 	router.RegisterCmd(&dgc.Command{
 		Name:        "footer",
 		Description: "Set your footer",
-		Usage:       "[p]footer <footer>",
+		Usage:       "[p]footer [footer]",
 		Flags:       []string{"DANGEROUS"},
 		Handler:     c.footer,
 	})
@@ -372,7 +372,7 @@ func (c ConfigCommands) RegisterCommands(router *dgc.Router) {
 	router.RegisterCmd(&dgc.Command{
 		Name:        "wall",
 		Description: "Set all webhooks at once",
-		Usage:       "[p]wall <webhook url>",
+		Usage:       "[p]wall [webhook url]",
 		Flags:       []string{"DANGEROUS"},
 		Handler:     c.wall,
 	})
@@ -387,7 +387,7 @@ func (c ConfigCommands) RegisterCommands(router *dgc.Router) {
 	router.RegisterCmd(&dgc.Command{
 		Name:        "wnitro",
 		Description: "Set the nitro sniper webhook",
-		Usage:       "[p]wnitro <webhook url>",
+		Usage:       "[p]wnitro [webhook url]",
 		Flags:       []string{"DANGEROUS"},
 		Handler:     c.wnitro,
 	})
@@ -402,7 +402,7 @@ func (c ConfigCommands) RegisterCommands(router *dgc.Router) {
 	router.RegisterCmd(&dgc.Command{
 		Name:        "wgiveaway",
 		Description: "Set the giveaway sniper webhook",
-		Usage:       "[p]wgiveaway <webhook url>",
+		Usage:       "[p]wgiveaway [webhook url]",
 		Flags:       []string{"DANGEROUS"},
 		Handler:     c.wgiveaway,
 	})
@@ -417,7 +417,7 @@ func (c ConfigCommands) RegisterCommands(router *dgc.Router) {
 	router.RegisterCmd(&dgc.Command{
 		Name:        "wselfbotdetection",
 		Description: "Set the selfbot detection webhook",
-		Usage:       "[p]wselfbotdetection <webhook url>",
+		Usage:       "[p]wselfbotdetection [webhook url]",
 		Flags:       []string{"DANGEROUS"},
 		Handler:     c.wselfbotdetection,
 	})
@@ -432,7 +432,7 @@ func (c ConfigCommands) RegisterCommands(router *dgc.Router) {
 	router.RegisterCmd(&dgc.Command{
 		Name:        "wstaffdetection",
 		Description: "Set the staff detection webhook",
-		Usage:       "[p]wstaffdetection <webhook url>",
+		Usage:       "[p]wstaffdetection [webhook url]",
 		Flags:       []string{"DANGEROUS"},
 		Handler:     c.wstaffdetection,
 	})
@@ -447,7 +447,7 @@ func (c ConfigCommands) RegisterCommands(router *dgc.Router) {
 	router.RegisterCmd(&dgc.Command{
 		Name:        "wnotifiers",
 		Description: "Set the notifiers webhook",
-		Usage:       "[p]wnotifiers <webhook url>",
+		Usage:       "[p]wnotifiers [webhook url]",
 		Flags:       []string{"DANGEROUS"},
 		Handler:     c.wnotifiers,
 	})
@@ -462,7 +462,7 @@ func (c ConfigCommands) RegisterCommands(router *dgc.Router) {
 	router.RegisterCmd(&dgc.Command{
 		Name:        "wpingdetection",
 		Description: "Set the ping detection webhook",
-		Usage:       "[p]wpingdetection <webhook url>",
+		Usage:       "[p]wpingdetection [webhook url]",
 		Flags:       []string{"DANGEROUS"},
 		Handler:     c.wpingdetection,
 	})
@@ -477,7 +477,7 @@ func (c ConfigCommands) RegisterCommands(router *dgc.Router) {
 	router.RegisterCmd(&dgc.Command{
 		Name:        "wmisc",
 		Description: "Set the misc webhook",
-		Usage:       "[p]wmisc <webhook url>",
+		Usage:       "[p]wmisc [webhook url]",
 		Flags:       []string{"DANGEROUS"},
 		Handler:     c.wmisc,
 	})
@@ -492,7 +492,7 @@ func (c ConfigCommands) RegisterCommands(router *dgc.Router) {
 	router.RegisterCmd(&dgc.Command{
 		Name:        "wsessions",
 		Description: "Set the sessions webhook",
-		Usage:       "[p]wsessions <webhook url>",
+		Usage:       "[p]wsessions [webhook url]",
 		Flags:       []string{"DANGEROUS"},
 		Handler:     c.wsessions,
 	})
@@ -1571,19 +1571,19 @@ func (ConfigCommands) wall(ctx *dgc.Ctx) {
 		return
 	}
 
-	cfg.Webhooks.NitroSniper = utils.Arguments["<webhook url>"]
-	cfg.Webhooks.GiveawaySniper = utils.Arguments["<webhook url>"]
-	cfg.Webhooks.SelfbotDetection = utils.Arguments["<webhook url>"]
-	cfg.Webhooks.StaffDetection = utils.Arguments["<webhook url>"]
-	cfg.Webhooks.Notifiers = utils.Arguments["<webhook url>"]
-	cfg.Webhooks.PingDetection = utils.Arguments["<webhook url>"]
-	cfg.Webhooks.Misc = utils.Arguments["<webhook url>"]
-	cfg.Webhooks.Sessions = utils.Arguments["<webhook url>"]
+	cfg.Webhooks.NitroSniper = utils.Arguments["[webhook url]"]
+	cfg.Webhooks.GiveawaySniper = utils.Arguments["[webhook url]"]
+	cfg.Webhooks.SelfbotDetection = utils.Arguments["[webhook url]"]
+	cfg.Webhooks.StaffDetection = utils.Arguments["[webhook url]"]
+	cfg.Webhooks.Notifiers = utils.Arguments["[webhook url]"]
+	cfg.Webhooks.PingDetection = utils.Arguments["[webhook url]"]
+	cfg.Webhooks.Misc = utils.Arguments["[webhook url]"]
+	cfg.Webhooks.Sessions = utils.Arguments["[webhook url]"]
 
 	_ = cfg.Save()
 
 	embed.NewEmbed().
-		SetDescription("Set all webhooks to " + utils.Arguments["<webhook url>"]).
+		SetDescription("Set all webhooks to " + utils.Arguments["[webhook url]"]).
 		Send(ctx)
 }
 
@@ -1606,11 +1606,11 @@ func (ConfigCommands) wnitro(ctx *dgc.Ctx) {
 		return
 	}
 
-	cfg.Webhooks.NitroSniper = utils.Arguments["<webhook url>"]
+	cfg.Webhooks.NitroSniper = utils.Arguments["[webhook url]"]
 	_ = cfg.Save()
 
 	embed.NewEmbed().
-		SetDescription("Set nitro sniper webhook to " + utils.Arguments["<webhook url>"]).
+		SetDescription("Set nitro sniper webhook to " + utils.Arguments["[webhook url]"]).
 		Send(ctx)
 }
 
@@ -1633,11 +1633,11 @@ func (ConfigCommands) wgiveaway(ctx *dgc.Ctx) {
 		return
 	}
 
-	cfg.Webhooks.GiveawaySniper = utils.Arguments["<webhook url>"]
+	cfg.Webhooks.GiveawaySniper = utils.Arguments["[webhook url]"]
 	_ = cfg.Save()
 
 	embed.NewEmbed().
-		SetDescription("Set giveaway sniper webhook to " + utils.Arguments["<webhook url>"]).
+		SetDescription("Set giveaway sniper webhook to " + utils.Arguments["[webhook url]"]).
 		Send(ctx)
 }
 
@@ -1660,11 +1660,11 @@ func (ConfigCommands) wselfbotdetection(ctx *dgc.Ctx) {
 		return
 	}
 
-	cfg.Webhooks.SelfbotDetection = utils.Arguments["<webhook url>"]
+	cfg.Webhooks.SelfbotDetection = utils.Arguments["[webhook url]"]
 	_ = cfg.Save()
 
 	embed.NewEmbed().
-		SetDescription("Set selfbot detection webhook to " + utils.Arguments["<webhook url>"]).
+		SetDescription("Set selfbot detection webhook to " + utils.Arguments["[webhook url]"]).
 		Send(ctx)
 }
 
@@ -1687,11 +1687,11 @@ func (ConfigCommands) wstaffdetection(ctx *dgc.Ctx) {
 		return
 	}
 
-	cfg.Webhooks.StaffDetection = utils.Arguments["<webhook url>"]
+	cfg.Webhooks.StaffDetection = utils.Arguments["[webhook url]"]
 	_ = cfg.Save()
 
 	embed.NewEmbed().
-		SetDescription("Set staff detection webhook to " + utils.Arguments["<webhook url>"]).
+		SetDescription("Set staff detection webhook to " + utils.Arguments["[webhook url]"]).
 		Send(ctx)
 }
 
@@ -1714,11 +1714,11 @@ func (ConfigCommands) wnotifiers(ctx *dgc.Ctx) {
 		return
 	}
 
-	cfg.Webhooks.Notifiers = utils.Arguments["<webhook url>"]
+	cfg.Webhooks.Notifiers = utils.Arguments["[webhook url]"]
 	_ = cfg.Save()
 
 	embed.NewEmbed().
-		SetDescription("Set notifiers webhook to " + utils.Arguments["<webhook url>"]).
+		SetDescription("Set notifiers webhook to " + utils.Arguments["[webhook url]"]).
 		Send(ctx)
 }
 
@@ -1741,11 +1741,11 @@ func (ConfigCommands) wpingdetection(ctx *dgc.Ctx) {
 		return
 	}
 
-	cfg.Webhooks.PingDetection = utils.Arguments["<webhook url>"]
+	cfg.Webhooks.PingDetection = utils.Arguments["[webhook url]"]
 	_ = cfg.Save()
 
 	embed.NewEmbed().
-		SetDescription("Set ping detection webhook to " + utils.Arguments["<webhook url>"]).
+		SetDescription("Set ping detection webhook to " + utils.Arguments["[webhook url]"]).
 		Send(ctx)
 }
 
@@ -1768,11 +1768,11 @@ func (ConfigCommands) wmisc(ctx *dgc.Ctx) {
 		return
 	}
 
-	cfg.Webhooks.Misc = utils.Arguments["<webhook url>"]
+	cfg.Webhooks.Misc = utils.Arguments["[webhook url]"]
 	_ = cfg.Save()
 
 	embed.NewEmbed().
-		SetDescription("Set misc webhook to " + utils.Arguments["<webhook url>"]).
+		SetDescription("Set misc webhook to " + utils.Arguments["[webhook url]"]).
 		Send(ctx)
 }
 
@@ -1795,11 +1795,11 @@ func (ConfigCommands) wsessions(ctx *dgc.Ctx) {
 		return
 	}
 
-	cfg.Webhooks.Sessions = utils.Arguments["<webhook url>"]
+	cfg.Webhooks.Sessions = utils.Arguments["[webhook url]"]
 	_ = cfg.Save()
 
 	embed.NewEmbed().
-		SetDescription("Set sessions webhook to " + utils.Arguments["<webhook url>"]).
+		SetDescription("Set sessions webhook to " + utils.Arguments["[webhook url]"]).
 		Send(ctx)
 }
 
