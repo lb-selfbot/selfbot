@@ -57,6 +57,15 @@ func getTimestamps(timeEnabled bool, startTime time.Time) *client.Timestamps {
 	return nil
 }
 
+func getDGTimestamps(timeEnabled bool, startTime time.Time) *discordgo.TimeStamps {
+	if timeEnabled {
+		return &discordgo.TimeStamps{
+			StartTimestamp: startTime.Unix(),
+		}
+	}
+	return nil
+}
+
 func getParty(cfg *config.Config) *client.Party {
 	if cfg.Activity.Invitable {
 		return &client.Party{
@@ -136,6 +145,7 @@ func setRPC(session *discordgo.Session, cfg *config.Config, startTime time.Time)
 			Name:    parseText(cfg.Activity.Name),
 			State:   parseText(cfg.Activity.State),
 			Details: parseText(cfg.Activity.Details),
+			Timestamps: getDGTimestamps(cfg.Activity.Time, startTime),
 			Type:    getActivityType(cfg.Activity.Type),
 			Assets: &discordgo.Assets{
 				LargeImageID: cfg.Activity.LargeImage,
