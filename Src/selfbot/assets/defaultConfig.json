@@ -1,0 +1,121 @@
+{
+  "AFK": {
+    "Delay": 10,
+    "Enabled": false,
+    "TriggerList": {
+      "Type": "Whitelist",
+      "Users": [],
+      "Servers": []
+    },
+    "Message": "I am currently AFK",
+    "OnDM": true,
+    "OnPing": true,
+    "Reply": true,
+    "Typing": true
+  },
+  "Account": {
+    "Discord": {
+      "Token": ""
+    },
+    "LightningBot": {
+      "Password": "",
+      "Username": ""
+    }
+  },
+  "Events": {
+    "BanNotifier": false,
+    "DMDeleteNotifier": false,
+    "DMEditNotifier": false,
+    "DMNotifier": false,
+    "DMTypingNotifier": false,
+    "DiscordStaffDetection": false,
+    "GhostPingDetection": false,
+    "MessageDeleteNotifier": false,
+    "SelfbotDetection": false,
+    "TicketNotifier": false,
+    "SessionConnected": false,
+    "SessionDisconnected": false
+  },
+  "Notifications": {
+    "Enabled": true
+  },
+  "Protections": {
+    "AntiFriendRequest": false,
+    "AntiMassDM": false,
+    "AntiPhishing": false,
+    "ServerProtections": {
+      "AntiDelete": false,
+      "AntiInvite": false,
+      "AntiSpam": false,
+      "AntiUpper": false,
+      "ProtectedServers": []
+    }
+  },
+  "Activity": {
+    "Enabled": false,
+    "ActivityType": "CustomActivity",
+    "Type": "Playing",
+    "ClientID": "898932653049393172",
+    "Name": "LightningBot",
+    "State": "Using LightningBot $VERSION",
+    "Details": "",
+    "Invitable": false,
+    "Time": true,
+    "StreamingURL": "https://twitch.tv/yourusername",
+    "LargeImage": "mp:external/ohNK0T0rUHTB2LD4m7s0SIJXgVARXBrlAFOj6aun1mY/https/lightning-bot.com/logo.png",
+    "LargeImageText": "",
+    "SmallImage": "",
+    "SmallImageText": "",
+    "Button1Label": "Website",
+    "Button1URL": "https://lightning-bot.com/",
+    "Button2Label": "Discord Server",
+    "Button2URL": "https://discord.gg/khVeaCsKCU"
+  },
+  "Selfbot": {
+    "CommandMode": "Text",
+    "CommandPrefix": "!",
+    "DeleteCommands": true,
+    "DeleteResponses": true,
+    "DeleteResponsesDelay": 300,
+    "Footer": "LightningBot $VERSION",
+    "MobileFriendly": false,
+    "Title": "LightningBot",
+    "Client": "Desktop"
+  },
+  "Sharing": {
+    "ShareAll": false,
+    "BlockDangerousCommands": true,
+    "SharedCategories": [],
+    "SharedCommands": [],
+    "SharedUsers": []
+  },
+  "Snipers": {
+    "Blacklist": [],
+    "ServerBlacklist": [],
+    "GiveawaySniper": {
+      "CustomBots": [],
+      "Sleep": 600,
+      "Enabled": true
+    },
+    "MultiTokenSniper": false,
+    "NitroSniper": true,
+    "PrivnoteSniper": true,
+    "Tokens": []
+  },
+  "UI": {
+    "Theme": "Dark",
+    "HideToSystemTray": false,
+    "RunOnStartup": false,
+    "RunSelfbotOnStartup": false
+  },
+  "Webhooks": {
+    "GiveawaySniper": "",
+    "Misc": "",
+    "NitroSniper": "",
+    "Notifiers": "",
+    "PingDetection": "",
+    "SelfbotDetection": "",
+    "StaffDetection": "",
+    "Sessions": ""
+  }
+}
