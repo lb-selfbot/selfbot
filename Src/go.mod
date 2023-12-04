@@ -7,8 +7,8 @@ require (
 	github.com/LightningDev1/beeep v0.1.0
 	github.com/LightningDev1/chromiumdp v0.0.0-20231128154929-66ef7c9d7fb7
 	github.com/LightningDev1/dgc v1.1.4-0.20231130125735-679db2635a21
-	github.com/LightningDev1/discordgo v0.26.6-0.20231202113950-0fd369905129
-	github.com/LightningDev1/go-privnote v0.1.0
+	github.com/LightningDev1/discordgo v0.26.6-0.20231204123852-4f3a81d7c035
+	github.com/LightningDev1/go-privnote v0.1.1
 	github.com/LightningDev1/screenshot v0.0.0-20230719145300-c8d3633174bf
 	github.com/bitly/go-simplejson v0.5.1
 	github.com/brianvoe/gofakeit/v6 v6.25.0
