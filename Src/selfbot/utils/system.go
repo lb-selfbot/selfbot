@@ -5,11 +5,17 @@ import (
 	"os/exec"
 	"runtime"
 	"syscall"
+
+	"github.com/LightningDev1/LB-Selfbot/selfbot/constants"
 )
 
 type SystemUtils struct{}
 
 func (SystemUtils) OpenURL(url string) error {
+	if constants.HOSTING {
+		return nil
+	}
+	
 	if runtime.GOOS == "windows" {
 		return exec.Command("explorer", url).Start()
 	} else if runtime.GOOS == "darwin" {
