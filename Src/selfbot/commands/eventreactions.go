@@ -7,7 +7,7 @@ import (
 
 	"github.com/LightningDev1/LB-Selfbot/selfbot/config"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/embed"
-	"github.com/LightningDev1/LB-Selfbot/selfbot/eventhandlers"
+	"github.com/LightningDev1/LB-Selfbot/selfbot/eventhandlers/eventreactions"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/utils"
 	"github.com/LightningDev1/dgc"
 	"github.com/LightningDev1/discordgo"
@@ -17,110 +17,248 @@ type EventReactionsCommands struct{}
 
 func (e *EventReactionsCommands) RegisterCommands(router *dgc.Router) {
 	router.StartCategory("EventReactions", "Event Reaction commands")
+
+	router.RegisterCmd(&dgc.Command{
+		Name:        "listreactions",
+		Description: "List all active event reactions",
+		Usage:       "[p]listreactions",
+		Handler:     e.listreactions,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "clearreactions",
+		Description: "Clear all active event reactions",
+		Usage:       "[p]clearreactions",
+		Handler:     e.clearreactions,
+	})
+
+	// Ignore user
 	router.RegisterCmd(&dgc.Command{
 		Name:        "ignoreuser",
 		Description: "Ignore messages from a user",
-		Usage:       "[p]ignoreuser <user>",
+		Usage:       "[p]ignoreuser <toggle/list/clear> [@user]",
 		Flags:       []string{"DANGEROUS"},
 		Handler:     e.ignoreuser,
 	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "unignoreuser",
-		Description: "Unignore a user",
-		Usage:       "[p]unignoreuser <user>",
-		Flags:       []string{"DANGEROUS"},
-		Handler:     e.unignoreuser,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "userignorelist",
-		Description: "See all ignored users",
-		Usage:       "[p]userignorelist",
-		Flags:       []string{"DANGEROUS"},
-		Handler:     e.userignorelist,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "clearuserignorelist",
-		Description: "Clear the list of ignored users",
-		Usage:       "[p]clearuserignorelist",
-		Flags:       []string{"DANGEROUS"},
-		Handler:     e.clearuserignorelist,
-	})
+
+	// Ignore server
 	router.RegisterCmd(&dgc.Command{
 		Name:        "ignoreserver",
 		Description: "Ignore messages from a server",
-		Usage:       "[p]ignoreserver [server id]",
+		Usage:       "[p]ignoreserver <toggle/list/clear> [server id]",
 		Flags:       []string{"DANGEROUS"},
 		Handler:     e.ignoreserver,
 	})
+
+	// Ping reactions
 	router.RegisterCmd(&dgc.Command{
-		Name:        "unignoreserver",
-		Description: "Unignore a server",
-		Usage:       "[p]unignoreserver [server id]",
+		Name:        "pingping",
+		Description: "Reply to pings by pinging the user",
+		Usage:       "[p]pingping <toggle/list/clear> [server/channel id]",
 		Flags:       []string{"DANGEROUS"},
-		Handler:     e.unignoreserver,
+		Handler:     e.pingping,
 	})
 	router.RegisterCmd(&dgc.Command{
-		Name:        "serverignorelist",
-		Description: "See all ignored servers",
-		Usage:       "[p]serverignorelist",
+		Name:        "pingkick",
+		Description: "Reply to pings by kicking the user",
+		Usage:       "[p]pingkick <toggle/list/clear> [server/channel id]",
 		Flags:       []string{"DANGEROUS"},
-		Handler:     e.serverignorelist,
+		Handler:     e.pingkick,
 	})
 	router.RegisterCmd(&dgc.Command{
-		Name:        "clearserverignorelist",
-		Description: "Clear the list of ignored servers",
-		Usage:       "[p]clearserverignorelist",
+		Name:        "pingban",
+		Description: "Reply to pings by banning the user",
+		Usage:       "[p]pingban <toggle/list/clear> [server/channel id]",
 		Flags:       []string{"DANGEROUS"},
-		Handler:     e.clearserverignorelist,
+		Handler:     e.pingban,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "pingmute",
-		Description: "Mute a user when they ping you",
-		Usage:       "[p]pingmute <on/off>",
+		Description: "Reply to pings by muting the user",
+		Usage:       "[p]pingmute <toggle/list/clear> [server/channel id]",
 		Flags:       []string{"DANGEROUS"},
 		Handler:     e.pingmute,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "pingtimeout",
-		Description: "Time a user out when they ping you",
-		Usage:       "[p]pingtimeout <on/off>",
+		Description: "Reply to pings by timing the user out",
+		Usage:       "[p]pingtimeout <toggle/list/clear> [server/channel id]",
 		Flags:       []string{"DANGEROUS"},
 		Handler:     e.pingtimeout,
 	})
 	router.RegisterCmd(&dgc.Command{
-		Name:        "pingban",
-		Description: "Ban a user when they ping you",
-		Usage:       "[p]pingban <on/off>",
-		Flags:       []string{"DANGEROUS"},
-		Handler:     e.pingban,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "pingkick",
-		Description: "Kick a user when they ping you",
-		Usage:       "[p]pingkick <on/off>",
-		Flags:       []string{"DANGEROUS"},
-		Handler:     e.pingkick,
-	})
-	router.RegisterCmd(&dgc.Command{
 		Name:        "pinginsult",
-		Description: "Insult a user when they ping you",
-		Usage:       "[p]pinginsult <on/off>",
+		Description: "Reply to pings by insulting the user",
+		Usage:       "[p]pinginsult <toggle/list/clear> [server/channel id]",
 		Flags:       []string{"DANGEROUS"},
 		Handler:     e.pinginsult,
 	})
 	router.RegisterCmd(&dgc.Command{
-		Name:        "pingping",
-		Description: "Ping a user back when they ping you",
-		Usage:       "[p]pingping <on/off>",
+		Name:        "pingresponse",
+		Description: "Reply to pings with a custom response",
+		Usage:       "[p]pingresponse <toggle/list/clear> <\"response\"> [server/channel id]",
 		Flags:       []string{"DANGEROUS"},
-		Handler:     e.pingping,
+		Handler:     e.pingresponse,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "pingairesponse",
+		Description: "Reply to pings with an AI response",
+		Usage:       "[p]pingairesponse <toggle/list/clear> [\"system\"] [server/channel id]",
+		Flags:       []string{"DANGEROUS"},
+		Handler:     e.pingairesponse,
+	})
+
+	// Mirror channel/server
+	router.RegisterCmd(&dgc.Command{
+		Name:        "mirrorchannel",
+		Description: "Mirror messages from one channel to another",
+		Usage:       "[p]mirrorchannel <toggle/list/clear> [source channel] [dest channel]",
+		Flags:       []string{"DANGEROUS"},
+		Handler:     e.mirrorchannel,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "mirrorserver",
+		Description: "Mirror messages from one server to another",
+		Usage:       "[p]mirrorserver <toggle/list/clear> [source server] [dest server]",
+		Flags:       []string{"DANGEROUS"},
+		Handler:     e.mirrorserver,
+	})
+
+	// Message Reactions
+	router.RegisterCmd(&dgc.Command{
+		Name:        "responder",
+		Description: "Reply to messages with a custom response",
+		Usage:       "[p]responder <toggle/list/clear> <\"response\"> [server/channel id]",
+		Flags:       []string{"DANGEROUS"},
+		Handler:     e.responder,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "airesponder",
+		Description: "Reply to messages with an AI response",
+		Usage:       "[p]airesponder <toggle/list/clear> [\"system\"] [server/channel id]",
+		Flags:       []string{"DANGEROUS"},
+		Handler:     e.airesponder,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "copy",
+		Description: "Copy a user's messages",
+		Usage:       "[p]copy <toggle/list/clear> <@user> [server/channel id]",
+		Flags:       []string{"DANGEROUS"},
+		Handler:     e.copy,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "replycopy",
+		Description: "Replycopy a user's messages",
+		Usage:       "[p]replycopy <toggle/list/clear> <@user> [server/channel id]",
+		Flags:       []string{"DANGEROUS"},
+		Handler:     e.replycopy,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "mock",
+		Description: "Mock a user's messages",
+		Usage:       "[p]mock <toggle/list/clear> <@user> [server/channel id]",
+		Flags:       []string{"DANGEROUS"},
+		Handler:     e.mock,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "pinspam",
+		Description: "Pin all of a user's messages",
+		Usage:       "[p]pinspam <toggle/list/clear> <@user> [server/channel id]",
+		Flags:       []string{"DANGEROUS"},
+		Handler:     e.pinspam,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "unpinspam",
+		Description: "Unpin messages pinned by pinspam",
+		Usage:       "[p]unpinspam",
+		Flags:       []string{"DANGEROUS"},
+		Handler:     e.unpinspam,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "reactspam",
+		Description: "React to all of a user's messages",
+		Usage:       "[p]reactspam <toggle/list/clear> <@user> <reaction> [server/channel id]",
+		Flags:       []string{"DANGEROUS"},
+		Handler:     e.reactspam,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "deletemessages",
+		Description: "Delete all of a user's messages",
+		Usage:       "[p]deletemessages <toggle/list/clear> <@user> [server/channel id]",
+		Flags:       []string{"DANGEROUS"},
+		Handler:     e.deletemessages,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "keywordnotifier",
+		Description: "Get notified when someone mentions a keyword",
+		Usage:       "[p]keywordnotifier <toggle/list/clear> <\"keyword\"> [global/server/channel id]",
+		Flags:       []string{"DANGEROUS"},
+		Handler:     e.keywordnotifier,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "removereactions",
+		Description: "Delete all of a user's reactions",
+		Usage:       "[p]removereactions <toggle/list/clear> <@user> [server/channel id]",
+		Flags:       []string{"DANGEROUS"},
+		Handler:     e.removereactions,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "forcedisconnect",
+		Description: "Disconnect a user from voice channels",
+		Usage:       "[p]forcedisconnect <toggle/list/clear> <@user> [server/channel id]",
+		Flags:       []string{"DANGEROUS"},
+		Handler:     e.forcedisconnect,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "forcenick",
+		Description: "Force change a user's nickname",
+		Usage:       "[p]forcenick <toggle/list/clear> <@user> <nickname> [server id]",
+		Flags:       []string{"DANGEROUS"},
+		Handler:     e.forcenick,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "forcekick",
+		Description: "Force kick a user",
+		Usage:       "[p]forcekick <toggle/list/clear> <@user> [server id]",
+		Flags:       []string{"DANGEROUS"},
+		Handler:     e.forcekick,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "noleave",
+		Description: "Prevent a user from leaving a group chat",
+		Usage:       "[p]noleave <toggle/list/clear> <@user> [channel id]",
+		Flags:       []string{"DANGEROUS"},
+		Handler:     e.noleave,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "antigroupchat",
+		Description: "Prevent users from adding you to group chats",
+		Usage:       "[p]antigroupchat <on/off> [silent leave: on/off]",
+		Flags:       []string{"DANGEROUS"},
+		Handler:     e.antigroupchat,
+	})
+
+	// AFK
+
+	router.RegisterCmd(&dgc.Command{
+		Name:        "getafkenabled",
+		Description: "Get the current AFK responder setting",
+		Usage:       "[p]getafkenabled",
+		Flags:       []string{"DANGEROUS"},
+		Handler:     e.getafkenabled,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "afkenabled",
-		Description: "Turn AFK mode on or off",
+		Description: "Turn the AFK responder on or off",
 		Usage:       "[p]afkenabled <on/off>",
 		Flags:       []string{"DANGEROUS"},
 		Handler:     e.afkenabled,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "getafkonping",
+		Description: "Get the current AFK on ping setting",
+		Usage:       "[p]getafkonping",
+		Flags:       []string{"DANGEROUS"},
+		Handler:     e.getafkonping,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "afkonping",
@@ -130,6 +268,13 @@ func (e *EventReactionsCommands) RegisterCommands(router *dgc.Router) {
 		Handler:     e.afkonping,
 	})
 	router.RegisterCmd(&dgc.Command{
+		Name:        "getafkondm",
+		Description: "Get the current AFK on DM setting",
+		Usage:       "[p]getafkondm",
+		Flags:       []string{"DANGEROUS"},
+		Handler:     e.getafkondm,
+	})
+	router.RegisterCmd(&dgc.Command{
 		Name:        "afkondm",
 		Description: "Set if an AFK message should be sent on DM",
 		Usage:       "[p]afkondm <on/off>",
@@ -137,25 +282,11 @@ func (e *EventReactionsCommands) RegisterCommands(router *dgc.Router) {
 		Handler:     e.afkondm,
 	})
 	router.RegisterCmd(&dgc.Command{
-		Name:        "afkmessage",
-		Description: "Set the AFK message",
-		Usage:       "[p]afkmessage <text>",
+		Name:        "getafkdelay",
+		Description: "Get the current AFK delay setting",
+		Usage:       "[p]getafkdelay",
 		Flags:       []string{"DANGEROUS"},
-		Handler:     e.afkmessage,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "afkreply",
-		Description: "Set if the AFK message should be a reply",
-		Usage:       "[p]afkreply <on/off>",
-		Flags:       []string{"DANGEROUS"},
-		Handler:     e.afkreply,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "afktyping",
-		Description: "Set if the bot should show typing before sending message",
-		Usage:       "[p]afktyping <on/off>",
-		Flags:       []string{"DANGEROUS"},
-		Handler:     e.afktyping,
+		Handler:     e.getafkdelay,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "afkdelay",
@@ -165,6 +296,97 @@ func (e *EventReactionsCommands) RegisterCommands(router *dgc.Router) {
 		Handler:     e.afkdelay,
 	})
 	router.RegisterCmd(&dgc.Command{
+		Name:        "getafkrandomdelay",
+		Description: "Get the current AFK random delay setting",
+		Usage:       "[p]getafkrandomdelay",
+		Flags:       []string{"DANGEROUS"},
+		Handler:     e.getafkrandomdelay,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "afkrandomdelay",
+		Description: "Set the AFK random delay setting",
+		Usage:       "[p]afkrandomdelay <on/off>",
+		Flags:       []string{"DANGEROUS"},
+		Handler:     e.afkrandomdelay,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "getafkmustbeinactive",
+		Description: "Get the current must be inactive setting",
+		Usage:       "[p]getafkmustbeinactive",
+		Flags:       []string{"DANGEROUS"},
+		Handler:     e.getafkmustbeinactive,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "afkmustbeinactive",
+		Description: "Only send AFK messages when inactive",
+		Usage:       "[p]afkmustbeinactive <on/off>",
+		Flags:       []string{"DANGEROUS"},
+		Handler:     e.afkmustbeinactive,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "getafkinactivetimeout",
+		Description: "Get the current inactive timeout",
+		Usage:       "[p]getafkinactivetimeout",
+		Flags:       []string{"DANGEROUS"},
+		Handler:     e.getafkinactivetimeout,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "afkinactivetimeout",
+		Description: "Minimum inactive time before being AFK",
+		Usage:       "[p]afkinactivetimeout <seconds>",
+		Flags:       []string{"DANGEROUS"},
+		Handler:     e.afkinactivetimeout,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "getafktyping",
+		Description: "Get the current AFK typing setting",
+		Usage:       "[p]getafktyping",
+		Flags:       []string{"DANGEROUS"},
+		Handler:     e.getafktyping,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "afktyping",
+		Description: "Set if the bot should show typing before sending message",
+		Usage:       "[p]afktyping <on/off>",
+		Flags:       []string{"DANGEROUS"},
+		Handler:     e.afktyping,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "getafkairesponse",
+		Description: "Get the current AFK AI response setting",
+		Usage:       "[p]getafkairesponse",
+		Flags:       []string{"DANGEROUS"},
+		Handler:     e.getafkairesponse,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "afkairesponse",
+		Description: "AI responder will use AI to generate response",
+		Usage:       "[p]afkairesponse <on/off>",
+		Flags:       []string{"DANGEROUS"},
+		Handler:     e.afkairesponse,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "getafkmessage",
+		Description: "Get the current AFK message",
+		Usage:       "[p]getafkmessage",
+		Flags:       []string{"DANGEROUS"},
+		Handler:     e.getafkmessage,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "afkmessage",
+		Description: "Set the AFK message",
+		Usage:       "[p]afkmessage <text>",
+		Flags:       []string{"DANGEROUS"},
+		Handler:     e.afkmessage,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "getafktriggertype",
+		Description: "Get the current AFK trigger type",
+		Usage:       "[p]getafktriggertype",
+		Flags:       []string{"DANGEROUS"},
+		Handler:     e.getafktriggertype,
+	})
+	router.RegisterCmd(&dgc.Command{
 		Name:        "afktriggertype",
 		Description: "Set the AFK trigger type",
 		Usage:       "[p]afktriggertype <type>",
@@ -172,448 +394,1401 @@ func (e *EventReactionsCommands) RegisterCommands(router *dgc.Router) {
 		Handler:     e.afktriggertype,
 	})
 	router.RegisterCmd(&dgc.Command{
-		Name:        "afkaddserver",
-		Description: "Add a server to the AFK trigger list",
-		Usage:       "[p]afkaddserver <server id>",
+		Name:        "afktriggerusers",
+		Description: "Add/remove/list users that trigger AFK message",
+		Usage:       "[p]afktriggerusers <add/rm/list> [@user]",
 		Flags:       []string{"DANGEROUS"},
-		Handler:     e.afkaddserver,
+		Handler:     e.afktriggerusers,
 	})
 	router.RegisterCmd(&dgc.Command{
-		Name:        "afkremoveserver",
-		Description: "Remove a server from the AFK trigger list",
-		Usage:       "[p]afkremoveserver <server id>",
+		Name:        "afktriggerservers",
+		Description: "Add/remove/list servers that trigger AFK message",
+		Usage:       "[p]afktriggerservers <add/rm/list> [server id]",
 		Flags:       []string{"DANGEROUS"},
-		Handler:     e.afkremoveserver,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "afkadduser",
-		Description: "Add a user to the AFK trigger list",
-		Usage:       "[p]afkadduser <<user>",
-		Flags:       []string{"DANGEROUS"},
-		Handler:     e.afkadduser,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "afkremoveuser",
-		Description: "Remove a user from the AFK trigger list",
-		Usage:       "[p]afkremoveuser <user>",
-		Flags:       []string{"DANGEROUS"},
-		Handler:     e.afkremoveuser,
+		Handler:     e.afktriggerservers,
 	})
 }
 
-func (EventReactionsCommands) ignoreuser(ctx *dgc.Ctx) {
-	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
-	if !success {
-		_ = ctx.RespondText("Could not find user.")
-		return
-	}
-	for _, ignoredUser := range eventhandlers.EventHandlers.Settings.IgnoredUsers {
-		if user.ID == ignoredUser.ID {
-			_ = ctx.RespondText("User is already ignored.")
-			return
-		}
-	}
-	eventhandlers.EventHandlers.Settings.IgnoredUsers = append(eventhandlers.EventHandlers.Settings.IgnoredUsers, user)
-}
+// Utils
 
-func (EventReactionsCommands) unignoreuser(ctx *dgc.Ctx) {
-	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
-	if !success {
-		_ = ctx.RespondText("Could not find user.")
+func (EventReactionsCommands) toggleReaction(ctx *dgc.Ctx, reaction eventreactions.EventReaction) {
+	// Delete the raction if it already exists
+	if eventreactions.Exists(reaction) {
+		eventreactions.Remove(reaction)
+		embed.NewEmbed().
+			SetDescription("Removed event reaction: " + reaction.Description()).
+			Send(ctx)
 		return
 	}
-	isIgnored := false
-	for _, ignoredUser := range eventhandlers.EventHandlers.Settings.IgnoredUsers {
-		if user.ID == ignoredUser.ID {
-			isIgnored = true
-		}
-	}
-	if !isIgnored {
-		_ = ctx.RespondText("User is already not ignored.")
-		return
-	}
-	eventhandlers.EventHandlers.Settings.IgnoredUsers = utils.RemoveSliceItem(
-		eventhandlers.EventHandlers.Settings.IgnoredUsers,
-		user,
-	)
-}
 
-func (EventReactionsCommands) userignorelist(ctx *dgc.Ctx) {
-	if len(eventhandlers.EventHandlers.Settings.IgnoredUsers) == 0 {
-		_ = ctx.RespondText("No users are ignored.")
-		return
-	}
-	ignoredUserString := ""
-	for _, user := range eventhandlers.EventHandlers.Settings.IgnoredUsers {
-		ignoredUserString += fmt.Sprintf("%s - %s\n", user.String(), user.ID)
-	}
+	eventreactions.Add(reaction)
+
 	embed.NewEmbed().
-		AddField("Ignored Users", ignoredUserString).
+		SetDescription("Added event reaction: " + reaction.Description()).
 		Send(ctx)
 }
 
-func (EventReactionsCommands) clearuserignorelist(*dgc.Ctx) {
-	eventhandlers.EventHandlers.Settings.IgnoredUsers = []*discordgo.User{}
-}
-
-func (EventReactionsCommands) ignoreserver(ctx *dgc.Ctx) {
-	guild, err := utils.Discord.GetGuild(ctx.Session, utils.Misc.Or(utils.Arguments["[server id]"], ctx.Event.GuildID))
-	if err != nil {
-		_ = ctx.RespondText("Error getting server: " + err.Error())
+func (EventReactionsCommands) mapReactions(ctx *dgc.Ctx, reactions []eventreactions.EventReaction, errText, title string) {
+	if len(reactions) == 0 {
+		embed.NewEmbed().
+			SetDescription(errText).
+			Send(ctx)
 		return
 	}
-	for _, ignoredGuild := range eventhandlers.EventHandlers.Settings.IgnoredGuilds {
-		if guild.ID == ignoredGuild.ID {
-			_ = ctx.RespondText("Server is already ignored.")
-			return
-		}
-	}
-	eventhandlers.EventHandlers.Settings.IgnoredGuilds = append(eventhandlers.EventHandlers.Settings.IgnoredGuilds, guild)
-}
 
-func (EventReactionsCommands) unignoreserver(ctx *dgc.Ctx) {
-	guild, err := utils.Discord.GetGuild(ctx.Session, utils.Misc.Or(utils.Arguments["[server id]"], ctx.Event.GuildID))
-	if err != nil {
-		_ = ctx.RespondText("Error getting server: " + err.Error())
-		return
-	}
-	isIgnored := false
-	for _, ignoredGuild := range eventhandlers.EventHandlers.Settings.IgnoredGuilds {
-		if guild.ID == ignoredGuild.ID {
-			isIgnored = true
-		}
-	}
-	if !isIgnored {
-		_ = ctx.RespondText("Server is already not ignored.")
-		return
-	}
-	eventhandlers.EventHandlers.Settings.IgnoredGuilds = utils.RemoveSliceItem(
-		eventhandlers.EventHandlers.Settings.IgnoredGuilds,
-		guild,
-	)
+	descriptions := utils.Map(reactions, func(reaction eventreactions.EventReaction) string {
+		return reaction.Description()
+	})
 
-}
-
-func (EventReactionsCommands) serverignorelist(ctx *dgc.Ctx) {
-	if len(eventhandlers.EventHandlers.Settings.IgnoredGuilds) == 0 {
-		_ = ctx.RespondText("No servers are ignored.")
-		return
-	}
-	ignoredServersString := ""
-	for _, guild := range eventhandlers.EventHandlers.Settings.IgnoredGuilds {
-		ignoredServersString += fmt.Sprintf("%s - %s\n", guild.Name, guild.ID)
-	}
 	embed.NewEmbed().
-		AddField("Ignored Servers", ignoredServersString).
+		SetDescription(title + ":\n\n" + strings.Join(descriptions, "\n")).
 		Send(ctx)
 }
 
-func (EventReactionsCommands) clearserverignorelist(*dgc.Ctx) {
-	eventhandlers.EventHandlers.Settings.IgnoredGuilds = []*discordgo.Guild{}
+func (EventReactionsCommands) getGuildOrChannel(ctx *dgc.Ctx, arg *dgc.Argument) (guild *discordgo.Guild, channel *discordgo.Channel, err error) {
+	givenID := utils.Misc.Or(arg.AsChannelMentionID(), arg.Raw())
+
+	if givenID == "" {
+		// Use the current server/channel
+		if ctx.Event.GuildID != "" {
+			guild, err = utils.Discord.GetGuild(ctx.Session, ctx.Event.GuildID)
+			if err != nil {
+				return
+			}
+		} else {
+			channel, err = utils.Discord.GetChannel(ctx.Session, ctx.Event.ChannelID)
+			if err != nil {
+				return
+			}
+		}
+	} else {
+		// Use the given server/channel
+		guild, err = utils.Discord.GetGuild(ctx.Session, givenID)
+		if err != nil {
+			channel, err = utils.Discord.GetChannel(ctx.Session, givenID)
+			if err != nil {
+				return
+			}
+		}
+	}
+
+	return
 }
 
-func (EventReactionsCommands) pingmute(ctx *dgc.Ctx) {
-	if !utils.Discord.CheckIfInServer(ctx) {
-		return
-	}
-	toggleString := strings.ToLower(utils.Arguments["<on/off>"])
-	if toggleString != "on" && toggleString != "off" {
-		_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
-		return
-	}
-	alreadyOn := utils.SliceContains(eventhandlers.EventHandlers.Settings.PingMuteServers, ctx.Event.GuildID)
-	if toggleString == "on" && alreadyOn {
-		_ = ctx.RespondText("Ping mute is already on in this server.")
-		return
-	} else if toggleString == "off" && !alreadyOn {
-		_ = ctx.RespondText("Ping mute is already off in this server.")
-		return
-	}
-	if toggleString == "on" {
-		eventhandlers.EventHandlers.Settings.PingMuteServers = append(eventhandlers.EventHandlers.Settings.PingMuteServers, ctx.Event.GuildID)
-	} else {
-		eventhandlers.EventHandlers.Settings.PingMuteServers = utils.RemoveSliceItem(
-			eventhandlers.EventHandlers.Settings.PingMuteServers,
-			ctx.Event.GuildID,
-		)
-	}
+// Commands
+
+func (e EventReactionsCommands) listreactions(ctx *dgc.Ctx) {
+	reactions := eventreactions.ActiveReactions
+
+	e.mapReactions(ctx, reactions, "There are no active event reactions", "Active event reactions")
 }
 
-func (EventReactionsCommands) pingtimeout(ctx *dgc.Ctx) {
-	if !utils.Discord.CheckIfInServer(ctx) {
-		return
-	}
-	toggleString := strings.ToLower(utils.Arguments["<on/off>"])
-	if toggleString != "on" && toggleString != "off" {
-		_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
-		return
-	}
-	alreadyOn := utils.SliceContains(eventhandlers.EventHandlers.Settings.PingTimeoutServers, ctx.Event.GuildID)
-	if toggleString == "on" && alreadyOn {
-		_ = ctx.RespondText("Ping timeout is already on in this server.")
-		return
-	} else if toggleString == "off" && !alreadyOn {
-		_ = ctx.RespondText("Ping timeout is already off in this server.")
-		return
-	}
-	if toggleString == "on" {
-		eventhandlers.EventHandlers.Settings.PingTimeoutServers = append(eventhandlers.EventHandlers.Settings.PingTimeoutServers, ctx.Event.GuildID)
-	} else {
-		eventhandlers.EventHandlers.Settings.PingTimeoutServers = utils.RemoveSliceItem(
-			eventhandlers.EventHandlers.Settings.PingTimeoutServers,
-			ctx.Event.GuildID,
-		)
-	}
+func (e EventReactionsCommands) clearreactions(ctx *dgc.Ctx) {
+	eventreactions.Clear()
+
+	embed.NewEmbed().
+		SetDescription("Cleared all event reactions").
+		Send(ctx)
 }
 
-func (EventReactionsCommands) pingban(ctx *dgc.Ctx) {
-	if !utils.Discord.CheckIfInServer(ctx) {
-		return
-	}
-	toggleString := strings.ToLower(utils.Arguments["<on/off>"])
-	if toggleString != "on" && toggleString != "off" {
-		_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
-		return
-	}
-	alreadyOn := utils.SliceContains(eventhandlers.EventHandlers.Settings.PingBanServers, ctx.Event.GuildID)
-	if toggleString == "on" && alreadyOn {
-		_ = ctx.RespondText("Ping ban is already on in this server.")
-		return
-	} else if toggleString == "off" && !alreadyOn {
-		_ = ctx.RespondText("Ping ban is already off in this server.")
-		return
-	}
-	if toggleString == "on" {
-		eventhandlers.EventHandlers.Settings.PingBanServers = append(eventhandlers.EventHandlers.Settings.PingBanServers, ctx.Event.GuildID)
-	} else {
-		eventhandlers.EventHandlers.Settings.PingBanServers = utils.RemoveSliceItem(
-			eventhandlers.EventHandlers.Settings.PingBanServers,
-			ctx.Event.GuildID,
-		)
+// Ignore User
+
+func (e EventReactionsCommands) ignoreuser(ctx *dgc.Ctx) {
+	switch strings.ToLower(utils.Arguments["<toggle/list/clear>"]) {
+	case "toggle":
+		user, ok := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(1))
+		if !ok {
+			embed.NewEmbed().
+				SetDescription("Could not find user").
+				Send(ctx)
+			return
+		}
+
+		e.toggleReaction(ctx, eventreactions.NewIgnoreUser(user))
+	case "list":
+		reactions := eventreactions.GetAll(eventreactions.IGNORE_USER)
+
+		e.mapReactions(ctx, reactions, "There are no ignored users.", "Ignored users")
+	case "clear":
+		eventreactions.RemoveAll(eventreactions.IGNORE_USER)
+
+		embed.NewEmbed().
+			SetDescription("Cleared all ignored users.").
+			Send(ctx)
+	default:
+		embed.NewEmbed().
+			SetDescription("Invalid toggle/list/clear argument.").
+			Send(ctx)
 	}
 }
 
-func (EventReactionsCommands) pingkick(ctx *dgc.Ctx) {
-	if !utils.Discord.CheckIfInServer(ctx) {
-		return
-	}
-	toggleString := strings.ToLower(utils.Arguments["<on/off>"])
-	if toggleString != "on" && toggleString != "off" {
-		_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
-		return
-	}
-	alreadyOn := utils.SliceContains(eventhandlers.EventHandlers.Settings.PingKickServers, ctx.Event.GuildID)
-	if toggleString == "on" && alreadyOn {
-		_ = ctx.RespondText("Ping kick is already on in this server.")
-		return
-	} else if toggleString == "off" && !alreadyOn {
-		_ = ctx.RespondText("Ping kick is already off in this server.")
-		return
-	}
-	if toggleString == "on" {
-		eventhandlers.EventHandlers.Settings.PingKickServers = append(eventhandlers.EventHandlers.Settings.PingKickServers, ctx.Event.GuildID)
-	} else {
-		eventhandlers.EventHandlers.Settings.PingKickServers = utils.RemoveSliceItem(
-			eventhandlers.EventHandlers.Settings.PingKickServers,
-			ctx.Event.GuildID,
-		)
+// Ignore Server
+
+func (e EventReactionsCommands) ignoreserver(ctx *dgc.Ctx) {
+	switch strings.ToLower(utils.Arguments["<toggle/list/clear>"]) {
+	case "toggle":
+		guildID := utils.Misc.Or(utils.Arguments["[server id]"], ctx.Event.GuildID)
+
+		guild, err := utils.Discord.GetGuild(ctx.Session, guildID)
+		if err != nil {
+			embed.NewEmbed().
+				SetDescription("Could not find server: " + err.Error()).
+				Send(ctx)
+			return
+		}
+
+		e.toggleReaction(ctx, eventreactions.NewIgnoreGuild(guild))
+	case "list":
+		reactions := eventreactions.GetAll(eventreactions.IGNORE_GUILD)
+
+		e.mapReactions(ctx, reactions, "There are no ignored servers.", "Ignored servers")
+	case "clear":
+		eventreactions.RemoveAll(eventreactions.IGNORE_GUILD)
+
+		embed.NewEmbed().
+			SetDescription("Cleared all ignored servers.").
+			Send(ctx)
+	default:
+		embed.NewEmbed().
+			SetDescription("Invalid toggle/list/clear argument.").
+			Send(ctx)
 	}
 }
 
-func (EventReactionsCommands) pinginsult(ctx *dgc.Ctx) {
-	if !utils.Discord.CheckIfInServer(ctx) {
-		return
-	}
-	toggleString := strings.ToLower(utils.Arguments["<on/off>"])
-	if toggleString != "on" && toggleString != "off" {
-		_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
-		return
-	}
-	alreadyOn := utils.SliceContains(eventhandlers.EventHandlers.Settings.PingInsultServers, ctx.Event.GuildID)
-	if toggleString == "on" && alreadyOn {
-		_ = ctx.RespondText("Ping insult is already on in this server.")
-		return
-	} else if toggleString == "off" && !alreadyOn {
-		_ = ctx.RespondText("Ping insult is already off in this server.")
-		return
-	}
-	if toggleString == "on" {
-		eventhandlers.EventHandlers.Settings.PingInsultServers = append(eventhandlers.EventHandlers.Settings.PingInsultServers, ctx.Event.GuildID)
-	} else {
-		eventhandlers.EventHandlers.Settings.PingInsultServers = utils.RemoveSliceItem(
-			eventhandlers.EventHandlers.Settings.PingInsultServers,
-			ctx.Event.GuildID,
-		)
+// Ping reactions
+
+func (e EventReactionsCommands) pingReaction(ctx *dgc.Ctx, reactionType eventreactions.EventReactionType, reaction string, i int) {
+	switch strings.ToLower(utils.Arguments["<toggle/list/clear>"]) {
+	case "toggle":
+		guild, channel, err := e.getGuildOrChannel(ctx, ctx.Arguments.Get(i))
+		if err != nil {
+			embed.NewEmbed().
+				SetDescription("Could not find server/channel: " + err.Error()).
+				Send(ctx)
+			return
+		}
+
+		eventReaction := eventreactions.NewPingReaction(reactionType, guild, channel)
+
+		eventReaction.System = utils.Arguments["[\"system\"]"]
+		eventReaction.Response = utils.Arguments["<\"response\">"]
+
+		e.toggleReaction(ctx, eventReaction)
+	case "list":
+		reactions := eventreactions.GetAll(reactionType)
+
+		e.mapReactions(ctx, reactions, fmt.Sprintf("There are no ping --> %s reactions.", reaction), fmt.Sprintf("Ping --> %s reactions", reaction))
+	case "clear":
+		eventreactions.RemoveAll(reactionType)
+
+		embed.NewEmbed().
+			SetDescription(fmt.Sprintf("Cleared all ping --> %s reactions.", reaction)).
+			Send(ctx)
+	default:
+		embed.NewEmbed().
+			SetDescription("Invalid toggle/list/clear argument").
+			Send(ctx)
 	}
 }
 
-func (EventReactionsCommands) pingping(ctx *dgc.Ctx) {
-	if !utils.Discord.CheckIfInServer(ctx) {
-		return
+func (e EventReactionsCommands) pingping(ctx *dgc.Ctx) {
+	e.pingReaction(ctx, eventreactions.PING_PING, "ping", 1)
+}
+
+func (e EventReactionsCommands) pingkick(ctx *dgc.Ctx) {
+	e.pingReaction(ctx, eventreactions.PING_KICK, "kick", 1)
+}
+
+func (e EventReactionsCommands) pingban(ctx *dgc.Ctx) {
+	e.pingReaction(ctx, eventreactions.PING_BAN, "ban", 1)
+}
+
+func (e EventReactionsCommands) pingmute(ctx *dgc.Ctx) {
+	e.pingReaction(ctx, eventreactions.PING_MUTE, "mute", 1)
+}
+
+func (e EventReactionsCommands) pingtimeout(ctx *dgc.Ctx) {
+	e.pingReaction(ctx, eventreactions.PING_TIMEOUT, "timeout", 1)
+}
+
+func (e EventReactionsCommands) pinginsult(ctx *dgc.Ctx) {
+	e.pingReaction(ctx, eventreactions.PING_INSULT, "insult", 1)
+}
+
+func (e EventReactionsCommands) pingresponse(ctx *dgc.Ctx) {
+	e.pingReaction(ctx, eventreactions.PING_RESPONSE, "response", 2)
+}
+
+func (e EventReactionsCommands) pingairesponse(ctx *dgc.Ctx) {
+	e.pingReaction(ctx, eventreactions.PING_AI_RESPONSE, "AI response", 2)
+}
+
+// Mirror channel/server
+
+func (e EventReactionsCommands) mirrorchannel(ctx *dgc.Ctx) {
+	switch strings.ToLower(utils.Arguments["<toggle/list/clear>"]) {
+	case "toggle":
+		srcChannel, srcOk := utils.Discord.TryGetChannelFromMention(ctx, ctx.Arguments.Get(1))
+		destChannel, destOk := utils.Discord.TryGetChannelFromMention(ctx, ctx.Arguments.Get(2))
+		if !srcOk || !destOk {
+			embed.NewEmbed().
+				SetDescription("Could not find channel").
+				Send(ctx)
+			return
+		}
+
+		e.toggleReaction(ctx, eventreactions.NewMirrorChannel(srcChannel, destChannel))
+	case "list":
+		reactions := eventreactions.GetAll(eventreactions.MIRROR_CHANNEL)
+
+		e.mapReactions(ctx, reactions, "There are no mirrored channels.", "Mirrored channels")
+	case "clear":
+		eventreactions.RemoveAll(eventreactions.MIRROR_CHANNEL)
+
+		embed.NewEmbed().
+			SetDescription("Cleared all mirrored channels.").
+			Send(ctx)
+	default:
+		embed.NewEmbed().
+			SetDescription("Invalid toggle/list/clear argument").
+			Send(ctx)
 	}
-	toggleString := strings.ToLower(utils.Arguments["<on/off>"])
-	if toggleString != "on" && toggleString != "off" {
+}
+
+func (e EventReactionsCommands) mirrorserver(ctx *dgc.Ctx) {
+	switch strings.ToLower(utils.Arguments["<toggle/list/clear>"]) {
+	case "toggle":
+		srcGuild, srcErr := utils.Discord.GetGuild(ctx.Session, utils.Arguments["[source server]"])
+		destGuild, destErr := utils.Discord.GetGuild(ctx.Session, utils.Arguments["[dest server]"])
+
+		if srcErr != nil || destErr != nil {
+			embed.NewEmbed().
+				SetDescription("Could not find server").
+				Send(ctx)
+			return
+		}
+
+		e.toggleReaction(ctx, eventreactions.NewMirrorGuild(srcGuild, destGuild))
+	case "list":
+		reactions := eventreactions.GetAll(eventreactions.MIRROR_CHANNEL)
+
+		e.mapReactions(ctx, reactions, "There are no mirrored servers.", "Mirrored servers")
+	case "clear":
+		eventreactions.RemoveAll(eventreactions.MIRROR_CHANNEL)
+
+		embed.NewEmbed().
+			SetDescription("Cleared all mirrored servers.").
+			Send(ctx)
+	default:
+		embed.NewEmbed().
+			SetDescription("Invalid toggle/list/clear argument").
+			Send(ctx)
+	}
+}
+
+// Message Reactions
+
+func (e EventReactionsCommands) responder(ctx *dgc.Ctx) {
+	switch strings.ToLower(utils.Arguments["<toggle/list/clear>"]) {
+	case "toggle":
+		guild, channel, err := e.getGuildOrChannel(ctx, ctx.Arguments.Get(2))
+		if err != nil {
+			embed.NewEmbed().
+				SetDescription("Could not find server/channel: " + err.Error()).
+				Send(ctx)
+			return
+		}
+
+		reaction := eventreactions.NewMessageReaction(eventreactions.RESPONDER, guild, channel, nil)
+		reaction.Response = utils.Arguments["<\"response\">"]
+		e.toggleReaction(ctx, reaction)
+	case "list":
+		reactions := eventreactions.GetAll(eventreactions.RESPONDER)
+
+		e.mapReactions(ctx, reactions, "There are no active responders.", "Responders")
+	case "clear":
+		eventreactions.RemoveAll(eventreactions.RESPONDER)
+
+		embed.NewEmbed().
+			SetDescription("Cleared all responders.").
+			Send(ctx)
+	default:
+		embed.NewEmbed().
+			SetDescription("Invalid toggle/list/clear argument").
+			Send(ctx)
+	}
+}
+
+func (e EventReactionsCommands) airesponder(ctx *dgc.Ctx) {
+	switch strings.ToLower(utils.Arguments["<toggle/list/clear>"]) {
+	case "toggle":
+		guild, channel, err := e.getGuildOrChannel(ctx, ctx.Arguments.Get(2))
+		if err != nil {
+			embed.NewEmbed().
+				SetDescription("Could not find server/channel: " + err.Error()).
+				Send(ctx)
+			return
+		}
+
+		reaction := eventreactions.NewMessageReaction(eventreactions.AI_RESPONDER, guild, channel, nil)
+		reaction.System = utils.Arguments["[\"system\"]"]
+		e.toggleReaction(ctx, reaction)
+	case "list":
+		reactions := eventreactions.GetAll(eventreactions.AI_RESPONDER)
+
+		e.mapReactions(ctx, reactions, "There are no active AI responders.", "AI Responders")
+	case "clear":
+		eventreactions.RemoveAll(eventreactions.AI_RESPONDER)
+
+		embed.NewEmbed().
+			SetDescription("Cleared all AI responders.").
+			Send(ctx)
+	default:
+		embed.NewEmbed().
+			SetDescription("Invalid toggle/list/clear argument").
+			Send(ctx)
+	}
+}
+
+func (e EventReactionsCommands) copy(ctx *dgc.Ctx) {
+	switch strings.ToLower(utils.Arguments["<toggle/list/clear>"]) {
+	case "toggle":
+		user, ok := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(1))
+		if !ok {
+			embed.NewEmbed().
+				SetDescription("Could not find user").
+				Send(ctx)
+			return
+		}
+
+		guild, channel, err := e.getGuildOrChannel(ctx, ctx.Arguments.Get(2))
+		if err != nil {
+			embed.NewEmbed().
+				SetDescription("Could not find server/channel: " + err.Error()).
+				Send(ctx)
+			return
+		}
+
+		e.toggleReaction(ctx, eventreactions.NewMessageReaction(eventreactions.COPY, guild, channel, user))
+	case "list":
+		reactions := eventreactions.GetAll(eventreactions.COPY)
+
+		e.mapReactions(ctx, reactions, "There are no copied users.", "Copied users")
+	case "clear":
+		eventreactions.RemoveAll(eventreactions.COPY)
+
+		embed.NewEmbed().
+			SetDescription("Cleared all copied users.").
+			Send(ctx)
+	default:
+		embed.NewEmbed().
+			SetDescription("Invalid toggle/list/clear argument").
+			Send(ctx)
+	}
+}
+
+func (e EventReactionsCommands) replycopy(ctx *dgc.Ctx) {
+	switch strings.ToLower(utils.Arguments["<toggle/list/clear>"]) {
+	case "toggle":
+		user, ok := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(1))
+		if !ok {
+			embed.NewEmbed().
+				SetDescription("Could not find user").
+				Send(ctx)
+			return
+		}
+
+		guild, channel, err := e.getGuildOrChannel(ctx, ctx.Arguments.Get(2))
+		if err != nil {
+			embed.NewEmbed().
+				SetDescription("Could not find server/channel: " + err.Error()).
+				Send(ctx)
+			return
+		}
+
+		e.toggleReaction(ctx, eventreactions.NewMessageReaction(eventreactions.REPLY_COPY, guild, channel, user))
+	case "list":
+		reactions := eventreactions.GetAll(eventreactions.REPLY_COPY)
+
+		e.mapReactions(ctx, reactions, "There are no replycopied users.", "Replycopied users")
+	case "clear":
+		eventreactions.RemoveAll(eventreactions.REPLY_COPY)
+
+		embed.NewEmbed().
+			SetDescription("Cleared all replycopied users.").
+			Send(ctx)
+	default:
+		embed.NewEmbed().
+			SetDescription("Invalid toggle/list/clear argument").
+			Send(ctx)
+	}
+}
+
+func (e EventReactionsCommands) mock(ctx *dgc.Ctx) {
+	switch strings.ToLower(utils.Arguments["<toggle/list/clear>"]) {
+	case "toggle":
+		user, ok := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(1))
+		if !ok {
+			embed.NewEmbed().
+				SetDescription("Could not find user").
+				Send(ctx)
+			return
+		}
+
+		guild, channel, err := e.getGuildOrChannel(ctx, ctx.Arguments.Get(2))
+		if err != nil {
+			embed.NewEmbed().
+				SetDescription("Could not find server/channel: " + err.Error()).
+				Send(ctx)
+			return
+		}
+
+		e.toggleReaction(ctx, eventreactions.NewMessageReaction(eventreactions.MOCK, guild, channel, user))
+	case "list":
+		reactions := eventreactions.GetAll(eventreactions.MOCK)
+
+		e.mapReactions(ctx, reactions, "There are no mocked users.", "Mocked users")
+	case "clear":
+		eventreactions.RemoveAll(eventreactions.MOCK)
+
+		embed.NewEmbed().
+			SetDescription("Cleared all mocked users.").
+			Send(ctx)
+	default:
+		embed.NewEmbed().
+			SetDescription("Invalid toggle/list/clear argument").
+			Send(ctx)
+	}
+}
+
+func (e EventReactionsCommands) pinspam(ctx *dgc.Ctx) {
+	switch strings.ToLower(utils.Arguments["<toggle/list/clear>"]) {
+	case "toggle":
+		user, ok := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(1))
+		if !ok {
+			embed.NewEmbed().
+				SetDescription("Could not find user").
+				Send(ctx)
+			return
+		}
+
+		guild, channel, err := e.getGuildOrChannel(ctx, ctx.Arguments.Get(2))
+		if err != nil {
+			embed.NewEmbed().
+				SetDescription("Could not find server/channel: " + err.Error()).
+				Send(ctx)
+			return
+		}
+
+		e.toggleReaction(ctx, eventreactions.NewMessageReaction(eventreactions.PIN_SPAM, guild, channel, user))
+	case "list":
+		reactions := eventreactions.GetAll(eventreactions.PIN_SPAM)
+
+		e.mapReactions(ctx, reactions, "There are no pinspammed users.", "Pinspammed users")
+	case "clear":
+		eventreactions.RemoveAll(eventreactions.PIN_SPAM)
+
+		embed.NewEmbed().
+			SetDescription("Cleared all pinspammed users.").
+			Send(ctx)
+	default:
+		embed.NewEmbed().
+			SetDescription("Invalid toggle/list/clear argument").
+			Send(ctx)
+	}
+}
+
+func (e EventReactionsCommands) unpinspam(ctx *dgc.Ctx) {
+	eventreactions.PinSpamMessages.ForEach(func(message *discordgo.Message) {
+		err := ctx.Session.ChannelMessageUnpin(message.ChannelID, message.ID)
+		if err != nil {
+			embed.NewEmbed().
+				SetDescription("Could not unpin message: " + err.Error()).
+				Send(ctx)
+			return
+		}
+	})
+
+	eventreactions.PinSpamMessages.Clear()
+
+	embed.NewEmbed().
+		SetDescription("Unpinned all messages.").
+		Send(ctx)
+}
+
+func (e EventReactionsCommands) reactspam(ctx *dgc.Ctx) {
+	switch strings.ToLower(utils.Arguments["<toggle/list/clear>"]) {
+	case "toggle":
+		user, ok := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(1))
+		if !ok {
+			embed.NewEmbed().
+				SetDescription("Could not find user").
+				Send(ctx)
+			return
+		}
+
+		guild, channel, err := e.getGuildOrChannel(ctx, ctx.Arguments.Get(3))
+		if err != nil {
+			embed.NewEmbed().
+				SetDescription("Could not find server/channel: " + err.Error()).
+				Send(ctx)
+			return
+		}
+
+		reaction := eventreactions.NewMessageReaction(eventreactions.REACT_SPAM, guild, channel, user)
+		reaction.Reaction = utils.Arguments["<reaction>"]
+		reaction.Reaction = strings.ReplaceAll(reaction.Reaction, "<", "")
+		reaction.Reaction = strings.ReplaceAll(reaction.Reaction, ">", "")
+
+		e.toggleReaction(ctx, reaction)
+	case "list":
+		reactions := eventreactions.GetAll(eventreactions.REACT_SPAM)
+
+		e.mapReactions(ctx, reactions, "There are no reactspammed users.", "Reactspammed users")
+	case "clear":
+		eventreactions.RemoveAll(eventreactions.REACT_SPAM)
+
+		embed.NewEmbed().
+			SetDescription("Cleared all reactspammed users.").
+			Send(ctx)
+	default:
+		embed.NewEmbed().
+			SetDescription("Invalid toggle/list/clear argument").
+			Send(ctx)
+	}
+}
+
+func (e EventReactionsCommands) deletemessages(ctx *dgc.Ctx) {
+	switch strings.ToLower(utils.Arguments["<toggle/list/clear>"]) {
+	case "toggle":
+		user, ok := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(1))
+		if !ok {
+			embed.NewEmbed().
+				SetDescription("Could not find user").
+				Send(ctx)
+			return
+		}
+
+		guild, channel, err := e.getGuildOrChannel(ctx, ctx.Arguments.Get(2))
+		if err != nil {
+			embed.NewEmbed().
+				SetDescription("Could not find server/channel: " + err.Error()).
+				Send(ctx)
+			return
+		}
+
+		e.toggleReaction(ctx, eventreactions.NewMessageReaction(eventreactions.DELETE_MESSAGES, guild, channel, user))
+	case "list":
+		reactions := eventreactions.GetAll(eventreactions.DELETE_MESSAGES)
+
+		e.mapReactions(ctx, reactions, "There are no deletemessage reactions.", "Deletemessage reactions")
+	case "clear":
+		eventreactions.RemoveAll(eventreactions.DELETE_MESSAGES)
+
+		embed.NewEmbed().
+			SetDescription("Cleared all deletemessage reactions.").
+			Send(ctx)
+	default:
+		embed.NewEmbed().
+			SetDescription("Invalid toggle/list/clear argument").
+			Send(ctx)
+	}
+}
+
+func (e EventReactionsCommands) keywordnotifier(ctx *dgc.Ctx) {
+	switch strings.ToLower(utils.Arguments["<toggle/list/clear>"]) {
+	case "toggle":
+		arg := strings.ToLower(utils.Arguments["[global/server/channel id]"])
+		global := arg == "global" || arg == ""
+
+		var guild *discordgo.Guild
+		var channel *discordgo.Channel
+		var err error
+
+		if !global {
+			guild, channel, err = e.getGuildOrChannel(ctx, ctx.Arguments.Get(2))
+			if err != nil {
+				embed.NewEmbed().
+					SetDescription("Could not find server/channel: " + err.Error()).
+					Send(ctx)
+				return
+			}
+		}
+
+		reaction := eventreactions.NewMessageReaction(eventreactions.KEYWORD_NOTIFIER, guild, channel, nil)
+		reaction.Keyword = utils.Arguments["<\"keyword\">"]
+		reaction.Global = global
+
+		e.toggleReaction(ctx, reaction)
+	case "list":
+		reactions := eventreactions.GetAll(eventreactions.KEYWORD_NOTIFIER)
+
+		e.mapReactions(ctx, reactions, "There are no keyword notifiers.", "Keyword notifiers")
+	case "clear":
+		eventreactions.RemoveAll(eventreactions.KEYWORD_NOTIFIER)
+
+		embed.NewEmbed().
+			SetDescription("Cleared all keyword notifiers.").
+			Send(ctx)
+	default:
+		embed.NewEmbed().
+			SetDescription("Invalid toggle/list/clear argument").
+			Send(ctx)
+	}
+}
+
+func (e EventReactionsCommands) removereactions(ctx *dgc.Ctx) {
+	switch strings.ToLower(utils.Arguments["<toggle/list/clear>"]) {
+	case "toggle":
+		user, ok := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(1))
+		if !ok {
+			embed.NewEmbed().
+				SetDescription("Could not find user").
+				Send(ctx)
+			return
+		}
+
+		guild, channel, err := e.getGuildOrChannel(ctx, ctx.Arguments.Get(2))
+		if err != nil {
+			embed.NewEmbed().
+				SetDescription("Could not find server/channel: " + err.Error()).
+				Send(ctx)
+			return
+		}
+
+		e.toggleReaction(ctx, eventreactions.NewRemoveReactions(guild, channel, user))
+	case "list":
+		reactions := eventreactions.GetAll(eventreactions.REMOVE_REACTIONS)
+
+		e.mapReactions(ctx, reactions, "There are no users with removed reactions.", "Users with removed reactions")
+	case "clear":
+		eventreactions.RemoveAll(eventreactions.REMOVE_REACTIONS)
+
+		embed.NewEmbed().
+			SetDescription("Cleared all users with removed reactions.").
+			Send(ctx)
+	default:
+		embed.NewEmbed().
+			SetDescription("Invalid toggle/list/clear argument").
+			Send(ctx)
+	}
+}
+
+func (e EventReactionsCommands) forcedisconnect(ctx *dgc.Ctx) {
+	switch strings.ToLower(utils.Arguments["<toggle/list/clear>"]) {
+	case "toggle":
+		user, ok := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(1))
+		if !ok {
+			embed.NewEmbed().
+				SetDescription("Could not find user").
+				Send(ctx)
+			return
+		}
+
+		guild, channel, err := e.getGuildOrChannel(ctx, ctx.Arguments.Get(2))
+		if err != nil {
+			embed.NewEmbed().
+				SetDescription("Could not find server/channel: " + err.Error()).
+				Send(ctx)
+			return
+		}
+
+		e.toggleReaction(ctx, eventreactions.NewForceDisconnect(guild, channel, user))
+	case "list":
+		reactions := eventreactions.GetAll(eventreactions.FORCE_DISCONNECT)
+
+		e.mapReactions(ctx, reactions, "There are no force disconnected users.", "Force disconnected users")
+	case "clear":
+		eventreactions.RemoveAll(eventreactions.FORCE_DISCONNECT)
+
+		embed.NewEmbed().
+			SetDescription("Cleared all force disconnected users").
+			Send(ctx)
+	default:
+		embed.NewEmbed().
+			SetDescription("Invalid toggle/list/clear argument").
+			Send(ctx)
+	}
+}
+
+func (e EventReactionsCommands) forcenick(ctx *dgc.Ctx) {
+	switch strings.ToLower(utils.Arguments["<toggle/list/clear>"]) {
+	case "toggle":
+		user, ok := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(1))
+		if !ok {
+			embed.NewEmbed().
+				SetDescription("Could not find user").
+				Send(ctx)
+			return
+		}
+
+		guildID := utils.Misc.Or(utils.Arguments["[server id]"], ctx.Event.GuildID)
+
+		guild, err := utils.Discord.GetGuild(ctx.Session, guildID)
+		if err != nil {
+			embed.NewEmbed().
+				SetDescription("Could not find server: " + err.Error()).
+				Send(ctx)
+			return
+		}
+
+		nickname := utils.Arguments["<nickname>"]
+
+		err = ctx.Session.GuildMemberNickname(ctx.Event.GuildID, user.ID, nickname)
+		if err != nil {
+			embed.NewEmbed().
+				SetDescription("Could not set nickname: " + err.Error()).
+				Send(ctx)
+			return
+		}
+
+		e.toggleReaction(ctx, eventreactions.NewForceNick(guild, user, nickname))
+	case "list":
+		reactions := eventreactions.GetAll(eventreactions.FORCE_NICK)
+
+		e.mapReactions(ctx, reactions, "There are no force nicked users.", "Force nicked users")
+	case "clear":
+		eventreactions.RemoveAll(eventreactions.FORCE_NICK)
+
+		embed.NewEmbed().
+			SetDescription("Cleared all force nicked users.").
+			Send(ctx)
+	default:
+		embed.NewEmbed().
+			SetDescription("Invalid toggle/list/clear argument.").
+			Send(ctx)
+	}
+}
+
+func (e EventReactionsCommands) forcekick(ctx *dgc.Ctx) {
+	switch strings.ToLower(utils.Arguments["<toggle/list/clear>"]) {
+	case "toggle":
+		user, ok := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(1))
+		if !ok {
+			embed.NewEmbed().
+				SetDescription("Could not find user").
+				Send(ctx)
+			return
+		}
+
+		guildID := utils.Misc.Or(utils.Arguments["[server id]"], ctx.Event.GuildID)
+
+		guild, err := utils.Discord.GetGuild(ctx.Session, guildID)
+		if err != nil {
+			embed.NewEmbed().
+				SetDescription("Could not find server: " + err.Error()).
+				Send(ctx)
+			return
+		}
+
+		err = ctx.Session.GuildMemberDelete(ctx.Event.GuildID, user.ID)
+		if err != nil {
+			embed.NewEmbed().
+				SetDescription("Could not kick user: " + err.Error()).
+				Send(ctx)
+			return
+		}
+
+		e.toggleReaction(ctx, eventreactions.NewForceKick(guild, user))
+	case "list":
+		reactions := eventreactions.GetAll(eventreactions.FORCE_KICK)
+
+		e.mapReactions(ctx, reactions, "There are no force kicked users.", "Force kicked users")
+	case "clear":
+		eventreactions.RemoveAll(eventreactions.FORCE_KICK)
+
+		embed.NewEmbed().
+			SetDescription("Cleared all force kicked users.").
+			Send(ctx)
+	default:
+		embed.NewEmbed().
+			SetDescription("Invalid toggle/list/clear argument.").
+			Send(ctx)
+	}
+}
+
+func (e EventReactionsCommands) noleave(ctx *dgc.Ctx) {
+	switch strings.ToLower(utils.Arguments["<toggle/list/clear>"]) {
+	case "toggle":
+		user, ok := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(1))
+		if !ok {
+			embed.NewEmbed().
+				SetDescription("Could not find user").
+				Send(ctx)
+			return
+		}
+
+		relationships := utils.Filter(ctx.Session.State.Relationships, func(r *discordgo.Relationship) bool {
+			return r.Type == 1 && r.ID == user.ID
+		})
+
+		if len(relationships) == 0 {
+			embed.NewEmbed().
+				SetDescription("The user must be a friend.").
+				Send(ctx)
+			return
+		}
+
+		arg := ctx.Arguments.Get(2)
+		givenID := utils.Misc.Or(arg.AsChannelMentionID(), arg.Raw())
+
+		channel, err := utils.Discord.GetChannel(ctx.Session, utils.Misc.Or(givenID, ctx.Event.ChannelID))
+		if err != nil {
+			embed.NewEmbed().
+				SetDescription("Could not find channel: " + err.Error()).
+				Send(ctx)
+			return
+		}
+
+		if channel.Type != discordgo.ChannelTypeGroupDM {
+			embed.NewEmbed().
+				SetDescription("The channel must be a group DM.").
+				Send(ctx)
+			return
+		}
+
+		e.toggleReaction(ctx, eventreactions.NewNoLeave(channel, user))
+	case "list":
+		reactions := eventreactions.GetAll(eventreactions.NO_LEAVE)
+
+		e.mapReactions(ctx, reactions, "There are no noleave users.", "Noleave users")
+	case "clear":
+		eventreactions.RemoveAll(eventreactions.NO_LEAVE)
+
+		embed.NewEmbed().
+			SetDescription("Cleared all noleave users.").
+			Send(ctx)
+	default:
+		embed.NewEmbed().
+			SetDescription("Invalid toggle/list/clear argument.").
+			Send(ctx)
+	}
+}
+
+func (e EventReactionsCommands) antigroupchat(ctx *dgc.Ctx) {
+	var toggle bool
+	var silentToggle bool
+
+	rawToggle := strings.ToLower(utils.Arguments["<on/off>"])
+	if rawToggle != "on" && rawToggle != "off" {
 		_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
 		return
 	}
-	alreadyOn := utils.SliceContains(eventhandlers.EventHandlers.Settings.PingPingServers, ctx.Event.GuildID)
-	if toggleString == "on" && alreadyOn {
-		_ = ctx.RespondText("Ping ping is already on in this server.")
-		return
-	} else if toggleString == "off" && !alreadyOn {
-		_ = ctx.RespondText("Ping ping is already off in this server.")
-		return
-	}
-	if toggleString == "on" {
-		eventhandlers.EventHandlers.Settings.PingPingServers = append(eventhandlers.EventHandlers.Settings.PingPingServers, ctx.Event.GuildID)
+	toggle = rawToggle == "on"
+
+	rawSilentToggle := strings.ToLower(utils.Arguments["[silent leave: on/off]"])
+	silentToggle = rawSilentToggle == "on"
+
+	reaction := eventreactions.NewAntiGroupChat(silentToggle)
+
+	if toggle {
+		// Turn on (first remove to reset silent argument)
+		eventreactions.Remove(reaction)
+		eventreactions.Add(reaction)
+
+		embed.NewEmbed().
+			SetDescription("Turned on the anti group chat reaction!").
+			Send(ctx)
 	} else {
-		eventhandlers.EventHandlers.Settings.PingPingServers = utils.RemoveSliceItem(
-			eventhandlers.EventHandlers.Settings.PingPingServers,
-			ctx.Event.GuildID,
-		)
+		// Turn off
+		eventreactions.Remove(reaction)
+
+		embed.NewEmbed().
+			SetDescription("Turned off the anti group chat reaction!").
+			Send(ctx)
 	}
+}
+
+// AFK
+
+func (EventReactionsCommands) getafkenabled(ctx *dgc.Ctx) {
+	cfg, err := config.GetConfig()
+	if err != nil {
+		_ = ctx.RespondText("Error getting config")
+		return
+	}
+
+	embed.NewEmbed().
+		SetDescription(fmt.Sprintf("AFK responder is currently %s", utils.Misc.FormatBoolOnOff(cfg.AFK.Enabled))).
+		Send(ctx)
 }
 
 func (EventReactionsCommands) afkenabled(ctx *dgc.Ctx) {
+	cfg, err := config.GetConfig()
+	if err != nil {
+		_ = ctx.RespondText("Error getting config")
+		return
+	}
+
 	toggle := strings.ToLower(utils.Arguments["<on/off>"])
 	if toggle != "on" && toggle != "off" {
 		_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
 		return
 	}
-	cfg, _ := config.GetConfig()
+
 	cfg.AFK.Enabled = toggle == "on"
 	_ = cfg.Save()
+
+	embed.NewEmbed().
+		SetDescription("Turned " + toggle + " the AFK responder.").
+		Send(ctx)
+}
+
+func (EventReactionsCommands) getafkonping(ctx *dgc.Ctx) {
+	cfg, err := config.GetConfig()
+	if err != nil {
+		_ = ctx.RespondText("Error getting config")
+		return
+	}
+
+	embed.NewEmbed().
+		SetDescription(fmt.Sprintf("AFK responder is currently %s on pings", utils.Misc.FormatBoolOnOff(cfg.AFK.OnPing))).
+		Send(ctx)
 }
 
 func (EventReactionsCommands) afkonping(ctx *dgc.Ctx) {
+	cfg, err := config.GetConfig()
+	if err != nil {
+		_ = ctx.RespondText("Error getting config")
+		return
+	}
+
 	toggle := strings.ToLower(utils.Arguments["<on/off>"])
 	if toggle != "on" && toggle != "off" {
 		_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
 		return
 	}
-	cfg, _ := config.GetConfig()
+
 	cfg.AFK.OnPing = toggle == "on"
 	_ = cfg.Save()
+
+	embed.NewEmbed().
+		SetDescription("Turned " + toggle + " the AFK responder on pings.").
+		Send(ctx)
+}
+
+func (EventReactionsCommands) getafkondm(ctx *dgc.Ctx) {
+	cfg, err := config.GetConfig()
+	if err != nil {
+		_ = ctx.RespondText("Error getting config")
+		return
+	}
+
+	embed.NewEmbed().
+		SetDescription(fmt.Sprintf("AFK responder is currently %s on DMs", utils.Misc.FormatBoolOnOff(cfg.AFK.OnDM))).
+		Send(ctx)
 }
 
 func (EventReactionsCommands) afkondm(ctx *dgc.Ctx) {
+	cfg, err := config.GetConfig()
+	if err != nil {
+		_ = ctx.RespondText("Error getting config")
+		return
+	}
+
 	toggle := strings.ToLower(utils.Arguments["<on/off>"])
 	if toggle != "on" && toggle != "off" {
 		_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
 		return
 	}
-	cfg, _ := config.GetConfig()
+
 	cfg.AFK.OnDM = toggle == "on"
 	_ = cfg.Save()
+
+	embed.NewEmbed().
+		SetDescription("Turned " + toggle + " the AFK responder on DMs.").
+		Send(ctx)
 }
 
-func (EventReactionsCommands) afkmessage(ctx *dgc.Ctx) {
-	cfg, _ := config.GetConfig()
-	cfg.AFK.Message = ctx.Arguments.Raw()
-	_ = cfg.Save()
-}
-
-func (EventReactionsCommands) afkreply(ctx *dgc.Ctx) {
-	toggle := strings.ToLower(utils.Arguments["<on/off>"])
-	if toggle != "on" && toggle != "off" {
-		_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
+func (EventReactionsCommands) getafkdelay(ctx *dgc.Ctx) {
+	cfg, err := config.GetConfig()
+	if err != nil {
+		_ = ctx.RespondText("Error getting config")
 		return
 	}
-	cfg, _ := config.GetConfig()
-	cfg.AFK.Reply = toggle == "on"
-	_ = cfg.Save()
-}
 
-func (EventReactionsCommands) afktyping(ctx *dgc.Ctx) {
-	toggle := strings.ToLower(utils.Arguments["<on/off>"])
-	if toggle != "on" && toggle != "off" {
-		_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
-		return
-	}
-	cfg, _ := config.GetConfig()
-	cfg.AFK.Typing = toggle == "on"
-	_ = cfg.Save()
+	embed.NewEmbed().
+		SetDescription(fmt.Sprintf("AFK delay is currently %d seconds", cfg.AFK.Delay)).
+		Send(ctx)
 }
 
 func (EventReactionsCommands) afkdelay(ctx *dgc.Ctx) {
-	cfg, _ := config.GetConfig()
+	cfg, err := config.GetConfig()
+	if err != nil {
+		_ = ctx.RespondText("Error getting config")
+		return
+	}
+
 	delay, err := strconv.Atoi(utils.Arguments["<seconds>"])
 	if err != nil {
 		_ = ctx.RespondText("Argument <seconds> must be a number.")
 		return
 	}
+
 	cfg.AFK.Delay = delay
 	_ = cfg.Save()
+
+	embed.NewEmbed().
+		SetDescription(fmt.Sprintf("AFK delay set to %d seconds", delay)).
+		Send(ctx)
+}
+
+func (EventReactionsCommands) getafkrandomdelay(ctx *dgc.Ctx) {
+	cfg, err := config.GetConfig()
+	if err != nil {
+		_ = ctx.RespondText("Error getting config")
+		return
+	}
+
+	embed.NewEmbed().
+		SetDescription(fmt.Sprintf("AFK random delay is currently %s", utils.Misc.FormatBoolOnOff(cfg.AFK.RandomDelay))).
+		Send(ctx)
+}
+
+func (EventReactionsCommands) afkrandomdelay(ctx *dgc.Ctx) {
+	cfg, err := config.GetConfig()
+	if err != nil {
+		_ = ctx.RespondText("Error getting config")
+		return
+	}
+
+	toggle := strings.ToLower(utils.Arguments["<on/off>"])
+	if toggle != "on" && toggle != "off" {
+		_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
+		return
+	}
+
+	cfg.AFK.RandomDelay = toggle == "on"
+	_ = cfg.Save()
+
+	embed.NewEmbed().
+		SetDescription("Turned " + toggle + " random delay.").
+		Send(ctx)
+}
+
+func (EventReactionsCommands) getafkmustbeinactive(ctx *dgc.Ctx) {
+	cfg, err := config.GetConfig()
+	if err != nil {
+		_ = ctx.RespondText("Error getting config")
+		return
+	}
+
+	embed.NewEmbed().
+		SetDescription(fmt.Sprintf("AFK must be inactive is currently %s", utils.Misc.FormatBoolOnOff(cfg.AFK.MustBeInactive))).
+		Send(ctx)
+}
+
+func (EventReactionsCommands) afkmustbeinactive(ctx *dgc.Ctx) {
+	cfg, err := config.GetConfig()
+	if err != nil {
+		_ = ctx.RespondText("Error getting config")
+		return
+	}
+
+	toggle := strings.ToLower(utils.Arguments["<on/off>"])
+	if toggle != "on" && toggle != "off" {
+		_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
+		return
+	}
+
+	cfg.AFK.MustBeInactive = toggle == "on"
+	_ = cfg.Save()
+
+	embed.NewEmbed().
+		SetDescription("Turned " + toggle + " must be inactive.").
+		Send(ctx)
+}
+
+func (EventReactionsCommands) getafkinactivetimeout(ctx *dgc.Ctx) {
+	cfg, err := config.GetConfig()
+	if err != nil {
+		_ = ctx.RespondText("Error getting config")
+		return
+	}
+
+	embed.NewEmbed().
+		SetDescription(fmt.Sprintf("AFK inactive timeout is currently %d seconds", cfg.AFK.InactiveTimeout)).
+		Send(ctx)
+}
+
+func (EventReactionsCommands) afkinactivetimeout(ctx *dgc.Ctx) {
+	cfg, err := config.GetConfig()
+	if err != nil {
+		_ = ctx.RespondText("Error getting config")
+		return
+	}
+
+	timeout, err := strconv.Atoi(utils.Arguments["<seconds>"])
+	if err != nil {
+		_ = ctx.RespondText("Argument <seconds> must be a number.")
+		return
+	}
+
+	cfg.AFK.InactiveTimeout = timeout
+	_ = cfg.Save()
+
+	embed.NewEmbed().
+		SetDescription(fmt.Sprintf("AFK inactive timeout set to %d seconds", timeout)).
+		Send(ctx)
+}
+
+func (EventReactionsCommands) getafktyping(ctx *dgc.Ctx) {
+	cfg, err := config.GetConfig()
+	if err != nil {
+		_ = ctx.RespondText("Error getting config")
+		return
+	}
+
+	embed.NewEmbed().
+		SetDescription(fmt.Sprintf("AFK typing is currently %s", utils.Misc.FormatBoolOnOff(cfg.AFK.Typing))).
+		Send(ctx)
+}
+
+func (EventReactionsCommands) afktyping(ctx *dgc.Ctx) {
+	cfg, err := config.GetConfig()
+	if err != nil {
+		_ = ctx.RespondText("Error getting config")
+		return
+	}
+
+	toggle := strings.ToLower(utils.Arguments["<on/off>"])
+	if toggle != "on" && toggle != "off" {
+		_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
+		return
+	}
+
+	cfg.AFK.Typing = toggle == "on"
+	_ = cfg.Save()
+
+	embed.NewEmbed().
+		SetDescription("Turned " + toggle + " typing.").
+		Send(ctx)
+}
+
+func (EventReactionsCommands) getafkairesponse(ctx *dgc.Ctx) {
+	cfg, err := config.GetConfig()
+	if err != nil {
+		_ = ctx.RespondText("Error getting config")
+		return
+	}
+
+	embed.NewEmbed().
+		SetDescription(fmt.Sprintf("AFK AI response is currently %s", utils.Misc.FormatBoolOnOff(cfg.AFK.Typing))).
+		Send(ctx)
+}
+
+func (EventReactionsCommands) afkairesponse(ctx *dgc.Ctx) {
+	cfg, err := config.GetConfig()
+	if err != nil {
+		_ = ctx.RespondText("Error getting config")
+		return
+	}
+
+	toggle := strings.ToLower(utils.Arguments["<on/off>"])
+	if toggle != "on" && toggle != "off" {
+		_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
+		return
+	}
+
+	cfg.AFK.AI = toggle == "on"
+	_ = cfg.Save()
+
+	embed.NewEmbed().
+		SetDescription("Turned " + toggle + " AI response.").
+		Send(ctx)
+}
+
+func (EventReactionsCommands) getafkmessage(ctx *dgc.Ctx) {
+	cfg, err := config.GetConfig()
+	if err != nil {
+		_ = ctx.RespondText("Error getting config")
+		return
+	}
+
+	embed.NewEmbed().
+		SetDescription("AFK message is currently " + cfg.AFK.Message).
+		Send(ctx)
+}
+
+func (EventReactionsCommands) afkmessage(ctx *dgc.Ctx) {
+	cfg, err := config.GetConfig()
+	if err != nil {
+		_ = ctx.RespondText("Error getting config")
+		return
+	}
+
+	cfg.AFK.Message = ctx.Arguments.Raw()
+	_ = cfg.Save()
+
+	embed.NewEmbed().
+		SetDescription("AFK message set to " + cfg.AFK.Message).
+		Send(ctx)
+}
+
+func (EventReactionsCommands) getafktriggertype(ctx *dgc.Ctx) {
+	cfg, err := config.GetConfig()
+	if err != nil {
+		_ = ctx.RespondText("Error getting config")
+		return
+	}
+
+	embed.NewEmbed().
+		SetDescription("AFK trigger type is currently " + cfg.AFK.TriggerList.Type).
+		Send(ctx)
 }
 
 func (EventReactionsCommands) afktriggertype(ctx *dgc.Ctx) {
+	cfg, err := config.GetConfig()
+	if err != nil {
+		_ = ctx.RespondText("Error getting config")
+		return
+	}
+
 	arg := strings.ToLower(utils.Arguments["<type>"])
 	if !utils.SliceContains([]string{"global", "whitelist", "blacklist"}, arg) {
 		_ = ctx.RespondText("Invalid value. Use `Global`, `Whitelist`, or `Blacklist`.")
 		return
 	}
 
-	cfg, _ := config.GetConfig()
 	cfg.AFK.TriggerList.Type = utils.String.Capitalize(arg)
 	_ = cfg.Save()
+
+	embed.NewEmbed().
+		SetDescription("AFK trigger type set to " + cfg.AFK.Message).
+		Send(ctx)
 }
 
-func (EventReactionsCommands) afkaddserver(ctx *dgc.Ctx) {
-	guild, err := utils.Discord.GetGuild(ctx.Session, utils.Misc.Or(utils.Arguments["<server id>"], ctx.Event.GuildID))
+func (EventReactionsCommands) afktriggerusers(ctx *dgc.Ctx) {
+	cfg, err := config.GetConfig()
 	if err != nil {
-		_ = ctx.RespondText("Could not find server.")
+		_ = ctx.RespondText("Error getting config")
 		return
 	}
-	cfg, _ := config.GetConfig()
-	if utils.SliceContains(cfg.AFK.TriggerList.Servers, guild.ID) {
-		_ = ctx.RespondText("Server is already added.")
-		return
+
+	switch strings.ToLower(utils.Arguments["<add/rm/list>"]) {
+	case "add":
+		user, ok := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(1))
+		if !ok {
+			embed.NewEmbed().
+				SetDescription("Could not find user.").
+				Send(ctx)
+			return
+		}
+
+		cfg.AFK.TriggerList.Users = append(cfg.AFK.TriggerList.Users, user.ID)
+
+		err = cfg.Save()
+		if err != nil {
+			embed.NewEmbed().
+				SetDescription("Error saving config: " + err.Error()).
+				Send(ctx)
+			return
+		}
+
+	case "rm":
+		user, ok := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(1))
+		if !ok {
+			embed.NewEmbed().
+				SetDescription("Could not find user.").
+				Send(ctx)
+			return
+		}
+
+		cfg.AFK.TriggerList.Users = utils.RemoveSliceItem(cfg.AFK.TriggerList.Users, user.ID)
+
+		err = cfg.Save()
+		if err != nil {
+			embed.NewEmbed().
+				SetDescription("Error saving config: " + err.Error()).
+				Send(ctx)
+			return
+		}
+	case "list":
+		var users []string
+
+		for _, id := range cfg.AFK.TriggerList.Users {
+			user, ok := utils.Discord.GetUser(ctx.Session, id)
+			if ok {
+				users = append(users, "- "+user.Username+" ("+id+")")
+			} else {
+				users = append(users, "- "+id)
+			}
+		}
+
+		embed.NewEmbed().
+			AddField("AFK Trigger Users", strings.Join(users, "\n")).
+			Send(ctx)
+
+	default:
+		embed.NewEmbed().
+			SetDescription("Invalid add/rm/list argument.").
+			Send(ctx)
 	}
-	cfg.AFK.TriggerList.Servers = append(cfg.AFK.TriggerList.Servers, guild.ID)
-	_ = cfg.Save()
 }
 
-func (EventReactionsCommands) afkremoveserver(ctx *dgc.Ctx) {
-	guild, err := utils.Discord.GetGuild(ctx.Session, utils.Misc.Or(utils.Arguments["<server id>"], ctx.Event.GuildID))
+func (EventReactionsCommands) afktriggerservers(ctx *dgc.Ctx) {
+	cfg, err := config.GetConfig()
 	if err != nil {
-		_ = ctx.RespondText("Could not find server.")
+		_ = ctx.RespondText("Error getting config")
 		return
 	}
-	cfg, _ := config.GetConfig()
-	if !utils.SliceContains(cfg.AFK.TriggerList.Servers, guild.ID) {
-		_ = ctx.RespondText("Server is already removed.")
-		return
-	}
-	cfg.AFK.TriggerList.Servers = utils.RemoveSliceItem(cfg.AFK.TriggerList.Servers, guild.ID)
-	_ = cfg.Save()
-}
 
-func (EventReactionsCommands) afkadduser(ctx *dgc.Ctx) {
-	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
-	if !success {
-		_ = ctx.RespondText("Could not find user.")
-		return
-	}
-	cfg, _ := config.GetConfig()
-	if utils.SliceContains(cfg.AFK.TriggerList.Users, user.ID) {
-		_ = ctx.RespondText("User is already added.")
-		return
-	}
-	cfg.AFK.TriggerList.Users = append(cfg.AFK.TriggerList.Users, user.ID)
-	_ = cfg.Save()
-}
+	switch strings.ToLower(utils.Arguments["<add/rm/list>"]) {
+	case "add":
+		guild, err := utils.Discord.GetGuild(ctx.Session, utils.Misc.Or(utils.Arguments["[server id]"], ctx.Event.GuildID))
+		if err != nil {
+			embed.NewEmbed().
+				SetDescription("Could not find server.").
+				Send(ctx)
+			return
+		}
 
-func (EventReactionsCommands) afkremoveuser(ctx *dgc.Ctx) {
-	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
-	if !success {
-		_ = ctx.RespondText("Could not find user.")
-		return
+		cfg.AFK.TriggerList.Servers = append(cfg.AFK.TriggerList.Servers, guild.ID)
+
+		err = cfg.Save()
+		if err != nil {
+			embed.NewEmbed().
+				SetDescription("Error saving config: " + err.Error()).
+				Send(ctx)
+			return
+		}
+
+	case "rm":
+		guild, err := utils.Discord.GetGuild(ctx.Session, utils.Misc.Or(utils.Arguments["[server id]"], ctx.Event.GuildID))
+		if err != nil {
+			embed.NewEmbed().
+				SetDescription("Could not find server.").
+				Send(ctx)
+			return
+		}
+
+		cfg.AFK.TriggerList.Servers = utils.RemoveSliceItem(cfg.AFK.TriggerList.Servers, guild.ID)
+
+		err = cfg.Save()
+		if err != nil {
+			embed.NewEmbed().
+				SetDescription("Error saving config: " + err.Error()).
+				Send(ctx)
+			return
+		}
+	case "list":
+		var servers []string
+
+		for _, s := range cfg.AFK.TriggerList.Servers {
+			if name := utils.Discord.GetGuildName(ctx.Session, s); name != "No Server" {
+				servers = append(servers, "- "+name+" ("+s+")")
+			} else {
+				servers = append(servers, "- "+s)
+			}
+		}
+
+		embed.NewEmbed().
+			AddField("AFK Trigger Servers", strings.Join(servers, "\n")).
+			Send(ctx)
+
+	default:
+		embed.NewEmbed().
+			SetDescription("Invalid add/rm/list argument.").
+			Send(ctx)
 	}
-	cfg, _ := config.GetConfig()
-	if !utils.SliceContains(cfg.AFK.TriggerList.Users, user.ID) {
-		_ = ctx.RespondText("User is already removed.")
-		return
-	}
-	cfg.AFK.TriggerList.Users = utils.RemoveSliceItem(cfg.AFK.TriggerList.Users, user.ID)
-	_ = cfg.Save()
 }

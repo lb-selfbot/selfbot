@@ -13,8 +13,8 @@ import (
 var commandCache = make(map[string]*discordgo.ApplicationCommand)
 
 type DiscordObject struct {
-	Name string `json:"name"`
-	ID   string `json:"id"`
+	Name string `json:"Name"`
+	ID   string `json:"ID"`
 }
 
 // Job represents a job to execute a slash command at a certain interval.
@@ -22,22 +22,22 @@ type DiscordObject struct {
 // The jobs are then executed by the job handler.
 type Job struct {
 	// The name and ID of the application command
-	CommandObject DiscordObject `json:"command"`
+	CommandObject DiscordObject `json:"Command"`
 
 	// The name and ID of the application
-	ApplicationObject DiscordObject `json:"application"`
+	ApplicationObject DiscordObject `json:"Application"`
 
 	// The name and ID of the channel
-	ChannelObject DiscordObject `json:"channel"`
+	ChannelObject DiscordObject `json:"Channel"`
 
 	// The name and ID of the guild
-	GuildObject DiscordObject `json:"guild"`
+	GuildObject DiscordObject `json:"Guild"`
 
 	// The raw arguments to execute the command with
-	RawArguments string `json:"raw_arguments"`
+	RawArguments string `json:"RawArguments"`
 
 	// The interval to execute the command at
-	IntervalSec int `json:"interval"`
+	IntervalSec int `json:"Interval"`
 
 	//////////////////////////////////////////////////////////////////
 	// The following fields are initialized when the job is started //

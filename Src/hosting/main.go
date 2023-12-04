@@ -113,6 +113,11 @@ func Main() {
 
 		msg := fmt.Sprintf(format, a...)
 
+		if strings.Contains(msg, "unknown event") && !debug {
+			// Ignore unknown event errors in release mode
+			return
+		}
+
 		msg = fmt.Sprintf("[DG%d] %s:%d:%s() %s\n", msgL, file, line, name, msg)
 
 		// Write log to file
@@ -184,7 +189,7 @@ func Main() {
 	})
 
 	eventhandlers.EventHandlers.RegisterHandlers(session, router)
-	commands.Commands.RegisterCommands(session, router)
+	commands.Commands.RegisterCommands(session, router, true)
 
 	router.Initialize(session)
 

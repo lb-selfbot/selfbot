@@ -46,9 +46,9 @@ func (UILogging) Error(errText string) {
 }
 
 func (UILogging) Append(text string) {
-	text = "\n" + utils.Logging.AnsiToHtml(text)
+	html := "\n" + utils.Logging.AnsiToHtml(text)
 
-	ipc.IPC.ConsoleAppend(text)
+	ipc.IPC.ConsoleAppend(text, html)
 	websocket.Websocket.Send(websocket.WsMessage{
 		Op: "CONSOLE_APPEND",
 		Data: websocket.WsData{
@@ -66,13 +66,13 @@ func (UILogging) Clear() {
 }
 
 func (UILogging) Set(text string) {
-	text = utils.Logging.AnsiToHtml(text)
+	html := utils.Logging.AnsiToHtml(text)
 
-	ipc.IPC.ConsoleSet(text)
+	ipc.IPC.ConsoleSet(text, html)
 	websocket.Websocket.Send(websocket.WsMessage{
 		Op: "CONSOLE_SET",
 		Data: websocket.WsData{
-			Text: text,
+			Text: html,
 		},
 	})
 }

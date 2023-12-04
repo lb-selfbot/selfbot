@@ -11,8 +11,8 @@ var LoginSessions []*discordgo.LoginSession
 var Status string
 
 func RegisterSessionHandler(session *discordgo.Session) {
+	parseStatus(session, session.State.Sessions)
 	GatewaySessions = filterSessions(session.State.Sessions)
-	parseStatus()
 
 	refreshLoginSessions(session)
 
@@ -20,8 +20,8 @@ func RegisterSessionHandler(session *discordgo.Session) {
 }
 
 func onSessionsReplace(session *discordgo.Session, replace *discordgo.SessionsReplace) {
+	parseStatus(session, replace.Sessions)
 	GatewaySessions = filterSessions(replace.Sessions)
-	parseStatus()
 
 	refreshLoginSessions(session)
 }
@@ -32,10 +32,10 @@ func filterSessions(sessions []*discordgo.GatewaySession) []*discordgo.GatewaySe
 	})
 }
 
-func parseStatus() {
+func parseStatus(session *discordgo.Session, sessions []*discordgo.GatewaySession) {
 	statuses := map[string]int{}
 
-	for _, session := range GatewaySessions {
+	for _, session := range sessions {
 		if session.SessionID == "all" {
 			Status = session.Status
 
@@ -59,7 +59,22 @@ func parseStatus() {
 		}
 	}
 
+	if maxStatus == "" {
+		maxStatus = getFallbackStatus(session)
+	}
+
 	Status = maxStatus
+}
+
+func getFallbackStatus(session *discordgo.Session) string {
+	status := "idle"
+
+	settings, err := session.UserSettings()
+	if err == nil {
+		status = settings["status"].(string)
+	}
+
+	return status
 }
 
 func refreshLoginSessions(session *discordgo.Session) error {

@@ -170,6 +170,12 @@ func (t TextCommands) RegisterCommands(router *dgc.Router) {
 		Usage:       "[p]customwave <width> <iterations> <text>",
 		Handler:     t.customwave,
 	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "zwc",
+		Description: "Sends text with zero width characters",
+		Usage:       "[p]zwc <text>",
+		Handler:     t.zwc,
+	})
 }
 
 func (TextCommands) empty(ctx *dgc.Ctx) {
@@ -442,4 +448,10 @@ func (TextCommands) customwave(ctx *dgc.Ctx) {
 	}
 
 	_ = ctx.RespondText(wave)
+}
+
+func (TextCommands) zwc(ctx *dgc.Ctx) {
+	text := ctx.Arguments.Raw()
+	text = strings.Join(strings.Split(text, ""), "\u200B")
+	_ = ctx.RespondText(text)
 }

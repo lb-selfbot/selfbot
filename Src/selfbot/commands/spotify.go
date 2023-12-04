@@ -287,13 +287,11 @@ func (s SpotifyCommands) squeue(ctx *dgc.Ctx) {
 	songUrl := song.Get("external_urls").Get("spotify").MustString()
 	songArtists := utils.Spotify.GetSongArtists(song)
 
-	_ = http.Post(
+	httpResponse := http.Post(
 		fmt.Sprintf("https://api.spotify.com/v1/me/player/queue?uri=%s", url.QueryEscape(songUrl)),
 		nil,
 		headers,
 	)
-
-	httpResponse := http.Post("https://api.spotify.com/v1/me/player/next", nil, headers)
 
 	s.HandleRequest(
 		ctx,
@@ -518,24 +516,27 @@ func (s SpotifyCommands) sbearertoken(ctx *dgc.Ctx) {
 }
 
 func (s SpotifyCommands) slistenalong(ctx *dgc.Ctx) {
-	for _, s := range sessions.GatewaySessions {
-		if len(s.Activities) == 0 || s.Activities[0].Name != "Spotify" {
-			continue
-		}
+	spotifySessions := utils.Filter(sessions.GatewaySessions, func(s *discordgo.GatewaySession) bool {
+		return len(s.Activities) != 0 && s.Activities[0].Name == "Spotify"
+	})
 
-		_, err := ctx.Session.ChannelMessageSendComplex(ctx.Event.ChannelID, &discordgo.MessageSend{
-			Content: ctx.Arguments.Raw(),
-			Activity: &discordgo.MessageActivity{
-				Type:      discordgo.MessageActivityTypeListen,
-				SessionID: s.SessionID,
-				PartyID:   s.Activities[0].Party.ID,
-			},
-			Nonce: discordgo.GenerateNonce(),
-			Flags: 0,
-		})
+	if len(spotifySessions) == 0 {
+		_ = ctx.RespondText("No Spotify sessions found.")
+		return
+	}
 
-		if err == nil {
-			break
-		}
+	_, err := ctx.Session.ChannelMessageSendComplex(ctx.Event.ChannelID, &discordgo.MessageSend{
+		Content: ctx.Arguments.Raw(),
+		Activity: &discordgo.MessageActivity{
+			Type:      discordgo.MessageActivityTypeListen,
+			SessionID: spotifySessions[0].SessionID,
+			PartyID:   spotifySessions[0].Activities[0].Party.ID,
+		},
+		Nonce: discordgo.GenerateNonce(),
+		Flags: 0,
+	})
+	if err != nil {
+		_ = ctx.RespondText("An error has occurred while sending the invite: " + err.Error())
+		return
 	}
 }

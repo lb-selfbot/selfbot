@@ -156,6 +156,13 @@ func (m *AdministrationCommands) RegisterCommands(router *dgc.Router) {
 		Handler:     m.purgeuser,
 	})
 	router.RegisterCmd(&dgc.Command{
+		Name:        "purgerange",
+		Description: "Purge a range of messages in a channel",
+		Usage:       "[p]purgerange <start message> <end message> [channel]",
+		Flags:       []string{"DANGEROUS"},
+		Handler:     m.purgerange,
+	})
+	router.RegisterCmd(&dgc.Command{
 		Name:        "nuke",
 		Description: "Nuke a channel",
 		Usage:       "[p]nuke [channel]",
@@ -195,7 +202,7 @@ func (m *AdministrationCommands) RegisterCommands(router *dgc.Router) {
 	router.RegisterCmd(&dgc.Command{
 		Name:        "userinfo",
 		Description: "Get info about a user",
-		Usage:       "[p]userinfo <user>",
+		Usage:       "[p]userinfo [user]",
 		Handler:     m.userinfo,
 	})
 	router.RegisterCmd(&dgc.Command{
@@ -217,22 +224,10 @@ func (m *AdministrationCommands) RegisterCommands(router *dgc.Router) {
 		Handler:     m.mutualservers,
 	})
 	router.RegisterCmd(&dgc.Command{
-		Name:        "mobile",
-		Description: "See if a user is on mobile",
-		Usage:       "[p]mobile <user>",
-		Handler:     m.mobile,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "web",
-		Description: "See if a user is on web",
-		Usage:       "[p]web <user>",
-		Handler:     m.web,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "desktop",
-		Description: "See if a user is on desktop",
-		Usage:       "[p]desktop <user>",
-		Handler:     m.desktop,
+		Name:        "platform",
+		Description: "See the platforms a user is online on",
+		Usage:       "[p]platform [user]",
+		Handler:     m.platform,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "avatar",
@@ -929,6 +924,34 @@ func (*AdministrationCommands) purgeuser(ctx *dgc.Ctx) {
 	}
 }
 
+func (*AdministrationCommands) purgerange(ctx *dgc.Ctx) {
+	channel, success := utils.Discord.TryGetChannelFromMention(ctx, ctx.Arguments.Get(2))
+	channelID := ctx.Event.ChannelID
+	if success {
+		channelID = channel.ID
+	}
+
+	start, end := utils.Arguments["<start message>"], utils.Arguments["<end message>"]
+
+	messages, err := utils.Discord.GetChannelMessagesRange(ctx.Session, channelID, utils.Arguments["<start message>"], utils.Arguments["<end message>"])
+	if err != nil {
+		_ = ctx.RespondText("Error getting messages: " + err.Error())
+		return
+	}
+
+	for _, message := range messages {
+		if message.ID < start || message.ID > end {
+			continue
+		}
+
+		err = ctx.Session.ChannelMessageDelete(channelID, message.ID)
+		if err != nil {
+			_ = ctx.RespondText("Error deleting messages: " + err.Error())
+			return
+		}
+	}
+}
+
 func (*AdministrationCommands) nuke(ctx *dgc.Ctx) {
 	channel, success := utils.Discord.TryGetChannelFromMention(ctx, ctx.Arguments.Get(0))
 	if !success {
@@ -1073,25 +1096,52 @@ func (*AdministrationCommands) webhookdelete(ctx *dgc.Ctx) {
 func (*AdministrationCommands) userinfo(ctx *dgc.Ctx) {
 	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
-		_ = ctx.RespondText("Could not find user")
-		return
+		user = ctx.Event.Author
 	}
-	member, _ := ctx.Session.GuildMember(ctx.Event.GuildID, user.ID)
+
+	var member *discordgo.Member
+	if ctx.Event.GuildID != "" {
+		member, _ = utils.Discord.GetMember(ctx.Session, ctx.Event.GuildID, user.ID, true)
+	}
 
 	emb := embed.NewEmbed().
 		SetDescription(fmt.Sprintf("User Info (%s - %s)", user.String(), user.ID)).
-		AddField("Avatar", user.AvatarURL("")).
-		AddField("Banner", user.BannerURL("")).
-		AddField("Banner Color", fmt.Sprintf("#%x", user.AccentColor)).
-		AddField("Is Bot", strconv.FormatBool(user.Bot)).
-		AddField("Created At", utils.Discord.SnowflakeToTime(user.ID).Format(time.RFC1123)).
-		AddField("Flags", fmt.Sprint(user.Flags))
-	if member != nil {
-		emb.AddField("Nickname", member.Nick).
-			AddField("Joined Server At", member.JoinedAt.Format(time.RFC1123)).
-			AddField("Role Amount", fmt.Sprint(len(member.Roles))).
-			AddField("Roles", utils.Discord.GetRoleNames(ctx, member))
+		AddField("Avatar", user.AvatarURL(""))
+
+	if user.BannerURL("") != "" {
+		emb.AddField("Banner", user.BannerURL(""))
 	}
+
+	if user.AccentColor != 0 {
+		emb.AddField("Banner Color", fmt.Sprintf("#%x", user.AccentColor))
+	}
+
+	emb.AddField("Is Bot", utils.Misc.FormatBoolYesNo(user.Bot)).
+		AddField("Created At", utils.Discord.SnowflakeToTime(user.ID).Format(time.RFC1123)).
+		AddField("Premium Type", utils.Discord.FormatPremiumType(user.PremiumType))
+
+	if flags := utils.Discord.FormatUserFlags(user.PublicFlags); flags != "" {
+		emb.AddField("Flags", utils.Discord.FormatUserFlags(user.PublicFlags))
+	}
+
+	if member != nil {
+		if member.Nick != "" {
+			emb.AddField("Nickname", member.Nick)
+		}
+
+		emb.AddField("Joined Server On", member.JoinedAt.Format(time.RFC1123)).
+			AddField("Roles", fmt.Sprintf("%d Roles:\n%s", len(member.Roles), utils.Discord.GetRoleNames(ctx, member)))
+
+		if p := member.Presence; p != nil {
+			emb.AddField("Status", utils.Discord.FormatStatusEmoji(p.Status)).
+				AddField("Platform", utils.Discord.FormatClientStatus(p.ClientStatus))
+
+			if len(p.Activities) > 0 {
+				emb.AddField("Activity", utils.Discord.FormatActivities(p.Activities))
+			}
+		}
+	}
+
 	emb.Send(ctx)
 }
 
@@ -1154,57 +1204,28 @@ func (*AdministrationCommands) mutualservers(ctx *dgc.Ctx) {
 		Send(ctx)
 }
 
-func (*AdministrationCommands) mobile(ctx *dgc.Ctx) {
-	member, success := utils.Discord.TryGetMemberFromMention(ctx, ctx.Arguments.Get(0))
-	if !success {
-		_ = ctx.RespondText("Could not find user")
+func (*AdministrationCommands) platform(ctx *dgc.Ctx) {
+	userIDArg := ctx.Arguments.Get(0)
+	userID := utils.Misc.Or(userIDArg.AsUserMentionID(), userIDArg.Raw())
+	if userID == "" {
+		userID = ctx.Event.Author.ID
+	}
+
+	member, ok := utils.Discord.GetMember(ctx.Session, ctx.Event.GuildID, userID, true)
+	if !ok {
+		_ = ctx.RespondText("Could not find user!")
 		return
 	}
 
-	clientStatus := discordgo.ClientStatus{}
-	if member.Presence != nil {
-		clientStatus = member.Presence.ClientStatus
-	}
-
-	embed.NewEmbed().
-		SetDescription(fmt.Sprintf("%s - %s", member.User.String(), member.User.ID)).
-		AddField("Is On Mobile", utils.Misc.FormatBoolYesNo(clientStatus.Mobile != "")).
-		Send(ctx)
-}
-
-func (*AdministrationCommands) web(ctx *dgc.Ctx) {
-	member, success := utils.Discord.TryGetMemberFromMention(ctx, ctx.Arguments.Get(0))
-	if !success {
-		_ = ctx.RespondText("Could not find user")
+	if member.Presence == nil {
+		_ = ctx.RespondText("Users presence is unknown!")
 		return
 	}
 
-	clientStatus := discordgo.ClientStatus{}
-	if member.Presence != nil {
-		clientStatus = member.Presence.ClientStatus
-	}
-
 	embed.NewEmbed().
-		SetDescription(fmt.Sprintf("%s - %s", member.User.String(), member.User.ID)).
-		AddField("Is On Web", utils.Misc.FormatBoolYesNo(clientStatus.Web != "")).
-		Send(ctx)
-}
-
-func (*AdministrationCommands) desktop(ctx *dgc.Ctx) {
-	member, success := utils.Discord.TryGetMemberFromMention(ctx, ctx.Arguments.Get(0))
-	if !success {
-		_ = ctx.RespondText("Could not find user")
-		return
-	}
-
-	clientStatus := discordgo.ClientStatus{}
-	if member.Presence != nil {
-		clientStatus = member.Presence.ClientStatus
-	}
-
-	embed.NewEmbed().
-		SetDescription(fmt.Sprintf("%s - %s", member.User.String(), member.User.ID)).
-		AddField("Is On Desktop", utils.Misc.FormatBoolYesNo(clientStatus.Desktop != "")).
+		AddField("User", member.User.Username).
+		AddField("Status", utils.Discord.FormatStatusEmoji(member.Presence.Status)).
+		AddField("Platform", utils.Discord.FormatClientStatus(member.Presence.ClientStatus)).
 		Send(ctx)
 }
 
@@ -1608,9 +1629,9 @@ func (*AdministrationCommands) serverinfo(ctx *dgc.Ctx) {
 		return
 	}
 
-	owner, err := utils.Discord.GetMember(ctx.Session, guild.ID, guild.OwnerID)
+	owner, ok := utils.Discord.GetMember(ctx.Session, guild.ID, guild.OwnerID)
 	ownerMention := "Error"
-	if err == nil {
+	if ok {
 		ownerMention = owner.User.String()
 	}
 
@@ -1649,9 +1670,9 @@ func (*AdministrationCommands) serverowner(ctx *dgc.Ctx) {
 		_ = ctx.RespondText("Error getting server: " + err.Error())
 		return
 	}
-	owner, err := utils.Discord.GetMember(ctx.Session, guild.ID, guild.OwnerID)
-	if err != nil {
-		_ = ctx.RespondText("Error getting server owner: " + err.Error())
+	owner, ok := utils.Discord.GetMember(ctx.Session, guild.ID, guild.OwnerID)
+	if !ok {
+		_ = ctx.RespondText("Error getting server owner")
 		return
 	}
 	embed.NewEmbed().

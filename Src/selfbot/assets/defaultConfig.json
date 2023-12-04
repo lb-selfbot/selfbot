@@ -1,6 +1,7 @@
 {
   "AFK": {
     "Delay": 10,
+    "RandomDelay": false,
     "Enabled": false,
     "TriggerList": {
       "Type": "Whitelist",
@@ -11,7 +12,8 @@
     "OnDM": true,
     "OnPing": true,
     "Reply": true,
-    "Typing": true
+    "Typing": true,
+    "AI": false
   },
   "Account": {
     "Discord": {
@@ -117,5 +119,7 @@
     "SelfbotDetection": "",
     "StaffDetection": "",
     "Sessions": ""
-  }
+  },
+  "SlashCommandJobs": [],
+  "EventReactions": []
 }

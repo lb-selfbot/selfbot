@@ -970,6 +970,56 @@ func (i ImageCommands) RegisterCommands(router *dgc.Router) {
 		Usage:       "[p]speechbubble [link/attachment] [force GIF: on/off]",
 		Handler:     i.speechbubble,
 	})
+
+	router.RegisterCmd(&dgc.Command{
+		Name:        "quotereply",
+		Description: "Quote the message you replied to",
+		Usage:       "[p]quotereply [background url]",
+		Handler:     i.quotereply,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "quotemessage",
+		Description: "Quote a message",
+		Usage:       "[p]quotemessage <message id> [channel id]",
+		Handler:     i.quotemessage,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "quoteuser",
+		Description: "Quote a user",
+		Usage:       "[p]quoteuser <@user> <\"text\"> [background url]",
+		Handler:     i.quoteuser,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "quotetext",
+		Description: "Quote using text",
+		Usage:       "[p]quotetext <\"author\"> <\"text\"> [background url]",
+		Handler:     i.quotetext,
+	})
+
+	router.RegisterCmd(&dgc.Command{
+		Name:        "discordquotereply",
+		Description: "Quote the Discord message you replied to",
+		Usage:       "[p]discordquotereply",
+		Handler:     i.discordquotereply,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "discordquotemessage",
+		Description: "Quote a Discord message",
+		Usage:       "[p]discordquotemessage <message id> [channel id]",
+		Handler:     i.discordquotemessage,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "discordquoteuser",
+		Description: "Quote a user",
+		Usage:       "[p]discordquoteuser <@user> <\"text\">",
+		Handler:     i.discordquoteuser,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "discordquotetext",
+		Description: "Quote a Discord message",
+		Usage:       "[p]discordquotetext <\"author\"> <\"text\"> <avatar url>",
+		Handler:     i.discordquotetext,
+	})
 }
 
 func (ImageCommands) tweet(ctx *dgc.Ctx) {
@@ -2658,4 +2708,184 @@ func (ImageCommands) speechbubble(ctx *dgc.Ctx) {
 	}
 
 	_ = ctx.RespondText("https://api.lightning-bot.com" + httpResponse.Headers["location"])
+}
+
+func (ImageCommands) quotereply(ctx *dgc.Ctx) {
+	if ctx.Event.ReferencedMessage == nil {
+		embed.NewEmbed().
+			SetDescription("You must reply to a message to use quotereply.").
+			Send(ctx)
+		return
+	}
+
+	m := ctx.Event.ReferencedMessage
+
+	_ = ctx.RespondText(fmt.Sprintf(
+		"https://api.lightning-bot.com/api/v3/imagegen/quote?author=%s&text=%s&background=%s",
+		url.QueryEscape(utils.Misc.Or(m.Author.DisplayName, m.Author.Username)),
+		url.QueryEscape(ctx.Event.ReferencedMessage.ContentWithMentionsReplaced()),
+		url.QueryEscape(utils.Arguments["[background url]"]),
+	))
+}
+
+func (ImageCommands) quotemessage(ctx *dgc.Ctx) {
+	channel, success := utils.Discord.TryGetChannelFromMention(ctx, ctx.Arguments.Get(1))
+	if !success {
+		var err error
+		channel, err = ctx.Session.State.Channel(ctx.Event.ChannelID)
+		if err != nil {
+			embed.NewEmbed().
+				SetDescription("Could not find channel.").
+				Send(ctx)
+			return
+		}
+	}
+
+	m, err := utils.Discord.GetChannelMessage(ctx.Session, channel.ID, utils.Arguments["<message id>"])
+	if err != nil {
+		embed.NewEmbed().
+			SetDescription("Could not find message: " + err.Error()).
+			Send(ctx)
+		return
+	}
+
+	_ = ctx.RespondText(fmt.Sprintf(
+		"https://api.lightning-bot.com/api/v3/imagegen/quote?author=%s&text=%s&background=%s",
+		url.QueryEscape(utils.Misc.Or(m.Author.DisplayName, m.Author.Username)),
+		url.QueryEscape(m.ContentWithMentionsReplaced()),
+		url.QueryEscape(utils.Arguments["[background url]"]),
+	))
+}
+
+func (ImageCommands) quoteuser(ctx *dgc.Ctx) {
+	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
+	if !success {
+		embed.NewEmbed().
+			SetDescription("Could not find user.").
+			Send(ctx)
+		return
+	}
+
+	_ = ctx.RespondText(fmt.Sprintf(
+		"https://api.lightning-bot.com/api/v3/imagegen/quote?author=%s&text=%s&background=%s",
+		url.QueryEscape(utils.Misc.Or(user.DisplayName, user.Username)),
+		url.QueryEscape(utils.Arguments["<\"text\">"]),
+		url.QueryEscape(utils.Arguments["[background url]"]),
+	))
+}
+
+func (ImageCommands) quotetext(ctx *dgc.Ctx) {
+	_ = ctx.RespondText(fmt.Sprintf(
+		"https://api.lightning-bot.com/api/v3/imagegen/quote?author=%s&text=%s&background=%s",
+		url.QueryEscape(utils.Arguments["<\"author\">"]),
+		url.QueryEscape(utils.Arguments["<\"text\">"]),
+		url.QueryEscape(utils.Arguments["[background url]"]),
+	))
+}
+
+func (ImageCommands) getRoleColor(ctx *dgc.Ctx, userID string) string {
+	if ctx.Event.GuildID == "" {
+		return ""
+	}
+
+	member, ok := utils.Discord.GetMember(ctx.Session, ctx.Event.GuildID, userID)
+	if !ok {
+		return ""
+	}
+
+	var authorColor string
+
+	for _, roleID := range member.Roles {
+		role, err := ctx.Session.State.Role(ctx.Event.GuildID, roleID)
+		if err != nil {
+			continue
+		}
+
+		if role.Color != 0 {
+			authorColor = fmt.Sprintf("#%x", role.Color)
+		}
+	}
+
+	return authorColor
+}
+
+func (i ImageCommands) discordquotemessage(ctx *dgc.Ctx) {
+	channel, success := utils.Discord.TryGetChannelFromMention(ctx, ctx.Arguments.Get(1))
+	if !success {
+		var err error
+		channel, err = ctx.Session.State.Channel(ctx.Event.ChannelID)
+		if err != nil {
+			embed.NewEmbed().
+				SetDescription("Could not find channel.").
+				Send(ctx)
+			return
+		}
+	}
+
+	m, err := utils.Discord.GetChannelMessage(ctx.Session, channel.ID, utils.Arguments["<message id>"])
+	if err != nil {
+		embed.NewEmbed().
+			SetDescription("Could not find message: " + err.Error()).
+			Send(ctx)
+		return
+	}
+
+	authorColor := i.getRoleColor(ctx, m.Author.ID)
+
+	_ = ctx.RespondText(fmt.Sprintf(
+		"https://api.lightning-bot.com/api/v3/imagegen/discordquote?author=%s&author_url=%s&author_color=%s&text=%s&timestamp=%s",
+		url.QueryEscape(utils.Misc.Or(m.Author.DisplayName, m.Author.Username)),
+		url.QueryEscape(m.Author.AvatarURL("")),
+		url.QueryEscape(authorColor),
+		url.QueryEscape(m.ContentWithMentionsReplaced()),
+		url.QueryEscape(m.Timestamp.Format("01/02/2006 3:04 PM")),
+	))
+}
+
+func (i ImageCommands) discordquotereply(ctx *dgc.Ctx) {
+	if ctx.Event.ReferencedMessage == nil {
+		embed.NewEmbed().
+			SetDescription("You must reply to a message to use quotereply.").
+			Send(ctx)
+		return
+	}
+
+	m := ctx.Event.ReferencedMessage
+
+	authorColor := i.getRoleColor(ctx, m.Author.ID)
+
+	_ = ctx.RespondText(fmt.Sprintf(
+		"https://api.lightning-bot.com/api/v3/imagegen/discordquote?author=%s&author_url=%s&author_color=%s&text=%s&timestamp=%s",
+		url.QueryEscape(utils.Misc.Or(m.Author.DisplayName, m.Author.Username)),
+		url.QueryEscape(m.Author.AvatarURL("")),
+		url.QueryEscape(authorColor),
+		url.QueryEscape(m.ContentWithMentionsReplaced()),
+		url.QueryEscape(m.Timestamp.Format("01/02/2006 3:04 PM")),
+	))
+}
+
+func (ImageCommands) discordquoteuser(ctx *dgc.Ctx) {
+	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
+	if !success {
+		embed.NewEmbed().
+			SetDescription("Could not find user.").
+			Send(ctx)
+		return
+	}
+
+	_ = ctx.RespondText(fmt.Sprintf(
+		"https://api.lightning-bot.com/api/v3/imagegen/discordquote?author=%s&author_url=%s&text=%s",
+		url.QueryEscape(utils.Misc.Or(user.DisplayName, user.Username)),
+		url.QueryEscape(user.AvatarURL("")),
+		url.QueryEscape(utils.String.RemoveWords(ctx.Arguments.Raw(), 1)),
+	))
+}
+
+func (ImageCommands) discordquotetext(ctx *dgc.Ctx) {
+	_ = ctx.RespondText(fmt.Sprintf(
+		"https://api.lightning-bot.com/api/v3/imagegen/discordquote?author=%s&author_url=%s&text=%s",
+		url.QueryEscape(utils.Arguments["<\"author\">"]),
+		url.QueryEscape(utils.Arguments["<avatar url>"]),
+		url.QueryEscape(utils.Arguments["<\"text\">"]),
+	))
 }

@@ -158,16 +158,16 @@ type Config struct {
 	AFK struct {
 		Enabled         bool        `json:"Enabled"`
 		Delay           int         `json:"Delay"`
+		RandomDelay     bool        `json:"RandomDelay"`
 		OnDM            bool        `json:"OnDM"`
 		OnPing          bool        `json:"OnPing"`
-		MustBeInactive  bool        `json:"MustBeInactive"`  // new
-		InactiveTimeout int         `json:"InactiveTimeout"` // new
+		MustBeInactive  bool        `json:"MustBeInactive"`
+		InactiveTimeout int         `json:"InactiveTimeout"`
 		Reply           bool        `json:"Reply"`
 		Typing          bool        `json:"Typing"`
 		TriggerList     TriggerList `json:"TriggerList"`
-		// IgnoredUsers    []string `json:"IgnoredUsers"`
-		// IgnoredServers  []string `json:"IgnoredServers"`
-		Message string `json:"Message"`
+		Message         string      `json:"Message"`
+		AI              bool        `json:"AI"`
 	} `json:"AFK"`
 	Sharing struct {
 		SharedUsers            []string `json:"SharedUsers"`
@@ -175,7 +175,9 @@ type Config struct {
 		SharedCommands         []string `json:"SharedCommands"`
 		ShareAll               bool     `json:"ShareAll"`
 		BlockDangerousCommands bool     `json:"BlockDangerousCommands"`
-	}
+	} `json:"Sharing"`
+	SlashCommandJobs json.RawMessage `json:"SlashCommandJobs"`
+	EventReactions   json.RawMessage `json:"EventReactions"`
 }
 
 var (

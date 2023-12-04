@@ -66,7 +66,11 @@ func (a *AICommands) RegisterCommands(router *dgc.Router) {
 }
 
 func (AICommands) chatgpt(ctx *dgc.Ctx) {
-	response := api.GPT3(utils.Arguments["<\"system\">"], utils.Arguments["<\"message\">"])
+	response, err := api.GPT3(utils.Arguments["<\"system\">"], utils.Arguments["<\"message\">"])
+	if err != nil {
+		_ = ctx.RespondText("Error getting response: " + err.Error())
+		return
+	}
 
 	embed.NewEmbed().
 		SetTitle("ChatGPT (GPT-3.5)").
@@ -134,7 +138,7 @@ func (AICommands) imagine(ctx *dgc.Ctx) {
 
 	var model string
 
-	if modelValue, ok := api.DefaultModels[model]; ok {
+	if modelValue, ok := api.DefaultModels[utils.Arguments["[\"model\"]"]]; ok {
 		model = modelValue
 	}
 

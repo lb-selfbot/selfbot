@@ -5,6 +5,7 @@ import (
 
 	"github.com/LightningDev1/LB-Selfbot/selfbot/api"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/config"
+	"github.com/LightningDev1/LB-Selfbot/selfbot/embed"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/utils"
 	"github.com/LightningDev1/dgc"
 )
@@ -33,6 +34,13 @@ func (p ProtectionsCommands) RegisterCommands(router *dgc.Router) {
 		Usage:       "[p]antimassmd <on/off>",
 		Flags:       []string{"DANGEROUS"},
 		Handler:     p.antimassdm,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "protectedservers",
+		Description: "Get a list of protected servers",
+		Usage:       "[p]protectedservers",
+		Flags:       []string{"DANGEROUS"},
+		Handler:     p.protectedservers,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "protectserver",
@@ -139,10 +147,32 @@ func (p ProtectionsCommands) antimassdm(ctx *dgc.Ctx) {
 	_ = cfg.Save()
 }
 
+func (ProtectionsCommands) protectedservers(ctx *dgc.Ctx) {
+	cfg, err := config.GetConfig()
+	if err != nil {
+		_ = ctx.RespondText("Could not get config.")
+		return
+	}
+
+	var servers []string
+
+	for _, s := range cfg.Protections.ServerProtections.ProtectedServers {
+		if name := utils.Discord.GetGuildName(ctx.Session, s); name != "No Server" {
+			servers = append(servers, "- "+name+" ("+s+")")
+		} else {
+			servers = append(servers, "- "+s)
+		}
+	}
+
+	embed.NewEmbed().
+		AddField("Protected Servers", strings.Join(servers, "\n")).
+		Send(ctx)
+}
+
 func (p ProtectionsCommands) protectserver(ctx *dgc.Ctx) {
 	guild, err := utils.Discord.GetGuild(ctx.Session, utils.Misc.Or(utils.Arguments["<server id>"], ctx.Event.GuildID))
 	if err != nil {
-		_ = ctx.RespondText("Could not find user.")
+		_ = ctx.RespondText("Could not find server.")
 		return
 	}
 	cfg, _ := config.GetConfig()
@@ -157,7 +187,7 @@ func (p ProtectionsCommands) protectserver(ctx *dgc.Ctx) {
 func (p ProtectionsCommands) unprotectserver(ctx *dgc.Ctx) {
 	guild, err := utils.Discord.GetGuild(ctx.Session, utils.Misc.Or(utils.Arguments["<server id>"], ctx.Event.GuildID))
 	if err != nil {
-		_ = ctx.RespondText("Could not find user.")
+		_ = ctx.RespondText("Could not find server.")
 		return
 	}
 	cfg, _ := config.GetConfig()

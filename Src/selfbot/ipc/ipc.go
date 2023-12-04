@@ -4,6 +4,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"regexp"
 
 	"github.com/LightningDev1/LB-Selfbot/selfbot/config"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/constants"
@@ -11,8 +12,12 @@ import (
 	"github.com/gorilla/websocket"
 )
 
+var ansiRegex = regexp.MustCompile("[\u001B\u009B][[\\]()#;?]*(?:(?:(?:[a-zA-Z\\d]*(?:;[a-zA-Z\\d]*)*)?\u0007)|(?:(?:\\d{1,4}(?:;\\d{0,4})*)?[\\dA-PRZcf-ntqry=><~]))")
+var htmlCutoff int = 1e8
+
 type JsonEventData struct {
 	Text       string         `json:"text,omitempty"`
+	IsRaw      bool           `json:"is_raw,omitempty"`
 	MainFolder string         `json:"mainFolder,omitempty"`
 	Config     *config.Config `json:"config,omitempty"`
 }
@@ -37,13 +42,17 @@ var (
 	OP_ConsoleSet    = 109
 )
 
-var Console string
+var HTMLConsole string
+var RawConsole string
+
+var ConfigUpdateCallbacks = []func(*config.Config){}
 
 type Ipc struct {
-	Upgrader  *websocket.Upgrader
-	Conn      *websocket.Conn
-	Connected bool
-	Connect   chan struct{}
+	Upgrader       *websocket.Upgrader
+	Conn           *websocket.Conn
+	Connected      bool
+	Connect        chan struct{}
+	SentRawConsole bool
 }
 
 func (i *Ipc) Init() {
@@ -103,29 +112,73 @@ func (i *Ipc) OnMessage(jsonEvent *JsonEvent) {
 		os.Exit(0)
 	case OP_ConfigUpdate:
 		config.SaveConfigFromUI(jsonEvent.Data.Config)
+
+		for _, callback := range ConfigUpdateCallbacks {
+			go callback(jsonEvent.Data.Config)
+		}
 	default:
 		utils.Logging.Warn("Unknown IPC message:", jsonEvent)
 	}
 }
 
-func (i *Ipc) ConsoleSet(text string) {
-	i.Write(JsonEvent{
-		Op: OP_ConsoleSet,
-		Data: JsonEventData{
-			Text: text,
-		},
-	})
-	Console = text
+func (i *Ipc) ConsoleSet(ansi, html string) {
+	HTMLConsole = html
+	newRawText := ansiRegex.ReplaceAllString(ansi, "") + "\n"
+	RawConsole = newRawText
+
+	if len(HTMLConsole) < htmlCutoff {
+		i.Write(JsonEvent{
+			Op: OP_ConsoleSet,
+			Data: JsonEventData{
+				Text: HTMLConsole,
+			},
+		})
+		return
+	} else {
+		i.Write(JsonEvent{
+			Op: OP_ConsoleSet,
+			Data: JsonEventData{
+				Text:  RawConsole,
+				IsRaw: true,
+			},
+		})
+		i.SentRawConsole = true
+	}
 }
 
-func (i *Ipc) ConsoleAppend(text string) {
-	i.Write(JsonEvent{
-		Op: OP_ConsoleAppend,
-		Data: JsonEventData{
-			Text: text,
-		},
-	})
-	Console += text + "\n"
+func (i *Ipc) ConsoleAppend(ansi, html string) {
+	HTMLConsole += html + "\n"
+	newRawText := ansiRegex.ReplaceAllString(ansi, "") + "\n"
+	RawConsole += newRawText
+
+	if len(HTMLConsole) < htmlCutoff {
+		i.Write(JsonEvent{
+			Op: OP_ConsoleAppend,
+			Data: JsonEventData{
+				Text: html,
+			},
+		})
+		return
+	}
+
+	if i.SentRawConsole {
+		i.Write(JsonEvent{
+			Op: OP_ConsoleAppend,
+			Data: JsonEventData{
+				Text:  newRawText,
+				IsRaw: true,
+			},
+		})
+	} else {
+		i.Write(JsonEvent{
+			Op: OP_ConsoleSet,
+			Data: JsonEventData{
+				Text:  RawConsole,
+				IsRaw: true,
+			},
+		})
+		i.SentRawConsole = true
+	}
 }
 
 func (i *Ipc) ConsoleClear() {
@@ -133,7 +186,9 @@ func (i *Ipc) ConsoleClear() {
 		Op:   OP_ConsoleClear,
 		Data: JsonEventData{},
 	})
-	Console = ""
+	HTMLConsole = ""
+	RawConsole = ""
+	i.SentRawConsole = false
 }
 
 func (i *Ipc) Restart() {
@@ -163,6 +218,10 @@ func SendNotification(text string) {
 }
 
 func ConfigUpdate(cfg *config.Config) {
+	for _, callback := range ConfigUpdateCallbacks {
+		go callback(cfg)
+	}
+
 	IPC.Write(JsonEvent{
 		Op: OP_ConfigUpdate,
 		Data: JsonEventData{

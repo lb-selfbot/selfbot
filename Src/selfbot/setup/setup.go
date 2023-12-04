@@ -2,10 +2,13 @@ package setup
 
 import (
 	"os"
+	"time"
 
 	"github.com/LightningDev1/LB-Selfbot/selfbot/api"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/utils"
+	"github.com/LightningDev1/LB-Selfbot/tui"
 	"github.com/LightningDev1/discordgo"
+	"golang.org/x/term"
 )
 
 func GetLogin() (string, string) {
@@ -15,8 +18,20 @@ func GetLogin() (string, string) {
 		}
 	}
 
+	if term.IsTerminal(int(os.Stdin.Fd())) {
+		// Is terminal --> use TUI
+		return tui.GetLogin("Please enter your LightningBot credentials:")
+	}
+
 	username := utils.Input.GetString("Please enter your LightningBot username")
 	password := utils.Input.GetString("Please enter your LightningBot password")
+
+	if username == "" || password == "" {
+		utils.Logging.Error("You must enter a username and password!")
+		time.Sleep(5 * time.Second)
+
+		return GetLogin()
+	}
 
 	httpResponse := api.Auth(username, password)
 	if httpResponse.Error != nil {
@@ -44,7 +59,20 @@ func GetToken(session *discordgo.Session) string {
 		return token
 	}
 
+	if term.IsTerminal(int(os.Stdin.Fd())) {
+		// Is terminal --> use TUI
+		return tui.GetToken()
+	}
+
 	token := utils.Input.GetString("Please enter your Discord token")
+
+	// This fixes a bug where the bot tries to DoS Discord when there is no stdin
+	if token == "" {
+		utils.Logging.Error("You must enter a token!")
+		time.Sleep(5 * time.Second)
+
+		return GetToken(session)
+	}
 
 	session.Token = token
 

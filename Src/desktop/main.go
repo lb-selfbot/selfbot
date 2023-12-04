@@ -20,6 +20,7 @@ import (
 	"github.com/LightningDev1/LB-Selfbot/selfbot/config"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/constants"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/eventhandlers"
+	"github.com/LightningDev1/LB-Selfbot/selfbot/extensions"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/http"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/ipc"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/logging"
@@ -28,6 +29,7 @@ import (
 	"github.com/LightningDev1/LB-Selfbot/selfbot/setup"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/utils"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/websocket"
+	"github.com/LightningDev1/LB-Selfbot/tui"
 	"github.com/LightningDev1/dgc"
 	"github.com/LightningDev1/discordgo"
 )
@@ -138,7 +140,30 @@ func initSelfbot(session *discordgo.Session) {
 func onWebsocketError(err error, closeCode int) {
 	switch closeCode {
 	case 3004, 3010:
-		logging.UI.Error("Your LightningBot credentials are invalid! Please re-enter them in the Config tab.")
+		if constants.CONSOLE {
+			utils.Logging.Error("Your LightningBot credentials are invalid!")
+
+			username, password := setup.GetLogin()
+
+			cfg, err := config.GetConfig()
+			if err != nil {
+				logging.UI.Error("Error loading config: " + err.Error())
+				os.Exit(0)
+			}
+
+			cfg.Account.LightningBot.Username = username
+			cfg.Account.LightningBot.Password = password
+
+			err = cfg.Save()
+			if err != nil {
+				logging.UI.Error("Error saving config: " + err.Error())
+				os.Exit(1)
+			}
+
+			utils.System.Restart()
+		} else {
+			logging.UI.Error("Your LightningBot credentials are invalid! Please re-enter them in the Config tab.")
+		}
 	case 3011:
 		logging.UI.Error("Your free trial has expired! Please purchase a license key to continue using LightningBot.")
 	case 3003:
@@ -297,7 +322,9 @@ func Main(discordgoDebug bool) {
 	})
 
 	eventhandlers.EventHandlers.RegisterHandlers(session, router)
-	commands.Commands.RegisterCommands(session, router)
+	commands.Commands.RegisterCommands(session, router, false)
+	extensions.RegisterExtensions(session, router)
+	commands.Commands.HelpCommand.RegisterHelpCommand(router, session)
 
 	router.Initialize(session)
 
@@ -314,9 +341,7 @@ func Main(discordgoDebug bool) {
 	if err != nil {
 		if strings.Contains(err.Error(), "Authentication failed") {
 			if constants.CONSOLE {
-				utils.Logging.Error("Your Discord token is invalid!")
-
-				token := setup.GetToken(session)
+				token := tui.GetToken("Your Discord token is invalid!")
 
 				cfg, err := config.GetConfig()
 				if err != nil {
@@ -327,7 +352,6 @@ func Main(discordgoDebug bool) {
 				// If env doesn't exist (using config)
 				if _, ok := os.LookupEnv("LB_TOKEN"); !ok {
 					cfg.Account.Discord.Token = token
-
 				}
 
 				err = cfg.Save()

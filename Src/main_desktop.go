@@ -5,17 +5,19 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"image"
 	"os"
 	"strings"
 
 	"github.com/LightningDev1/dgc"
 	"github.com/LightningDev1/discordgo"
+	"github.com/bitly/go-simplejson"
 
+	"github.com/LightningDev1/LB-Selfbot/browserautomation"
 	"github.com/LightningDev1/LB-Selfbot/desktop"
+	"github.com/LightningDev1/LB-Selfbot/savedtokens"
+	"github.com/LightningDev1/LB-Selfbot/selfbot/api"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/commands"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/constants"
-	"github.com/LightningDev1/LB-Selfbot/selfbot/qrlogin"
 )
 
 var discordgoDebug = false
@@ -36,7 +38,7 @@ func initArgs() {
 		session, _ := discordgo.New("")
 		router := dgc.Create(&dgc.Router{})
 
-		commands.Commands.RegisterCommands(session, router)
+		commands.Commands.RegisterCommands(session, router, true)
 
 		data := map[string]any{
 			"categories": router.Categories,
@@ -52,7 +54,7 @@ func initArgs() {
 		session, _ := discordgo.New("")
 		router := dgc.Create(&dgc.Router{})
 
-		commands.Commands.RegisterCommands(session, router)
+		commands.Commands.RegisterCommands(session, router, true)
 
 		data := map[string]any{}
 
@@ -66,8 +68,8 @@ func initArgs() {
 	}
 
 	if strings.Contains(args, "-qrlogin") {
-		login := qrlogin.Login{
-			ImageReadyCallback: func(_ image.Image, raw []byte) error {
+		login := browserautomation.QRLogin{
+			ImageReadyCallback: func(raw []byte) error {
 				_, err := os.Stdout.Write(raw)
 				return err
 			},
@@ -81,6 +83,59 @@ func initArgs() {
 			fmt.Println("ERR:", err)
 			os.Exit(1)
 		}
+
+		os.Exit(0)
+	}
+
+	if strings.Contains(args, "-weblogin") {
+		login := browserautomation.WebLogin{
+			TokenCallback: func(token string) error {
+				s, err := discordgo.New("")
+				if err != nil {
+					return err
+				}
+
+				resp, err := api.GetTokenData(s, token)
+				if err != nil {
+					return err
+				}
+
+				tokenData, err := simplejson.NewJson(resp)
+				if err != nil {
+					return err
+				}
+
+				user := discordgo.User{
+					ID:       tokenData.Get("id").MustString(),
+					Avatar:   tokenData.Get("avatar").MustString(),
+					Username: tokenData.Get("username").MustString(),
+					Token:    token,
+				}
+
+				return json.NewEncoder(os.Stdout).Encode(map[string]string{
+					"token":    user.Token,
+					"username": user.Username,
+					"id":       user.ID,
+					"avatar":   user.AvatarURL(""),
+				})
+			},
+		}
+
+		if err := login.Start(); err != nil {
+			_ = json.NewEncoder(os.Stdout).Encode(map[string]string{
+				"error": err.Error(),
+			})
+
+			os.Exit(1)
+		}
+
+		os.Exit(0)
+	}
+
+	if strings.Contains(args, "-savedtokens") {
+		tokens := savedtokens.GetSavedTokens()
+
+		_ = json.NewEncoder(os.Stdout).Encode(tokens)
 
 		os.Exit(0)
 	}

@@ -499,8 +499,8 @@ func (a *ActivityCommands) getactivityjson(ctx *dgc.Ctx) {
 		if err != nil {
 			continue
 		}
-		member, err := utils.Discord.GetMember(ctx.Session, guild.ID, user.ID)
-		if err != nil {
+		member, ok := utils.Discord.GetMember(ctx.Session, guild.ID, user.ID)
+		if !ok {
 			continue
 		}
 		if member.Presence == nil {

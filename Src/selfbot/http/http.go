@@ -2,11 +2,32 @@ package http
 
 import (
 	_json "encoding/json"
+	"os"
 	"strings"
 
+	"github.com/LightningDev1/discordgo"
 	"github.com/bitly/go-simplejson"
 	"github.com/valyala/fasthttp"
 )
+
+type client interface {
+	Do(req *fasthttp.Request, resp *fasthttp.Response) error
+}
+
+func getClient() client {
+	if proxy := os.Getenv("HTTP_PROXY"); proxy != "" {
+		return &fasthttp.HostClient{
+			Addr: strings.ReplaceAll(proxy, "http://", ""),
+			Name: discordgo.UserAgentDesktop,
+		}
+	}
+
+	return &fasthttp.Client{
+		Name: discordgo.UserAgentDesktop,
+	}
+}
+
+var c = getClient()
 
 type HttpResponse struct {
 	Success       bool
@@ -65,7 +86,7 @@ func Get(url string, headersList ...map[string]string) *HttpResponse {
 		}
 	}
 
-	err := fasthttp.Do(req, resp)
+	err := c.Do(req, resp)
 	if err != nil {
 		return errorResponse(err)
 	}
@@ -109,7 +130,7 @@ func CustomMethodWithData(url, method string, data []byte, headersList ...map[st
 		}
 	}
 
-	err := fasthttp.Do(req, resp)
+	err := c.Do(req, resp)
 	if err != nil {
 		return errorResponse(err)
 	}
@@ -145,4 +166,15 @@ func PostJson(url string, data any, headersList ...map[string]string) *HttpRespo
 	headersList = append(headersList, map[string]string{"Content-Type": "application/json"})
 
 	return CustomMethodWithData(url, "POST", dataJson, headersList...)
+}
+
+func PutJson(url string, data any, headersList ...map[string]string) *HttpResponse {
+	dataJson, err := _json.Marshal(data)
+	if err != nil {
+		return errorResponse(err)
+	}
+
+	headersList = append(headersList, map[string]string{"Content-Type": "application/json"})
+
+	return CustomMethodWithData(url, "PUT", dataJson, headersList...)
 }

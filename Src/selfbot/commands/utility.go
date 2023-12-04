@@ -19,7 +19,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/LightningDev1/LB-Selfbot/selfbot/eventhandlers"
+	"github.com/LightningDev1/LB-Selfbot/selfbot/eventhandlers/eventreactions"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/ipc"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/logging"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/uploaders/destinations"
@@ -63,8 +63,14 @@ func (u UtilityCommands) RegisterCommands(router *dgc.Router) {
 	router.RegisterCmd(&dgc.Command{
 		Name:        "leavegroups",
 		Description: "Leave all of your groups",
-		Usage:       "[p]leavegroups",
+		Usage:       "[p]leavegroups [silent: on/off]",
 		Handler:     u.leavegroups,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "unfriendall",
+		Description: "Remove all of your friends",
+		Usage:       "[p]unfriendall",
+		Handler:     u.unfriendall,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "tts",
@@ -154,28 +160,28 @@ func (u UtilityCommands) RegisterCommands(router *dgc.Router) {
 		Name:        "shutdownpc",
 		Description: "Shut your PC down",
 		Usage:       "[p]shutdownpc",
-		Flags:       []string{"DANGEROUS", "DANGEROUS_HOSTING"},
+		Flags:       []string{"DANGEROUS", "HOSTING_DANGEROUS"},
 		Handler:     u.shutdownpc,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "restartpc",
 		Description: "Restart your PC",
 		Usage:       "[p]restartpc",
-		Flags:       []string{"DANGEROUS", "DANGEROUS_HOSTING"},
+		Flags:       []string{"DANGEROUS", "HOSTING_DANGEROUS"},
 		Handler:     u.restartpc,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "sleeppc",
 		Description: "Put your PC to sleep",
 		Usage:       "[p]sleeppc",
-		Flags:       []string{"DANGEROUS", "DANGEROUS_HOSTING"},
+		Flags:       []string{"DANGEROUS", "HOSTING_DANGEROUS"},
 		Handler:     u.sleeppc,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "lockpc",
 		Description: "Lock your PC",
 		Usage:       "[p]lockpc",
-		Flags:       []string{"DANGEROUS", "DANGEROUS_HOSTING"},
+		Flags:       []string{"DANGEROUS", "HOSTING_DANGEROUS"},
 		Handler:     u.lockpc,
 	})
 	router.RegisterCmd(&dgc.Command{
@@ -200,14 +206,14 @@ func (u UtilityCommands) RegisterCommands(router *dgc.Router) {
 		Name:        "website",
 		Description: "Open the LightningBot website",
 		Usage:       "[p]website",
-		Flags:       []string{"DANGEROUS_HOSTING"},
+		Flags:       []string{"HOSTING_DANGEROUS"},
 		Handler:     u.website,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "dashboard",
 		Description: "Opens dashboard in browser",
 		Usage:       "[p]dashboard",
-		Flags:       []string{"DANGEROUS_HOSTING"},
+		Flags:       []string{"HOSTING_DANGEROUS"},
 		Handler:     u.dashboard,
 	})
 	router.RegisterCmd(&dgc.Command{
@@ -253,49 +259,49 @@ func (u UtilityCommands) RegisterCommands(router *dgc.Router) {
 		Name:        "openfolder",
 		Description: "Open the LightningBot folder",
 		Usage:       "[p]openfolder",
-		Flags:       []string{"DANGEROUS_HOSTING"},
+		Flags:       []string{"HOSTING_DANGEROUS"},
 		Handler:     u.openfolder,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "mastercard",
 		Description: "Generate a mastercard credit card",
-		Usage:       "[p]mastercard",
+		Usage:       "[p]mastercard [name]",
 		Handler:     u.mastercard,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "visa16",
 		Description: "Generate a visa credit card (16 characters)",
-		Usage:       "[p]visa16",
+		Usage:       "[p]visa16 [name]",
 		Handler:     u.visa16,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "visa13",
 		Description: "Generate a visa credit card (13 characters)",
-		Usage:       "[p]visa13",
+		Usage:       "[p]visa13 [name]",
 		Handler:     u.visa13,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "amex",
 		Description: "Generate an amex credit card",
-		Usage:       "[p]amex",
+		Usage:       "[p]amex [name]",
 		Handler:     u.amex,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "discover",
 		Description: "Generate a discover credit card",
-		Usage:       "[p]discover",
+		Usage:       "[p]discover [name]",
 		Handler:     u.discover,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "diners",
 		Description: "Generate a diners credit card",
-		Usage:       "[p]diners",
+		Usage:       "[p]diners [name]",
 		Handler:     u.diners,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "jcb",
 		Description: "Generate a JCB credit card",
-		Usage:       "[p]jcb",
+		Usage:       "[p]jcb [name]",
 		Handler:     u.jcb,
 	})
 	router.RegisterCmd(&dgc.Command{
@@ -308,14 +314,14 @@ func (u UtilityCommands) RegisterCommands(router *dgc.Router) {
 		Name:        "calc",
 		Description: "Open the calculator",
 		Usage:       "[p]calc",
-		Flags:       []string{"DANGEROUS", "DANGEROUS_HOSTING"},
+		Flags:       []string{"DANGEROUS", "HOSTING_DANGEROUS"},
 		Handler:     u.calc,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "notepad",
 		Description: "Open notepad",
 		Usage:       "[p]notepad",
-		Flags:       []string{"DANGEROUS", "DANGEROUS_HOSTING"},
+		Flags:       []string{"DANGEROUS", "HOSTING_DANGEROUS"},
 		Handler:     u.notepad,
 	})
 	router.RegisterCmd(&dgc.Command{
@@ -438,7 +444,7 @@ func (u UtilityCommands) RegisterCommands(router *dgc.Router) {
 		Name:        "screenshot",
 		Description: "Make a screenshot",
 		Usage:       "[p]screenshot [delay]",
-		Flags:       []string{"DANGEROUS", "DANGEROUS_HOSTING"},
+		Flags:       []string{"DANGEROUS", "HOSTING_DANGEROUS"},
 		Handler:     u.screenshot,
 	})
 	router.RegisterCmd(&dgc.Command{
@@ -451,7 +457,7 @@ func (u UtilityCommands) RegisterCommands(router *dgc.Router) {
 		Name:        "uploadss",
 		Description: "Upload a screenshot",
 		Usage:       "[p]uploadss <destination> [delay]",
-		Flags:       []string{"DANGEROUS", "DANGEROUS_HOSTING"},
+		Flags:       []string{"DANGEROUS", "HOSTING_DANGEROUS"},
 		Handler:     u.uploadss,
 	})
 	router.RegisterCmd(&dgc.Command{
@@ -485,6 +491,26 @@ func (u UtilityCommands) RegisterCommands(router *dgc.Router) {
 		Description: "Obfuscate a JS script",
 		Usage:       "[p]obfuscatejs [script/attachment]",
 		Handler:     u.obfuscateFunc("javascript", "js"),
+	})
+
+	// ReviewDB
+	router.RegisterCmd(&dgc.Command{
+		Name:        "reviewdbtoken",
+		Description: "Get your ReviewDB token",
+		Usage:       "[p]reviewdbtoken",
+		Handler:     u.reviewdbtoken,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "getreviews",
+		Description: "Get a users ReviewDB reviews",
+		Usage:       "[p]getreviews <user>",
+		Handler:     u.getreviews,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "addreview",
+		Description: "Add a ReviewDB review to a user",
+		Usage:       "[p]addreview <user> <review>",
+		Handler:     u.addreview,
 	})
 }
 
@@ -723,15 +749,46 @@ func (UtilityCommands) copychannel(ctx *dgc.Ctx) {
 
 func (UtilityCommands) leaveservers(ctx *dgc.Ctx) {
 	for _, guild := range ctx.Session.State.Guilds {
-		_ = ctx.Session.GuildLeave(guild.ID)
+		err := ctx.Session.GuildLeave(guild.ID)
+		if err != nil {
+			_ = ctx.RespondText("Error leaving server: " + err.Error())
+		}
+
+		time.Sleep(2 * time.Second)
 	}
 }
 
 func (UtilityCommands) leavegroups(ctx *dgc.Ctx) {
+	rawSilentToggle := strings.ToLower(utils.Arguments["[silent leave: on/off]"])
+	silentToggle := rawSilentToggle == "on"
+
 	for _, channel := range ctx.Session.State.PrivateChannels {
 		if channel.Type == discordgo.ChannelTypeGroupDM {
-			_, _ = ctx.Session.ChannelDelete(channel.ID)
+			_, err := ctx.Session.ChannelDelete(channel.ID, silentToggle)
+			if err != nil {
+				_ = ctx.RespondText("Error leaving group: " + err.Error())
+			}
+
+			time.Sleep(2 * time.Second)
 		}
+	}
+}
+
+func (UtilityCommands) unfriendall(ctx *dgc.Ctx) {
+	rels, err := ctx.Session.UserRelationships()
+	if err != nil {
+		_ = ctx.RespondText("Error getting relationships: " + err.Error())
+		return
+	}
+
+	for _, rel := range rels {
+		err = ctx.Session.UserRelationshipDelete(rel.User.ID)
+		if err != nil {
+			_ = ctx.RespondText("Error removing friend: " + err.Error())
+			return
+		}
+
+		time.Sleep(2 * time.Second)
 	}
 }
 
@@ -984,8 +1041,8 @@ func (UtilityCommands) snipe(ctx *dgc.Ctx) {
 		}
 	}
 
-	messages, ok := eventhandlers.EventHandlers.Settings.DeletedMessages[channel.ID]
-	if !ok || len(messages) == 0 {
+	messages := eventreactions.GetDeletedMessages(channel.ID)
+	if len(messages) == 0 {
 		embed.NewEmbed().
 			SetDescription("No deleted message was found in this channel!").
 			Send(ctx)
@@ -1011,8 +1068,8 @@ func (UtilityCommands) editsnipe(ctx *dgc.Ctx) {
 		}
 	}
 
-	messages, ok := eventhandlers.EventHandlers.Settings.EditedMessages[channel.ID]
-	if !ok || len(messages) == 0 {
+	messages := eventreactions.GetEditedMessages(channel.ID)
+	if len(messages) == 0 {
 		embed.NewEmbed().
 			SetDescription("No deleted message was found in this channel!").
 			Send(ctx)
@@ -1030,10 +1087,13 @@ func (UtilityCommands) editsnipe(ctx *dgc.Ctx) {
 }
 
 func (UtilityCommands) history(ctx *dgc.Ctx) {
+	eventreactions.UsedCommands.Mutex.Lock()
+	defer eventreactions.UsedCommands.Mutex.Unlock()
+
 	usedCommands := ""
 	index := 1
-	for i := len(eventhandlers.EventHandlers.Settings.UsedCommands) - 1; i >= 0 && i <= 10; i-- {
-		cmd := eventhandlers.EventHandlers.Settings.UsedCommands[i]
+	for i := len(eventreactions.UsedCommands.Items) - 1; i >= 0 && i <= 10; i-- {
+		cmd := eventreactions.UsedCommands.Items[i]
 		usedCommands += fmt.Sprintf("%d. %s\n", index, cmd.Event.Content)
 		index++
 	}
@@ -1051,7 +1111,11 @@ func (UtilityCommands) dashboard(*dgc.Ctx) {
 }
 
 func (UtilityCommands) restartbot(*dgc.Ctx) {
-	ipc.IPC.Restart()
+	if constants.CONSOLE {
+		utils.System.Restart()
+	} else {
+		ipc.IPC.Restart()
+	}
 }
 
 func (UtilityCommands) stopbot(*dgc.Ctx) {
@@ -1101,7 +1165,7 @@ func (UtilityCommands) version(ctx *dgc.Ctx) {
 
 func (UtilityCommands) uptime(ctx *dgc.Ctx) {
 	embed.NewEmbed().
-		AddField("Uptime", utils.Misc.FormatDuration(time.Since(eventhandlers.EventHandlers.StartTime))).
+		AddField("Uptime", utils.Misc.FormatDuration(time.Since(constants.START_TIME))).
 		Send(ctx)
 }
 
@@ -1114,7 +1178,7 @@ func (UtilityCommands) openfolder(*dgc.Ctx) {
 }
 
 func (UtilityCommands) mastercard(ctx *dgc.Ctx) {
-	creditCard := api.GenerateCreditCard("mastercard")
+	creditCard := api.GenerateCreditCard("mastercard", ctx.Arguments.Raw())
 	embed.NewEmbed().
 		AddField("Card Type", "Mastercard").
 		AddField("Card Number", creditCard.Number).
@@ -1125,7 +1189,7 @@ func (UtilityCommands) mastercard(ctx *dgc.Ctx) {
 }
 
 func (UtilityCommands) visa16(ctx *dgc.Ctx) {
-	creditCard := api.GenerateCreditCard("visa16")
+	creditCard := api.GenerateCreditCard("visa16", ctx.Arguments.Raw())
 	embed.NewEmbed().
 		AddField("Card Type", "Visa").
 		AddField("Card Number", creditCard.Number).
@@ -1136,7 +1200,7 @@ func (UtilityCommands) visa16(ctx *dgc.Ctx) {
 }
 
 func (UtilityCommands) visa13(ctx *dgc.Ctx) {
-	creditCard := api.GenerateCreditCard("visa13")
+	creditCard := api.GenerateCreditCard("visa13", ctx.Arguments.Raw())
 	embed.NewEmbed().
 		AddField("Card Type", "Visa").
 		AddField("Card Number", creditCard.Number).
@@ -1147,7 +1211,7 @@ func (UtilityCommands) visa13(ctx *dgc.Ctx) {
 }
 
 func (UtilityCommands) amex(ctx *dgc.Ctx) {
-	creditCard := api.GenerateCreditCard("amex")
+	creditCard := api.GenerateCreditCard("amex", ctx.Arguments.Raw())
 	embed.NewEmbed().
 		AddField("Card Type", "American Express").
 		AddField("Card Number", creditCard.Number).
@@ -1158,7 +1222,7 @@ func (UtilityCommands) amex(ctx *dgc.Ctx) {
 }
 
 func (UtilityCommands) discover(ctx *dgc.Ctx) {
-	creditCard := api.GenerateCreditCard("discover")
+	creditCard := api.GenerateCreditCard("discover", ctx.Arguments.Raw())
 	embed.NewEmbed().
 		AddField("Card Type", "Discover").
 		AddField("Card Number", creditCard.Number).
@@ -1169,7 +1233,7 @@ func (UtilityCommands) discover(ctx *dgc.Ctx) {
 }
 
 func (UtilityCommands) diners(ctx *dgc.Ctx) {
-	creditCard := api.GenerateCreditCard("diners")
+	creditCard := api.GenerateCreditCard("diners", ctx.Arguments.Raw())
 	embed.NewEmbed().
 		AddField("Card Type", "Diners").
 		AddField("Card Number", creditCard.Number).
@@ -1180,7 +1244,7 @@ func (UtilityCommands) diners(ctx *dgc.Ctx) {
 }
 
 func (UtilityCommands) jcb(ctx *dgc.Ctx) {
-	creditCard := api.GenerateCreditCard("jcb")
+	creditCard := api.GenerateCreditCard("jcb", ctx.Arguments.Raw())
 	embed.NewEmbed().
 		AddField("Card Type", "JCB").
 		AddField("Card Number", creditCard.Number).
@@ -1237,7 +1301,7 @@ func (UtilityCommands) firstmessage(ctx *dgc.Ctx) {
 		SetDescription("First Message").
 		AddField("Author", messages[0].Author.String()).
 		AddField("Message", messages[0].Content).
-		AddField("Jump URL", fmt.Sprintf("https://discord.com/channels/%s/%s/%s", utils.Misc.Or(channel.GuildID, "@me"), channel.ID, messages[0].ID)).
+		AddField("Jump URL", utils.Discord.GetMessageLink(messages[0])).
 		Send(ctx)
 }
 
@@ -1679,4 +1743,70 @@ func (UtilityCommands) obfuscateFunc(lang, ext string) func(ctx *dgc.Ctx) {
 			},
 		})
 	}
+}
+
+// ReviewDB
+
+func (UtilityCommands) reviewdbtoken(ctx *dgc.Ctx) {
+	token, err := api.GetReviewDBToken(ctx.Session)
+	if err != nil {
+		embed.NewEmbed().
+			SetDescription("Error getting token: " + err.Error()).
+			Send(ctx)
+		return
+	}
+
+	embed.NewEmbed().
+		AddField("Token", token).
+		Send(ctx)
+}
+
+func (UtilityCommands) getreviews(ctx *dgc.Ctx) {
+	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
+	if !success {
+		embed.NewEmbed().
+			SetDescription("Could not find user").
+			Send(ctx)
+		return
+	}
+
+	reviews, err := api.GetReviewDBReviews(user.ID)
+	if err != nil {
+		embed.NewEmbed().
+			SetDescription("Error getting reviews: " + err.Error()).
+			Send(ctx)
+		return
+	}
+
+	reviewString := ""
+
+	for _, review := range reviews {
+		reviewString += fmt.Sprintf("**[%s] %s:**\n%s\n\n", review.Timestamp.Format(time.RFC1123), review.Username, review.Comment)
+	}
+
+	embed.NewEmbed().
+		AddField("Reviews", reviewString).
+		Send(ctx)
+}
+
+func (UtilityCommands) addreview(ctx *dgc.Ctx) {
+	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
+	if !success {
+		embed.NewEmbed().
+			SetDescription("Could not find user").
+			Send(ctx)
+		return
+	}
+
+	err := api.AddReviewDBReview(ctx.Session, user.ID, utils.String.RemoveWords(ctx.Arguments.Raw(), 1))
+	if err != nil {
+		embed.NewEmbed().
+			SetDescription("Error adding review: " + err.Error()).
+			Send(ctx)
+		return
+	}
+
+	embed.NewEmbed().
+		SetDescription("Successfully added review to " + user.Username + "!").
+		Send(ctx)
 }

@@ -8,7 +8,7 @@ import (
 	"github.com/LightningDev1/LB-Selfbot/selfbot/config"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/constants"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/embed"
-	"github.com/LightningDev1/LB-Selfbot/selfbot/eventhandlers"
+	"github.com/LightningDev1/LB-Selfbot/selfbot/eventhandlers/eventreactions"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/utils"
 	"github.com/LightningDev1/dgc"
 	"github.com/LightningDev1/discordgo"
@@ -86,7 +86,9 @@ func getNameFromArgument(arg string) string {
 	arg = strings.ReplaceAll(arg, "slashcommands", "SlashCommands")
 	arg = strings.ReplaceAll(arg, "slashcommand", "SlashCommands")
 
-	arg = strings.ReplaceAll(arg, "ai", "AI")
+	if arg == "ai" {
+		arg = "AI"
+	}
 
 	if arg == "admin" {
 		arg = "Admininstration"
@@ -271,20 +273,34 @@ func (HelpCommand) search(ctx *dgc.Ctx) {
 }
 
 func (HelpCommand) repeat(ctx *dgc.Ctx) {
-	usedCommands := eventhandlers.EventHandlers.Settings.UsedCommands
-	if len(eventhandlers.EventHandlers.Settings.UsedCommands) < 2 {
+	eventreactions.UsedCommands.Mutex.Lock()
+	defer eventreactions.UsedCommands.Mutex.Unlock()
+
+	usedCommands := eventreactions.UsedCommands.Items
+	if len(usedCommands) < 2 {
 		embed.NewEmbed().
 			SetDescription("No commands have been used yet").
 			Send(ctx)
 		return
 	}
+
 	lastCommand := usedCommands[len(usedCommands)-2]
-	lastCommand.Event = ctx.Event
 
 	// Restore arguments
-	arguments, _ := utils.Discord.GetArguments(lastCommand)
+	arguments, ok := utils.Discord.GetArguments(lastCommand)
+	if !ok {
+		return
+	}
+
 	utils.Arguments = arguments
 
 	// Invoke the last command
-	lastCommand.Command.Handler(lastCommand)
+	go lastCommand.Command.Handler(&dgc.Ctx{
+		Session:       ctx.Session,
+		Event:         ctx.Event,
+		Arguments:     lastCommand.Arguments,
+		CustomObjects: lastCommand.CustomObjects,
+		Router:        ctx.Router,
+		Command:       lastCommand.Command,
+	})
 }

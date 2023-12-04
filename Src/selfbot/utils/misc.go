@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/LightningDev1/LB-Selfbot/selfbot/http"
+	"github.com/LightningDev1/discordgo"
 )
 
 type MiscUtils struct{}
@@ -117,6 +118,11 @@ func (MiscUtils) Minimum(a, b, c int) int {
 
 func (MiscUtils) HexToRGB(hex string) (int, int, int) {
 	hex = strings.Replace(hex, "#", "", -1)
+
+	if len(hex) != 6 {
+		return Misc.HexToRGB("#C1EFFF")
+	}
+
 	r, _ := strconv.ParseInt(hex[0:2], 16, 64)
 	g, _ := strconv.ParseInt(hex[2:4], 16, 64)
 	b, _ := strconv.ParseInt(hex[4:6], 16, 64)
@@ -137,6 +143,44 @@ func (MiscUtils) CreateSawtoothWave(width, iterations int) []int {
 		}
 	}
 	return list
+}
+
+func (MiscUtils) CreateAISystemPing(system string, session *discordgo.Session, message *discordgo.Message) string {
+	if system == "" {
+		system = fmt.Sprintf("You are a Discord user named %s. A user named %s just mentioned/pinged you. You can mention/ping them back by saying `%s` The following message is what they sent. Respond to them in the style of their message or like a normal Discord user. Use as little punctuation and uppercase letters as possible.", session.State.User.Username, message.Author.Username, message.Author.Mention())
+	}
+	return system
+}
+
+func (MiscUtils) CreateAISystemPingMessages(system string, session *discordgo.Session, messages []*discordgo.Message) []any {
+	system = Misc.CreateAISystemPing(system, session, messages[len(messages)-1])
+
+	gptMessages := []any{
+		map[string]any{
+			"role":    "system",
+			"content": system,
+		},
+	}
+
+	for i := len(messages)-1; i >= 0; i-- {
+		message := messages[i]
+		
+		role := "user"
+		if message.Author.ID == session.State.User.ID {
+			role = "assistant"
+		}
+
+		gptMessages = append(gptMessages, map[string]any{
+			"role":    role,
+			"content": message.Content,
+		})
+	}
+
+	return gptMessages
+}
+
+func (MiscUtils) CreateAISystemAFK(system string, session *discordgo.Session, message *discordgo.Message) string {
+	return fmt.Sprintf("You are a Discord user named %s. A user named %s just messaged you. You can mention/ping them by saying `%s` The following message is what they sent. Respond to them in the style of their message or like a normal Discord user. Use as little punctuation and uppercase letters as possible. Extra instructions: %s", session.State.User.Username, message.Author.Username, message.Author.Mention(), system)
 }
 
 var Misc = &MiscUtils{}

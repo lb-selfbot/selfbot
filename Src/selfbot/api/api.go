@@ -298,8 +298,8 @@ type CreditCard struct {
 	Visualisation string
 }
 
-func GenerateCreditCard(ccType string) CreditCard {
-	url := fmt.Sprintf("https://api.lightning-bot.com/api/v3/misc/ccgen?type=%s", ccType)
+func GenerateCreditCard(ccType, name string) CreditCard {
+	url := fmt.Sprintf("https://api.lightning-bot.com/api/v3/misc/ccgen?type=%s&name=%s", ccType, name)
 
 	httpResult := http.Get(url)
 	if httpResult.Error != nil {
@@ -514,24 +514,32 @@ func CreateGuild(session *discordgo.Session, name, icon, guildTemplateCode strin
 
 // AI
 
-func GPT3(instructions, message string) string {
+func GPT3Custom(messages []any) (string, error) {
 	headers := map[string]string{"Authorization": "Bearer nk-wwwchatgptorguk"}
 
 	httpResponse := http.PostJson("https://gpt4.xunika.uk/api/openai/v1/chat/completions", map[string]any{
 		"model":       "gpt-3.5-turbo-16k-0613",
 		"temperature": 0.75,
-		"messages": []any{
-			map[string]any{"role": "system", "content": instructions},
-			map[string]any{"role": "user", "content": message},
-		},
+		"messages":    messages,
 	}, headers)
 	if httpResponse.Error != nil {
-		return "An error has occurred: " + httpResponse.Error.Error()
+		return "An error has occurred: " + httpResponse.Error.Error(), httpResponse.Error
 	}
 
 	content := httpResponse.Json().Get("choices").GetIndex(0).GetPath("message", "content").MustString()
 
-	return utils.Misc.Or(content, "An error has occurred")
+	if content == "" {
+		return "An error has occurred: " + httpResponse.Body, fmt.Errorf("empty response")
+	}
+
+	return content, nil
+}
+
+func GPT3(instructions, message string) (string, error) {
+	return GPT3Custom([]any{
+		map[string]any{"role": "system", "content": instructions},
+		map[string]any{"role": "user", "content": message},
+	})
 }
 
 var DefaultStyles = map[string]string{
@@ -556,36 +564,63 @@ var DefaultStyles = map[string]string{
 }
 
 var DefaultModels = map[string]string{
-	"Analog V1":                      "analog-diffusion-1.0.ckpt [9ca13f02]",
-	"Anything V3":                    "anythingv3_0-pruned.ckpt [2700c435]",
-	"Anything V4.5":                  "anything-v4.5-pruned.ckpt [65745d25]",
-	"Anything V5":                    "anythingV5_PrtRE.safetensors [893e49b9]",
-	"AbyssOrangeMix V3":              "AOM3A3_orangemixs.safetensors [9600da17]",
-	"Deliberate V2":                  "deliberate_v2.safetensors [10ec4b29]",
-	"Dreamlike Diffusion V1":         "dreamlike-diffusion-1.0.safetensors [5c9fd6e0]",
-	"Dreamlike Diffusion V2":         "dreamlike-diffusion-2.0.safetensors [fdcf65e7]",
-	"Dreamshaper 5 baked vae":        "dreamshaper_5BakedVae.safetensors [a3fbf318]",
-	"Dreamshaper 6 baked vae":        "dreamshaper_6BakedVae.safetensors [114c8abb]",
-	"Dreamshaper 7":                  "dreamshaper_7.safetensors [5cf5ae06]",
-	"Eimis Anime Diffusion V1.0":     "EimisAnimeDiffusion_V1.ckpt [4f828a15]",
-	"Elldreth's Vivid":               "elldreths-vivid-mix.safetensors [342d9d26]",
-	"Lyriel V1.5":                    "lyriel_v15.safetensors [65d547c5]",
-	"Lyriel V1.6":                    "lyriel_v16.safetensors [68fceea2]",
-	"MechaMix V1.0":                  "mechamix_v10.safetensors [ee685731]",
-	"MeinaMix Meina V9":              "meinamix_meinaV9.safetensors [2ec66ab0]",
-	"MeinaMix Meina V11":             "meinamix_meinaV11.safetensors [b56ce717]",
-	"Openjourney V4":                 "openjourney_V4.ckpt [ca2f377f]",
-	"Portrait+ V1":                   "portraitplus_V1.0.safetensors [1400e684]",
-	"Realistic Vision V1.4":          "Realistic_Vision_V1.4-pruned-fp16.safetensors [8d21810b]",
-	"Realistic Vision V2.0":          "Realistic_Vision_V2.0.safetensors [79587710]",
-	"Realistic Vision V4.0":          "Realistic_Vision_V4.0.safetensors [29a7afaa]",
-	"Redshift Diffusion V1.0":        "redshift_diffusion-V10.safetensors [1400e684]",
-	"ReV Animated V1.2.2":            "revAnimated_v122.safetensors [3f4fefd9]",
-	"SD V1.4":                        "sdv1_4.ckpt [7460a6fa]",
-	"SD V1.5":                        "v1-5-pruned-emaonly.ckpt [81761151]",
-	"Shonin's Beautiful People V1.0": "shoninsBeautiful_v10.safetensors [25d8c546]",
-	"TheAlly's Mix II":               "theallys-mix-ii-churned.safetensors [5d9225a4]",
-	"Timeless V1":                    "timeless-1.0.ckpt [7c4971d4]",
+	"3 Guofeng3 V3.4":                         "3Guofeng3_v34.safetensors [50f420de]",
+	"Absolute Reality V1.6":                   "absolutereality_V16.safetensors [37db0fc3]",
+	"Absolute Reality V1.8.1":                 "absolutereality_v181.safetensors [3d9d4d2b]",
+	"Am I Real V4.1":                          "amIReal_V41.safetensors [0a8a2e61]",
+	"Analog V1":                               "analog-diffusion-1.0.ckpt [9ca13f02]",
+	"Anything V3":                             "anythingv3_0-pruned.ckpt [2700c435]",
+	"Anything V4.5":                           "anything-v4.5-pruned.ckpt [65745d25]",
+	"Anything V5":                             "anythingV5_PrtRE.safetensors [893e49b9]",
+	"AbyssOrangeMix V3":                       "AOM3A3_orangemixs.safetensors [9600da17]",
+	"Blazing Drive V10g":                      "blazing_drive_v10g.safetensors [ca1c1eab]",
+	"CetusMix Version35":                      "cetusMix_Version35.safetensors [de2f2560]",
+	"Children's Stories V1 3D":                "childrensStories_v13D.safetensors [9dfaabcb]",
+	"Children's Stories V1 SemiReal":          "childrensStories_v1SemiReal.safetensors [a1c56dbb]",
+	"Children's Stories V1 Toon-Anime":        "childrensStories_v1ToonAnime.safetensors [2ec7b88b]",
+	"Counterfeit V3.0":                        "Counterfeit_v30.safetensors [9e2a8f19]",
+	"CuteYukimix MidChapter3":                 "cuteyukimixAdorable_midchapter3.safetensors [04bdffe6]",
+	"CyberRealistic V3.3":                     "cyberrealistic_v33.safetensors [82b0d085]",
+	"Dalcefo V4":                              "dalcefo_v4.safetensors [425952fe]",
+	"Deliberate V2":                           "deliberate_v2.safetensors [10ec4b29]",
+	"Deliberate V3":                           "deliberate_v3.safetensors [afd9d2d4]",
+	"Dreamlike Anime V1":                      "dreamlike-anime-1.0.safetensors [4520e090]",
+	"Dreamlike Diffusion V1":                  "dreamlike-diffusion-1.0.safetensors [5c9fd6e0]",
+	"Dreamlike Photoreal V2":                  "dreamlike-photoreal-2.0.safetensors [fdcf65e7]",
+	"Dreamshaper 6 baked vae":                 "dreamshaper_6BakedVae.safetensors [114c8abb]",
+	"Dreamshaper 7":                           "dreamshaper_7.safetensors [5cf5ae06]",
+	"Dreamshaper 8":                           "dreamshaper_8.safetensors [9d40847d]",
+	"Edge of Realism EOR V2.0":                "edgeOfRealism_eorV20.safetensors [3ed5de15]",
+	"Eimis Anime Diffusion V1.0":              "EimisAnimeDiffusion_V1.ckpt [4f828a15]",
+	"Elldreth's Vivid":                        "elldreths-vivid-mix.safetensors [342d9d26]",
+	"EpiCRealism Natural Sin RC1":             "epicrealism_naturalSinRC1VAE.safetensors [90a4c676]",
+	"I Cant Believe Its Not Photography Seco": "ICantBelieveItsNotPhotography_seco.safetensors [4e7a3dfd]",
+	"Juggernaut Aftermath":                    "juggernaut_aftermath.safetensors [5e20c455]",
+	"Lofi V4":                                 "lofi_v4.safetensors [ccc204d6]",
+	"Lyriel V1.6":                             "lyriel_v16.safetensors [68fceea2]",
+	"MajicMix Realistic V4":                   "majicmixRealistic_v4.safetensors [29d0de58]",
+	"MechaMix V1.0":                           "mechamix_v10.safetensors [ee685731]",
+	"MeinaMix Meina V9":                       "meinamix_meinaV9.safetensors [2ec66ab0]",
+	"MeinaMix Meina V11":                      "meinamix_meinaV11.safetensors [b56ce717]",
+	"Neverending Dream V1.22":                 "neverendingDream_v122.safetensors [f964ceeb]",
+	"Openjourney V4":                          "openjourney_V4.ckpt [ca2f377f]",
+	"Pastel-Mix":                              "pastelMixStylizedAnime_pruned_fp16.safetensors [793a26e8]",
+	"Portrait+ V1":                            "portraitplus_V1.0.safetensors [1400e684]",
+	"Protogen x3.4":                           "protogenx34.safetensors [5896f8d5]",
+	"Realistic Vision V1.4":                   "Realistic_Vision_V1.4-pruned-fp16.safetensors [8d21810b]",
+	"Realistic Vision V2.0":                   "Realistic_Vision_V2.0.safetensors [79587710]",
+	"Realistic Vision V4.0":                   "Realistic_Vision_V4.0.safetensors [29a7afaa]",
+	"Realistic Vision V5.0":                   "Realistic_Vision_V5.0.safetensors [614d1063]",
+	"Redshift Diffusion V1.0":                 "redshift_diffusion-V10.safetensors [1400e684]",
+	"ReV Animated V1.2.2":                     "revAnimated_v122.safetensors [3f4fefd9]",
+	"RunDiffusion FX 2.5D V1.0":               "rundiffusionFX25D_v10.safetensors [cd12b0ee]",
+	"RunDiffusion FX Photorealistic V1.0":     "rundiffusionFX_v10.safetensors [cd4e694d]",
+	"SD V1.4":                                 "sdv1_4.ckpt [7460a6fa]",
+	"SD V1.5":                                 "v1-5-pruned-emaonly.safetensors [d7049739]",
+	"Shonin's Beautiful People V1.0":          "shoninsBeautiful_v10.safetensors [25d8c546]",
+	"TheAlly's Mix II":                        "theallys-mix-ii-churned.safetensors [5d9225a4]",
+	"Timeless V1":                             "timeless-1.0.ckpt [7c4971d4]",
+	"ToonYou Beta 6":                          "toonyou_beta6.safetensors [980f6b15]",
 }
 
 func GetImageModels() map[string]string {
@@ -606,12 +641,14 @@ func GetImageModels() map[string]string {
 		return DefaultModels
 	}
 
-	models := regexp.MustCompile(`VUE_APP_AI_MODELS:'(.*?)'`).FindStringSubmatch(httpResponse.Body)
-	if len(models) < 2 {
+	modelsList := regexp.MustCompile(`VUE_APP_AI_MODELS:'(.*?)',`).FindSubmatch(httpResponse.BodyBytes)
+	if len(modelsList) < 2 {
 		return DefaultModels
 	}
 
-	_ = json.Unmarshal([]byte(models[1]+"a"), &DefaultModels)
+	models := bytes.ReplaceAll(modelsList[1], []byte(`\'`), []byte(`'`))
+
+	_ = json.Unmarshal(models, &DefaultModels)
 
 	return DefaultModels
 }
@@ -627,7 +664,7 @@ func CreateImageJob(prompt, negPrompt, model string) (string, error) {
 		"steps":           {"30"},
 		"cfg":             {"9.5"},
 		"seed":            {strconv.Itoa(seed)},
-		"sampler":         {"Euler"},
+		"sampler":         {"DPM++ 2M Karras"},
 		"aspect_ratio":    {"square"},
 	}
 
@@ -681,7 +718,7 @@ func GenerateImage(prompt, negPrompt, model string) (*bytes.Reader, error) {
 	}
 
 	start := time.Now()
-	maxDuration := 20 * time.Second
+	maxDuration := 30 * time.Second
 
 	for {
 		time.Sleep(500 * time.Millisecond)
@@ -709,4 +746,95 @@ func GenerateImage(prompt, negPrompt, model string) (*bytes.Reader, error) {
 	}
 
 	return bytes.NewReader(httpResponse.BodyBytes), nil
+}
+
+// ReviewDB
+
+var reviewDBToken string
+
+func GetReviewDBToken(session *discordgo.Session) (string, error) {
+	if reviewDBToken != "" {
+		return reviewDBToken, nil
+	}
+
+	authorizeUrl := "https://discord.com/api/v9/oauth2/authorize?client_id=915703782174752809&response_type=code&redirect_uri=https%3A%2F%2Fmanti.vendicated.dev%2Fapi%2Freviewdb%2Fauth&scope=identify"
+
+	rawData, err := session.Request("POST", authorizeUrl, map[string]any{
+		"authorize":    true,
+		"permissions":  "0",
+		"user_install": false,
+	})
+	if err != nil {
+		return "", err
+	}
+
+	var data map[string]any
+	err = json.Unmarshal(rawData, &data)
+	if err != nil {
+		return "", err
+	}
+
+	location, ok := data["location"].(string)
+	if !ok {
+		return "", fmt.Errorf("invalid response: no location: %s", string(rawData))
+	}
+
+	apiData, err := http.GetJson(location + "&clientMod=vencord")
+	if err != nil {
+		return "", err
+	}
+
+	token := apiData.Get("token").MustString()
+	if token == "" {
+		return "", fmt.Errorf("invalid response: no token")
+	}
+
+	return token, nil
+}
+
+type Review struct {
+	ID        int64
+	Username  string
+	Comment   string
+	Timestamp time.Time
+}
+
+func GetReviewDBReviews(userID string) ([]Review, error) {
+	data, err := http.GetJson("https://manti.vendicated.dev/api/reviewdb/users/" + userID + "/reviews?flags=0&offset=0")
+	if err != nil {
+		return nil, err
+	}
+
+	if !data.Get("success").MustBool() {
+		return nil, fmt.Errorf("invalid response: %s", data.Get("message").MustString())
+	}
+
+	rawReviews := data.Get("reviews")
+	reviews := []Review{}
+
+	for i := 0; i < len(rawReviews.MustArray()); i++ {
+		review := rawReviews.GetIndex(i)
+
+		reviews = append(reviews, Review{
+			ID:        review.Get("id").MustInt64(),
+			Username:  review.GetPath("sender", "username").MustString(),
+			Comment:   review.Get("comment").MustString(),
+			Timestamp: time.Unix(review.Get("timestamp").MustInt64(), 0),
+		})
+	}
+
+	return reviews, nil
+}
+
+func AddReviewDBReview(session *discordgo.Session, userID, review string) error {
+	token, err := GetReviewDBToken(session)
+	if err != nil {
+		return err
+	}
+
+	return http.PutJson("https://manti.vendicated.dev/api/reviewdb/users/"+userID+"/reviews", map[string]any{
+		"token":   strings.TrimSpace(token),
+		"comment": review,
+		"userid":  userID,
+	}).Error
 }

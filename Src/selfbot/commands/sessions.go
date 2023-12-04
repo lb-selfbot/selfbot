@@ -35,13 +35,21 @@ func (s *SessionsCommands) RegisterCommands(router *dgc.Router, mainSession *dis
 func (s *SessionsCommands) viewgatewaysessions(ctx *dgc.Ctx) {
 	emb := embed.NewEmbed().SetDescription("Sessions")
 	for index, session := range sessions.GatewaySessions {
+		var activity string
+		if len(session.Activities) > 0 {
+			activity = session.Activities[0].Name
+		} else {
+			activity = "None"
+		}
+
 		emb.AddField(
 			fmt.Sprintf("Session %d", index+1),
 			fmt.Sprintf(
-				"Session ID: %s\nOS: %s\nClient: %s",
+				"Session ID: %s\nOS: %s\nClient: %s\nActivity: %s",
 				session.SessionID,
 				utils.String.Capitalize(session.ClientInfo.OS),
 				utils.String.Capitalize(session.ClientInfo.Client),
+				activity,
 			),
 		)
 	}

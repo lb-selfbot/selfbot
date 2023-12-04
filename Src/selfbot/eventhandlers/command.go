@@ -2,6 +2,7 @@ package eventhandlers
 
 import (
 	"github.com/LightningDev1/LB-Selfbot/selfbot/config"
+	"github.com/LightningDev1/LB-Selfbot/selfbot/eventhandlers/eventreactions"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/logging"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/utils"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/websocket"
@@ -27,7 +28,7 @@ func (e *Events) OnCommand(following dgc.ExecutionHandler) dgc.ExecutionHandler 
 
 		utils.Arguments = arguments
 
-		e.Settings.UsedCommands = append(e.Settings.UsedCommands, ctx)
+		eventreactions.UsedCommands.Add(ctx)
 
 		logging.Logging.CommandUsed(ctx.Command.Name)
 

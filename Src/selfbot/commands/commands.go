@@ -38,7 +38,7 @@ type CommandRegistrar struct {
 	HelpCommand            HelpCommand
 }
 
-func (c CommandRegistrar) RegisterCommands(session *discordgo.Session, router *dgc.Router) {
+func (c CommandRegistrar) RegisterCommands(session *discordgo.Session, router *dgc.Router, registerHelp bool) {
 	c.TextCommands.RegisterCommands(router)
 	c.EncodingCommands.RegisterCommands(router)
 	c.CodeblockCommands.RegisterCommands(router)
@@ -68,7 +68,9 @@ func (c CommandRegistrar) RegisterCommands(session *discordgo.Session, router *d
 	c.SharingCommands.RegisterCommands(router)
 	c.ProtectionsCommands.RegisterCommands(router)
 	c.ConfigCommands.RegisterCommands(router)
-	c.HelpCommand.RegisterHelpCommand(router, session)
+	if registerHelp {
+		c.HelpCommand.RegisterHelpCommand(router, session)
+	}
 }
 
 var Commands = CommandRegistrar{}

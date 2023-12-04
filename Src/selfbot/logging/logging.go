@@ -176,16 +176,20 @@ func (_Logging) DMEditNotifier(message *discordgo.Message) {
 		Show()
 }
 
-func (_Logging) DMDeleteNotifier(message *discordgo.Message) {
+func (_Logging) DMDeleteNotifier(message *discordgo.Message, attachments []string) {
 	UI.Notification("DM Delete Notifier: Deleted DM from " + message.Author.String())
 	cfg, _ := config.GetConfig()
-	NewConsoleMessage().
+	c := NewConsoleMessage().
 		SetTitle("DM Delete Notifier").
 		SetColor("#C1EFFF").
 		AddInfo("", "Deleted DM from "+message.Author.String()).
-		AddInfo("Content", message.Content).
-		SetWebhookURL(cfg.Webhooks.Notifiers).
-		Show()
+		AddInfo("Content", message.Content)
+
+	if len(attachments) > 0 {
+		c.AddInfo("Attachments", strings.Join(attachments, ", "))
+	}
+
+	c.SetWebhookURL(cfg.Webhooks.Notifiers).Show()
 }
 
 func (_Logging) DMTypingNotifier(userName string) {
@@ -199,20 +203,24 @@ func (_Logging) DMTypingNotifier(userName string) {
 		Show()
 }
 
-func (_Logging) MessageDeleteNotifier(session *discordgo.Session, message *discordgo.Message) {
+func (_Logging) MessageDeleteNotifier(session *discordgo.Session, message *discordgo.Message, attachments []string) {
 	guildName := utils.Discord.GetGuildName(session, message.GuildID)
 	channelName := utils.Discord.GetChannelName(session, message.ChannelID)
 	UI.Notification("Message Delete Notifier: Deleted message from " + message.Author.String())
 	cfg, _ := config.GetConfig()
-	NewConsoleMessage().
+	c := NewConsoleMessage().
 		SetTitle("Message Delete Notifier").
 		SetColor("#C1EFFF").
 		AddInfo("", "Deleted message from "+message.Author.String()).
 		AddInfo("Content", message.Content).
 		AddInfo("Server", guildName).
-		AddInfo("Channel", channelName).
-		SetWebhookURL(cfg.Webhooks.Notifiers).
-		Show()
+		AddInfo("Channel", channelName)
+
+	if len(attachments) > 0 {
+		c.AddInfo("Attachments", strings.Join(attachments, ", "))
+	}
+
+	c.SetWebhookURL(cfg.Webhooks.Notifiers).Show()
 }
 
 func (_Logging) DiscordStaffDetection(session *discordgo.Session, message *discordgo.Message) {
@@ -445,8 +453,30 @@ func (_Logging) SlashCommandJobs(amount int) {
 		info += "s"
 	}
 
+	UI.Notification(info)
 	NewConsoleMessage().
 		SetTitle("Slash Commands").
+		SetColor("#C1EFFF").
+		AddInfo("", info).
+		SetWebhookURL(cfg.Webhooks.Misc).
+		Show()
+}
+
+func (_Logging) EventReactions(amount int) {
+	cfg, err := config.GetConfig()
+	if err != nil {
+		return
+	}
+
+	info := fmt.Sprintf("Initialized %d event reaction", amount)
+
+	if amount > 1 {
+		info += "s"
+	}
+
+	UI.Notification(info)
+	NewConsoleMessage().
+		SetTitle("Event Reactions").
 		SetColor("#C1EFFF").
 		AddInfo("", info).
 		SetWebhookURL(cfg.Webhooks.Misc).
@@ -461,6 +491,7 @@ func (_Logging) BlockedDangerousCommand(user *discordgo.User, command string) {
 
 	info := fmt.Sprintf("Blocked %s from using a dangerous command (%s)", user.DisplayName, command)
 
+	UI.Notification(info)
 	NewConsoleMessage().
 		SetTitle("Sharing").
 		SetColor("#C1EFFF").
@@ -481,6 +512,28 @@ func (_Logging) BlockedHostingDangerousCommand(command string) {
 		SetTitle("LightningBot Hosting").
 		SetColor("#C1EFFF").
 		AddInfo("", info).
+		SetWebhookURL(cfg.Webhooks.Misc).
+		Show()
+}
+
+func (_Logging) KeywordNotifier(session *discordgo.Session, message *discordgo.Message, keyword string) {
+	cfg, err := config.GetConfig()
+	if err != nil {
+		return
+	}
+
+	guildName := utils.Discord.GetGuildName(session, message.GuildID)
+	channelName := utils.Discord.GetChannelName(session, message.ChannelID)
+
+	UI.Notification("Keyword Notifier: Keyword sent by " + message.Author.Username + "\nServer: " + guildName + "\nChannel: " + channelName + "\nKeyword: " + keyword)
+	NewConsoleMessage().
+		SetTitle("Keyword Notifier").
+		SetColor("#C1EFFF").
+		AddInfo("", "Keyword found").
+		AddInfo("Server", guildName).
+		AddInfo("Channel", channelName).
+		AddInfo("Author", message.Author.String()).
+		AddInfo("Keyword", keyword).
 		SetWebhookURL(cfg.Webhooks.Misc).
 		Show()
 }

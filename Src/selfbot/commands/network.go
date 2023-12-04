@@ -55,6 +55,12 @@ func (n NetworkCommands) RegisterCommands(router *dgc.Router) {
 		Handler:     n.urbandictionary,
 	})
 	router.RegisterCmd(&dgc.Command{
+		Name:        "define",
+		Description: "Define a word",
+		Usage:       "[p]define <word>",
+		Handler:     n.define,
+	})
+	router.RegisterCmd(&dgc.Command{
 		Name:        "wikipedia",
 		Description: "Search someting on Wikipedia",
 		Usage:       "[p]wikipedia <query>",
@@ -314,6 +320,50 @@ func (NetworkCommands) urbandictionary(ctx *dgc.Ctx) {
 		Send(ctx)
 }
 
+func (NetworkCommands) define(ctx *dgc.Ctx) {
+	url := fmt.Sprintf(
+		"https://api.dictionaryapi.dev/api/v2/entries/en/%s",
+		url.QueryEscape(ctx.Arguments.Raw()),
+	)
+
+	httpResponse := http.Get(url)
+	if httpResponse.Error != nil {
+		_ = ctx.RespondText("An error has occurred.")
+		return
+	}
+
+	list := httpResponse.Json()
+
+	if len(list.MustArray()) == 0 {
+		_ = ctx.RespondText("No results found.")
+		return
+	}
+
+	result := list.GetIndex(0)
+
+	meanings := utils.Map(result.Get("meanings").MustArray(), func(obj any) string {
+		meaning := obj.(map[string]any)
+		definitions := meaning["definitions"].([]any)
+
+		if len(definitions) == 0 {
+			return ""
+		}
+
+		definition := definitions[0].(map[string]any)["definition"].(string)
+
+		return fmt.Sprintf("**%s**: %s", meaning["partOfSpeech"].(string), definition)
+	})
+
+	meanings = utils.Filter(meanings, func(obj string) bool {
+		return obj != ""
+	})
+
+	embed.NewEmbed().
+		AddField("Word", ctx.Arguments.Raw()).
+		AddField("Meanings", strings.Join(meanings, "\n")).
+		Send(ctx)
+}
+
 func (NetworkCommands) wikipedia(ctx *dgc.Ctx) {
 	query := ctx.Arguments.Raw()
 	article, err := api.WikipediaSearch(query)
@@ -389,18 +439,23 @@ func (NetworkCommands) ipinfo(ctx *dgc.Ctx) {
 
 	ipinfo := httpResponse.Json()
 
-	if ipinfo.Get("hostname").MustInt(0) == 404 {
+	if ipinfo.Get("status").MustInt(0) == 404 {
 		_ = ctx.RespondText("No results found.")
 		return
 	}
 
+	location := fmt.Sprintf(
+		"%s, %s, %s (postal code %s) (coordinates %s)",
+		ipinfo.Get("city").MustString(), ipinfo.Get("region").MustString(),
+		ipinfo.Get("country").MustString(), ipinfo.Get("postal").MustString(),
+		ipinfo.Get("loc").MustString(),
+	)
+
 	embed.NewEmbed().
 		AddField("IP", utils.Arguments["<ip>"]).
 		AddField("Hostname", ipinfo.Get("hostname").MustString()).
-		AddField("City", ipinfo.Get("city").MustString()).
-		AddField("Region", ipinfo.Get("region").MustString()).
-		AddField("Country", ipinfo.Get("country").MustString()).
-		AddField("Location", ipinfo.Get("loc").MustString()).
+		AddField("Timezone", ipinfo.Get("timezone").MustString()).
+		AddField("Location", location).
 		Send(ctx)
 }
 
@@ -464,9 +519,13 @@ func (NetworkCommands) youtubedl(ctx *dgc.Ctx) {
 }
 
 func (NetworkCommands) lvbypass(ctx *dgc.Ctx) {
-	httpResponse := http.PostJson("https://api.bypass.vip/", map[string]string{"url": ctx.Arguments.Raw()})
+	resp, err := http.GetJson("https://bypass.pm/bypass2?url=" + ctx.Arguments.Raw())
+	if err != nil {
+		_ = ctx.RespondText("An error has occurred: " + err.Error())
+		return
+	}
 
-	destination := httpResponse.Json().Get("destination").MustString()
+	destination := resp.Get("destination").MustString()
 
 	embed.NewEmbed().
 		AddField("URL", ctx.Arguments.Raw()).
@@ -634,21 +693,21 @@ func (NetworkCommands) amazon(ctx *dgc.Ctx) {
 func (NetworkCommands) steam(ctx *dgc.Ctx) {
 	query := ctx.Arguments.Raw()
 	embed.NewEmbed().
-		AddField("Amazon Search", fmt.Sprintf("https://store.steampowered.com/search/?term=%s", url.QueryEscape(query))).
+		AddField("Steam Search", fmt.Sprintf("https://store.steampowered.com/search/?term=%s", url.QueryEscape(query))).
 		Send(ctx)
 }
 
 func (NetworkCommands) github(ctx *dgc.Ctx) {
 	query := ctx.Arguments.Raw()
 	embed.NewEmbed().
-		AddField("Amazon Search", fmt.Sprintf("https://github.com/search?q=%s", url.QueryEscape(query))).
+		AddField("GitHub Search", fmt.Sprintf("https://github.com/search?q=%s", url.QueryEscape(query))).
 		Send(ctx)
 }
 
 func (NetworkCommands) stackoverflow(ctx *dgc.Ctx) {
 	query := ctx.Arguments.Raw()
 	embed.NewEmbed().
-		AddField("Amazon Search", fmt.Sprintf("https://stackoverflow.com/search?q=%s", url.QueryEscape(query))).
+		AddField("Stack Overflow Search", fmt.Sprintf("https://stackoverflow.com/search?q=%s", url.QueryEscape(query))).
 		Send(ctx)
 }
 

@@ -1,0 +1,152 @@
+package eventreactions
+
+import (
+	"fmt"
+	"math/rand"
+	"strings"
+	"time"
+
+	"github.com/LightningDev1/LB-Selfbot/selfbot/api"
+	"github.com/LightningDev1/LB-Selfbot/selfbot/config"
+	"github.com/LightningDev1/LB-Selfbot/selfbot/utils"
+	"github.com/LightningDev1/discordgo"
+)
+
+type AFK struct{}
+
+func NewAFK() *AFK {
+	return &AFK{}
+}
+
+func (a *AFK) Type() EventReactionType {
+	return AFK_RESPONDER
+}
+
+func (a *AFK) Description() string {
+	return "AFK Responder (default)"
+}
+
+func (a *AFK) Equals(other EventReaction) bool {
+	_, ok := other.(*AFK)
+
+	return ok
+}
+
+func (a *AFK) HandleLastActivity(session *discordgo.Session, m *discordgo.Message) {
+	if m.Author.ID == session.State.User.ID && !IsEventReactionMessage(m) {
+		LastActivity = time.Now()
+	}
+}
+
+func (a *AFK) IsActive(cfg *config.Config) bool {
+	if !cfg.AFK.MustBeInactive {
+		return false
+	}
+
+	inactiveTimeout := time.Duration(cfg.AFK.InactiveTimeout) * time.Second
+
+	return time.Since(LastActivity) < inactiveTimeout
+}
+
+func (a *AFK) Data() map[string]any {
+	return map[string]any{}
+}
+
+func (a *AFK) GetAFKMessage(m *discordgo.Message, message string) string {
+	message = strings.ReplaceAll(message, "$USER", m.Author.Username)
+	message = strings.ReplaceAll(message, "$MENTION", m.Author.Mention())
+	message = strings.ReplaceAll(message, "$MSGLINK", utils.Discord.GetMessageLink(m))
+	message = strings.ReplaceAll(message, "$MSGCONTENT", m.ContentWithMentionsReplaced())
+	message = strings.ReplaceAll(message, "$AFKSINCE", fmt.Sprintf("<t:%d:R>", LastActivity.Unix()))
+
+	return message
+}
+
+func (a *AFK) Handler(session *discordgo.Session, event any) {
+	message, ok := event.(*discordgo.MessageCreate)
+	if !ok {
+		utils.Logging.Debug("AFK.Handler: Event is not a message create event")
+		return
+	}
+
+	a.HandleLastActivity(session, message.Message)
+
+	cfg, err := config.GetConfig()
+	if err != nil {
+		utils.Logging.Debug("AFK.Handler: Error getting config: " + err.Error())
+		return
+	}
+
+	pinged := false
+	for _, mention := range message.Mentions {
+		if mention.ID == session.State.User.ID {
+			pinged = true
+		}
+	}
+
+	activatedOnPing := cfg.AFK.OnPing && pinged
+	activatedOnDM := cfg.AFK.OnDM && message.GuildID == "" && (message.Type == discordgo.MessageTypeDefault || message.Type == discordgo.MessageTypeReply)
+
+	if !activatedOnPing && !activatedOnDM {
+		return
+	}
+
+	// Check if AFK is enabled
+	if !cfg.AFK.Enabled || message.Author.ID == session.State.User.ID {
+		return
+	}
+
+	// Check if AFK is triggered here
+	if !cfg.AFK.TriggerList.IsTriggered(session, message.Author.ID, message.GuildID) {
+		return
+	}
+
+	if a.IsActive(&cfg) {
+		return
+	}
+
+	_ = session.MessageAck(message.ChannelID, message.ID)
+
+	if cfg.AFK.Delay > 0 {
+		delay := cfg.AFK.Delay
+
+		// Random delay
+		if cfg.AFK.RandomDelay && delay > 0 {
+			delay = rand.Intn(delay)
+		}
+
+		if cfg.AFK.Typing {
+			utils.Discord.SleepWithTyping(session, message.ChannelID, time.Second*time.Duration(delay))
+		} else {
+			time.Sleep(time.Second * time.Duration(delay))
+		}
+
+	}
+
+	time.Sleep(2 * time.Second)
+
+	if a.IsActive(&cfg) {
+		return
+	}
+
+	afkMessage := a.GetAFKMessage(message.Message, cfg.AFK.Message)
+	if cfg.AFK.AI {
+		instructions := utils.Misc.CreateAISystemAFK(afkMessage, session, message.Message)
+
+		message.Content = strings.ReplaceAll(message.Content, session.State.User.Mention(), message.Author.Mention())
+
+		afkMessage, err = api.GPT3(instructions, message.Content)
+		if err != nil {
+			utils.Logging.Error("AFK.Handler: Error getting AI response: " + err.Error())
+			return
+		}
+	}
+
+	if cfg.AFK.Reply {
+		m, err := session.ChannelMessageSendReply(message.ChannelID, afkMessage, message.Reference())
+		HandleMessage(m, err)
+	} else {
+		m, err := session.ChannelMessageSend(message.ChannelID, afkMessage)
+		HandleMessage(m, err)
+	}
+}

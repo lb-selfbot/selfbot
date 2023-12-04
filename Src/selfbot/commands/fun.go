@@ -405,12 +405,6 @@ func (f FunCommands) RegisterCommands(router *dgc.Router) {
 		Handler:     f.rickroll,
 	})
 	router.RegisterCmd(&dgc.Command{
-		Name:        "impersonate",
-		Description: "Impersonate a user using a webhook",
-		Usage:       "[p]impersonate <user> <text>",
-		Handler:     f.impersonate,
-	})
-	router.RegisterCmd(&dgc.Command{
 		Name:        "coinflip",
 		Description: "Flip a coin",
 		Usage:       "[p]coinflip",
@@ -1207,35 +1201,6 @@ func (FunCommands) rickrollurl(ctx *dgc.Ctx) {
 
 func (FunCommands) rickroll(ctx *dgc.Ctx) {
 	_ = ctx.RespondText("**We're no strangers to love\nYou know the rules and so do I\nA full commitment's what I'm thinking of\nYou wouldn't get this from any other guy\nI just wanna tell you how I'm feeling\nGotta make you understand\nNever gonna give you up\nNever gonna let you down\nNever gonna run around and desert you\nNever gonna make you cry\nNever gonna say goodbye\nNever gonna tell a lie and hurt you\nWe've known each other for so long\nYour heart's been aching but you're too shy to say it\nInside we both know what's been going on\nWe know the game and we're gonna play it\nAnd if you ask me how I'm feeling\nDon't tell me you're too blind to see\nNever gonna give you up\nNever gonna let you down\nNever gonna run around and desert you\nNever gonna make you cry\nNever gonna say goodbye\nNever gonna tell a lie and hurt you\nNever gonna give you up\nNever gonna let you down\nNever gonna run around and desert you\nNever gonna make you cry\nNever gonna say goodbye\nNever gonna tell a lie and hurt you\nNever gonna give, never gonna give\n(Give you up)\n(Ooh) Never gonna give, never gonna give\n(Give you up)\nWe've known each other for so long\nYour heart's been aching but you're too shy to say it\nInside we both know what's been going on\nWe know the game and we're gonna play it\nI just wanna tell you how I'm feeling\nGotta make you understand\nNever gonna give you up\nNever gonna let you down\nNever gonna run around and desert you\nNever gonna make you cry\nNever gonna say goodbye\nNever gonna tell a lie and hurt you\nNever gonna give you up\nNever gonna let you down\nNever gonna run around and desert you\nNever gonna make you cry\nNever gonna say goodbye\nNever gonna tell a lie and hurt you\nNever gonna give you up\nNever gonna let you down\nNever gonna run around and desert you\nNever gonna make you cry**")
-}
-
-func (FunCommands) impersonate(ctx *dgc.Ctx) {
-	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
-	if !success {
-		_ = ctx.RespondText("Could not find user.")
-		return
-	}
-	text := utils.String.RemoveWords(ctx.Arguments.Raw(), 1)
-	webhooks, err := ctx.Session.ChannelWebhooks(ctx.Event.ChannelID)
-	if err != nil {
-		_ = ctx.RespondText("You need the manage_webhooks permission to use this command.")
-		return
-	}
-	var webhook *discordgo.Webhook
-	if len(webhooks) == 0 {
-		webhook, err = ctx.Session.WebhookCreate(ctx.Event.ChannelID, "Impersonate", "")
-		if err != nil {
-			_ = ctx.RespondText("An error has occurred creating a webhook.")
-			return
-		}
-	} else {
-		webhook = webhooks[0]
-	}
-	_, _ = ctx.Session.WebhookExecute(webhook.ID, webhook.Token, false, &discordgo.WebhookParams{
-		Username:  user.Username,
-		AvatarURL: user.AvatarURL(""),
-		Content:   text,
-	})
 }
 
 func (FunCommands) coinflip(ctx *dgc.Ctx) {

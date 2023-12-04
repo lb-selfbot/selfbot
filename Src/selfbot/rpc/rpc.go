@@ -8,6 +8,7 @@ import (
 	"github.com/LightningDev1/LB-Selfbot/selfbot/constants"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/logging"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/sessions"
+	"github.com/LightningDev1/LB-Selfbot/selfbot/utils"
 	"github.com/LightningDev1/discordgo"
 	"github.com/hugolgst/rich-go/client"
 )
@@ -90,6 +91,7 @@ func getSecrets(cfg *config.Config) *client.Secrets {
 
 func parseText(text string) string {
 	text = strings.ReplaceAll(text, "$VERSION", constants.VERSION)
+	text = strings.ReplaceAll(text, "$UPTIME", utils.Misc.FormatDuration(time.Since(constants.START_TIME)))
 
 	return text
 }

@@ -1,0 +1,509 @@
+package eventreactions
+
+import (
+	"encoding/json"
+	"strings"
+	"sync"
+	"time"
+
+	"github.com/LightningDev1/LB-Selfbot/selfbot/config"
+	"github.com/LightningDev1/LB-Selfbot/selfbot/logging"
+	"github.com/LightningDev1/LB-Selfbot/selfbot/utils"
+	"github.com/LightningDev1/dgc"
+	"github.com/LightningDev1/discordgo"
+)
+
+// Event reaction types
+
+type EventReactionType int
+
+const (
+	// Ignore reactions
+	IGNORE_USER EventReactionType = iota
+	IGNORE_GUILD
+
+	// Ping reactions
+	PING_PING
+	PING_KICK
+	PING_BAN
+	PING_MUTE
+	PING_TIMEOUT
+	PING_INSULT
+	PING_RESPONSE
+	PING_AI_RESPONSE
+
+	// Mirror reactions
+	MIRROR_GUILD
+	MIRROR_CHANNEL
+
+	// Responder reactions
+	RESPONDER
+	AI_RESPONDER
+
+	// Message reactions
+	COPY
+	REPLY_COPY
+	MOCK
+	PIN_SPAM
+	REACT_SPAM
+	DELETE_MESSAGES
+	KEYWORD_NOTIFIER
+
+	// AFK
+	AFK_RESPONDER
+
+	// Phishing
+	ANTI_PHISHING
+
+	// Protections
+	PROTECTIONS
+
+	// Notifiers
+	NOTIFIERS
+
+	// Selfbot detection
+	SELFBOT_DETECTION
+
+	// Remove reactions
+	REMOVE_REACTIONS
+
+	// Force disconnect
+	FORCE_DISCONNECT
+
+	// Force nick
+	FORCE_NICK
+
+	// Force kick
+	FORCE_KICK
+
+	// No leave
+	NO_LEAVE
+
+	// Anti group chat
+	ANTI_GROUP_CHAT
+)
+
+func defaultEventReactions() []EventReaction {
+	return []EventReaction{
+		NewAFK(),
+		NewPhishing(),
+		NewNotifiers(),
+		NewProtections(),
+		NewSelfbotDetection(),
+	}
+}
+
+// ReactionsMutex is a mutex for the list of active event reactions
+var ReactionsMutex sync.Mutex
+
+// ActiveReactions is a list of currently active event reactions
+var ActiveReactions = []EventReaction{}
+
+// PinSpamMessages is a list of messages that are pinned by the pin spam reaction
+var PinSpamMessages = utils.NewList[*discordgo.Message]()
+
+// EventReactionMessages is a list of messages that are created by event reactions
+var EventReactionMessages = utils.NewList[*discordgo.Message]()
+
+// EditedMessages is a map of messages that are edited by users in a channel
+var EditedMessages = sync.Map{}
+
+// DeletedMessages is a map of messages that are deleted by users in a channel
+var DeletedMessages = sync.Map{}
+
+// UsedCommands is a list of commands that have been used
+var UsedCommands = utils.NewList[*dgc.Ctx]()
+
+// TimeDifference is the time difference between the local time and the Discord time
+var TimeDifference time.Duration = 0
+
+// LastActivity is the last time the user was active (used for AFK inactive timeout)
+var LastActivity = time.Now()
+
+var OnConfigUpdate func(cfg *config.Config)
+
+// EventReaction is an interface for event reactions
+type EventReaction interface {
+	Type() EventReactionType
+	Description() string
+	Equals(other EventReaction) bool
+	Data() map[string]any
+	Handler(session *discordgo.Session, event any)
+}
+
+// Persistence
+func StartLoading(session *discordgo.Session) {
+	err := Load(session, true)
+	if err != nil {
+		utils.Logging.Error("Failed to load event reactions:", err.Error())
+	}
+
+	for {
+		time.Sleep(time.Second * 5)
+
+		err = Load(session, false)
+		if err != nil {
+			utils.Logging.Error("Failed to load event reactions:", err.Error())
+		}
+	}
+}
+func Load(session *discordgo.Session, first bool) error {
+	ReactionsMutex.Lock()
+	defer ReactionsMutex.Unlock()
+
+	cfg, err := config.GetConfig()
+	if err != nil {
+		return err
+	}
+
+	var reactions []struct {
+		Type EventReactionType `json:"Type"`
+		Data map[string]any    `json:"Data"`
+	}
+	_ = json.Unmarshal(cfg.EventReactions, &reactions)
+
+	ActiveReactions = defaultEventReactions()
+	oldLength := len(ActiveReactions)
+
+	for _, reaction := range reactions {
+		switch reaction.Type {
+		case IGNORE_USER, IGNORE_GUILD:
+			ignore, err := NewIgnoreFromData(session, reaction.Data)
+			if err == nil {
+				ActiveReactions = append(ActiveReactions, ignore)
+			}
+		case PING_PING, PING_KICK, PING_BAN, PING_MUTE, PING_TIMEOUT, PING_INSULT, PING_RESPONSE, PING_AI_RESPONSE:
+			ping, err := NewPingFromData(session, reaction.Type, reaction.Data)
+			if err == nil {
+				ActiveReactions = append(ActiveReactions, ping)
+			}
+		case MIRROR_GUILD, MIRROR_CHANNEL:
+			mirror, err := NewMirrorFromData(session, reaction.Data)
+			if err == nil {
+				ActiveReactions = append(ActiveReactions, mirror)
+			}
+		case RESPONDER, AI_RESPONDER, COPY, REPLY_COPY, MOCK, PIN_SPAM, REACT_SPAM, DELETE_MESSAGES, KEYWORD_NOTIFIER:
+			responder, err := NewMessageReactionFromData(session, reaction.Type, reaction.Data)
+			if err == nil {
+				ActiveReactions = append(ActiveReactions, responder)
+			}
+		case REMOVE_REACTIONS:
+			remove, err := NewRemoveReactionsFromData(session, reaction.Data)
+			if err == nil {
+				ActiveReactions = append(ActiveReactions, remove)
+			}
+		case FORCE_DISCONNECT:
+			forceDisconnect, err := NewForceDisconnectFromData(session, reaction.Data)
+			if err == nil {
+				ActiveReactions = append(ActiveReactions, forceDisconnect)
+			}
+		case FORCE_NICK:
+			forceNick, err := NewForceNickFromData(session, reaction.Data)
+			if err == nil {
+				ActiveReactions = append(ActiveReactions, forceNick)
+			}
+		case FORCE_KICK:
+			forceKick, err := NewForceKickFromData(session, reaction.Data)
+			if err == nil {
+				ActiveReactions = append(ActiveReactions, forceKick)
+			}
+		case NO_LEAVE:
+			noLeave, err := NewNoLeaveFromData(session, reaction.Data)
+			if err == nil {
+				ActiveReactions = append(ActiveReactions, noLeave)
+			}
+		case ANTI_GROUP_CHAT:
+			antiGroupChat, err := NewAntiGroupChatFromData(session, reaction.Data)
+			if err == nil {
+				ActiveReactions = append(ActiveReactions, antiGroupChat)
+			}
+		}
+	}
+
+	new := len(ActiveReactions) - oldLength
+	if first && new > 0 {
+		logging.Logging.EventReactions(new)
+	}
+
+	return nil
+}
+
+func Save() error {
+	var reactions []any
+
+	for _, reaction := range ActiveReactions {
+		if strings.Contains(reaction.Description(), "default") {
+			continue
+		}
+
+		reactions = append(reactions, map[string]any{
+			"Type": reaction.Type(),
+			"Data": reaction.Data(),
+		})
+	}
+
+	cfg, err := config.GetConfig()
+	if err != nil {
+		return err
+	}
+
+	reactionsBytes, err := json.MarshalIndent(reactions, "", "  ")
+	if err != nil {
+		return err
+	}
+
+	cfg.EventReactions = reactionsBytes
+
+	return cfg.Save()
+}
+
+// Exists checks if an event reaction already exists
+func Exists(reaction EventReaction) bool {
+	ReactionsMutex.Lock()
+	defer ReactionsMutex.Unlock()
+
+	for _, r := range ActiveReactions {
+		if r.Equals(reaction) {
+			return true
+		}
+	}
+
+	return false
+}
+
+// Add adds an event reaction to the list of active event reactions
+func Add(reaction EventReaction) {
+	if Exists(reaction) {
+		return
+	}
+
+	ReactionsMutex.Lock()
+	defer ReactionsMutex.Unlock()
+
+	ActiveReactions = append(ActiveReactions, reaction)
+
+	Save()
+}
+
+// GetAll gets all event reactions of a certain type
+func GetAll(reactionType EventReactionType) (reactions []EventReaction) {
+	ReactionsMutex.Lock()
+	defer ReactionsMutex.Unlock()
+
+	for _, r := range ActiveReactions {
+		if r.Type() == reactionType {
+			reactions = append(reactions, r)
+		}
+	}
+
+	return
+}
+
+// Remove removes an event reaction from the list of active event reactions
+func Remove(reaction EventReaction) {
+	ReactionsMutex.Lock()
+	defer ReactionsMutex.Unlock()
+
+	for i, r := range ActiveReactions {
+		if r.Equals(reaction) {
+			ActiveReactions = append(ActiveReactions[:i], ActiveReactions[i+1:]...)
+		}
+	}
+
+	Save()
+}
+
+// RemoveAll removes all event reactions of a certain type
+func RemoveAll(reactionType EventReactionType) {
+	ReactionsMutex.Lock()
+	defer ReactionsMutex.Unlock()
+
+	for i, r := range ActiveReactions {
+		if r.Type() == reactionType {
+			ActiveReactions = append(ActiveReactions[:i], ActiveReactions[i+1:]...)
+		}
+	}
+
+	Save()
+}
+
+// Clear clears all event reactions
+func Clear() {
+	ReactionsMutex.Lock()
+	defer ReactionsMutex.Unlock()
+
+	ActiveReactions = defaultEventReactions()
+
+	Save()
+}
+
+// HandleMessage adds a message to the list of event reaction messages
+func HandleMessage(message *discordgo.Message, err error) {
+	if err != nil {
+		return
+	}
+
+	EventReactionMessages.Mutex.Lock()
+	defer EventReactionMessages.Mutex.Unlock()
+
+	EventReactionMessages.Add(message)
+}
+
+// IsEventReactionMessage checks if a message is an event reaction message
+func IsEventReactionMessage(message *discordgo.Message) bool {
+	EventReactionMessages.Mutex.Lock()
+	defer EventReactionMessages.Mutex.Unlock()
+
+	for _, m := range EventReactionMessages.Items {
+		if m.ID == message.ID {
+			return true
+		}
+	}
+
+	return false
+}
+
+func AddEditedMessage(message *discordgo.MessageUpdate) {
+	messages, _ := EditedMessages.LoadOrStore(message.ChannelID, []*discordgo.MessageUpdate{})
+
+	messages = append(messages.([]*discordgo.MessageUpdate), message)
+
+	EditedMessages.Store(message.ChannelID, messages)
+}
+
+func GetEditedMessages(channelID string) []*discordgo.MessageUpdate {
+	messages, _ := EditedMessages.LoadOrStore(channelID, []*discordgo.MessageUpdate{})
+
+	return messages.([]*discordgo.MessageUpdate)
+}
+
+func AddDeletedMessage(message *discordgo.Message) {
+	messages, _ := DeletedMessages.LoadOrStore(message.ChannelID, []*discordgo.Message{})
+
+	messages = append(messages.([]*discordgo.Message), message)
+
+	DeletedMessages.Store(message.ChannelID, messages)
+}
+
+func GetDeletedMessages(channelID string) []*discordgo.Message {
+	messages, _ := DeletedMessages.LoadOrStore(channelID, []*discordgo.Message{})
+
+	return messages.([]*discordgo.Message)
+}
+
+func HandleEvent(session *discordgo.Session, event any) {
+	ReactionsMutex.Lock()
+	defer ReactionsMutex.Unlock()
+
+	for _, r := range ActiveReactions {
+		go r.Handler(session, event)
+	}
+}
+
+func RegisterHandlers(session *discordgo.Session) {
+	// Message Events
+	session.AddHandler(func(_ *discordgo.Session, m *discordgo.MessageCreate) {
+		if m.Message == nil || m.Author == nil {
+			return
+		}
+
+		HandleEvent(session, m)
+	})
+
+	session.AddHandler(func(_ *discordgo.Session, m *discordgo.MessageUpdate) {
+		message, err := session.State.Message(m.Message.ChannelID, m.Message.ID)
+		if err == nil {
+			m.Message = message
+		}
+
+		if m.Message == nil || m.Author == nil {
+			return
+		}
+
+		if m.BeforeUpdate == nil {
+			m.BeforeUpdate = m.Message
+		}
+
+		if !IsEventReactionMessage(m.Message) {
+			HandleEvent(session, m)
+		}
+
+		// Add edited message
+		cfg, err := config.GetConfig()
+		if err != nil {
+			return
+		}
+
+		if m.Author.ID != session.State.User.ID || !strings.HasPrefix(m.Message.Content, cfg.Selfbot.CommandPrefix) {
+			AddEditedMessage(m)
+		}
+	})
+
+	session.AddHandler(func(_ *discordgo.Session, m *discordgo.MessageDelete) {
+		if m.Message == nil || m.Author == nil {
+			return
+		}
+
+		if m.BeforeDelete == nil {
+			m.BeforeDelete = m.Message
+		}
+
+		if !IsEventReactionMessage(m.Message) {
+			HandleEvent(session, m)
+		}
+
+		// Add deleted message
+		cfg, err := config.GetConfig()
+		if err != nil {
+			return
+		}
+
+		if m.Author.ID != session.State.User.ID || !strings.HasPrefix(m.Message.Content, cfg.Selfbot.CommandPrefix) {
+			AddDeletedMessage(m.BeforeDelete)
+		}
+	})
+
+	session.AddHandler(func(_ *discordgo.Session, m *discordgo.MessageReactionAdd) {
+		msg := &discordgo.Message{ID: m.MessageID}
+
+		if !IsEventReactionMessage(msg) {
+			HandleEvent(session, m)
+		}
+	})
+
+	session.AddHandler(func(_ *discordgo.Session, t *discordgo.TypingStart) {
+		HandleEvent(session, t)
+	})
+
+	// Guild Events
+	session.AddHandler(func(_ *discordgo.Session, g *discordgo.GuildBanAdd) {
+		HandleEvent(session, g)
+	})
+
+	session.AddHandler(func(_ *discordgo.Session, g *discordgo.GuildMemberAdd) {
+		HandleEvent(session, g)
+	})
+
+	session.AddHandler(func(_ *discordgo.Session, g *discordgo.GuildMemberUpdate) {
+		HandleEvent(session, g)
+	})
+
+	// User Events
+	session.AddHandler(func(_ *discordgo.Session, r *discordgo.RelationshipAdd) {
+		HandleEvent(session, r)
+	})
+
+	// Channel Event
+	session.AddHandler(func(_ *discordgo.Session, r *discordgo.VoiceStateUpdate) {
+		HandleEvent(session, r)
+	})
+
+	session.AddHandler(func(_ *discordgo.Session, r *discordgo.ChannelCreate) {
+		HandleEvent(session, r)
+	})
+
+	session.AddHandler(func(_ *discordgo.Session, r *discordgo.ChannelRecipientRemove) {
+		HandleEvent(session, r)
+	})
+
+}

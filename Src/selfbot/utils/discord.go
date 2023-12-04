@@ -3,7 +3,11 @@ package utils
 import (
 	"bytes"
 	"fmt"
+	"io"
 	"math"
+	nethttp "net/http"
+	"os"
+	"path"
 	"regexp"
 	"strconv"
 	"strings"
@@ -51,32 +55,7 @@ func (DiscordUtils) TryGetUserFromMention(session *discordgo.Session, mention *d
 }
 
 func (DiscordUtils) TryGetMemberFromMention(ctx *dgc.Ctx, mention *dgc.Argument) (*discordgo.Member, bool) {
-	userId := Misc.Or(mention.AsUserMentionID(), mention.Raw())
-	member, err := ctx.Session.State.Member(ctx.Event.GuildID, userId)
-	if err != nil {
-		userIdInt, err := strconv.Atoi(userId)
-		if err != nil {
-			return nil, false
-		}
-
-		params := discordgo.NewQueryGuildMembersParams(ctx.Event.GuildID)
-		params.UserIDs = []int{userIdInt}
-
-		members, err := ctx.Session.QueryGuildMembers(params)
-		if err != nil {
-			return nil, false
-		}
-
-		if len(members) > 0 {
-			member = members[0]
-		}
-	}
-
-	if member == nil {
-		return nil, false
-	}
-
-	return member, true
+	return Discord.GetMember(ctx.Session, ctx.Event.GuildID, Misc.Or(mention.AsUserMentionID(), mention.Raw()))
 }
 
 func (d DiscordUtils) TryGetUsernameFromMention(session *discordgo.Session, mention *dgc.Argument) (string, bool) {
@@ -157,20 +136,20 @@ func (DiscordUtils) GetArguments(ctx *dgc.Ctx) (map[string]string, bool) {
 	commandArguments := regexp.MustCompile(`(<(.*?)>|\[(.*?)])`).FindAllString(rawArguments, -1)
 	arguments := map[string]string{}
 	content := ctx.Event.Message.Content
-	for index, arg := range commandArguments {
+	for index, argName := range commandArguments {
 		raw := ctx.Arguments.Get(index).Raw()
-		isRequired := strings.Contains(arg, "<") && strings.Contains(arg, ">")
+		isRequired := strings.Contains(argName, "<") && strings.Contains(argName, ">")
 
-		if strings.Contains(arg, "\"") && strings.Count(raw, "\"") >= 2 {
-			arguments[arg] = regexp.MustCompile("\"(.*?)\"").FindString(content)
-			content = strings.Replace(content, arguments[arg], "", -1)
+		if strings.Contains(argName, "\"") && strings.Count(raw, "\"") >= 2 {
+			arguments[argName] = regexp.MustCompile("\"(.*?)\"").FindString(content)
+			content = strings.Replace(content, arguments[argName], "", -1)
 		} else {
-			arguments[arg] = raw
+			arguments[argName] = raw
 			content = String.RemoveWords(content, 1)
 		}
 
-		if arguments[arg] == "" && isRequired {
-			_ = ctx.RespondText("Missing required argument: " + arg)
+		if arguments[argName] == "" && isRequired {
+			_ = ctx.RespondText("Missing required argument: " + argName)
 			return map[string]string{}, false
 		}
 	}
@@ -178,6 +157,11 @@ func (DiscordUtils) GetArguments(ctx *dgc.Ctx) (map[string]string, bool) {
 }
 
 func (DiscordUtils) GetChannelMessages(session *discordgo.Session, channelID string, limit int) ([]*discordgo.Message, error) {
+	channel, err := session.State.Channel(channelID)
+	if err == nil && len(channel.Messages) >= limit {
+		return channel.Messages, nil
+	}
+
 	// The maximum number of messages that can be retrieved at once is 100.
 	if limit <= 100 {
 		return session.ChannelMessages(channelID, limit, "", "", "")
@@ -202,6 +186,52 @@ func (DiscordUtils) GetChannelMessages(session *discordgo.Session, channelID str
 	return messages, nil
 }
 
+func (DiscordUtils) GetChannelMessagesRange(session *discordgo.Session, channelID, fromID, toID string) ([]*discordgo.Message, error) {
+	messages, err := session.ChannelMessages(channelID, 100, toID, fromID, "")
+	if err != nil {
+		return nil, err
+	}
+
+	messages = append(messages, &discordgo.Message{ID: fromID})
+
+	if len(messages) < 100 {
+		return messages, nil
+	}
+
+	lastID := messages[len(messages)-1].ID
+
+	for {
+		newMessages, err := session.ChannelMessages(channelID, 100, toID, lastID, "")
+		if err != nil {
+			return nil, err
+		}
+
+		if len(newMessages) == 0 {
+			break
+		}
+
+		messages = append(messages, newMessages...)
+		lastID = messages[len(messages)-1].ID
+	}
+
+	return messages, nil
+}
+
+func (DiscordUtils) GetChannelMessage(session *discordgo.Session, channelID, ID string) (*discordgo.Message, error) {
+	messages, err := session.ChannelMessages(channelID, 100, "", "", ID)
+	if err != nil {
+		return nil, err
+	}
+
+	for _, m := range messages {
+		if m.ID == ID {
+			return m, nil
+		}
+	}
+
+	return nil, fmt.Errorf("message not found")
+}
+
 func (DiscordUtils) GetRoleNames(ctx *dgc.Ctx, member *discordgo.Member) string {
 	var roleNames []string
 	for _, role := range member.Roles {
@@ -214,6 +244,10 @@ func (DiscordUtils) GetRoleNames(ctx *dgc.Ctx, member *discordgo.Member) string 
 }
 
 func (DiscordUtils) GetGuild(session *discordgo.Session, guildID string) (guild *discordgo.Guild, err error) {
+	if guildID == "" {
+		return nil, fmt.Errorf("guildID is empty")
+	}
+
 	guild, err = session.State.Guild(guildID)
 	if err != nil {
 		guild, err = session.Guild(guildID)
@@ -224,15 +258,32 @@ func (DiscordUtils) GetGuild(session *discordgo.Session, guildID string) (guild 
 	return guild, nil
 }
 
-func (DiscordUtils) GetMember(session *discordgo.Session, guildID, userID string) (member *discordgo.Member, err error) {
-	member, err = session.State.Member(guildID, userID)
-	if err != nil {
-		member, err = session.GuildMember(guildID, userID)
+func (DiscordUtils) GetMember(session *discordgo.Session, guildID, userID string, reload ...bool) (*discordgo.Member, bool) {
+	member, err := session.State.Member(guildID, userID)
+	if err != nil || len(reload) > 0 && reload[0] {
+		userIDInt, err := strconv.Atoi(userID)
 		if err != nil {
-			return nil, err
+			return nil, false
+		}
+
+		params := discordgo.NewQueryGuildMembersParams(guildID)
+		params.UserIDs = []int{userIDInt}
+
+		members, err := session.QueryGuildMembers(params)
+		if err != nil {
+			return nil, false
+		}
+
+		if len(members) > 0 {
+			member = members[0]
 		}
 	}
-	return member, nil
+
+	if member == nil {
+		return nil, false
+	}
+
+	return member, true
 }
 
 func (DiscordUtils) GetBoosters(guild *discordgo.Guild) []*discordgo.Member {
@@ -499,6 +550,197 @@ func (DiscordUtils) UserChannelPermissions(session *discordgo.Session, guildID s
 	}
 
 	return session.State.UserChannelPermissions(userID, channelID)
+}
+
+func (DiscordUtils) Impersonate(s *discordgo.Session, user *discordgo.User, content, channelID string) (*discordgo.Message, error) {
+	webhooks, err := s.ChannelWebhooks(channelID)
+	if err != nil {
+		return nil, err
+	}
+
+	var webhook *discordgo.Webhook
+	if len(webhooks) == 0 {
+		webhook, err = s.WebhookCreate(channelID, "Impersonate", "")
+		if err != nil {
+			return nil, err
+		}
+	} else {
+		webhook = webhooks[0]
+	}
+
+	return s.WebhookExecute(webhook.ID, webhook.Token, true, &discordgo.WebhookParams{
+		Username:  user.Username,
+		AvatarURL: user.AvatarURL(""),
+		Content:   content,
+	})
+}
+
+func (DiscordUtils) IsDM(message *discordgo.Message) bool {
+	return message.GuildID == "" && (message.Type == discordgo.MessageTypeDefault || message.Type == discordgo.MessageTypeReply)
+}
+
+func (DiscordUtils) FormatStatusEmoji(status discordgo.Status) string {
+	switch status {
+	case discordgo.StatusOnline:
+		return "`🟢` Online"
+	case discordgo.StatusIdle:
+		return "`🟡` Idle"
+	case discordgo.StatusDoNotDisturb:
+		return "`🔴` Do Not Disturb"
+	case discordgo.StatusInvisible:
+		return "`⚪` Invisible"
+	case discordgo.StatusOffline:
+		return "`⚪` Offline"
+	default:
+		return "`⚪` Unknown"
+	}
+}
+
+func (DiscordUtils) FormatClientStatus(clientStatus discordgo.ClientStatus) string {
+	return fmt.Sprintf(
+		"Desktop: %s\nMobile: %s\nWeb: %s",
+		Discord.FormatStatusEmoji(clientStatus.Desktop),
+		Discord.FormatStatusEmoji(clientStatus.Mobile),
+		Discord.FormatStatusEmoji(clientStatus.Web),
+	)
+}
+
+func (DiscordUtils) FormatUserFlags(flags discordgo.UserFlags) string {
+	var formatted []string
+
+	if flags&discordgo.UserFlagDiscordEmployee != 0 {
+		formatted = append(formatted, "Discord Employee")
+	}
+	if flags&discordgo.UserFlagDiscordPartner != 0 {
+		formatted = append(formatted, "Discord Partner")
+	}
+	if flags&discordgo.UserFlagHypeSquadEvents != 0 {
+		formatted = append(formatted, "HypeSquad Events")
+	}
+	if flags&discordgo.UserFlagBugHunterLevel1 != 0 {
+		formatted = append(formatted, "Bug Hunter Level 1")
+	}
+	if flags&discordgo.UserFlagHouseBravery != 0 {
+		formatted = append(formatted, "HypeSquad Bravery")
+	}
+	if flags&discordgo.UserFlagHouseBrilliance != 0 {
+		formatted = append(formatted, "HypeSquad Brilliance")
+	}
+	if flags&discordgo.UserFlagHouseBalance != 0 {
+		formatted = append(formatted, "HypeSquad Balance")
+	}
+	if flags&discordgo.UserFlagEarlySupporter != 0 {
+		formatted = append(formatted, "Early Supporter")
+	}
+	if flags&discordgo.UserFlagTeamUser != 0 {
+		formatted = append(formatted, "Team User")
+	}
+	if flags&discordgo.UserFlagSystem != 0 {
+		formatted = append(formatted, "System")
+	}
+	if flags&discordgo.UserFlagBugHunterLevel2 != 0 {
+		formatted = append(formatted, "Bug Hunter Level 2")
+	}
+	if flags&discordgo.UserFlagVerifiedBot != 0 {
+		formatted = append(formatted, "Verified Bot")
+	}
+	if flags&discordgo.UserFlagVerifiedBotDeveloper != 0 {
+		formatted = append(formatted, "Verified Bot Developer")
+	}
+	if flags&discordgo.UserFlagDiscordCertifiedModerator != 0 {
+		formatted = append(formatted, "Discord Certified Moderator")
+	}
+	if flags&discordgo.UserFlagBotHTTPInteractions != 0 {
+		formatted = append(formatted, "Bot HTTP Interactions")
+	}
+	if flags&discordgo.UserFlagActiveDeveloper != 0 {
+		formatted = append(formatted, "Active Developer")
+	}
+
+	return strings.Join(formatted, ", ")
+}
+
+func (DiscordUtils) FormatPremiumType(premium discordgo.UserPremiumType) string {
+	switch premium {
+	case discordgo.UserPremiumTypeNone:
+		return "None"
+	case discordgo.UserPremiumTypeNitroClassic:
+		return "Nitro Classic"
+	case discordgo.UserPremiumTypeNitro:
+		return "Nitro Boost"
+	case discordgo.UserPremiumTypeNitroBasic:
+		return "Nitro Basic"
+	default:
+		return "Unknown"
+	}
+}
+
+func (DiscordUtils) FormatActivities(activities []*discordgo.Activity) string {
+	var formatted []string
+
+	for _, activity := range activities {
+		var activityFormat string
+
+		switch activity.Type {
+		case discordgo.ActivityTypeGame:
+			activityFormat = fmt.Sprintf("Playing **%s**", activity.Name)
+		case discordgo.ActivityTypeStreaming:
+			activityFormat = fmt.Sprintf("Streaming **%s**", activity.Name)
+		case discordgo.ActivityTypeListening:
+			activityFormat = fmt.Sprintf("Listening to **%s**", activity.Name)
+		case discordgo.ActivityTypeWatching:
+			activityFormat = fmt.Sprintf("Watching **%s**", activity.Name)
+		case discordgo.ActivityTypeCustom:
+			activityFormat = fmt.Sprintf("Custom Status: **%s**", activity.State)
+		case discordgo.ActivityTypeCompeting:
+			activityFormat = fmt.Sprintf("Competing in **%s**", activity.Name)
+		default:
+			activityFormat = fmt.Sprintf("Unknown Activity: **%s**", activity.Name)
+		}
+
+		if activity.Details != "" {
+			activityFormat += fmt.Sprintf(" (%s)", activity.Details)
+		}
+
+		formatted = append(formatted, activityFormat)
+	}
+
+	return strings.Join(formatted, "\n")
+}
+
+func (DiscordUtils) GetMessageLink(m *discordgo.Message) string {
+	return fmt.Sprintf("https://discord.com/channels/%s/%s/%s", Misc.Or(m.GuildID, "@me"), m.ChannelID, m.ID)
+}
+
+func (DiscordUtils) SaveAttachment(attachment *discordgo.MessageAttachment) (string, error) {
+	filename := IO.SanitizeFilename(attachment.ID + "-" + attachment.Filename)
+	filepath := path.Join(IO.GetMainFolder(), "Downloads", filename)
+
+	outFile, err := os.Create(filepath)
+	if err != nil {
+		return "", fmt.Errorf("error creating attachment file: %w", err)
+	}
+
+	defer outFile.Close()
+
+	var resp *nethttp.Response
+	resp, err = nethttp.Get(attachment.URL)
+	if err != nil {
+		var err error
+		resp, err = nethttp.Get(attachment.ProxyURL)
+		if err != nil {
+			return "", fmt.Errorf("error downloading attachment: %w", err)
+		}
+	}
+
+	defer resp.Body.Close()
+
+	_, err = io.Copy(outFile, resp.Body)
+	if err != nil {
+		return "", fmt.Errorf("error downloading attachment: %w", err)
+	}
+
+	return filepath, nil
 }
 
 var Discord = &DiscordUtils{}

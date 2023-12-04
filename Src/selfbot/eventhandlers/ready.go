@@ -1,6 +1,7 @@
 package eventhandlers
 
 import (
+	"github.com/LightningDev1/LB-Selfbot/selfbot/eventhandlers/eventreactions"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/logging"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/sessions"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/slashcommands"
@@ -13,6 +14,7 @@ func (e *Events) OnReady(session *discordgo.Session, event *discordgo.Ready) {
 
 	// Start slash command jobs
 	go slashcommands.StartJobs(session)
+	go eventreactions.StartLoading(session)
 
 	logging.Logging.OnReady(e.Router, event)
 }

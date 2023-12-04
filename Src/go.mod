@@ -1,17 +1,20 @@
 module github.com/LightningDev1/LB-Selfbot
 
-go 1.20
+go 1.21
 
 require (
 	fyne.io/fyne/v2 v2.4.0
 	github.com/LightningDev1/beeep v0.1.0
-	github.com/LightningDev1/chromiumdp v0.0.0-20230903180009-90a1416c90c2
-	github.com/LightningDev1/dgc v1.1.4-0.20230327145349-fd063e2b2054
-	github.com/LightningDev1/discordgo v0.26.6-0.20230906193200-d9381f45cf97
+	github.com/LightningDev1/chromiumdp v0.0.0-20231128154929-66ef7c9d7fb7
+	github.com/LightningDev1/dgc v1.1.4-0.20231130125735-679db2635a21
+	github.com/LightningDev1/discordgo v0.26.6-0.20231202113950-0fd369905129
 	github.com/LightningDev1/go-privnote v0.1.0
 	github.com/LightningDev1/screenshot v0.0.0-20230719145300-c8d3633174bf
 	github.com/bitly/go-simplejson v0.5.1
 	github.com/brianvoe/gofakeit/v6 v6.23.2
+	github.com/charmbracelet/bubbles v0.16.1
+	github.com/charmbracelet/bubbletea v0.24.2
+	github.com/charmbracelet/lipgloss v0.7.1
 	github.com/darkwyrm/b85 v0.0.0-20210908110113-bdd55eedeb3c
 	github.com/deadshot465/owoify-go v1.0.1
 	github.com/hugolgst/rich-go v0.0.0-20210925091458-d59fb695d9c0
@@ -23,6 +26,23 @@ require (
 	github.com/shirou/gopsutil v3.21.11+incompatible
 	github.com/valyala/fasthttp v1.49.0
 	golang.org/x/text v0.13.0
+)
+
+require (
+	github.com/atotto/clipboard v0.1.4 // indirect
+	github.com/aymanbagabas/go-osc52/v2 v2.0.1 // indirect
+	github.com/containerd/console v1.0.4-0.20230313162750-1ae8d489ac81 // indirect
+	github.com/lucasb-eyer/go-colorful v1.2.0 // indirect
+	github.com/mattn/go-isatty v0.0.18 // indirect
+	github.com/mattn/go-localereader v0.0.1 // indirect
+	github.com/mattn/go-runewidth v0.0.15 // indirect
+	github.com/muesli/ansi v0.0.0-20211018074035-2e021307bc4b // indirect
+	github.com/muesli/cancelreader v0.2.2 // indirect
+	github.com/muesli/reflow v0.3.0 // indirect
+	github.com/muesli/termenv v0.15.1 // indirect
+	github.com/rivo/uniseg v0.4.4 // indirect
+	github.com/sahilm/fuzzy v0.1.0 // indirect
+	golang.org/x/sync v0.1.0 // indirect
 )
 
 require (
@@ -71,6 +91,7 @@ require (
 	github.com/tevino/abool v1.2.0 // indirect
 	github.com/tklauser/go-sysconf v0.3.12 // indirect
 	github.com/tklauser/numcpus v0.6.1 // indirect
+	github.com/traefik/yaegi v0.15.1
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	github.com/yuin/goldmark v1.5.5 // indirect
 	github.com/yusufpapurcu/wmi v1.2.3 // indirect
@@ -88,6 +109,6 @@ require (
 	github.com/karrick/tparse/v2 v2.8.2 // indirect
 	github.com/zekroTJA/timedmap v1.5.1 // indirect
 	golang.org/x/crypto v0.13.0
-	golang.org/x/sys v0.12.0 // indirect
+	golang.org/x/sys v0.12.0
 	golang.org/x/term v0.12.0
 )

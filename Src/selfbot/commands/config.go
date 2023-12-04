@@ -821,7 +821,7 @@ func (ConfigCommands) title(ctx *dgc.Ctx) {
 	_ = cfg.Save()
 
 	embed.NewEmbed().
-		SetDescription("Title set to " + cfg.Selfbot.CommandMode).
+		SetDescription("Title set to " + cfg.Selfbot.Title).
 		Send(ctx)
 }
 
