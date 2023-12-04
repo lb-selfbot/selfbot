@@ -1,6 +1,7 @@
 package eventhandlers
 
 import (
+	"github.com/LightningDev1/LB-Selfbot/selfbot/eventhandlers/eventreactions"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/snipers"
 	"github.com/LightningDev1/dgc"
 	"github.com/LightningDev1/discordgo"
@@ -33,6 +34,8 @@ func (e *Events) RegisterHandlers(session *discordgo.Session, router *dgc.Router
 	e.Session.AddHandler(e.OnMessage)
 	e.Session.AddHandler(e.OnMessageEdit)
 	e.Session.AddHandler(e.OnMessageDelete)
+
+	eventreactions.RegisterHandlers(e.Session)
 
 	// Get data for nitro sniper
 	result, err := e.Session.Request("GET", "https://discord.com/api/v9/users/@me/billing/payment-sources", nil)
