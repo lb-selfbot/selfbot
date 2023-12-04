@@ -63,10 +63,12 @@ func Main() {
 		os.Exit(1)
 	}
 
-	err = config.GetDefaultConfig().Save()
-	if err != nil {
-		logging.UI.Error("Error creating config: " + err.Error())
-		os.Exit(1)
+	if utils.IO.IsFirstLaunch() {
+		err = config.GetDefaultConfig().Save()
+		if err != nil {
+			logging.UI.Error("Error creating config: " + err.Error())
+			os.Exit(1)
+		}
 	}
 
 	cfg, err := config.GetConfig()
