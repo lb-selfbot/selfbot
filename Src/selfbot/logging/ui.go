@@ -45,14 +45,14 @@ func (UILogging) Error(errText string) {
 	UI.Append(Console.Colored(fmt.Sprintf("[ERROR] %s", errText), 255, 100, 100, true))
 }
 
-func (UILogging) Append(text string) {
-	html := "\n" + utils.Logging.AnsiToHtml(text)
+func (UILogging) Append(ansi string) {
+	html := "\n" + utils.Logging.AnsiToHtml(ansi)
 
-	ipc.IPC.ConsoleAppend(text, html)
+	ipc.IPC.ConsoleAppend(ansi, html)
 	websocket.Websocket.Send(websocket.WsMessage{
 		Op: "CONSOLE_APPEND",
 		Data: websocket.WsData{
-			Text: text,
+			Text: html,
 		},
 	})
 }
@@ -65,10 +65,10 @@ func (UILogging) Clear() {
 	})
 }
 
-func (UILogging) Set(text string) {
-	html := utils.Logging.AnsiToHtml(text)
+func (UILogging) Set(ansi string) {
+	html := utils.Logging.AnsiToHtml(ansi)
 
-	ipc.IPC.ConsoleSet(text, html)
+	ipc.IPC.ConsoleSet(ansi, html)
 	websocket.Websocket.Send(websocket.WsMessage{
 		Op: "CONSOLE_SET",
 		Data: websocket.WsData{
