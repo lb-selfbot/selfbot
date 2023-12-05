@@ -161,13 +161,13 @@ func Main() {
 				return false
 			}
 
-			if utils.SliceContains(ctx.Command.Flags, "DANGEROUS") && cfg.Sharing.BlockDangerousCommands {
-				logging.Logging.BlockedDangerousCommand(ctx.Event.Author, ctx.Command.Name)
+			if !utils.SliceContains(cfg.Sharing.SharedUsers, ctx.Event.Author.ID) &&
+				!utils.SliceContains(cfg.Sharing.SharedUsers, ctx.Event.Author.String()) {
 				return false
 			}
 
-			if !utils.SliceContains(cfg.Sharing.SharedUsers, ctx.Event.Author.ID) &&
-				!utils.SliceContains(cfg.Sharing.SharedUsers, ctx.Event.Author.String()) {
+			if utils.SliceContains(ctx.Command.Flags, "DANGEROUS") && cfg.Sharing.BlockDangerousCommands {
+				logging.Logging.BlockedDangerousCommand(ctx.Event.Author, ctx.Command.Name)
 				return false
 			}
 

@@ -292,11 +292,6 @@ func Main(discordgoDebug bool) {
 				return false
 			}
 
-			if utils.SliceContains(ctx.Command.Flags, "DANGEROUS") && cfg.Sharing.BlockDangerousCommands {
-				logging.Logging.BlockedDangerousCommand(ctx.Event.Author, ctx.Command.Name)
-				return false
-			}
-
 			if !utils.SliceContains(cfg.Sharing.SharedUsers, ctx.Event.Author.ID) &&
 				!utils.SliceContains(cfg.Sharing.SharedUsers, ctx.Event.Author.String()) {
 				return false
@@ -304,6 +299,11 @@ func Main(discordgoDebug bool) {
 
 			if cfg.Sharing.ShareAll || utils.SliceContains([]string{"help", "search", "repeat"}, ctx.Command.Name) {
 				return true
+			}
+
+			if utils.SliceContains(ctx.Command.Flags, "DANGEROUS") && cfg.Sharing.BlockDangerousCommands {
+				logging.Logging.BlockedDangerousCommand(ctx.Event.Author, ctx.Command.Name)
+				return false
 			}
 
 			categoryName := ""
