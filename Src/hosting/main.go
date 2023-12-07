@@ -92,6 +92,7 @@ func Main() {
 	}
 
 	session.SetIdentify(cfg.GetClient())
+	session.State.MaxMessageCount = 200
 	session.LogLevel = discordgo.LogWarning
 
 	if debug {
@@ -101,7 +102,7 @@ func Main() {
 	logPath := filepath.Join(utils.IO.GetMainFolder(), "LB.log")
 
 	// Remove log file if it exists
-	_ = os.Remove(logPath)
+	_ = utils.IO.Write(logPath, "")
 
 	discordgo.Logger = func(msgL, caller int, format string, a ...interface{}) {
 		pc, file, line, _ := runtime.Caller(caller + 1)
@@ -147,44 +148,52 @@ func Main() {
 		},
 		IgnorePrefixCase: true,
 		IsUserAllowedFunc: func(ctx *dgc.Ctx) bool {
+			isAllowed := func() bool {
+				if ctx.Event.Author.ID == session.State.User.ID {
+					return true
+				}
+
+				cfg, err := config.GetConfig()
+				if err != nil {
+					return false
+				}
+
+				if !utils.SliceContains(cfg.Sharing.SharedUsers, ctx.Event.Author.ID) &&
+					!utils.SliceContains(cfg.Sharing.SharedUsers, ctx.Event.Author.String()) {
+					return false
+				}
+
+				if utils.SliceContains(ctx.Command.Flags, "DANGEROUS") && cfg.Sharing.BlockDangerousCommands {
+					logging.Logging.BlockedDangerousCommand(ctx.Event.Author, ctx.Command.Name)
+					return false
+				}
+
+				if cfg.Sharing.ShareAll || utils.SliceContains([]string{"help", "search", "repeat"}, ctx.Command.Name) {
+					return true
+				}
+
+				categoryName := ""
+				if ctx.Command.Category != nil {
+					categoryName = ctx.Command.Category.Name
+				}
+				for _, category := range cfg.Sharing.SharedCategories {
+					if strings.EqualFold(category, categoryName) {
+						return true
+					}
+				}
+				return utils.SliceContains(cfg.Sharing.SharedCommands, ctx.Command.Name)
+			}()
+
+			if !isAllowed {
+				return false
+			}
+
 			if utils.SliceContains(ctx.Command.Flags, "HOSTING_DANGEROUS") {
 				logging.Logging.BlockedHostingDangerousCommand(ctx.Command.Name)
 				return false
 			}
 
-			if ctx.Event.Author.ID == session.State.User.ID {
-				return true
-			}
-
-			cfg, err := config.GetConfig()
-			if err != nil {
-				return false
-			}
-
-			if !utils.SliceContains(cfg.Sharing.SharedUsers, ctx.Event.Author.ID) &&
-				!utils.SliceContains(cfg.Sharing.SharedUsers, ctx.Event.Author.String()) {
-				return false
-			}
-
-			if utils.SliceContains(ctx.Command.Flags, "DANGEROUS") && cfg.Sharing.BlockDangerousCommands {
-				logging.Logging.BlockedDangerousCommand(ctx.Event.Author, ctx.Command.Name)
-				return false
-			}
-
-			if cfg.Sharing.ShareAll || utils.SliceContains([]string{"help", "search", "repeat"}, ctx.Command.Name) {
-				return true
-			}
-
-			categoryName := ""
-			if ctx.Command.Category != nil {
-				categoryName = ctx.Command.Category.Name
-			}
-			for _, category := range cfg.Sharing.SharedCategories {
-				if strings.EqualFold(category, categoryName) {
-					return true
-				}
-			}
-			return utils.SliceContains(cfg.Sharing.SharedCommands, ctx.Command.Name)
+			return true
 		},
 		Commands:    []*dgc.Command{},
 		Middlewares: []dgc.Middleware{},
