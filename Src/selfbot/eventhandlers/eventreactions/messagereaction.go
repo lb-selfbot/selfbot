@@ -198,17 +198,17 @@ func (m *MessageReaction) Handler(session *discordgo.Session, event any) {
 		return
 	}
 
-	if message.Author.ID == session.State.User.ID {
+	allowedForSelf := []EventReactionType{REACT_SPAM}
+
+	if message.Author.ID == session.State.User.ID && !utils.SliceContains(allowedForSelf, m.ReactionType) {
 		return
 	}
 
-	if m.Guild != nil && m.Guild.ID != message.GuildID {
-		return
-	} else if m.Channel != nil && m.Channel.ID != message.ChannelID {
-		return
-	} else if m.User != nil && m.User.ID != message.Author.ID {
-		return
-	} else if !m.Global {
+	triggered := m.Guild != nil && m.Guild.ID == message.GuildID ||
+		m.Channel != nil && m.Channel.ID == message.ChannelID ||
+		m.User != nil && m.User.ID == message.Author.ID ||
+		m.Global
+	if !triggered {
 		return
 	}
 
