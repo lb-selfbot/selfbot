@@ -95,7 +95,7 @@ func (e *EventReactionsCommands) RegisterCommands(router *dgc.Router) {
 	router.RegisterCmd(&dgc.Command{
 		Name:        "pingresponse",
 		Description: "Reply to pings with a custom response",
-		Usage:       "[p]pingresponse <toggle/list/clear> <\"response\"> [server/channel id]",
+		Usage:       "[p]pingresponse <toggle/list/clear> [\"response\"] [server/channel id]",
 		Flags:       []string{"DANGEROUS"},
 		Handler:     e.pingresponse,
 	})
@@ -127,7 +127,7 @@ func (e *EventReactionsCommands) RegisterCommands(router *dgc.Router) {
 	router.RegisterCmd(&dgc.Command{
 		Name:        "responder",
 		Description: "Reply to messages with a custom response",
-		Usage:       "[p]responder <toggle/list/clear> <\"response\"> [server/channel id]",
+		Usage:       "[p]responder <toggle/list/clear> [\"response\"] [server/channel id]",
 		Flags:       []string{"DANGEROUS"},
 		Handler:     e.responder,
 	})
@@ -141,14 +141,14 @@ func (e *EventReactionsCommands) RegisterCommands(router *dgc.Router) {
 	router.RegisterCmd(&dgc.Command{
 		Name:        "copy",
 		Description: "Copy a user's messages",
-		Usage:       "[p]copy <toggle/list/clear> <@user> [server/channel id]",
+		Usage:       "[p]copy <toggle/list/clear> [@user] [server/channel id]",
 		Flags:       []string{"DANGEROUS"},
 		Handler:     e.copy,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "replycopy",
 		Description: "Replycopy a user's messages",
-		Usage:       "[p]replycopy <toggle/list/clear> <@user> [server/channel id]",
+		Usage:       "[p]replycopy <toggle/list/clear> [@user] [server/channel id]",
 		Flags:       []string{"DANGEROUS"},
 		Handler:     e.replycopy,
 	})
@@ -162,7 +162,7 @@ func (e *EventReactionsCommands) RegisterCommands(router *dgc.Router) {
 	router.RegisterCmd(&dgc.Command{
 		Name:        "pinspam",
 		Description: "Pin all of a user's messages",
-		Usage:       "[p]pinspam <toggle/list/clear> <@user> [server/channel id]",
+		Usage:       "[p]pinspam <toggle/list/clear> [@user] [server/channel id]",
 		Flags:       []string{"DANGEROUS"},
 		Handler:     e.pinspam,
 	})
@@ -176,56 +176,56 @@ func (e *EventReactionsCommands) RegisterCommands(router *dgc.Router) {
 	router.RegisterCmd(&dgc.Command{
 		Name:        "reactspam",
 		Description: "React to all of a user's messages",
-		Usage:       "[p]reactspam <toggle/list/clear> <@user> <reaction> [server/channel id]",
+		Usage:       "[p]reactspam <toggle/list/clear> [@user] <reaction> [global/server/channel id]",
 		Flags:       []string{"DANGEROUS"},
 		Handler:     e.reactspam,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "deletemessages",
 		Description: "Delete all of a user's messages",
-		Usage:       "[p]deletemessages <toggle/list/clear> <@user> [server/channel id]",
+		Usage:       "[p]deletemessages <toggle/list/clear> [@user] [server/channel id]",
 		Flags:       []string{"DANGEROUS"},
 		Handler:     e.deletemessages,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "keywordnotifier",
 		Description: "Get notified when someone mentions a keyword",
-		Usage:       "[p]keywordnotifier <toggle/list/clear> <\"keyword\"> [global/server/channel id]",
+		Usage:       "[p]keywordnotifier <toggle/list/clear> [\"keyword\"] [global/server/channel id]",
 		Flags:       []string{"DANGEROUS"},
 		Handler:     e.keywordnotifier,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "removereactions",
 		Description: "Delete all of a user's reactions",
-		Usage:       "[p]removereactions <toggle/list/clear> <@user> [server/channel id]",
+		Usage:       "[p]removereactions <toggle/list/clear> [@user] [server/channel id]",
 		Flags:       []string{"DANGEROUS"},
 		Handler:     e.removereactions,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "forcedisconnect",
 		Description: "Disconnect a user from voice channels",
-		Usage:       "[p]forcedisconnect <toggle/list/clear> <@user> [server/channel id]",
+		Usage:       "[p]forcedisconnect <toggle/list/clear> [@user] [server/channel id]",
 		Flags:       []string{"DANGEROUS"},
 		Handler:     e.forcedisconnect,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "forcenick",
 		Description: "Force change a user's nickname",
-		Usage:       "[p]forcenick <toggle/list/clear> <@user> <nickname> [server id]",
+		Usage:       "[p]forcenick <toggle/list/clear> [@user] <nickname> [server id]",
 		Flags:       []string{"DANGEROUS"},
 		Handler:     e.forcenick,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "forcekick",
 		Description: "Force kick a user",
-		Usage:       "[p]forcekick <toggle/list/clear> <@user> [server id]",
+		Usage:       "[p]forcekick <toggle/list/clear> [@user] [server id]",
 		Flags:       []string{"DANGEROUS"},
 		Handler:     e.forcekick,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "noleave",
 		Description: "Prevent a user from leaving a group chat",
-		Usage:       "[p]noleave <toggle/list/clear> <@user> [channel id]",
+		Usage:       "[p]noleave <toggle/list/clear> [@user] [channel id]",
 		Flags:       []string{"DANGEROUS"},
 		Handler:     e.noleave,
 	})
@@ -571,7 +571,7 @@ func (e EventReactionsCommands) pingReaction(ctx *dgc.Ctx, reactionType eventrea
 		eventReaction := eventreactions.NewPingReaction(reactionType, guild, channel)
 
 		eventReaction.System = utils.Arguments["[\"system\"]"]
-		eventReaction.Response = utils.Arguments["<\"response\">"]
+		eventReaction.Response = utils.Arguments["[\"response\"]"]
 
 		e.toggleReaction(ctx, eventReaction)
 	case "list":
@@ -700,7 +700,7 @@ func (e EventReactionsCommands) responder(ctx *dgc.Ctx) {
 		}
 
 		reaction := eventreactions.NewMessageReaction(eventreactions.RESPONDER, guild, channel, nil)
-		reaction.Response = utils.Arguments["<\"response\">"]
+		reaction.Response = utils.Arguments["[\"response\"]"]
 		e.toggleReaction(ctx, reaction)
 	case "list":
 		reactions := eventreactions.GetAll(eventreactions.RESPONDER)
@@ -927,15 +927,25 @@ func (e EventReactionsCommands) reactspam(ctx *dgc.Ctx) {
 			return
 		}
 
-		guild, channel, err := e.getGuildOrChannel(ctx, ctx.Arguments.Get(3))
-		if err != nil {
-			embed.NewEmbed().
-				SetDescription("Could not find server/channel: " + err.Error()).
-				Send(ctx)
-			return
+		arg := strings.ToLower(utils.Arguments["[global/server/channel id]"])
+		global := arg == "global" || arg == ""
+
+		var guild *discordgo.Guild
+		var channel *discordgo.Channel
+		var err error
+
+		if !global {
+			guild, channel, err = e.getGuildOrChannel(ctx, ctx.Arguments.Get(2))
+			if err != nil {
+				embed.NewEmbed().
+					SetDescription("Could not find server/channel: " + err.Error()).
+					Send(ctx)
+				return
+			}
 		}
 
 		reaction := eventreactions.NewMessageReaction(eventreactions.REACT_SPAM, guild, channel, user)
+		reaction.Global = global
 		reaction.Reaction = utils.Arguments["<reaction>"]
 		reaction.Reaction = strings.ReplaceAll(reaction.Reaction, "<", "")
 		reaction.Reaction = strings.ReplaceAll(reaction.Reaction, ">", "")
@@ -1016,7 +1026,7 @@ func (e EventReactionsCommands) keywordnotifier(ctx *dgc.Ctx) {
 		}
 
 		reaction := eventreactions.NewMessageReaction(eventreactions.KEYWORD_NOTIFIER, guild, channel, nil)
-		reaction.Keyword = utils.Arguments["<\"keyword\">"]
+		reaction.Keyword = utils.Arguments["[\"keyword\"]"]
 		reaction.Global = global
 
 		e.toggleReaction(ctx, reaction)
