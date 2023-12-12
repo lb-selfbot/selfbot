@@ -935,7 +935,7 @@ func (e EventReactionsCommands) reactspam(ctx *dgc.Ctx) {
 		var err error
 
 		if !global {
-			guild, channel, err = e.getGuildOrChannel(ctx, ctx.Arguments.Get(2))
+			guild, channel, err = e.getGuildOrChannel(ctx, ctx.Arguments.Get(3))
 			if err != nil {
 				embed.NewEmbed().
 					SetDescription("Could not find server/channel: " + err.Error()).
