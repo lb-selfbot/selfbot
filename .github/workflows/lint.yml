@@ -32,14 +32,12 @@ jobs:
         uses: actions/setup-go@v3
         with:
           go-version: ">=1.21.1"
-    
-      - name: Change directory
-        run: cd Src
 
       - name: Run go vet
-        run: go vet -x ./...
+        run: cd SRc && go vet -x ./...
 
       - name: Run GolangCI-Lint
         uses: golangci/golangci-lint-action@v3
         with:
           version: v1.54.2
+          working-directory: Src
