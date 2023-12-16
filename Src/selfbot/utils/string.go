@@ -186,7 +186,6 @@ func (StringUtils) RegexReplace(regex, replaceWith string, s *string) {
 	*s = r.ReplaceAllString(*s, replaceWith)
 }
 
-
 func (StringUtils) RemoveDuplicateChars(word string) string {
 	var last rune
 

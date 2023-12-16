@@ -162,9 +162,9 @@ func (MiscUtils) CreateAISystemPingMessages(system string, session *discordgo.Se
 		},
 	}
 
-	for i := len(messages)-1; i >= 0; i-- {
+	for i := len(messages) - 1; i >= 0; i-- {
 		message := messages[i]
-		
+
 		role := "user"
 		if message.Author.ID == session.State.User.ID {
 			role = "assistant"

@@ -85,9 +85,7 @@ func (r *NoLeave) Handler(session *discordgo.Session, event any) {
 
 	if recipientRemove.User == nil {
 		return
-	} else
-
-	if recipientRemove.User.ID == session.State.User.ID {
+	} else if recipientRemove.User.ID == session.State.User.ID {
 		return
 	}
 

@@ -25,7 +25,7 @@ func NewForceDisconnectFromData(session *discordgo.Session, data map[string]any)
 	if ok {
 		guild, err = utils.Discord.GetGuild(session, guildID)
 		if err != nil {
-			guild  = &discordgo.Guild{ID: guildID}
+			guild = &discordgo.Guild{ID: guildID}
 		}
 	}
 

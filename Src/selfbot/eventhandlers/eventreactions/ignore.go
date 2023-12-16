@@ -42,7 +42,7 @@ func NewIgnoreFromData(session *discordgo.Session, data map[string]any) (*Ignore
 	}
 
 	utils.Logging.Error("Ignore.NewIgnoreFromData: Invalid ignore data")
-	
+
 	return nil, fmt.Errorf("invalid reaction data")
 }
 

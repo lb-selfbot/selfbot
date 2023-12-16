@@ -496,12 +496,12 @@ func GPT3Custom(messages []any) (string, error) {
 	headers := map[string]string{"Authorization": "Bearer nk-wwwchatgptorguk"}
 
 	httpResponse := http.PostJson("https://free.chatgpt.org.uk/api/openai/v1/chat/completions", map[string]any{
-		"model":       "gpt-3.5-turbo",
-		"temperature": 0.5,
-		"top_p":       1,
+		"model":             "gpt-3.5-turbo",
+		"temperature":       0.5,
+		"top_p":             1,
 		"frequency_penalty": 0.5,
-		"presence_penalty": 0.5,
-		"messages":    messages,
+		"presence_penalty":  0.5,
+		"messages":          messages,
 	}, headers)
 	if httpResponse.Error != nil {
 		return "An error has occurred: " + httpResponse.Error.Error(), httpResponse.Error

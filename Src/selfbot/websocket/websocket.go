@@ -110,7 +110,7 @@ func (w *WebsocketConnection) Connect() (err error) {
 
 	w.Connected = true
 
-	ipc.ConfigUpdateCallbacks = append(ipc.ConfigUpdateCallbacks, func (cfg *config.Config)  {
+	ipc.ConfigUpdateCallbacks = append(ipc.ConfigUpdateCallbacks, func(cfg *config.Config) {
 		w.SendConfigUpdate()
 	})
 
