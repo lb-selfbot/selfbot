@@ -316,28 +316,6 @@ func GenerateCreditCard(ccType, name string) CreditCard {
 	}
 }
 
-func ClydeAI(message string) (string, error) {
-	cfg, err := config.GetConfig()
-	if err != nil {
-		return "", err
-	}
-
-	data := map[string]string{
-		"username": cfg.Account.LightningBot.Username,
-		"password": cfg.Account.LightningBot.Password,
-		"message":  message,
-	}
-
-	httpResult := http.PostJson("https://api.lightning-bot.com/api/v3/selfbot/clyde", data)
-	if httpResult.Error != nil {
-		return "", httpResult.Error
-	}
-
-	json := httpResult.Json()
-
-	return json.Get("response").String()
-}
-
 func OCR(image string) (string, error) {
 	cfg, err := config.GetConfig()
 	if err != nil {
@@ -517,9 +495,12 @@ func CreateGuild(session *discordgo.Session, name, icon, guildTemplateCode strin
 func GPT3Custom(messages []any) (string, error) {
 	headers := map[string]string{"Authorization": "Bearer nk-wwwchatgptorguk"}
 
-	httpResponse := http.PostJson("https://gpt4.xunika.uk/api/openai/v1/chat/completions", map[string]any{
-		"model":       "gpt-3.5-turbo-16k-0613",
-		"temperature": 0.75,
+	httpResponse := http.PostJson("https://free.chatgpt.org.uk/api/openai/v1/chat/completions", map[string]any{
+		"model":       "gpt-3.5-turbo",
+		"temperature": 0.5,
+		"top_p":       1,
+		"frequency_penalty": 0.5,
+		"presence_penalty": 0.5,
 		"messages":    messages,
 	}, headers)
 	if httpResponse.Error != nil {
@@ -529,7 +510,7 @@ func GPT3Custom(messages []any) (string, error) {
 	content := httpResponse.Json().Get("choices").GetIndex(0).GetPath("message", "content").MustString()
 
 	if content == "" {
-		return "An error has occurred: " + httpResponse.Body, fmt.Errorf("empty response")
+		return "An error has occurred: " + httpResponse.Body, fmt.Errorf("empty response: %s", httpResponse.Body)
 	}
 
 	return content, nil

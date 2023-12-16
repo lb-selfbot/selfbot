@@ -96,6 +96,8 @@ func parseText(text string) string {
 	return text
 }
 
+var errorLogged = false
+
 func setRPC(session *discordgo.Session, cfg *config.Config, startTime time.Time) error {
 	if !cfg.Activity.Enabled {
 		client.Logout()
@@ -104,9 +106,22 @@ func setRPC(session *discordgo.Session, cfg *config.Config, startTime time.Time)
 
 	switch cfg.Activity.ActivityType {
 	case "RPC":
+		if constants.HOSTING {
+			if !errorLogged {
+				logging.UI.Error("RPC is not supported when hosting the bot. Please use Custom Activity instead.")
+				errorLogged = true
+			}
+
+			return nil
+		}
+
 		err := client.Login(cfg.Activity.ClientID)
 		if err != nil {
-			logging.UI.Error("RPC Login failed: " + err.Error())
+			if !errorLogged {
+				logging.UI.Error("RPC Login failed: " + err.Error())
+				errorLogged = true
+			}
+
 			return err
 		}
 
@@ -144,6 +159,10 @@ func setRPC(session *discordgo.Session, cfg *config.Config, startTime time.Time)
 			buttonUrls = append(buttonUrls, cfg.Activity.Button2URL)
 		}
 		appID := "898932653049393172"
+
+		if cfg.Activity.ClientID != "" {
+			appID = cfg.Activity.ClientID
+		}
 
 		activity := &discordgo.Activity{
 			Name:       parseText(cfg.Activity.Name),

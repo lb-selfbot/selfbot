@@ -206,8 +206,15 @@ func (m *MessageReaction) Handler(session *discordgo.Session, event any) {
 
 	triggered := m.Guild != nil && m.Guild.ID == message.GuildID ||
 		m.Channel != nil && m.Channel.ID == message.ChannelID ||
-		m.User != nil && m.User.ID == message.Author.ID ||
-		m.Global
+		m.User != nil && m.User.ID == message.Author.ID
+	
+	if m.Global {
+		if m.User != nil {
+			triggered = m.User.ID == message.Author.ID
+		} else {
+			triggered = true
+		}
+	}
 	if !triggered {
 		return
 	}

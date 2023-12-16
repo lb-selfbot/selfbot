@@ -1,0 +1,39 @@
+name: Format and lint
+on: [push, pull_request]
+
+permissions:
+  contents: read
+
+jobs:
+  format:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Install Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: ">=1.21.1"
+
+      - name: Check diff between gofmt and code
+        run: diff <(gofmt -d .) <(echo -n)
+
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Install Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: ">=1.21.1"
+
+      - name: Run go vet
+        run: go vet -x ./...
+
+      - name: Run GolangCI-Lint
+        uses: golangci/golangci-lint-action@v3
+        with:
+          version: v1.54.2

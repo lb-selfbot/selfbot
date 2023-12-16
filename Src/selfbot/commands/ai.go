@@ -23,13 +23,6 @@ func (a *AICommands) RegisterCommands(router *dgc.Router) {
 	})
 
 	router.RegisterCmd(&dgc.Command{
-		Name:        "clydeai",
-		Description: "Talk to Discord's Clyde AI",
-		Usage:       "[p]clydeai <message>",
-		Handler:     a.clydeai,
-	})
-
-	router.RegisterCmd(&dgc.Command{
 		Name:        "imaginestyles",
 		Description: "List of available styles for [p]imagine",
 		Usage:       "[p]imaginestyles",
@@ -76,22 +69,6 @@ func (AICommands) chatgpt(ctx *dgc.Ctx) {
 		SetTitle("ChatGPT (GPT-3.5)").
 		AddField("System", utils.Arguments["<\"system\">"]).
 		AddField("Message", utils.Arguments["<\"message\">"]).
-		AddField("Response", response).
-		Send(ctx)
-}
-
-func (AICommands) clydeai(ctx *dgc.Ctx) {
-	response, err := api.ClydeAI(ctx.Arguments.Raw())
-	if err != nil {
-		_ = ctx.RespondText("Error getting response: " + err.Error())
-		return
-	}
-
-	response = strings.ReplaceAll(response, "1101230589195079822", ctx.Session.State.User.ID)
-
-	embed.NewEmbed().
-		SetTitle("Clyde AI").
-		AddField("Message", ctx.Arguments.Raw()).
 		AddField("Response", response).
 		Send(ctx)
 }
