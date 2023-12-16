@@ -16,6 +16,9 @@ jobs:
         with:
           go-version: ">=1.21.1"
 
+      - name: Change directory
+        run: cd Src
+
       - name: Check diff between gofmt and code
         run: diff <(gofmt -d .) <(echo -n)
 
@@ -29,6 +32,9 @@ jobs:
         uses: actions/setup-go@v3
         with:
           go-version: ">=1.21.1"
+    
+      - name: Change directory
+        run: cd Src
 
       - name: Run go vet
         run: go vet -x ./...
