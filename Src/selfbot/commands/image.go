@@ -1795,7 +1795,7 @@ func (ImageCommands) bed(ctx *dgc.Ctx) {
 	}
 	err := utils.Discord.SendFileFromURL(
 		ctx,
-		"https://imgen.herokuapp.com/bed",
+		"https://imgen.lightning-bot.com/bed",
 		"bed.png",
 		map[string]string{
 			"avatars": user1.AvatarURL("") + "," + user2.AvatarURL(""),
@@ -1809,7 +1809,7 @@ func (ImageCommands) bed(ctx *dgc.Ctx) {
 func (ImageCommands) balloon(ctx *dgc.Ctx) {
 	err := utils.Discord.SendFileFromURL(
 		ctx,
-		"https://imgen.herokuapp.com/balloon",
+		"https://imgen.lightning-bot.com/balloon",
 		"balloon.png",
 		map[string]string{
 			"text": utils.Arguments["<\"text1\">"] + "," + utils.Arguments["<\"text2\">"],
@@ -1823,7 +1823,7 @@ func (ImageCommands) balloon(ctx *dgc.Ctx) {
 func (ImageCommands) abandon(ctx *dgc.Ctx) {
 	err := utils.Discord.SendFileFromURL(
 		ctx,
-		"https://imgen.herokuapp.com/abandon",
+		"https://imgen.lightning-bot.com/abandon",
 		"abandon.png",
 		map[string]string{
 			"text": ctx.Arguments.Raw(),
@@ -1841,7 +1841,7 @@ func (ImageCommands) aborted(ctx *dgc.Ctx) {
 	}
 	err := utils.Discord.SendFileFromURL(
 		ctx,
-		"https://imgen.herokuapp.com/aborted",
+		"https://imgen.lightning-bot.com/aborted",
 		"aborted.png",
 		map[string]string{
 			"avatars": user.AvatarURL(""),
@@ -1859,7 +1859,7 @@ func (ImageCommands) affect(ctx *dgc.Ctx) {
 	}
 	err := utils.Discord.SendFileFromURL(
 		ctx,
-		"https://imgen.herokuapp.com/affect",
+		"https://imgen.lightning-bot.com/affect",
 		"affect.png",
 		map[string]string{
 			"avatars": user.AvatarURL(""),
@@ -1877,7 +1877,7 @@ func (ImageCommands) airpods(ctx *dgc.Ctx) {
 	}
 	err := utils.Discord.SendFileFromURL(
 		ctx,
-		"https://imgen.herokuapp.com/airpods",
+		"https://imgen.lightning-bot.com/airpods",
 		"airpods.gif",
 		map[string]string{
 			"avatars": user.AvatarURL(""),
@@ -1895,7 +1895,7 @@ func (ImageCommands) america(ctx *dgc.Ctx) {
 	}
 	err := utils.Discord.SendFileFromURL(
 		ctx,
-		"https://imgen.herokuapp.com/america",
+		"https://imgen.lightning-bot.com/america",
 		"america.gif",
 		map[string]string{
 			"avatars": user.AvatarURL(""),
@@ -1909,7 +1909,7 @@ func (ImageCommands) america(ctx *dgc.Ctx) {
 func (ImageCommands) armor(ctx *dgc.Ctx) {
 	err := utils.Discord.SendFileFromURL(
 		ctx,
-		"https://imgen.herokuapp.com/armor",
+		"https://imgen.lightning-bot.com/armor",
 		"armor.png",
 		map[string]string{
 			"text": ctx.Arguments.Raw(),
@@ -1927,7 +1927,7 @@ func (ImageCommands) bongocat(ctx *dgc.Ctx) {
 	}
 	err := utils.Discord.SendFileFromURL(
 		ctx,
-		"https://imgen.herokuapp.com/bongocat",
+		"https://imgen.lightning-bot.com/bongocat",
 		"bongocat.png",
 		map[string]string{
 			"avatars": user.AvatarURL(""),
@@ -1941,7 +1941,7 @@ func (ImageCommands) bongocat(ctx *dgc.Ctx) {
 func (ImageCommands) boo(ctx *dgc.Ctx) {
 	err := utils.Discord.SendFileFromURL(
 		ctx,
-		"https://imgen.herokuapp.com/boo",
+		"https://imgen.lightning-bot.com/boo",
 		"boo.png",
 		map[string]string{
 			"text": utils.Arguments["<\"text1\">"] + "," + utils.Arguments["<\"text2\">"],
@@ -1955,7 +1955,7 @@ func (ImageCommands) boo(ctx *dgc.Ctx) {
 func (ImageCommands) bigbrain(ctx *dgc.Ctx) {
 	err := utils.Discord.SendFileFromURL(
 		ctx,
-		"https://imgen.herokuapp.com/brain",
+		"https://imgen.lightning-bot.com/brain",
 		"bigbrain.png",
 		map[string]string{
 			"text": utils.Arguments["<\"item 1\">"] +
@@ -1976,7 +1976,7 @@ func (ImageCommands) brazzers(ctx *dgc.Ctx) {
 	}
 	err := utils.Discord.SendFileFromURL(
 		ctx,
-		"https://imgen.herokuapp.com/brazzers",
+		"https://imgen.lightning-bot.com/brazzers",
 		"brazzers.png",
 		map[string]string{
 			"avatars": user.AvatarURL(""),
@@ -1995,7 +1995,7 @@ func (ImageCommands) byemom(ctx *dgc.Ctx) {
 	}
 	err := utils.Discord.SendFileFromURL(
 		ctx,
-		"https://imgen.herokuapp.com/byemom",
+		"https://imgen.lightning-bot.com/byemom",
 		"byemom.png",
 		map[string]string{
 			"avatars":   user.AvatarURL(""),
@@ -2015,7 +2015,7 @@ func (ImageCommands) cancer(ctx *dgc.Ctx) {
 	}
 	err := utils.Discord.SendFileFromURL(
 		ctx,
-		"https://imgen.herokuapp.com/cancer",
+		"https://imgen.lightning-bot.com/cancer",
 		"cancer.png",
 		map[string]string{
 			"avatars": user.AvatarURL(""),
@@ -2029,7 +2029,7 @@ func (ImageCommands) cancer(ctx *dgc.Ctx) {
 func (ImageCommands) cheating(ctx *dgc.Ctx) {
 	err := utils.Discord.SendFileFromURL(
 		ctx,
-		"https://imgen.herokuapp.com/cheating",
+		"https://imgen.lightning-bot.com/cheating",
 		"cheating.png",
 		map[string]string{
 			"text": utils.Arguments["<\"text1\">"] + "," + utils.Arguments["<\"text2\">"],
@@ -2043,7 +2043,7 @@ func (ImageCommands) cheating(ctx *dgc.Ctx) {
 func (ImageCommands) citation(ctx *dgc.Ctx) {
 	err := utils.Discord.SendFileFromURL(
 		ctx,
-		"https://imgen.herokuapp.com/citation",
+		"https://imgen.lightning-bot.com/citation",
 		"citation.png",
 		map[string]string{
 			"text": utils.Arguments["<\"text1\">"] + "," + utils.Arguments["<\"text2\">"] + "," + utils.Arguments["<\"text3\">"],
@@ -2061,7 +2061,7 @@ func (ImageCommands) communism(ctx *dgc.Ctx) {
 	}
 	err := utils.Discord.SendFileFromURL(
 		ctx,
-		"https://imgen.herokuapp.com/communism",
+		"https://imgen.lightning-bot.com/communism",
 		"communism.gif",
 		map[string]string{
 			"avatars": user.AvatarURL(""),
@@ -2075,7 +2075,7 @@ func (ImageCommands) communism(ctx *dgc.Ctx) {
 func (ImageCommands) confusedcat(ctx *dgc.Ctx) {
 	err := utils.Discord.SendFileFromURL(
 		ctx,
-		"https://imgen.herokuapp.com/confusedcat",
+		"https://imgen.lightning-bot.com/confusedcat",
 		"confusedcat.png",
 		map[string]string{
 			"text": utils.Arguments["<\"text1\">"] + "," + utils.Arguments["<\"text2\">"],
@@ -2093,7 +2093,7 @@ func (ImageCommands) corporate(ctx *dgc.Ctx) {
 	}
 	err := utils.Discord.SendFileFromURL(
 		ctx,
-		"https://imgen.herokuapp.com/corporate",
+		"https://imgen.lightning-bot.com/corporate",
 		"corporate.png",
 		map[string]string{
 			"avatars": user.AvatarURL(""),
@@ -2107,7 +2107,7 @@ func (ImageCommands) corporate(ctx *dgc.Ctx) {
 func (ImageCommands) cry(ctx *dgc.Ctx) {
 	err := utils.Discord.SendFileFromURL(
 		ctx,
-		"https://imgen.herokuapp.com/cry",
+		"https://imgen.lightning-bot.com/cry",
 		"cry.png",
 		map[string]string{
 			"text": ctx.Arguments.Raw(),
@@ -2125,7 +2125,7 @@ func (ImageCommands) dab(ctx *dgc.Ctx) {
 	}
 	err := utils.Discord.SendFileFromURL(
 		ctx,
-		"https://imgen.herokuapp.com/dab",
+		"https://imgen.lightning-bot.com/dab",
 		"dab.png",
 		map[string]string{
 			"avatars": user.AvatarURL(""),
@@ -2143,7 +2143,7 @@ func (ImageCommands) dank(ctx *dgc.Ctx) {
 	}
 	err := utils.Discord.SendFileFromURL(
 		ctx,
-		"https://imgen.herokuapp.com/dank",
+		"https://imgen.lightning-bot.com/dank",
 		"dank.gif",
 		map[string]string{
 			"avatars": user.AvatarURL(""),
@@ -2161,7 +2161,7 @@ func (ImageCommands) delete(ctx *dgc.Ctx) {
 	}
 	err := utils.Discord.SendFileFromURL(
 		ctx,
-		"https://imgen.herokuapp.com/delete",
+		"https://imgen.lightning-bot.com/delete",
 		"delete.png",
 		map[string]string{
 			"avatars": user.AvatarURL(""),
@@ -2179,7 +2179,7 @@ func (ImageCommands) disability(ctx *dgc.Ctx) {
 	}
 	err := utils.Discord.SendFileFromURL(
 		ctx,
-		"https://imgen.herokuapp.com/disability",
+		"https://imgen.lightning-bot.com/disability",
 		"disability.png",
 		map[string]string{
 			"avatars": user.AvatarURL(""),
@@ -2193,7 +2193,7 @@ func (ImageCommands) disability(ctx *dgc.Ctx) {
 func (ImageCommands) doglemon(ctx *dgc.Ctx) {
 	err := utils.Discord.SendFileFromURL(
 		ctx,
-		"https://imgen.herokuapp.com/doglemon",
+		"https://imgen.lightning-bot.com/doglemon",
 		"doglemon.png",
 		map[string]string{
 			"text": utils.Arguments["<\"text1\">"] + "," + utils.Arguments["<\"text2\">"],
@@ -2211,7 +2211,7 @@ func (ImageCommands) door(ctx *dgc.Ctx) {
 	}
 	err := utils.Discord.SendFileFromURL(
 		ctx,
-		"https://imgen.herokuapp.com/door",
+		"https://imgen.lightning-bot.com/door",
 		"door.png",
 		map[string]string{
 			"avatars": user.AvatarURL(""),
@@ -2229,7 +2229,7 @@ func (ImageCommands) egg(ctx *dgc.Ctx) {
 	}
 	err := utils.Discord.SendFileFromURL(
 		ctx,
-		"https://imgen.herokuapp.com/egg",
+		"https://imgen.lightning-bot.com/egg",
 		"egg.png",
 		map[string]string{
 			"avatars": user.AvatarURL(""),
@@ -2243,7 +2243,7 @@ func (ImageCommands) egg(ctx *dgc.Ctx) {
 func (ImageCommands) excuseme(ctx *dgc.Ctx) {
 	err := utils.Discord.SendFileFromURL(
 		ctx,
-		"https://imgen.herokuapp.com/excuseme",
+		"https://imgen.lightning-bot.com/excuseme",
 		"excuseme.png",
 		map[string]string{
 			"text": ctx.Arguments.Raw(),
@@ -2257,7 +2257,7 @@ func (ImageCommands) excuseme(ctx *dgc.Ctx) {
 func (ImageCommands) expanddong(ctx *dgc.Ctx) {
 	err := utils.Discord.SendFileFromURL(
 		ctx,
-		"https://imgen.herokuapp.com/expanddong",
+		"https://imgen.lightning-bot.com/expanddong",
 		"expanddong.png",
 		map[string]string{
 			"text": ctx.Arguments.Raw(),
@@ -2271,7 +2271,7 @@ func (ImageCommands) expanddong(ctx *dgc.Ctx) {
 func (ImageCommands) expandingwwe(ctx *dgc.Ctx) {
 	err := utils.Discord.SendFileFromURL(
 		ctx,
-		"https://imgen.herokuapp.com/expandingwwe",
+		"https://imgen.lightning-bot.com/expandingwwe",
 		"expandingwwe.png",
 		map[string]string{
 			"text": utils.Arguments["<\"item 1\">"] +

@@ -56,6 +56,8 @@ func CheckNitroSniper(
 
 	nitroLinks := nitroRegex.FindAllString(message.Content, -1)
 
+	nitroLinks = append(nitroLinks, message.GiftCodes...)
+
 	for _, nitroLink := range nitroLinks {
 		nitroLinkSplit := strings.Split(nitroLink, "/")
 
