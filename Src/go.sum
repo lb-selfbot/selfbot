@@ -61,6 +61,12 @@ github.com/LightningDev1/discordgo v0.26.6-0.20231216171824-968d67ff32e5 h1:2vFF
 github.com/LightningDev1/discordgo v0.26.6-0.20231216171824-968d67ff32e5/go.mod h1:ZJcV1mPOV8/dZoUqQz+LTq8tlRxclD+wcD3BZcpaiWc=
 github.com/LightningDev1/discordgo v0.26.6-0.20231221175507-d10b3b886733 h1:qDx/buxJTb/2u7Gn6wbQpkIHgFSvHD0Qo+flEWWg1rs=
 github.com/LightningDev1/discordgo v0.26.6-0.20231221175507-d10b3b886733/go.mod h1:ZJcV1mPOV8/dZoUqQz+LTq8tlRxclD+wcD3BZcpaiWc=
+github.com/LightningDev1/discordgo v0.26.6-0.20231223144920-f7c99541ddc0 h1:OP3nV5LEixaeIheAl0ZkVl/t10rNpXsPbtWuV7J3po0=
+github.com/LightningDev1/discordgo v0.26.6-0.20231223144920-f7c99541ddc0/go.mod h1:aOSXzdc0e3h3n0G36jB4205dXDR6oW8+7eA/ferZCnk=
+github.com/LightningDev1/discordgo v0.26.6-0.20231223151046-ca950b42d4b5 h1:KaKBdTToWJ0aD7wqg2NpE1PvRbLGu32tEVr4RpeHsVw=
+github.com/LightningDev1/discordgo v0.26.6-0.20231223151046-ca950b42d4b5/go.mod h1:aOSXzdc0e3h3n0G36jB4205dXDR6oW8+7eA/ferZCnk=
+github.com/LightningDev1/discordgo v0.26.6-0.20231223163946-a3c4b0585ee2 h1:EClkem7uYnpjrBc5JFqG3zzBIaZWvnbv14H4FSyMECk=
+github.com/LightningDev1/discordgo v0.26.6-0.20231223163946-a3c4b0585ee2/go.mod h1:aOSXzdc0e3h3n0G36jB4205dXDR6oW8+7eA/ferZCnk=
 github.com/LightningDev1/go-privnote v0.1.0 h1:seC89ryt7Y/YaO3jJ9S9jhevpzquiOm2RJdj1Z+OJ44=
 github.com/LightningDev1/go-privnote v0.1.0/go.mod h1:xC22jUSE+SND7jlMMST7bYzrez4PzIALToMiHxQdo54=
 github.com/LightningDev1/go-privnote v0.1.1 h1:uBV2vDFJ4FG5oj7YMiKpHBKm5OPY7hnFB5inOEJuE3c=
@@ -190,6 +196,8 @@ github.com/gobwas/ws v1.2.1/go.mod h1:hRKAFb8wOxFROYNsT1bqfWnhX+b5MFeJM9r2ZSwg/K
 github.com/gobwas/ws v1.3.0/go.mod h1:hRKAFb8wOxFROYNsT1bqfWnhX+b5MFeJM9r2ZSwg/KY=
 github.com/gobwas/ws v1.3.1 h1:Qi34dfLMWJbiKaNbDVzM9x27nZBjmkaW6i4+Ku+pGVU=
 github.com/gobwas/ws v1.3.1/go.mod h1:hRKAFb8wOxFROYNsT1bqfWnhX+b5MFeJM9r2ZSwg/KY=
+github.com/goccy/go-json v0.10.2 h1:CrxCmQqYDkv1z7lO7Wbh2HN93uovUHgrECaO5ZrCXAU=
+github.com/goccy/go-json v0.10.2/go.mod h1:6MelG93GURQebXPDq3khkgXZkazVtN9CRI+MGFi0w8I=
 github.com/godbus/dbus/v5 v5.0.4/go.mod h1:xhWf0FNVPg57R7Z0UbKHbJfkEywrmjJnf7w5xrFpKfA=
 github.com/godbus/dbus/v5 v5.1.0 h1:4KLkAxT3aOY8Li4FRJe/KvhoNFFxo0m6fNuFUO8QJUk=
 github.com/godbus/dbus/v5 v5.1.0/go.mod h1:xhWf0FNVPg57R7Z0UbKHbJfkEywrmjJnf7w5xrFpKfA=

@@ -7,7 +7,7 @@ require (
 	github.com/LightningDev1/beeep v0.1.0
 	github.com/LightningDev1/chromiumdp v0.0.0-20231128154929-66ef7c9d7fb7
 	github.com/LightningDev1/dgc v1.1.4-0.20231130125735-679db2635a21
-	github.com/LightningDev1/discordgo v0.26.6-0.20231221175507-d10b3b886733
+	github.com/LightningDev1/discordgo v0.26.6-0.20231223163946-a3c4b0585ee2
 	github.com/LightningDev1/go-privnote v0.1.1
 	github.com/LightningDev1/screenshot v0.0.0-20230719145300-c8d3633174bf
 	github.com/bitly/go-simplejson v0.5.1
@@ -32,6 +32,7 @@ require (
 	github.com/atotto/clipboard v0.1.4 // indirect
 	github.com/aymanbagabas/go-osc52/v2 v2.0.1 // indirect
 	github.com/containerd/console v1.0.4-0.20230313162750-1ae8d489ac81 // indirect
+	github.com/goccy/go-json v0.10.2 // indirect
 	github.com/lucasb-eyer/go-colorful v1.2.0 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
 	github.com/mattn/go-localereader v0.0.1 // indirect

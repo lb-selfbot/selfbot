@@ -183,6 +183,8 @@ func Main(discordgoDebug bool) {
 	}
 
 	session, _ := discordgo.New("")
+	session.ShouldSubscribeGuilds = false
+	session.State.TrackVoice = false
 
 	initSelfbot(session)
 

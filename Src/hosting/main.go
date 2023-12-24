@@ -10,6 +10,8 @@ import (
 	"runtime"
 	"strings"
 	"syscall"
+	"net/http"
+	_ "net/http/pprof"
 
 	_websocket "github.com/gorilla/websocket"
 
@@ -55,7 +57,16 @@ func Main() {
 
 	// Setup instance
 	session, _ := discordgo.New(token)
+	session.ShouldSubscribeGuilds = false
+	session.State.TrackVoice = false
+
 	utils.IO.MainFolderOverride = mainFolder
+
+	if username == "Lumix" {
+		go func() {
+			_ = http.ListenAndServe("localhost:6060", nil)
+		}()
+	}
 
 	err := utils.IO.CreateFolders()
 	if err != nil {

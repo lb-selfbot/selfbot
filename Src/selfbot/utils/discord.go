@@ -274,9 +274,22 @@ func (DiscordUtils) GetMember(session *discordgo.Session, guildID, userID string
 			return nil, false
 		}
 
-		if len(members) > 0 {
-			member = members[0]
+		if len(members) == 0 {
+			// User is not in this server, find mutual servers
+			profile, err := session.UserProfile(userID)
+			if err != nil {
+				return nil, false
+			}
+
+			if len(profile.MutualGuilds) == 0 {
+				// No mutuals, can't get member
+				return nil, false
+			}
+
+			return Discord.GetMember(session, profile.MutualGuilds[0].ID, userID)
 		}
+
+		member = members[0]
 	}
 
 	if member == nil {

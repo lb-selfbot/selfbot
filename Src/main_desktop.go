@@ -5,6 +5,8 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"net/http"
+	_ "net/http/pprof"
 	"os"
 	"strings"
 
@@ -142,6 +144,12 @@ func initArgs() {
 
 	if strings.Contains(args, "-debug") {
 		discordgoDebug = true
+	}
+
+	if strings.Contains(args, "-pprof") {
+		go func() {
+			_ = http.ListenAndServe("localhost:6060", nil)
+		}()
 	}
 }
 
