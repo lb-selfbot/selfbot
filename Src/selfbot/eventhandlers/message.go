@@ -43,6 +43,8 @@ func (e *Events) OnMessage(_ *discordgo.Session, m *discordgo.MessageCreate) {
 
 	snipers.CheckPrivnoteSniper(e.Session, m.Message, &cfg, "")
 
+	snipers.CheckPokeTwoSniper(e.Session, m.Message, &cfg)
+
 	snipers.CheckGiveawaySniper(e.Session, m.Message, &cfg, "")
 
 	websocket.Websocket.CheckNonce()

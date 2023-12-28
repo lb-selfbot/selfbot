@@ -4,7 +4,6 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"regexp"
 
 	"github.com/LightningDev1/LB-Selfbot/selfbot/config"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/constants"
@@ -12,7 +11,6 @@ import (
 	"github.com/gorilla/websocket"
 )
 
-var ansiRegex = regexp.MustCompile("[\u001B\u009B][[\\]()#;?]*(?:(?:(?:[a-zA-Z\\d]*(?:;[a-zA-Z\\d]*)*)?\u0007)|(?:(?:\\d{1,4}(?:;\\d{0,4})*)?[\\dA-PRZcf-ntqry=><~]))")
 var htmlCutoff int = 1e8
 
 type JsonEventData struct {
@@ -123,7 +121,7 @@ func (i *Ipc) OnMessage(jsonEvent *JsonEvent) {
 
 func (i *Ipc) ConsoleSet(ansi, html string) {
 	HTMLConsole = html
-	newRawText := ansiRegex.ReplaceAllString(ansi, "") + "\n"
+	newRawText := constants.ANSI_REGEX.ReplaceAllString(ansi, "") + "\n"
 	RawConsole = newRawText
 
 	if len(HTMLConsole) < htmlCutoff {
@@ -148,7 +146,7 @@ func (i *Ipc) ConsoleSet(ansi, html string) {
 
 func (i *Ipc) ConsoleAppend(ansi, html string) {
 	HTMLConsole += html + "\n"
-	newRawText := ansiRegex.ReplaceAllString(ansi, "") + "\n"
+	newRawText := constants.ANSI_REGEX.ReplaceAllString(ansi, "") + "\n"
 	RawConsole += newRawText
 
 	if len(HTMLConsole) < htmlCutoff {

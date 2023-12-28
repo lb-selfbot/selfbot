@@ -82,7 +82,8 @@
     "Footer": "LightningBot $VERSION",
     "MobileFriendly": false,
     "Title": "LightningBot",
-    "Client": "Desktop"
+    "Client": "Desktop",
+    "CommandAliases": {}
   },
   "Sharing": {
     "ShareAll": false,
@@ -102,7 +103,17 @@
     "MultiTokenSniper": false,
     "NitroSniper": true,
     "PrivnoteSniper": true,
-    "Tokens": []
+    "Tokens": [],
+    "PokeTwoSniper": {
+      "Enabled": false,
+      "Timeout": 20,
+      "Sleep": 5,
+      "RandomSleep": false,
+      "Typing": true,
+      "FakeActivity": true,
+      "CatchRate": 100,
+      "Channels": []
+    }
   },
   "UI": {
     "Theme": "Dark",

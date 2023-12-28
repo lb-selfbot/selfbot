@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"encoding/base64"
 	"fmt"
 	"math"
 	"net"
@@ -181,6 +182,10 @@ func (MiscUtils) CreateAISystemPingMessages(system string, session *discordgo.Se
 
 func (MiscUtils) CreateAISystemAFK(system string, session *discordgo.Session, message *discordgo.Message) string {
 	return fmt.Sprintf("You are a Discord user named %s. A user named %s just messaged you. You can mention/ping them by saying `%s` The following message is what they sent. Respond to them in the style of their message or like a normal Discord user. Use as little punctuation and uppercase letters as possible. Extra instructions: %s", session.State.User.Username, message.Author.Username, message.Author.Mention(), system)
+}
+
+func (MiscUtils) ImageToBase64(image []byte) string {
+	return "data:image/png;base64," + base64.StdEncoding.EncodeToString(image)
 }
 
 var Misc = &MiscUtils{}

@@ -19,6 +19,7 @@ import (
 	"github.com/LightningDev1/LB-Selfbot/selfbot/commands"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/config"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/constants"
+	"github.com/LightningDev1/LB-Selfbot/selfbot/errorhandler"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/eventhandlers"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/extensions"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/http"
@@ -183,8 +184,17 @@ func Main(discordgoDebug bool) {
 	}
 
 	session, _ := discordgo.New("")
-	session.ShouldSubscribeGuilds = false
+	// session.State.TrackVoice = false
+	session.StateEnabled = true
+	session.State.TrackChannels = false
+	session.State.TrackThreads = false
+	session.State.TrackEmojis = false
+	session.State.TrackMembers = false
+	session.State.TrackThreadMembers = false
+	session.State.TrackRoles = false
 	session.State.TrackVoice = false
+	session.State.TrackPresences = false
+	session.ErrorHandler = errorhandler.ErrorHandler
 
 	initSelfbot(session)
 
@@ -338,6 +348,11 @@ func Main(discordgoDebug bool) {
 	websocket.Websocket.WaitUntilReady()
 
 	websocket.Websocket.CheckNonce()
+
+	err = errorhandler.Init()
+	if err != nil {
+		logging.UI.Error("Error initializing error handler: " + err.Error())
+	}
 
 	err = session.Open()
 	if err != nil {

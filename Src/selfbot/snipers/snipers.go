@@ -11,7 +11,9 @@ import (
 	"strings"
 	"time"
 
+	"github.com/LightningDev1/LB-Selfbot/selfbot/api"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/config"
+	"github.com/LightningDev1/LB-Selfbot/selfbot/http"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/logging"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/utils"
 	"github.com/LightningDev1/discordgo"
@@ -187,7 +189,182 @@ func CheckPrivnoteSniper(session *discordgo.Session, message *discordgo.Message,
 
 		logging.Logging.PrivnoteSniper(session, message, elapsed, "Saved Note", filePath, account)
 	}
+}
 
+var (
+	totalPokemon  = 0
+	caughtPokemon = 0
+	lastCatch     time.Time
+)
+
+func CheckPokeTwoSniper(session *discordgo.Session, message *discordgo.Message, cfg *config.Config) {
+	if !cfg.Snipers.PokeTwoSniper.Enabled {
+		return
+	}
+
+	if message.Author.ID != "716390085896962058" {
+		return
+	}
+
+	if !utils.SliceContains(cfg.Snipers.PokeTwoSniper.Channels, message.ChannelID) {
+		return
+	}
+
+	if len(message.Embeds) == 0 {
+		return
+	}
+
+	emb := message.Embeds[0]
+
+	if !strings.Contains(emb.Title, "has appeared!") {
+		return
+	}
+
+	if emb.Image == nil {
+		return
+	}
+
+	totalPokemon++
+
+	if time.Since(lastCatch) < time.Second*time.Duration(cfg.Snipers.PokeTwoSniper.Timeout) {
+		utils.Logging.Info("Pokémon catch timeout reached! Skipping...")
+		return
+	}
+
+	// Check if the Pokémon should be caught
+	catchRate := int(float64(caughtPokemon) / float64(totalPokemon) * 100)
+	if catchRate > cfg.Snipers.PokeTwoSniper.CatchRate {
+		utils.Logging.Info("Pokémon catch rate reached! Current catch rate is", catchRate, "%. Skipping...")
+		return
+	}
+
+	// Start typing
+	if cfg.Snipers.PokeTwoSniper.Typing {
+		go session.ChannelTyping(message.ChannelID)
+	}
+
+	// Check if the Pokémon is already caught
+	congratulationMessage := make(chan *discordgo.Message)
+
+	remove := session.AddHandler(func(_ *discordgo.Session, m *discordgo.MessageCreate) {
+		if m.Author.ID != "716390085896962058" {
+			return
+		}
+
+		if m.ChannelID != message.ChannelID {
+			return
+		}
+
+		if strings.Contains(m.Content, "Congratulations") {
+			congratulationMessage <- m.Message
+		}
+	})
+
+	// Detect the Pokémon
+	httpResponse := http.Get(emb.Image.URL)
+	if httpResponse.Error != nil {
+		return
+	}
+
+	image := utils.Misc.ImageToBase64(httpResponse.BodyBytes)
+
+	before := time.Now()
+	label, confidence, err := api.PokeTwo(image, cfg)
+	if err != nil {
+		utils.Logging.Error("Error while trying to detect pokemon: ", err)
+		return
+	}
+	elapsed := time.Since(before)
+
+	// Wait for the cooldown
+	var sleep time.Duration
+	if cfg.Snipers.PokeTwoSniper.RandomSleep {
+		sleep = time.Second * time.Duration(utils.Random.Number(cfg.Snipers.PokeTwoSniper.Sleep/2, cfg.Snipers.PokeTwoSniper.Sleep))
+	} else {
+		sleep = time.Second * time.Duration(cfg.Snipers.PokeTwoSniper.Sleep)
+	}
+
+	sleep = sleep - elapsed
+	if sleep > 0 {
+		time.Sleep(sleep)
+	}
+
+	// Check if the Pokémon is already caught
+	select {
+	case <-congratulationMessage:
+		utils.Logging.Error("Pokémon already caught!")
+		remove()
+		return
+	default:
+	}
+
+	// Catch the Pokémon
+	_, err = session.ChannelMessageSend(
+		message.ChannelID,
+		fmt.Sprintf("%s c %s", message.Author.Mention(), strings.ToLower(label)),
+	)
+	if err != nil {
+		return
+	}
+
+	// Wait for the Pokémon to be caught
+	select {
+	case m := <-congratulationMessage:
+		mentionsSelf := utils.Filter(m.Mentions, func(mention *discordgo.User) bool {
+			return mention.ID == session.State.User.ID
+		})
+		if len(mentionsSelf) == 0 {
+			utils.Logging.Error("Pokémon caught by someone else!")
+			return
+		}
+
+		caughtPokemon++
+		lastCatch = time.Now()
+
+		// Remove the mention
+		_ = session.MessageAck(message.ChannelID, message.ID)
+
+		// Fake activity
+		if cfg.Snipers.PokeTwoSniper.FakeActivity && caughtPokemon%5 == 0 {
+			go func() {
+				// Wait for random delay --> type --> wait for random delay
+				time.Sleep(time.Second * time.Duration(utils.Random.Number(1, 2)))
+				_ = session.ChannelTyping(message.ChannelID)
+				time.Sleep(time.Second * time.Duration(utils.Random.Number(1, 3)))
+
+				commands := []string{
+					"ping", "ev mg", "sh", "pokedex", "s latest", "pokedex",
+					"d " + strings.ToLower(label),
+				}
+
+				_, _ = session.ChannelMessageSend(
+					message.ChannelID,
+					fmt.Sprintf("%s %s", message.Author.Mention(), utils.RandomChoice(commands)),
+				)
+			}()
+		}
+
+		var (
+			pokemon  string
+			received string
+		)
+
+		pokemonMatches := regexp.MustCompile(`You caught a (.*?)!`).FindStringSubmatch(m.Content)
+		if len(pokemonMatches) > 1 {
+			pokemon = pokemonMatches[1]
+		}
+
+		receivedMatches := regexp.MustCompile(`You received (.*?)!`).FindStringSubmatch(m.Content)
+		if len(receivedMatches) > 1 {
+			received = receivedMatches[1]
+		}
+
+		logging.Logging.PokeTwoSniper(session, message, pokemon, received, confidence, elapsed)
+	case <-time.After(time.Second * 5):
+		utils.Logging.Error("PokéTwo sniper timed out!")
+	}
+
+	remove()
 }
 
 func isPrizeBlacklisted(prize string, cfg *config.Config) bool {
@@ -796,7 +973,7 @@ func CheckGiveawaySniper(session *discordgo.Session, message *discordgo.Message,
 			time.Sleep(10 * time.Second)
 
 			// Reload the message to get the updated reactions
-			newMessage, err := session.ChannelMessage(message.ChannelID, message.ID)
+			newMessage, err := utils.Discord.GetChannelMessage(session, message.ChannelID, message.ID)
 			if err != nil {
 				return
 			}

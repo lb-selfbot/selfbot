@@ -7,6 +7,7 @@ import (
 
 	"github.com/LightningDev1/LB-Selfbot/selfbot/config"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/embed"
+	"github.com/LightningDev1/LB-Selfbot/selfbot/eventhandlers/eventreactions"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/logging"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/utils"
 	"github.com/LightningDev1/dgc"
@@ -43,7 +44,7 @@ func (c ConfigCommands) RegisterCommands(router *dgc.Router) {
 	router.RegisterCmd(&dgc.Command{
 		Name:        "commandmode",
 		Description: "Set your command mode",
-		Usage:       "[p]commandmode <codeblock/text/webhookembed/indent>",
+		Usage:       "[p]commandmode <codeblock/text/indent/webhookembed/urlembed>",
 		Flags:       []string{"DANGEROUS"},
 		Handler:     c.commandmode,
 	})
@@ -152,7 +153,27 @@ func (c ConfigCommands) RegisterCommands(router *dgc.Router) {
 		Flags:       []string{"DANGEROUS"},
 		Handler:     c.clientspoof,
 	})
-
+	router.RegisterCmd(&dgc.Command{
+		Name:        "getcmdaliases",
+		Description: "Get your current command aliases",
+		Usage:       "[p]getcmdaliases",
+		Flags:       []string{"DANGEROUS"},
+		Handler:     c.getcmdaliases,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "addcmdalias",
+		Description: "Add a command alias",
+		Usage:       "[p]addcmdalias <alias> <command>",
+		Flags:       []string{"DANGEROUS"},
+		Handler:     c.addcmdalias,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "rmcmdalias",
+		Description: "Remove a command alias",
+		Usage:       "[p]rmcmdalias <alias>",
+		Flags:       []string{"DANGEROUS"},
+		Handler:     c.rmcmdalias,
+	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "getnotifications",
 		Description: "Get your current notifications setting",
@@ -337,6 +358,127 @@ func (c ConfigCommands) RegisterCommands(router *dgc.Router) {
 		Usage:       "[p]privnotesniper <on/off>",
 		Flags:       []string{"DANGEROUS"},
 		Handler:     c.privnotesniper,
+	})
+
+	router.RegisterCmd(&dgc.Command{
+		Name:        "getpoketwosniper",
+		Description: "Get your current PokéTwo sniper setting",
+		Usage:       "[p]getpoketwosniper",
+		Flags:       []string{"DANGEROUS"},
+		Handler:     c.getpoketwosniper,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "poketwosniper",
+		Description: "Turn the PokéTwo sniper on or off",
+		Usage:       "[p]poketwosniper <on/off>",
+		Flags:       []string{"DANGEROUS"},
+		Handler:     c.poketwosniper,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "getpoketwosleep",
+		Description: "Get your current PokéTwo sniper sleep setting",
+		Usage:       "[p]getpoketwosleep",
+		Flags:       []string{"DANGEROUS"},
+		Handler:     c.getpoketwosleep,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "poketwosleep",
+		Description: "Set the delay before a Pokémon is caught",
+		Usage:       "[p]poketwosleep <seconds>",
+		Flags:       []string{"DANGEROUS"},
+		Handler:     c.poketwosleep,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "getpoketworandomsleep",
+		Description: "Get your current PokéTwo random sleep setting",
+		Usage:       "[p]getpoketworandomsleep",
+		Flags:       []string{"DANGEROUS"},
+		Handler:     c.getpoketworandomsleep,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "poketworandomsleep",
+		Description: "Turn PokéTwo random sleep on or off",
+		Usage:       "[p]poketworandomsleep <on/off>",
+		Flags:       []string{"DANGEROUS"},
+		Handler:     c.poketworandomsleep,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "getpoketwotimeout",
+		Description: "Get your current PokéTwo sniper timeout",
+		Usage:       "[p]getpoketwotimeout",
+		Flags:       []string{"DANGEROUS"},
+		Handler:     c.getpoketwotimeout,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "poketwotimeout",
+		Description: "Set a timeout for the PokéTwo sniper",
+		Usage:       "[p]poketwotimeout <seconds>",
+		Flags:       []string{"DANGEROUS"},
+		Handler:     c.poketwotimeout,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "getpoketwotyping",
+		Description: "Get your current PokéTwo typing setting",
+		Usage:       "[p]getpoketwotyping",
+		Flags:       []string{"DANGEROUS"},
+		Handler:     c.getpoketwotyping,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "poketwotyping",
+		Description: "Turn PokéTwo typing on or off",
+		Usage:       "[p]poketwotyping <on/off>",
+		Flags:       []string{"DANGEROUS"},
+		Handler:     c.poketwotyping,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "getpoketwocatchrate",
+		Description: "Get your current PokéTwo catch rate",
+		Usage:       "[p]getpoketwocatchrate",
+		Flags:       []string{"DANGEROUS"},
+		Handler:     c.getpoketwocatchrate,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "poketwocatchrate",
+		Description: "Set your PokéTwo catch rate",
+		Usage:       "[p]poketwocatchrate <percentage>",
+		Flags:       []string{"DANGEROUS"},
+		Handler:     c.poketwocatchrate,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "getpoketwofakeactivity",
+		Description: "Get your current PokéTwo fake activity setting",
+		Usage:       "[p]getpoketwofakeactivity",
+		Flags:       []string{"DANGEROUS"},
+		Handler:     c.getpoketwofakeactivity,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "poketwofakeactivity",
+		Description: "Turn PokéTwo fake activity on or off",
+		Usage:       "[p]poketwofakeactivity <on/off>",
+		Flags:       []string{"DANGEROUS"},
+		Handler:     c.poketwofakeactivity,
+	})
+
+	router.RegisterCmd(&dgc.Command{
+		Name:        "getpoketwochannels",
+		Description: "Get the list of PokéTwo catch channels",
+		Usage:       "[p]getpoketwochannels",
+		Flags:       []string{"DANGEROUS"},
+		Handler:     c.getpoketwochannels,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "addpoketwochannel",
+		Description: "Add a channel to the PokéTwo catch channels",
+		Usage:       "[p]addpoketwochannel <channel>",
+		Flags:       []string{"DANGEROUS"},
+		Handler:     c.addpoketwochannel,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "rmpoketwochannel",
+		Description: "Remove a channel from the PokéTwo catch channels",
+		Usage:       "[p]rmpoketwochannel <channel>",
+		Flags:       []string{"DANGEROUS"},
+		Handler:     c.rmpoketwochannel,
 	})
 
 	router.RegisterCmd(&dgc.Command{
@@ -784,13 +926,14 @@ func (ConfigCommands) commandmode(ctx *dgc.Ctx) {
 		return
 	}
 
-	mode := utils.String.Capitalize(utils.Arguments["<codeblock/text/webhookembed/indent>"])
-	if !utils.SliceContains([]string{"Codeblock", "Text", "Webhookembed", "Indent"}, mode) {
+	mode := utils.String.Capitalize(utils.Arguments["<codeblock/text/indent/webhookembed/urlembed>"])
+	if !utils.SliceContains([]string{"Codeblock", "Text", "Indent", "Webhookembed", "Urlembed"}, mode) {
 		_ = ctx.RespondText("Invalid command mode.")
 		return
 	}
 
 	cfg.Selfbot.CommandMode = strings.ReplaceAll(mode, "Webhookembed", "WebhookEmbed")
+	cfg.Selfbot.CommandMode = strings.ReplaceAll(cfg.Selfbot.CommandMode, "Urlembed", "URLEmbed")
 	_ = cfg.Save()
 
 	embed.NewEmbed().
@@ -1014,6 +1157,83 @@ func (ConfigCommands) clientspoof(ctx *dgc.Ctx) {
 
 	embed.NewEmbed().
 		SetDescription("Client set to " + cfg.Selfbot.CommandMode).
+		Send(ctx)
+}
+
+func (ConfigCommands) getcmdaliases(ctx *dgc.Ctx) {
+	cfg, err := config.GetConfig()
+	if err != nil {
+		_ = ctx.RespondText("Error getting config.")
+		return
+	}
+
+	prefix := cfg.Selfbot.CommandPrefix
+	var aliases []string
+
+	for alias, command := range cfg.Selfbot.CommandAliases {
+		aliases = append(aliases, fmt.Sprintf("%s%s - %s%s", prefix, alias, prefix, command))
+	}
+
+	if len(aliases) == 0 {
+		aliases = append(aliases, "No aliases set.")
+	}
+
+	embed.NewEmbed().
+		AddField("Command Aliases", strings.Join(aliases, "\n")).
+		Send(ctx)
+}
+
+func (ConfigCommands) addcmdalias(ctx *dgc.Ctx) {
+	cfg, err := config.GetConfig()
+	if err != nil {
+		_ = ctx.RespondText("Error getting config.")
+		return
+	}
+
+	alias, cmd := utils.Arguments["<alias>"], utils.Arguments["<command>"]
+
+	if _, ok := cfg.Selfbot.CommandAliases[alias]; ok {
+		_ = ctx.RespondText("Alias already exists.")
+		return
+	}
+
+	if ctx.Router.GetCmd(cmd) == nil {
+		_ = ctx.RespondText("Command does not exist.")
+		return
+	}
+
+	cfg.Selfbot.CommandAliases[alias] = cmd
+	_ = cfg.Save()
+
+	_ = eventreactions.LoadAliases(ctx.Router)
+
+	embed.NewEmbed().
+		SetDescription(fmt.Sprintf("Added alias `%s` for command `%s`.", alias, cmd)).
+		Send(ctx)
+}
+
+func (ConfigCommands) rmcmdalias(ctx *dgc.Ctx) {
+	cfg, err := config.GetConfig()
+	if err != nil {
+		_ = ctx.RespondText("Error getting config.")
+		return
+	}
+
+	alias := utils.Arguments["<alias>"]
+
+	cmd, ok := cfg.Selfbot.CommandAliases[alias]
+	if !ok {
+		_ = ctx.RespondText("Alias doesn't exist.")
+		return
+	}
+
+	delete(cfg.Selfbot.CommandAliases, alias)
+	_ = cfg.Save()
+
+	_ = eventreactions.LoadAliases(ctx.Router)
+
+	embed.NewEmbed().
+		SetDescription(fmt.Sprintf("Removed alias `%s` for command `%s`.", alias, cmd)).
 		Send(ctx)
 }
 
@@ -1457,6 +1677,319 @@ func (ConfigCommands) multitokensniper(ctx *dgc.Ctx) {
 
 	embed.NewEmbed().
 		SetDescription("Turned " + toggle + " multi token sniper").
+		Send(ctx)
+}
+
+func (ConfigCommands) getpoketwosniper(ctx *dgc.Ctx) {
+	cfg, err := config.GetConfig()
+	if err != nil {
+		_ = ctx.RespondText("Error getting config")
+		return
+	}
+
+	embed.NewEmbed().
+		AddField("PokéTwo Sniper", utils.Misc.FormatBoolOnOff(cfg.Snipers.PokeTwoSniper.Enabled)).
+		Send(ctx)
+}
+
+func (ConfigCommands) poketwosniper(ctx *dgc.Ctx) {
+	cfg, err := config.GetConfig()
+	if err != nil {
+		_ = ctx.RespondText("Error getting config")
+		return
+	}
+
+	toggle := strings.ToLower(utils.Arguments["<on/off>"])
+	if toggle != "on" && toggle != "off" {
+		_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
+		return
+	}
+
+	cfg.Snipers.PokeTwoSniper.Enabled = toggle == "on"
+	_ = cfg.Save()
+
+	embed.NewEmbed().
+		SetDescription("Turned " + toggle + " PokéTwo sniper").
+		Send(ctx)
+}
+
+func (ConfigCommands) getpoketwosleep(ctx *dgc.Ctx) {
+	cfg, err := config.GetConfig()
+	if err != nil {
+		_ = ctx.RespondText("Error getting config")
+		return
+	}
+
+	embed.NewEmbed().
+		AddField("PokéTwo Sniper Sleep", fmt.Sprintf("%d seconds", cfg.Snipers.PokeTwoSniper.Sleep)).
+		Send(ctx)
+}
+
+func (ConfigCommands) poketwosleep(ctx *dgc.Ctx) {
+	cfg, err := config.GetConfig()
+	if err != nil {
+		_ = ctx.RespondText("Error getting config")
+		return
+	}
+
+	delay, err := strconv.Atoi(utils.Arguments["<seconds>"])
+	if err != nil {
+		_ = ctx.RespondText("Argument <seconds> must be a number.")
+		return
+	}
+
+	cfg.Snipers.PokeTwoSniper.Sleep = delay
+	_ = cfg.Save()
+
+	embed.NewEmbed().
+		SetDescription(fmt.Sprintf("PokéTwo sniper sleep set to %d seconds", cfg.Snipers.PokeTwoSniper.Sleep)).
+		Send(ctx)
+}
+
+func (ConfigCommands) getpoketworandomsleep(ctx *dgc.Ctx) {
+	cfg, err := config.GetConfig()
+	if err != nil {
+		_ = ctx.RespondText("Error getting config")
+		return
+	}
+
+	embed.NewEmbed().
+		AddField("PokéTwo Random Sleep", utils.Misc.FormatBoolOnOff(cfg.Snipers.PokeTwoSniper.RandomSleep)).
+		Send(ctx)
+}
+
+func (ConfigCommands) poketworandomsleep(ctx *dgc.Ctx) {
+	cfg, err := config.GetConfig()
+	if err != nil {
+		_ = ctx.RespondText("Error getting config")
+		return
+	}
+
+	toggle := strings.ToLower(utils.Arguments["<on/off>"])
+	if toggle != "on" && toggle != "off" {
+		_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
+		return
+	}
+
+	cfg.Snipers.PokeTwoSniper.RandomSleep = toggle == "on"
+	_ = cfg.Save()
+
+	embed.NewEmbed().
+		SetDescription("Turned " + toggle + " PokéTwo random sleep").
+		Send(ctx)
+}
+
+func (ConfigCommands) getpoketwotimeout(ctx *dgc.Ctx) {
+	cfg, err := config.GetConfig()
+	if err != nil {
+		_ = ctx.RespondText("Error getting config")
+		return
+	}
+
+	embed.NewEmbed().
+		AddField("PokéTwo Sniper Timeout", fmt.Sprintf("%d seconds", cfg.Snipers.PokeTwoSniper.Timeout)).
+		Send(ctx)
+}
+
+func (ConfigCommands) poketwotimeout(ctx *dgc.Ctx) {
+	cfg, err := config.GetConfig()
+	if err != nil {
+		_ = ctx.RespondText("Error getting config")
+		return
+	}
+
+	timeout, err := strconv.Atoi(utils.Arguments["<seconds>"])
+	if err != nil {
+		_ = ctx.RespondText("Argument <seconds> must be a number.")
+		return
+	}
+
+	cfg.Snipers.PokeTwoSniper.Timeout = timeout
+	_ = cfg.Save()
+
+	embed.NewEmbed().
+		SetDescription(fmt.Sprintf("PokéTwo sniper timeout set to %d seconds", cfg.Snipers.PokeTwoSniper.Timeout)).
+		Send(ctx)
+}
+
+func (ConfigCommands) getpoketwotyping(ctx *dgc.Ctx) {
+	cfg, err := config.GetConfig()
+	if err != nil {
+		_ = ctx.RespondText("Error getting config")
+		return
+	}
+
+	embed.NewEmbed().
+		AddField("PokéTwo Typing", utils.Misc.FormatBoolOnOff(cfg.Snipers.PokeTwoSniper.Typing)).
+		Send(ctx)
+}
+
+func (ConfigCommands) poketwotyping(ctx *dgc.Ctx) {
+	cfg, err := config.GetConfig()
+	if err != nil {
+		_ = ctx.RespondText("Error getting config")
+		return
+	}
+
+	toggle := strings.ToLower(utils.Arguments["<on/off>"])
+	if toggle != "on" && toggle != "off" {
+		_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
+		return
+	}
+
+	cfg.Snipers.PokeTwoSniper.Typing = toggle == "on"
+	_ = cfg.Save()
+
+	embed.NewEmbed().
+		SetDescription("Turned " + toggle + " PokéTwo typing").
+		Send(ctx)
+}
+
+func (ConfigCommands) getpoketwocatchrate(ctx *dgc.Ctx) {
+	cfg, err := config.GetConfig()
+	if err != nil {
+		_ = ctx.RespondText("Error getting config")
+		return
+	}
+
+	embed.NewEmbed().
+		AddField("PokéTwo Catch Rate", fmt.Sprintf("%d%%", cfg.Snipers.PokeTwoSniper.CatchRate)).
+		Send(ctx)
+}
+
+func (ConfigCommands) poketwocatchrate(ctx *dgc.Ctx) {
+	cfg, err := config.GetConfig()
+	if err != nil {
+		_ = ctx.RespondText("Error getting config")
+		return
+	}
+
+	catchRate, err := strconv.Atoi(strings.ReplaceAll(utils.Arguments["<percentage>"], "%", ""))
+	if err != nil || catchRate < 0 || catchRate > 100 {
+		_ = ctx.RespondText("Argument <percentage> must be a percentage in the format `0-100%`.")
+		return
+	}
+
+	cfg.Snipers.PokeTwoSniper.CatchRate = catchRate
+	_ = cfg.Save()
+
+	embed.NewEmbed().
+		SetDescription(fmt.Sprintf("PokéTwo catch rate set to %d%%", cfg.Snipers.PokeTwoSniper.CatchRate)).
+		Send(ctx)
+}
+
+func (ConfigCommands) getpoketwofakeactivity(ctx *dgc.Ctx) {
+	cfg, err := config.GetConfig()
+	if err != nil {
+		_ = ctx.RespondText("Error getting config")
+		return
+	}
+
+	embed.NewEmbed().
+		AddField("PokéTwo Fake Activity", utils.Misc.FormatBoolOnOff(cfg.Snipers.PokeTwoSniper.FakeActivity)).
+		Send(ctx)
+}
+
+func (ConfigCommands) poketwofakeactivity(ctx *dgc.Ctx) {
+	cfg, err := config.GetConfig()
+	if err != nil {
+		_ = ctx.RespondText("Error getting config")
+		return
+	}
+
+	toggle := strings.ToLower(utils.Arguments["<on/off>"])
+	if toggle != "on" && toggle != "off" {
+		_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
+		return
+	}
+
+	cfg.Snipers.PokeTwoSniper.FakeActivity = toggle == "on"
+	_ = cfg.Save()
+
+	embed.NewEmbed().
+		SetDescription("Turned " + toggle + " PokéTwo fake activity").
+		Send(ctx)
+}
+
+func (ConfigCommands) getpoketwochannels(ctx *dgc.Ctx) {
+	cfg, err := config.GetConfig()
+	if err != nil {
+		_ = ctx.RespondText("Error getting config")
+		return
+	}
+
+	var channels []string
+
+	for _, channelID := range cfg.Snipers.PokeTwoSniper.Channels {
+		channel, err := utils.Discord.GetChannel(ctx.Session, channelID)
+		if err == nil {
+			guildName := "Unknown server"
+
+			guild, err := utils.Discord.GetGuild(ctx.Session, channel.GuildID)
+			if err == nil {
+				guildName = guild.Name
+			}
+
+			channels = append(channels, fmt.Sprintf("%s - %s (%s)", channel.Mention(), channel.ID, guildName))
+		} else {
+			channels = append(channels, channelID)
+		}
+	}
+
+	embed.NewEmbed().
+		AddField("PokéTwo Sniper Channels", strings.Join(channels, "\n")).
+		Send(ctx)
+}
+
+func (ConfigCommands) addpoketwochannel(ctx *dgc.Ctx) {
+	cfg, err := config.GetConfig()
+	if err != nil {
+		_ = ctx.RespondText("Error getting config")
+		return
+	}
+
+	channel, success := utils.Discord.TryGetChannelFromMention(ctx, ctx.Arguments.Get(0))
+	if !success {
+		_ = ctx.RespondText("Could not find channel")
+		return
+	}
+
+	if utils.SliceContains(cfg.Snipers.PokeTwoSniper.Channels, channel.ID) {
+		_ = ctx.RespondText("Channel is already in the catch list!")
+		return
+	}
+
+	cfg.Snipers.PokeTwoSniper.Channels = append(cfg.Snipers.PokeTwoSniper.Channels, channel.ID)
+	_ = cfg.Save()
+
+	embed.NewEmbed().
+		SetDescription(fmt.Sprintf("Added %s to the PokéTwo sniper catch list.", channel.Mention())).
+		Send(ctx)
+}
+
+func (ConfigCommands) rmpoketwochannel(ctx *dgc.Ctx) {
+	cfg, err := config.GetConfig()
+	if err != nil {
+		_ = ctx.RespondText("Error getting config")
+		return
+	}
+
+	channel, success := utils.Discord.TryGetChannelFromMention(ctx, ctx.Arguments.Get(0))
+	if !success {
+		_ = ctx.RespondText("Could not find channel")
+		return
+	}
+
+	if !utils.SliceContains(cfg.Snipers.PokeTwoSniper.Channels, channel.ID) {
+		_ = ctx.RespondText("Channel is not in the catch list!")
+		return
+	}
+
+	cfg.Snipers.PokeTwoSniper.Channels = utils.RemoveSliceItem(cfg.Snipers.PokeTwoSniper.Channels, channel.ID)
+	_ = cfg.Save()
+
+	embed.NewEmbed().
+		SetDescription(fmt.Sprintf("Removed %s from the PokéTwo sniper catch list.", channel.Mention())).
 		Send(ctx)
 }
 

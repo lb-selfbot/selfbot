@@ -4,9 +4,11 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"net/url"
 	"strings"
 	"time"
 
+	"github.com/LightningDev1/LB-Selfbot/selfbot/api"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/config"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/constants"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/http"
@@ -453,6 +455,110 @@ func (e *Embed) ToIndent() []string {
 	return append(strings_, newStr)
 }
 
+func (e *Embed) URLEmbedGen(urlEmbed api.URLEmbed) string {
+	const host = "https://embed.ched.rip/api/embed?"
+
+	values := url.Values{
+		"title":         {urlEmbed.Title},
+		"description":   {urlEmbed.Description},
+		"url":           {urlEmbed.URL},
+		"color":         {urlEmbed.Color},
+		"image":         {urlEmbed.Image},
+		"large":         {fmt.Sprintf("%t", urlEmbed.Large)},
+		"video":         {urlEmbed.Video},
+		"provider_name": {urlEmbed.ProviderName},
+		"provider_url":  {urlEmbed.ProviderURL},
+		"author_name":   {urlEmbed.AuthorName},
+		"author_url":    {urlEmbed.AuthorURL},
+	}
+
+	return host + values.Encode()
+}
+
+func (e *Embed) ToURLEmbed() []string {
+	// Generate description
+	description := ""
+	if e.Description != "" {
+		description = e.Description
+	}
+	if len(e.Fields) > 0 {
+		for _, v := range e.Fields {
+			description += fmt.Sprintf("\n\n• %s\n%s", v.Name, v.Value)
+		}
+	}
+	if e.Subtext != "" {
+		e.Subtext = constants.ANSI_REGEX.ReplaceAllString(e.Subtext, "")
+		description += fmt.Sprintf("\n\n%s", e.Subtext)
+	}
+	if e.FooterStr != "" {
+		description += fmt.Sprintf("\n\n%s", e.FooterStr)
+	}
+
+	descriptions := []string{}
+
+	// Split descriptions into multiple embeds
+	var current string
+	for _, line := range strings.Split(description, "\n") {
+		if len(current+line)+1 > 350 {
+			descriptions = append(descriptions, current)
+			current = ""
+		}
+
+		current += line + "\n"
+	}
+
+	descriptions = append(descriptions, current)
+
+	// Generate embeds
+	embeds := []api.URLEmbed{}
+
+	embeds = append(embeds, api.URLEmbed{
+		Title:       e.Title,
+		Description: descriptions[0],
+		URL:         "https://lightning-bot.com/",
+		Color:       "3990c1",
+		Image:       "https://lightning-bot.com/logo.png",
+	})
+
+	if e.Author != nil {
+		embeds[0].AuthorName = e.Author.Name
+		embeds[0].AuthorURL = e.Author.URL
+	}
+
+	for _, description := range descriptions[1:] {
+		embeds = append(embeds, api.URLEmbed{
+			Description: description,
+			Color:       "3990c1",
+		})
+	}
+
+	urls := utils.Map(embeds, func(embed api.URLEmbed) string {
+		url, err := api.GenerateURLEmbed(embed)
+		if err != nil {
+			return ""
+		}
+
+		return url
+	})
+
+	// Generate messages
+	var batches [][]string
+	batchSize := 5
+
+	for i := 0; i < len(urls); i += batchSize {
+		end := i + batchSize
+		if end > len(urls) {
+			end = len(urls)
+		}
+		batch := urls[i:end]
+		batches = append(batches, batch)
+	}
+
+	return utils.Map(batches, func(batch []string) string {
+		return constants.INVISIBLE_TEXT + " " + strings.Join(batch, " ")
+	})
+}
+
 func (e *Embed) ToEmbed() *discordgo.MessageEmbed {
 	if e.Subtext != "" {
 		e.AddField("Subtext", e.Subtext)
@@ -472,6 +578,8 @@ func (e *Embed) ToString(commandMode string) []string {
 		return e.ToText()
 	case "Indent":
 		return e.ToIndent()
+	case "URLEmbed":
+		return e.ToURLEmbed()
 	case "load":
 		cfg, _ := config.GetConfig()
 

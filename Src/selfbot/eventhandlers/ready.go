@@ -14,7 +14,7 @@ func (e *Events) OnReady(session *discordgo.Session, event *discordgo.Ready) {
 
 	// Start slash command jobs
 	go slashcommands.StartJobs(session)
-	go eventreactions.StartLoading(session)
+	go eventreactions.StartLoading(session, e.Router)
 
 	logging.Logging.OnReady(e.Router, event)
 }

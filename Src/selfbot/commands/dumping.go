@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"runtime"
 	"strings"
 
 	"github.com/LightningDev1/LB-Selfbot/selfbot/embed"
@@ -599,6 +600,9 @@ func (*DumpingCommands) dumpmembers(ctx *dgc.Ctx) {
 	filePath := filepath.Join(folder, utils.IO.SanitizeFilename(guild.ID+"_"+guild.Name+".txt"))
 	_ = utils.IO.Write(filePath, logString)
 	_ = utils.System.OpenURL(filePath)
+
+	runtime.GC()
+
 	embed.NewEmbed().
 		SetDescription(fmt.Sprintf("Dumped %d members from %s", len(guild.Members), guild.Name)).
 		Send(ctx)

@@ -538,4 +538,27 @@ func (_Logging) KeywordNotifier(session *discordgo.Session, message *discordgo.M
 		Show()
 }
 
+func (_Logging) PokeTwoSniper(session *discordgo.Session, message *discordgo.Message, pokemon, received string, confidence float64, elapsed time.Duration) {
+	cfg, err := config.GetConfig()
+	if err != nil {
+		return
+	}
+
+	guildName := utils.Discord.GetGuildName(session, message.GuildID)
+	channelName := utils.Discord.GetChannelName(session, message.ChannelID)
+
+	UI.Notification("PokéTwo Sniper: Caught a " + pokemon + " in " + guildName + "\nChannel: " + channelName)
+	NewConsoleMessage().
+		SetTitle("PokéTwo Sniper").
+		SetColor("#C1EFFF").
+		AddInfo("", "Caught a "+pokemon).
+		AddInfoConditional("Received", received, received != "").
+		AddInfo("AI Confidence", fmt.Sprint(confidence)).
+		AddInfo("Detection Time", elapsed.String()).
+		AddInfo("Server", guildName).
+		AddInfo("Channel", channelName).
+		SetWebhookURL(cfg.Webhooks.Misc).
+		Show()
+}
+
 var Logging = _Logging{}

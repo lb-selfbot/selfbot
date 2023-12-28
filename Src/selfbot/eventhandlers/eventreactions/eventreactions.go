@@ -120,8 +120,6 @@ var TimeDifference time.Duration = 0
 // LastActivity is the last time the user was active (used for AFK inactive timeout)
 var LastActivity = time.Now()
 
-var OnConfigUpdate func(cfg *config.Config)
-
 // EventReaction is an interface for event reactions
 type EventReaction interface {
 	Type() EventReactionType
@@ -132,7 +130,7 @@ type EventReaction interface {
 }
 
 // Persistence
-func StartLoading(session *discordgo.Session) {
+func StartLoading(session *discordgo.Session, router *dgc.Router) {
 	err := Load(session, true)
 	if err != nil {
 		utils.Logging.Error("Failed to load event reactions:", err.Error())
@@ -144,6 +142,12 @@ func StartLoading(session *discordgo.Session) {
 		err = Load(session, false)
 		if err != nil {
 			utils.Logging.Error("Failed to load event reactions:", err.Error())
+		}
+
+		// Load command aliases
+		err = LoadAliases(router)
+		if err != nil {
+			utils.Logging.Error("Failed to load command aliases:", err.Error())
 		}
 	}
 }
@@ -223,6 +227,31 @@ func Load(session *discordgo.Session, first bool) error {
 	new := len(ActiveReactions) - oldLength
 	if first && new > 0 {
 		logging.Logging.EventReactions(new)
+	}
+
+	return nil
+}
+
+func LoadAliases(router *dgc.Router) error {
+	cfg, err := config.GetConfig()
+	if err != nil {
+		return err
+	}
+
+	aliases := make(map[string][]string)
+
+	for alias, cmd := range cfg.Selfbot.CommandAliases {
+		if aliases[cmd] == nil {
+			aliases[cmd] = []string{}
+		}
+
+		aliases[cmd] = append(aliases[cmd], alias)
+	}
+
+	for _, cmd := range cfg.Selfbot.CommandAliases {
+		if cmd := router.GetCmd(cmd); cmd != nil {
+			cmd.Aliases = aliases[cmd.Name]
+		}
 	}
 
 	return nil

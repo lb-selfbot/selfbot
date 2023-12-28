@@ -426,6 +426,61 @@ func Obfuscate(lang, code string) string {
 	return obf
 }
 
+type URLEmbed struct {
+	Title        string
+	Description  string
+	URL          string
+	Color        string
+	Image        string
+	Large        bool
+	Video        string
+	ProviderName string
+	ProviderURL  string
+	AuthorName   string
+	AuthorURL    string
+}
+
+func GenerateURLEmbed(embed URLEmbed) (string, error) {
+	values := url.Values{
+		"title":         {embed.Title},
+		"description":   {embed.Description},
+		"url":           {embed.URL},
+		"color":         {embed.Color},
+		"image":         {embed.Image},
+		"large":         {fmt.Sprintf("%t", embed.Large)},
+		"video":         {embed.Video},
+		"provider_name": {embed.ProviderName},
+		"provider_url":  {embed.ProviderURL},
+		"author_name":   {embed.AuthorName},
+		"author_url":    {embed.AuthorURL},
+	}
+	httpResponse := http.Post(
+		"https://embed.lightning-bot.com/api/embed?"+values.Encode(),
+		nil,
+	)
+	if httpResponse.Error != nil {
+		return "", httpResponse.Error
+	}
+
+	return "https://embed.lightning-bot.com/api/embed?key=" + httpResponse.Body, nil
+
+}
+
+func PokeTwo(image string, cfg *config.Config) (string, float64, error) {
+	httpResponse := http.PostJson(
+		"https://lightningdev1-poketwo.hf.space/run/predict",
+		map[string]any{"data": []any{image}},
+	)
+	if httpResponse.Error != nil {
+		return "", 0, httpResponse.Error
+	}
+
+	json := httpResponse.Json()
+	data := json.Get("data").GetIndex(0).Get("confidences").GetIndex(0)
+
+	return data.Get("label").MustString(), data.Get("confidence").MustFloat64(), nil
+}
+
 func GetTokenData(session *discordgo.Session, token string) ([]byte, error) {
 	headers := map[string]string{
 		"Authorization": token,

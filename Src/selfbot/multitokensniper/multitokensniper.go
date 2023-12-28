@@ -34,6 +34,7 @@ func (s *SniperInstance) Start() error {
 	s.Session = session
 	s.Session.SetIdentify(discordgo.IdentifyDiscordClient)
 	s.Session.ShouldSubscribeGuilds = false
+	s.Session.StateEnabled = false
 
 	s.Session.AddHandler(func(_ *discordgo.Session, ready *discordgo.Ready) {
 		s.State = STATE_CONNECTED

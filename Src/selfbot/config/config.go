@@ -12,25 +12,6 @@ import (
 	"github.com/LightningDev1/discordgo"
 )
 
-type RPCButton struct {
-	Label string `json:"Label"`
-	URL   string `json:"URL"`
-}
-
-type RPCData struct {
-	Enabled    bool        `json:"Enabled"`
-	ClientID   string      `json:"ClientID"`
-	State      string      `json:"State"`
-	Details    string      `json:"Details"`
-	Time       bool        `json:"Time"`
-	LargeImage string      `json:"LargeImage"`
-	LargeText  string      `json:"LargeText"`
-	SmallImage string      `json:"SmallImage"`
-	SmallText  string      `json:"SmallText"`
-	Invitable  bool        `json:"Invitable"`
-	Buttons    []RPCButton `json:"Buttons"`
-}
-
 type TriggerList struct {
 	Type    string   `json:"Type"`
 	Users   []string `json:"Users"`
@@ -76,8 +57,18 @@ type Config struct {
 			Enabled    bool     `json:"Enabled"`
 			CustomBots []string `json:"CustomBots"`
 		} `json:"GiveawaySniper"`
-		NitroSniper      bool     `json:"NitroSniper"`
-		PrivnoteSniper   bool     `json:"PrivnoteSniper"`
+		NitroSniper    bool `json:"NitroSniper"`
+		PrivnoteSniper bool `json:"PrivnoteSniper"`
+		PokeTwoSniper  struct {
+			Enabled      bool     `json:"Enabled"`
+			Channels     []string `json:"Channels"`
+			Sleep        int      `json:"Sleep"`
+			RandomSleep  bool     `json:"RandomSleep"`
+			Timeout      int      `json:"Timeout"`
+			Typing       bool     `json:"Typing"`
+			CatchRate    int      `json:"CatchRate"`
+			FakeActivity bool     `json:"FakeActivity"`
+		} `json:"PokeTwoSniper"`
 		MultiTokenSniper bool     `json:"MultiTokenSniper"`
 		Tokens           []string `json:"Tokens"`
 	} `json:"Snipers"`
@@ -105,7 +96,6 @@ type Config struct {
 		SessionConnected      bool `json:"SessionConnected"`
 		SessionDisconnected   bool `json:"SessionDisconnected"`
 	} `json:"Events"`
-	RPC      RPCData `json:"RPC"`
 	Activity struct {
 		Enabled        bool   `json:"Enabled"`
 		ActivityType   string `json:"ActivityType"`
@@ -133,15 +123,16 @@ type Config struct {
 		RunSelfbotOnStartup bool   `json:"RunSelfbotOnStartup"`
 	} `json:"UI"`
 	Selfbot struct {
-		CommandPrefix        string `json:"CommandPrefix"`
-		CommandMode          string `json:"CommandMode"`
-		Title                string `json:"Title"`
-		Footer               string `json:"Footer"`
-		DeleteResponses      bool   `json:"DeleteResponses"`
-		DeleteResponsesDelay int    `json:"DeleteResponsesDelay"`
-		DeleteCommands       bool   `json:"DeleteCommands"`
-		MobileFriendly       bool   `json:"MobileFriendly"`
-		Client               string `json:"Client"`
+		CommandPrefix        string            `json:"CommandPrefix"`
+		CommandMode          string            `json:"CommandMode"`
+		Title                string            `json:"Title"`
+		Footer               string            `json:"Footer"`
+		DeleteResponses      bool              `json:"DeleteResponses"`
+		DeleteResponsesDelay int               `json:"DeleteResponsesDelay"`
+		DeleteCommands       bool              `json:"DeleteCommands"`
+		MobileFriendly       bool              `json:"MobileFriendly"`
+		Client               string            `json:"Client"`
+		CommandAliases       map[string]string `json:"CommandAliases"`
 	}
 	Protections struct {
 		AntiPhishing      bool `json:"AntiPhishing"`
@@ -198,6 +189,7 @@ func (c Config) GetClient() discordgo.Identify {
 
 	return discordgo.IdentifyDiscordClient
 }
+
 
 func (c Config) Save() error {
 	configMutex.Lock()
