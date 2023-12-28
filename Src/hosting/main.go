@@ -20,6 +20,7 @@ import (
 	"github.com/LightningDev1/LB-Selfbot/selfbot/constants"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/errorhandler"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/eventhandlers"
+	"github.com/LightningDev1/LB-Selfbot/selfbot/extensions"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/logging"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/multitokensniper"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/rpc"
@@ -213,6 +214,7 @@ func Main() {
 
 	eventhandlers.EventHandlers.RegisterHandlers(session, router)
 	commands.Commands.RegisterCommands(session, router, true)
+	extensions.RegisterExtensions(session, router)
 
 	router.Initialize(session)
 
