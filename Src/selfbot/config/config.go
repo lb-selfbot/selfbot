@@ -190,7 +190,6 @@ func (c Config) GetClient() discordgo.Identify {
 	return discordgo.IdentifyDiscordClient
 }
 
-
 func (c Config) Save() error {
 	configMutex.Lock()
 	defer configMutex.Unlock()

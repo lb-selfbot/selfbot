@@ -184,16 +184,7 @@ func Main(discordgoDebug bool) {
 	}
 
 	session, _ := discordgo.New("")
-	// session.State.TrackVoice = false
-	session.StateEnabled = true
-	session.State.TrackChannels = false
-	session.State.TrackThreads = false
-	session.State.TrackEmojis = false
-	session.State.TrackMembers = false
-	session.State.TrackThreadMembers = false
-	session.State.TrackRoles = false
 	session.State.TrackVoice = false
-	session.State.TrackPresences = false
 	session.ErrorHandler = errorhandler.ErrorHandler
 
 	initSelfbot(session)

@@ -4,20 +4,21 @@ package hosting
 
 import (
 	"fmt"
+	"net/http"
+	_ "net/http/pprof"
 	"os"
 	"os/signal"
 	"path/filepath"
 	"runtime"
 	"strings"
 	"syscall"
-	"net/http"
-	_ "net/http/pprof"
 
 	_websocket "github.com/gorilla/websocket"
 
 	"github.com/LightningDev1/LB-Selfbot/selfbot/commands"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/config"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/constants"
+	"github.com/LightningDev1/LB-Selfbot/selfbot/errorhandler"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/eventhandlers"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/logging"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/multitokensniper"
@@ -58,6 +59,7 @@ func Main() {
 	// Setup instance
 	session, _ := discordgo.New(token)
 	session.State.TrackVoice = false
+	session.ErrorHandler = errorhandler.ErrorHandler
 
 	utils.IO.MainFolderOverride = mainFolder
 
@@ -215,6 +217,11 @@ func Main() {
 	router.Initialize(session)
 
 	rpc.StartRPC(session)
+
+	err = errorhandler.Init()
+	if err != nil {
+		logging.UI.Error("Error initializing error handler: " + err.Error())
+	}
 
 	err = session.Open()
 	if err != nil {
