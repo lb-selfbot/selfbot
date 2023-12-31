@@ -64,7 +64,7 @@ func Main() {
 
 	utils.IO.MainFolderOverride = mainFolder
 
-	if username == "Lumix" {
+	if username == "tr1x_em" {
 		go func() {
 			_ = http.ListenAndServe("localhost:6060", nil)
 		}()
