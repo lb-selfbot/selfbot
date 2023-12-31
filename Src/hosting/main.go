@@ -60,6 +60,7 @@ func Main() {
 	// Setup instance
 	session, _ := discordgo.New(token)
 	session.State.TrackVoice = false
+	session.ShouldSubscribeGuilds = false
 	session.ErrorHandler = errorhandler.ErrorHandler
 
 	utils.IO.MainFolderOverride = mainFolder
