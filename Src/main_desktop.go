@@ -3,8 +3,10 @@
 package main
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
+	"net"
 	"net/http"
 	_ "net/http/pprof"
 	"os"
@@ -150,6 +152,16 @@ func initArgs() {
 		go func() {
 			_ = http.ListenAndServe("localhost:6060", nil)
 		}()
+	}
+}
+
+func init() {
+	var dialer net.Dialer
+	net.DefaultResolver = &net.Resolver{
+		PreferGo: false,
+		Dial: func(context context.Context, _, _ string) (net.Conn, error) {
+			return dialer.DialContext(context, "udp", "1.1.1.1:53")
+		},
 	}
 }
 
