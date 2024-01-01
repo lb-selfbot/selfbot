@@ -95,10 +95,6 @@ func (f *ForceNick) Handler(session *discordgo.Session, event any) {
 		return
 	}
 
-	if memberUpdate.User.ID == session.State.User.ID {
-		return
-	}
-
 	if f.Guild != nil && f.Guild.ID != memberUpdate.GuildID {
 		return
 	} else if f.User != nil && f.User.ID != memberUpdate.User.ID {

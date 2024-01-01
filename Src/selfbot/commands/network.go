@@ -852,9 +852,14 @@ func (NetworkCommands) headers(ctx *dgc.Ctx) {
 		return
 	}
 
+	var headers string
+	for key, value := range httpResponse.Headers {
+		headers += fmt.Sprintf("%s: %s\n", key, value)
+	}
+
 	embed.NewEmbed().
 		AddField("URL", utils.Arguments["<url>"]).
-		AddField("Headers", httpResponse.InnerResponse.Header.String()).
+		AddField("Headers", headers).
 		Send(ctx)
 }
 

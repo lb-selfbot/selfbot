@@ -211,7 +211,7 @@ func (e *EventReactionsCommands) RegisterCommands(router *dgc.Router) {
 	router.RegisterCmd(&dgc.Command{
 		Name:        "forcenick",
 		Description: "Force change a user's nickname",
-		Usage:       "[p]forcenick <toggle/list/clear> [@user] <nickname> [server id]",
+		Usage:       "[p]forcenick <toggle/list/clear> [@user] [nickname] [server id]",
 		Flags:       []string{"DANGEROUS"},
 		Handler:     e.forcenick,
 	})
@@ -1142,7 +1142,7 @@ func (e EventReactionsCommands) forcenick(ctx *dgc.Ctx) {
 			return
 		}
 
-		nickname := utils.Arguments["<nickname>"]
+		nickname := utils.Arguments["[nickname]"]
 
 		err = ctx.Session.GuildMemberNickname(ctx.Event.GuildID, user.ID, nickname)
 		if err != nil {

@@ -6,6 +6,7 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
+	"io"
 	"math/rand"
 	"net"
 	"net/url"
@@ -14,6 +15,10 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	fhttp "github.com/bogdanfinn/fhttp"
+	tls_client "github.com/bogdanfinn/tls-client"
+	"github.com/bogdanfinn/tls-client/profiles"
 
 	"github.com/LightningDev1/LB-Selfbot/selfbot/config"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/encodings"
@@ -99,17 +104,18 @@ func LeaveHypesquad(session *discordgo.Session) (err error) {
 }
 
 var RedditHeaders = map[string]string{
-	"User-Agent":                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/93.0.4577.82 Safari/537.36",
-	"Accept":                    "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
-	"Accept-Encoding":           "",
+	"Authority":                 "www.reddit.com",
+	"Accept":                    "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
 	"Accept-Language":           "en-US,en;q=0.9",
-	"Sec-Ch-Ua":                 "\"Opera GX\";v=\"93\", \"Not\\A)Brand\";v=\"99\", \"Chromium\";v=\"93\"",
-	"Sec-Ch-Ua-Mobile":          "?0",
-	"Sec-Fetch-Dest":            "document",
-	"Sec-Fetch-Mode":            "navigate",
-	"Sec-Fetch-Site":            "none",
-	"Sec-Fetch-User":            "?1",
+	"Cache-Control":             "max-age=0",
+	"Sec-CH-UA":                 "\"Opera GX\";v=\"105\", \"Chromium\";v=\"119\", \"Not?A_Brand\";v=\"24\"",
+	"Sec-CH-UA-Mobile":          "?0",
+	"Sec-CH-UA-Platform":        "\"Windows\"",
+	"Sec-Fetch-Dest":            "empty",
+	"Sec-Fetch-Mode":            "cors",
+	"Sec-Fetch-Site":            "same-origin",
 	"Upgrade-Insecure-Requests": "1",
+	"User-Agent":                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36 OPR/105.0.0.0",
 }
 
 type RedditPost struct {
@@ -119,11 +125,39 @@ type RedditPost struct {
 
 func GetImageFromSubreddit(subreddit string) (*RedditPost, bool) {
 	sortBy := []string{"best", "new", "top", "hot"}[rand.Intn(4)]
+	url := fmt.Sprintf("https://www.reddit.com/r/%s/%s.json?limit=20", subreddit, sortBy)
 
-	httpResponse := http.Get(
-		fmt.Sprintf("https://www.reddit.com/r/%s/%s.json?limit=20", subreddit, sortBy),
-		RedditHeaders,
-	)
+	options := []tls_client.HttpClientOption{
+		tls_client.WithTimeoutSeconds(20),
+		tls_client.WithClientProfile(profiles.Chrome_117),
+		tls_client.WithCookieJar(tls_client.NewCookieJar()),
+		tls_client.WithRandomTLSExtensionOrder(),
+	}
+
+	client, _ := tls_client.NewHttpClient(tls_client.NewNoopLogger(), options...)
+
+	req, _ := fhttp.NewRequest("GET", url, nil)
+
+	for k, v := range RedditHeaders {
+		req.Header.Set(k, v)
+	}
+	req.Header.Set("Referer", url)
+
+	resp, err := client.Do(req)
+	if err != nil {
+		return nil, false
+	}
+
+	b, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return nil, false
+	}
+
+	fmt.Println(string(b))
+
+	httpResponse := http.Get(url, RedditHeaders)
+
+	fmt.Println(httpResponse)
 
 	if httpResponse.Error != nil || httpResponse.StatusCode != 200 {
 		return nil, false
