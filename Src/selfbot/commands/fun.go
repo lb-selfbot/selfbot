@@ -504,7 +504,11 @@ func (FunCommands) eightball(ctx *dgc.Ctx) {
 }
 
 func (FunCommands) howgay(ctx *dgc.Ctx) {
-	user, _ := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
+	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
+	if !success {
+		ctx.RespondText("Couldn't find user!")
+		return
+	}
 	embed.NewEmbed().
 		AddField("User", user.String()).
 		AddField("Gay Percentage", utils.Random.Percentage()).
@@ -512,7 +516,11 @@ func (FunCommands) howgay(ctx *dgc.Ctx) {
 }
 
 func (FunCommands) howsimp(ctx *dgc.Ctx) {
-	user, _ := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
+	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
+	if !success {
+		ctx.RespondText("Couldn't find user!")
+		return
+	}
 	embed.NewEmbed().
 		AddField("User", user.String()).
 		AddField("Simp Percentage", utils.Random.Percentage()).
@@ -526,7 +534,11 @@ func (FunCommands) penis(ctx *dgc.Ctx) {
 		penis += "="
 	}
 	penis += "Đ"
-	user, _ := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
+	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
+	if !success {
+		ctx.RespondText("Couldn't find user!")
+		return
+	}
 	embed.NewEmbed().
 		AddField("User", user.String()).
 		AddField("Penis", penis).
@@ -535,7 +547,11 @@ func (FunCommands) penis(ctx *dgc.Ctx) {
 }
 
 func (FunCommands) ego(ctx *dgc.Ctx) {
-	user, _ := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
+	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
+	if !success {
+		ctx.RespondText("Couldn't find user!")
+		return
+	}
 	embed.NewEmbed().
 		AddField("User", user.String()).
 		AddField("Ego", utils.Random.Percentage()).
@@ -543,7 +559,11 @@ func (FunCommands) ego(ctx *dgc.Ctx) {
 }
 
 func (FunCommands) iqtest(ctx *dgc.Ctx) {
-	user, _ := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
+	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
+	if !success {
+		ctx.RespondText("Couldn't find user!")
+		return
+	}
 	embed.NewEmbed().
 		AddField("User", user.String()).
 		AddField("IQ", fmt.Sprint(utils.Random.Number(1, 200))).
@@ -551,7 +571,11 @@ func (FunCommands) iqtest(ctx *dgc.Ctx) {
 }
 
 func (FunCommands) hack(ctx *dgc.Ctx) {
-	user, _ := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
+	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
+	if !success {
+		ctx.RespondText("Couldn't find user!")
+		return
+	}
 	cc := gofakeit.CreditCard()
 	embed.NewEmbed().
 		AddField("User", user.String()).
@@ -1021,7 +1045,11 @@ func (FunCommands) rps(ctx *dgc.Ctx) {
 }
 
 func (FunCommands) covidtest(ctx *dgc.Ctx) {
-	user, _ := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
+	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
+	if !success {
+		ctx.RespondText("Couldn't find user!")
+		return
+	}
 	embed.NewEmbed().
 		AddField("User", user.String()).
 		AddField("Result", utils.RandomChoice([]string{"Positive", "Negative"})).
