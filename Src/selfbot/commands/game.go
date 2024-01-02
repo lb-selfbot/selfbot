@@ -3,12 +3,15 @@ package commands
 import (
 	"fmt"
 	"net/url"
+	"regexp"
 	"strings"
 
 	"github.com/LightningDev1/LB-Selfbot/selfbot/embed"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/http"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/utils"
 	"github.com/LightningDev1/dgc"
+	"github.com/LightningDev1/discordgo"
+	"github.com/bitly/go-simplejson"
 )
 
 type GameCommands struct{}
@@ -110,6 +113,19 @@ func (g GameCommands) RegisterCommands(router *dgc.Router) {
 		Description: "Get info about a FiveM server",
 		Usage:       "[p]fiveminfo <ip:port>",
 		Handler:     g.fiveminfo,
+	})
+
+	router.RegisterCmd(&dgc.Command{
+		Name:        "hltbsearch",
+		Description: "Search for a game on HowLongToBeat",
+		Usage:       "[p]hltbsearch <game>",
+		Handler:     g.hltbsearch,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "hltbinfo",
+		Description: "Get info about a game on HowLongToBeat",
+		Usage:       "[p]hltbinfo <game id>",
+		Handler:     g.hltbinfo,
 	})
 }
 
@@ -433,5 +449,131 @@ func (GameCommands) fiveminfo(ctx *dgc.Ctx) {
 		AddField("Map", json.Get("mapname").MustString()).
 		AddField("Players", fmt.Sprint(json.Get("clients").MustInt())).
 		AddField("Max Players", json.Get("sv_maxclients").MustString()).
+		Send(ctx)
+}
+
+var HLTBHeaders = map[string]string{
+	"Authority":          "howlongtobeat.com",
+	"Method":             "POST",
+	"Path":               "/api/search",
+	"Scheme":             "https",
+	"Accept":             "application/json, text/plain, */*",
+	"Accept-Encoding":    "gzip, deflate, br",
+	"Accept-Language":    "en-US,en;q=0.9",
+	"Origin":             "https://howlongtobeat.com",
+	"Referer":            "https://howlongtobeat.com/",
+	"Sec-CH-UA":          "\" Not A;Brand\";v=\"99\", \"Chromium\";v=\"119\", \"Google Chrome\";v=\"119\"",
+	"Sec-CH-UA-Mobile":   "?0",
+	"Sec-CH-UA-Platform": "Windows",
+	"Sec-Fetch-Dest":     "empty",
+	"Sec-Fetch-Mode":     "cors",
+	"Sec-Fetch-Site":     "same-origin",
+	"User-Agent":         discordgo.UserAgentWeb,
+}
+
+func (GameCommands) hltbsearch(ctx *dgc.Ctx) {
+	httpResponse := http.PostJson(
+		"https://howlongtobeat.com/api/search",
+		map[string]any{
+			"searchType":  "games",
+			"searchTerms": []string{ctx.Arguments.Raw()},
+			"searchPage":  1,
+			"size":        20,
+			"searchOptions": map[string]any{
+				"games": map[string]any{
+					"userId":        0,
+					"platform":      "",
+					"sortCategory":  "popular",
+					"rangeCategory": "main",
+					"rangeTime":     map[string]any{"min": nil, "max": nil},
+					"gameplay":      map[string]any{"perspective": "", "flow": "", "genre": ""},
+					"rangeYear":     map[string]any{"min": "", "max": ""},
+					"modifier":      "",
+				},
+				"users":      map[string]any{"sortCategory": "postcount"},
+				"lists":      map[string]any{"sortCategory": "follows"},
+				"filter":     "",
+				"sort":       0,
+				"randomizer": 0,
+			},
+		},
+		HLTBHeaders,
+	)
+	if httpResponse.Error != nil {
+		_ = ctx.RespondText("An error has occurred: " + httpResponse.Error.Error())
+		return
+	}
+
+	json := httpResponse.Json()
+
+	if json.Get("count").MustInt() == 0 {
+		_ = ctx.RespondText("No results found.")
+		return
+	}
+
+	var games []string
+
+	for i := 0; i < len(json.Get("data").MustArray()); i++ {
+		game := json.Get("data").GetIndex(i)
+		games = append(games, fmt.Sprintf(
+			"%s (%d)",
+			game.Get("game_name").MustString(),
+			game.Get("game_id").MustInt(),
+		))
+	}
+
+	embed.NewEmbed().
+		AddField("Games", strings.Join(games, "\n")).
+		Send(ctx)
+}
+
+func secondsToTime(seconds int) string {
+	hours := seconds / 3600
+	minutes := (seconds - (hours * 3600)) / 60
+	return fmt.Sprintf("%d Hours, %d Minutes", hours, minutes)
+}
+
+func (GameCommands) hltbinfo(ctx *dgc.Ctx) {
+	httpResponse := http.Post(
+		"https://howlongtobeat.com/game?id="+utils.Arguments["<game id>"],
+		nil,
+		HLTBHeaders,
+	)
+	if httpResponse.Error != nil {
+		_ = ctx.RespondText("An error has occurred: " + httpResponse.Error.Error())
+		return
+	}
+
+	dataMatches := regexp.MustCompile("<script id=\"__NEXT_DATA__\" type=\"application/json\">(.*?)</script>").FindStringSubmatch(httpResponse.Body)
+	if len(dataMatches) < 2 {
+		_ = ctx.RespondText("An error has occurred: No data matches")
+		return
+	}
+
+	json, err := simplejson.NewJson([]byte(dataMatches[1]))
+	if err != nil {
+		_ = ctx.RespondText("An error has occurred: " + err.Error())
+		return
+	}
+
+	games := json.GetPath("props", "pageProps", "game", "data", "game")
+	if len(games.MustArray()) == 0 {
+		_ = ctx.RespondText("An error has occurred: Game not found")
+		return
+	}
+
+	game := games.GetIndex(0)
+
+	embed.NewEmbed().
+		AddField("Name", game.Get("game_name").MustString("None")).
+		AddField("Aliases", game.Get("game_alias").MustString("None")).
+		AddField("Main Story", secondsToTime(game.Get("comp_main").MustInt())).
+		AddField("Main + Extras", secondsToTime(game.Get("comp_plus").MustInt())).
+		AddField("Completionist", secondsToTime(game.Get("comp_100").MustInt())).
+		AddField("All Styles", secondsToTime(game.Get("comp_all").MustInt())).
+		AddField("Rating", fmt.Sprintf("%d/100", game.Get("review_score").MustInt())).
+		AddField("Currently Playing", fmt.Sprintf("%d Players", game.Get("count_playing").MustInt())).
+		AddField("Developer", game.Get("profile_dev").MustString("None")).
+		AddField("Platforms", game.Get("profile_platform").MustString("None")).
 		Send(ctx)
 }
