@@ -19,6 +19,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/LightningDev1/LB-Selfbot/selfbot/config"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/eventhandlers/eventreactions"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/ipc"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/logging"
@@ -512,6 +513,33 @@ func (u UtilityCommands) RegisterCommands(router *dgc.Router) {
 		Usage:       "[p]addreview <user> <review>",
 		Handler:     u.addreview,
 	})
+
+	// Tags
+	router.RegisterCmd(&dgc.Command{
+		Name:        "tag",
+		Description: "Send a tag's content",
+		Usage:       "[p]tag <tag>",
+		Handler:     u.tag,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "taglist",
+		Description: "List all tags",
+		Usage:       "[p]taglist",
+		Handler:     u.taglist,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "createtag",
+		Description: "Add a tag",
+		Usage:       "[p]createtag <tag> <content>",
+		Handler:     u.createtag,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "deletetag",
+		Description: "Delete a tag",
+		Usage:       "[p]deletetag <tag>",
+		Handler:     u.deletetag,
+	})
+
 }
 
 func getChannelType(channelType discordgo.ChannelType) discordgo.ChannelType {
@@ -1808,5 +1836,83 @@ func (UtilityCommands) addreview(ctx *dgc.Ctx) {
 
 	embed.NewEmbed().
 		SetDescription("Successfully added review to " + user.Username + "!").
+		Send(ctx)
+}
+
+func (UtilityCommands) tag(ctx *dgc.Ctx) {
+	cfg, err := config.GetConfig()
+	if err != nil {
+		_ = ctx.RespondText("Error getting config: " + err.Error())
+		return
+	}
+
+	content, ok := cfg.Tags[ctx.Arguments.Get(0).Raw()]
+	if !ok {
+		_ = ctx.RespondText("Error: tag does not exist")
+		return
+	}
+
+	_ = ctx.RespondText(content)
+}
+
+func (UtilityCommands) taglist(ctx *dgc.Ctx) {
+	cfg, err := config.GetConfig()
+	if err != nil {
+		_ = ctx.RespondText("Error getting config: " + err.Error())
+		return
+	}
+
+	var tagList []string
+
+	for tag := range cfg.Tags {
+		tagList = append(tagList, fmt.Sprintf("%s:\n%s\n", tag, cfg.Tags[tag]))
+	}
+	
+	embed.NewEmbed().
+		AddField("Tags", strings.Join(tagList, "\n")).
+		Send(ctx)
+}
+
+func (UtilityCommands) createtag(ctx *dgc.Ctx) {
+	cfg, err := config.GetConfig()
+	if err != nil {
+		_ = ctx.RespondText("Error getting config: " + err.Error())
+		return
+	}
+
+	if cfg.Tags == nil {
+		cfg.Tags = map[string]string{}
+	}
+
+	cfg.Tags[ctx.Arguments.Get(0).Raw()] = strings.Join(strings.Split(ctx.Event.Content, " ")[2:], " ")
+
+	err = cfg.Save()
+	if err != nil {
+		_ = ctx.RespondText("Error saving config: " + err.Error())
+		return
+	}
+	
+	embed.NewEmbed().
+		SetDescription("Successfully created tag").
+		Send(ctx)
+}
+
+func (UtilityCommands) deletetag(ctx *dgc.Ctx) {
+	cfg, err := config.GetConfig()
+	if err != nil {
+		_ = ctx.RespondText("Error getting config: " + err.Error())
+		return
+	}
+
+	delete(cfg.Tags, ctx.Arguments.Get(0).Raw())
+
+	err = cfg.Save()
+	if err != nil {
+		_ = ctx.RespondText("Error saving config: " + err.Error())
+		return
+	}
+	
+	embed.NewEmbed().
+		SetDescription("Successfully deleted tag").
 		Send(ctx)
 }

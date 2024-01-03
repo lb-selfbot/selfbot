@@ -167,8 +167,9 @@ type Config struct {
 		ShareAll               bool     `json:"ShareAll"`
 		BlockDangerousCommands bool     `json:"BlockDangerousCommands"`
 	} `json:"Sharing"`
-	SlashCommandJobs json.RawMessage `json:"SlashCommandJobs"`
-	EventReactions   json.RawMessage `json:"EventReactions"`
+	SlashCommandJobs json.RawMessage   `json:"SlashCommandJobs"`
+	EventReactions   json.RawMessage   `json:"EventReactions"`
+	Tags             map[string]string `json:"Tags"`
 }
 
 var (
