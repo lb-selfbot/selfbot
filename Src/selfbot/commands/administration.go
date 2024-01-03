@@ -740,6 +740,7 @@ func (*AdministrationCommands) slowmode(ctx *dgc.Ctx) {
 	}
 
 	_, err = ctx.Session.ChannelEditComplex(channel.ID, &discordgo.ChannelEdit{
+		Position:         channel.Position,
 		RateLimitPerUser: &seconds,
 	})
 	if err != nil {
@@ -761,6 +762,7 @@ func (*AdministrationCommands) removeslowmode(ctx *dgc.Ctx) {
 	}
 
 	_, err := ctx.Session.ChannelEditComplex(channel.ID, &discordgo.ChannelEdit{
+		Position:         channel.Position,
 		RateLimitPerUser: nil,
 	})
 	if err != nil {
@@ -782,6 +784,7 @@ func (*AdministrationCommands) lockchannel(ctx *dgc.Ctx) {
 	}
 
 	_, err := ctx.Session.ChannelEditComplex(channel.ID, &discordgo.ChannelEdit{
+		Position: channel.Position,
 		PermissionOverwrites: []*discordgo.PermissionOverwrite{
 			{
 				ID:   channel.GuildID,
@@ -809,6 +812,7 @@ func (*AdministrationCommands) unlockchannel(ctx *dgc.Ctx) {
 	}
 
 	_, err := ctx.Session.ChannelEditComplex(channel.ID, &discordgo.ChannelEdit{
+		Position: channel.Position,
 		PermissionOverwrites: []*discordgo.PermissionOverwrite{
 			{
 				ID:   channel.GuildID,
@@ -1850,6 +1854,7 @@ func (*AdministrationCommands) lockserver(ctx *dgc.Ctx) {
 		}
 
 		_, err = ctx.Session.ChannelEditComplex(channel.ID, &discordgo.ChannelEdit{
+			Position:             channel.Position,
 			PermissionOverwrites: overwrites,
 		})
 
@@ -1885,17 +1890,18 @@ func (*AdministrationCommands) unlockserver(ctx *dgc.Ctx) {
 		}
 
 		_, err = ctx.Session.ChannelEditComplex(channel.ID, &discordgo.ChannelEdit{
+			Position:             channel.Position,
 			PermissionOverwrites: overwrites,
 		})
 
 		if err != nil {
-			_ = ctx.RespondText("Error locking server: " + err.Error())
+			_ = ctx.RespondText("Error unlocking server: " + err.Error())
 			return
 		}
 	}
 
 	embed.NewEmbed().
-		SetDescription("Successfully locked server!").
+		SetDescription("Successfully unlocked server!").
 		Send(ctx)
 }
 
