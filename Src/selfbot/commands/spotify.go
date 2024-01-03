@@ -111,6 +111,20 @@ func (s SpotifyCommands) RegisterCommands(router *dgc.Router) {
 		Handler:     s.sseek,
 	})
 	router.RegisterCmd(&dgc.Command{
+		Name:        "sdevices",
+		Description: "Get your available Spotify devices",
+		Usage:       "[p]sdevices",
+		Flags:       []string{"DANGEROUS"},
+		Handler:     s.sdevices,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "sprofile",
+		Description: "Get your Spotify profile info",
+		Usage:       "[p]sprofile",
+		Flags:       []string{"DANGEROUS"},
+		Handler:     s.sprofile,
+	})
+	router.RegisterCmd(&dgc.Command{
 		Name:        "sbearertoken",
 		Description: "Get your Spotify bearer token used for the API",
 		Usage:       "[p]sbearertoken",
@@ -496,6 +510,64 @@ func (s SpotifyCommands) sseek(ctx *dgc.Ctx) {
 	)
 
 	s.HandleRequest(ctx, httpResponse, fmt.Sprintf("Sucessfully seeked song to %d seconds.", seconds))
+}
+
+func (s SpotifyCommands) sdevices(ctx *dgc.Ctx) {
+	bearerToken, success := s.GetBearerToken(ctx)
+	if !success {
+		return
+	}
+
+	httpResponse := http.Get("https://api.spotify.com/v1/me/player/devices", map[string]string{"Authorization": bearerToken})
+	if !s.checkRequest(ctx, httpResponse) {
+		return
+	}
+
+	devices := httpResponse.Json().Get("devices")
+	deviceLen := len(devices.MustArray())
+
+	var deviceList []string
+
+	for i := 0; i < deviceLen; i++ {
+		device := devices.GetIndex(i)
+
+		deviceData := fmt.Sprintf(
+			"**%s**\nType: %s\nActive: %s\nVolume: %d%%\n",
+			device.Get("name").MustString(),
+			device.Get("type").MustString(),
+			utils.Misc.FormatBoolYesNo(device.Get("is_active").MustBool(false)),
+			device.Get("volume_percent").MustInt(0),
+		)
+
+		deviceList = append(deviceList, deviceData)
+	}
+
+	embed.NewEmbed().
+		AddField("Devices", strings.Join(deviceList, "\n")).
+		Send(ctx)
+}
+
+func (s SpotifyCommands) sprofile(ctx *dgc.Ctx) {
+	bearerToken, success := s.GetBearerToken(ctx)
+	if !success {
+		return
+	}
+
+	httpResponse := http.Get("https://api.spotify.com/v1/me", map[string]string{"Authorization": bearerToken})
+	if !s.checkRequest(ctx, httpResponse) {
+		return
+	}
+
+	json := httpResponse.Json()
+
+	embed.NewEmbed().
+		AddField("Username", json.Get("display_name").MustString()).
+		AddField("ID", json.Get("id").MustString()).
+		AddField("Country", json.Get("country").MustString()).
+		AddField("Product", json.Get("product").MustString()).
+		AddField("Followers", fmt.Sprint(json.GetPath("followers", "total").MustInt())).
+		AddField("URL", json.GetPath("href").MustString()).
+		Send(ctx)
 }
 
 func (s SpotifyCommands) sbearertoken(ctx *dgc.Ctx) {
