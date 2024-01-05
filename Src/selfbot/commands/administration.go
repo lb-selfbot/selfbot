@@ -137,28 +137,28 @@ func (m *AdministrationCommands) RegisterCommands(router *dgc.Router) {
 	router.RegisterCmd(&dgc.Command{
 		Name:        "purge",
 		Description: "Delete messages in a channel",
-		Usage:       "[p]purge <amount> [channel]",
+		Usage:       "[p]purge <amount> [delay] [channel]",
 		Flags:       []string{"DANGEROUS"},
 		Handler:     m.purge,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "purgeself",
 		Description: "Delete your own messages in a channel",
-		Usage:       "[p]purgeself <amount> [channel]",
+		Usage:       "[p]purgeself <amount> [delay] [channel]",
 		Flags:       []string{"DANGEROUS"},
 		Handler:     m.purgeself,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "purgeuser",
 		Description: "Delete a users messages in a channel",
-		Usage:       "[p]purgeuser <amount> <user> [channel]",
+		Usage:       "[p]purgeuser <amount> <user> [delay] [channel]",
 		Flags:       []string{"DANGEROUS"},
 		Handler:     m.purgeuser,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "purgerange",
 		Description: "Purge a range of messages in a channel",
-		Usage:       "[p]purgerange <start message> <end message> [channel]",
+		Usage:       "[p]purgerange <start message> <end message> [delay] [channel]",
 		Flags:       []string{"DANGEROUS"},
 		Handler:     m.purgerange,
 	})
@@ -839,7 +839,12 @@ func (*AdministrationCommands) purge(ctx *dgc.Ctx) {
 		return
 	}
 
-	channel, success := utils.Discord.TryGetChannelFromMention(ctx, ctx.Arguments.Get(1))
+	delay, err := strconv.Atoi(utils.Arguments["[delay]"])
+	if err != nil {
+		delay = 1
+	}
+
+	channel, success := utils.Discord.TryGetChannelFromMention(ctx, ctx.Arguments.Get(2))
 	channelID := ctx.Event.ChannelID
 	if success {
 		channelID = channel.ID
@@ -857,6 +862,8 @@ func (*AdministrationCommands) purge(ctx *dgc.Ctx) {
 			_ = ctx.RespondText("Error deleting messages: " + err.Error())
 			return
 		}
+
+		time.Sleep(time.Duration(delay) * time.Second)
 	}
 }
 
@@ -867,7 +874,12 @@ func (*AdministrationCommands) purgeself(ctx *dgc.Ctx) {
 		return
 	}
 
-	channel, success := utils.Discord.TryGetChannelFromMention(ctx, ctx.Arguments.Get(1))
+	delay, err := strconv.Atoi(utils.Arguments["[delay]"])
+	if err != nil {
+		delay = 1
+	}
+
+	channel, success := utils.Discord.TryGetChannelFromMention(ctx, ctx.Arguments.Get(2))
 	channelID := ctx.Event.ChannelID
 	if success {
 		channelID = channel.ID
@@ -883,11 +895,14 @@ func (*AdministrationCommands) purgeself(ctx *dgc.Ctx) {
 		if message.Author.ID != ctx.Session.State.User.ID {
 			continue
 		}
+
 		err = ctx.Session.ChannelMessageDelete(channelID, message.ID)
 		if err != nil {
 			_ = ctx.RespondText("Error deleting messages: " + err.Error())
 			return
 		}
+
+		time.Sleep(time.Duration(delay) * time.Second)
 	}
 }
 
@@ -904,7 +919,12 @@ func (*AdministrationCommands) purgeuser(ctx *dgc.Ctx) {
 		return
 	}
 
-	channel, success := utils.Discord.TryGetChannelFromMention(ctx, ctx.Arguments.Get(2))
+	delay, err := strconv.Atoi(utils.Arguments["[delay]"])
+	if err != nil {
+		delay = 1
+	}
+
+	channel, success := utils.Discord.TryGetChannelFromMention(ctx, ctx.Arguments.Get(3))
 	channelID := ctx.Event.ChannelID
 	if success {
 		channelID = channel.ID
@@ -920,11 +940,14 @@ func (*AdministrationCommands) purgeuser(ctx *dgc.Ctx) {
 		if message.Author.ID != user.ID {
 			continue
 		}
+
 		err = ctx.Session.ChannelMessageDelete(channelID, message.ID)
 		if err != nil {
 			_ = ctx.RespondText("Error deleting messages: " + err.Error())
 			return
 		}
+
+		time.Sleep(time.Duration(delay) * time.Second)
 	}
 }
 
@@ -936,6 +959,11 @@ func (*AdministrationCommands) purgerange(ctx *dgc.Ctx) {
 	}
 
 	start, end := utils.Arguments["<start message>"], utils.Arguments["<end message>"]
+
+	delay, err := strconv.Atoi(utils.Arguments["[delay]"])
+	if err != nil {
+		delay = 1
+	}
 
 	messages, err := utils.Discord.GetChannelMessagesRange(ctx.Session, channelID, utils.Arguments["<start message>"], utils.Arguments["<end message>"])
 	if err != nil {
@@ -953,6 +981,8 @@ func (*AdministrationCommands) purgerange(ctx *dgc.Ctx) {
 			_ = ctx.RespondText("Error deleting messages: " + err.Error())
 			return
 		}
+
+		time.Sleep(time.Duration(delay) * time.Second)
 	}
 }
 
