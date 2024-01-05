@@ -1,10 +1,12 @@
 package commands
 
 import (
+	"fmt"
 	"strings"
 	"time"
 
 	"github.com/LightningDev1/LB-Selfbot/selfbot/constants"
+	"github.com/LightningDev1/LB-Selfbot/selfbot/embed"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/utils"
 	"github.com/LightningDev1/dgc"
 	"github.com/common-nighthawk/go-figure"
@@ -175,6 +177,12 @@ func (t TextCommands) RegisterCommands(router *dgc.Router) {
 		Description: "Sends text with zero width characters",
 		Usage:       "[p]zwc <text>",
 		Handler:     t.zwc,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "distance",
+		Description: "Calculate the Levenshtein distance between two strings",
+		Usage:       "[p]distance <\"text1\"> <\"text2\">",
+		Handler:     t.distance,
 	})
 }
 
@@ -454,4 +462,17 @@ func (TextCommands) zwc(ctx *dgc.Ctx) {
 	text := ctx.Arguments.Raw()
 	text = strings.Join(strings.Split(text, ""), "\u200B")
 	_ = ctx.RespondText(text)
+}
+
+func (TextCommands) distance(ctx *dgc.Ctx) {
+	distance := utils.Misc.GetDistance(
+		utils.Arguments["<\"text1\">"],
+		utils.Arguments["<\"text2\">"],
+	)
+
+	embed.NewEmbed().
+		AddField("Text 1", utils.Arguments["<\"text1\">"]).
+		AddField("Text 2", utils.Arguments["<\"text2\">"]).
+		AddField("Distance", fmt.Sprint(distance)).
+		Send(ctx)
 }

@@ -443,7 +443,7 @@ func (u UtilityCommands) RegisterCommands(router *dgc.Router) {
 	// Uploading
 	router.RegisterCmd(&dgc.Command{
 		Name:        "screenshot",
-		Description: "Make a screenshot",
+		Description: "Take a screenshot",
 		Usage:       "[p]screenshot [delay]",
 		Flags:       []string{"DANGEROUS", "HOSTING_DANGEROUS"},
 		Handler:     u.screenshot,

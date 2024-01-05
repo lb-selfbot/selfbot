@@ -26,7 +26,7 @@ func (MiscUtils) GetImageUrlFromJson(url string, jsonQuery string) (string, erro
 
 func (MiscUtils) IsPortOpen(hostname string, port int) bool {
 	address := hostname + ":" + strconv.Itoa(port)
-	conn, err := net.DialTimeout("tcp", address, 100*time.Millisecond)
+	conn, err := net.DialTimeout("tcp", address, 50*time.Millisecond)
 	if err != nil {
 		return false
 	}
