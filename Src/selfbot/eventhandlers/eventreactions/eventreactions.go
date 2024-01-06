@@ -117,8 +117,11 @@ var UsedCommands = utils.NewList[*dgc.Ctx]()
 // TimeDifference is the time difference between the local time and the Discord time
 var TimeDifference time.Duration = 0
 
-// LastActivity is the last time the user was active (used for AFK inactive timeout)
+// LastActivity is the last time the user was active (used for inactive timeout)
 var LastActivity = time.Now()
+
+// LastAFKMessage is the last time an AFK message was sent
+var LastAFKMessage = time.Now()
 
 // EventReaction is an interface for event reactions
 type EventReaction interface {

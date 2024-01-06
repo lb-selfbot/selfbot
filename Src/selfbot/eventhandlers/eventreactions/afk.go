@@ -101,11 +101,14 @@ func (a *AFK) Handler(session *discordgo.Session, event any) {
 		return
 	}
 
-	if a.IsActive(&cfg) {
+	_ = session.MessageAck(message.ChannelID, message.ID)
+
+	if a.IsActive(&cfg) || time.Since(LastAFKMessage) < 10*time.Second {
+		fmt.Println("skip")
 		return
 	}
 
-	_ = session.MessageAck(message.ChannelID, message.ID)
+	LastAFKMessage = time.Now()
 
 	if cfg.AFK.Delay > 0 {
 		delay := cfg.AFK.Delay
