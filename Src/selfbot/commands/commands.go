@@ -9,13 +9,12 @@ type CommandRegistrar struct {
 	TextCommands           TextCommands
 	EncodingCommands       EncodingCommands
 	CodeblockCommands      CodeblockCommands
-	CryptoCommands         CryptoCommands
+	CurrencyCommands       CurrencyCommands
 	FunCommands            FunCommands
 	TrollingCommands       TrollingCommands
 	EventReactionsCommands EventReactionsCommands
 	ImageCommands          ImageCommands
 	MemeGenCommands        MemeGenCommands
-	NetworkCommands        NetworkCommands
 	AICommands             AICommands
 	StockCommands          StockCommands
 	AdministrationCommands AdministrationCommands
@@ -42,13 +41,12 @@ func (c CommandRegistrar) RegisterCommands(session *discordgo.Session, router *d
 	c.TextCommands.RegisterCommands(router)
 	c.EncodingCommands.RegisterCommands(router)
 	c.CodeblockCommands.RegisterCommands(router)
-	c.CryptoCommands.RegisterCommands(router)
+	c.CurrencyCommands.RegisterCommands(router)
 	c.FunCommands.RegisterCommands(router)
 	c.TrollingCommands.RegisterCommands(router)
 	c.EventReactionsCommands.RegisterCommands(router)
 	c.ImageCommands.RegisterCommands(router)
 	c.MemeGenCommands.RegisterCommands(router)
-	c.NetworkCommands.RegisterCommands(router)
 	c.AICommands.RegisterCommands(router)
 	c.StockCommands.RegisterCommands(router)
 	c.AdministrationCommands.RegisterCommands(router)

@@ -8,13 +8,14 @@ import (
 
 	"github.com/LightningDev1/LB-Selfbot/selfbot/embed"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/http"
+	"github.com/LightningDev1/LB-Selfbot/selfbot/utils"
 	"github.com/LightningDev1/dgc"
 )
 
-type CryptoCommands struct{}
+type CurrencyCommands struct{}
 
-func (c CryptoCommands) RegisterCommands(router *dgc.Router) {
-	router.StartCategory("Crypto", "Check cryptocurrency prices")
+func (c CurrencyCommands) RegisterCommands(router *dgc.Router) {
+	router.StartCategory("Currency", "Information about (crypto)currencies")
 
 	router.RegisterCmd(&dgc.Command{
 		Name:        "btcaddress",
@@ -81,66 +82,15 @@ func (c CryptoCommands) RegisterCommands(router *dgc.Router) {
 		Handler:     c.generateTransactionFunc("Dogecoin", "DOGE", 8),
 	})
 
-	cryptoCurrencies := [][]string{
-		{"btc", "BTC", "Bitcoin", "1"},
-		{"eth", "ETH", "Ethereum", "1027"},
-		{"bnb", "BNB", "Binance Coin", "1839"},
-		{"dogecoin", "DOGE", "Dogecoin", "74"},
-		{"tether", "USDT", "Tether", "825"},
-		{"cardano", "ADA", "Cardano", "2010"},
-		{"ripple", "XRP", "Ripple", "52"},
-		{"polkadot", "DOT", "Polkadot", "6636"},
-		{"bitcoincash", "BCH", "Bitcoin Cash", "1831"},
-		{"litecoin", "LTC", "Litecoin", "2"},
-		{"chainlink", "LINK", "Chainlink", "1975"},
-		{"uniswap", "UNI", "UniSwap", "7083"},
-		{"stellar", "XLM", "Stellar", "512"},
-		{"usdcoin", "USDC", "USD Coin", "3408"},
-		{"vechain", "VET", "VeChain", "3077"},
-		{"ethereumclassic", "ETC", "Ehereum Classic", "3077"},
-		{"solana", "SOL", "Solana", "5426"},
-		{"theta", "THETA", "Theta", "2416"},
-		{"shibainu", "SHIB", "Shiba Inu", "5994"},
-		{"tron", "TRX", "TRON", "1958"},
-		{"filecoin", "FIL", "FileCoin", "2280"},
-		{"wrappedbitcoin", "WBTC", "Wrapped Bitcoin", "3717"},
-		{"eos", "EOS", "EOS", "1765"},
-		{"monero", "XMR", "Monero", "328"},
-		{"neo", "NEO", "Neo", "1376"},
-		{"binanceusd", "BUSD", "Binance USD", "4687"},
-		{"bitcoinsv", "BSV", "Bitcoin SV", "3602"},
-		{"terra", "LUNA", "Terra", "4172"},
-		{"pancakeswap", "CAKE", "PancakeSwap", "7186"},
-		{"iota", "MIOTA", "IOTA", "1720"},
-		{"aave", "AAVE", "Aave", "7278"},
-		{"ftxtoken", "FTT", "FTX Token", "4195"},
-		{"cosmos", "ATOM", "Cosmos", "3794"},
-		{"bittorrent", "BTT", "BitTorrent", "3718"},
-		{"cryptocomcoin", "CRO", "Crypto.com Coin", "3635"},
-		{"dash", "DASH", "Dash", "131"},
-		{"zcash", "ZEC", "Zcash", "1437"},
-		{"chiliz", "CHZ", "Chiliz", "4066"},
-		{"digibyte", "DGB", "DigiByte", "109"},
-		{"sushiswap", "SUSHI", "SushiSwap", "6758"},
-		{"icon", "ICX", "ICON", "2099"},
-		{"zrx", "ZRX", "0x", "1896"},
-		{"ravencoin", "RVN", "RavenCoin", "2577"},
-		{"nano", "NANO", "Nano", "1567"},
-		{"polygon", "MATIC", "Polygon", "3890"},
-		{"avalanche", "AVAX", "Avalanche", "5805"},
-		{"algorand", "ALGO", "Algorand", "4030"},
-	}
-	for _, element := range cryptoCurrencies {
-		router.RegisterCmd(&dgc.Command{
-			Name:        element[0],
-			Description: "Sends the current " + element[2] + " price in USD and Euro",
-			Usage:       "[p]" + element[0],
-			Handler:     c.generatePriceFunc(element),
-		})
-	}
+	router.RegisterCmd(&dgc.Command{
+		Name:        "priceinfo",
+		Description: "Get price information from a (crypto)currency",
+		Usage:       "[p]priceinfo <from symbol> [to symbol]",
+		Handler:     c.priceinfo,
+	})
 }
 
-func (CryptoCommands) generateAddressFunc(name, shortCode string, power int) func(ctx *dgc.Ctx) {
+func (CurrencyCommands) generateAddressFunc(name, shortCode string, power int) func(ctx *dgc.Ctx) {
 	return func(ctx *dgc.Ctx) {
 		address := ctx.Arguments.Get(0).Raw()
 		if address == "" {
@@ -173,7 +123,7 @@ func (CryptoCommands) generateAddressFunc(name, shortCode string, power int) fun
 	}
 }
 
-func (CryptoCommands) generateTransactionFunc(name, shortCode string, power int) func(ctx *dgc.Ctx) {
+func (CurrencyCommands) generateTransactionFunc(name, shortCode string, power int) func(ctx *dgc.Ctx) {
 	return func(ctx *dgc.Ctx) {
 		hash := ctx.Arguments.Get(0).Raw()
 		if hash == "" {
@@ -208,26 +158,55 @@ func (CryptoCommands) generateTransactionFunc(name, shortCode string, power int)
 	}
 }
 
-func (CryptoCommands) generatePriceFunc(element []string) func(ctx *dgc.Ctx) {
-	// This makes sure that the function is not overwritten by the next command.
-	// If you put the function in the RegisterCommands function, the element
-	// variable will always be the last element in the command array.
-	return func(ctx *dgc.Ctx) {
-		url := fmt.Sprintf("https://min-api.cryptocompare.com/data/price?fsym=%s&tsyms=USD,EUR", element[1])
+func (CurrencyCommands) priceinfo(ctx *dgc.Ctx) {
+	from, to := utils.Arguments["<from symbol>"], utils.Arguments["[to symbol]"]
+	if to == "" {
+		to = "USD,EUR"
+	}
 
-		httpResponse := http.Get(url)
-		if httpResponse.Error != nil {
-			_ = ctx.RespondText("An error has occurred.")
-			return
+	httpResponse := http.Get(fmt.Sprintf("https://min-api.cryptocompare.com/data/pricemultifull?fsyms=%s&tsyms=%s", from, to))
+	if httpResponse.Error != nil {
+		_ = ctx.RespondText("An error has occurred: " + httpResponse.Error.Error())
+		return
+	}
+
+	json := httpResponse.Json()
+
+	if msg := json.Get("Message").MustString(); msg != "" {
+		_ = ctx.RespondText("An error has occurred: " + msg)
+		return
+	}
+
+	raw := json.Get("DISPLAY").MustMap()
+	parsed := make(map[string]string)
+
+	for from, data := range raw {
+		data, ok := data.(map[string]any)
+		if !ok {
+			continue
 		}
 
-		json := httpResponse.Json()
-		usd := json.Get("USD").MustFloat64()
-		eur := json.Get("EUR").MustFloat64()
+		for to, data := range data {
+			data, ok := data.(map[string]any)
+			if !ok {
+				continue
+			}
 
-		embed.NewEmbed().
-			SetDescription(fmt.Sprintf("USD: %.2f$\nEUR: %.2f€", usd, eur)).
-			SetAuthor(element[2], fmt.Sprintf("https://s2.coinmarketcap.com/static/img/coins/200x200/%s.png", element[3])).
-			Send(ctx)
+			parsed[from+"/"+to] = fmt.Sprintf(
+				"Price: %s\nVolume (24h): %s (%s)\nChange (24h): %s (%s%%)\nMarket cap: %s",
+				data["PRICE"],
+				data["VOLUME24HOURTO"], data["VOLUME24HOUR"],
+				data["CHANGE24HOUR"], data["CHANGEPCT24HOUR"],
+				data["MKTCAP"],
+			)
+		}
 	}
+
+	emb := embed.NewEmbed()
+
+	for k, v := range parsed {
+		emb.AddField(k, v)
+	}
+
+	emb.Send(ctx)
 }

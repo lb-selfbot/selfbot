@@ -52,14 +52,8 @@ func (a *ActivityCommands) RegisterCommands(router *dgc.Router, session *discord
 	router.RegisterCmd(&dgc.Command{
 		Name:        "customstatus",
 		Description: "Change your custom status",
-		Usage:       "[p]customstatus <text>",
+		Usage:       "[p]customstatus [text]",
 		Handler:     a.customstatus,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "clearcustomstatus",
-		Description: "Clear your custom status",
-		Usage:       "[p]clearcustomstatus",
-		Handler:     a.clearcustomstatus,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "listening",
@@ -302,10 +296,6 @@ func (a *ActivityCommands) invisible(ctx *dgc.Ctx) {
 
 func (a *ActivityCommands) customstatus(ctx *dgc.Ctx) {
 	a.setActivity(ctx.Session, "customstatus", ctx.Arguments.Raw())
-}
-
-func (a *ActivityCommands) clearcustomstatus(ctx *dgc.Ctx) {
-	a.setActivity(ctx.Session, "customstatus", "")
 }
 
 func (a *ActivityCommands) listening(ctx *dgc.Ctx) {

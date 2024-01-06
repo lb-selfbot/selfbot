@@ -470,6 +470,48 @@ func (f FunCommands) RegisterCommands(router *dgc.Router) {
 		Usage:       "[p]ermahgerd <text>",
 		Handler:     f.ermahgerd,
 	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "iseven",
+		Description: "Check if a number is even",
+		Usage:       "[p]iseven <number>",
+		Handler:     f.iseven,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "agify",
+		Description: "Determine the age of a first name",
+		Usage:       "[p]agify <name>",
+		Handler:     f.agify,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "randomword",
+		Description: "Get a random word",
+		Usage:       "[p]randomword",
+		Handler:     f.randomword,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "randomweirdword",
+		Description: "Get a random weird word",
+		Usage:       "[p]randomweirdword",
+		Handler:     f.randomweirdword,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "startupidea",
+		Description: "Get a random startup idea",
+		Usage:       "[p]startupidea",
+		Handler:     f.startupidea,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "fakeperson",
+		Description: "Generate an image of a fake person",
+		Usage:       "[p]fakeperson",
+		Handler:     f.fakeperson,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "commitmessage",
+		Description: "Generate a random commit message",
+		Usage:       "[p]commitmessage",
+		Handler:     f.commitmessage,
+	})
 }
 
 func (FunCommands) eightball(ctx *dgc.Ctx) {
@@ -1358,4 +1400,93 @@ func (FunCommands) boredactivity(ctx *dgc.Ctx) {
 
 func (FunCommands) ermahgerd(ctx *dgc.Ctx) {
 	ctx.RespondText(utils.String.Ermahgerd(ctx.Arguments.Raw()))
+}
+
+func (FunCommands) iseven(ctx *dgc.Ctx) {
+	number, err := ctx.Arguments.Get(0).AsInt()
+	if err != nil {
+		_ = ctx.RespondText("Argument <number> must be a number.")
+		return
+	}
+
+	embed.NewEmbed().
+		AddField("Number", ctx.Arguments.Get(0).Raw()).
+		AddField("Is Even", utils.Misc.FormatBoolYesNo(number%2 == 0)).
+		Send(ctx)
+}
+
+func (FunCommands) agify(ctx *dgc.Ctx) {
+	json, err := http.GetJson("https://api.agify.io?name=" + url.QueryEscape(ctx.Arguments.Raw()))
+	if err != nil {
+		_ = ctx.RespondText("An error has occurred.")
+		return
+	}
+
+	embed.NewEmbed().
+		AddField("Name", json.Get("name").MustString()).
+		AddField("Age", fmt.Sprint(json.Get("age").MustInt())).
+		AddField("Count", fmt.Sprint(json.Get("count").MustInt())).
+		Send(ctx)
+}
+
+func (FunCommands) randomword(ctx *dgc.Ctx) {
+	json, err := http.GetJson("https://randomwordgenerator.com/json/words_ws.json")
+	if err != nil {
+		_ = ctx.RespondText("An error has occurred.")
+		return
+	}
+
+	words := json.Get("data")
+	word := words.GetIndex(utils.Random.Number(0, len(words.MustArray()))).Get("word")
+
+	embed.NewEmbed().
+		AddField("Random Word", word.Get("value").MustString()).
+		Send(ctx)
+}
+
+func (FunCommands) randomweirdword(ctx *dgc.Ctx) {
+	json, err := http.GetJson("https://randomwordgenerator.com/json/unusual-words.json")
+	if err != nil {
+		_ = ctx.RespondText("An error has occurred.")
+		return
+	}
+
+	words := json.Get("data")
+	word := words.GetIndex(utils.Random.Number(0, len(words.MustArray()))).Get("word")
+
+	embed.NewEmbed().
+		AddField("Random Weird Word", word.Get("value").MustString()).
+		AddField("Definition", word.Get("definition").MustString()).
+		Send(ctx)
+}
+
+func (FunCommands) startupidea(ctx *dgc.Ctx) {
+	httpResponse := http.Get("https://itsthisforthat.com/api.php?text")
+	if httpResponse.Error != nil {
+		_ = ctx.RespondText("An error has occurred.")
+		return
+	}
+
+	embed.NewEmbed().
+		AddField("Startup Idea", httpResponse.Body).
+		Send(ctx)
+}
+
+func (FunCommands) fakeperson(ctx *dgc.Ctx) {
+	embed.NewEmbed().
+		SetDescription("Fake Person").
+		SetImage("https://thispersondoesnotexist.com?" + fmt.Sprint(utils.Random.Number(1000, 9999))).
+		Send(ctx)
+}
+
+func (FunCommands) commitmessage(ctx *dgc.Ctx) {
+	httpResponse := http.Get("https://whatthecommit.com/index.txt")
+	if httpResponse.Error != nil {
+		_ = ctx.RespondText("An error has occurred.")
+		return
+	}
+
+	embed.NewEmbed().
+		AddField("Commit Message", httpResponse.Body).
+		Send(ctx)
 }
