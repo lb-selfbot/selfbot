@@ -2848,5 +2848,3 @@ func (UtilityCommands) baconipsum(ctx *dgc.Ctx) {
 		SetDescription(httpResponse.Body).
 		Send(ctx)
 }
-
-
