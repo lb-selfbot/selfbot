@@ -111,7 +111,7 @@ func (w *WebsocketConnection) Connect() (err error) {
 	w.Connected = true
 
 	ipc.ConfigUpdateCallbacks = append(ipc.ConfigUpdateCallbacks, func(cfg *config.Config) {
-		w.SendConfigUpdate()
+		_ = w.SendConfigUpdate()
 	})
 
 	// Wait a bit before sending HELLO to allow
@@ -257,14 +257,16 @@ func (w *WebsocketConnection) OnMessage(msg WsMessage) {
 		w.Ready = true
 		w.ReadyChannel <- struct{}{}
 
-		w.SendConfigUpdate()
+		_ = w.SendConfigUpdate()
 	case "FREE_TRIAL_START":
-		go beeep.Notify(
-			"LightningBot",
-			"Your free trial has started! You will be able to use LightningBot for free for the next 7 days.",
-			"LightningBot",
-			filepath.Join(utils.IO.GetMainFolder(), "Logo.png"),
-		)
+		go func() {
+			_ = beeep.Notify(
+				"LightningBot",
+				"Your free trial has started! You will be able to use LightningBot for free for the next 7 days.",
+				"LightningBot",
+				filepath.Join(utils.IO.GetMainFolder(), "Logo.png"),
+			)
+		}()
 	case "EXIT":
 		os.Exit(0)
 	case "RESTART":
@@ -275,7 +277,7 @@ func (w *WebsocketConnection) OnMessage(msg WsMessage) {
 			Data: WsData{Text: ipc.HTMLConsole},
 		})
 
-		w.SendConfigUpdate()
+		_ = w.SendConfigUpdate()
 	case "CONFIG_UPDATE":
 		if msg.Data.Config == nil {
 			break

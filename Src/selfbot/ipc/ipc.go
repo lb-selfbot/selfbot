@@ -91,7 +91,7 @@ func (i *Ipc) Init() {
 
 func (i *Ipc) Write(data interface{}) {
 	if i.Conn != nil {
-		i.Conn.WriteJSON(data)
+		_ = i.Conn.WriteJSON(data)
 	}
 }
 

@@ -24,12 +24,14 @@ func (UILogging) Notification(message string) {
 		return
 	}
 
-	go beeep.Notify(
-		"LightningBot",
-		message,
-		"LightningBot",
-		filepath.Join(utils.IO.GetMainFolder(), "Logo.png"),
-	)
+	go func() {
+		_ = beeep.Notify(
+			"LightningBot",
+			message,
+			"LightningBot",
+			filepath.Join(utils.IO.GetMainFolder(), "Logo.png"),
+		)
+	}()
 }
 
 func (UILogging) Error(errText string) {
@@ -49,7 +51,7 @@ func (UILogging) Append(ansi string) {
 	html := "\n" + utils.Logging.AnsiToHtml(ansi)
 
 	ipc.IPC.ConsoleAppend(ansi, html)
-	websocket.Websocket.Send(websocket.WsMessage{
+	_ = websocket.Websocket.Send(websocket.WsMessage{
 		Op: "CONSOLE_APPEND",
 		Data: websocket.WsData{
 			Text: html,
@@ -59,7 +61,7 @@ func (UILogging) Append(ansi string) {
 
 func (UILogging) Clear() {
 	ipc.IPC.ConsoleClear()
-	websocket.Websocket.Send(websocket.WsMessage{
+	_ = websocket.Websocket.Send(websocket.WsMessage{
 		Op:   "CONSOLE_CLEAR",
 		Data: websocket.WsData{},
 	})
@@ -69,7 +71,7 @@ func (UILogging) Set(ansi string) {
 	html := utils.Logging.AnsiToHtml(ansi)
 
 	ipc.IPC.ConsoleSet(ansi, html)
-	websocket.Websocket.Send(websocket.WsMessage{
+	_ = websocket.Websocket.Send(websocket.WsMessage{
 		Op: "CONSOLE_SET",
 		Data: websocket.WsData{
 			Text: html,

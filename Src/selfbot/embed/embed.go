@@ -680,6 +680,6 @@ func deleteMessagesAfter(session *discordgo.Session, messages []*discordgo.Messa
 	time.Sleep(time.Duration(delay) * time.Second)
 
 	for _, message := range messages {
-		session.ChannelMessageDelete(message.ChannelID, message.ID)
+		_ = session.ChannelMessageDelete(message.ChannelID, message.ID)
 	}
 }
