@@ -18,8 +18,15 @@ func (a *AICommands) RegisterCommands(router *dgc.Router) {
 	router.RegisterCmd(&dgc.Command{
 		Name:        "chatgpt",
 		Description: "Talk to OpenAI GPT-3.5",
-		Usage:       "[p]chatgpt <\"system\"> <\"message\">",
+		Usage:       "[p]chatgpt <\"message\"> [\"system\"]",
 		Handler:     a.chatgpt,
+	})
+
+	router.RegisterCmd(&dgc.Command{
+		Name:        "gpt4",
+		Description: "Talk to OpenAI GPT-4",
+		Usage:       "[p]gpt4 <\"message\"> [\"system\"]",
+		Handler:     a.gpt4,
 	})
 
 	router.RegisterCmd(&dgc.Command{
@@ -59,7 +66,7 @@ func (a *AICommands) RegisterCommands(router *dgc.Router) {
 }
 
 func (AICommands) chatgpt(ctx *dgc.Ctx) {
-	response, err := api.GPT3(utils.Arguments["<\"system\">"], utils.Arguments["<\"message\">"])
+	response, err := api.GPT(utils.Arguments["[\"system\"]"], utils.Arguments["<\"message\">"])
 	if err != nil {
 		_ = ctx.RespondText("Error getting response: " + err.Error())
 		return
@@ -67,7 +74,22 @@ func (AICommands) chatgpt(ctx *dgc.Ctx) {
 
 	embed.NewEmbed().
 		SetTitle("ChatGPT (GPT-3.5)").
-		AddField("System", utils.Arguments["<\"system\">"]).
+		AddField("System", utils.Arguments["[\"system\"]"]).
+		AddField("Message", utils.Arguments["<\"message\">"]).
+		AddField("Response", response).
+		Send(ctx)
+}
+
+func (AICommands) gpt4(ctx *dgc.Ctx) {
+	response, err := api.GPT(utils.Arguments["[\"system\"]"], utils.Arguments["<\"message\">"], "gpt-4")
+	if err != nil {
+		_ = ctx.RespondText("Error getting response: " + err.Error())
+		return
+	}
+
+	embed.NewEmbed().
+		SetTitle("ChatGPT (GPT-4)").
+		AddField("System", utils.Arguments["[\"system\"]"]).
 		AddField("Message", utils.Arguments["<\"message\">"]).
 		AddField("Response", response).
 		Send(ctx)

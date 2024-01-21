@@ -232,7 +232,7 @@ func (m *MessageReaction) Handler(session *discordgo.Session, event any) {
 
 		gptMessages := utils.Misc.CreateAISystemPingMessages(m.System, session, messages)
 
-		response, err := api.GPT3Custom(gptMessages)
+		response, err := api.GPTCustom(gptMessages)
 		if err != nil {
 			utils.Logging.Error("Responder.Handler: Error getting AI response: " + response + err.Error())
 			return

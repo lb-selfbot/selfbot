@@ -104,7 +104,6 @@ func (a *AFK) Handler(session *discordgo.Session, event any) {
 	_ = session.MessageAck(message.ChannelID, message.ID)
 
 	if a.IsActive(&cfg) || time.Since(LastAFKMessage) < 10*time.Second {
-		fmt.Println("skip")
 		return
 	}
 
@@ -138,7 +137,7 @@ func (a *AFK) Handler(session *discordgo.Session, event any) {
 
 		message.Content = strings.ReplaceAll(message.Content, session.State.User.Mention(), message.Author.Mention())
 
-		afkMessage, err = api.GPT3(instructions, message.Content)
+		afkMessage, err = api.GPT(instructions, message.Content)
 		if err != nil {
 			utils.Logging.Error("AFK.Handler: Error getting AI response: " + err.Error())
 			return

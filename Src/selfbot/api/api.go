@@ -581,22 +581,28 @@ func CreateGuild(session *discordgo.Session, name, icon, guildTemplateCode strin
 
 // AI
 
-func GPT3Custom(messages []any) (string, error) {
-	headers := map[string]string{"Authorization": "Bearer nk-wwwchatgptorguk"}
+func GPTCustom(messages []any, models ...string) (string, error) {
+	cfg, err := config.GetConfig()
+	if err != nil {
+		return "An error has occurred: " + err.Error(), err
+	}
 
-	httpResponse := http.PostJson("https://free.chatgpt.org.uk/api/openai/v1/chat/completions", map[string]any{
-		"model":             "gpt-3.5-turbo",
-		"temperature":       0.5,
-		"top_p":             1,
-		"frequency_penalty": 0.5,
-		"presence_penalty":  0.5,
-		"messages":          messages,
-	}, headers)
+	model := "gpt-3.5-turbo"
+	if len(models) > 0 {
+		model = models[0]
+	}
+
+	httpResponse := http.PostJson("https://api.lightning-bot.com/api/v3/selfbot/gpt", map[string]any{
+		"username": cfg.Account.LightningBot.Username,
+		"password": cfg.Account.LightningBot.Password,
+		"model":    model,
+		"messages": messages,
+	})
 	if httpResponse.Error != nil {
 		return "An error has occurred: " + httpResponse.Error.Error(), httpResponse.Error
 	}
 
-	content := httpResponse.Json().Get("choices").GetIndex(0).GetPath("message", "content").MustString()
+	content := httpResponse.Json().Get("response").MustString()
 
 	if content == "" {
 		return "An error has occurred: " + httpResponse.Body, fmt.Errorf("empty response: %s", httpResponse.Body)
@@ -605,11 +611,18 @@ func GPT3Custom(messages []any) (string, error) {
 	return content, nil
 }
 
-func GPT3(instructions, message string) (string, error) {
-	return GPT3Custom([]any{
-		map[string]any{"role": "system", "content": instructions},
-		map[string]any{"role": "user", "content": message},
-	})
+func GPT(instructions, message string, model ...string) (string, error) {
+	messages := []any{}
+
+	if instructions != "" {
+		messages = append(messages, map[string]any{"role": "system", "content": instructions})
+	}
+
+	if message != "" {
+		messages = append(messages, map[string]any{"role": "user", "content": message})
+	}
+
+	return GPTCustom(messages, model...)
 }
 
 var DefaultStyles = map[string]string{

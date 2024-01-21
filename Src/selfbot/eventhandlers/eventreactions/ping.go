@@ -172,7 +172,7 @@ func (p *Ping) Handler(session *discordgo.Session, event any) {
 		HandleMessage(m, err)
 	case PING_AI_RESPONSE:
 		system := utils.Misc.CreateAISystemPing(p.System, session, message.Message)
-		response, err := api.GPT3(system, message.Content)
+		response, err := api.GPT(system, message.Content)
 		if err != nil {
 			utils.Logging.Error("Ping.Handler: Failed to get AI response:", err)
 			return

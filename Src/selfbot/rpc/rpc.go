@@ -62,7 +62,7 @@ func getTimestamps(timeEnabled bool, startTime time.Time) *client.Timestamps {
 func getDGTimestamps(timeEnabled bool, startTime time.Time) *discordgo.TimeStamps {
 	if timeEnabled {
 		return &discordgo.TimeStamps{
-			StartTimestamp: startTime.Unix(),
+			StartTimestamp: startTime.UnixMilli(),
 		}
 	}
 	return nil
@@ -192,7 +192,7 @@ func setRPC(session *discordgo.Session, cfg *config.Config, startTime time.Time)
 
 		return session.UpdateStatusComplex(discordgo.UpdateStatusData{
 			Activities: []*discordgo.Activity{activity},
-			Game:       activity,
+			Game:       nil,
 			AFK:        true,
 			Status:     sessions.Status,
 		})

@@ -219,7 +219,14 @@ func (a *ActivityCommands) setActivity(session *discordgo.Session, activityType,
 
 	switch activityType {
 	case "status":
+		sessions.LastStatusChange = time.Now()
+		sessions.Status = text
+		
 		_ = api.ChangeSettings(session, "/settings", map[string]any{"status": text})
+		_ = a.Session.UpdateStatusComplex(discordgo.UpdateStatusData{
+			AFK:    true,
+			Status: text,
+		})
 	case "customstatus":
 		data := map[string]any{"custom_status": map[string]any{"text": text}}
 		if text == "" {

@@ -1,6 +1,8 @@
 package sessions
 
 import (
+	"time"
+
 	"github.com/LightningDev1/LB-Selfbot/selfbot/logging"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/utils"
 	"github.com/LightningDev1/discordgo"
@@ -8,10 +10,11 @@ import (
 
 var GatewaySessions []*discordgo.GatewaySession
 var LoginSessions []*discordgo.LoginSession
+var LastStatusChange time.Time
 var Status string
 
 func RegisterSessionHandler(session *discordgo.Session) {
-	parseStatus(session, session.State.Sessions)
+	parseStatus(session, session.State.Sessions, false)
 	GatewaySessions = filterSessions(session.State.Sessions)
 
 	refreshLoginSessions(session)
@@ -20,7 +23,7 @@ func RegisterSessionHandler(session *discordgo.Session) {
 }
 
 func onSessionsReplace(session *discordgo.Session, replace *discordgo.SessionsReplace) {
-	parseStatus(session, replace.Sessions)
+	parseStatus(session, replace.Sessions, true)
 	GatewaySessions = filterSessions(replace.Sessions)
 
 	refreshLoginSessions(session)
@@ -32,21 +35,25 @@ func filterSessions(sessions []*discordgo.GatewaySession) []*discordgo.GatewaySe
 	})
 }
 
-func parseStatus(session *discordgo.Session, sessions []*discordgo.GatewaySession) {
+func parseStatus(session *discordgo.Session, sessions []*discordgo.GatewaySession, isReplace bool) {
 	statuses := map[string]int{}
 
-	for _, session := range sessions {
-		if session.SessionID == "all" {
-			Status = session.Status
+	for _, gatewaySession := range sessions {
+		if gatewaySession.SessionID == session.State.SessionID {
+			continue
+		}
+
+		if gatewaySession.SessionID == "all" {
+			setStatus(session, gatewaySession.Status, isReplace)
 
 			return
 		}
 
-		if _, ok := statuses[session.Status]; !ok {
-			statuses[session.Status] = 0
+		if _, ok := statuses[gatewaySession.Status]; !ok {
+			statuses[gatewaySession.Status] = 0
 		}
 
-		statuses[session.Status]++
+		statuses[gatewaySession.Status]++
 	}
 
 	var maxStatus string
@@ -63,7 +70,7 @@ func parseStatus(session *discordgo.Session, sessions []*discordgo.GatewaySessio
 		maxStatus = getFallbackStatus(session)
 	}
 
-	Status = maxStatus
+	setStatus(session, maxStatus, isReplace)
 }
 
 func getFallbackStatus(session *discordgo.Session) string {
@@ -75,6 +82,25 @@ func getFallbackStatus(session *discordgo.Session) string {
 	}
 
 	return status
+}
+
+func setStatus(session *discordgo.Session, status string, isReplace bool) {
+	if status == Status {
+		return
+	}
+
+	if time.Since(LastStatusChange) < time.Second*5 {
+		return
+	}
+
+	Status = status
+
+	if isReplace {
+		_ = session.UpdateStatusComplex(discordgo.UpdateStatusData{
+			AFK:    true,
+			Status: status,
+		})
+	}
 }
 
 func refreshLoginSessions(session *discordgo.Session) error {

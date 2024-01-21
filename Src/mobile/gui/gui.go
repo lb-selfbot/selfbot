@@ -28,9 +28,14 @@ func New(title string) *GUI {
 }
 
 func (g *GUI) SetupGUI() {
+	toolbar := widget.NewMenu(fyne.NewMenu("Menu test", fyne.NewMenuItem("item1", func() {}), fyne.NewMenuItem("item1", func() {}), fyne.NewMenuItem("item1", func() {})))
+
+	content := container.NewBorder(toolbar, nil, nil, nil, widget.NewLabel("Content"))
+
 	g.Window.SetContent(
 		container.NewVBox(
 			widget.NewLabel("Hello Fyne!"),
+			content,
 			widget.NewButton("Quit", func() {
 				g.App.Quit()
 			}),

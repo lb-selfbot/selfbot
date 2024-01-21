@@ -9,7 +9,7 @@ import (
 	"github.com/LightningDev1/LB-Selfbot/mobile"
 )
 
-func init() {
+func main() {
 	var dialer net.Dialer
 	net.DefaultResolver = &net.Resolver{
 		PreferGo: false,
@@ -17,8 +17,6 @@ func init() {
 			return dialer.DialContext(context, "udp", "1.1.1.1:53")
 		},
 	}
-}
 
-func main() {
 	mobile.Main()
 }
