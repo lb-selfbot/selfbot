@@ -46,7 +46,7 @@ func (c *ConsoleMessage) AddInfoConditional(key, value string, condition bool) *
 
 func (c *ConsoleMessage) Show() {
 	r, g, b := utils.Misc.HexToRGB(c.Color)
-	timeFormat := Console.Colored(time.Now().Local().Format("15:04:05"), 193, 239, 255, false)
+	timeFormat := Console.Colored(time.Now().Local().Format("2006-01-02 15:04:05"), 193, 239, 255, false)
 	message := Console.Colored("[", 238, 238, 238, false) + timeFormat + Console.Colored("] ", 238, 238, 238, false) + Console.Colored(c.Title, r, g, b, false) + "\n"
 
 	for e := c.Info.Front(); e != nil; e = e.Next() {
