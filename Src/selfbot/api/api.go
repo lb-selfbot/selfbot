@@ -174,6 +174,10 @@ func ExtractRedditURL(jsonData *simplejson.Json, tries int) (*RedditPost, bool) 
 	posts := jsonData.GetPath("data", "children")
 	postsAmount := len(posts.MustArray())
 
+	if postsAmount == 0 {
+		return nil, false
+	}
+
 	post := posts.GetIndex(rand.Intn(postsAmount - 1)).Get("data")
 
 	if regexp.MustCompile(`(\.jpg|\.png|\.gif|\.jpeg)`).MatchString(post.Get("url_overridden_by_dest").MustString()) {
