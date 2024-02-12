@@ -111,7 +111,7 @@ func (a *AFK) Handler(session *discordgo.Session, event any) {
 		delay := cfg.AFK.Delay
 
 		// Random delay
-		if cfg.AFK.RandomDelay && delay > 0 {
+		if cfg.AFK.RandomDelay {
 			delay = rand.Intn(delay)
 		}
 
