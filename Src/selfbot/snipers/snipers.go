@@ -387,8 +387,14 @@ func CheckGiveawaySniper(session *discordgo.Session, message *discordgo.Message,
 
 	switch message.Author.ID {
 	case "676039466175168543": // ZAP-Hosting Bot#7133
-		if !strings.Contains(message.Content, "It's time for a Giveaway!") {
-			break
+		if len(message.Embeds) == 0 {
+			return
+		}
+
+		emb := message.Embeds[0]
+
+		if !strings.Contains(emb.Title, "It's time for a Giveaway!") {
+			return
 		}
 
 		if len(message.Components) == 0 {
@@ -397,7 +403,7 @@ func CheckGiveawaySniper(session *discordgo.Session, message *discordgo.Message,
 
 		actionsRow, ok := message.Components[0].(*discordgo.ActionsRow)
 		if !ok {
-			break
+			return
 		}
 
 		if len(actionsRow.Components) == 0 {
