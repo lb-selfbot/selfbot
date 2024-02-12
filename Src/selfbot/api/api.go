@@ -125,7 +125,7 @@ type RedditPost struct {
 
 func GetImageFromSubreddit(subreddit string) (*RedditPost, bool) {
 	sortBy := []string{"best", "new", "top", "hot"}[rand.Intn(4)]
-	url := fmt.Sprintf("https://www.reddit.com/r/%s/%s.json?limit=20", subreddit, sortBy)
+	url := fmt.Sprintf("https://www.reddit.com/r/%s/%s.json?limit=50", subreddit, sortBy)
 
 	options := []tls_client.HttpClientOption{
 		tls_client.WithTimeoutSeconds(20),
@@ -157,7 +157,7 @@ func GetImageFromSubreddit(subreddit string) (*RedditPost, bool) {
 
 	httpResponse := http.Get(url, RedditHeaders)
 
-	fmt.Println(httpResponse)
+	// fmt.Println(httpResponse)
 
 	if httpResponse.Error != nil || httpResponse.StatusCode != 200 {
 		return nil, false
@@ -181,6 +181,19 @@ func ExtractRedditURL(jsonData *simplejson.Json, tries int) (*RedditPost, bool) 
 			Title:    post.Get("title").MustString(),
 			ImageURL: strings.ReplaceAll(post.Get("url_overridden_by_dest").MustString(), " .gifv", ".gif"),
 		}, true
+	}
+
+	if post.GetPath("preview", "images").MustArray() != nil {
+		image := post.GetPath("preview", "images").GetIndex(0).GetPath("source", "url").MustString()
+		image = strings.ReplaceAll(image, "amp;", "")
+		image = strings.ReplaceAll(image, " .gifv", ".gif")
+
+		if image != "" {
+			return &RedditPost{
+				Title:    post.Get("title").MustString(),
+				ImageURL: image,
+			}, true
+		}
 	}
 
 	if post.Get("is_video").MustBool() || post.Get("media").MustMap() == nil {
