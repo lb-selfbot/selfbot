@@ -892,6 +892,10 @@ func (*AdministrationCommands) purgeself(ctx *dgc.Ctx) {
 	}
 
 	for _, message := range messages {
+		if message.Author == nil {
+			continue
+		}
+
 		if message.Author.ID != ctx.Session.State.User.ID {
 			continue
 		}
