@@ -941,6 +941,10 @@ func (*AdministrationCommands) purgeuser(ctx *dgc.Ctx) {
 	}
 
 	for _, message := range messages {
+		if message.Author == nil {
+			continue
+		}
+		
 		if message.Author.ID != user.ID {
 			continue
 		}
