@@ -101,8 +101,6 @@ func (a *AFK) Handler(session *discordgo.Session, event any) {
 		return
 	}
 
-	_ = session.MessageAck(message.ChannelID, message.ID)
-
 	if a.IsActive(&cfg) || time.Since(LastAFKMessage) < 10*time.Second {
 		return
 	}
