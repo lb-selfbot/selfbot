@@ -936,7 +936,7 @@ func (FunCommands) trivia(ctx *dgc.Ctx) {
 		return
 	}
 
-	httpResponse.Body = strings.Replace(httpResponse.Body, "&quot;", "\"", -1)
+	httpResponse.Body = strings.Replace(httpResponse.Body, "&quot;", "\\\"", -1)
 	httpResponse.Body = strings.Replace(httpResponse.Body, "&#039;", "'", -1)
 	httpResponse.BodyBytes = []byte(httpResponse.Body)
 
