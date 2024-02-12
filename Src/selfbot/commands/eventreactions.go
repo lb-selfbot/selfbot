@@ -176,7 +176,7 @@ func (e *EventReactionsCommands) RegisterCommands(router *dgc.Router) {
 	router.RegisterCmd(&dgc.Command{
 		Name:        "reactspam",
 		Description: "React to all of a user's messages",
-		Usage:       "[p]reactspam <toggle/list/clear> [@user] <reaction> [global/server/channel id]",
+		Usage:       "[p]reactspam <toggle/list/clear> [@user] [reaction] [global/server/channel id]",
 		Flags:       []string{"DANGEROUS"},
 		Handler:     e.reactspam,
 	})
@@ -949,6 +949,11 @@ func (e EventReactionsCommands) reactspam(ctx *dgc.Ctx) {
 		reaction.Reaction = utils.Arguments["<reaction>"]
 		reaction.Reaction = strings.ReplaceAll(reaction.Reaction, "<", "")
 		reaction.Reaction = strings.ReplaceAll(reaction.Reaction, ">", "")
+
+		if reaction.Reaction == "" {
+			_ = ctx.RespondText("Reaction cannot be empty!")
+			return
+		}
 
 		e.toggleReaction(ctx, reaction)
 	case "list":
