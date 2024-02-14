@@ -589,7 +589,13 @@ func (DiscordUtils) Impersonate(s *discordgo.Session, user *discordgo.User, cont
 }
 
 func (DiscordUtils) IsDM(message *discordgo.Message) bool {
-	return message.GuildID == "" && (message.Type == discordgo.MessageTypeDefault || message.Type == discordgo.MessageTypeReply)
+	if message == nil {
+		return false
+	}
+
+	return message.GuildID == "" && // No server
+		(message.Type == discordgo.MessageTypeDefault || message.Type == discordgo.MessageTypeReply) && // Normal message
+		message.Flags&discordgo.MessageFlagsEphemeral == 0 // Not ephemeral
 }
 
 func (DiscordUtils) FormatStatusEmoji(status discordgo.Status) string {
