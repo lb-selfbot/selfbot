@@ -965,6 +965,76 @@ func CheckGiveawaySniper(session *discordgo.Session, message *discordgo.Message,
 			time.Sleep(time.Second * time.Duration(cfg.Snipers.GiveawaySniper.Sleep))
 			_ = session.MessageReactionAdd(message.ChannelID, message.ID, "🎉")
 		}()
+	case "235148962103951360": // Carl-bot#1536
+		// Win check
+		mentioned := false
+		for _, mention := range message.Mentions {
+			if mention.ID == session.State.User.ID {
+				mentioned = true
+				break
+			}
+		}
+
+		prizeList := regexp.MustCompile(`Congratulations to the winner of \*\*(.*?)\*\*`).FindStringSubmatch(message.Content)
+		if len(prizeList) > 1 && mentioned {
+			logging.Logging.GiveawayWon(session, message, prizeList[1], account)
+		}
+
+		// Entering
+
+		if len(message.Embeds) == 0 {
+			break
+		}
+
+		emb := message.Embeds[0]
+
+		if emb.Description != "Click the button below to join the giveaway!" {
+			break
+		}
+
+		if len(message.Components) == 0 {
+			return
+		}
+
+		component, ok := message.Components[0].(*discordgo.ActionsRow)
+		if !ok {
+			break
+		}
+
+		if len(component.Components) == 0 {
+			return
+		}
+
+		button, ok := component.Components[0].(*discordgo.Button)
+		if !ok {
+			break
+		}
+
+		prize := emb.Title
+
+		endsIn := ""
+		if len(emb.Fields) > 0 {
+			endsInList := regexp.MustCompile(`<t:(.*?):R>`).FindStringSubmatch(emb.Fields[0].Value)
+			if len(endsInList) > 1 {
+				endsUnix, _ := strconv.ParseInt(endsInList[1], 10, 64)
+				endsIn = utils.Misc.FormatDuration(time.Until(time.Unix(endsUnix, 0)))
+			}
+		}
+
+		host := ""
+		if len(emb.Fields) > 1 {
+			hostIDList := regexp.MustCompile("<@(.*?)>").FindStringSubmatch(emb.Fields[1].Value)
+			if len(hostIDList) > 1 {
+				host = hostIDList[1]
+			}
+		}
+
+		logging.Logging.GiveawayFound(session, message, prize, host, endsIn, account)
+
+		go func() {
+			time.Sleep(time.Second * time.Duration(cfg.Snipers.GiveawaySniper.Sleep))
+			_ = session.InteractionClick(button, message)
+		}()
 	default:
 		isCustomBot := utils.Discord.IsUserInList(session, message.Author.ID, cfg.Snipers.GiveawaySniper.CustomBots)
 
