@@ -576,7 +576,7 @@ func (u UtilityCommands) RegisterCommands(router *dgc.Router) {
 		Name:        "interface",
 		Description: "See your public/local ip and MAC address",
 		Usage:       "[p]interface",
-		Flags:       []string{"DANGEROUS"},
+		Flags:       []string{"DANGEROUS", "HOSTING_DANGEROUS"},
 		Handler:     u._interface,
 	})
 
