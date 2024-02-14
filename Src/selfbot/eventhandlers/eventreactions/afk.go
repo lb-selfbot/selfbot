@@ -33,7 +33,7 @@ func (a *AFK) Equals(other EventReaction) bool {
 }
 
 func (a *AFK) HandleLastActivity(session *discordgo.Session, m *discordgo.Message) {
-	if m.Author.ID == session.State.User.ID && !IsEventReactionMessage(m) {
+	if m.Author.ID == session.State.User.ID && !IsEventReactionMessage(m) && time.Since(LastAFKMessage) > 5*time.Second {
 		LastActivity = time.Now()
 	}
 }
@@ -85,9 +85,13 @@ func (a *AFK) Handler(session *discordgo.Session, event any) {
 	}
 
 	activatedOnPing := cfg.AFK.OnPing && pinged
-	activatedOnDM := cfg.AFK.OnDM && message.GuildID == "" && (message.Type == discordgo.MessageTypeDefault || message.Type == discordgo.MessageTypeReply)
+	activatedOnDM := cfg.AFK.OnDM && utils.Discord.IsDM(message.Message)
 
-	if !activatedOnPing && !activatedOnDM {
+	if !(activatedOnPing || activatedOnDM) {
+		return
+	}
+
+	if message.Author.Bot {
 		return
 	}
 
@@ -101,11 +105,9 @@ func (a *AFK) Handler(session *discordgo.Session, event any) {
 		return
 	}
 
-	if a.IsActive(&cfg) || time.Since(LastAFKMessage) < 10*time.Second {
+	if a.IsActive(&cfg) {
 		return
 	}
-
-	LastAFKMessage = time.Now()
 
 	if cfg.AFK.Delay > 0 {
 		delay := cfg.AFK.Delay
@@ -125,9 +127,11 @@ func (a *AFK) Handler(session *discordgo.Session, event any) {
 
 	time.Sleep(2 * time.Second)
 
-	if a.IsActive(&cfg) {
+	if a.IsActive(&cfg) || time.Since(LastAFKMessage) < 10*time.Second {
 		return
 	}
+
+	LastAFKMessage = time.Now()
 
 	afkMessage := a.GetAFKMessage(message.Message, cfg.AFK.Message)
 	if cfg.AFK.AI {
