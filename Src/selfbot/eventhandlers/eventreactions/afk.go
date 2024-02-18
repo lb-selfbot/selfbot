@@ -9,6 +9,7 @@ import (
 	"github.com/LightningDev1/LB-Selfbot/selfbot/api"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/config"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/utils"
+	"github.com/LightningDev1/LB-Selfbot/selfbot/variables"
 	"github.com/LightningDev1/discordgo"
 )
 
@@ -58,6 +59,8 @@ func (a *AFK) GetAFKMessage(m *discordgo.Message, message string) string {
 	message = strings.ReplaceAll(message, "$MSGLINK", utils.Discord.GetMessageLink(m))
 	message = strings.ReplaceAll(message, "$MSGCONTENT", m.ContentWithMentionsReplaced())
 	message = strings.ReplaceAll(message, "$AFKSINCE", fmt.Sprintf("<t:%d:R>", LastActivity.Unix()))
+
+	message = variables.Parse(message)
 
 	return message
 }

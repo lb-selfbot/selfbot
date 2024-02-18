@@ -512,6 +512,37 @@ func (f FunCommands) RegisterCommands(router *dgc.Router) {
 		Usage:       "[p]commitmessage",
 		Handler:     f.commitmessage,
 	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "showerthought",
+		Description: "Send a random shower thought",
+		Usage:       "[p]showerthought",
+		Handler:     f.showerthought,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "truth",
+		Description: "Play Truth or Dare",
+		Usage:       "[p]truth",
+		Handler:     f.truth,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "dare",
+		Description: "Play Truth or Dare",
+		Usage:       "[p]dare",
+		Handler:     f.dare,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "neverhaveiever",
+		Description: "Play Never have I ever...",
+		Usage:       "[p]neverhaveiever",
+		Handler:     f.neverhaveiever,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "paranoia",
+		Description: "Send a random paranoia question",
+		Usage:       "[p]paranoia",
+		Handler:     f.paranoia,
+	})
+
 }
 
 func (FunCommands) eightball(ctx *dgc.Ctx) {
@@ -1488,5 +1519,65 @@ func (FunCommands) commitmessage(ctx *dgc.Ctx) {
 
 	embed.NewEmbed().
 		AddField("Commit Message", httpResponse.Body).
+		Send(ctx)
+}
+
+func (FunCommands) showerthought(ctx *dgc.Ctx) {
+	data, err := http.GetJson("https://showerthoughts.nickf.me/api/thoughts/random?limit=1")
+	if err != nil {
+		_ = ctx.RespondText("An error has occurred.")
+		return
+	}
+
+	embed.NewEmbed().
+		AddField("Shower Thought", data.Get("title").MustString()).
+		Send(ctx)
+}
+
+func (FunCommands) truth(ctx *dgc.Ctx) {
+	data, err := http.GetJson("https://api.truthordarebot.xyz/v1/truth")
+	if err != nil {
+		_ = ctx.RespondText("An error has occurred.")
+		return
+	}
+
+	embed.NewEmbed().
+		AddField("Truth Question", data.Get("question").MustString()).
+		Send(ctx)
+}
+
+func (FunCommands) dare(ctx *dgc.Ctx) {
+	data, err := http.GetJson("https://api.truthordarebot.xyz/v1/dare")
+	if err != nil {
+		_ = ctx.RespondText("An error has occurred.")
+		return
+	}
+
+	embed.NewEmbed().
+		AddField("Dare Question", data.Get("question").MustString()).
+		Send(ctx)
+}
+
+func (FunCommands) neverhaveiever(ctx *dgc.Ctx) {
+	data, err := http.GetJson("https://api.truthordarebot.xyz/v1/nhie")
+	if err != nil {
+		_ = ctx.RespondText("An error has occurred.")
+		return
+	}
+
+	embed.NewEmbed().
+		AddField("Never have I ever...", data.Get("question").MustString()).
+		Send(ctx)
+}
+
+func (FunCommands) paranoia(ctx *dgc.Ctx) {
+	data, err := http.GetJson("https://api.truthordarebot.xyz/v1/paranoia")
+	if err != nil {
+		_ = ctx.RespondText("An error has occurred.")
+		return
+	}
+
+	embed.NewEmbed().
+		AddField("Paranoia Question", data.Get("question").MustString()).
 		Send(ctx)
 }

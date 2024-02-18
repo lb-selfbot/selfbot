@@ -9,6 +9,7 @@ import (
 	"github.com/LightningDev1/LB-Selfbot/selfbot/logging"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/sessions"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/utils"
+	"github.com/LightningDev1/LB-Selfbot/selfbot/variables"
 	"github.com/LightningDev1/discordgo"
 	"github.com/hugolgst/rich-go/client"
 )
@@ -89,13 +90,6 @@ func getSecrets(cfg *config.Config) *client.Secrets {
 	return nil
 }
 
-func parseText(text string) string {
-	text = strings.ReplaceAll(text, "$VERSION", constants.VERSION)
-	text = strings.ReplaceAll(text, "$UPTIME", utils.Misc.FormatDuration(time.Since(constants.START_TIME)))
-
-	return text
-}
-
 var errorLogged = false
 
 func setRPC(session *discordgo.Session, cfg *config.Config, startTime time.Time) error {
@@ -126,12 +120,12 @@ func setRPC(session *discordgo.Session, cfg *config.Config, startTime time.Time)
 		}
 
 		err = client.SetActivity(client.Activity{
-			Details:    parseText(cfg.Activity.Details),
-			State:      parseText(cfg.Activity.State),
+			Details:    variables.Parse(cfg.Activity.Details),
+			State:      variables.Parse(cfg.Activity.State),
 			LargeImage: cfg.Activity.LargeImage,
-			LargeText:  parseText(cfg.Activity.LargeImageText),
+			LargeText:  variables.Parse(cfg.Activity.LargeImageText),
 			SmallImage: cfg.Activity.SmallImage,
-			SmallText:  parseText(cfg.Activity.SmallImageText),
+			SmallText:  variables.Parse(cfg.Activity.SmallImageText),
 			Buttons:    getButtons(cfg),
 			Timestamps: getTimestamps(cfg.Activity.Time, startTime),
 			Party:      getParty(cfg),
@@ -150,13 +144,17 @@ func setRPC(session *discordgo.Session, cfg *config.Config, startTime time.Time)
 		buttonUrls := []string{}
 
 		if cfg.Activity.Button1Label != "" {
-			buttons = append(buttons, cfg.Activity.Button1Label)
-			buttonUrls = append(buttonUrls, cfg.Activity.Button1URL)
+			label := variables.Parse(cfg.Activity.Button1Label)
+
+			buttons = append(buttons, utils.String.Limit(label, 31))
+			buttonUrls = append(buttonUrls, variables.Parse(cfg.Activity.Button1URL))
 		}
 
 		if cfg.Activity.Button2Label != "" {
-			buttons = append(buttons, cfg.Activity.Button2Label)
-			buttonUrls = append(buttonUrls, cfg.Activity.Button2URL)
+			label := variables.Parse(cfg.Activity.Button2Label)
+
+			buttons = append(buttons, utils.String.Limit(label, 31))
+			buttonUrls = append(buttonUrls, variables.Parse(cfg.Activity.Button2URL))
 		}
 		appID := "898932653049393172"
 
@@ -165,16 +163,16 @@ func setRPC(session *discordgo.Session, cfg *config.Config, startTime time.Time)
 		}
 
 		activity := &discordgo.Activity{
-			Name:       parseText(cfg.Activity.Name),
-			State:      parseText(cfg.Activity.State),
-			Details:    parseText(cfg.Activity.Details),
+			Name:       utils.String.Limit(variables.Parse(cfg.Activity.Name), 128),
+			State:      utils.String.Limit(variables.Parse(cfg.Activity.State), 128),
+			Details:    utils.String.Limit(variables.Parse(cfg.Activity.Details), 128),
 			Timestamps: getDGTimestamps(cfg.Activity.Time, startTime),
 			Type:       getActivityType(cfg.Activity.Type),
 			Assets: &discordgo.Assets{
-				LargeImageID: cfg.Activity.LargeImage,
-				LargeText:    parseText(cfg.Activity.LargeImageText),
-				SmallImageID: cfg.Activity.SmallImage,
-				SmallText:    parseText(cfg.Activity.SmallImageText),
+				LargeImageID: variables.Parse(cfg.Activity.LargeImage),
+				LargeText:    utils.String.Limit(variables.Parse(cfg.Activity.LargeImageText), 128),
+				SmallImageID: variables.Parse(cfg.Activity.SmallImage),
+				SmallText:    utils.String.Limit(variables.Parse(cfg.Activity.SmallImageText), 128),
 			},
 			Buttons: buttons,
 			Metadata: &discordgo.ActivityMetadata{
@@ -184,10 +182,11 @@ func setRPC(session *discordgo.Session, cfg *config.Config, startTime time.Time)
 		}
 
 		if cfg.Activity.Type == "Streaming" {
-			activity.ApplicationID = nil
-			activity.Buttons = nil
-			activity.Metadata = nil
 			activity.URL = cfg.Activity.StreamingURL
+
+			if !strings.HasPrefix(activity.URL, "https://") {
+				activity.URL = "https://twitch.tv/ninja"
+			}
 		}
 
 		return session.UpdateStatusComplex(discordgo.UpdateStatusData{
@@ -205,7 +204,7 @@ func StartRPC(session *discordgo.Session) {
 	go func() {
 		startTime := time.Now()
 		for {
-			time.Sleep(time.Second * 5)
+			time.Sleep(time.Second * 10)
 
 			cfg, err := config.GetConfig()
 			if err != nil {

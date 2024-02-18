@@ -330,4 +330,12 @@ func (StringUtils) Ermahgerd(text string) string {
 	return strings.Join(translatedWords, " ")
 }
 
+func (StringUtils) Limit(text string, limit int) string {
+	if len(text) > limit {
+		return text[:limit]
+	}
+
+	return text
+}
+
 var String = &StringUtils{}

@@ -26,6 +26,7 @@ import (
 	"github.com/LightningDev1/LB-Selfbot/selfbot/ipc"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/logging"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/uploaders/destinations"
+	"github.com/LightningDev1/go-foreground"
 	"github.com/LightningDev1/screenshot"
 	"github.com/bitly/go-simplejson"
 	"github.com/kkdai/youtube/v2"
@@ -329,6 +330,13 @@ func (u UtilityCommands) RegisterCommands(router *dgc.Router) {
 		Usage:       "[p]lockpc",
 		Flags:       []string{"DANGEROUS", "HOSTING_DANGEROUS"},
 		Handler:     u.lockpc,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "activewindow",
+		Description: "View the active window on your PC",
+		Usage:       "[p]activewindow",
+		Flags:       []string{"DANGEROUS", "HOSTING_DANGEROUS"},
+		Handler:     u.activewindow,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "calc",
@@ -1606,6 +1614,16 @@ func (UtilityCommands) lockpc(ctx *dgc.Ctx) {
 	_ = utils.System.LockPC()
 }
 
+func (UtilityCommands) activewindow(ctx *dgc.Ctx) {
+	pid, _ := foreground.GetForegroundPID()
+	title, _ := foreground.GetForegroundTitle()
+
+	embed.NewEmbed().
+		AddField("Active Window PID", fmt.Sprint(pid)).
+		AddField("Active Window Title", title).
+		Send(ctx)
+}
+
 func (UtilityCommands) calc(ctx *dgc.Ctx) {
 	if runtime.GOOS != "windows" {
 		_ = ctx.RespondText("This command is only available on Windows")
@@ -2431,21 +2449,9 @@ func (UtilityCommands) wikipedia(ctx *dgc.Ctx) {
 }
 
 func (UtilityCommands) weather(ctx *dgc.Ctx) {
-	url := fmt.Sprintf(
-		"https://api.openweathermap.org/data/2.5/weather?appid=533d00f29739edba54c5fb2b1a8262b3&q=%s",
-		url.QueryEscape(ctx.Arguments.Raw()),
-	)
-
-	httpResponse := http.Get(url)
-	if httpResponse.Error != nil {
-		_ = ctx.RespondText("An error has occurred: " + httpResponse.Error.Error())
-		return
-	}
-
-	weather := httpResponse.Json()
-
-	if fmt.Sprint(weather.Get("cod").MustInt()) == "404" {
-		_ = ctx.RespondText("No results found.")
+	weather, err := api.GetWeather(ctx.Arguments.Raw())
+	if err != nil {
+		_ = ctx.RespondText("An error has occurred: " + err.Error())
 		return
 	}
 

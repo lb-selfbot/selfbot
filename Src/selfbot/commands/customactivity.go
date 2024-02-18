@@ -1,6 +1,7 @@
 package commands
 
 import (
+	"fmt"
 	"strings"
 
 	"github.com/LightningDev1/LB-Selfbot/selfbot/api"
@@ -93,6 +94,12 @@ func (r CustomActivityCommands) RegisterCommands(router *dgc.Router) {
 		Handler:     r.catime,
 	})
 	router.RegisterCmd(&dgc.Command{
+		Name:        "castreamingurl",
+		Description: "Set the URL for the streaming activity",
+		Usage:       "[p]castreamingurl [url]",
+		Handler:     r.castreamingurl,
+	})
+	router.RegisterCmd(&dgc.Command{
 		Name:        "cacreateimagekey",
 		Description: "Create an image key for a Custom Activity",
 		Usage:       "[p]cacreateimagekey <image url>",
@@ -146,6 +153,37 @@ func (r CustomActivityCommands) RegisterCommands(router *dgc.Router) {
 		Usage:       "[p]cabutton2url [url]",
 		Handler:     r.cabutton2url,
 	})
+
+	router.RegisterCmd(&dgc.Command{
+		Name:        "capresets",
+		Description: "List all Custom Activity presets",
+		Usage:       "[p]capresets",
+		Handler:     r.capresets,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "clearcapresets",
+		Description: "Clear all Custom Activity presets",
+		Usage:       "[p]clearcapresets",
+		Handler:     r.clearcapresets,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "savecapreset",
+		Description: "Save current activity as a preset",
+		Usage:       "[p]savecapreset <name>",
+		Handler:     r.savecapreset,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "loadcapreset",
+		Description: "Load a Custom Activity preset",
+		Usage:       "[p]loadcapreset <name>",
+		Handler:     r.loadcapreset,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "deletecapreset",
+		Description: "Delete a Custom Activity preset",
+		Usage:       "[p]deletecapreset <name>",
+		Handler:     r.deletecapreset,
+	})
 }
 
 func (CustomActivityCommands) caenabled(ctx *dgc.Ctx) {
@@ -154,13 +192,26 @@ func (CustomActivityCommands) caenabled(ctx *dgc.Ctx) {
 		_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
 		return
 	}
-	cfg, _ := config.GetConfig()
+	cfg, err := config.GetConfig()
+	if err != nil {
+		_ = ctx.RespondText("Failed to get config.")
+		return
+	}
+
 	cfg.Activity.Enabled = toggle == "on"
 	_ = cfg.Save()
+
+	embed.NewEmbed().
+		SetDescription(fmt.Sprintf("Turned Custom Activity %s.", toggle)).
+		Send(ctx)
 }
 
 func (CustomActivityCommands) cactivitytype(ctx *dgc.Ctx) {
-	cfg, _ := config.GetConfig()
+	cfg, err := config.GetConfig()
+	if err != nil {
+		_ = ctx.RespondText("Failed to get config.")
+		return
+	}
 
 	toggle := strings.ToLower(utils.Arguments["<rpc/custom>"])
 	if toggle == "rpc" {
@@ -173,71 +224,181 @@ func (CustomActivityCommands) cactivitytype(ctx *dgc.Ctx) {
 	}
 
 	_ = cfg.Save()
+
+	embed.NewEmbed().
+		SetDescription(fmt.Sprintf("Set activity type to %s.", toggle)).
+		Send(ctx)
 }
 
-func (CustomActivityCommands) caplaying(*dgc.Ctx) {
-	cfg, _ := config.GetConfig()
+func (CustomActivityCommands) caplaying(ctx *dgc.Ctx) {
+	cfg, err := config.GetConfig()
+	if err != nil {
+		_ = ctx.RespondText("Failed to get config.")
+		return
+	}
+
 	cfg.Activity.Type = "Playing"
 	_ = cfg.Save()
+
+	embed.NewEmbed().
+		SetDescription("Set custom activity type to Playing.").
+		Send(ctx)
 }
 
-func (CustomActivityCommands) calistening(*dgc.Ctx) {
-	cfg, _ := config.GetConfig()
+func (CustomActivityCommands) calistening(ctx *dgc.Ctx) {
+	cfg, err := config.GetConfig()
+	if err != nil {
+		_ = ctx.RespondText("Failed to get config.")
+		return
+	}
+
 	cfg.Activity.Type = "Listening"
 	_ = cfg.Save()
+
+	embed.NewEmbed().
+		SetDescription("Set custom activity type to Listening.").
+		Send(ctx)
 }
 
-func (CustomActivityCommands) cawatching(*dgc.Ctx) {
-	cfg, _ := config.GetConfig()
+func (CustomActivityCommands) cawatching(ctx *dgc.Ctx) {
+	cfg, err := config.GetConfig()
+	if err != nil {
+		_ = ctx.RespondText("Failed to get config.")
+		return
+	}
+
 	cfg.Activity.Type = "Watching"
 	_ = cfg.Save()
+
+	embed.NewEmbed().
+		SetDescription("Set custom activity type to Watching.").
+		Send(ctx)
 }
 
-func (CustomActivityCommands) castreaming(*dgc.Ctx) {
-	cfg, _ := config.GetConfig()
+func (CustomActivityCommands) castreaming(ctx *dgc.Ctx) {
+	cfg, err := config.GetConfig()
+	if err != nil {
+		_ = ctx.RespondText("Failed to get config.")
+		return
+	}
+
 	cfg.Activity.Type = "Streaming"
 	_ = cfg.Save()
+
+	embed.NewEmbed().
+		SetDescription("Set custom activity type to Streaming.").
+		Send(ctx)
 }
 
-func (CustomActivityCommands) cacompeting(*dgc.Ctx) {
-	cfg, _ := config.GetConfig()
+func (CustomActivityCommands) cacompeting(ctx *dgc.Ctx) {
+	cfg, err := config.GetConfig()
+	if err != nil {
+		_ = ctx.RespondText("Failed to get config.")
+		return
+	}
+
 	cfg.Activity.Type = "Competing"
 	_ = cfg.Save()
+
+	embed.NewEmbed().
+		SetDescription("Set custom activity type to Competing.").
+		Send(ctx)
 }
 
-func (CustomActivityCommands) caclientid(*dgc.Ctx) {
-	cfg, _ := config.GetConfig()
+func (CustomActivityCommands) caclientid(ctx *dgc.Ctx) {
+	cfg, err := config.GetConfig()
+	if err != nil {
+		_ = ctx.RespondText("Failed to get config.")
+		return
+	}
+
 	cfg.Activity.ClientID = utils.Arguments["<client id>"]
 	_ = cfg.Save()
+
+	embed.NewEmbed().
+		SetDescription(fmt.Sprintf("Set activity client id to `%s`.", cfg.Activity.ClientID)).
+		Send(ctx)
 }
 
 func (CustomActivityCommands) caname(ctx *dgc.Ctx) {
-	cfg, _ := config.GetConfig()
+	cfg, err := config.GetConfig()
+	if err != nil {
+		_ = ctx.RespondText("Failed to get config.")
+		return
+	}
+
 	cfg.Activity.Name = ctx.Arguments.Raw()
 	_ = cfg.Save()
+
+	embed.NewEmbed().
+		SetDescription(fmt.Sprintf("Set activity name to `%s`.", cfg.Activity.Name)).
+		Send(ctx)
 }
 
 func (CustomActivityCommands) castate(ctx *dgc.Ctx) {
-	cfg, _ := config.GetConfig()
+	cfg, err := config.GetConfig()
+	if err != nil {
+		_ = ctx.RespondText("Failed to get config.")
+		return
+	}
+
 	cfg.Activity.State = ctx.Arguments.Raw()
 	_ = cfg.Save()
+
+	embed.NewEmbed().
+		SetDescription(fmt.Sprintf("Set activity state to `%s`.", cfg.Activity.State)).
+		Send(ctx)
 }
 
 func (CustomActivityCommands) cadetails(ctx *dgc.Ctx) {
-	cfg, _ := config.GetConfig()
+	cfg, err := config.GetConfig()
+	if err != nil {
+		_ = ctx.RespondText("Failed to get config.")
+		return
+	}
+
 	cfg.Activity.Details = ctx.Arguments.Raw()
 	_ = cfg.Save()
+
+	embed.NewEmbed().
+		SetDescription(fmt.Sprintf("Set activity details to `%s`.", cfg.Activity.Details)).
+		Send(ctx)
 }
 
 func (CustomActivityCommands) catime(ctx *dgc.Ctx) {
+	cfg, err := config.GetConfig()
+	if err != nil {
+		_ = ctx.RespondText("Failed to get config.")
+		return
+	}
+
 	toggle := strings.ToLower(utils.Arguments["<on/off>"])
 	if toggle != "on" && toggle != "off" {
 		_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
 		return
 	}
-	cfg, _ := config.GetConfig()
+
 	cfg.Activity.Time = toggle == "on"
 	_ = cfg.Save()
+
+	embed.NewEmbed().
+		SetDescription(fmt.Sprintf("Turned activity time %s.", toggle)).
+		Send(ctx)
+}
+
+func (CustomActivityCommands) castreamingurl(ctx *dgc.Ctx) {
+	cfg, err := config.GetConfig()
+	if err != nil {
+		_ = ctx.RespondText("Failed to get config.")
+		return
+	}
+
+	cfg.Activity.StreamingURL = ctx.Arguments.Raw()
+	_ = cfg.Save()
+
+	embed.NewEmbed().
+		SetDescription(fmt.Sprintf("Set streaming URL to `%s`.", cfg.Activity.StreamingURL)).
+		Send(ctx)
 }
 
 func (CustomActivityCommands) cacreateimagekey(ctx *dgc.Ctx) {
@@ -256,60 +417,246 @@ func (CustomActivityCommands) cacreateimagekey(ctx *dgc.Ctx) {
 }
 
 func (CustomActivityCommands) cainvitable(ctx *dgc.Ctx) {
+	cfg, err := config.GetConfig()
+	if err != nil {
+		_ = ctx.RespondText("Failed to get config.")
+		return
+	}
+
 	toggle := strings.ToLower(utils.Arguments["<on/off>"])
 	if toggle != "on" && toggle != "off" {
 		_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
 		return
 	}
-	cfg, _ := config.GetConfig()
+
 	cfg.Activity.Invitable = toggle == "on"
 	_ = cfg.Save()
+
+	embed.NewEmbed().
+		SetDescription(fmt.Sprintf("Turned activity invitable %s.", toggle)).
+		Send(ctx)
 }
 
 func (CustomActivityCommands) calargeimage(ctx *dgc.Ctx) {
-	cfg, _ := config.GetConfig()
+	cfg, err := config.GetConfig()
+	if err != nil {
+		_ = ctx.RespondText("Failed to get config.")
+		return
+	}
+
 	cfg.Activity.LargeImage = ctx.Arguments.Raw()
 	_ = cfg.Save()
+
+	embed.NewEmbed().
+		SetDescription(fmt.Sprintf("Set large image key to `%s`.", cfg.Activity.LargeImage)).
+		Send(ctx)
 }
 
 func (CustomActivityCommands) calargetext(ctx *dgc.Ctx) {
-	cfg, _ := config.GetConfig()
+	cfg, err := config.GetConfig()
+	if err != nil {
+		_ = ctx.RespondText("Failed to get config.")
+		return
+	}
+
 	cfg.Activity.LargeImageText = ctx.Arguments.Raw()
 	_ = cfg.Save()
+
+	embed.NewEmbed().
+		SetDescription(fmt.Sprintf("Set large image text to `%s`.", cfg.Activity.LargeImageText)).
+		Send(ctx)
 }
 
 func (CustomActivityCommands) casmallimage(ctx *dgc.Ctx) {
-	cfg, _ := config.GetConfig()
+	cfg, err := config.GetConfig()
+	if err != nil {
+		_ = ctx.RespondText("Failed to get config.")
+		return
+	}
+
 	cfg.Activity.SmallImage = ctx.Arguments.Raw()
 	_ = cfg.Save()
+
+	embed.NewEmbed().
+		SetDescription(fmt.Sprintf("Set small image key to `%s`.", cfg.Activity.SmallImage)).
+		Send(ctx)
 }
 
 func (CustomActivityCommands) casmalltext(ctx *dgc.Ctx) {
-	cfg, _ := config.GetConfig()
+	cfg, err := config.GetConfig()
+	if err != nil {
+		_ = ctx.RespondText("Failed to get config.")
+		return
+	}
+
 	cfg.Activity.SmallImageText = ctx.Arguments.Raw()
 	_ = cfg.Save()
+
+	embed.NewEmbed().
+		SetDescription(fmt.Sprintf("Set small image text to `%s`.", cfg.Activity.SmallImageText)).
+		Send(ctx)
 }
 
 func (CustomActivityCommands) cabutton1text(ctx *dgc.Ctx) {
-	cfg, _ := config.GetConfig()
+	cfg, err := config.GetConfig()
+	if err != nil {
+		_ = ctx.RespondText("Failed to get config.")
+		return
+	}
+
 	cfg.Activity.Button1Label = ctx.Arguments.Raw()
 	_ = cfg.Save()
+
+	embed.NewEmbed().
+		SetDescription(fmt.Sprintf("Set button 1 text to `%s`.", cfg.Activity.Button1Label)).
+		Send(ctx)
 }
 
 func (CustomActivityCommands) cabutton1url(ctx *dgc.Ctx) {
-	cfg, _ := config.GetConfig()
+	cfg, err := config.GetConfig()
+	if err != nil {
+		_ = ctx.RespondText("Failed to get config.")
+		return
+	}
+
 	cfg.Activity.Button1URL = ctx.Arguments.Raw()
 	_ = cfg.Save()
+
+	embed.NewEmbed().
+		SetDescription(fmt.Sprintf("Set button 1 url to `%s`.", cfg.Activity.Button1URL)).
+		Send(ctx)
 }
 
 func (CustomActivityCommands) cabutton2text(ctx *dgc.Ctx) {
-	cfg, _ := config.GetConfig()
+	cfg, err := config.GetConfig()
+	if err != nil {
+		_ = ctx.RespondText("Failed to get config.")
+		return
+	}
+
 	cfg.Activity.Button2Label = ctx.Arguments.Raw()
 	_ = cfg.Save()
+
+	embed.NewEmbed().
+		SetDescription(fmt.Sprintf("Set button 2 text to `%s`.", cfg.Activity.Button2Label)).
+		Send(ctx)
 }
 
 func (CustomActivityCommands) cabutton2url(ctx *dgc.Ctx) {
-	cfg, _ := config.GetConfig()
+	cfg, err := config.GetConfig()
+	if err != nil {
+		_ = ctx.RespondText("Failed to get config.")
+		return
+	}
+
 	cfg.Activity.Button2URL = ctx.Arguments.Raw()
 	_ = cfg.Save()
+
+	embed.NewEmbed().
+		SetDescription(fmt.Sprintf("Set button 2 url to `%s`.", cfg.Activity.Button2URL)).
+		Send(ctx)
+}
+
+func (CustomActivityCommands) capresets(ctx *dgc.Ctx) {
+	cfg, err := config.GetConfig()
+	if err != nil {
+		_ = ctx.RespondText("Failed to get config.")
+		return
+	}
+
+	var presets []string
+
+	for k, v := range cfg.ActivityPresets {
+		presets = append(presets, fmt.Sprintf("%s: %s %s", k, v.Type, v.Name))
+	}
+
+	if len(presets) == 0 {
+		embed.NewEmbed().SetDescription("No Custom Activity presets found.").Send(ctx)
+		return
+	}
+
+	embed.NewEmbed().
+		SetDescription("Custom Activity presets\n\n" + strings.Join(presets, "\n")).
+		Send(ctx)
+}
+
+func (CustomActivityCommands) clearcapresets(ctx *dgc.Ctx) {
+	cfg, err := config.GetConfig()
+	if err != nil {
+		_ = ctx.RespondText("Failed to get config.")
+		return
+	}
+
+	cfg.ActivityPresets = make(map[string]config.Activity)
+	_ = cfg.Save()
+
+	embed.NewEmbed().
+		SetDescription("Cleared all activity presets.").
+		Send(ctx)
+}
+
+func (CustomActivityCommands) savecapreset(ctx *dgc.Ctx) {
+	cfg, err := config.GetConfig()
+	if err != nil {
+		_ = ctx.RespondText("Failed to get config.")
+		return
+	}
+
+	name := utils.Arguments["<name>"]
+
+	if cfg.ActivityPresets == nil {
+		cfg.ActivityPresets = make(map[string]config.Activity)
+	}
+
+	cfg.ActivityPresets[name] = cfg.Activity
+	_ = cfg.Save()
+
+	embed.NewEmbed().
+		SetDescription(fmt.Sprintf("Saved current activity as preset `%s`.", name)).
+		Send(ctx)
+}
+
+func (CustomActivityCommands) loadcapreset(ctx *dgc.Ctx) {
+	cfg, err := config.GetConfig()
+	if err != nil {
+		_ = ctx.RespondText("Failed to get config.")
+		return
+	}
+
+	name := utils.Arguments["<name>"]
+
+	preset, ok := cfg.ActivityPresets[name]
+	if !ok {
+		embed.NewEmbed().SetDescription(fmt.Sprintf("Preset `%s` not found.", name)).Send(ctx)
+		return
+	}
+
+	cfg.Activity = preset
+	_ = cfg.Save()
+
+	embed.NewEmbed().
+		SetDescription(fmt.Sprintf("Loaded activity preset `%s`.", name)).
+		Send(ctx)
+}
+
+func (CustomActivityCommands) deletecapreset(ctx *dgc.Ctx) {
+	cfg, err := config.GetConfig()
+	if err != nil {
+		_ = ctx.RespondText("Failed to get config.")
+		return
+	}
+
+	name := utils.Arguments["<name>"]
+
+	if _, ok := cfg.ActivityPresets[name]; !ok {
+		embed.NewEmbed().SetDescription(fmt.Sprintf("Preset `%s` not found.", name)).Send(ctx)
+		return
+	}
+
+	delete(cfg.ActivityPresets, name)
+	_ = cfg.Save()
+
+	embed.NewEmbed().
+		SetDescription(fmt.Sprintf("Deleted activity preset `%s`.", name)).
+		Send(ctx)
 }

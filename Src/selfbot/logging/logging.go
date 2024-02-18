@@ -7,6 +7,7 @@ import (
 
 	"github.com/LightningDev1/LB-Selfbot/selfbot/config"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/constants"
+	"github.com/LightningDev1/LB-Selfbot/selfbot/data"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/utils"
 	"github.com/LightningDev1/dgc"
 	"github.com/LightningDev1/discordgo"
@@ -61,6 +62,11 @@ func (_Logging) OnReady(router *dgc.Router, event *discordgo.Ready) {
 	} else if event.User.Discriminator != "0" {
 		userText = event.User.Username + "#" + event.User.Discriminator
 	}
+
+	data.TotalCommands = len(router.Commands)
+	data.Guilds = len(event.Guilds)
+	data.Friends = len(friends)
+	data.AvatarImageKey = strings.ReplaceAll(event.User.AvatarURL(""), "https://cdn.discordapp.com/", "mp:")
 
 	bannerTextUpper := fmt.Sprintf("LightningBot %s | %s | Prefix: %s", constants.VERSION, userText, cfg.Selfbot.CommandPrefix)
 	bannerTextLower := fmt.Sprintf("%d Commands | %d Servers | %d Friends", len(router.Commands), len(event.Guilds), len(friends))

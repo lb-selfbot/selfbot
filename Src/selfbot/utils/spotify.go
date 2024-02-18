@@ -2,56 +2,57 @@ package utils
 
 import (
 	"fmt"
+	"time"
 
-	"github.com/LightningDev1/discordgo"
+	"github.com/LightningDev1/LB-Selfbot/selfbot/http"
 	"github.com/bitly/go-simplejson"
 )
 
-type SpotifyUtils struct{}
+type SpotifyUtils struct {
+	connName        string
+	connAccessToken string
+	connRetrieved   time.Time
+}
 
 func formatAsBearerToken(token string) string {
 	return fmt.Sprintf("Bearer %s", token)
 }
 
-func (s *SpotifyUtils) GetBearerToken(session *discordgo.Session) string {
-	response, err := session.Request("GET", "https://discord.com/api/v10/users/@me/connections", nil)
-	if err != nil {
-		return ""
-	}
-
-	connections, err := simplejson.NewJson(response)
-	if err != nil {
-		return ""
-	}
-
-	for i := 0; i < len(connections.MustArray()); i++ {
-		connection := connections.GetIndex(i)
-		connectionType := connection.Get("type").MustString()
-		connectionName := connection.Get("name").MustString()
-		connectionAccessToken := connection.Get("access_token").MustString()
-
-		if connectionType != "spotify" {
-			continue
-		}
-
-		response, err = session.Request(
-			"GET",
-			fmt.Sprintf("https://discord.com/api/v10/users/@me/connections/spotify/%s/access-token", connectionName),
-			nil,
+func (s *SpotifyUtils) GetBearerToken(token string) string {
+	if s.connName == "" || time.Since(s.connRetrieved).Minutes() > 10 {
+		conns, err := http.GetJson(
+			"https://discord.com/api/v10/users/@me/connections",
+			map[string]string{"Authorization": token},
 		)
 		if err != nil {
-			return formatAsBearerToken(connectionAccessToken)
+			return ""
 		}
 
-		json, err := simplejson.NewJson(response)
-		if err != nil {
-			return formatAsBearerToken(connectionAccessToken)
-		}
+		for i := 0; i < len(conns.MustArray()); i++ {
+			conn := conns.GetIndex(i)
+			if conn.Get("type").MustString() != "spotify" {
+				continue
+			}
 
-		return formatAsBearerToken(json.Get("access_token").MustString())
+			s.connName = conn.Get("name").MustString()
+			s.connAccessToken = conn.Get("access_token").MustString()
+			s.connRetrieved = time.Now()
+
+			conn, err := http.GetJson(
+				fmt.Sprintf("https://discord.com/api/v10/users/@me/connections/spotify/%s/access-token", s.connName),
+				map[string]string{"Authorization": token},
+			)
+			if err != nil {
+				return ""
+			}
+
+			s.connAccessToken = conn.Get("access_token").MustString()
+
+			break
+		}
 	}
 
-	return ""
+	return formatAsBearerToken(s.connAccessToken)
 }
 
 func (s SpotifyUtils) GetSongArtists(song *simplejson.Json) []string {

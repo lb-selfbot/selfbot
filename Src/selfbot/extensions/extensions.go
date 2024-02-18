@@ -10,6 +10,7 @@ import (
 
 	"github.com/LightningDev1/LB-Selfbot/selfbot/config"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/constants"
+	"github.com/LightningDev1/LB-Selfbot/selfbot/data"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/embed"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/extensions/interop"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/logging"
@@ -86,6 +87,8 @@ func RegisterExtensions(session *discordgo.Session, router *dgc.Router) {
 			}
 
 			registerFunc(session, router)
+
+			data.LoadedExtensions++
 		}
 
 		return nil

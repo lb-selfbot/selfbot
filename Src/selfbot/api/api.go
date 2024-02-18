@@ -938,3 +938,37 @@ func AddReviewDBReview(session *discordgo.Session, userID, review string) error 
 		"userid":  userID,
 	}).Error
 }
+
+type weatherData struct {
+	weather *simplejson.Json
+	time    time.Time
+}
+
+var weatherCache = map[string]weatherData{}
+
+func GetWeather(location string) (*simplejson.Json, error) {
+	if w, ok := weatherCache[location]; ok && time.Since(w.time) < time.Minute*5 {
+		return w.weather, nil
+	}
+
+	url := fmt.Sprintf(
+		"https://api.openweathermap.org/data/2.5/weather?appid=533d00f29739edba54c5fb2b1a8262b3&q=%s",
+		url.QueryEscape(location),
+	)
+
+	weather, err := http.GetJson(url)
+	if err != nil {
+		return nil, err
+	}
+
+	if weather.Get("cod").MustInt() != 200 {
+		return nil, fmt.Errorf("invalid location")
+	}
+
+	weatherCache[location] = weatherData{
+		weather: weather,
+		time:    time.Now(),
+	}
+
+	return weather, nil
+}

@@ -7,7 +7,7 @@ require (
 	github.com/LightningDev1/beeep v0.1.0
 	github.com/LightningDev1/chromiumdp v0.0.0-20231128154929-66ef7c9d7fb7
 	github.com/LightningDev1/dgc v1.1.4-0.20231130125735-679db2635a21
-	github.com/LightningDev1/discordgo v0.26.6-0.20240101115634-68677b26bfef
+	github.com/LightningDev1/discordgo v0.26.6-0.20240212104707-2d442d89d90b
 	github.com/LightningDev1/go-privnote v0.1.1
 	github.com/LightningDev1/screenshot v0.0.0-20230719145300-c8d3633174bf
 	github.com/bitly/go-simplejson v0.5.1
@@ -38,7 +38,8 @@ require (
 
 require (
 	fyne.io/systray v1.10.1-0.20231115130155-104f5ef7839e // indirect
-	github.com/BurntSushi/xgb v0.0.0-20160522181843-27f122750802 // indirect
+	github.com/BurntSushi/xgb v0.0.0-20210121224620-deaf085860bc // indirect
+	github.com/LightningDev1/go-foreground v0.0.0-20240212170329-90837907b759 // indirect
 	github.com/andybalholm/brotli v1.0.6 // indirect
 	github.com/atotto/clipboard v0.1.4 // indirect
 	github.com/aymanbagabas/go-osc52/v2 v2.0.1 // indirect
@@ -84,6 +85,7 @@ require (
 	github.com/muesli/termenv v0.15.2 // indirect
 	github.com/nu7hatch/gouuid v0.0.0-20131221200532-179d4d0c4d8d // indirect
 	github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2 // indirect
+	github.com/progrium/macdriver v0.5.0-preview.0.20240129182626-6a98f82290e5 // indirect
 	github.com/quic-go/quic-go v0.40.1 // indirect
 	github.com/rivo/uniseg v0.4.4 // indirect
 	github.com/sahilm/fuzzy v0.1.1-0.20230530133925-c48e322e2a8f // indirect

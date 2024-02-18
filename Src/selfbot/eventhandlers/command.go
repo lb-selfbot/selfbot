@@ -2,6 +2,7 @@ package eventhandlers
 
 import (
 	"github.com/LightningDev1/LB-Selfbot/selfbot/config"
+	"github.com/LightningDev1/LB-Selfbot/selfbot/data"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/eventhandlers/eventreactions"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/logging"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/utils"
@@ -23,12 +24,13 @@ func (e *Events) OnCommand(following dgc.ExecutionHandler) dgc.ExecutionHandler 
 		}
 
 		if cfg.Selfbot.DeleteCommands {
-			_ = ctx.Session.ChannelMessageDelete(ctx.Event.Message.ChannelID, ctx.Event.Message.ID)
+			go ctx.Session.ChannelMessageDelete(ctx.Event.Message.ChannelID, ctx.Event.Message.ID)
 		}
 
 		utils.Arguments = arguments
 
 		eventreactions.UsedCommands.Add(ctx)
+		data.UsedCommands++
 
 		logging.Logging.CommandUsed(ctx.Command.Name)
 

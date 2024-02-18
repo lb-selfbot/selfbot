@@ -36,6 +36,27 @@ func (t *TriggerList) IsTriggered(session *discordgo.Session, userID string, gui
 	}
 }
 
+type Activity struct {
+	Enabled        bool   `json:"Enabled"`
+	ActivityType   string `json:"ActivityType"`
+	Type           string `json:"Type"`
+	ClientID       string `json:"ClientID"`
+	Name           string `json:"Name"`
+	State          string `json:"State"`
+	Details        string `json:"Details"`
+	Invitable      bool   `json:"Invitable"`
+	Time           bool   `json:"Time"`
+	StreamingURL   string `json:"StreamingURL"`
+	LargeImage     string `json:"LargeImage"`
+	LargeImageText string `json:"LargeImageText"`
+	SmallImage     string `json:"SmallImage"`
+	SmallImageText string `json:"SmallImageText"`
+	Button1Label   string `json:"Button1Label"`
+	Button1URL     string `json:"Button1URL"`
+	Button2Label   string `json:"Button2Label"`
+	Button2URL     string `json:"Button2URL"`
+}
+
 type Config struct {
 	Account struct {
 		LightningBot struct {
@@ -96,27 +117,9 @@ type Config struct {
 		SessionConnected      bool `json:"SessionConnected"`
 		SessionDisconnected   bool `json:"SessionDisconnected"`
 	} `json:"Events"`
-	Activity struct {
-		Enabled        bool   `json:"Enabled"`
-		ActivityType   string `json:"ActivityType"`
-		Type           string `json:"Type"`
-		ClientID       string `json:"ClientID"`
-		Name           string `json:"Name"`
-		State          string `json:"State"`
-		Details        string `json:"Details"`
-		Invitable      bool   `json:"Invitable"`
-		Time           bool   `json:"Time"`
-		StreamingURL   string `json:"StreamingURL"`
-		LargeImage     string `json:"LargeImage"`
-		LargeImageText string `json:"LargeImageText"`
-		SmallImage     string `json:"SmallImage"`
-		SmallImageText string `json:"SmallImageText"`
-		Button1Label   string `json:"Button1Label"`
-		Button1URL     string `json:"Button1URL"`
-		Button2Label   string `json:"Button2Label"`
-		Button2URL     string `json:"Button2URL"`
-	} `json:"Activity"`
-	UI struct {
+	Activity        Activity            `json:"Activity"`
+	ActivityPresets map[string]Activity `json:"ActivityPresets"`
+	UI              struct {
 		Theme               string `json:"Theme"`
 		HideToSystemTray    bool   `json:"HideToSystemTray"`
 		RunOnStartup        bool   `json:"RunOnStartup"`

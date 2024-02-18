@@ -13,6 +13,7 @@ import (
 	"github.com/LightningDev1/LB-Selfbot/selfbot/constants"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/http"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/utils"
+	"github.com/LightningDev1/LB-Selfbot/selfbot/variables"
 	"github.com/LightningDev1/dgc"
 	"github.com/LightningDev1/discordgo"
 )
@@ -38,12 +39,15 @@ var (
 // NewEmbed returns a new embed object
 func NewEmbed() *Embed {
 	embed := &Embed{&discordgo.MessageEmbed{}, "", ""}
+
 	cfg, err := config.GetConfig()
 	if err != nil {
 		return embed
 	}
-	embed.SetTitle(strings.Replace(cfg.Selfbot.Title, "$VERSION", constants.VERSION, -1))
-	embed.SetFooter(strings.Replace(cfg.Selfbot.Footer, "$VERSION", constants.VERSION, -1))
+
+	embed.SetTitle(variables.Parse(cfg.Selfbot.Title))
+	embed.SetFooter(variables.Parse(cfg.Selfbot.Footer))
+
 	return embed
 }
 

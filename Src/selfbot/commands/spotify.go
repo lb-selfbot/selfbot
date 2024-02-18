@@ -141,7 +141,7 @@ func (s SpotifyCommands) RegisterCommands(router *dgc.Router) {
 }
 
 func (s SpotifyCommands) GetBearerToken(ctx *dgc.Ctx) (string, bool) {
-	bearerToken := utils.Spotify.GetBearerToken(ctx.Session)
+	bearerToken := utils.Spotify.GetBearerToken(ctx.Session.Identify.Token)
 
 	if bearerToken == "" {
 		_ = ctx.RespondText("Could not find a Spotify connection. Please connect your Spotify account to your Discord.")
@@ -331,11 +331,8 @@ func (s SpotifyCommands) splaying(ctx *dgc.Ctx) {
 	songArtistsString := strings.Join(songArtists, ", ")
 	songReleaseDate := song.GetPath("album", "release_date").MustString("Unknown")
 	songExplicit := utils.Misc.FormatBoolYesNo(song.Get("explicit").MustBool(false))
-	songDuration := fmt.Sprintf(
-		"%d:%02d",
-		int(song.Get("duration_ms").MustInt(0))/1000/60,
-		int(song.Get("duration_ms").MustInt(0))/1000%60,
-	)
+	duration := int(song.Get("duration_ms").MustInt(0)) / 1000
+	songDuration := fmt.Sprintf("%d:%02d", duration/60, duration&60)
 	songUrl := song.GetPath("external_urls", "spotify").MustString("Unknown")
 	songImageUrl := song.GetPath("album", "images").GetIndex(0).Get("url").MustString("")
 
