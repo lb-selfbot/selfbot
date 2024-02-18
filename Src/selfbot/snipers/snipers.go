@@ -240,7 +240,9 @@ func CheckPokeTwoSniper(session *discordgo.Session, message *discordgo.Message, 
 
 	// Start typing
 	if cfg.Snipers.PokeTwoSniper.Typing {
-		go session.ChannelTyping(message.ChannelID)
+		go func() {
+			_ = session.ChannelTyping(message.ChannelID)
+		}()
 	}
 
 	// Check if the Pokémon is already caught

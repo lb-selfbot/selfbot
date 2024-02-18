@@ -17,7 +17,7 @@ func RegisterSessionHandler(session *discordgo.Session) {
 	parseStatus(session, session.State.Sessions, false)
 	GatewaySessions = filterSessions(session.State.Sessions)
 
-	refreshLoginSessions(session)
+	_ = refreshLoginSessions(session)
 
 	session.AddHandler(onSessionsReplace)
 }
@@ -26,7 +26,7 @@ func onSessionsReplace(session *discordgo.Session, replace *discordgo.SessionsRe
 	parseStatus(session, replace.Sessions, true)
 	GatewaySessions = filterSessions(replace.Sessions)
 
-	refreshLoginSessions(session)
+	_ = refreshLoginSessions(session)
 }
 
 func filterSessions(sessions []*discordgo.GatewaySession) []*discordgo.GatewaySession {

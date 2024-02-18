@@ -24,7 +24,9 @@ func (e *Events) OnCommand(following dgc.ExecutionHandler) dgc.ExecutionHandler 
 		}
 
 		if cfg.Selfbot.DeleteCommands {
-			go ctx.Session.ChannelMessageDelete(ctx.Event.Message.ChannelID, ctx.Event.Message.ID)
+			go func() {
+				_ = ctx.Session.ChannelMessageDelete(ctx.Event.Message.ChannelID, ctx.Event.Message.ID)
+			}()
 		}
 
 		utils.Arguments = arguments

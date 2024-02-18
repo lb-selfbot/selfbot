@@ -40,10 +40,10 @@ var interopExports = interp.Exports{
 func RegisterExtensions(session *discordgo.Session, router *dgc.Router) {
 	i := interp.New(interp.Options{})
 
-	i.Use(stdlib.Symbols)
-	i.Use(discordgo.Symbols)
-	i.Use(dgc.Symbols)
-	i.Use(interopExports)
+	_ = i.Use(stdlib.Symbols)
+	_ = i.Use(discordgo.Symbols)
+	_ = i.Use(dgc.Symbols)
+	_ = i.Use(interopExports)
 
 	dir := path.Join(utils.IO.GetMainFolder(), "Extensions")
 

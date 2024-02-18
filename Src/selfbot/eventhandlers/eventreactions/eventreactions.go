@@ -314,7 +314,7 @@ func Add(reaction EventReaction) {
 
 	ActiveReactions = append(ActiveReactions, reaction)
 
-	Save()
+	_ = Save()
 }
 
 // GetAll gets all event reactions of a certain type

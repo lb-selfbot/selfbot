@@ -62,7 +62,9 @@ func loginWithBrowser() string {
 	model := NewLoadingModel("Please login to Discord in the browser window.")
 	program := tea.NewProgram(model)
 
-	go program.Run()
+	go func() {
+		_, _ = program.Run()
+	}()
 
 	var token string
 
@@ -94,7 +96,9 @@ func loginWithSavedToken() string {
 	model := NewLoadingModel("Loading saved accounts...")
 	program := tea.NewProgram(model)
 
-	go program.Run()
+	go func() {
+		_, _ = program.Run()
+	}()
 
 	savedTokens := savedtokens.GetSavedTokens()
 	if len(savedTokens) == 0 {
