@@ -946,7 +946,7 @@ func (e EventReactionsCommands) reactspam(ctx *dgc.Ctx) {
 
 		reaction := eventreactions.NewMessageReaction(eventreactions.REACT_SPAM, guild, channel, user)
 		reaction.Global = global
-		reaction.Reaction = utils.Arguments["<reaction>"]
+		reaction.Reaction = utils.Arguments["[reaction]"]
 		reaction.Reaction = strings.ReplaceAll(reaction.Reaction, "<", "")
 		reaction.Reaction = strings.ReplaceAll(reaction.Reaction, ">", "")
 
