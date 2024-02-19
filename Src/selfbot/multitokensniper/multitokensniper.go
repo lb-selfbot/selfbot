@@ -11,21 +11,23 @@ import (
 	"github.com/LightningDev1/discordgo"
 )
 
-var (
-	STATE_DISCONNECTED = 0
-	STATE_CONNECTING   = 1
-	STATE_CONNECTED    = 2
+type SniperState int
+
+const (
+	StateDisconnected SniperState = iota
+	StateConnecting
+	StateConnected
 )
 
 type SniperInstance struct {
+	State   SniperState
 	Token   string
-	State   int
 	Guilds  int
 	Session *discordgo.Session
 }
 
 func (s *SniperInstance) Start() error {
-	s.State = STATE_DISCONNECTED
+	s.State = StateDisconnected
 
 	session, err := discordgo.New(s.Token)
 	if err != nil {
@@ -38,7 +40,7 @@ func (s *SniperInstance) Start() error {
 	s.Session.StateEnabled = false
 
 	s.Session.AddHandler(func(_ *discordgo.Session, ready *discordgo.Ready) {
-		s.State = STATE_CONNECTED
+		s.State = StateConnected
 		s.Guilds = len(ready.Guilds)
 	})
 
@@ -92,7 +94,7 @@ func (s *SniperInstance) Start() error {
 	})
 
 	if err = s.Session.Open(); err == nil {
-		s.State = STATE_CONNECTING
+		s.State = StateConnecting
 	}
 
 	return nil
@@ -115,8 +117,8 @@ func Init(cfg config.Config) {
 			}
 		}
 		instance := &SniperInstance{
+			State: StateDisconnected,
 			Token: token,
-			State: STATE_DISCONNECTED,
 		}
 		instance.Start()
 		SniperInstances = append(SniperInstances, instance)
