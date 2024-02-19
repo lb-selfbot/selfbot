@@ -36,23 +36,21 @@ import (
 )
 
 func checkForUpdates() {
-	httpResponse := http.PostJson(
+	resp, err := http.PostJson(
 		"https://api.lightning-bot.com/api/v3/selfbot/check-version",
 		map[string]string{
 			"branch":  "selfbot",
 			"version": constants.VERSION[1:],
 		},
 	)
-	if httpResponse.Error != nil {
-		logging.UI.Error("Error checking for updates: " + httpResponse.Error.Error())
+	if err != nil {
+		logging.UI.Error("Error checking for updates: " + err.Error())
 		time.Sleep(3 * time.Second)
 		return
 	}
 
-	json := httpResponse.Json()
-
-	isLatest := json.Get("is_latest").MustBool()
-	latestVersion := json.GetPath("latest", "version").MustString()
+	isLatest := resp.Get("is_latest").MustBool()
+	latestVersion := resp.GetPath("latest", "version").MustString()
 
 	if isLatest {
 		return
