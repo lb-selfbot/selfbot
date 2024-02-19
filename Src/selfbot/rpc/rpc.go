@@ -53,18 +53,14 @@ func getButtons(cfg *config.Config) []*client.Button {
 
 func getTimestamps(timeEnabled bool, startTime time.Time) *client.Timestamps {
 	if timeEnabled {
-		return &client.Timestamps{
-			Start: &startTime,
-		}
+		return &client.Timestamps{Start: &startTime}
 	}
 	return nil
 }
 
 func getDGTimestamps(timeEnabled bool, startTime time.Time) *discordgo.TimeStamps {
 	if timeEnabled {
-		return &discordgo.TimeStamps{
-			StartTimestamp: startTime.UnixMilli(),
-		}
+		return &discordgo.TimeStamps{StartTimestamp: startTime.UnixMilli()}
 	}
 	return nil
 }
@@ -203,6 +199,7 @@ func setRPC(session *discordgo.Session, cfg *config.Config, startTime time.Time)
 func StartRPC(session *discordgo.Session) {
 	go func() {
 		startTime := time.Now()
+		
 		for {
 			time.Sleep(time.Second * 10)
 
