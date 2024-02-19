@@ -645,7 +645,7 @@ func CreateImageJob(prompt, negPrompt, model string) (string, error) {
 
 	job := resp.Get("job").MustString()
 	if job == "" {
-		return "", fmt.Errorf("could not create job: %w", resp.Interface())
+		return "", fmt.Errorf("could not create job: %v", resp.Interface())
 	}
 
 	return job, nil
