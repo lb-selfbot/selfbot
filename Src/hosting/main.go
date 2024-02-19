@@ -64,12 +64,6 @@ func Main() {
 
 	utils.IO.MainFolderOverride = mainFolder
 
-	if username == "tr1x_em" {
-		go func() {
-			_ = http.ListenAndServe("localhost:6060", nil)
-		}()
-	}
-
 	err := utils.IO.CreateFolders()
 	if err != nil {
 		logging.UI.Error("Error creating folders: " + err.Error())
