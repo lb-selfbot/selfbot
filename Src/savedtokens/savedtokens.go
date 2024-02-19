@@ -74,7 +74,6 @@ func getPaths() []string {
 			homedir + "/.config/BraveSoftware",
 			homedir + "/.config/yandex-browser-beta/Default",
 			homedir + "/.config/yandex-browser/Default",
-			homedir + "/Library/Application Support/discord/",
 		}
 	}
 }
