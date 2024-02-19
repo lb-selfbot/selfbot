@@ -64,13 +64,9 @@ func checkForUpdates() {
 	if runtime.GOOS == "darwin" {
 		downloadUrl += "macos/selfbot"
 	} else if runtime.GOOS == "linux" {
-		downloadUrl += "linux/"
-		downloadUrl += runtime.GOARCH
-		downloadUrl += "/selfbot"
+		downloadUrl += "linux/" + runtime.GOARCH + "/selfbot"
 	} else if runtime.GOOS == "windows" {
-		downloadUrl += "windows/"
-		downloadUrl += runtime.GOARCH
-		downloadUrl += "/selfbot.exe"
+		downloadUrl += "windows/" + runtime.GOARCH + "/selfbot.exe"
 	}
 
 	time.Sleep(3 * time.Second)
@@ -139,30 +135,31 @@ func initSelfbot(session *discordgo.Session) {
 func onWebsocketError(err error, closeCode int) {
 	switch closeCode {
 	case 3004, 3010:
-		if constants.CONSOLE {
-			utils.Logging.Error("Your LightningBot credentials are invalid!")
-
-			username, password := setup.GetLogin()
-
-			cfg, err := config.GetConfig()
-			if err != nil {
-				logging.UI.Error("Error loading config: " + err.Error())
-				os.Exit(0)
-			}
-
-			cfg.Account.LightningBot.Username = username
-			cfg.Account.LightningBot.Password = password
-
-			err = cfg.Save()
-			if err != nil {
-				logging.UI.Error("Error saving config: " + err.Error())
-				os.Exit(1)
-			}
-
-			utils.System.Restart()
-		} else {
+		if !constants.CONSOLE {
 			logging.UI.Error("Your LightningBot credentials are invalid! Please re-enter them in the Config tab.")
+			break
 		}
+
+		utils.Logging.Error("Your LightningBot credentials are invalid!")
+
+		username, password := setup.GetLogin()
+
+		cfg, err := config.GetConfig()
+		if err != nil {
+			logging.UI.Error("Error loading config: " + err.Error())
+			os.Exit(0)
+		}
+
+		cfg.Account.LightningBot.Username = username
+		cfg.Account.LightningBot.Password = password
+
+		err = cfg.Save()
+		if err != nil {
+			logging.UI.Error("Error saving config: " + err.Error())
+			os.Exit(1)
+		}
+
+		utils.System.Restart()
 	case 3011:
 		logging.UI.Error("Your free trial has expired! Please purchase a license key to continue using LightningBot.")
 	case 3003:
@@ -199,12 +196,17 @@ func Main(discordgoDebug bool) {
 
 	username := cfg.Account.LightningBot.Username
 	password := cfg.Account.LightningBot.Password
+	token := cfg.Account.Discord.Token
 
+	// Check for env variables
 	if envUsername, ok := os.LookupEnv("LB_USERNAME"); ok {
-		if envPassword, ok := os.LookupEnv("LB_PASSWORD"); ok {
-			username = envUsername
-			password = envPassword
-		}
+		username = envUsername
+	}
+	if envPassword, ok := os.LookupEnv("LB_PASSWORD"); ok {
+		password = envPassword
+	}
+	if envToken, ok := os.LookupEnv("LB_TOKEN"); ok {
+		token = envToken
 	}
 
 	websocket.Websocket.LogError = onWebsocketError
@@ -221,13 +223,9 @@ func Main(discordgoDebug bool) {
 		os.Exit(1)
 	}
 
-	session.Token = cfg.Account.Discord.Token
+	session.Token = token
 	session.State.MaxMessageCount = 200
 	session.SetIdentify(cfg.GetClient())
-
-	if token, ok := os.LookupEnv("LB_TOKEN"); ok {
-		session.Token = token
-	}
 
 	session.LogLevel = discordgo.LogWarning
 
@@ -346,37 +344,36 @@ func Main(discordgoDebug bool) {
 	err = session.Open()
 	if err != nil {
 		if strings.Contains(err.Error(), "Authentication failed") {
-			if constants.CONSOLE {
-				token := tui.GetToken("Your Discord token is invalid!")
-
-				cfg, err := config.GetConfig()
-				if err != nil {
-					logging.UI.Error("Error loading config: " + err.Error())
-					os.Exit(0)
-				}
-
-				// If env doesn't exist (using config)
-				if _, ok := os.LookupEnv("LB_TOKEN"); !ok {
-					cfg.Account.Discord.Token = token
-				}
-
-				err = cfg.Save()
-				if err != nil {
-					logging.UI.Error("Error saving config: " + err.Error())
-					os.Exit(1)
-				}
-
-				// Restart
-				Main(discordgoDebug)
-				return
-			} else {
+			if !constants.CONSOLE {
 				logging.UI.Error("Your Discord token is invalid! Please enter a valid token in the Config tab.")
+				os.Exit(0)
 			}
-		} else {
-			logging.UI.Error("An unknown error has occured while connecting to Discord: " + err.Error())
+
+			if _, ok := os.LookupEnv("LB_TOKEN"); ok {
+				logging.UI.Error("Your Discord token is invalid! Please enter a valid token in the LB_TOKEN environment variable.")
+				os.Exit(0)
+			}
+
+			token := tui.GetToken("Your Discord token is invalid!")
+
+			cfg, err := config.GetConfig()
+			if err != nil {
+				logging.UI.Error("Error loading config: " + err.Error())
+				os.Exit(0)
+			}
+
+			cfg.Account.Discord.Token = token
+
+			err = cfg.Save()
+			if err != nil {
+				logging.UI.Error("Error saving config: " + err.Error())
+				os.Exit(1)
+			}
+
+			utils.System.Restart()
 		}
 
-		os.Exit(0)
+		logging.UI.Error("An unknown error has occured while connecting to Discord: " + err.Error())
 	}
 
 	multitokensniper.Init(cfg)
