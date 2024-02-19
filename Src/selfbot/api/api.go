@@ -21,7 +21,6 @@ import (
 	"github.com/bogdanfinn/tls-client/profiles"
 
 	"github.com/LightningDev1/LB-Selfbot/selfbot/config"
-	"github.com/LightningDev1/LB-Selfbot/selfbot/encodings"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/encryption"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/utils"
 	"github.com/LightningDev1/discordgo"
@@ -552,45 +551,6 @@ func AllowFriendRequestsFrom(session *discordgo.Session, types []string) error {
 	}
 
 	return ChangeSettings(session, "/settings", newSettings)
-}
-
-// TODO: DEPRECATE
-func CreateGuild(session *discordgo.Session, name, icon, guildTemplateCode string) (*discordgo.Guild, error) {
-	var iconData *string
-	if icon != "" {
-		encoded := encodings.Base64(icon, false)
-		iconData = &encoded
-	}
-
-	if guildTemplateCode != "" {
-		guildTemplateCode = "2TffvPucqHkN"
-	}
-
-	headers := map[string]string{"Authorization": session.Identify.Token}
-
-	for k, v := range session.Headers {
-		headers[k] = v
-	}
-
-	httpResponse := http.Post("https://discord.com/api/v9/guilds", map[string]any{
-		"name":                name,
-		"icon":                iconData,
-		"channels":            []any{},
-		"system_channel_id":   nil,
-		"guild_template_code": guildTemplateCode,
-	}, headers)
-	if httpResponse.Error != nil {
-		return nil, httpResponse.Error
-	}
-
-	guild := &discordgo.Guild{}
-
-	err := json.Unmarshal(httpResponse.BodyBytes, guild)
-	if err != nil {
-		return nil, err
-	}
-
-	return guild, nil
 }
 
 // AI

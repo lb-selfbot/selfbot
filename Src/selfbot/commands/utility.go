@@ -2,6 +2,7 @@ package commands
 
 import (
 	"bytes"
+	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"go/token"
@@ -778,14 +779,15 @@ func (UtilityCommands) copyserver(ctx *dgc.Ctx) {
 		return
 	}
 
-	icon := http.Get(guild.IconURL()).Body
-
-	// TODO: Use discordgo
-	newGuild, err := api.CreateGuild(ctx.Session, fmt.Sprintf("%s - Copy", guild.Name), icon, "") //ctx.Session.GuildCreate(fmt.Sprintf("%s - Copy", guild.Name))
+	newGuild, err := ctx.Session.GuildCreate(fmt.Sprintf("%s - Copy", guild.Name))
 	if err != nil {
 		_ = ctx.RespondText("Error copying server: " + err.Error())
 		return
 	}
+
+	iconResp := http.Get(guild.IconURL())
+	icon := "data:image/png;base64," + base64.StdEncoding.EncodeToString(iconResp.BodyBytes)
+
 	_, _ = ctx.Session.GuildEdit(newGuild.ID, &discordgo.GuildParams{
 		VerificationLevel:           &guild.VerificationLevel,
 		DefaultMessageNotifications: int(guild.DefaultMessageNotifications),

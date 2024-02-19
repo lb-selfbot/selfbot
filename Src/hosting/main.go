@@ -4,7 +4,6 @@ package hosting
 
 import (
 	"fmt"
-	"net/http"
 	_ "net/http/pprof"
 	"os"
 	"os/signal"
