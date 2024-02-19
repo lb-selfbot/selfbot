@@ -4,7 +4,6 @@ import (
 	"bytes"
 
 	"github.com/LightningDev1/LB-Selfbot/selfbot/uploaders"
-	"github.com/LightningDev1/LB-Selfbot/selfbot/uploaders/anonfiles"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/uploaders/catbox"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/uploaders/imgbb"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/uploaders/imgur"
@@ -19,11 +18,10 @@ type Destination interface {
 }
 
 var Destinations = map[string]Destination{
-	"imgur":     imgur.Imgur{},
-	"vgyme":     vgyme.Vgyme{},
-	"imgbb":     imgbb.ImgBB{},
-	"suleu":     suleu.SulEU{},
-	"anonfiles": anonfiles.Anonfiles{},
-	"sxcu":      sxcu.SXCU{},
-	"catbox":    catbox.Catbox{},
+	"imgur":  imgur.Imgur{},
+	"vgyme":  vgyme.Vgyme{},
+	"imgbb":  imgbb.ImgBB{},
+	"suleu":  suleu.SulEU{},
+	"sxcu":   sxcu.SXCU{},
+	"catbox": catbox.Catbox{},
 }
