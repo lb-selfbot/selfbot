@@ -36,7 +36,7 @@ func (e *EventReactionsCommands) RegisterCommands(router *dgc.Router) {
 		Name:        "ignoreuser",
 		Description: "Ignore messages from a user",
 		Usage:       "[p]ignoreuser <toggle/list/clear> [@user]",
-		Flags:       []string{"DANGEROUS"},
+		Flags:       []string{CmdFlagDangerous},
 		Handler:     e.ignoreuser,
 	})
 
@@ -45,7 +45,7 @@ func (e *EventReactionsCommands) RegisterCommands(router *dgc.Router) {
 		Name:        "ignoreserver",
 		Description: "Ignore messages from a server",
 		Usage:       "[p]ignoreserver <toggle/list/clear> [server id]",
-		Flags:       []string{"DANGEROUS"},
+		Flags:       []string{CmdFlagDangerous},
 		Handler:     e.ignoreserver,
 	})
 
@@ -54,56 +54,56 @@ func (e *EventReactionsCommands) RegisterCommands(router *dgc.Router) {
 		Name:        "pingping",
 		Description: "Reply to pings by pinging the user",
 		Usage:       "[p]pingping <toggle/list/clear> [server/channel id]",
-		Flags:       []string{"DANGEROUS"},
+		Flags:       []string{CmdFlagDangerous},
 		Handler:     e.pingping,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "pingkick",
 		Description: "Reply to pings by kicking the user",
 		Usage:       "[p]pingkick <toggle/list/clear> [server/channel id]",
-		Flags:       []string{"DANGEROUS"},
+		Flags:       []string{CmdFlagDangerous},
 		Handler:     e.pingkick,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "pingban",
 		Description: "Reply to pings by banning the user",
 		Usage:       "[p]pingban <toggle/list/clear> [server/channel id]",
-		Flags:       []string{"DANGEROUS"},
+		Flags:       []string{CmdFlagDangerous},
 		Handler:     e.pingban,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "pingmute",
 		Description: "Reply to pings by muting the user",
 		Usage:       "[p]pingmute <toggle/list/clear> [server/channel id]",
-		Flags:       []string{"DANGEROUS"},
+		Flags:       []string{CmdFlagDangerous},
 		Handler:     e.pingmute,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "pingtimeout",
 		Description: "Reply to pings by timing the user out",
 		Usage:       "[p]pingtimeout <toggle/list/clear> [server/channel id]",
-		Flags:       []string{"DANGEROUS"},
+		Flags:       []string{CmdFlagDangerous},
 		Handler:     e.pingtimeout,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "pinginsult",
 		Description: "Reply to pings by insulting the user",
 		Usage:       "[p]pinginsult <toggle/list/clear> [server/channel id]",
-		Flags:       []string{"DANGEROUS"},
+		Flags:       []string{CmdFlagDangerous},
 		Handler:     e.pinginsult,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "pingresponse",
 		Description: "Reply to pings with a custom response",
 		Usage:       "[p]pingresponse <toggle/list/clear> [\"response\"] [server/channel id]",
-		Flags:       []string{"DANGEROUS"},
+		Flags:       []string{CmdFlagDangerous},
 		Handler:     e.pingresponse,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "pingairesponse",
 		Description: "Reply to pings with an AI response",
 		Usage:       "[p]pingairesponse <toggle/list/clear> [\"system\"] [server/channel id]",
-		Flags:       []string{"DANGEROUS"},
+		Flags:       []string{CmdFlagDangerous},
 		Handler:     e.pingairesponse,
 	})
 
@@ -112,14 +112,14 @@ func (e *EventReactionsCommands) RegisterCommands(router *dgc.Router) {
 		Name:        "mirrorchannel",
 		Description: "Mirror messages from one channel to another",
 		Usage:       "[p]mirrorchannel <toggle/list/clear> [source channel] [dest channel]",
-		Flags:       []string{"DANGEROUS"},
+		Flags:       []string{CmdFlagDangerous},
 		Handler:     e.mirrorchannel,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "mirrorserver",
 		Description: "Mirror messages from one server to another",
 		Usage:       "[p]mirrorserver <toggle/list/clear> [source server] [dest server]",
-		Flags:       []string{"DANGEROUS"},
+		Flags:       []string{CmdFlagDangerous},
 		Handler:     e.mirrorserver,
 	})
 
@@ -128,112 +128,112 @@ func (e *EventReactionsCommands) RegisterCommands(router *dgc.Router) {
 		Name:        "responder",
 		Description: "Reply to messages with a custom response",
 		Usage:       "[p]responder <toggle/list/clear> [\"response\"] [server/channel id]",
-		Flags:       []string{"DANGEROUS"},
+		Flags:       []string{CmdFlagDangerous},
 		Handler:     e.responder,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "airesponder",
 		Description: "Reply to messages with an AI response",
 		Usage:       "[p]airesponder <toggle/list/clear> [\"system\"] [server/channel id]",
-		Flags:       []string{"DANGEROUS"},
+		Flags:       []string{CmdFlagDangerous},
 		Handler:     e.airesponder,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "copy",
 		Description: "Copy a user's messages",
 		Usage:       "[p]copy <toggle/list/clear> [@user] [server/channel id]",
-		Flags:       []string{"DANGEROUS"},
+		Flags:       []string{CmdFlagDangerous},
 		Handler:     e.copy,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "replycopy",
 		Description: "Replycopy a user's messages",
 		Usage:       "[p]replycopy <toggle/list/clear> [@user] [server/channel id]",
-		Flags:       []string{"DANGEROUS"},
+		Flags:       []string{CmdFlagDangerous},
 		Handler:     e.replycopy,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "mock",
 		Description: "Mock a user's messages",
 		Usage:       "[p]mock <toggle/list/clear> <@user> [server/channel id]",
-		Flags:       []string{"DANGEROUS"},
+		Flags:       []string{CmdFlagDangerous},
 		Handler:     e.mock,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "pinspam",
 		Description: "Pin all of a user's messages",
 		Usage:       "[p]pinspam <toggle/list/clear> [@user] [server/channel id]",
-		Flags:       []string{"DANGEROUS"},
+		Flags:       []string{CmdFlagDangerous},
 		Handler:     e.pinspam,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "unpinspam",
 		Description: "Unpin messages pinned by pinspam",
 		Usage:       "[p]unpinspam",
-		Flags:       []string{"DANGEROUS"},
+		Flags:       []string{CmdFlagDangerous},
 		Handler:     e.unpinspam,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "reactspam",
 		Description: "React to all of a user's messages",
 		Usage:       "[p]reactspam <toggle/list/clear> [@user] [reaction] [global/server/channel id]",
-		Flags:       []string{"DANGEROUS"},
+		Flags:       []string{CmdFlagDangerous},
 		Handler:     e.reactspam,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "deletemessages",
 		Description: "Delete all of a user's messages",
 		Usage:       "[p]deletemessages <toggle/list/clear> [@user] [server/channel id]",
-		Flags:       []string{"DANGEROUS"},
+		Flags:       []string{CmdFlagDangerous},
 		Handler:     e.deletemessages,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "keywordnotifier",
 		Description: "Get notified when someone mentions a keyword",
 		Usage:       "[p]keywordnotifier <toggle/list/clear> [\"keyword\"] [global/server/channel id]",
-		Flags:       []string{"DANGEROUS"},
+		Flags:       []string{CmdFlagDangerous},
 		Handler:     e.keywordnotifier,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "removereactions",
 		Description: "Delete all of a user's reactions",
 		Usage:       "[p]removereactions <toggle/list/clear> [@user] [server/channel id]",
-		Flags:       []string{"DANGEROUS"},
+		Flags:       []string{CmdFlagDangerous},
 		Handler:     e.removereactions,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "forcedisconnect",
 		Description: "Disconnect a user from voice channels",
 		Usage:       "[p]forcedisconnect <toggle/list/clear> [@user] [server/channel id]",
-		Flags:       []string{"DANGEROUS"},
+		Flags:       []string{CmdFlagDangerous},
 		Handler:     e.forcedisconnect,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "forcenick",
 		Description: "Force change a user's nickname",
 		Usage:       "[p]forcenick <toggle/list/clear> [@user] [nickname] [server id]",
-		Flags:       []string{"DANGEROUS"},
+		Flags:       []string{CmdFlagDangerous},
 		Handler:     e.forcenick,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "forcekick",
 		Description: "Force kick a user",
 		Usage:       "[p]forcekick <toggle/list/clear> [@user] [server id]",
-		Flags:       []string{"DANGEROUS"},
+		Flags:       []string{CmdFlagDangerous},
 		Handler:     e.forcekick,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "noleave",
 		Description: "Prevent a user from leaving a group chat",
 		Usage:       "[p]noleave <toggle/list/clear> [@user] [channel id]",
-		Flags:       []string{"DANGEROUS"},
+		Flags:       []string{CmdFlagDangerous},
 		Handler:     e.noleave,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "antigroupchat",
 		Description: "Prevent users from adding you to group chats",
 		Usage:       "[p]antigroupchat <on/off> [silent leave: on/off]",
-		Flags:       []string{"DANGEROUS"},
+		Flags:       []string{CmdFlagDangerous},
 		Handler:     e.antigroupchat,
 	})
 
@@ -243,168 +243,168 @@ func (e *EventReactionsCommands) RegisterCommands(router *dgc.Router) {
 		Name:        "getafkenabled",
 		Description: "Get the current AFK responder setting",
 		Usage:       "[p]getafkenabled",
-		Flags:       []string{"DANGEROUS"},
+		Flags:       []string{CmdFlagDangerous},
 		Handler:     e.getafkenabled,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "afkenabled",
 		Description: "Turn the AFK responder on or off",
 		Usage:       "[p]afkenabled <on/off>",
-		Flags:       []string{"DANGEROUS"},
+		Flags:       []string{CmdFlagDangerous},
 		Handler:     e.afkenabled,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "getafkonping",
 		Description: "Get the current AFK on ping setting",
 		Usage:       "[p]getafkonping",
-		Flags:       []string{"DANGEROUS"},
+		Flags:       []string{CmdFlagDangerous},
 		Handler:     e.getafkonping,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "afkonping",
 		Description: "Set if an AFK message should be sent on ping",
 		Usage:       "[p]afkonping <on/off>",
-		Flags:       []string{"DANGEROUS"},
+		Flags:       []string{CmdFlagDangerous},
 		Handler:     e.afkonping,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "getafkondm",
 		Description: "Get the current AFK on DM setting",
 		Usage:       "[p]getafkondm",
-		Flags:       []string{"DANGEROUS"},
+		Flags:       []string{CmdFlagDangerous},
 		Handler:     e.getafkondm,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "afkondm",
 		Description: "Set if an AFK message should be sent on DM",
 		Usage:       "[p]afkondm <on/off>",
-		Flags:       []string{"DANGEROUS"},
+		Flags:       []string{CmdFlagDangerous},
 		Handler:     e.afkondm,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "getafkdelay",
 		Description: "Get the current AFK delay setting",
 		Usage:       "[p]getafkdelay",
-		Flags:       []string{"DANGEROUS"},
+		Flags:       []string{CmdFlagDangerous},
 		Handler:     e.getafkdelay,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "afkdelay",
 		Description: "Set delay before sending AFK message",
 		Usage:       "[p]afkdelay <seconds>",
-		Flags:       []string{"DANGEROUS"},
+		Flags:       []string{CmdFlagDangerous},
 		Handler:     e.afkdelay,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "getafkrandomdelay",
 		Description: "Get the current AFK random delay setting",
 		Usage:       "[p]getafkrandomdelay",
-		Flags:       []string{"DANGEROUS"},
+		Flags:       []string{CmdFlagDangerous},
 		Handler:     e.getafkrandomdelay,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "afkrandomdelay",
 		Description: "Set the AFK random delay setting",
 		Usage:       "[p]afkrandomdelay <on/off>",
-		Flags:       []string{"DANGEROUS"},
+		Flags:       []string{CmdFlagDangerous},
 		Handler:     e.afkrandomdelay,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "getafkmustbeinactive",
 		Description: "Get the current must be inactive setting",
 		Usage:       "[p]getafkmustbeinactive",
-		Flags:       []string{"DANGEROUS"},
+		Flags:       []string{CmdFlagDangerous},
 		Handler:     e.getafkmustbeinactive,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "afkmustbeinactive",
 		Description: "Only send AFK messages when inactive",
 		Usage:       "[p]afkmustbeinactive <on/off>",
-		Flags:       []string{"DANGEROUS"},
+		Flags:       []string{CmdFlagDangerous},
 		Handler:     e.afkmustbeinactive,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "getafkinactivetimeout",
 		Description: "Get the current inactive timeout",
 		Usage:       "[p]getafkinactivetimeout",
-		Flags:       []string{"DANGEROUS"},
+		Flags:       []string{CmdFlagDangerous},
 		Handler:     e.getafkinactivetimeout,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "afkinactivetimeout",
 		Description: "Minimum inactive time before being AFK",
 		Usage:       "[p]afkinactivetimeout <seconds>",
-		Flags:       []string{"DANGEROUS"},
+		Flags:       []string{CmdFlagDangerous},
 		Handler:     e.afkinactivetimeout,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "getafktyping",
 		Description: "Get the current AFK typing setting",
 		Usage:       "[p]getafktyping",
-		Flags:       []string{"DANGEROUS"},
+		Flags:       []string{CmdFlagDangerous},
 		Handler:     e.getafktyping,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "afktyping",
 		Description: "Set if the bot should show typing before sending message",
 		Usage:       "[p]afktyping <on/off>",
-		Flags:       []string{"DANGEROUS"},
+		Flags:       []string{CmdFlagDangerous},
 		Handler:     e.afktyping,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "getafkairesponse",
 		Description: "Get the current AFK AI response setting",
 		Usage:       "[p]getafkairesponse",
-		Flags:       []string{"DANGEROUS"},
+		Flags:       []string{CmdFlagDangerous},
 		Handler:     e.getafkairesponse,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "afkairesponse",
 		Description: "AI responder will use AI to generate response",
 		Usage:       "[p]afkairesponse <on/off>",
-		Flags:       []string{"DANGEROUS"},
+		Flags:       []string{CmdFlagDangerous},
 		Handler:     e.afkairesponse,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "getafkmessage",
 		Description: "Get the current AFK message",
 		Usage:       "[p]getafkmessage",
-		Flags:       []string{"DANGEROUS"},
+		Flags:       []string{CmdFlagDangerous},
 		Handler:     e.getafkmessage,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "afkmessage",
 		Description: "Set the AFK message",
 		Usage:       "[p]afkmessage <text>",
-		Flags:       []string{"DANGEROUS"},
+		Flags:       []string{CmdFlagDangerous},
 		Handler:     e.afkmessage,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "getafktriggertype",
 		Description: "Get the current AFK trigger type",
 		Usage:       "[p]getafktriggertype",
-		Flags:       []string{"DANGEROUS"},
+		Flags:       []string{CmdFlagDangerous},
 		Handler:     e.getafktriggertype,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "afktriggertype",
 		Description: "Set the AFK trigger type",
 		Usage:       "[p]afktriggertype <type>",
-		Flags:       []string{"DANGEROUS"},
+		Flags:       []string{CmdFlagDangerous},
 		Handler:     e.afktriggertype,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "afktriggerusers",
 		Description: "Add/remove/list users that trigger AFK message",
 		Usage:       "[p]afktriggerusers <add/rm/list> [@user]",
-		Flags:       []string{"DANGEROUS"},
+		Flags:       []string{CmdFlagDangerous},
 		Handler:     e.afktriggerusers,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "afktriggerservers",
 		Description: "Add/remove/list servers that trigger AFK message",
 		Usage:       "[p]afktriggerservers <add/rm/list> [server id]",
-		Flags:       []string{"DANGEROUS"},
+		Flags:       []string{CmdFlagDangerous},
 		Handler:     e.afktriggerservers,
 	})
 }

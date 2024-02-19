@@ -19,7 +19,7 @@ func (s *SessionsCommands) RegisterCommands(router *dgc.Router, mainSession *dis
 		Name:        "viewgatewaysessions",
 		Description: "View all your gateway sessions (active devices)",
 		Usage:       "[p]viewgatewaysessions",
-		Flags:       []string{"DANGEROUS"},
+		Flags:       []string{CmdFlagDangerous},
 		Handler:     s.viewgatewaysessions,
 	})
 
@@ -27,7 +27,7 @@ func (s *SessionsCommands) RegisterCommands(router *dgc.Router, mainSession *dis
 		Name:        "viewloginsessions",
 		Description: "View all your login sessions (tokens)",
 		Usage:       "[p]viewloginsessions",
-		Flags:       []string{"DANGEROUS"},
+		Flags:       []string{CmdFlagDangerous},
 		Handler:     s.viewloginsessions,
 	})
 }

@@ -5,6 +5,11 @@ import (
 	"github.com/LightningDev1/discordgo"
 )
 
+var (
+	CmdFlagDangerous        = "D"
+	CmdFlagHostingDangerous = "H"
+)
+
 type CommandRegistrar struct {
 	TextCommands           TextCommands
 	EncodingCommands       EncodingCommands

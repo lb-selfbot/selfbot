@@ -28,7 +28,7 @@ func (b BackupCommands) RegisterCommands(router *dgc.Router) {
 		Name:        "backuprelationships",
 		Description: "Create a backup of your friends and blocked users",
 		Usage:       "[p]backuprelationships [backup name]",
-		Flags:       []string{"DANGEROUS"},
+		Flags:       []string{CmdFlagDangerous},
 		Handler:     b.backuprelationships,
 	})
 
@@ -36,7 +36,7 @@ func (b BackupCommands) RegisterCommands(router *dgc.Router) {
 		Name:        "backupservers",
 		Description: "Create a backup of your servers",
 		Usage:       "[p]backupservers [backup name]",
-		Flags:       []string{"DANGEROUS"},
+		Flags:       []string{CmdFlagDangerous},
 		Handler:     b.backupservers,
 	})
 
@@ -44,7 +44,7 @@ func (b BackupCommands) RegisterCommands(router *dgc.Router) {
 		Name:        "backupaccount",
 		Description: "Create a backup of your account",
 		Usage:       "[p]backupaccount [backup name]",
-		Flags:       []string{"DANGEROUS"},
+		Flags:       []string{CmdFlagDangerous},
 		Handler:     b.backupaccount,
 	})
 
@@ -52,7 +52,7 @@ func (b BackupCommands) RegisterCommands(router *dgc.Router) {
 		Name:        "backupsettings",
 		Description: "Create a backup of your settings",
 		Usage:       "[p]backupsettings [backup name]",
-		Flags:       []string{"DANGEROUS"},
+		Flags:       []string{CmdFlagDangerous},
 		Handler:     b.backupsettings,
 	})
 
@@ -60,7 +60,7 @@ func (b BackupCommands) RegisterCommands(router *dgc.Router) {
 		Name:        "restorerelationships",
 		Description: "Restore your relationships",
 		Usage:       "[p]restorerelationships [backup name]",
-		Flags:       []string{"DANGEROUS"},
+		Flags:       []string{CmdFlagDangerous},
 		Handler:     b.restorerelationships,
 	})
 
@@ -68,7 +68,7 @@ func (b BackupCommands) RegisterCommands(router *dgc.Router) {
 		Name:        "restoreservers",
 		Description: "Restore your servers",
 		Usage:       "[p]restoreservers [backup name]",
-		Flags:       []string{"DANGEROUS"},
+		Flags:       []string{CmdFlagDangerous},
 		Handler:     b.restoreservers,
 	})
 
@@ -76,7 +76,7 @@ func (b BackupCommands) RegisterCommands(router *dgc.Router) {
 		Name:        "restoreaccount",
 		Description: "Restore your account information",
 		Usage:       "[p]restoreaccount [backup name]",
-		Flags:       []string{"DANGEROUS"},
+		Flags:       []string{CmdFlagDangerous},
 		Handler:     b.restoreaccount,
 	})
 
@@ -84,7 +84,7 @@ func (b BackupCommands) RegisterCommands(router *dgc.Router) {
 		Name:        "restoresettings",
 		Description: "Restore your settings",
 		Usage:       "[p]restoresettings [backup name]",
-		Flags:       []string{"DANGEROUS"},
+		Flags:       []string{CmdFlagDangerous},
 		Handler:     b.restoresettings,
 	})
 }

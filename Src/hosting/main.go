@@ -169,7 +169,7 @@ func Main() {
 					return false
 				}
 
-				if utils.SliceContains(ctx.Command.Flags, "DANGEROUS") && cfg.Sharing.BlockDangerousCommands {
+				if utils.SliceContains(ctx.Command.Flags, commands.CmdFlagDangerous) && cfg.Sharing.BlockDangerousCommands {
 					logging.Logging.BlockedDangerousCommand(ctx.Event.Author, ctx.Command.Name)
 					return false
 				}
@@ -194,7 +194,7 @@ func Main() {
 				return false
 			}
 
-			if utils.SliceContains(ctx.Command.Flags, "HOSTING_DANGEROUS") {
+			if utils.SliceContains(ctx.Command.Flags, commands.CmdFlagHostingDangerous) {
 				logging.Logging.BlockedHostingDangerousCommand(ctx.Command.Name)
 				return false
 			}

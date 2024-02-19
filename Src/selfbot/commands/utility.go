@@ -233,14 +233,14 @@ func (u UtilityCommands) RegisterCommands(router *dgc.Router) {
 		Name:        "website",
 		Description: "Open the LightningBot website",
 		Usage:       "[p]website",
-		Flags:       []string{"HOSTING_DANGEROUS"},
+		Flags:       []string{CmdFlagHostingDangerous},
 		Handler:     u.website,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "dashboard",
 		Description: "Open the LightningBot dashboard",
 		Usage:       "[p]dashboard",
-		Flags:       []string{"HOSTING_DANGEROUS"},
+		Flags:       []string{CmdFlagHostingDangerous},
 		Handler:     u.dashboard,
 	})
 	router.RegisterCmd(&dgc.Command{
@@ -271,28 +271,28 @@ func (u UtilityCommands) RegisterCommands(router *dgc.Router) {
 		Name:        "restartbot",
 		Description: "Restart LightningBot",
 		Usage:       "[p]restartbot",
-		Flags:       []string{"DANGEROUS"},
+		Flags:       []string{CmdFlagDangerous},
 		Handler:     u.restartbot,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "stopbot",
 		Description: "Stop LightningBot",
 		Usage:       "[p]stopbot",
-		Flags:       []string{"DANGEROUS"},
+		Flags:       []string{CmdFlagDangerous},
 		Handler:     u.stopbot,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "cls",
 		Description: "Clear UI console",
 		Usage:       "[p]cls",
-		Flags:       []string{"DANGEROUS"},
+		Flags:       []string{CmdFlagDangerous},
 		Handler:     u.cls,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "openfolder",
 		Description: "Open the LightningBot folder",
 		Usage:       "[p]openfolder",
-		Flags:       []string{"HOSTING_DANGEROUS"},
+		Flags:       []string{CmdFlagHostingDangerous},
 		Handler:     u.openfolder,
 	})
 
@@ -308,56 +308,56 @@ func (u UtilityCommands) RegisterCommands(router *dgc.Router) {
 		Name:        "shutdownpc",
 		Description: "Shut your PC down",
 		Usage:       "[p]shutdownpc",
-		Flags:       []string{"DANGEROUS", "HOSTING_DANGEROUS"},
+		Flags:       []string{CmdFlagDangerous, CmdFlagHostingDangerous},
 		Handler:     u.shutdownpc,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "restartpc",
 		Description: "Restart your PC",
 		Usage:       "[p]restartpc",
-		Flags:       []string{"DANGEROUS", "HOSTING_DANGEROUS"},
+		Flags:       []string{CmdFlagDangerous, CmdFlagHostingDangerous},
 		Handler:     u.restartpc,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "sleeppc",
 		Description: "Put your PC to sleep",
 		Usage:       "[p]sleeppc",
-		Flags:       []string{"DANGEROUS", "HOSTING_DANGEROUS"},
+		Flags:       []string{CmdFlagDangerous, CmdFlagHostingDangerous},
 		Handler:     u.sleeppc,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "lockpc",
 		Description: "Lock your PC",
 		Usage:       "[p]lockpc",
-		Flags:       []string{"DANGEROUS", "HOSTING_DANGEROUS"},
+		Flags:       []string{CmdFlagDangerous, CmdFlagHostingDangerous},
 		Handler:     u.lockpc,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "activewindow",
 		Description: "View the active window on your PC",
 		Usage:       "[p]activewindow",
-		Flags:       []string{"DANGEROUS", "HOSTING_DANGEROUS"},
+		Flags:       []string{CmdFlagDangerous, CmdFlagHostingDangerous},
 		Handler:     u.activewindow,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "calc",
 		Description: "Open the calculator",
 		Usage:       "[p]calc",
-		Flags:       []string{"DANGEROUS", "HOSTING_DANGEROUS"},
+		Flags:       []string{CmdFlagDangerous, CmdFlagHostingDangerous},
 		Handler:     u.calc,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "notepad",
 		Description: "Open notepad",
 		Usage:       "[p]notepad",
-		Flags:       []string{"DANGEROUS", "HOSTING_DANGEROUS"},
+		Flags:       []string{CmdFlagDangerous, CmdFlagHostingDangerous},
 		Handler:     u.notepad,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "open",
 		Description: "Open a URL in the browser",
 		Usage:       "[p]open <url>",
-		Flags:       []string{"DANGEROUS", "HOSTING_DANGEROUS"},
+		Flags:       []string{CmdFlagDangerous, CmdFlagHostingDangerous},
 		Handler:     u.open,
 	})
 
@@ -367,7 +367,7 @@ func (u UtilityCommands) RegisterCommands(router *dgc.Router) {
 		Name:        "screenshot",
 		Description: "Take a screenshot",
 		Usage:       "[p]screenshot [delay]",
-		Flags:       []string{"DANGEROUS", "HOSTING_DANGEROUS"},
+		Flags:       []string{CmdFlagDangerous, CmdFlagHostingDangerous},
 		Handler:     u.screenshot,
 	})
 	router.RegisterCmd(&dgc.Command{
@@ -380,7 +380,7 @@ func (u UtilityCommands) RegisterCommands(router *dgc.Router) {
 		Name:        "uploadss",
 		Description: "Upload a screenshot",
 		Usage:       "[p]uploadss <destination> [delay]",
-		Flags:       []string{"DANGEROUS", "HOSTING_DANGEROUS"},
+		Flags:       []string{CmdFlagDangerous, CmdFlagHostingDangerous},
 		Handler:     u.uploadss,
 	})
 	router.RegisterCmd(&dgc.Command{
@@ -585,7 +585,7 @@ func (u UtilityCommands) RegisterCommands(router *dgc.Router) {
 		Name:        "interface",
 		Description: "See your public/local ip and MAC address",
 		Usage:       "[p]interface",
-		Flags:       []string{"DANGEROUS", "HOSTING_DANGEROUS"},
+		Flags:       []string{CmdFlagDangerous, CmdFlagHostingDangerous},
 		Handler:     u._interface,
 	})
 
@@ -1225,7 +1225,7 @@ func (UtilityCommands) hypesquad(ctx *dgc.Ctx) {
 		_ = ctx.RespondText("Missing required argument: <bravery/brilliance/balance>")
 		return
 	}
-	
+
 	err := api.SetHypesquad(ctx.Session, house)
 	if err != nil {
 		_ = ctx.RespondText("Error setting hypesquad: " + err.Error())

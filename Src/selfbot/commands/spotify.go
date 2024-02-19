@@ -23,119 +23,119 @@ func (s SpotifyCommands) RegisterCommands(router *dgc.Router) {
 		Name:        "spause",
 		Description: "Pause Spotify Music",
 		Usage:       "[p]spause",
-		Flags:       []string{"DANGEROUS"},
+		Flags:       []string{CmdFlagDangerous},
 		Handler:     s.spause,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "sresume",
 		Description: "Resume Spotify Music",
 		Usage:       "[p]sresume",
-		Flags:       []string{"DANGEROUS"},
+		Flags:       []string{CmdFlagDangerous},
 		Handler:     s.sresume,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "sprevious",
 		Description: "Play the previous song",
 		Usage:       "[p]sprevious",
-		Flags:       []string{"DANGEROUS"},
+		Flags:       []string{CmdFlagDangerous},
 		Handler:     s.sprevious,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "snext",
 		Description: "Play the next song",
 		Usage:       "[p]snext",
-		Flags:       []string{"DANGEROUS"},
+		Flags:       []string{CmdFlagDangerous},
 		Handler:     s.snext,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "splay",
 		Description: "Play a song on Spotify",
 		Usage:       "[p]splay <song name>",
-		Flags:       []string{"DANGEROUS"},
+		Flags:       []string{CmdFlagDangerous},
 		Handler:     s.splay,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "squeue",
 		Description: "Queue a song to play after the current one",
 		Usage:       "[p]squeue <song name>",
-		Flags:       []string{"DANGEROUS"},
+		Flags:       []string{CmdFlagDangerous},
 		Handler:     s.squeue,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "splaying",
 		Description: "Current playing song info",
 		Usage:       "[p]splaying",
-		Flags:       []string{"DANGEROUS"},
+		Flags:       []string{CmdFlagDangerous},
 		Handler:     s.splaying,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "svolume",
 		Description: "Change Spotify volume",
 		Usage:       "[p]svolume <volume>",
-		Flags:       []string{"DANGEROUS"},
+		Flags:       []string{CmdFlagDangerous},
 		Handler:     s.svolume,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "spresence",
 		Description: "Set a fake Spotify presence (use simageid command for image id)",
 		Usage:       "[p]spresence <on/off> [\"artist\"] [\"song\"] [\"album\"] [image id]",
-		Flags:       []string{"DANGEROUS"},
+		Flags:       []string{CmdFlagDangerous},
 		Handler:     s.spresence,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "simageid",
 		Description: "Get an image id for the spresence command",
 		Usage:       "[p]simageid <song name>",
-		Flags:       []string{"DANGEROUS"},
+		Flags:       []string{CmdFlagDangerous},
 		Handler:     s.simageid,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "sshuffle",
 		Description: "Turn shuffle on or off",
 		Usage:       "[p]sshuffle <on/off>",
-		Flags:       []string{"DANGEROUS"},
+		Flags:       []string{CmdFlagDangerous},
 		Handler:     s.sshuffle,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "srepeat",
 		Description: "Change the Spotify repeat mode",
 		Usage:       "[p]srepeat <track/context/off>",
-		Flags:       []string{"DANGEROUS"},
+		Flags:       []string{CmdFlagDangerous},
 		Handler:     s.srepeat,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "sseek",
 		Description: "Seek to a specific time in the song",
 		Usage:       "[p]sseek <seconds>",
-		Flags:       []string{"DANGEROUS"},
+		Flags:       []string{CmdFlagDangerous},
 		Handler:     s.sseek,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "sdevices",
 		Description: "Get your available Spotify devices",
 		Usage:       "[p]sdevices",
-		Flags:       []string{"DANGEROUS"},
+		Flags:       []string{CmdFlagDangerous},
 		Handler:     s.sdevices,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "sprofile",
 		Description: "Get your Spotify profile info",
 		Usage:       "[p]sprofile",
-		Flags:       []string{"DANGEROUS"},
+		Flags:       []string{CmdFlagDangerous},
 		Handler:     s.sprofile,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "sbearertoken",
 		Description: "Get your Spotify bearer token used for the API",
 		Usage:       "[p]sbearertoken",
-		Flags:       []string{"DANGEROUS"},
+		Flags:       []string{CmdFlagDangerous},
 		Handler:     s.sbearertoken,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "slistenalong",
 		Description: "Send a Spotify listen along invite",
 		Usage:       "[p]slistenalong [content]",
-		Flags:       []string{"DANGEROUS"},
+		Flags:       []string{CmdFlagDangerous},
 		Handler:     s.slistenalong,
 	})
 }

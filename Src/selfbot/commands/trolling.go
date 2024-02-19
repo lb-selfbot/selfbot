@@ -22,98 +22,98 @@ func (t TrollingCommands) RegisterCommands(router *dgc.Router) {
 		Name:        "purgehack",
 		Description: "Purge a chat without permissions",
 		Usage:       "[p]purgehack",
-		Flags:       []string{"DANGEROUS"},
+		Flags:       []string{CmdFlagDangerous},
 		Handler:     t.purgehack,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "ghostping",
 		Description: "Ghostping a user",
 		Usage:       "[p]ghostping <user>",
-		Flags:       []string{"DANGEROUS"},
+		Flags:       []string{CmdFlagDangerous},
 		Handler:     t.ghostping,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "gprole",
 		Description: "Ghostping a role",
 		Usage:       "[p]gprole <role>",
-		Flags:       []string{"DANGEROUS"},
+		Flags:       []string{CmdFlagDangerous},
 		Handler:     t.gprole,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "token",
 		Description: "Send the first part of someones token",
 		Usage:       "[p]token <user>",
-		Flags:       []string{"DANGEROUS"},
+		Flags:       []string{CmdFlagDangerous},
 		Handler:     t.token,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "trollnitro",
 		Description: "Send a fake nitro link with an image",
 		Usage:       "[p]trollnitro",
-		Flags:       []string{"DANGEROUS"},
+		Flags:       []string{CmdFlagDangerous},
 		Handler:     t.trollnitro,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "fakenitro",
 		Description: "Generate fake nitro codes",
 		Usage:       "[p]fakenitro <amount>",
-		Flags:       []string{"DANGEROUS"},
+		Flags:       []string{CmdFlagDangerous},
 		Handler:     t.fakenitro,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "hiddentext",
 		Description: "Hide text behind other text",
 		Usage:       "[p]hiddentext <\"text\"> <\"hidden\">",
-		Flags:       []string{"DANGEROUS"},
+		Flags:       []string{CmdFlagDangerous},
 		Handler:     t.hiddentext,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "hiddeninvite",
 		Description: "Hide an invite behind text",
 		Usage:       "[p]hiddeninvite <invite> <text>",
-		Flags:       []string{"DANGEROUS"},
+		Flags:       []string{CmdFlagDangerous},
 		Handler:     t.hiddeninvite,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "hiddenping",
 		Description: "Hide a ping behind text",
 		Usage:       "[p]hiddenping <userid> <text>",
-		Flags:       []string{"DANGEROUS"},
+		Flags:       []string{CmdFlagDangerous},
 		Handler:     t.hiddenping,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "hiddenroleping",
 		Description: "Hide a role ping behind text",
 		Usage:       "[p]hiddenroleping <roleid> <text>",
-		Flags:       []string{"DANGEROUS"},
+		Flags:       []string{CmdFlagDangerous},
 		Handler:     t.hiddenroleping,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "hiddeneveryone",
 		Description: "Hide an everyone ping behind text",
 		Usage:       "[p]hiddeneveryone <text>",
-		Flags:       []string{"DANGEROUS"},
+		Flags:       []string{CmdFlagDangerous},
 		Handler:     t.hiddeneveryone,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "hiddenhere",
 		Description: "Hide a here ping behind text",
 		Usage:       "[p]hiddenhere <text>",
-		Flags:       []string{"DANGEROUS"},
+		Flags:       []string{CmdFlagDangerous},
 		Handler:     t.hiddenhere,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "voicemove",
 		Description: "Move to random voice channels",
 		Usage:       "[p]voicemove <amount>",
-		Flags:       []string{"DANGEROUS"},
+		Flags:       []string{CmdFlagDangerous},
 		Handler:     t.voicemove,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "triggertyping",
 		Description: "Fake \"User is typing\" message",
 		Usage:       "[p]triggertyping <seconds> [channel]",
-		Flags:       []string{"DANGEROUS"},
+		Flags:       []string{CmdFlagDangerous},
 		Handler:     t.triggertyping,
 	})
 	router.RegisterCmd(&dgc.Command{

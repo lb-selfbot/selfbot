@@ -18,77 +18,77 @@ func (s *SharingCommands) RegisterCommands(router *dgc.Router) {
 		Name:        "addshareduser",
 		Description: "Add a user to the shared users",
 		Usage:       "[p]addshareduser <user>",
-		Flags:       []string{"DANGEROUS"},
+		Flags:       []string{CmdFlagDangerous},
 		Handler:     s.addshareduser,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "removeshareduser",
 		Description: "Remove a user from the shared users",
 		Usage:       "[p]removeshareduser <user>",
-		Flags:       []string{"DANGEROUS"},
+		Flags:       []string{CmdFlagDangerous},
 		Handler:     s.removeshareduser,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "listsharedusers",
 		Description: "See all shared users",
 		Usage:       "[p]listsharedusers",
-		Flags:       []string{"DANGEROUS"},
+		Flags:       []string{CmdFlagDangerous},
 		Handler:     s.listsharedusers,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "addsharedcategory",
 		Description: "Add a command category to be shared",
 		Usage:       "[p]addsharedcategory <category name>",
-		Flags:       []string{"DANGEROUS"},
+		Flags:       []string{CmdFlagDangerous},
 		Handler:     s.addsharedcategory,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "removesharedcategory",
 		Description: "Remove a shared category",
 		Usage:       "[p]removesharedcategory <category name>",
-		Flags:       []string{"DANGEROUS"},
+		Flags:       []string{CmdFlagDangerous},
 		Handler:     s.removesharedcategory,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "listsharedcategories",
 		Description: "See all shared categories",
 		Usage:       "[p]listsharedcategories",
-		Flags:       []string{"DANGEROUS"},
+		Flags:       []string{CmdFlagDangerous},
 		Handler:     s.listsharedcategories,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "addsharedcommand",
 		Description: "Add a command to be shared",
 		Usage:       "[p]addsharedcommand <command name>",
-		Flags:       []string{"DANGEROUS"},
+		Flags:       []string{CmdFlagDangerous},
 		Handler:     s.addsharedcommand,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "removesharedcommand",
 		Description: "Remove a shared command",
 		Usage:       "[p]removesharedcommand <command name>",
-		Flags:       []string{"DANGEROUS"},
+		Flags:       []string{CmdFlagDangerous},
 		Handler:     s.removesharedcommand,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "listsharedcommands",
 		Description: "See all shared commands",
 		Usage:       "[p]listsharedcommands",
-		Flags:       []string{"DANGEROUS"},
+		Flags:       []string{CmdFlagDangerous},
 		Handler:     s.listsharedcommands,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "shareall",
 		Description: "Share all commands",
 		Usage:       "[p]shareall <on/off>",
-		Flags:       []string{"DANGEROUS"},
+		Flags:       []string{CmdFlagDangerous},
 		Handler:     s.shareall,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "blockdangerous",
 		Description: "Block users from using dangerous commands",
 		Usage:       "[p]blockdangerous <on/off>",
-		Flags:       []string{"DANGEROUS"},
+		Flags:       []string{CmdFlagDangerous},
 		Handler:     s.blockdangerous,
 	})
 }

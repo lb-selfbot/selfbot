@@ -18,98 +18,98 @@ func (p ProtectionsCommands) RegisterCommands(router *dgc.Router) {
 		Name:        "antiphishing",
 		Description: "Turn anti phishing on or off",
 		Usage:       "[p]antiphishing <on/off>",
-		Flags:       []string{"DANGEROUS"},
+		Flags:       []string{CmdFlagDangerous},
 		Handler:     p.antiphishing,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "antifriendrequest",
 		Description: "Turn anti friend request spam on or off",
 		Usage:       "[p]antifriendrequest <on/off>",
-		Flags:       []string{"DANGEROUS"},
+		Flags:       []string{CmdFlagDangerous},
 		Handler:     p.antifriendrequest,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "antimassdm",
 		Description: "Turn anti mass DM on or off",
 		Usage:       "[p]antimassmd <on/off>",
-		Flags:       []string{"DANGEROUS"},
+		Flags:       []string{CmdFlagDangerous},
 		Handler:     p.antimassdm,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "protectedservers",
 		Description: "Get a list of protected servers",
 		Usage:       "[p]protectedservers",
-		Flags:       []string{"DANGEROUS"},
+		Flags:       []string{CmdFlagDangerous},
 		Handler:     p.protectedservers,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "protectserver",
 		Description: "Protect a server",
 		Usage:       "[p]protectserver <server id>",
-		Flags:       []string{"DANGEROUS"},
+		Flags:       []string{CmdFlagDangerous},
 		Handler:     p.protectserver,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "unprotectserver",
 		Description: "Protect a server",
 		Usage:       "[p]protectserver <server id>",
-		Flags:       []string{"DANGEROUS"},
+		Flags:       []string{CmdFlagDangerous},
 		Handler:     p.unprotectserver,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "antiinvite",
 		Description: "Turn anti invite on or off",
 		Usage:       "[p]antiinvite <on/off>",
-		Flags:       []string{"DANGEROUS"},
+		Flags:       []string{CmdFlagDangerous},
 		Handler:     p.antiinvite,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "antispam",
 		Description: "Turn anti spam on or off",
 		Usage:       "[p]antispam <on/off>",
-		Flags:       []string{"DANGEROUS"},
+		Flags:       []string{CmdFlagDangerous},
 		Handler:     p.antispam,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "antiupper",
 		Description: "Turn anti upper on or off",
 		Usage:       "[p]antiupper <on/off>",
-		Flags:       []string{"DANGEROUS"},
+		Flags:       []string{CmdFlagDangerous},
 		Handler:     p.antiupper,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "antidelete",
 		Description: "Turn anti delete on or off",
 		Usage:       "[p]antidelete <on/off>",
-		Flags:       []string{"DANGEROUS"},
+		Flags:       []string{CmdFlagDangerous},
 		Handler:     p.antidelete,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "closedm",
 		Description: "Close your DMs",
 		Usage:       "[p]closedm",
-		Flags:       []string{"DANGEROUS"},
+		Flags:       []string{CmdFlagDangerous},
 		Handler:     p.closedm,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "opendm",
 		Description: "Allow DMs from everyone",
 		Usage:       "[p]opendm",
-		Flags:       []string{"DANGEROUS"},
+		Flags:       []string{CmdFlagDangerous},
 		Handler:     p.opendm,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "enablefriendrequests",
 		Description: "Enable friend requests",
 		Usage:       "[p]enablefriendrequests",
-		Flags:       []string{"DANGEROUS"},
+		Flags:       []string{CmdFlagDangerous},
 		Handler:     p.enablefriendrequests,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "disablefriendrequests",
 		Description: "Disable friend requests",
 		Usage:       "[p]disablefriendrequests",
-		Flags:       []string{"DANGEROUS"},
+		Flags:       []string{CmdFlagDangerous},
 		Handler:     p.disablefriendrequests,
 	})
 }

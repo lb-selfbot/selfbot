@@ -20,7 +20,7 @@ func (s SlashCommands) RegisterCommands(router *dgc.Router) {
 		Name:        "searchslash",
 		Description: "Search a slash command",
 		Usage:       "[p]searchslash <#channel> <query>",
-		Flags:       []string{"DANGEROUS"},
+		Flags:       []string{CmdFlagDangerous},
 		Handler:     s.searchslash,
 	})
 
@@ -28,7 +28,7 @@ func (s SlashCommands) RegisterCommands(router *dgc.Router) {
 		Name:        "executeslash",
 		Description: "Run a slash command",
 		Usage:       "[p]executeslash <#channel> <@bot> <command> [options...]",
-		Flags:       []string{"DANGEROUS"},
+		Flags:       []string{CmdFlagDangerous},
 		Handler:     s.executeslash,
 	})
 
@@ -36,7 +36,7 @@ func (s SlashCommands) RegisterCommands(router *dgc.Router) {
 		Name:        "slashcommandjobhelp",
 		Description: "More information about slash command jobs",
 		Usage:       "[p]slashcommandjobhelp",
-		Flags:       []string{"DANGEROUS"},
+		Flags:       []string{CmdFlagDangerous},
 		Handler:     s.slashcommandjobhelp,
 	})
 
@@ -44,7 +44,7 @@ func (s SlashCommands) RegisterCommands(router *dgc.Router) {
 		Name:        "listscjobs",
 		Description: "List all slash command jobs",
 		Usage:       "[p]listscjobs",
-		Flags:       []string{"DANGEROUS"},
+		Flags:       []string{CmdFlagDangerous},
 		Handler:     s.listscjobs,
 	})
 
@@ -52,7 +52,7 @@ func (s SlashCommands) RegisterCommands(router *dgc.Router) {
 		Name:        "getscjob",
 		Description: "Get info about a slash command job",
 		Usage:       "[p]getscjob <job id>",
-		Flags:       []string{"DANGEROUS"},
+		Flags:       []string{CmdFlagDangerous},
 		Handler:     s.getscjob,
 	})
 
@@ -60,7 +60,7 @@ func (s SlashCommands) RegisterCommands(router *dgc.Router) {
 		Name:        "createscjob",
 		Description: "Create a slash command job",
 		Usage:       "[p]createscjob <#channel> <@bot> <interval> <command> [options...]",
-		Flags:       []string{"DANGEROUS"},
+		Flags:       []string{CmdFlagDangerous},
 		Handler:     s.createscjob,
 	})
 
@@ -68,7 +68,7 @@ func (s SlashCommands) RegisterCommands(router *dgc.Router) {
 		Name:        "deletescjob",
 		Description: "Delete a slash command job",
 		Usage:       "[p]deletescjob <job id>",
-		Flags:       []string{"DANGEROUS"},
+		Flags:       []string{CmdFlagDangerous},
 		Handler:     s.deletescjob,
 	})
 
@@ -76,7 +76,7 @@ func (s SlashCommands) RegisterCommands(router *dgc.Router) {
 		Name:        "setscjobcommand",
 		Description: "Set a job's command",
 		Usage:       "[p]setscjobcommand <job id> <@bot> <command> [options...]",
-		Flags:       []string{"DANGEROUS"},
+		Flags:       []string{CmdFlagDangerous},
 		Handler:     s.setscjobcommand,
 	})
 
@@ -84,7 +84,7 @@ func (s SlashCommands) RegisterCommands(router *dgc.Router) {
 		Name:        "setscjobchannel",
 		Description: "Set a job's channel",
 		Usage:       "[p]setscjobcommand <job id> <#channel>",
-		Flags:       []string{"DANGEROUS"},
+		Flags:       []string{CmdFlagDangerous},
 		Handler:     s.setscjobchannel,
 	})
 
@@ -92,7 +92,7 @@ func (s SlashCommands) RegisterCommands(router *dgc.Router) {
 		Name:        "setscjobinterval",
 		Description: "Set a job's interval (in seconds)",
 		Usage:       "[p]setscjobinterval <job id> <interval>",
-		Flags:       []string{"DANGEROUS"},
+		Flags:       []string{CmdFlagDangerous},
 		Handler:     s.setscjobinterval,
 	})
 }
