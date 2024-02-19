@@ -38,10 +38,8 @@ func (UILogging) Error(errText string) {
 	utils.Logging.Error(errText)
 
 	ipc.IPC.Write(ipc.JsonEvent{
-		Op: ipc.OP_Error,
-		Data: ipc.JsonEventData{
-			Text: errText,
-		},
+		Op:   ipc.OP_Error,
+		Data: ipc.JsonEventData{Text: errText},
 	})
 
 	UI.Append(Console.Colored(fmt.Sprintf("[ERROR] %s", errText), 255, 100, 100, true))
@@ -52,10 +50,8 @@ func (UILogging) Append(ansi string) {
 
 	ipc.IPC.ConsoleAppend(ansi, html)
 	_ = websocket.Websocket.Send(websocket.WsMessage{
-		Op: "CONSOLE_APPEND",
-		Data: websocket.WsData{
-			Text: html,
-		},
+		Op:   "CONSOLE_APPEND",
+		Data: websocket.WsData{Text: html},
 	})
 }
 
@@ -72,10 +68,8 @@ func (UILogging) Set(ansi string) {
 
 	ipc.IPC.ConsoleSet(ansi, html)
 	_ = websocket.Websocket.Send(websocket.WsMessage{
-		Op: "CONSOLE_SET",
-		Data: websocket.WsData{
-			Text: html,
-		},
+		Op:   "CONSOLE_SET",
+		Data: websocket.WsData{Text: html},
 	})
 }
 

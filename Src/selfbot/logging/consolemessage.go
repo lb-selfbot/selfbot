@@ -81,7 +81,5 @@ func (c *ConsoleMessage) Show() {
 }
 
 func NewConsoleMessage() *ConsoleMessage {
-	return &ConsoleMessage{
-		Info: list.New(),
-	}
+	return &ConsoleMessage{Info: list.New()}
 }
