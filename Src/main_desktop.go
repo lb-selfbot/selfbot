@@ -71,26 +71,6 @@ func initArgs() {
 		os.Exit(0)
 	}
 
-	if strings.Contains(args, "-qrlogin") {
-		login := browserautomation.QRLogin{
-			ImageReadyCallback: func(raw []byte) error {
-				_, err := os.Stdout.Write(raw)
-				return err
-			},
-			TokenCallback: func(token string) error {
-				_, err := os.Stdout.WriteString(token)
-				return err
-			},
-		}
-
-		if err := login.Start(); err != nil {
-			fmt.Println("ERR:", err)
-			os.Exit(1)
-		}
-
-		os.Exit(0)
-	}
-
 	if strings.Contains(args, "-weblogin") {
 		login := browserautomation.WebLogin{
 			TokenCallback: func(token string) error {
