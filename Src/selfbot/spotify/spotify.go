@@ -23,65 +23,69 @@ func (s *SpotifyAPI) formatAsBearerToken(token string) string {
 }
 
 func (s *SpotifyAPI) GetBearerToken(token string) string {
-	if s.connName == "" || time.Since(s.connRetrieved).Minutes() > 10 {
-		conns, err := http.GetJson(
-			"https://discord.com/api/v10/users/@me/connections",
+	if s.connName != "" && time.Since(s.connRetrieved).Minutes() < 10 {
+		return s.formatAsBearerToken(s.connAccessToken)
+	}
+
+	conns, err := http.GetJson(
+		"https://discord.com/api/v10/users/@me/connections",
+		map[string]string{"Authorization": token},
+	)
+	if err != nil {
+		return ""
+	}
+
+	for i := 0; i < len(conns.MustArray()); i++ {
+		conn := conns.GetIndex(i)
+		if conn.Get("type").MustString() != "spotify" {
+			continue
+		}
+
+		s.connName = conn.Get("name").MustString()
+		s.connAccessToken = conn.Get("access_token").MustString()
+		s.connRetrieved = time.Now()
+
+		conn, err := http.GetJson(
+			fmt.Sprintf("https://discord.com/api/v10/users/@me/connections/spotify/%s/access-token", s.connName),
 			map[string]string{"Authorization": token},
 		)
 		if err != nil {
 			return ""
 		}
 
-		for i := 0; i < len(conns.MustArray()); i++ {
-			conn := conns.GetIndex(i)
-			if conn.Get("type").MustString() != "spotify" {
-				continue
-			}
+		s.connAccessToken = conn.Get("access_token").MustString()
 
-			s.connName = conn.Get("name").MustString()
-			s.connAccessToken = conn.Get("access_token").MustString()
-			s.connRetrieved = time.Now()
-
-			conn, err := http.GetJson(
-				fmt.Sprintf("https://discord.com/api/v10/users/@me/connections/spotify/%s/access-token", s.connName),
-				map[string]string{"Authorization": token},
-			)
-			if err != nil {
-				return ""
-			}
-
-			s.connAccessToken = conn.Get("access_token").MustString()
-
-			break
-		}
+		break
 	}
 
 	return s.formatAsBearerToken(s.connAccessToken)
 }
 
 func (s *SpotifyAPI) GetCurrentlyPlaying(token string) (*simplejson.Json, error) {
-	if s.currentlyPlaying == nil || time.Since(s.currentlyPlayingRetrieved).Seconds() > 10 {
-		bearerToken := s.GetBearerToken(token)
-		if bearerToken == "" {
-			return nil, errors.New("spotify is not connected to your discord account")
-		}
-
-		resp, err := http.GetJson(
-			"https://api.spotify.com/v1/me/player/currently-playing",
-			map[string]string{"Authorization": bearerToken},
-		)
-		if err != nil {
-			return nil, err
-		}
-
-		var ok bool
-		s.currentlyPlaying, ok = resp.CheckGet("item")
-		if !ok {
-			return nil, errors.New("no song currently playing on spotify")
-		}
-
-		s.currentlyPlayingRetrieved = time.Now()
+	if s.currentlyPlaying != nil && time.Since(s.currentlyPlayingRetrieved).Seconds() < 10 {
+		return s.currentlyPlaying, nil
 	}
+
+	bearerToken := s.GetBearerToken(token)
+	if bearerToken == "" {
+		return nil, errors.New("spotify is not connected to your discord account")
+	}
+
+	resp, err := http.GetJson(
+		"https://api.spotify.com/v1/me/player/currently-playing",
+		map[string]string{"Authorization": bearerToken},
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	var ok bool
+	s.currentlyPlaying, ok = resp.CheckGet("item")
+	if !ok {
+		return nil, errors.New("no song currently playing on spotify")
+	}
+
+	s.currentlyPlayingRetrieved = time.Now()
 
 	return s.currentlyPlaying, nil
 }
