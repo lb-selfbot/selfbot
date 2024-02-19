@@ -628,14 +628,14 @@ func CreateImageJob(prompt, negPrompt, model string) (string, error) {
 		"dnt":                "1",
 		"origin":             "https://app.prodia.com",
 		"referer":            "https://app.prodia.com/",
-		"sec-ch-ua":          "\"Brave\";v=\"113\", \"Chromium\";v=\"113\", \"Not-A.Brand\";v=\"24\"",
+		"sec-ch-ua":          "\"Chromium\";v=\"119\", \"Not-A.Brand\";v=\"24\"",
 		"sec-ch-ua-mobile":   "?0",
-		"sec-ch-ua-platform": "\"Linux\"",
+		"sec-ch-ua-platform": "\"Windows\"",
 		"sec-fetch-dest":     "empty",
 		"sec-fetch-mode":     "cors",
 		"sec-fetch-site":     "same-site",
 		"sec-gpc":            "1",
-		"user-agent":         "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/113.0.0.0 Safari/537.36",
+		"user-agent":         discordgo.UserAgentWeb,
 	}
 
 	resp, err := http.GetJson("https://api.prodia.com/generate?"+params.Encode(), headers)
