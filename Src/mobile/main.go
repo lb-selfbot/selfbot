@@ -22,7 +22,6 @@ func Main() {
 }
 
 func SBMain() {
-
 	fmt.Println("Continuing LightningBot...")
 	sc := make(chan os.Signal, 1)
 	signal.Notify(sc, syscall.SIGINT, syscall.SIGTERM)
