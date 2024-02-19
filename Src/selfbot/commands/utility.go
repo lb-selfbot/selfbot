@@ -1211,15 +1211,29 @@ func (UtilityCommands) firstmessage(ctx *dgc.Ctx) {
 }
 
 func (UtilityCommands) hypesquad(ctx *dgc.Ctx) {
-	house := utils.Arguments["<bravery/brilliance/balance>"]
-	house = strings.ReplaceAll(house, "bravery", "1")
-	house = strings.ReplaceAll(house, "brilliance", "2")
-	house = strings.ReplaceAll(house, "balance", "3")
-	if house != "1" && house != "2" && house != "3" {
+	houseName := utils.Arguments["<bravery/brilliance/balance>"]
+	var house int
+
+	switch houseName {
+	case "bravery":
+		house = 1
+	case "brilliance":
+		house = 2
+	case "balance":
+		house = 3
+	default:
 		_ = ctx.RespondText("Missing required argument: <bravery/brilliance/balance>")
 		return
 	}
-	_ = api.SetHypesquad(ctx.Session, house)
+	
+	err := api.SetHypesquad(ctx.Session, house)
+	if err != nil {
+		_ = ctx.RespondText("Error setting hypesquad: " + err.Error())
+	}
+
+	embed.NewEmbed().
+		SetDescription("Hypesquad set successfully!").
+		Send(ctx)
 }
 
 func (UtilityCommands) leavehypesquad(ctx *dgc.Ctx) {

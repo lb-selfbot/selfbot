@@ -6,7 +6,6 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
-	"io"
 	"math/rand"
 	"net"
 	"net/url"
@@ -15,10 +14,6 @@ import (
 	"strconv"
 	"strings"
 	"time"
-
-	fhttp "github.com/bogdanfinn/fhttp"
-	tls_client "github.com/bogdanfinn/tls-client"
-	"github.com/bogdanfinn/tls-client/profiles"
 
 	"github.com/LightningDev1/LB-Selfbot/selfbot/config"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/encryption"
@@ -56,46 +51,38 @@ func WikipediaSearch(query string) (string, error) {
 		url.QueryEscape(query),
 	)
 
-	httpResult := http.Get(searchUrl)
-	if httpResult.Error != nil {
-		return "No results found", httpResult.Error
+	resp, err := http.GetJson(searchUrl)
+	if err != nil {
+		return "No results found", err
 	}
 
-	pages := httpResult.Json().Get("query").Get("pages")
+	pages := resp.Get("query").Get("pages")
 
 	for pageId := range pages.MustMap() {
 		page := pages.Get(pageId)
 
-		_, missing := page.CheckGet("missing")
-		if missing {
+		if _, missing := page.CheckGet("missing"); missing {
 			continue
 		}
 
 		return page.Get("extract").MustString(), nil
 	}
 
-	return "No results found", nil
+	return "No results found", fmt.Errorf("no results found")
 }
 
-func SetHypesquad(session *discordgo.Session, hypesquad string) (err error) {
-	hypesquadInt, err := strconv.Atoi(hypesquad)
-	if err != nil {
-		return err
-	}
-
+func SetHypesquad(session *discordgo.Session, hypesquad int) (err error) {
 	_, err = session.Request(
 		"POST",
-		"https://discord.com/api/v10/hypesquad/online",
-		map[string]int{
-			"house_id": hypesquadInt,
-		},
+		"https://discord.com/api/v9/hypesquad/online",
+		map[string]int{"house_id": hypesquad},
 	)
 
 	return err
 }
 
 func LeaveHypesquad(session *discordgo.Session) (err error) {
-	_, err = session.Request("DELETE", "https://discord.com/api/v10/hypesquad/online", nil)
+	_, err = session.Request("DELETE", "https://discord.com/api/v9/hypesquad/online", nil)
 
 	return err
 }
@@ -105,14 +92,14 @@ var RedditHeaders = map[string]string{
 	"Accept":                    "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
 	"Accept-Language":           "en-US,en;q=0.9",
 	"Cache-Control":             "max-age=0",
-	"Sec-CH-UA":                 "\"Opera GX\";v=\"105\", \"Chromium\";v=\"119\", \"Not?A_Brand\";v=\"24\"",
+	"Sec-CH-UA":                 "\"Chromium\";v=\"119\", \"Not?A_Brand\";v=\"24\"",
 	"Sec-CH-UA-Mobile":          "?0",
 	"Sec-CH-UA-Platform":        "\"Windows\"",
 	"Sec-Fetch-Dest":            "empty",
 	"Sec-Fetch-Mode":            "cors",
 	"Sec-Fetch-Site":            "same-origin",
 	"Upgrade-Insecure-Requests": "1",
-	"User-Agent":                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36 OPR/105.0.0.0",
+	"User-Agent":                discordgo.UserAgentWeb,
 }
 
 type RedditPost struct {
@@ -124,43 +111,12 @@ func GetImageFromSubreddit(subreddit string) (*RedditPost, bool) {
 	sortBy := []string{"best", "new", "top", "hot"}[rand.Intn(4)]
 	url := fmt.Sprintf("https://www.reddit.com/r/%s/%s.json?limit=50", subreddit, sortBy)
 
-	options := []tls_client.HttpClientOption{
-		tls_client.WithTimeoutSeconds(20),
-		tls_client.WithClientProfile(profiles.Chrome_117),
-		tls_client.WithCookieJar(tls_client.NewCookieJar()),
-		tls_client.WithRandomTLSExtensionOrder(),
-	}
-
-	client, _ := tls_client.NewHttpClient(tls_client.NewNoopLogger(), options...)
-
-	req, _ := fhttp.NewRequest("GET", url, nil)
-
-	for k, v := range RedditHeaders {
-		req.Header.Set(k, v)
-	}
-	req.Header.Set("Referer", url)
-
-	resp, err := client.Do(req)
+	resp, err := http.GetJson(url, RedditHeaders)
 	if err != nil {
 		return nil, false
 	}
 
-	b, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return nil, false
-	}
-
-	fmt.Println(string(b))
-
-	httpResponse := http.Get(url, RedditHeaders)
-
-	// fmt.Println(httpResponse)
-
-	if httpResponse.Error != nil || httpResponse.StatusCode != 200 {
-		return nil, false
-	}
-
-	return ExtractRedditURL(httpResponse.Json(), 0)
+	return ExtractRedditURL(resp, 0)
 }
 
 func ExtractRedditURL(jsonData *simplejson.Json, tries int) (*RedditPost, bool) {
@@ -224,6 +180,7 @@ func GetLocalIP() string {
 		return "Error"
 	}
 	defer conn.Close()
+
 	localAddr := conn.LocalAddr().(*net.UDPAddr)
 	return localAddr.IP.String()
 }
@@ -237,6 +194,7 @@ func GetMacAddress() string {
 		if err != nil {
 			continue
 		}
+
 		for _, addr := range addrs {
 			if !strings.Contains(addr.String(), currentIP) {
 				continue
@@ -246,6 +204,7 @@ func GetMacAddress() string {
 			if err != nil {
 				continue
 			}
+
 			return strings.ToUpper(netInterface.HardwareAddr.String())
 		}
 	}
@@ -294,29 +253,25 @@ func Translate(text, language string) *TranslateResult {
 		url.QueryEscape(text),
 	)
 
-	httpResponse := http.Get(translateUrl)
-	if httpResponse.Error != nil {
-		return &TranslateResult{
-			Error: httpResponse.Error,
-		}
+	resp, err := http.GetJson(translateUrl)
+	if err != nil {
+		return &TranslateResult{Error: err}
 	}
 
-	json := httpResponse.Json()
-
-	translateData := json.GetIndex(0).GetIndex(0)
+	result := resp.GetIndex(0).GetIndex(0)
 	return &TranslateResult{
-		Original:            translateData.GetIndex(1).MustString(),
-		Result:              translateData.GetIndex(0).MustString(),
-		SourceLanguage:      json.GetIndex(2).MustString(),
+		Original:            result.GetIndex(1).MustString(),
+		Result:              result.GetIndex(0).MustString(),
+		SourceLanguage:      resp.GetIndex(2).MustString(),
 		DestinationLanguage: language,
-		Confidence:          json.GetIndex(6).MustFloat64(),
+		Confidence:          resp.GetIndex(6).MustFloat64(),
 	}
 }
 
 func ReportMessage(session *discordgo.Session, guildID, channelID, messageID string, reason int) error {
 	_, err := session.Request(
 		"POST",
-		"https://discord.com/api/v10/report",
+		"https://discord.com/api/v9/report",
 		map[string]any{
 			"channel_id": channelID,
 			"guild_id":   guildID,
@@ -331,12 +286,12 @@ func ReportMessage(session *discordgo.Session, guildID, channelID, messageID str
 func GoogleSearch(query string) (*simplejson.Json, error) {
 	url := fmt.Sprintf("https://api.lightning-bot.com/api/v3/misc/search?query=%s", url.QueryEscape(query))
 
-	httpResult := http.Get(url)
-	if httpResult.Error != nil {
-		return nil, httpResult.Error
+	resp, err := http.GetJson(url)
+	if err != nil {
+		return nil, err
 	}
 
-	return httpResult.Json().Get("results"), nil
+	return resp.Get("results"), nil
 }
 
 type CreditCard struct {
@@ -349,18 +304,16 @@ type CreditCard struct {
 func GenerateCreditCard(ccType, name string) CreditCard {
 	url := fmt.Sprintf("https://api.lightning-bot.com/api/v3/misc/ccgen?type=%s&name=%s", ccType, name)
 
-	httpResult := http.Get(url)
-	if httpResult.Error != nil {
+	resp, err := http.GetJson(url)
+	if err != nil {
 		return CreditCard{}
 	}
 
-	json := httpResult.Json()
-
 	return CreditCard{
-		Number:        json.Get("number").MustString(),
-		CVV:           json.Get("cvv").MustString(),
-		ExpiryDate:    json.Get("expiry_date").MustString(),
-		Visualisation: json.Get("visualisation").MustString(),
+		Number:        resp.Get("number").MustString(),
+		CVV:           resp.Get("cvv").MustString(),
+		ExpiryDate:    resp.Get("expiry_date").MustString(),
+		Visualisation: resp.Get("visualisation").MustString(),
 	}
 }
 
@@ -382,60 +335,6 @@ func OCR(image string) (string, error) {
 	}
 
 	return resp.Get("text").String()
-}
-
-func GetStartParams() *simplejson.Json {
-	// XOR encryption
-	encrypted := []int{2, 15, 13, 48, 11, 25, 22, 16, 31, 51, 53, 13, 44, 20, 32, 7, 34, 53, 48, 37, 13, 5, 7, 62, 59, 30, 36, 20, 25, 7, 36, 0, 59, 3, 61, 56, 22, 8, 48, 34, 10, 54, 7, 8, 29, 58, 15, 52, 11, 49, 39, 62, 49, 39, 51, 17, 49, 21, 43, 19, 15, 61, 63, 11, 39, 58, 12, 2, 37, 22, 42, 11, 31, 57, 60, 41, 18, 45, 42, 33, 53, 50, 8, 48, 57, 2, 59, 63, 62, 50, 25, 43, 46, 42, 34, 17, 4, 35, 2, 24, 15}
-	keyInt := []int{73, 104, 122, 122, 67, 99, 111, 100, 67, 111, 78, 104, 114, 117, 74, 115, 113, 119, 114, 120, 79, 106, 69, 111, 65, 106, 114, 78, 84, 65, 110, 103, 76, 99, 71, 86, 73, 114, 77, 122, 87, 102, 66, 103, 99, 99, 116, 66, 86}
-	decrypted := ""
-	for i := len(encrypted) - 1; i > -1; i-- {
-		decrypted += string(rune(encrypted[i] ^ keyInt[(len(encrypted)-1-i)%len(keyInt)]))
-	}
-	keyEncryption := &encryption.AESCBC{Key: decrypted}
-	encryptedKey := []byte{78, 70, 57, 114, 89, 55, 75, 67, 112, 105, 57, 68, 102, 104, 71, 80, 121, 53, 107, 86, 53, 78, 76, 74, 104, 85, 70, 78, 74, 51, 77, 121, 102, 53, 88, 121, 56, 43, 48, 89, 106, 77, 111, 61, 58, 87, 97, 53, 113, 115, 76, 51, 99, 116, 107, 118, 110, 79, 120, 48, 102, 56, 86, 57, 70, 117, 103, 61, 61, 58, 102, 104, 105, 66, 105, 113, 48, 116, 79, 119, 80, 54, 87, 82, 101, 71, 113, 118, 102, 117, 66, 103, 43, 83, 102, 88, 111, 53, 106, 109, 68, 86, 90, 55, 99, 82, 71, 87, 57, 121, 109, 72, 120, 120, 113, 55, 78, 56, 98, 85, 121, 116, 74, 86, 117, 70, 104, 100, 49, 122, 43, 74, 43, 67, 69, 78, 68, 66, 82, 54, 55, 57, 57, 105, 99, 103, 74, 51, 90, 87, 103, 73, 57, 52, 66, 119, 61, 61}
-	key, _ := keyEncryption.Decrypt(encryptedKey)
-	Encryption := &encryption.AESCBC{Key: string(key)}
-
-	keyHash := sha512.Sum512(key)
-
-	httpResponse := http.Post("https://api.lightning-bot.com/api/v3/selfbot/start-params", keyHash[:])
-	if httpResponse.Error != nil {
-		return nil
-	}
-
-	encryptedStartParams := httpResponse.BodyBytes
-
-	decryptedStartParams, err := Encryption.Decrypt(encryptedStartParams)
-	if err != nil {
-		return nil
-	}
-
-	hash := sha512.Sum512(decryptedStartParams)
-
-	var newHash []byte
-
-	for i, hashByte := range hash {
-		if i%2 == 0 {
-			continue
-		}
-
-		newHash = append(newHash, hashByte^byte(i))
-	}
-
-	newHashStr := base64.StdEncoding.EncodeToString(newHash)
-
-	if httpResponse.Headers["cf-ray-id"] != newHashStr {
-		utils.Logging.Error("Error checking for updates")
-		os.Exit(1)
-	}
-
-	jsonStartParams, err := simplejson.NewJson(decryptedStartParams)
-	if err != nil {
-		return nil
-	}
-
-	return jsonStartParams
 }
 
 func Auth(username, password string) *http.HttpResponse {
@@ -536,7 +435,7 @@ func GetTokenData(session *discordgo.Session, token string) ([]byte, error) {
 }
 
 func ChangeSettings(session *discordgo.Session, path string, settings map[string]any) error {
-	_, err := session.Request("PATCH", "https://discord.com/api/v10/users/@me"+path, settings)
+	_, err := session.Request("PATCH", "https://discord.com/api/v9/users/@me"+path, settings)
 
 	return err
 }
@@ -743,14 +642,14 @@ func CreateImageJob(prompt, negPrompt, model string) (string, error) {
 		"user-agent":         "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/113.0.0.0 Safari/537.36",
 	}
 
-	httpResponse := http.Get("https://api.prodia.com/generate?"+params.Encode(), headers)
-	if httpResponse.Error != nil {
-		return "", httpResponse.Error
+	resp, err := http.GetJson("https://api.prodia.com/generate?"+params.Encode(), headers)
+	if err != nil {
+		return "", err
 	}
 
-	job := httpResponse.Json().Get("job").MustString()
+	job := resp.Get("job").MustString()
 	if job == "" {
-		return "", fmt.Errorf("could not create job: %s", httpResponse.Body)
+		return "", fmt.Errorf("could not create job: %w", resp.Interface())
 	}
 
 	return job, nil
@@ -780,12 +679,12 @@ func GenerateImage(prompt, negPrompt, model string) (*bytes.Reader, error) {
 
 	for {
 		time.Sleep(500 * time.Millisecond)
-		httpResponse := http.Get("https://api.prodia.com/job/"+job, headers)
-		if httpResponse.Error != nil {
-			return nil, httpResponse.Error
+		resp, err := http.GetJson("https://api.prodia.com/job/"+job, headers)
+		if err != nil {
+			return nil, err
 		}
 
-		status := httpResponse.Json().Get("status").MustString()
+		status := resp.Get("status").MustString()
 
 		if status == "succeeded" {
 			break
@@ -837,12 +736,12 @@ func GetReviewDBToken(session *discordgo.Session) (string, error) {
 		return "", fmt.Errorf("invalid response: no location: %s", string(rawData))
 	}
 
-	apiData, err := http.GetJson(location + "&clientMod=vencord")
+	resp, err := http.GetJson(location + "&clientMod=vencord")
 	if err != nil {
 		return "", err
 	}
 
-	token := apiData.Get("token").MustString()
+	token := resp.Get("token").MustString()
 	if token == "" {
 		return "", fmt.Errorf("invalid response: no token")
 	}
@@ -858,16 +757,16 @@ type Review struct {
 }
 
 func GetReviewDBReviews(userID string) ([]Review, error) {
-	data, err := http.GetJson("https://manti.vendicated.dev/api/reviewdb/users/" + userID + "/reviews?flags=0&offset=0")
+	resp, err := http.GetJson("https://manti.vendicated.dev/api/reviewdb/users/" + userID + "/reviews?flags=0&offset=0")
 	if err != nil {
 		return nil, err
 	}
 
-	if !data.Get("success").MustBool() {
-		return nil, fmt.Errorf("invalid response: %s", data.Get("message").MustString())
+	if !resp.Get("success").MustBool() {
+		return nil, fmt.Errorf("invalid response: %s", resp.Get("message").MustString())
 	}
 
-	rawReviews := data.Get("reviews")
+	rawReviews := resp.Get("reviews")
 	reviews := []Review{}
 
 	for i := 0; i < len(rawReviews.MustArray()); i++ {
@@ -914,19 +813,19 @@ func GetWeather(location string) (*simplejson.Json, error) {
 		url.QueryEscape(location),
 	)
 
-	weather, err := http.GetJson(url)
+	resp, err := http.GetJson(url)
 	if err != nil {
 		return nil, err
 	}
 
-	if weather.Get("cod").MustInt() != 200 {
+	if resp.Get("cod").MustInt() != 200 {
 		return nil, fmt.Errorf("invalid location")
 	}
 
 	weatherCache[location] = weatherData{
-		weather: weather,
+		weather: resp,
 		time:    time.Now(),
 	}
 
-	return weather, nil
+	return resp, nil
 }
