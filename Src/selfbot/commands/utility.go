@@ -780,6 +780,7 @@ func (UtilityCommands) copyserver(ctx *dgc.Ctx) {
 
 	icon := http.Get(guild.IconURL()).Body
 
+	// TODO: Use discordgo
 	newGuild, err := api.CreateGuild(ctx.Session, fmt.Sprintf("%s - Copy", guild.Name), icon, "") //ctx.Session.GuildCreate(fmt.Sprintf("%s - Copy", guild.Name))
 	if err != nil {
 		_ = ctx.RespondText("Error copying server: " + err.Error())
@@ -1493,43 +1494,34 @@ func (UtilityCommands) dashboard(*dgc.Ctx) {
 }
 
 func (UtilityCommands) changelog(ctx *dgc.Ctx) {
-	httpResponse := http.PostJson(
+	resp, err := http.PostJson(
 		"https://api.lightning-bot.com/api/v3/selfbot/check-version",
 		map[string]string{"branch": "selfbot", "version": ""},
 	)
-	if httpResponse.Error != nil {
-		_ = ctx.RespondText("An error has occurred: " + httpResponse.Error.Error())
+	if err != nil {
+		_ = ctx.RespondText("An error has occurred: " + err.Error())
 		return
 	}
 
-	json := httpResponse.Json()
-
-	latestVersion := json.GetPath("latest", "version").MustString()
-	changelog := json.GetPath("latest", "changelog").MustString()
-
 	embed.NewEmbed().
-		AddField("Latest Version", latestVersion).
-		AddField("Changelog", changelog).
+		AddField("Latest Version", resp.GetPath("latest", "version").MustString()).
+		AddField("Changelog", resp.GetPath("latest", "changelog").MustString()).
 		Send(ctx)
 }
 
 func (UtilityCommands) version(ctx *dgc.Ctx) {
-	httpResponse := http.PostJson(
+	resp, err := http.PostJson(
 		"https://api.lightning-bot.com/api/v3/selfbot/check-version",
 		map[string]string{"branch": "selfbot", "version": ""},
 	)
-	if httpResponse.Error != nil {
-		_ = ctx.RespondText("An error has occurred: " + httpResponse.Error.Error())
+	if err != nil {
+		_ = ctx.RespondText("An error has occurred: " + err.Error())
 		return
 	}
 
-	json := httpResponse.Json()
-
-	latestVersion := json.GetPath("latest", "version").MustString()
-
 	embed.NewEmbed().
 		AddField("Current Version", constants.VERSION[1:]).
-		AddField("Latest Version", latestVersion).
+		AddField("Latest Version", resp.GetPath("latest", "version").MustString()).
 		Send(ctx)
 }
 

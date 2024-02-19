@@ -128,11 +128,7 @@ func CustomMethodWithData(url, method string, data []byte, headersList ...map[st
 	return Do(req)
 }
 
-func Post(url string, data []byte, headersList ...map[string]string) *HttpResponse {
-	return CustomMethodWithData(url, "POST", data, headersList...)
-}
-
-func PostJson(url string, data any, headersList ...map[string]string) *HttpResponse {
+func Post(url string, data any, headersList ...map[string]string) *HttpResponse {
 	jsonData, err := json.Marshal(data)
 	if err != nil {
 		return errorResponse(err)
@@ -143,6 +139,11 @@ func PostJson(url string, data any, headersList ...map[string]string) *HttpRespo
 	})
 
 	return Post(url, jsonData, headersList...)
+}
+
+func PostJson(url string, data any, headersList ...map[string]string) (*simplejson.Json, error) {
+	httpResponse := Post(url, data, headersList...)
+	return httpResponse.Json(), httpResponse.Error
 }
 
 func Put(url string, data []byte, headersList ...map[string]string) *HttpResponse {

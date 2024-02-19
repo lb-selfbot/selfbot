@@ -673,7 +673,7 @@ func (e *Embed) sendWebhookEmbed(ctx *dgc.Ctx) error {
 }
 
 func (e *Embed) SendWebhook(webhookUrl string) *http.HttpResponse {
-	return http.PostJson(webhookUrl, map[string]any{
+	return http.Post(webhookUrl, map[string]any{
 		"embeds":     []any{e},
 		"username":   "LightningBot Webhook Notifications",
 		"avatar_url": "https://lightning-bot.com/logo.png",

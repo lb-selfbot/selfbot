@@ -32,14 +32,12 @@ import (
 )
 
 func CreatePaste(text string) (string, error) {
-	httpResult := http.Post("https://paste.lightning-bot.com/documents", []byte(text))
-	if httpResult.Error != nil {
-		return "", httpResult.Error
+	resp, err := http.PostJson("https://paste.lightning-bot.com/documents", []byte(text))
+	if err != nil {
+		return "", err
 	}
 
-	key := httpResult.Json().Get("key").MustString()
-
-	return fmt.Sprintf("https://paste.lightning-bot.com/%s", key), nil
+	return "https://paste.lightning-bot.com/%s" + resp.Get("key").MustString(), nil
 }
 
 func Ping(host string) (time.Duration, error) {
@@ -379,14 +377,12 @@ func OCR(image string) (string, error) {
 		"image":    image,
 	}
 
-	httpResult := http.PostJson("https://api.lightning-bot.com/api/v3/selfbot/ocr", data)
-	if httpResult.Error != nil {
-		return "", httpResult.Error
+	resp, err := http.PostJson("https://api.lightning-bot.com/api/v3/selfbot/ocr", data)
+	if err != nil {
+		return "", err
 	}
 
-	json := httpResult.Json()
-
-	return json.Get("text").String()
+	return resp.Get("text").String()
 }
 
 func GetStartParams() *simplejson.Json {
@@ -444,7 +440,7 @@ func GetStartParams() *simplejson.Json {
 }
 
 func Auth(username, password string) *http.HttpResponse {
-	return http.PostJson(
+	return http.Post(
 		"https://api.lightning-bot.com/api/v3/auth/auth",
 		map[string]any{
 			"username":    username,
@@ -455,26 +451,27 @@ func Auth(username, password string) *http.HttpResponse {
 }
 
 func GenImageKey(imageUrl string) string {
-	httpResponse := http.PostJson(
+	resp, err := http.PostJson(
 		"https://api.lightning-bot.com/api/v3/selfbot/gen-image-key",
 		map[string]any{"image_url": imageUrl},
 	)
+	if err != nil {
+		return "Error generating image key: " + err.Error()
+	}
 
-	return httpResponse.Json().Get("image_key").MustString()
+	return resp.Get("image_key").MustString()
 }
 
 func Obfuscate(lang, code string) string {
-	httpResponse := http.PostJson(
+	resp, err := http.PostJson(
 		"https://api.lightning-bot.com/api/v3/selfbot/obfuscate",
 		map[string]any{"lang": lang, "code": code},
 	)
 
-	obf := httpResponse.Json().Get("code").MustString()
-	if obf == "" {
-		return "An error has occurred: " + httpResponse.Body
-	}
-
-	return obf
+	return utils.Misc.Or(
+		resp.Get("code").MustString(),
+		"An error has occurred: "+err.Error(),
+	)
 }
 
 type URLEmbed struct {
@@ -518,16 +515,15 @@ func GenerateURLEmbed(embed URLEmbed) (string, error) {
 }
 
 func PokeTwo(image string, cfg *config.Config) (string, float64, error) {
-	httpResponse := http.PostJson(
+	resp, err := http.PostJson(
 		"https://lightningdev1-poketwo.hf.space/run/predict",
 		map[string]any{"data": []any{image}},
 	)
-	if httpResponse.Error != nil {
-		return "", 0, httpResponse.Error
+	if err != nil {
+		return "", 0, err
 	}
 
-	json := httpResponse.Json()
-	data := json.Get("data").GetIndex(0).Get("confidences").GetIndex(0)
+	data := resp.Get("data").GetIndex(0).Get("confidences").GetIndex(0)
 
 	return data.Get("label").MustString(), data.Get("confidence").MustFloat64(), nil
 }
@@ -558,6 +554,7 @@ func AllowFriendRequestsFrom(session *discordgo.Session, types []string) error {
 	return ChangeSettings(session, "/settings", newSettings)
 }
 
+// TODO: DEPRECATE
 func CreateGuild(session *discordgo.Session, name, icon, guildTemplateCode string) (*discordgo.Guild, error) {
 	var iconData *string
 	if icon != "" {
@@ -575,7 +572,7 @@ func CreateGuild(session *discordgo.Session, name, icon, guildTemplateCode strin
 		headers[k] = v
 	}
 
-	httpResponse := http.PostJson("https://discord.com/api/v9/guilds", map[string]any{
+	httpResponse := http.Post("https://discord.com/api/v9/guilds", map[string]any{
 		"name":                name,
 		"icon":                iconData,
 		"channels":            []any{},
@@ -609,20 +606,21 @@ func GPTCustom(messages []any, models ...string) (string, error) {
 		model = models[0]
 	}
 
-	httpResponse := http.PostJson("https://api.lightning-bot.com/api/v3/selfbot/gpt", map[string]any{
+	resp, err := http.PostJson("https://api.lightning-bot.com/api/v3/selfbot/gpt", map[string]any{
 		"username": cfg.Account.LightningBot.Username,
 		"password": cfg.Account.LightningBot.Password,
 		"model":    model,
 		"messages": messages,
 	})
-	if httpResponse.Error != nil {
-		return "An error has occurred: " + httpResponse.Error.Error(), httpResponse.Error
+	if err != nil {
+		return "An error has occurred: " + err.Error(), err
 	}
 
-	content := httpResponse.Json().Get("response").MustString()
+	content := resp.Get("response").MustString()
 
 	if content == "" {
-		return "An error has occurred: " + httpResponse.Body, fmt.Errorf("empty response: %s", httpResponse.Body)
+		data := fmt.Sprint(resp.Interface())
+		return "An error has occurred: " + data, fmt.Errorf("empty response: %s", data)
 	}
 
 	return content, nil

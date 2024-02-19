@@ -1111,7 +1111,15 @@ func (*AdministrationCommands) webhooksend(ctx *dgc.Ctx) {
 		"content": utils.Arguments["<\"message\">"],
 	}
 
-	_ = http.PostJson(webhookUrl.String(), data)
+	httpResponse := http.Post(webhookUrl.String(), data)
+	if httpResponse.Error != nil || httpResponse.StatusCode != 204 {
+		_ = ctx.RespondText("Error sending message to webhook: " + httpResponse.Body)
+		return
+	}
+
+	embed.NewEmbed().
+		SetDescription("Successfully sent message to webhook.").
+		Send(ctx)
 }
 
 func (*AdministrationCommands) webhookdelete(ctx *dgc.Ctx) {

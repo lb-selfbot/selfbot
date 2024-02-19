@@ -132,16 +132,16 @@ func (g GameCommands) RegisterCommands(router *dgc.Router) {
 func (GameCommands) mcuuid(ctx *dgc.Ctx) {
 	username := utils.Arguments["<username>"]
 
-	httpResponse := http.PostJson(
+	resp, err := http.PostJson(
 		"https://api.mojang.com/profiles/minecraft",
 		[]string{username},
 	)
-	if httpResponse.Error != nil {
+	if err != nil {
 		_ = ctx.RespondText("An error has occurred.")
 		return
 	}
 
-	uuid := httpResponse.Json().GetIndex(0).Get("id").MustString()
+	uuid := resp.GetIndex(0).Get("id").MustString()
 
 	embed.NewEmbed().
 		AddField("Username", username).
@@ -472,7 +472,7 @@ var HLTBHeaders = map[string]string{
 }
 
 func (GameCommands) hltbsearch(ctx *dgc.Ctx) {
-	httpResponse := http.PostJson(
+	resp, err := http.PostJson(
 		"https://howlongtobeat.com/api/search",
 		map[string]any{
 			"searchType":  "games",
@@ -499,22 +499,20 @@ func (GameCommands) hltbsearch(ctx *dgc.Ctx) {
 		},
 		HLTBHeaders,
 	)
-	if httpResponse.Error != nil {
-		_ = ctx.RespondText("An error has occurred: " + httpResponse.Error.Error())
+	if err != nil {
+		_ = ctx.RespondText("An error has occurred: " + err.Error())
 		return
 	}
 
-	json := httpResponse.Json()
-
-	if json.Get("count").MustInt() == 0 {
+	if resp.Get("count").MustInt() == 0 {
 		_ = ctx.RespondText("No results found.")
 		return
 	}
 
 	var games []string
 
-	for i := 0; i < len(json.Get("data").MustArray()); i++ {
-		game := json.Get("data").GetIndex(i)
+	for i := 0; i < len(resp.Get("data").MustArray()); i++ {
+		game := resp.Get("data").GetIndex(i)
 		games = append(games, fmt.Sprintf(
 			"%s (%d)",
 			game.Get("game_name").MustString(),
