@@ -49,6 +49,9 @@ const (
 	DELETE_MESSAGES
 	KEYWORD_NOTIFIER
 
+	// Snipers
+	SNIPERS
+
 	// AFK
 	AFK_RESPONDER
 
@@ -85,6 +88,7 @@ const (
 
 func defaultEventReactions() []EventReaction {
 	return []EventReaction{
+		NewSnipers(""),
 		NewAFK(),
 		NewPhishing(),
 		NewNotifiers(),
