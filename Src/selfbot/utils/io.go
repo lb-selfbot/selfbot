@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"encoding/json"
 	"os"
 	"path/filepath"
 	"strings"
@@ -136,8 +137,23 @@ func (*IOUtils) Exists(path string) bool {
 }
 
 func (*IOUtils) IsFirstLaunch() bool {
+	configPath := filepath.Join(IO.GetMainFolder(), "Config", "config.json")
+
 	// Check if config file exists
-	return !IO.Exists(filepath.Join(IO.GetMainFolder(), "Config", "config.json"))
+	if !IO.Exists(configPath) {
+		return true
+	}
+
+	data, err := os.ReadFile(filepath.FromSlash(configPath))
+	if err != nil {
+		return true
+	}
+
+	// Check if config is valid JSON
+	var cfg any
+	err = json.Unmarshal(data, &cfg)
+
+	return err != nil
 }
 
 var IO = &IOUtils{}
