@@ -129,16 +129,24 @@ func CustomMethodWithData(url, method string, data []byte, headersList ...map[st
 }
 
 func Post(url string, data any, headersList ...map[string]string) *HttpResponse {
-	jsonData, err := json.Marshal(data)
-	if err != nil {
-		return errorResponse(err)
+	var rawData []byte
+
+	switch data := data.(type) {
+	case []byte:
+		rawData = data
+	default:
+		var err error
+		rawData, err = json.Marshal(data)
+		if err != nil {
+			return errorResponse(err)
+		}
+
+		headersList = append(headersList, map[string]string{
+			"Content-Type": "application/json",
+		})
 	}
 
-	headersList = append(headersList, map[string]string{
-		"Content-Type": "application/json",
-	})
-
-	return Post(url, jsonData, headersList...)
+	return CustomMethodWithData(url, "POST", rawData, headersList...)
 }
 
 func PostJson(url string, data any, headersList ...map[string]string) (*simplejson.Json, error) {
