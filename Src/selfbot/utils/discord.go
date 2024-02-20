@@ -232,6 +232,50 @@ func (DiscordUtils) GetChannelMessage(session *discordgo.Session, channelID, ID 
 	return nil, fmt.Errorf("message not found")
 }
 
+func (DiscordUtils) DeleteMessages(session *discordgo.Session, channelID, userID string, amount int, delay time.Duration) (int, error) {
+	var deleted int
+	var lastID string
+
+	// Fetch messages in chunks of 100 until desired amount is deleted
+	for deleted < amount {
+		messages, err := session.ChannelMessages(channelID, 100, lastID, "", "")
+		if err != nil {
+			return deleted, err
+		}
+
+		// No messages left to delete
+		if len(messages) == 0 {
+			break
+		}
+
+		for _, m := range messages {
+			lastID = m.ID
+
+			// Check if message is from the desired user
+			if m.Author == nil || (userID != "" && m.Author.ID != userID) {
+				continue
+			}
+
+			// Delete message
+			err := session.ChannelMessageDelete(channelID, m.ID)
+			if err != nil {
+				return deleted, err
+			}
+
+			deleted++
+
+			time.Sleep(delay)
+
+			// Check if the desired amount is deleted
+			if deleted >= amount {
+				break
+			}
+		}
+	}
+
+	return deleted, nil
+}
+
 func (DiscordUtils) GetRoleNames(ctx *dgc.Ctx, member *discordgo.Member) string {
 	var roleNames []string
 	for _, role := range member.Roles {

@@ -101,7 +101,7 @@ func (f *ForceNick) Handler(session *discordgo.Session, event any) {
 		return
 	}
 
-	if memberUpdate.BeforeUpdate.Nick != memberUpdate.Nick {
+	if memberUpdate.Nick != f.Nickname {
 		_ = session.GuildMemberNickname(memberUpdate.GuildID, memberUpdate.User.ID, f.Nickname)
 	}
 }

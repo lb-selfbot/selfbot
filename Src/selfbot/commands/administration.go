@@ -874,9 +874,9 @@ func (*AdministrationCommands) purgeself(ctx *dgc.Ctx) {
 		return
 	}
 
-	delay, err := strconv.Atoi(utils.Arguments["[delay]"])
+	delaySec, err := strconv.Atoi(utils.Arguments["[delay]"])
 	if err != nil {
-		delay = 1
+		delaySec = 1
 	}
 
 	channel, success := utils.Discord.TryGetChannelFromMention(ctx, ctx.Arguments.Get(2))
@@ -885,29 +885,21 @@ func (*AdministrationCommands) purgeself(ctx *dgc.Ctx) {
 		channelID = channel.ID
 	}
 
-	messages, err := utils.Discord.GetChannelMessages(ctx.Session, channelID, amount)
+	userID := ctx.Event.Author.ID
+	delay := time.Duration(delaySec) * time.Second
+
+	// Allow the command to be deleted before the messages are deleted
+	time.Sleep(1 * time.Second)
+
+	deleted, err := utils.Discord.DeleteMessages(ctx.Session, channelID, userID, amount, delay)
 	if err != nil {
-		_ = ctx.RespondText("Error getting messages: " + err.Error())
+		_ = ctx.RespondText("Error deleting messages: " + err.Error())
 		return
 	}
 
-	for _, message := range messages {
-		if message.Author == nil {
-			continue
-		}
-
-		if message.Author.ID != ctx.Session.State.User.ID {
-			continue
-		}
-
-		err = ctx.Session.ChannelMessageDelete(channelID, message.ID)
-		if err != nil {
-			_ = ctx.RespondText("Error deleting messages: " + err.Error())
-			return
-		}
-
-		time.Sleep(time.Duration(delay) * time.Second)
-	}
+	embed.NewEmbed().
+		SetDescription(fmt.Sprintf("Successfully deleted %d messages!", deleted)).
+		Send(ctx)
 }
 
 func (*AdministrationCommands) purgeuser(ctx *dgc.Ctx) {
@@ -923,9 +915,9 @@ func (*AdministrationCommands) purgeuser(ctx *dgc.Ctx) {
 		return
 	}
 
-	delay, err := strconv.Atoi(utils.Arguments["[delay]"])
+	delaySec, err := strconv.Atoi(utils.Arguments["[delay]"])
 	if err != nil {
-		delay = 1
+		delaySec = 1
 	}
 
 	channel, success := utils.Discord.TryGetChannelFromMention(ctx, ctx.Arguments.Get(3))
@@ -934,29 +926,20 @@ func (*AdministrationCommands) purgeuser(ctx *dgc.Ctx) {
 		channelID = channel.ID
 	}
 
-	messages, err := utils.Discord.GetChannelMessages(ctx.Session, channelID, amount)
+	delay := time.Duration(delaySec) * time.Second
+
+	// Allow the command to be deleted before the messages are deleted
+	time.Sleep(1 * time.Second)
+
+	deleted, err := utils.Discord.DeleteMessages(ctx.Session, channelID, user.ID, amount, delay)
 	if err != nil {
-		_ = ctx.RespondText("Error getting messages: " + err.Error())
+		_ = ctx.RespondText("Error deleting messages: " + err.Error())
 		return
 	}
 
-	for _, message := range messages {
-		if message.Author == nil {
-			continue
-		}
-
-		if message.Author.ID != user.ID {
-			continue
-		}
-
-		err = ctx.Session.ChannelMessageDelete(channelID, message.ID)
-		if err != nil {
-			_ = ctx.RespondText("Error deleting messages: " + err.Error())
-			return
-		}
-
-		time.Sleep(time.Duration(delay) * time.Second)
-	}
+	embed.NewEmbed().
+		SetDescription(fmt.Sprintf("Successfully deleted %d messages!", deleted)).
+		Send(ctx)
 }
 
 func (*AdministrationCommands) purgerange(ctx *dgc.Ctx) {
