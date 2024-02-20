@@ -544,7 +544,7 @@ func (_Logging) KeywordNotifier(session *discordgo.Session, message *discordgo.M
 		Show()
 }
 
-func (_Logging) PokeTwoSniper(session *discordgo.Session, message *discordgo.Message, pokemon, received string, confidence float64, elapsed time.Duration) {
+func (_Logging) PokeTwoSniper(session *discordgo.Session, message *discordgo.Message, pokemon, received, iv string, confidence float64, elapsed time.Duration) {
 	cfg, err := config.GetConfig()
 	if err != nil {
 		return
@@ -559,6 +559,7 @@ func (_Logging) PokeTwoSniper(session *discordgo.Session, message *discordgo.Mes
 		SetColor("#C1EFFF").
 		AddInfo("", "Caught a "+pokemon).
 		AddInfoConditional("Received", received, received != "").
+		AddInfoConditional("IV", iv, iv != "").
 		AddInfo("AI Confidence", fmt.Sprint(confidence)).
 		AddInfo("Detection Time", elapsed.String()).
 		AddInfo("Server", guildName).

@@ -8,7 +8,10 @@ import (
 
 	"github.com/LightningDev1/LB-Selfbot/selfbot/config"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/logging"
+	"github.com/LightningDev1/LB-Selfbot/selfbot/sessions"
+	"github.com/LightningDev1/LB-Selfbot/selfbot/slashcommands"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/utils"
+	"github.com/LightningDev1/LB-Selfbot/selfbot/websocket"
 	"github.com/LightningDev1/dgc"
 	"github.com/LightningDev1/discordgo"
 )
@@ -436,7 +439,21 @@ func HandleEvent(session *discordgo.Session, event any) {
 	}
 }
 
-func RegisterHandlers(session *discordgo.Session) {
+func RegisterHandlers(session *discordgo.Session, router *dgc.Router) {
+	// Ready Event
+	session.AddHandler(func(_ *discordgo.Session, ready *discordgo.Ready) {
+		// Start the session handler
+		sessions.RegisterSessionHandler(session)
+
+		// Start slash command jobs
+		go slashcommands.StartJobs(session)
+
+		// Start event reactions
+		go StartLoading(session, router)
+
+		logging.Logging.OnReady(router, ready)
+	})
+
 	// Message Events
 	session.AddHandler(func(_ *discordgo.Session, m *discordgo.MessageCreate) {
 		if m.Message == nil || m.Author == nil {
@@ -444,6 +461,12 @@ func RegisterHandlers(session *discordgo.Session) {
 		}
 
 		HandleEvent(session, m)
+
+		TimeDifference = time.Since(utils.Discord.SnowflakeToTime(m.ID))
+
+		session.State.MessageAdd(m.Message)
+
+		websocket.Websocket.CheckNonce()
 	})
 
 	session.AddHandler(func(_ *discordgo.Session, m *discordgo.MessageUpdate) {
@@ -473,6 +496,8 @@ func RegisterHandlers(session *discordgo.Session) {
 		if m.Author.ID != session.State.User.ID || !strings.HasPrefix(m.Message.Content, cfg.Selfbot.CommandPrefix) {
 			AddEditedMessage(m)
 		}
+
+		websocket.Websocket.CheckNonce()
 	})
 
 	session.AddHandler(func(_ *discordgo.Session, m *discordgo.MessageDelete) {
@@ -497,6 +522,8 @@ func RegisterHandlers(session *discordgo.Session) {
 		if m.Author.ID != session.State.User.ID || !strings.HasPrefix(m.Message.Content, cfg.Selfbot.CommandPrefix) {
 			AddDeletedMessage(m.BeforeDelete)
 		}
+
+		websocket.Websocket.CheckNonce()
 	})
 
 	session.AddHandler(func(_ *discordgo.Session, m *discordgo.MessageReactionAdd) {
@@ -505,41 +532,59 @@ func RegisterHandlers(session *discordgo.Session) {
 		if !IsEventReactionMessage(msg) {
 			HandleEvent(session, m)
 		}
+
+		websocket.Websocket.CheckNonce()
 	})
 
 	session.AddHandler(func(_ *discordgo.Session, t *discordgo.TypingStart) {
 		HandleEvent(session, t)
+
+		websocket.Websocket.CheckNonce()
 	})
 
 	// Guild Events
 	session.AddHandler(func(_ *discordgo.Session, g *discordgo.GuildBanAdd) {
 		HandleEvent(session, g)
+
+		websocket.Websocket.CheckNonce()
 	})
 
 	session.AddHandler(func(_ *discordgo.Session, g *discordgo.GuildMemberAdd) {
 		HandleEvent(session, g)
+
+		websocket.Websocket.CheckNonce()
 	})
 
 	session.AddHandler(func(_ *discordgo.Session, g *discordgo.GuildMemberUpdate) {
 		HandleEvent(session, g)
+
+		websocket.Websocket.CheckNonce()
 	})
 
 	// User Events
 	session.AddHandler(func(_ *discordgo.Session, r *discordgo.RelationshipAdd) {
 		HandleEvent(session, r)
+
+		websocket.Websocket.CheckNonce()
 	})
 
-	// Channel Event
+	// Channel Events
 	session.AddHandler(func(_ *discordgo.Session, r *discordgo.VoiceStateUpdate) {
 		HandleEvent(session, r)
+
+		websocket.Websocket.CheckNonce()
 	})
 
 	session.AddHandler(func(_ *discordgo.Session, r *discordgo.ChannelCreate) {
 		HandleEvent(session, r)
+
+		websocket.Websocket.CheckNonce()
 	})
 
 	session.AddHandler(func(_ *discordgo.Session, r *discordgo.ChannelRecipientRemove) {
 		HandleEvent(session, r)
+
+		websocket.Websocket.CheckNonce()
 	})
 
 }

@@ -361,7 +361,7 @@ func CheckPokeTwoSniper(session *discordgo.Session, message *discordgo.Message, 
 			received = receivedMatches[1]
 		}
 
-		logging.Logging.PokeTwoSniper(session, message, pokemon, received, confidence, elapsed)
+		logging.Logging.PokeTwoSniper(session, message, pokemon, received, "", confidence, elapsed)
 	case <-time.After(time.Second * 5):
 		utils.Logging.Error("PokéTwo sniper timed out!")
 	}

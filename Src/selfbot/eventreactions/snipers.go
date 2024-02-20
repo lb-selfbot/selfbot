@@ -125,13 +125,22 @@ func (s *Snipers) Handler(session *discordgo.Session, event any) {
 			return
 		}
 
-		s.CheckNitroSniper(session, event)
-		s.CheckPrivnoteSniper(session, event)
-	}
+		s.CheckNitroSniper(session, event.Message)
+		s.CheckPrivnoteSniper(session, event.Message)
+		s.CheckPokeTwoSniper(session, event)
+		s.CheckGiveawaySniper(session, event)
+	case *discordgo.MessageUpdate:
+		if utils.SliceContains(cfg.Snipers.ServerBlacklist, event.GuildID) {
+			return
+		}
 
+		s.CheckNitroSniper(session, event.Message)
+		s.CheckPrivnoteSniper(session, event.Message)
+		s.CheckGiveawaySniperEdit(session, event)
+	}
 }
 
-func (s *Snipers) CheckNitroSniper(session *discordgo.Session, m *discordgo.MessageCreate) {
+func (s *Snipers) CheckNitroSniper(session *discordgo.Session, m *discordgo.Message) {
 	cfg, err := config.GetConfig()
 	if err != nil {
 		utils.Logging.Debug("Snipers.CheckNitroSniper: Error getting config: ", err)
@@ -187,7 +196,7 @@ func (s *Snipers) CheckNitroSniper(session *discordgo.Session, m *discordgo.Mess
 
 		// Check code length
 		if len(code) < 15 || len(code) > 26 {
-			logging.Logging.NitroSniperFake(session, m.Message, code, "")
+			logging.Logging.NitroSniperFake(session, m, code, "")
 
 			continue
 		}
@@ -215,25 +224,25 @@ func (s *Snipers) CheckNitroSniper(session *discordgo.Session, m *discordgo.Mess
 
 		// Code has been redeemed
 		if strings.Contains(respString, "subscription_plan") {
-			logging.Logging.NitroSniper(session, m.Message, elapsed, "Redeemed Nitro", code, s.Account)
+			logging.Logging.NitroSniper(session, m, elapsed, "Redeemed Nitro", code, s.Account)
 			continue
 		}
 
 		// Code has already been redeemed
 		if strings.Contains(respString, "This gift has been redeemed already.") {
-			logging.Logging.NitroSniper(session, m.Message, elapsed, "Already Redeemed", code, s.Account)
+			logging.Logging.NitroSniper(session, m, elapsed, "Already Redeemed", code, s.Account)
 			continue
 		}
 
 		// User already has nitro
 		if strings.Contains(respString, "Already purchased") {
-			logging.Logging.NitroSniper(session, m.Message, elapsed, "Already Purchased", code, s.Account)
+			logging.Logging.NitroSniper(session, m, elapsed, "Already Purchased", code, s.Account)
 			continue
 		}
 
 		// Invalid code
 		if strings.Contains(respString, "Unknown Gift Code") {
-			logging.Logging.NitroSniper(session, m.Message, elapsed, "Unknown Code", code, s.Account)
+			logging.Logging.NitroSniper(session, m, elapsed, "Unknown Code", code, s.Account)
 			continue
 		}
 
@@ -245,11 +254,11 @@ func (s *Snipers) CheckNitroSniper(session *discordgo.Session, m *discordgo.Mess
 
 		status := utils.Misc.Or(json.Get("message").MustString(), "Unknown Status")
 
-		logging.Logging.NitroSniper(session, m.Message, elapsed, status, code, s.Account)
+		logging.Logging.NitroSniper(session, m, elapsed, status, code, s.Account)
 	}
 }
 
-func (s *Snipers) CheckPrivnoteSniper(session *discordgo.Session, m *discordgo.MessageCreate) {
+func (s *Snipers) CheckPrivnoteSniper(session *discordgo.Session, m *discordgo.Message) {
 	cfg, err := config.GetConfig()
 	if err != nil {
 		utils.Logging.Debug("Snipers.CheckPrivnoteSniper: Error getting config: ", err)
@@ -294,7 +303,7 @@ func (s *Snipers) CheckPrivnoteSniper(session *discordgo.Session, m *discordgo.M
 			continue
 		}
 
-		logging.Logging.PrivnoteSniper(session, m.Message, elapsed, "Saved Note", filePath, s.Account)
+		logging.Logging.PrivnoteSniper(session, m, elapsed, "Saved Note", filePath, s.Account)
 	}
 }
 
@@ -316,8 +325,18 @@ func (s *Snipers) getButtonComponent(m *discordgo.Message, i int) (button *disco
 	return
 }
 
-func (s *Snipers) giveawaySniperSleepDuration(cfg *config.Config) time.Duration {
-	return time.Duration(cfg.Snipers.GiveawaySniper.Sleep) * time.Second
+func (s *Snipers) giveawaySniperSleepDuration(cfg *config.Config, endTime *time.Time) time.Duration {
+	sleep := time.Duration(cfg.Snipers.GiveawaySniper.Sleep) * time.Second
+
+	if endTime != nil && time.Until(*endTime) < sleep {
+		// Multiply the time until endTime by a random number between 0.2 and 0.7
+		untilEnd := float64(time.Until(*endTime))
+		sleep = time.Duration(untilEnd * (0.2 + 0.5*rand.Float64()))
+
+		logging.UI.Info("Giveaway ends in less than the sleep duration, sleeping for " + utils.Misc.FormatDuration(sleep) + " instead.")
+	}
+
+	return sleep
 }
 
 func (s *Snipers) isBlacklisted(cfg *config.Config, text string) bool {
@@ -391,7 +410,7 @@ func (s *Snipers) CheckGiveawaySniper(session *discordgo.Session, m *discordgo.M
 		logging.Logging.GiveawayFound(session, m.Message, "€10 worth of ZAP Coins", "ZAP-Hosting", "1 hour", s.Account)
 
 		go func() {
-			time.Sleep(s.giveawaySniperSleepDuration(&cfg))
+			time.Sleep(s.giveawaySniperSleepDuration(&cfg, nil))
 
 			// Click the enter button
 			err = session.InteractionClick(button, m.Message)
@@ -401,16 +420,12 @@ func (s *Snipers) CheckGiveawaySniper(session *discordgo.Session, m *discordgo.M
 		}()
 	case "294882584201003009", "1041302711750119504": // GiveawayBot#2381, LightningBot#1992
 		// Win check
-		if m.Type == discordgo.MessageTypeReply {
-			winRegex := regexp.MustCompile(`Congratulations <@!?(\d+)>! You won the \*\*(.*?)\*\*!`)
+		if m.Type == discordgo.MessageTypeReply && utils.Discord.IsUserMentioned(m.Message, session.State.User.ID) {
+			winRegex := regexp.MustCompile(`You won the \*\*(.*?)\*\*!`)
 
 			wins := winRegex.FindAllStringSubmatch(m.Content, -1)
 			for _, win := range wins {
-				winnerID, prize := win[1], win[2]
-
-				if winnerID != session.State.User.ID {
-					continue
-				}
+				prize := win[1]
 
 				logging.Logging.GiveawayWon(session, m.Message, prize, s.Account)
 			}
@@ -442,7 +457,8 @@ func (s *Snipers) CheckGiveawaySniper(session *discordgo.Session, m *discordgo.M
 
 		// Parse UNIX timestamp
 		endsUnix, _ := strconv.ParseInt(ends, 10, 64)
-		endsFormat := utils.Misc.FormatDuration(time.Until(time.Unix(endsUnix, 0)))
+		endsTime := time.Unix(endsUnix, 0)
+		endsFormat := utils.Misc.FormatDuration(time.Until(endsTime))
 
 		// If the ends time is zero, the message is not a giveaway
 		if endsUnix == 0 {
@@ -452,61 +468,12 @@ func (s *Snipers) CheckGiveawaySniper(session *discordgo.Session, m *discordgo.M
 		logging.Logging.GiveawayFound(session, m.Message, prize, hostID, endsFormat, s.Account)
 
 		go func() {
-			time.Sleep(s.giveawaySniperSleepDuration(&cfg))
+			time.Sleep(s.giveawaySniperSleepDuration(&cfg, &endsTime))
 
 			// Click the enter button
 			err = session.InteractionClick(button, m.Message)
 			if err != nil {
 				utils.Logging.Debug("Snipers.CheckGiveawaySniper: Error clicking button: ", err)
-			}
-		}()
-	case "396464677032427530": // Giveaway#7832
-		// Win check
-		winRegex := regexp.MustCompile(`:tada: <@!?(\d+)> won \*\*(.*?)\*\*`)
-
-		wins := winRegex.FindAllStringSubmatch(m.Content, -1)
-		for _, win := range wins {
-			winnerID, prize := win[1], win[2]
-
-			if winnerID == session.State.User.ID {
-				continue
-			}
-
-			logging.Logging.GiveawayWon(session, m.Message, prize, s.Account)
-		}
-
-		// Check if the message is a giveaway
-		if len(m.Embeds) == 0 || len(m.Embeds[0].Fields) == 0 ||
-			!strings.Contains(m.Embeds[0].Title, "Giveaway") {
-			break
-		}
-
-		// Get giveaway info
-		prize := m.Embeds[0].Fields[0].Value
-		if s.isBlacklisted(&cfg, prize) {
-			break
-		}
-
-		hostRegex := regexp.MustCompile(`Hosted by: <@!?(\d+)>`)
-		hostMatches := hostRegex.FindStringSubmatch(m.Embeds[0].Description)
-
-		endsTime, err := time.Parse(time.RFC3339, m.Embeds[0].Timestamp)
-		if err != nil || len(hostMatches) == 0 {
-			break
-		}
-
-		hostID := hostMatches[1]
-		endsFormat := utils.Misc.FormatDuration(time.Until(endsTime))
-
-		logging.Logging.GiveawayFound(session, m.Message, prize, hostID, endsFormat, s.Account)
-
-		go func() {
-			time.Sleep(s.giveawaySniperSleepDuration(&cfg))
-
-			// Add the enter reaction
-			err = session.MessageReactionAdd(m.ChannelID, m.ID, "🎉")
-			if err != nil {
-				utils.Logging.Debug("Snipers.CheckGiveawaySniper: Error adding reaction: ", err)
 			}
 		}()
 	case "700743797977514004": // Friskytool#6219
@@ -549,7 +516,7 @@ func (s *Snipers) CheckGiveawaySniper(session *discordgo.Session, m *discordgo.M
 		logging.Logging.GiveawayFound(session, m.Message, prize, hostID, endsFormat, s.Account)
 
 		go func() {
-			time.Sleep(s.giveawaySniperSleepDuration(&cfg))
+			time.Sleep(s.giveawaySniperSleepDuration(&cfg, &endsTime))
 
 			// Add the enter reaction
 			err = session.MessageReactionAdd(m.ChannelID, m.ID, "🎉")
@@ -563,9 +530,9 @@ func (s *Snipers) CheckGiveawaySniper(session *discordgo.Session, m *discordgo.M
 		}
 
 		// Win check
-		winRegex := regexp.MustCompile(`<@!?(\d+)>  won the giveaway of \[(.*?)\]`)
+		winRegex := regexp.MustCompile(`<@!?(\d+)> won the giveaway of \[(.*?)\]`)
 
-		wins := winRegex.FindAllStringSubmatch(m.Content, -1)
+		wins := winRegex.FindAllStringSubmatch(m.Embeds[0].Description, -1)
 		for _, win := range wins {
 			winnerID, prize := win[1], win[2]
 
@@ -578,7 +545,7 @@ func (s *Snipers) CheckGiveawaySniper(session *discordgo.Session, m *discordgo.M
 
 		// Check if the message is a giveaway
 		button, ok := s.getButtonComponent(m.Message, 0)
-		if !strings.Contains(m.Embeds[0].Description, "React with") || !ok {
+		if !strings.Contains(m.Embeds[0].Description, "button to enter!") || !ok {
 			break
 		}
 
@@ -588,21 +555,25 @@ func (s *Snipers) CheckGiveawaySniper(session *discordgo.Session, m *discordgo.M
 			break
 		}
 
-		hostRegex := regexp.MustCompile(`Hosted by <@!?(\d+)>`)
+		hostRegex := regexp.MustCompile(`Hosted by: <@!?(\d+)>`)
 		hostMatches := hostRegex.FindStringSubmatch(m.Embeds[0].Description)
 
+		hostID := ""
+		if len(hostMatches) > 0 {
+			hostID = hostMatches[1]
+		}
+
 		endsTime, err := time.Parse(time.RFC3339, m.Embeds[0].Timestamp)
-		if err != nil || len(hostMatches) == 0 {
+		if err != nil {
 			break
 		}
 
-		hostID := hostMatches[1]
 		endsFormat := utils.Misc.FormatDuration(time.Until(endsTime))
 
 		logging.Logging.GiveawayFound(session, m.Message, prize, hostID, endsFormat, s.Account)
 
 		go func() {
-			time.Sleep(s.giveawaySniperSleepDuration(&cfg))
+			time.Sleep(s.giveawaySniperSleepDuration(&cfg, &endsTime))
 
 			// Click the enter button
 			err = session.InteractionClick(button, m.Message)
@@ -627,12 +598,9 @@ func (s *Snipers) CheckGiveawaySniper(session *discordgo.Session, m *discordgo.M
 		}
 
 		// Get giveaway info
-		prize := m.Embeds[0].Title
-		if len(prize) < 4 {
-			break
-		}
-
-		prize = prize[2 : len(prize)-2] // Remove the emojis
+		prize := strings.ReplaceAll(m.Embeds[0].Title, "🎉", "")
+		prize = strings.TrimPrefix(prize, " ")
+		prize = strings.TrimSuffix(prize, " ")
 		if s.isBlacklisted(&cfg, prize) {
 			break
 		}
@@ -646,12 +614,13 @@ func (s *Snipers) CheckGiveawaySniper(session *discordgo.Session, m *discordgo.M
 
 		// Parse UNIX timestamp
 		endsUnix, _ := strconv.ParseInt(endsMatches[1], 10, 64)
-		endsFormat := utils.Misc.FormatDuration(time.Until(time.Unix(endsUnix, 0)))
+		endsTime := time.Unix(endsUnix, 0)
+		endsFormat := utils.Misc.FormatDuration(time.Until(endsTime))
 
 		logging.Logging.GiveawayFound(session, m.Message, prize, "", endsFormat, s.Account)
 
 		go func() {
-			time.Sleep(s.giveawaySniperSleepDuration(&cfg))
+			time.Sleep(s.giveawaySniperSleepDuration(&cfg, &endsTime))
 
 			// Add the enter reaction
 			err = session.MessageReactionAdd(m.ChannelID, m.ID, "🎁")
@@ -661,7 +630,7 @@ func (s *Snipers) CheckGiveawaySniper(session *discordgo.Session, m *discordgo.M
 		}()
 	case "651627261782523926": // Giveaways#8717
 		// Win check
-		winRegex := regexp.MustCompile(`Congratulations, <@!?(\d+)>, you won \*\*(.*?)\*\*`)
+		winRegex := regexp.MustCompile(`Congratulations <@!?(\d+)>, you won \*\*(.*?)\*\*`)
 
 		wins := winRegex.FindAllStringSubmatch(m.Content, -1)
 		for _, win := range wins {
@@ -700,90 +669,16 @@ func (s *Snipers) CheckGiveawaySniper(session *discordgo.Session, m *discordgo.M
 
 		// Parse UNIX timestamp
 		endsUnix, _ := strconv.ParseInt(ends, 10, 64)
-		endsFormat := utils.Misc.FormatDuration(time.Until(time.Unix(endsUnix, 0)))
+		endsTime := time.Unix(endsUnix, 0)
+		endsFormat := utils.Misc.FormatDuration(time.Until(endsTime))
 
 		logging.Logging.GiveawayFound(session, m.Message, prize, hostID, endsFormat, s.Account)
 
 		go func() {
-			time.Sleep(s.giveawaySniperSleepDuration(&cfg))
+			time.Sleep(s.giveawaySniperSleepDuration(&cfg, &endsTime))
 
 			// Add the enter reaction
 			err = session.MessageReactionAdd(m.ChannelID, m.ID, "🎉")
-			if err != nil {
-				utils.Logging.Debug("Snipers.CheckGiveawaySniper: Error adding reaction: ", err)
-			}
-		}()
-	case "693167035068317736": // Rumble Royale#6012
-		// Win check
-		if len(m.Embeds) >= 2 && strings.Contains(m.Embeds[0].Title, "WINNER") &&
-			utils.Discord.IsUserMentioned(m.Message, session.State.User.ID) {
-			logging.Logging.GiveawayWon(session, m.Message, "Rumble Royale", s.Account)
-		}
-
-		// Check if the message is a giveaway
-		if len(m.Embeds) == 0 || !strings.Contains(m.Embeds[0].Title, "Rumble Royale") {
-			break
-		}
-
-		// Bot uses invisible characters to prevent sniping (U+200E)
-		m.Embeds[0].Description = strings.Map(func(r rune) rune {
-			if unicode.IsGraphic(r) {
-				return r
-			}
-
-			return -1
-		}, m.Embeds[0].Description)
-
-		if !strings.Contains(m.Embeds[0].Description, "Click the emoji below to join.") {
-			break
-		}
-
-		// Get giveaway info
-		hostRegex := regexp.MustCompile(`hosted by (.*?)$`)
-		hostMatches := hostRegex.FindStringSubmatch(m.Embeds[0].Description)
-
-		endsRegex := regexp.MustCompile(`Starting in (.*?)!`)
-		endsMatches := endsRegex.FindStringSubmatch(m.Embeds[0].Description)
-
-		if len(hostMatches) == 0 || len(endsMatches) == 0 {
-			break
-		}
-
-		host, endsIn := hostMatches[1], endsMatches[1]
-
-		logging.Logging.GiveawayFound(session, m.Message, "Rumble Royale", host, endsIn, s.Account)
-
-		go func() {
-			// Wait until the bot has reacted
-			time.Sleep(time.Duration(utils.Random.Number(5, 30)) * time.Second)
-
-			// Reload the message to get the updated reactions
-			newMessage, err := utils.Discord.GetChannelMessage(session, m.ChannelID, m.ID)
-			if err != nil {
-				utils.Logging.Debug("Snipers.CheckGiveawaySniper: Error reloading message: ", err)
-				return
-			}
-
-			if len(newMessage.Reactions) == 0 {
-				return
-			}
-
-			// Add the enter reaction
-			var emoji string
-
-			reaction := newMessage.Reactions[0]
-			if reaction.Emoji != nil {
-				emoji = reaction.Emoji.APIName()
-			}
-
-			if emoji == "" {
-				return
-			}
-
-			time.Sleep(s.giveawaySniperSleepDuration(&cfg))
-
-			// Add the enter reaction
-			err = session.MessageReactionAdd(m.ChannelID, m.ID, emoji)
 			if err != nil {
 				utils.Logging.Debug("Snipers.CheckGiveawaySniper: Error adding reaction: ", err)
 			}
@@ -793,29 +688,22 @@ func (s *Snipers) CheckGiveawaySniper(session *discordgo.Session, m *discordgo.M
 			break
 		}
 
-		// Win check
-
 		// Check if the message is a giveaway
-		if len(m.Embeds[0].Fields) == 0 || !strings.Contains(m.Embeds[0].Fields[0].Name, "React with") {
+		if len(m.Embeds) == 0 || !strings.Contains(m.Embeds[0].Description, "React with") {
 			break
 		}
 
 		// Get giveaway info
-		prize := m.Embeds[0].Title
-		if len(prize) < 2 {
-			break
-		}
-
-		prize = prize[2:]
+		prize := strings.ReplaceAll(m.Embeds[0].Title, "🎆 ", "")
 		if s.isBlacklisted(&cfg, prize) {
 			break
 		}
 
 		emojiRegex := regexp.MustCompile(`React with (.*?) to enter`)
-		emojiMatches := emojiRegex.FindStringSubmatch(m.Embeds[0].Fields[0].Value)
+		emojiMatches := emojiRegex.FindStringSubmatch(m.Embeds[0].Description)
 
 		endsRegex := regexp.MustCompile(`<t:(\d+):R>`)
-		endsMatches := endsRegex.FindStringSubmatch(m.Embeds[0].Fields[0].Value)
+		endsMatches := endsRegex.FindStringSubmatch(m.Embeds[0].Description)
 
 		if len(emojiMatches) == 0 || len(endsMatches) == 0 {
 			break
@@ -825,12 +713,13 @@ func (s *Snipers) CheckGiveawaySniper(session *discordgo.Session, m *discordgo.M
 
 		// Parse UNIX timestamp
 		endsUnix, _ := strconv.ParseInt(ends, 10, 64)
-		endsFormat := utils.Misc.FormatDuration(time.Until(time.Unix(endsUnix, 0)))
+		endsTime := time.Unix(endsUnix, 0)
+		endsFormat := utils.Misc.FormatDuration(time.Until(endsTime))
 
 		logging.Logging.GiveawayFound(session, m.Message, prize, "", endsFormat, s.Account)
 
 		go func() {
-			time.Sleep(s.giveawaySniperSleepDuration(&cfg))
+			time.Sleep(s.giveawaySniperSleepDuration(&cfg, &endsTime))
 
 			// Add the enter reaction
 			err = session.MessageReactionAdd(m.ChannelID, m.ID, emoji)
@@ -877,11 +766,13 @@ func (s *Snipers) CheckGiveawaySniper(session *discordgo.Session, m *discordgo.M
 		timeButton.Label = timezoneRegex.ReplaceAllString(timeButton.Label, "")
 
 		endsIn := ""
+		var giveawayEnd *time.Time
 
 		timezone, err := time.LoadLocation(timezoneMatches[1])
 		if err == nil {
 			endsTime, err := time.ParseInLocation("Ends on Mon _2 Jan 2006 at 15:04", timeButton.Label, timezone)
 			if err == nil {
+				giveawayEnd = &endsTime
 				endsIn = utils.Misc.FormatDuration(time.Until(endsTime))
 			}
 		}
@@ -889,7 +780,7 @@ func (s *Snipers) CheckGiveawaySniper(session *discordgo.Session, m *discordgo.M
 		logging.Logging.GiveawayFound(session, m.Message, "MEE6", "", endsIn, s.Account)
 
 		go func() {
-			time.Sleep(s.giveawaySniperSleepDuration(&cfg))
+			time.Sleep(s.giveawaySniperSleepDuration(&cfg, giveawayEnd))
 
 			// Click the enter button
 			err = session.InteractionClick(enterButton, m.Message)
@@ -899,7 +790,7 @@ func (s *Snipers) CheckGiveawaySniper(session *discordgo.Session, m *discordgo.M
 		}()
 	case "824119071556763668": // Apollo#2300
 		// Win check
-		winRegex := regexp.MustCompile(`Congratulations <@!?(\d+)>! You won the \*\*(.*?)\*\*`)
+		winRegex := regexp.MustCompile(`Congratulations, <@!?(\d+)>! You won \*\*(.*?)\*\*!`)
 
 		wins := winRegex.FindAllStringSubmatch(m.Content, -1)
 		for _, win := range wins {
@@ -928,10 +819,10 @@ func (s *Snipers) CheckGiveawaySniper(session *discordgo.Session, m *discordgo.M
 		}
 
 		hostRegex := regexp.MustCompile(`Hosted by <@!?(\d+)>`)
-		hostMatches := hostRegex.FindStringSubmatch(m.Content)
+		hostMatches := hostRegex.FindStringSubmatch(m.Embeds[0].Description)
 
 		endsRegex := regexp.MustCompile(`Ends <t:(\d+):R>`)
-		endsMatches := endsRegex.FindStringSubmatch(m.Content)
+		endsMatches := endsRegex.FindStringSubmatch(m.Embeds[0].Description)
 
 		if len(hostMatches) == 0 || len(endsMatches) == 0 {
 			break
@@ -941,12 +832,13 @@ func (s *Snipers) CheckGiveawaySniper(session *discordgo.Session, m *discordgo.M
 
 		// Parse UNIX timestamp
 		endsUnix, _ := strconv.ParseInt(ends, 10, 64)
-		endsFormat := utils.Misc.FormatDuration(time.Until(time.Unix(endsUnix, 0)))
+		endsTime := time.Unix(endsUnix, 0)
+		endsFormat := utils.Misc.FormatDuration(time.Until(endsTime))
 
 		logging.Logging.GiveawayFound(session, m.Message, prize, hostID, endsFormat, s.Account)
 
 		go func() {
-			time.Sleep(s.giveawaySniperSleepDuration(&cfg))
+			time.Sleep(s.giveawaySniperSleepDuration(&cfg, &endsTime))
 
 			// Add the enter reaction
 			err = session.MessageReactionAdd(m.ChannelID, m.ID, "🎉")
@@ -994,12 +886,13 @@ func (s *Snipers) CheckGiveawaySniper(session *discordgo.Session, m *discordgo.M
 
 		// Parse UNIX timestamp
 		endsUnix, _ := strconv.ParseInt(ends, 10, 64)
-		endsFormat := utils.Misc.FormatDuration(time.Until(time.Unix(endsUnix, 0)))
+		endsTime := time.Unix(endsUnix, 0)
+		endsFormat := utils.Misc.FormatDuration(time.Until(endsTime))
 
 		logging.Logging.GiveawayFound(session, m.Message, prize, hostID, endsFormat, s.Account)
 
 		go func() {
-			time.Sleep(s.giveawaySniperSleepDuration(&cfg))
+			time.Sleep(s.giveawaySniperSleepDuration(&cfg, &endsTime))
 
 			// Click the enter button
 			err = session.InteractionClick(button, m.Message)
@@ -1038,16 +931,20 @@ func (s *Snipers) CheckGiveawaySniper(session *discordgo.Session, m *discordgo.M
 		endsMatches := endsRegex.FindStringSubmatch(rawMessageString)
 
 		endsIn := ""
+		var giveawayEnd *time.Time
+
 		if len(endsMatches) > 1 {
 			// Parse UNIX timestamp
 			endsUnix, _ := strconv.ParseInt(endsMatches[1], 10, 64)
-			endsIn = utils.Misc.FormatDuration(time.Until(time.Unix(endsUnix, 0)))
+			endsTime := time.Unix(endsUnix, 0)
+			giveawayEnd = &endsTime
+			endsIn = utils.Misc.FormatDuration(time.Until(endsTime))
 		}
 
 		logging.Logging.GiveawayFound(session, m.Message, "Unknown (Custom Bot)", host, endsIn, s.Account)
 
 		go func() {
-			time.Sleep(s.giveawaySniperSleepDuration(&cfg))
+			time.Sleep(s.giveawaySniperSleepDuration(&cfg, giveawayEnd))
 
 			button, ok := s.getButtonComponent(m.Message, 0)
 			if ok {
@@ -1090,7 +987,113 @@ func (s *Snipers) CheckGiveawaySniper(session *discordgo.Session, m *discordgo.M
 			}
 		}()
 	}
+}
 
+func (s *Snipers) CheckGiveawaySniperEdit(session *discordgo.Session, m *discordgo.MessageUpdate) {
+	cfg, err := config.GetConfig()
+	if err != nil {
+		utils.Logging.Debug("Snipers.CheckGiveawaySniper: Error getting config: ", err)
+		return
+	}
+
+	if !cfg.Snipers.GiveawaySniper.Enabled {
+		return
+	}
+
+	switch m.Author.ID {
+	case "693167035068317736": // Rumble Royale#6012
+		// Win check
+		if len(m.Embeds) >= 2 && strings.Contains(m.Embeds[0].Title, "WINNER") &&
+			utils.Discord.IsUserMentioned(m.Message, session.State.User.ID) {
+			logging.Logging.GiveawayWon(session, m.Message, "Rumble Royale", s.Account)
+		}
+
+		// Check if the message is a giveaway
+		if len(m.Embeds) == 0 || !strings.Contains(m.Embeds[0].Title, "Rumble Royale") {
+			break
+		}
+
+		// Bot uses invisible characters to prevent sniping (U+200E)
+		m.Embeds[0].Description = strings.Map(func(r rune) rune {
+			if unicode.IsGraphic(r) {
+				return r
+			}
+
+			return -1
+		}, m.Embeds[0].Description)
+
+		if !strings.Contains(m.Embeds[0].Description, "Click the emoji below to join.") {
+			break
+		}
+
+		// Get giveaway info
+		hostRegex := regexp.MustCompile(`hosted by (.*?)$`)
+		hostMatches := hostRegex.FindStringSubmatch(m.Embeds[0].Title)
+
+		endsRegex := regexp.MustCompile(`Starting in (.*?)!`)
+		endsMatches := endsRegex.FindStringSubmatch(m.Embeds[0].Description)
+
+		if len(hostMatches) == 0 || len(endsMatches) == 0 {
+			break
+		}
+
+		host, endsIn := hostMatches[1], endsMatches[1]
+
+		logging.Logging.GiveawayFound(session, m.Message, "Rumble Royale", host, endsIn, s.Account)
+
+		go func() {
+			// Wait until the bot has reacted
+			time.Sleep(time.Duration(utils.Random.Number(5, 30)) * time.Second)
+
+			// Reload the message to get the updated reactions
+			newMessage, err := utils.Discord.GetChannelMessage(session, m.ChannelID, m.ID)
+			if err != nil {
+				utils.Logging.Debug("Snipers.CheckGiveawaySniper: Error reloading message: ", err)
+				return
+			}
+
+			if len(newMessage.Reactions) == 0 {
+				return
+			}
+
+			// Add the enter reaction
+			var emoji string
+
+			reaction := newMessage.Reactions[0]
+			if reaction.Emoji != nil {
+				emoji = reaction.Emoji.APIName()
+			}
+
+			if emoji == "" {
+				return
+			}
+
+			// Add the enter reaction
+			err = session.MessageReactionAdd(m.ChannelID, m.ID, emoji)
+			if err != nil {
+				utils.Logging.Debug("Snipers.CheckGiveawaySniper: Error adding reaction: ", err)
+			}
+		}()
+	case "676039466175168543": // ZAP-Hosting Bot#7133
+		// Win check
+		if strings.Contains(m.Content, "Giveaway Winner:") &&
+			utils.Discord.IsUserMentioned(m.Message, session.State.User.ID) {
+			logging.Logging.GiveawayWon(session, m.Message, "€10 worth of ZAP Coins", s.Account)
+		}
+	case "368521195940741122": // Lawliet#5480
+		// Win check
+		if len(m.Embeds) > 0 && strings.Contains(m.Embeds[0].Description, "You just won in the giveaway!") &&
+			utils.Discord.IsUserMentioned(m.Message, session.State.User.ID) {
+			prize := m.Embeds[0].Title
+			if len(prize) < 2 {
+				break
+			}
+
+			prize = prize[2:]
+
+			logging.Logging.GiveawayWon(session, m.Message, prize, s.Account)
+		}
+	}
 }
 
 func (s *Snipers) CheckPokeTwoSniper(session *discordgo.Session, m *discordgo.MessageCreate) {
@@ -1172,8 +1175,8 @@ func (s *Snipers) CheckPokeTwoSniper(session *discordgo.Session, m *discordgo.Me
 	// Calculate the sleep time
 	sleep := time.Duration(cfg.Snipers.PokeTwoSniper.Sleep) * time.Second
 	if cfg.Snipers.PokeTwoSniper.RandomSleep {
-		// Multiply the sleep time by a random number between 0.5 and 1
-		sleep *= time.Duration(0.5 + 0.5*rand.Float64())
+		// Randomize the sleep time
+		sleep = time.Duration(float64(sleep) * (0.2 + 0.5*rand.Float64()))
 	}
 
 	// Wait for the sleep time
@@ -1216,9 +1219,10 @@ func (s *Snipers) CheckPokeTwoSniper(session *discordgo.Session, m *discordgo.Me
 		var (
 			pokemon  string
 			received string
+			iv       string
 		)
 
-		pokemonMatches := regexp.MustCompile(`You caught a (.*?) <`).FindStringSubmatch(m.Content)
+		pokemonMatches := regexp.MustCompile(`You caught a (.*?)<`).FindStringSubmatch(m.Content)
 		if len(pokemonMatches) > 1 {
 			pokemon = pokemonMatches[1]
 		}
@@ -1228,7 +1232,12 @@ func (s *Snipers) CheckPokeTwoSniper(session *discordgo.Session, m *discordgo.Me
 			received = receivedMatches[1]
 		}
 
-		logging.Logging.PokeTwoSniper(session, m, pokemon, received, confidence, elapsed)
+		ivMatches := regexp.MustCompile(`\((.*?)\)`).FindStringSubmatch(m.Content)
+		if len(ivMatches) > 1 {
+			iv = ivMatches[1]
+		}
+
+		logging.Logging.PokeTwoSniper(session, m, pokemon, received, iv, confidence, elapsed)
 
 		// Fake activity
 

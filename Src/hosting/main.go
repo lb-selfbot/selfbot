@@ -17,8 +17,9 @@ import (
 	"github.com/LightningDev1/LB-Selfbot/selfbot/commands"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/config"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/constants"
+	"github.com/LightningDev1/LB-Selfbot/selfbot/data"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/errorhandler"
-	"github.com/LightningDev1/LB-Selfbot/selfbot/eventhandlers"
+	"github.com/LightningDev1/LB-Selfbot/selfbot/eventreactions"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/extensions"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/logging"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/multitokensniper"
@@ -201,11 +202,43 @@ func Main() {
 
 			return true
 		},
-		Commands:    []*dgc.Command{},
-		Middlewares: []dgc.Middleware{},
+		Commands: []*dgc.Command{},
+		Middlewares: []dgc.Middleware{
+			func(following dgc.ExecutionHandler) dgc.ExecutionHandler {
+				return func(ctx *dgc.Ctx) {
+					arguments, success := utils.Discord.GetArguments(ctx)
+					if !success {
+						return
+					}
+
+					cfg, err := config.GetConfig()
+					if err != nil {
+						logging.UI.Error("Failed to get config")
+						return
+					}
+
+					if cfg.Selfbot.DeleteCommands {
+						go func() {
+							_ = ctx.Session.ChannelMessageDelete(ctx.Event.Message.ChannelID, ctx.Event.Message.ID)
+						}()
+					}
+
+					utils.Arguments = arguments
+
+					eventreactions.UsedCommands.Add(ctx)
+					data.UsedCommands++
+
+					logging.Logging.CommandUsed(ctx.Command.Name)
+
+					websocket.Websocket.CheckNonce()
+
+					following(ctx)
+				}
+			},
+		},
 	})
 
-	eventhandlers.EventHandlers.RegisterHandlers(session, router)
+	eventreactions.RegisterHandlers(session, router)
 	commands.Commands.RegisterCommands(session, router, true)
 	extensions.RegisterExtensions(session, router)
 
@@ -229,7 +262,7 @@ func Main() {
 		os.Exit(1)
 	}
 
-	multitokensniper.Init(cfg)
+	multitokensniper.Init(session, cfg)
 
 	sc := make(chan os.Signal, 1)
 	signal.Notify(sc, syscall.SIGINT, syscall.SIGTERM)

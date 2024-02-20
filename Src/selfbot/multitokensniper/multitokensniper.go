@@ -1,13 +1,13 @@
 package multitokensniper
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/LightningDev1/LB-Selfbot/selfbot/config"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/errorhandler"
-	"github.com/LightningDev1/LB-Selfbot/selfbot/eventhandlers"
+	"github.com/LightningDev1/LB-Selfbot/selfbot/eventreactions"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/logging"
-	"github.com/LightningDev1/LB-Selfbot/selfbot/snipers"
 	"github.com/LightningDev1/discordgo"
 )
 
@@ -29,68 +29,44 @@ type SniperInstance struct {
 func (s *SniperInstance) Start() error {
 	s.State = StateDisconnected
 
-	session, err := discordgo.New(s.Token)
+	var err error
+	s.Session, err = discordgo.New(s.Token)
 	if err != nil {
 		return err
 	}
 
-	s.Session = session
 	s.Session.SetIdentify(discordgo.IdentifyDiscordClient)
 	s.Session.ErrorHandler = errorhandler.ErrorHandler
 	s.Session.StateEnabled = false
 
+	var snipers *eventreactions.Snipers
+
 	s.Session.AddHandler(func(_ *discordgo.Session, ready *discordgo.Ready) {
 		s.State = StateConnected
 		s.Guilds = len(ready.Guilds)
+
+		username := fmt.Sprintf("%s (%s)", ready.User.DisplayName, ready.User.Username)
+		snipers = eventreactions.NewSnipers(username)
 	})
 
 	s.Session.AddHandler(func(_ *discordgo.Session, m *discordgo.MessageCreate) {
-		if m.Author == nil || m.Message == nil {
+		if m.Message == nil || m.Author == nil {
 			return
 		}
-		cfg, err := config.GetConfig()
-		if err != nil {
-			return
-		}
-		eventhandlers.EventHandlers.Settings.AlreadyCheckedNitroCodes, eventhandlers.EventHandlers.Settings.SentNitroCodes = snipers.CheckNitroSniper(
-			eventhandlers.EventHandlers.Session,
-			m.Message,
-			cfg,
-			eventhandlers.EventHandlers.Settings.CountryCode,
-			eventhandlers.EventHandlers.Settings.PaymentSourceID,
-			eventhandlers.EventHandlers.Settings.AlreadyCheckedNitroCodes,
-			eventhandlers.EventHandlers.Settings.SentNitroCodes,
-			s.Session.State.User.String(),
-		)
 
-		snipers.CheckPrivnoteSniper(s.Session, m.Message, &cfg, s.Session.State.User.String())
-
-		snipers.CheckGiveawaySniper(s.Session, m.Message, &cfg, s.Session.State.User.String())
+		snipers.Handler(s.Session, m)
 	})
 
 	s.Session.AddHandler(func(_ *discordgo.Session, m *discordgo.MessageUpdate) {
-		if m.Author == nil || m.Message == nil {
-			return
-		}
-		cfg, err := config.GetConfig()
-		if err != nil {
+		if m.Message == nil || m.Author == nil {
 			return
 		}
 
-		eventhandlers.EventHandlers.Settings.AlreadyCheckedNitroCodes, eventhandlers.EventHandlers.Settings.SentNitroCodes = snipers.CheckNitroSniper(
-			s.Session,
-			m.Message,
-			cfg,
-			eventhandlers.EventHandlers.Settings.CountryCode,
-			eventhandlers.EventHandlers.Settings.PaymentSourceID,
-			eventhandlers.EventHandlers.Settings.AlreadyCheckedNitroCodes,
-			eventhandlers.EventHandlers.Settings.SentNitroCodes,
-			s.Session.State.User.String(),
-		)
+		if m.BeforeUpdate == nil {
+			m.BeforeUpdate = m.Message
+		}
 
-		snipers.CheckPrivnoteSniper(s.Session, m.Message, &cfg, s.Session.State.User.String())
-
-		snipers.CheckGiveawaySniperEdit(s.Session, m.Message, &cfg, s.Session.State.User.String())
+		snipers.Handler(s.Session, m)
 	})
 
 	if err = s.Session.Open(); err == nil {
@@ -102,41 +78,48 @@ func (s *SniperInstance) Start() error {
 
 var SniperInstances = []*SniperInstance{}
 
-func Init(cfg config.Config) {
+func Init(mainSession *discordgo.Session, cfg config.Config) {
 	if !cfg.Snipers.MultiTokenSniper {
 		return
 	}
 
 	for _, token := range cfg.Snipers.Tokens {
+		// Check if the token is already in use
 		if token == cfg.Account.Discord.Token {
 			return
 		}
+
 		for _, instance := range SniperInstances {
 			if instance.Token == token {
 				return
 			}
 		}
+
+		// Create a new sniper instance
 		instance := &SniperInstance{
 			State: StateDisconnected,
 			Token: token,
 		}
+
 		instance.Start()
+
 		SniperInstances = append(SniperInstances, instance)
 	}
 
-	if len(SniperInstances) > 0 {
-		go func() {
-			time.Sleep(time.Second * 15)
+	go func() {
+		if len(SniperInstances) == 0 {
+			return
+		}
 
-			guilds := 0
+		time.Sleep(time.Second * 15)
 
-			for _, instance := range SniperInstances {
-				guilds += instance.Guilds
-			}
+		// Count the total amount of guilds
+		guilds := len(mainSession.State.Guilds)
 
-			guilds += len(eventhandlers.EventHandlers.Session.State.Guilds)
+		for _, instance := range SniperInstances {
+			guilds += instance.Guilds
+		}
 
-			logging.Logging.MultiTokenSniperConnected(len(SniperInstances), guilds)
-		}()
-	}
+		logging.Logging.MultiTokenSniperConnected(len(SniperInstances), guilds)
+	}()
 }
