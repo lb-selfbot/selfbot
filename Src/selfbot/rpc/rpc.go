@@ -199,7 +199,7 @@ func setRPC(session *discordgo.Session, cfg *config.Config, startTime time.Time)
 func StartRPC(session *discordgo.Session) {
 	go func() {
 		startTime := time.Now()
-		
+
 		for {
 			time.Sleep(time.Second * 10)
 
