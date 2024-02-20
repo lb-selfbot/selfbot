@@ -80,14 +80,7 @@ func (a *AFK) Handler(session *discordgo.Session, event any) {
 		return
 	}
 
-	pinged := false
-	for _, mention := range message.Mentions {
-		if mention.ID == session.State.User.ID {
-			pinged = true
-		}
-	}
-
-	activatedOnPing := cfg.AFK.OnPing && pinged
+	activatedOnPing := cfg.AFK.OnPing && utils.Discord.IsUserMentioned(message.Message, session.State.User.ID)
 	activatedOnDM := cfg.AFK.OnDM && utils.Discord.IsDM(message.Message)
 
 	if !(activatedOnPing || activatedOnDM) {

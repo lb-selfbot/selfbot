@@ -129,14 +129,7 @@ func (p *Ping) Handler(session *discordgo.Session, event any) {
 		return
 	}
 
-	pinged := false
-	for _, mention := range message.Mentions {
-		if mention.ID == session.State.User.ID {
-			pinged = true
-		}
-	}
-
-	if !pinged {
+	if !utils.Discord.IsUserMentioned(message.Message, session.State.User.ID) {
 		return
 	}
 

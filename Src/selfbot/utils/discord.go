@@ -762,4 +762,14 @@ func (DiscordUtils) SaveAttachment(attachment *discordgo.MessageAttachment) (str
 	return filepath, nil
 }
 
+func (DiscordUtils) IsUserMentioned(message *discordgo.Message, userID string) bool {
+	for _, user := range message.Mentions {
+		if user.ID == userID {
+			return true
+		}
+	}
+
+	return false
+}
+
 var Discord = &DiscordUtils{}

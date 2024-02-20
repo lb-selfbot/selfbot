@@ -969,16 +969,8 @@ func CheckGiveawaySniper(session *discordgo.Session, message *discordgo.Message,
 		}()
 	case "235148962103951360": // Carl-bot#1536
 		// Win check
-		mentioned := false
-		for _, mention := range message.Mentions {
-			if mention.ID == session.State.User.ID {
-				mentioned = true
-				break
-			}
-		}
-
 		prizeList := regexp.MustCompile(`Congratulations to the winner of \*\*(.*?)\*\*`).FindStringSubmatch(message.Content)
-		if len(prizeList) > 1 && mentioned {
+		if len(prizeList) > 1 && utils.Discord.IsUserMentioned(message, session.State.User.ID) {
 			logging.Logging.GiveawayWon(session, message, prizeList[1], account)
 		}
 
