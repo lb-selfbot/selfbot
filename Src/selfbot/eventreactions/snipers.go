@@ -45,9 +45,10 @@ type Snipers struct {
 
 	PrivnoteClient *privnote.Client
 
-	TotalPokemon  int
-	CaughtPokemon int
-	LastCatch     time.Time
+	PokeTwoCaptchaRequired bool
+	TotalPokemon           int
+	CaughtPokemon          int
+	LastCatch              time.Time
 }
 
 func NewSnipers(account string) *Snipers {
@@ -1103,10 +1104,39 @@ func (s *Snipers) CheckPokeTwoSniper(session *discordgo.Session, m *discordgo.Me
 		return
 	}
 
-	sniperConditions := cfg.Snipers.PokeTwoSniper.Enabled && // Sniper is enabled
+	isPokeTwo := cfg.Snipers.PokeTwoSniper.Enabled && // Sniper is enabled
 		m.Author.ID == "716390085896962058" && // Message is from PokeTwo
-		utils.SliceContains(cfg.Snipers.PokeTwoSniper.Channels, m.ChannelID) && // Message is in a sniper channel
-		len(m.Embeds) == 1
+		utils.SliceContains(cfg.Snipers.PokeTwoSniper.Channels, m.ChannelID) // Message is in a sniper channel
+
+	// Captcha check
+	captchaRegex := regexp.MustCompile(`Whoa there. Please tell us you're human! https://verify.poketwo.net/captcha/(\d+)`)
+	captchaMatches := captchaRegex.FindStringSubmatch(m.Content)
+	if len(captchaMatches) > 1 && captchaMatches[1] == session.State.User.ID {
+		s.PokeTwoCaptchaRequired = true
+
+		logging.UI.Info("PokéTwo Sniper: Captcha required!")
+
+		err = api.PokeTwoVerify(session.State.User.ID)
+		if err != nil {
+			utils.Logging.Debug("Snipers.CheckPokeTwoSniper: Error verifying captcha: ", err)
+
+			logging.UI.Info("PokéTwo Sniper: Error completing captcha! You need to complete it manually at https://verify.poketwo.net/captcha/" + session.State.User.ID)
+
+			// Try again after 5 minutes
+			go func() {
+				time.Sleep(time.Minute * 5)
+				s.PokeTwoCaptchaRequired = false
+			}()
+		} else {
+			logging.UI.Info("PokéTwo Sniper: Captcha completed!")
+
+			s.PokeTwoCaptchaRequired = false
+		}
+
+		return
+	}
+
+	sniperConditions := isPokeTwo && len(m.Embeds) == 1
 
 	if !sniperConditions {
 		return

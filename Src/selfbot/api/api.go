@@ -422,6 +422,66 @@ func PokeTwo(image string, cfg *config.Config) (string, float64, error) {
 	return data.Get("label").MustString(), data.Get("confidence").MustFloat64(), nil
 }
 
+func PokeTwoVerify(userID string) error {
+	cfg, err := config.GetConfig()
+	if err != nil {
+		return err
+	}
+
+	resp, err := http.PostJson(
+		"http://localhost:8000/api/v3/selfbot/poketwo-verify", // TODO: Change to prod
+		map[string]any{
+			"username": cfg.Account.LightningBot.Username,
+			"password": cfg.Account.LightningBot.Password,
+			"user_id":  userID,
+		},
+	)
+	if err != nil {
+		return err
+	}
+
+	captchaResp := resp.Get("response").MustString()
+
+	params := url.Values{
+		"token": {captchaResp},
+		"uid":   {userID},
+	}
+
+	httpResponse := http.Post(
+		"https://verify.poketwo.net/api/recaptcha?"+params.Encode(),
+		nil,
+		map[string]string{
+			"Accept":                      "*/*",
+			"Accept-Language":             "en-US,en;q=0.9",
+			"Content-Length":              "0",
+			"Origin":                      "https://verify.poketwo.net",
+			"Referer":                     "https://verify.poketwo.net/captcha/" + userID,
+			"Sec-Ch-Ua":                   "\"Not_A Brand\";v=\"8\", \"Chromium\";v=\"119\"",
+			"Sec-Ch-Ua-Arch":              "x86",
+			"Sec-Ch-Ua-Bitness":           "64",
+			"Sec-Ch-Ua-Full-Version":      "119.0.0.0",
+			"Sec-Ch-Ua-Full-Version-List": "\"Not_A Brand\";v=\"8.0.0.0\", \"Chromium\";v=\"119.0.0.0\"",
+			"Sec-Ch-Ua-Mobile":            "?0",
+			"Sec-Ch-Ua-Model":             "",
+			"Sec-Ch-Ua-Platform":          "Windows",
+			"Sec-Ch-Ua-Platform-Version":  "10.0.0",
+			"Sec-Fetch-Dest":              "empty",
+			"Sec-Fetch-Mode":              "cors",
+			"Sec-Fetch-Site":              "same-origin",
+			"User-Agent":                  discordgo.UserAgentWeb,
+		},
+	)
+	if httpResponse.Error != nil {
+		return httpResponse.Error
+	}
+
+	if httpResponse.StatusCode != 204 {
+		return fmt.Errorf("error verifying captcha: %d %s", httpResponse.StatusCode, httpResponse.Body)
+	}
+
+	return nil
+}
+
 func GetTokenData(session *discordgo.Session, token string) ([]byte, error) {
 	headers := map[string]string{
 		"Authorization": token,
