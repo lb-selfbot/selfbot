@@ -1159,7 +1159,7 @@ func (s *Snipers) CheckPokeTwoSniper(session *discordgo.Session, m *discordgo.Me
 
 	// Check if the catch rate has been reached
 	currentCatchRate := int(float64(s.CaughtPokemon) / float64(s.TotalPokemon) * 100)
-	if int(currentCatchRate*100) > cfg.Snipers.PokeTwoSniper.CatchRate {
+	if currentCatchRate > cfg.Snipers.PokeTwoSniper.CatchRate {
 		logging.UI.Info(fmt.Sprintf("PokéTwo Sniper: Catch rate reached! Current catch rate is %d%%. Skipping...", currentCatchRate))
 		return
 	}
