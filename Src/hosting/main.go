@@ -95,7 +95,6 @@ func Main() {
 		}
 
 		logging.UI.Error("Error connecting to websocket: " + err.Error())
-		os.Exit(1)
 	}
 
 	session.SetIdentify(cfg.GetClient())

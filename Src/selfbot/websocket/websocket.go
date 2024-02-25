@@ -81,9 +81,9 @@ func (w *WebsocketConnection) Init(username, password string) error {
 
 	w.Nonce = utils.Random.String(64)
 
-	w.MaxErrors = 5
+	w.MaxErrors = 20
 	w.ErrorStart = time.Now()
-	w.ErrorWindow = 60 * time.Second
+	w.ErrorWindow = 15 * time.Minute
 
 	w.Username = username
 	w.Password = password
@@ -333,12 +333,12 @@ func (w *WebsocketConnection) OnError(err error) {
 		w.Errors = 1
 	}
 
-	if w.Errors > w.MaxErrors {
+	if w.Errors > w.MaxErrors && !constants.HOSTING {
 		w.LogError(err, -1)
 		os.Exit(1)
 	}
 
-	time.Sleep(10 * time.Second)
+	time.Sleep(30 * time.Second)
 
 	utils.Logging.Info("reconnecting websocket...")
 
