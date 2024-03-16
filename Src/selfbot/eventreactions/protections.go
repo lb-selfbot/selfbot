@@ -78,7 +78,7 @@ func (p *Protections) MessageCreateHandler(session *discordgo.Session, message *
 		messages, _ := utils.Discord.GetChannelMessages(session, message.ChannelID, 100)
 
 		directMessages := utils.Filter(messages, func(message *discordgo.Message) bool {
-			return message.Author.ID != session.State.User.ID
+			return message.Author != nil && message.Author.ID != session.State.User.ID
 		})
 
 		// There are more than 2 messages from this user, so this is not a new DM

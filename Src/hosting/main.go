@@ -155,6 +155,10 @@ func Main() {
 		IgnorePrefixCase: true,
 		IsUserAllowedFunc: func(ctx *dgc.Ctx) bool {
 			isAllowed := func() bool {
+				if ctx.Event.Author == nil {
+					return false
+				}
+	
 				if ctx.Event.Author.ID == session.State.User.ID {
 					return true
 				}

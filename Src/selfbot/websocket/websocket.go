@@ -171,6 +171,11 @@ func (w *WebsocketConnection) Send(msg WsMessage) error {
 	w.WriteMutex.Lock()
 	defer w.WriteMutex.Unlock()
 
+	// check again in case the connection was closed while waiting for the mutex
+	if w.Encryption == nil || w.Conn == nil {
+		return fmt.Errorf("websocket connection is not initialized")
+	}
+
 	return w.Conn.WriteMessage(websocket.TextMessage, encrypted)
 }
 
