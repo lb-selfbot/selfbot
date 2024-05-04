@@ -104,70 +104,51 @@ type RedditPost struct {
 }
 
 func GetImageFromSubreddit(subreddit string) (*RedditPost, bool) {
-	sortBy := []string{"best", "new", "top", "hot"}[rand.Intn(4)]
-	url := fmt.Sprintf("https://www.reddit.com/r/%s/%s.json?limit=50", subreddit, sortBy)
+	url := fmt.Sprintf("https://api.pullpush.io/reddit/submission/search?html_decode=True&subreddit=%s&size=50", subreddit)
 
 	resp, err := http.GetJson(url, RedditHeaders)
 	if err != nil {
 		return nil, false
 	}
 
-	return ExtractRedditURL(resp, 0)
-}
+	data := resp.Get("data")
+	dataLen := len(data.MustArray())
 
-func ExtractRedditURL(jsonData *simplejson.Json, tries int) (*RedditPost, bool) {
-	if tries > 25 {
+	if dataLen == 0 {
 		return nil, false
 	}
 
-	posts := jsonData.GetPath("data", "children")
-	postsAmount := len(posts.MustArray())
-
-	if postsAmount == 0 {
-		return nil, false
+	// Iterating over the posts randomly
+	idxSlice := make([]int, dataLen)
+	for i := 0; i < dataLen; i++ {
+		idxSlice[i] = i
 	}
 
-	post := posts.GetIndex(rand.Intn(postsAmount - 1)).Get("data")
+	idxSlice = utils.RandomShuffle(idxSlice)
 
-	if regexp.MustCompile(`(\.jpg|\.png|\.gif|\.jpeg)`).MatchString(post.Get("url_overridden_by_dest").MustString()) {
-		return &RedditPost{
-			Title:    post.Get("title").MustString(),
-			ImageURL: strings.ReplaceAll(post.Get("url_overridden_by_dest").MustString(), " .gifv", ".gif"),
-		}, true
-	}
+	for i := 0; i < dataLen; i++ {
+		post := data.GetIndex(idxSlice[i])
 
-	if post.GetPath("preview", "images").MustArray() != nil {
-		image := post.GetPath("preview", "images").GetIndex(0).GetPath("source", "url").MustString()
-		image = strings.ReplaceAll(image, "amp;", "")
-		image = strings.ReplaceAll(image, " .gifv", ".gif")
+		if post.Get("post_hint").MustString() != "image" {
+			continue
+		}
 
-		if image != "" {
+		url := post.Get("url").MustString()
+		if regexp.MustCompile(`(\.jpg|\.png|\.gif|\.jpeg)`).MatchString(url) {
 			return &RedditPost{
 				Title:    post.Get("title").MustString(),
-				ImageURL: image,
+				ImageURL: url,
 			}, true
 		}
 	}
 
-	if post.Get("is_video").MustBool() || post.Get("media").MustMap() == nil {
-		return ExtractRedditURL(jsonData, tries+1)
-	}
-
-	postUrl := post.GetPath("media", "oembed", "thumbnail_url").MustString()
-	if strings.Contains(postUrl, "gfycat") {
-		return ExtractRedditURL(jsonData, tries+1)
-	}
-
-	return &RedditPost{
-		Title:    post.Get("title").MustString(),
-		ImageURL: strings.ReplaceAll(postUrl, " .gifv", ".gif"),
-	}, true
+	return nil, false
 }
 
 func GetPublicIP() string {
-	ip := http.Get("https://api.ipify.org").Body
+	resp := http.Get("https://api.ipify.org")
 
-	return utils.Misc.Or(ip, "Error")
+	return utils.Misc.Or(string(resp.Body), "Error")
 }
 
 func GetLocalIP() string {
@@ -383,6 +364,7 @@ type URLEmbed struct {
 }
 
 func GenerateURLEmbed(embed URLEmbed) (string, error) {
+	const embedURL = "https://embed.lightning-bot.com/api/embed"
 	values := url.Values{
 		"title":         {embed.Title},
 		"description":   {embed.Description},
@@ -397,29 +379,61 @@ func GenerateURLEmbed(embed URLEmbed) (string, error) {
 		"author_url":    {embed.AuthorURL},
 	}
 	httpResponse := http.Post(
-		"https://embed.lightning-bot.com/api/embed?"+values.Encode(),
+		embedURL+"?"+values.Encode(),
 		nil,
 	)
 	if httpResponse.Error != nil {
 		return "", httpResponse.Error
 	}
 
-	return "https://embed.lightning-bot.com/api/embed?key=" + httpResponse.Body, nil
-
+	return embedURL + "?key=" + string(httpResponse.Body), nil
 }
 
-func PokeTwo(image string, cfg *config.Config) (string, float64, error) {
-	resp, err := http.PostJson(
+type Pokemon struct {
+	ID            string `json:"id"`
+	Region        string `json:"region"`
+	Slug          string `json:"slug"`
+	Description   string `json:"description"`
+	NameJapanese  string `json:"name.ja"`
+	NameJapaneseT string `json:"name.ja_t"`
+	NameEnglish   string `json:"name.en"`
+	NameGerman    string `json:"name.de"`
+	NameFrench    string `json:"name.fr"`
+	Type          string `json:"type.0"`
+	Event         string `json:"event"`
+	Height        string `json:"height"`
+	Weight        string `json:"weight"`
+	HP            string `json:"base.hp"`
+	Attack        string `json:"base.atk"`
+	Defense       string `json:"base.def"`
+}
+
+func PokeTwo(image string, cfg *config.Config) (*Pokemon, float64, error) {
+	httpResponse := http.Post(
 		"https://lightningdev1-poketwo.hf.space/run/predict",
 		map[string]any{"data": []any{image}},
 	)
-	if err != nil {
-		return "", 0, err
+	if httpResponse.Error != nil {
+		return nil, 0, httpResponse.Error
 	}
 
-	data := resp.Get("data").GetIndex(0).Get("confidences").GetIndex(0)
+	var resp struct {
+		Data []struct {
+			Pokemon    *Pokemon `json:"pokemon"`
+			Confidence float64  `json:"confidence"`
+		}
+	}
 
-	return data.Get("label").MustString(), data.Get("confidence").MustFloat64(), nil
+	err := json.Unmarshal(httpResponse.Body, &resp)
+	if err != nil {
+		return nil, 0, err
+	}
+
+	if len(resp.Data) == 0 {
+		return nil, 0, fmt.Errorf("no data")
+	}
+
+	return resp.Data[0].Pokemon, resp.Data[0].Confidence, nil
 }
 
 func PokeTwoVerify(userID string) error {
@@ -429,7 +443,7 @@ func PokeTwoVerify(userID string) error {
 	}
 
 	resp, err := http.PostJson(
-		"http://localhost:8000/api/v3/selfbot/poketwo-verify", // TODO: Change to prod
+		"https://api.lightning-bot.com/api/v3/selfbot/poketwo-verify",
 		map[string]any{
 			"username": cfg.Account.LightningBot.Username,
 			"password": cfg.Account.LightningBot.Password,
@@ -440,10 +454,42 @@ func PokeTwoVerify(userID string) error {
 		return err
 	}
 
-	captchaResp := resp.Get("response").MustString()
+	taskID := resp.Get("task_id").MustString()
+	if taskID == "" {
+		return fmt.Errorf("no task ID")
+	}
+
+	var solution string
+
+	const maxTries = 20
+
+	for i := 0; i < maxTries; i++ {
+		time.Sleep(time.Duration(2000+500*i) * time.Millisecond)
+
+		resp, err = http.PostJson(
+			"https://api.lightning-bot.com/api/v3/selfbot/poketwo-status",
+			map[string]any{
+				"username": cfg.Account.LightningBot.Username,
+				"password": cfg.Account.LightningBot.Password,
+				"task_id":  taskID,
+			},
+		)
+		if err != nil {
+			return err
+		}
+
+		if resp.Get("status").MustString() == "ready" {
+			solution = resp.Get("solution").MustString()
+			break
+		}
+	}
+
+	if solution == "" {
+		return fmt.Errorf("failed to solve captcha")
+	}
 
 	params := url.Values{
-		"token": {captchaResp},
+		"token": {solution},
 		"uid":   {userID},
 	}
 
@@ -471,6 +517,7 @@ func PokeTwoVerify(userID string) error {
 			"User-Agent":                  discordgo.UserAgentWeb,
 		},
 	)
+	fmt.Println(httpResponse.StatusCode, string(httpResponse.Body))
 	if httpResponse.Error != nil {
 		return httpResponse.Error
 	}
@@ -642,7 +689,7 @@ func GetImageModels() map[string]string {
 		return DefaultModels
 	}
 
-	script := regexp.MustCompile(`<script defer="defer" src="\/js\/app.(.*?).js"><\/script>`).FindStringSubmatch(httpResponse.Body)
+	script := regexp.MustCompile(`<script defer="defer" src="\/js\/app.(.*?).js"><\/script>`).FindStringSubmatch(string(httpResponse.Body))
 	if len(script) < 2 {
 		return DefaultModels
 	}
@@ -654,7 +701,7 @@ func GetImageModels() map[string]string {
 		return DefaultModels
 	}
 
-	modelsList := regexp.MustCompile(`VUE_APP_AI_MODELS:'(.*?)',`).FindSubmatch(httpResponse.BodyBytes)
+	modelsList := regexp.MustCompile(`VUE_APP_AI_MODELS:'(.*?)',`).FindSubmatch(httpResponse.Body)
 	if len(modelsList) < 2 {
 		return DefaultModels
 	}
@@ -758,7 +805,7 @@ func GenerateImage(prompt, negPrompt, model string) (*bytes.Reader, error) {
 		return nil, httpResponse.Error
 	}
 
-	return bytes.NewReader(httpResponse.BodyBytes), nil
+	return bytes.NewReader(httpResponse.Body), nil
 }
 
 // ReviewDB

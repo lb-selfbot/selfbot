@@ -67,6 +67,7 @@ func (_Logging) OnReady(router *dgc.Router, event *discordgo.Ready) {
 	data.Guilds = len(event.Guilds)
 	data.Friends = len(friends)
 	data.AvatarImageKey = strings.ReplaceAll(event.User.AvatarURL(""), "https://cdn.discordapp.com/", "mp:")
+	data.UserID = event.User.ID
 
 	bannerTextUpper := fmt.Sprintf("LightningBot %s | %s | Prefix: %s", constants.VERSION, userText, cfg.Selfbot.CommandPrefix)
 	bannerTextLower := fmt.Sprintf("%d Commands | %d Servers | %d Friends", len(router.Commands), len(event.Guilds), len(friends))
@@ -105,6 +106,7 @@ func (_Logging) NitroSniperFake(session *discordgo.Session, message *discordgo.M
 		AddInfo("Server", guildName).
 		AddInfo("Channel", channelName).
 		AddInfo("Code", code).
+		AddInfo("Message Link", message.GetLink()).
 		AddInfoConditional("On Account", account, account != "").
 		SetWebhookURL(cfg.Webhooks.NitroSniper).
 		Show()
@@ -124,6 +126,7 @@ func (_Logging) NitroSniper(session *discordgo.Session, message *discordgo.Messa
 		AddInfo("Channel", channelName).
 		AddInfo("Code", code).
 		AddInfo("Snipe Time", elapsed.String()).
+		AddInfo("Message Link", message.GetLink()).
 		AddInfoConditional("On Account", account, account != "").
 		SetWebhookURL(cfg.Webhooks.NitroSniper).
 		Show()
@@ -143,6 +146,7 @@ func (_Logging) PrivnoteSniper(session *discordgo.Session, message *discordgo.Me
 		AddInfo("Channel", channelName).
 		AddInfo("Saved At", path).
 		AddInfo("Snipe Time", elapsed.String()).
+		AddInfo("Message Link", message.GetLink()).
 		AddInfoConditional("On Account", account, account != "").
 		SetWebhookURL(cfg.Webhooks.Misc).
 		Show()
@@ -167,17 +171,21 @@ func (_Logging) DMNotifier(message *discordgo.Message) {
 		SetTitle("DM Notifier").
 		SetColor("#C1EFFF").
 		AddInfo("", "New DM from "+message.Author.String()).
+		AddInfo("Content", message.Content).
+		AddInfo("Message Link", message.GetLink()).
 		SetWebhookURL(cfg.Webhooks.Notifiers).
 		Show()
 }
 
-func (_Logging) DMEditNotifier(message *discordgo.Message) {
+func (_Logging) DMEditNotifier(message *discordgo.Message, before, after string) {
 	UI.Notification("DM Edit Notifier: Edited DM from " + message.Author.String())
 	cfg, _ := config.GetConfig()
 	NewConsoleMessage().
 		SetTitle("DM Edit Notifier").
 		SetColor("#C1EFFF").
 		AddInfo("", "Edited DM from "+message.Author.String()).
+		AddInfo("Before", before).
+		AddInfo("After", after).
 		SetWebhookURL(cfg.Webhooks.Notifiers).
 		Show()
 }
@@ -240,6 +248,7 @@ func (_Logging) DiscordStaffDetection(session *discordgo.Session, message *disco
 		AddInfo("", message.Author.String()+" is Discord staff").
 		AddInfo("Server", guildName).
 		AddInfo("Channel", channelName).
+		AddInfo("Message Link", message.GetLink()).
 		SetWebhookURL(cfg.Webhooks.StaffDetection).
 		Show()
 }
@@ -271,6 +280,7 @@ func (_Logging) SelfbotDetection(session *discordgo.Session, message *discordgo.
 		AddInfo("Server", guildName).
 		AddInfo("Channel", channelName).
 		AddInfo("Selfbot", selfbot).
+		AddInfo("Message Link", message.GetLink()).
 		SetWebhookURL(cfg.Webhooks.SelfbotDetection).
 		Show()
 }
@@ -303,6 +313,7 @@ func (_Logging) PhishingDetected(session *discordgo.Session, message *discordgo.
 		AddInfo("Author", message.Author.String()).
 		AddInfo("Server", guildName).
 		AddInfo("Channel", channelName).
+		AddInfo("Message Link", message.GetLink()).
 		SetWebhookURL(cfg.Webhooks.Misc).
 		Show()
 }
@@ -365,6 +376,7 @@ func (_Logging) GiveawayFound(session *discordgo.Session, message *discordgo.Mes
 		AddInfoConditional("Prize", prize, prize != "").
 		AddInfoConditional("Hosted By", hostName, hostName != "").
 		AddInfoConditional("Ends In", endsIn, endsIn != "").
+		AddInfo("Message Link", message.GetLink()).
 		AddInfoConditional("On Account", account, account != "").
 		SetWebhookURL(cfg.Webhooks.GiveawaySniper).
 		Show()
@@ -383,6 +395,7 @@ func (_Logging) GiveawayWon(session *discordgo.Session, message *discordgo.Messa
 		AddInfo("Channel", channelName).
 		AddInfo("Bot", message.Author.String()).
 		AddInfoConditional("Prize", prize, prize != "").
+		AddInfo("Message Link", message.GetLink()).
 		AddInfoConditional("On Account", account, account != "").
 		SetWebhookURL(cfg.Webhooks.GiveawaySniper).
 		Show()
@@ -540,11 +553,12 @@ func (_Logging) KeywordNotifier(session *discordgo.Session, message *discordgo.M
 		AddInfo("Channel", channelName).
 		AddInfo("Author", message.Author.String()).
 		AddInfo("Keyword", keyword).
+		AddInfo("Message Link", message.GetLink()).
 		SetWebhookURL(cfg.Webhooks.Misc).
 		Show()
 }
 
-func (_Logging) PokeTwoSniper(session *discordgo.Session, message *discordgo.Message, pokemon, received, iv string, confidence float64, elapsed time.Duration) {
+func (_Logging) PokeTwoSniper(session *discordgo.Session, message *discordgo.Message, pokemon, received, iv string, confidence float64, elapsed time.Duration, account string) {
 	cfg, err := config.GetConfig()
 	if err != nil {
 		return
@@ -564,6 +578,8 @@ func (_Logging) PokeTwoSniper(session *discordgo.Session, message *discordgo.Mes
 		AddInfo("Detection Time", elapsed.String()).
 		AddInfo("Server", guildName).
 		AddInfo("Channel", channelName).
+		AddInfo("Message Link", message.GetLink()).
+		AddInfoConditional("On Account", account, account != "").
 		SetWebhookURL(cfg.Webhooks.Misc).
 		Show()
 }

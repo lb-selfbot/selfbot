@@ -434,7 +434,7 @@ func (DiscordUtils) SendFileFromURL(ctx *dgc.Ctx, url string, fileName string, h
 	_, err := ctx.Session.ChannelFileSend(
 		ctx.Event.ChannelID,
 		fileName,
-		bytes.NewReader(httpResponse.BodyBytes),
+		bytes.NewReader(httpResponse.Body),
 	)
 	return err
 }

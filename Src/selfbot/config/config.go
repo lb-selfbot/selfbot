@@ -81,14 +81,15 @@ type Config struct {
 		NitroSniper    bool `json:"NitroSniper"`
 		PrivnoteSniper bool `json:"PrivnoteSniper"`
 		PokeTwoSniper  struct {
-			Enabled      bool     `json:"Enabled"`
-			Channels     []string `json:"Channels"`
-			Sleep        int      `json:"Sleep"`
-			RandomSleep  bool     `json:"RandomSleep"`
-			Timeout      int      `json:"Timeout"`
-			Typing       bool     `json:"Typing"`
-			CatchRate    int      `json:"CatchRate"`
-			FakeActivity bool     `json:"FakeActivity"`
+			Enabled       bool     `json:"Enabled"`
+			Channels      []string `json:"Channels"`
+			Sleep         int      `json:"Sleep"`
+			RandomSleep   bool     `json:"RandomSleep"`
+			Timeout       int      `json:"Timeout"`
+			Typing        bool     `json:"Typing"`
+			CatchRate     int      `json:"CatchRate"`
+			FakeActivity  bool     `json:"FakeActivity"`
+			CatchLanguage string   `json:"CatchLanguage"`
 		} `json:"PokeTwoSniper"`
 		MultiTokenSniper bool     `json:"MultiTokenSniper"`
 		Tokens           []string `json:"Tokens"`
@@ -102,6 +103,8 @@ type Config struct {
 		PingDetection    string `json:"PingDetection"`
 		Misc             string `json:"Misc"`
 		Sessions         string `json:"Sessions"`
+		PingSelf         bool   `json:"PingSelf"`
+		PingEveryone     bool   `json:"PingEveryone"`
 	} `json:"Webhooks"`
 	Events struct {
 		BanNotifier           bool `json:"BanNotifier"`
@@ -135,6 +138,7 @@ type Config struct {
 		DeleteCommands       bool              `json:"DeleteCommands"`
 		MobileFriendly       bool              `json:"MobileFriendly"`
 		Client               string            `json:"Client"`
+		Timezone             string            `json:"Timezone"`
 		CommandAliases       map[string]string `json:"CommandAliases"`
 	}
 	Protections struct {
@@ -194,6 +198,18 @@ func (c Config) GetClient() discordgo.Identify {
 	return discordgo.IdentifyDiscordClient
 }
 
+func (c Config) GetTimezone() *time.Location {
+	location, err := time.LoadLocation(c.Selfbot.Timezone)
+	if err != nil {
+		location = time.UTC
+	}
+
+	// Set the local timezone
+	time.Local = location
+
+	return location
+}
+
 func (c Config) Save() error {
 	configMutex.Lock()
 	defer configMutex.Unlock()
@@ -241,6 +257,8 @@ func GetConfig() (config Config, err error) {
 	if err != nil {
 		return config, err
 	}
+
+	_ = config.GetTimezone()
 
 	lastConfig = &config
 	lastConfigTime = time.Now()

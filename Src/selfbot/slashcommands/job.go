@@ -49,6 +49,9 @@ type Job struct {
 	// The application command to execute
 	Command *discordgo.ApplicationCommand `json:"-"`
 
+	// The command options
+	Options []*discordgo.ApplicationCommandOption `json:"-"`
+
 	// The arguments to execute the command with
 	Arguments *dgc.Arguments `json:"-"`
 
@@ -74,28 +77,22 @@ func (j *Job) GetCommand(session *discordgo.Session) (*discordgo.ApplicationComm
 		return command, nil
 	}
 
-	commands, _, err := session.ChannelApplicationCommandsSearch(&discordgo.ApplicationCommandsSearchParams{
-		ChannelID:           j.ChannelObject.ID,
-		Type:                1,
-		Query:               j.CommandObject.Name,
-		Limit:               20,
-		IncludeApplications: false,
-	})
+	commands, _, err := session.GuildApplicationCommandIndex(j.GuildObject.ID)
 	if err != nil {
 		return nil, err
 	}
 
-	rightCommands := utils.Filter(commands, func(command *discordgo.ApplicationCommand) bool {
+	commands = utils.Filter(commands, func(command *discordgo.ApplicationCommand) bool {
 		return command.Name == j.CommandObject.Name && command.ApplicationID == j.ApplicationObject.ID
 	})
 
-	if len(rightCommands) == 0 {
+	if len(commands) == 0 {
 		return nil, fmt.Errorf("no commands found")
 	}
 
-	commandCache[j.ID] = rightCommands[0]
+	commandCache[j.ID] = commands[0]
 
-	return rightCommands[0], nil
+	return commands[0], nil
 }
 
 func (j *Job) GetArguments() *dgc.Arguments {
@@ -115,12 +112,11 @@ func (j *Job) Load(session *discordgo.Session) error {
 		j.Command = command
 	}
 
-	options, err := ArgumentsToCommandOptions(j.Command.Options, j.Arguments, 0)
+	var err error
+	j.Options, err = ArgumentsToCommandOptions(j.Command.Options, j.Arguments, 0)
 	if err != nil {
 		return err
 	}
-
-	j.Command.Options = options
 
 	j.Interval = time.Duration(j.IntervalSec) * time.Second
 
@@ -133,8 +129,16 @@ func (j *Job) ExecuteInteraction(session *discordgo.Session) error {
 	}
 
 	return session.Interact(&discordgo.InteractData{
-		Type:          int(discordgo.InteractionApplicationCommand),
-		Data:          j.Command,
+		Type: int(discordgo.InteractionApplicationCommand),
+		Data: map[string]any{
+			"version":             j.Command.Version,
+			"id":                  j.Command.ID,
+			"name":                j.Command.Name,
+			"type":                j.Command.Type,
+			"options":             j.Options,
+			"application_command": j.Command,
+			"attachments":         []any{},
+		},
 		ChannelID:     j.ChannelObject.ID,
 		GuildID:       j.GuildObject.ID,
 		ApplicationID: j.Command.ApplicationID,

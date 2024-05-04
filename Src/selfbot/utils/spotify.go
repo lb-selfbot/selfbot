@@ -38,8 +38,10 @@ func (s *SpotifyUtils) GetBearerToken(token string) string {
 			s.connAccessToken = conn.Get("access_token").MustString()
 			s.connRetrieved = time.Now()
 
+			connID := conn.Get("id").MustString()
+
 			conn, err := http.GetJson(
-				fmt.Sprintf("https://discord.com/api/v10/users/@me/connections/spotify/%s/access-token", s.connName),
+				fmt.Sprintf("https://discord.com/api/v10/users/@me/connections/spotify/%s/access-token", connID),
 				map[string]string{"Authorization": token},
 			)
 			if err != nil {

@@ -2,6 +2,7 @@ package commands
 
 import (
 	"fmt"
+	"html"
 	"net/url"
 	"strings"
 	"time"
@@ -244,7 +245,7 @@ func (f FunCommands) RegisterCommands(router *dgc.Router) {
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "poll",
-		Description: "Make a poll",
+		Description: "Create a poll",
 		Usage:       "[p]poll <question>",
 		Handler:     f.poll,
 	})
@@ -542,7 +543,12 @@ func (f FunCommands) RegisterCommands(router *dgc.Router) {
 		Usage:       "[p]paranoia",
 		Handler:     f.paranoia,
 	})
-
+	router.RegisterCmd(&dgc.Command{
+		Name:        "randomcolor",
+		Description: "Generate a random color",
+		Usage:       "[p]randomcolor",
+		Handler:     f.randomcolor,
+	})
 }
 
 func (FunCommands) eightball(ctx *dgc.Ctx) {
@@ -668,9 +674,10 @@ func (FunCommands) insult(ctx *dgc.Ctx) {
 	httpResponse := http.Get("https://insult.mattbas.org/api/insult")
 	if httpResponse.Error != nil {
 		_ = ctx.RespondText("An error has occurred.")
+		return
 	}
 	embed.NewEmbed().
-		AddField("Insult", httpResponse.Body).
+		AddField("Insult", string(httpResponse.Body)).
 		Send(ctx)
 }
 
@@ -967,22 +974,25 @@ func (FunCommands) trivia(ctx *dgc.Ctx) {
 		return
 	}
 
-	httpResponse.Body = strings.Replace(httpResponse.Body, "&quot;", "\\\"", -1)
-	httpResponse.Body = strings.Replace(httpResponse.Body, "&#039;", "'", -1)
-	httpResponse.BodyBytes = []byte(httpResponse.Body)
+	data := httpResponse.Json()
 
-	trivia := httpResponse.Json()
+	if data.Get("response_code").MustInt64() != 0 {
+		_ = ctx.RespondText("An error has occurred.")
+		return
+	}
 
-	trivia = trivia.Get("results").GetIndex(0)
-	answers := trivia.Get("incorrect_answers").MustStringArray()
-	answers = append(answers, trivia.Get("correct_answer").MustString())
+	data = data.Get("results").GetIndex(0)
+
+	answers := data.Get("incorrect_answers").MustStringArray()
+	answers = append(answers, data.Get("correct_answer").MustString())
 	answers = utils.RandomShuffle(answers)
+
 	embed.NewEmbed().
-		AddField("Question", trivia.Get("question").MustString()).
-		AddField("Category", trivia.Get("category").MustString()).
-		AddField("Difficulty", utils.String.Capitalize(trivia.Get("difficulty").MustString())).
-		AddField("Answers", strings.Join(answers, ", ")).
-		AddField("Correct Answer", fmt.Sprintf("||%s||", trivia.Get("correct_answer").MustString())).
+		AddField("Question", html.UnescapeString(data.Get("question").MustString())).
+		AddField("Category", data.Get("category").MustString()).
+		AddField("Difficulty", utils.String.Capitalize(data.Get("difficulty").MustString())).
+		AddField("Answers", html.UnescapeString(strings.Join(answers, ", "))).
+		AddField("Correct Answer", fmt.Sprintf("||%s||", html.UnescapeString(data.Get("correct_answer").MustString()))).
 		Send(ctx)
 }
 
@@ -1037,7 +1047,7 @@ func (FunCommands) poll(ctx *dgc.Ctx) {
 		AddField("Question", ctx.Arguments.Raw()).
 		Send(ctx)
 
-	if len(messages) != 0 {
+	if len(messages) > 0 {
 		_ = ctx.Session.MessageReactionAdd(ctx.Event.ChannelID, messages[0].ID, "👍")
 		_ = ctx.Session.MessageReactionAdd(ctx.Event.ChannelID, messages[0].ID, "👎")
 	}
@@ -1052,7 +1062,7 @@ func (FunCommands) numberfact(ctx *dgc.Ctx) {
 	}
 	embed.NewEmbed().
 		AddField("Number", number).
-		AddField("Fact", httpResponse.Body).
+		AddField("Fact", string(httpResponse.Body)).
 		Send(ctx)
 }
 
@@ -1280,7 +1290,7 @@ func (FunCommands) evilinsult(ctx *dgc.Ctx) {
 		return
 	}
 	embed.NewEmbed().
-		AddField("Evil Insult", httpResponse.Body).
+		AddField("Evil Insult", string(httpResponse.Body)).
 		Send(ctx)
 }
 
@@ -1499,7 +1509,7 @@ func (FunCommands) startupidea(ctx *dgc.Ctx) {
 	}
 
 	embed.NewEmbed().
-		AddField("Startup Idea", httpResponse.Body).
+		AddField("Startup Idea", string(httpResponse.Body)).
 		Send(ctx)
 }
 
@@ -1518,7 +1528,7 @@ func (FunCommands) commitmessage(ctx *dgc.Ctx) {
 	}
 
 	embed.NewEmbed().
-		AddField("Commit Message", httpResponse.Body).
+		AddField("Commit Message", string(httpResponse.Body)).
 		Send(ctx)
 }
 
@@ -1580,4 +1590,26 @@ func (FunCommands) paranoia(ctx *dgc.Ctx) {
 	embed.NewEmbed().
 		AddField("Paranoia Question", data.Get("question").MustString()).
 		Send(ctx)
+}
+
+func (FunCommands) randomcolor(ctx *dgc.Ctx) {
+	r, g, b := utils.Random.Number(0, 255), utils.Random.Number(0, 255), utils.Random.Number(0, 255)
+	hex := fmt.Sprintf("%02x%02x%02x", r, g, b)
+	name := "Unknown"
+
+	data, err := http.GetJson("https://www.thecolorapi.com/id?hex=" + hex)
+	if err == nil {
+		name = data.GetPath("name", "value").MustString()
+	}
+
+	embed.NewEmbed().
+		AddField("Color", name).
+		AddField("RGB", fmt.Sprintf("%d, %d, %d", r, g, b)).
+		AddField("Hex", "#"+hex).
+		Send(ctx)
+
+	preview, err := utils.Misc.PreviewColorImage(500, 100, r, g, b)
+	if err == nil {
+		_, _ = ctx.Session.ChannelFileSend(ctx.Event.ChannelID, "color.png", preview)
+	}
 }

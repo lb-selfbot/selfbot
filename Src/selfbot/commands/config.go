@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/LightningDev1/LB-Selfbot/selfbot/config"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/embed"
@@ -153,6 +154,22 @@ func (c ConfigCommands) RegisterCommands(router *dgc.Router) {
 		Flags:       []string{CmdFlagDangerous},
 		Handler:     c.clientspoof,
 	})
+
+	router.RegisterCmd(&dgc.Command{
+		Name:        "gettimezone",
+		Description: "Get your current timezone setting",
+		Usage:       "[p]gettimezone",
+		Flags:       []string{CmdFlagDangerous},
+		Handler:     c.gettimezone,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "timezone",
+		Description: "Set your timezone",
+		Usage:       "[p]timezone <timezone>",
+		Flags:       []string{CmdFlagDangerous},
+		Handler:     c.timezone,
+	})
+
 	router.RegisterCmd(&dgc.Command{
 		Name:        "getcmdaliases",
 		Description: "Get your current command aliases",
@@ -482,6 +499,22 @@ func (c ConfigCommands) RegisterCommands(router *dgc.Router) {
 	})
 
 	router.RegisterCmd(&dgc.Command{
+		Name:        "getpoketwolanguage",
+		Description: "Get your current PokéTwo catch language",
+		Usage:       "[p]getpoketwolanguage",
+		Flags:       []string{CmdFlagDangerous},
+		Handler:     c.getpoketwolanguage,
+	})
+
+	router.RegisterCmd(&dgc.Command{
+		Name:        "poketwolanguage",
+		Description: "Get your current PokéTwo catch language",
+		Usage:       "[p]poketwolanguage <language>",
+		Flags:       []string{CmdFlagDangerous},
+		Handler:     c.poketwolanguage,
+	})
+
+	router.RegisterCmd(&dgc.Command{
 		Name:        "getsnipertokens",
 		Description: "Get list of multi token sniper tokens",
 		Usage:       "[p]getsnipertokens",
@@ -637,6 +670,36 @@ func (c ConfigCommands) RegisterCommands(router *dgc.Router) {
 		Usage:       "[p]wsessions [webhook url]",
 		Flags:       []string{CmdFlagDangerous},
 		Handler:     c.wsessions,
+	})
+
+	router.RegisterCmd(&dgc.Command{
+		Name:        "getwpingself",
+		Description: "Get the current webhook ping self setting",
+		Usage:       "[p]getwsessions",
+		Flags:       []string{CmdFlagDangerous},
+		Handler:     c.getwpingself,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "wpingself",
+		Description: "Set the webhook ping self setting",
+		Usage:       "[p]wpingself <on/off>",
+		Flags:       []string{CmdFlagDangerous},
+		Handler:     c.wpingself,
+	})
+
+	router.RegisterCmd(&dgc.Command{
+		Name:        "getwpingeveryone",
+		Description: "Get the current webhook ping everyone setting",
+		Usage:       "[p]getwpingeveryone",
+		Flags:       []string{CmdFlagDangerous},
+		Handler:     c.getwpingeveryone,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "wpingeveryone",
+		Description: "Set the webhook ping everyone setting",
+		Usage:       "[p]wpingeveryone <on/off>",
+		Flags:       []string{CmdFlagDangerous},
+		Handler:     c.wpingeveryone,
 	})
 
 	router.RegisterCmd(&dgc.Command{
@@ -1157,6 +1220,47 @@ func (ConfigCommands) clientspoof(ctx *dgc.Ctx) {
 
 	embed.NewEmbed().
 		SetDescription("Client set to " + cfg.Selfbot.CommandMode).
+		Send(ctx)
+}
+
+func (ConfigCommands) gettimezone(ctx *dgc.Ctx) {
+	cfg, err := config.GetConfig()
+	if err != nil {
+		_ = ctx.RespondText("Error getting config")
+		return
+	}
+
+	location, err := time.LoadLocation(cfg.Selfbot.Timezone)
+	if err != nil {
+		location = time.UTC
+	}
+
+	currTime := time.Now().In(location).Format("15:04:05")
+
+	embed.NewEmbed().
+		AddField("Timezone", cfg.Selfbot.Timezone).
+		AddField("Current Time", currTime).
+		Send(ctx)
+}
+
+func (ConfigCommands) timezone(ctx *dgc.Ctx) {
+	cfg, err := config.GetConfig()
+	if err != nil {
+		_ = ctx.RespondText("Error getting config")
+		return
+	}
+
+	timezone := utils.Arguments["<timezone>"]
+	if _, err := time.LoadLocation(timezone); err != nil {
+		_ = ctx.RespondText("Invalid timezone: " + err.Error())
+		return
+	}
+
+	cfg.Selfbot.Timezone = timezone
+	_ = cfg.Save()
+
+	embed.NewEmbed().
+		SetDescription("Timezone set to " + cfg.Selfbot.Timezone).
 		Send(ctx)
 }
 
@@ -1993,6 +2097,57 @@ func (ConfigCommands) rmpoketwochannel(ctx *dgc.Ctx) {
 		Send(ctx)
 }
 
+func (ConfigCommands) getpoketwolanguage(ctx *dgc.Ctx) {
+	cfg, err := config.GetConfig()
+	if err != nil {
+		_ = ctx.RespondText("Error getting config")
+		return
+	}
+
+	embed.NewEmbed().
+		AddField("PokéTwo Catch Language", cfg.Snipers.PokeTwoSniper.CatchLanguage).
+		Send(ctx)
+}
+
+func (ConfigCommands) poketwolanguage(ctx *dgc.Ctx) {
+	cfg, err := config.GetConfig()
+	if err != nil {
+		_ = ctx.RespondText("Error getting config")
+		return
+	}
+
+	language := strings.ToLower(utils.Arguments["<language>"])
+	if !utils.SliceContains([]string{"english", "en", "japanese", "ja", "japanese_t", "ja_t", "french", "fr", "german", "de"}, language) {
+		_ = ctx.RespondText("Invalid language. Use `english`/`en`, `japanese`/`ja`, `japanese_t`/`ja_t` (transliterated), `french`/`fr`, or `german`/`de`.")
+		return
+	}
+
+	switch language {
+	case "en":
+	case "english":
+		cfg.Snipers.PokeTwoSniper.CatchLanguage = "English"
+	case "ja":
+	case "japanese":
+		cfg.Snipers.PokeTwoSniper.CatchLanguage = "Japanese"
+	case "ja_t":
+	case "japanese_t":
+		cfg.Snipers.PokeTwoSniper.CatchLanguage = "JapaneseTransliterated"
+	case "fr":
+	case "french":
+		cfg.Snipers.PokeTwoSniper.CatchLanguage = "French"
+	case "de":
+	case "german":
+		cfg.Snipers.PokeTwoSniper.CatchLanguage = "German"
+	}
+
+	_ = cfg.Save()
+
+	embed.NewEmbed().
+		SetDescription(fmt.Sprintf("PokéTwo catch language set to %s.", cfg.Snipers.PokeTwoSniper.CatchLanguage)).
+		Send(ctx)
+
+}
+
 func (ConfigCommands) getsnipertokens(ctx *dgc.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
@@ -2333,6 +2488,72 @@ func (ConfigCommands) wsessions(ctx *dgc.Ctx) {
 
 	embed.NewEmbed().
 		SetDescription("Set sessions webhook to " + utils.Arguments["[webhook url]"]).
+		Send(ctx)
+}
+
+func (ConfigCommands) getwpingself(ctx *dgc.Ctx) {
+	cfg, err := config.GetConfig()
+	if err != nil {
+		_ = ctx.RespondText("Error getting config")
+		return
+	}
+
+	embed.NewEmbed().
+		AddField("Webhook Ping Self", utils.Misc.FormatBoolOnOff(cfg.Webhooks.PingSelf)).
+		Send(ctx)
+}
+
+func (ConfigCommands) wpingself(ctx *dgc.Ctx) {
+	cfg, err := config.GetConfig()
+	if err != nil {
+		_ = ctx.RespondText("Error getting config")
+		return
+	}
+
+	toggle := strings.ToLower(utils.Arguments["<on/off>"])
+	if toggle != "on" && toggle != "off" {
+		_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
+		return
+	}
+
+	cfg.Webhooks.PingSelf = toggle == "on"
+	_ = cfg.Save()
+
+	embed.NewEmbed().
+		SetDescription("Turned " + toggle + " webhook ping self").
+		Send(ctx)
+}
+
+func (ConfigCommands) getwpingeveryone(ctx *dgc.Ctx) {
+	cfg, err := config.GetConfig()
+	if err != nil {
+		_ = ctx.RespondText("Error getting config")
+		return
+	}
+
+	embed.NewEmbed().
+		AddField("Webhook Ping Everyone", utils.Misc.FormatBoolOnOff(cfg.Webhooks.PingEveryone)).
+		Send(ctx)
+}
+
+func (ConfigCommands) wpingeveryone(ctx *dgc.Ctx) {
+	cfg, err := config.GetConfig()
+	if err != nil {
+		_ = ctx.RespondText("Error getting config")
+		return
+	}
+
+	toggle := strings.ToLower(utils.Arguments["<on/off>"])
+	if toggle != "on" && toggle != "off" {
+		_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
+		return
+	}
+
+	cfg.Webhooks.PingEveryone = toggle == "on"
+	_ = cfg.Save()
+
+	embed.NewEmbed().
+		SetDescription("Turned " + toggle + " webhook ping everyone").
 		Send(ctx)
 }
 

@@ -89,7 +89,7 @@ func (n *Notifiers) MessageUpdateHandler(session *discordgo.Session, message *di
 
 	//  DM Edit Notifier
 	if isDM && cfg.Events.DMEditNotifier {
-		logging.Logging.DMEditNotifier(message.Message)
+		logging.Logging.DMEditNotifier(message.Message, message.BeforeUpdate.Content, message.Content)
 	}
 }
 

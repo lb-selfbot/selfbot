@@ -2,6 +2,7 @@ package eventreactions
 
 import (
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/LightningDev1/LB-Selfbot/selfbot/api"
@@ -16,6 +17,7 @@ type Ping struct {
 	Channel      *discordgo.Channel
 	System       string
 	Response     string
+	Reaction     string
 }
 
 func NewPingReaction(reactionType EventReactionType, guild *discordgo.Guild, channel *discordgo.Channel) *Ping {
@@ -23,29 +25,32 @@ func NewPingReaction(reactionType EventReactionType, guild *discordgo.Guild, cha
 }
 
 func NewPingFromData(session *discordgo.Session, reactionType EventReactionType, data map[string]any) (*Ping, error) {
+	var guild *discordgo.Guild
+	var channel *discordgo.Channel
+
 	guildID, ok := data["guild"].(string)
 	if ok {
-		guild, err := utils.Discord.GetGuild(session, guildID)
-		if err != nil {
-			guild = &discordgo.Guild{ID: guildID}
-		}
-
-		return NewPingReaction(reactionType, guild, nil), nil
+		guild, _ = utils.Discord.GetGuild(session, guildID)
 	}
 
 	channelID, ok := data["channel"].(string)
 	if ok {
-		channel, err := utils.Discord.GetChannel(session, channelID)
-		if err != nil {
-			channel = &discordgo.Channel{ID: channelID}
-		}
-
-		return NewPingReaction(reactionType, nil, channel), nil
+		channel, _ = utils.Discord.GetChannel(session, channelID)
 	}
 
-	utils.Logging.Error("Ping.NewPingFromData: Invalid ping data")
+	if guild == nil && channel == nil {
+		utils.Logging.Error("Ping.NewPingFromData: Invalid ping data")
 
-	return nil, fmt.Errorf("invalid ping data")
+		return nil, fmt.Errorf("invalid ping data")
+	}
+
+	reaction := NewPingReaction(reactionType, guild, channel)
+
+	reaction.System, _ = data["system"].(string)
+	reaction.Response, _ = data["response"].(string)
+	reaction.Reaction, _ = data["reaction"].(string)
+
+	return reaction, nil
 }
 
 func (p *Ping) Type() EventReactionType {
@@ -53,13 +58,25 @@ func (p *Ping) Type() EventReactionType {
 }
 
 func (p *Ping) Description() string {
-	var location string
-	if p.Guild != nil {
-		location = p.Guild.Name
-	} else {
-		location = p.Channel.Name
+	var locations []string
+
+	if p.Channel != nil {
+		locations = append(locations, p.Channel.Name)
 	}
-	location = " (" + location + ")"
+	if p.Guild != nil {
+		locations = append(locations, p.Guild.Name)
+	}
+	if p.System != "" {
+		locations = append(locations, p.System)
+	}
+	if p.Response != "" {
+		locations = append(locations, p.Response)
+	}
+	if p.Reaction != "" {
+		locations = append(locations, "<"+p.Reaction+">")
+	}
+
+	location := " (" + strings.Join(locations, " - ") + ")"
 
 	switch p.ReactionType {
 	case PING_PING:
@@ -74,6 +91,8 @@ func (p *Ping) Description() string {
 		return "Ping --> Timeout" + location
 	case PING_INSULT:
 		return "Ping --> Insult" + location
+	case PING_REACT:
+		return "Ping --> React" + location
 	case PING_RESPONSE:
 		return "Ping --> Response" + location
 	case PING_AI_RESPONSE:
@@ -93,7 +112,9 @@ func (p *Ping) Equals(other EventReaction) bool {
 
 	return p.ReactionType == otherPing.ReactionType &&
 		p.Guild == otherPing.Guild &&
-		p.Channel == otherPing.Channel
+		p.Channel == otherPing.Channel &&
+		p.Reaction == otherPing.Reaction
+
 }
 
 func (p *Ping) Data() map[string]any {
@@ -108,6 +129,7 @@ func (p *Ping) Data() map[string]any {
 	}
 	data["system"] = p.System
 	data["response"] = p.Response
+	data["reaction"] = p.Reaction
 
 	return data
 }
@@ -158,8 +180,12 @@ func (p *Ping) Handler(session *discordgo.Session, event any) {
 		_ = session.GuildMemberTimeout(member.GuildID, member.User.ID, &until)
 	case PING_INSULT:
 		httpResponse := http.Get("https://evilinsult.com/generate_insult.php?lang=en")
-		m, err := session.ChannelMessageSend(message.ChannelID, message.Author.Mention()+" "+httpResponse.Body)
+		insult := message.Author.Mention() + " " + string(httpResponse.Body)
+
+		m, err := session.ChannelMessageSend(message.ChannelID, insult)
 		HandleMessage(m, err)
+	case PING_REACT:
+		_ = session.MessageReactionAdd(message.ChannelID, message.ID, p.Reaction)
 	case PING_RESPONSE:
 		m, err := session.ChannelMessageSend(message.ChannelID, p.Response)
 		HandleMessage(m, err)

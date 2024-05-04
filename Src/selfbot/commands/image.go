@@ -967,7 +967,7 @@ func (i ImageCommands) RegisterCommands(router *dgc.Router) {
 	router.RegisterCmd(&dgc.Command{
 		Name:        "speechbubble",
 		Description: "Add a speech bubble to an image",
-		Usage:       "[p]speechbubble [link/attachment] [force GIF: on/off]",
+		Usage:       "[p]speechbubble [force GIF: on/off] [link/attachment]",
 		Handler:     i.speechbubble,
 	})
 
@@ -2678,13 +2678,15 @@ func (ImageCommands) pikachu(ctx *dgc.Ctx) {
 
 func (ImageCommands) speechbubble(ctx *dgc.Ctx) {
 	link := utils.Arguments["[link/attachment]"]
+
+	attachments := ctx.Event.Message.Attachments
+	if len(attachments) > 0 {
+		link = attachments[0].URL
+	}
+
 	if link == "" {
-		if len(ctx.Event.Message.Attachments) > 0 {
-			link = ctx.Event.Message.Attachments[0].URL
-		} else {
-			_ = ctx.RespondText("Please provide a link or attachment.")
-			return
-		}
+		_ = ctx.RespondText("Please provide a link or attachment.")
+		return
 	}
 
 	forceGIF := strings.ToLower(utils.Arguments["[force GIF: on/off]"])
@@ -2707,7 +2709,7 @@ func (ImageCommands) speechbubble(ctx *dgc.Ctx) {
 		return
 	}
 
-	_ = ctx.RespondText("https://api.lightning-bot.com" + httpResponse.Headers["location"])
+	_ = ctx.RespondText("https://api.lightning-bot.com" + httpResponse.Header.Get("Location"))
 }
 
 func (ImageCommands) quotereply(ctx *dgc.Ctx) {

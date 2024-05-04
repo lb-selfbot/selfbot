@@ -71,8 +71,7 @@ func ArgumentsToCommandOptions(options []*discordgo.ApplicationCommandOption, ar
 
 			option.Value = asBool
 		case discordgo.ApplicationCommandOptionUser, discordgo.ApplicationCommandOptionChannel, discordgo.ApplicationCommandOptionRole, discordgo.ApplicationCommandOptionMentionable:
-			asUser := arg.AsUserMentionID()
-			option.Value = map[string]any{"id": asUser}
+			option.Value = arg.AsUserMentionID()
 		}
 	}
 

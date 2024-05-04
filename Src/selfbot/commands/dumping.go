@@ -177,7 +177,7 @@ func (*DumpingCommands) dumpimages(ctx *dgc.Ctx) {
 				continue
 			}
 
-			_ = utils.IO.WriteBytes(filePath, httpResponse.BodyBytes)
+			_ = utils.IO.WriteBytes(filePath, httpResponse.Body)
 
 			images++
 		}
@@ -219,7 +219,7 @@ func (*DumpingCommands) dumpvideos(ctx *dgc.Ctx) {
 				continue
 			}
 
-			_ = utils.IO.WriteBytes(filePath, httpResponse.BodyBytes)
+			_ = utils.IO.WriteBytes(filePath, httpResponse.Body)
 
 			videos++
 		}
@@ -261,7 +261,7 @@ func (*DumpingCommands) dumpaudio(ctx *dgc.Ctx) {
 				continue
 			}
 
-			_ = utils.IO.WriteBytes(filePath, httpResponse.BodyBytes)
+			_ = utils.IO.WriteBytes(filePath, httpResponse.Body)
 
 			audios++
 		}
@@ -303,7 +303,7 @@ func (*DumpingCommands) dumptext(ctx *dgc.Ctx) {
 				continue
 			}
 
-			_ = utils.IO.WriteBytes(filePath, httpResponse.BodyBytes)
+			_ = utils.IO.WriteBytes(filePath, httpResponse.Body)
 
 			texts++
 		}
@@ -341,7 +341,7 @@ func (*DumpingCommands) dumpattachments(ctx *dgc.Ctx) {
 				continue
 			}
 
-			_ = utils.IO.WriteBytes(filePath, httpResponse.BodyBytes)
+			_ = utils.IO.WriteBytes(filePath, httpResponse.Body)
 
 			attachments++
 		}
@@ -385,7 +385,7 @@ func (*DumpingCommands) dumpfiletype(ctx *dgc.Ctx) {
 				continue
 			}
 
-			_ = utils.IO.WriteBytes(filePath, httpResponse.BodyBytes)
+			_ = utils.IO.WriteBytes(filePath, httpResponse.Body)
 
 			attachments++
 		}
@@ -429,7 +429,7 @@ func (*DumpingCommands) dumpcontenttype(ctx *dgc.Ctx) {
 				continue
 			}
 
-			_ = utils.IO.WriteBytes(filePath, httpResponse.BodyBytes)
+			_ = utils.IO.WriteBytes(filePath, httpResponse.Body)
 
 			attachments++
 		}
@@ -469,7 +469,7 @@ func (*DumpingCommands) dumpemojis(ctx *dgc.Ctx) {
 			continue
 		}
 
-		_ = utils.IO.WriteBytes(filePath, httpResponse.BodyBytes)
+		_ = utils.IO.WriteBytes(filePath, httpResponse.Body)
 	}
 	embed.NewEmbed().
 		SetDescription(fmt.Sprintf("Dumped %d emojis from %s", len(emojis), guild.Name)).
@@ -508,7 +508,7 @@ func (*DumpingCommands) dumpstickers(ctx *dgc.Ctx) {
 			continue
 		}
 
-		_ = utils.IO.WriteBytes(filePath, httpResponse.BodyBytes)
+		_ = utils.IO.WriteBytes(filePath, httpResponse.Body)
 	}
 	embed.NewEmbed().
 		SetDescription(fmt.Sprintf("Dumped %d stickers from %s", len(guild.Stickers), guild.Name)).
@@ -543,7 +543,7 @@ func (*DumpingCommands) dumpavatars(ctx *dgc.Ctx) {
 			continue
 		}
 
-		_ = utils.IO.WriteBytes(filePath, httpResponse.BodyBytes)
+		_ = utils.IO.WriteBytes(filePath, httpResponse.Body)
 	}
 	embed.NewEmbed().
 		SetDescription(fmt.Sprintf("Dumped %d avatars from %s", len(guild.Members), guild.Name)).

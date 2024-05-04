@@ -14,6 +14,7 @@ import (
 	"hash/crc32"
 	"hash/crc64"
 	"hash/fnv"
+	"net/url"
 	"strconv"
 	"strings"
 
@@ -53,7 +54,7 @@ func Binary(s string, decode bool) string {
 		for i := 0; i+8 <= len(s); i += 8 {
 			b, err := strconv.ParseUint(s[i:i+8], 2, 8)
 			if err != nil {
-				return "An error has occurred"
+				return "An error has occurred: " + err.Error()
 			}
 			out = append(out, byte(b))
 		}
@@ -73,7 +74,7 @@ func Base32(s string, decode bool) string {
 	if decode {
 		decoded, err := b32.DecodeString(s)
 		if err != nil {
-			return "An error has occurred"
+			return "An error has occurred: " + err.Error()
 		}
 		return string(decoded)
 	} else {
@@ -85,7 +86,7 @@ func Base36(s string, decode bool) string {
 	if decode {
 		decoded, err := base36.DecodeString(s)
 		if err != nil {
-			return "An error has occurred"
+			return "An error has occurred: " + err.Error()
 		}
 		return string(decoded)
 	} else {
@@ -97,7 +98,7 @@ func Base58(s string, decode bool) string {
 	if decode {
 		decoded, err := base58.Decode(s)
 		if err != nil {
-			return "An error has occurred"
+			return "An error has occurred: " + err.Error()
 		}
 		return string(decoded)
 	} else {
@@ -109,7 +110,7 @@ func Base64(s string, decode bool) string {
 	if decode {
 		decoded, err := base64.RawStdEncoding.DecodeString(s)
 		if err != nil {
-			return "An error has occurred"
+			return "An error has occurred: " + err.Error()
 		}
 		return string(decoded)
 	} else {
@@ -121,7 +122,7 @@ func Base64Url(s string, decode bool) string {
 	if decode {
 		decoded, err := base64.URLEncoding.DecodeString(s)
 		if err != nil {
-			return "An error has occurred"
+			return "An error has occurred: " + err.Error()
 		}
 		return string(decoded)
 	} else {
@@ -134,7 +135,7 @@ func Ascii85(s string, decode bool) string {
 		decoded := make([]byte, ascii85.MaxEncodedLen(len(s)))
 		n, _, err := ascii85.Decode(decoded, []byte(s), true)
 		if err != nil {
-			return "An error has occurred"
+			return "An error has occurred: " + err.Error()
 		}
 		return string(decoded[:n])
 	} else {
@@ -148,12 +149,25 @@ func Base85(s string, decode bool) string {
 	if decode {
 		decoded, err := b85.Decode(s)
 		if err != nil {
-			return "An error has occurred"
+			return "An error has occurred: " + err.Error()
 		}
 		return string(decoded)
 	} else {
 		return b85.Encode([]byte(s))
 	}
+}
+
+func URLEncode(s string, decode bool) string {
+	if decode {
+		decoded, err := url.QueryUnescape(s)
+		if err != nil {
+			return "An error has occurred: " + err.Error()
+		}
+		return decoded
+	} else {
+		return url.QueryEscape(s)
+	}
+
 }
 
 func MorseCode(s string, decode bool) string {

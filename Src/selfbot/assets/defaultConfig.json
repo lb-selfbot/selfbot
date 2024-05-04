@@ -83,6 +83,7 @@
     "MobileFriendly": false,
     "Title": "LightningBot",
     "Client": "Desktop",
+    "Timezone": "Local",
     "CommandAliases": {}
   },
   "Sharing": {
@@ -112,7 +113,8 @@
       "Typing": true,
       "FakeActivity": true,
       "CatchRate": 100,
-      "Channels": []
+      "Channels": [],
+      "CatchLanguage": "English"
     }
   },
   "UI": {
@@ -129,7 +131,9 @@
     "PingDetection": "",
     "SelfbotDetection": "",
     "StaffDetection": "",
-    "Sessions": ""
+    "Sessions": "",
+    "PingSelf": false,
+    "PingEveryone": false
   },
   "SlashCommandJobs": [],
   "EventReactions": [],

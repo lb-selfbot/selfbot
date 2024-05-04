@@ -542,7 +542,7 @@ func (GameCommands) hltbinfo(ctx *dgc.Ctx) {
 		return
 	}
 
-	dataMatches := regexp.MustCompile("<script id=\"__NEXT_DATA__\" type=\"application/json\">(.*?)</script>").FindStringSubmatch(httpResponse.Body)
+	dataMatches := regexp.MustCompile("<script id=\"__NEXT_DATA__\" type=\"application/json\">(.*?)</script>").FindStringSubmatch(string(httpResponse.Body))
 	if len(dataMatches) < 2 {
 		_ = ctx.RespondText("An error has occurred: No data matches")
 		return

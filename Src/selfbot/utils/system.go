@@ -73,6 +73,17 @@ func (SystemUtils) SleepPC() error {
 	}
 }
 
+func (SystemUtils) HibernatePC() error {
+	if runtime.GOOS == "windows" {
+		_, _, err := System.RunDllFunc("powrprof.dll", "SetSuspendState", 2, 1, 1, 0)
+		return err
+	} else if runtime.GOOS == "darwin" {
+		return exec.Command("pmset", "displaysleepnow").Start()
+	} else {
+		return exec.Command("systemctl", "suspend").Start()
+	}
+}
+
 func (SystemUtils) LockPC() error {
 	if runtime.GOOS == "windows" {
 		_, _, err := System.RunDllFunc("user32.dll", "LockWorkStation")

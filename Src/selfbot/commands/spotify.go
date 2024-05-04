@@ -151,7 +151,7 @@ func (s SpotifyCommands) GetBearerToken(ctx *dgc.Ctx) (string, bool) {
 	return bearerToken, true
 }
 
-func (s SpotifyCommands) checkRequest(ctx *dgc.Ctx, httpResponse *http.HttpResponse) bool {
+func (s SpotifyCommands) checkResponse(ctx *dgc.Ctx, httpResponse *http.HttpResponse) bool {
 	if httpResponse.Error != nil {
 		_ = ctx.RespondText("An error has occurred: " + httpResponse.Error.Error())
 		return false
@@ -174,11 +174,11 @@ func (s SpotifyCommands) HandleRequest(ctx *dgc.Ctx, httpResponse *http.HttpResp
 		return
 	}
 
-	if httpResponse.Body != "" {
-		if !s.checkRequest(ctx, httpResponse) {
-			return
-		}
+	// Check the response if the body isn't empty
+	if len(httpResponse.Body) != 0 && !s.checkResponse(ctx, httpResponse) {
+		return
 	}
+
 	_ = ctx.RespondText(onSuccess)
 }
 
@@ -516,7 +516,7 @@ func (s SpotifyCommands) sdevices(ctx *dgc.Ctx) {
 	}
 
 	httpResponse := http.Get("https://api.spotify.com/v1/me/player/devices", map[string]string{"Authorization": bearerToken})
-	if !s.checkRequest(ctx, httpResponse) {
+	if !s.checkResponse(ctx, httpResponse) {
 		return
 	}
 
@@ -551,7 +551,7 @@ func (s SpotifyCommands) sprofile(ctx *dgc.Ctx) {
 	}
 
 	httpResponse := http.Get("https://api.spotify.com/v1/me", map[string]string{"Authorization": bearerToken})
-	if !s.checkRequest(ctx, httpResponse) {
+	if !s.checkResponse(ctx, httpResponse) {
 		return
 	}
 
@@ -574,7 +574,7 @@ func (s SpotifyCommands) sbearertoken(ctx *dgc.Ctx) {
 	}
 
 	httpResponse := http.Get("https://api.spotify.com/v1/me", map[string]string{"Authorization": bearerToken})
-	if !s.checkRequest(ctx, httpResponse) {
+	if !s.checkResponse(ctx, httpResponse) {
 		return
 	}
 

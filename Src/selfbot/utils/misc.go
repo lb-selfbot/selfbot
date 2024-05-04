@@ -1,8 +1,14 @@
 package utils
 
 import (
+	"bytes"
 	"encoding/base64"
 	"fmt"
+	"image"
+	"image/color"
+	"image/draw"
+	"image/png"
+	"io"
 	"math"
 	"net"
 	"strconv"
@@ -98,6 +104,16 @@ func (MiscUtils) FormatDurationShort(duration time.Duration) string {
 	return fmt.Sprintf("%dd %dh %dm %ds",
 		int64(duration.Hours()/24), int64(remainingHours),
 		int64(remainingMinutes), int64(remainingSeconds))
+}
+
+func (MiscUtils) ParseDuration(text string) (time.Duration, error) {
+	d, err := time.ParseDuration(text)
+	if err != nil && strings.Contains(err.Error(), "missing unit") {
+		text += "s"
+		d, err = time.ParseDuration(text)
+	}
+
+	return d, err
 }
 
 // GetDistance returns the Levenshtein distance between two strings.
@@ -208,6 +224,21 @@ func (MiscUtils) CreateAISystemAFK(system string, session *discordgo.Session, me
 
 func (MiscUtils) ImageToBase64(image []byte) string {
 	return "data:image/png;base64," + base64.StdEncoding.EncodeToString(image)
+}
+
+func (MiscUtils) PreviewColorImage(x, y, r, g, b int) (io.Reader, error) {
+	img := image.NewRGBA(image.Rect(0, 0, x, y))
+	fillColor := color.RGBA{uint8(r), uint8(g), uint8(b), 255}
+	draw.Draw(img, img.Bounds(), &image.Uniform{fillColor}, image.Point{}, draw.Src)
+
+	var buf bytes.Buffer
+
+	err := png.Encode(&buf, img)
+	if err != nil {
+		return nil, err
+	}
+
+	return &buf, nil
 }
 
 var Misc = &MiscUtils{}

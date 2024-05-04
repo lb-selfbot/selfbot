@@ -6,3 +6,4 @@ var LoadedExtensions int
 var Guilds int
 var Friends int
 var AvatarImageKey string
+var UserID string

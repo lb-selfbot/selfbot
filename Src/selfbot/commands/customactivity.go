@@ -2,6 +2,8 @@ package commands
 
 import (
 	"fmt"
+	"reflect"
+	"slices"
 	"strings"
 
 	"github.com/LightningDev1/LB-Selfbot/selfbot/api"
@@ -183,6 +185,18 @@ func (r CustomActivityCommands) RegisterCommands(router *dgc.Router) {
 		Description: "Delete a Custom Activity preset",
 		Usage:       "[p]deletecapreset <name>",
 		Handler:     r.deletecapreset,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "currentcapreset",
+		Description: "Get the name of the current Custom Activity preset",
+		Usage:       "[p]currentcapreset",
+		Handler:     r.currentcapreset,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "nextcapreset",
+		Description: "Load the next Custom Activity preset",
+		Usage:       "[p]nextcapreset",
+		Handler:     r.nextcapreset,
 	})
 }
 
@@ -658,5 +672,84 @@ func (CustomActivityCommands) deletecapreset(ctx *dgc.Ctx) {
 
 	embed.NewEmbed().
 		SetDescription(fmt.Sprintf("Deleted activity preset `%s`.", name)).
+		Send(ctx)
+}
+
+func (CustomActivityCommands) currentcapreset(ctx *dgc.Ctx) {
+	cfg, err := config.GetConfig()
+	if err != nil {
+		_ = ctx.RespondText("Failed to get config.")
+		return
+	}
+
+	// Get current preset
+	var currentPreset string
+
+	for name, preset := range cfg.ActivityPresets {
+		if reflect.DeepEqual(preset, cfg.Activity) {
+			currentPreset = name
+			break
+		}
+	}
+
+	if currentPreset == "" {
+		embed.NewEmbed().
+			SetDescription("You must load a preset before using the current preset command!").
+			Send(ctx)
+		return
+	}
+
+	embed.NewEmbed().
+		SetDescription(fmt.Sprintf("Current activity preset is `%s`.", currentPreset)).
+		Send(ctx)
+}
+
+func (CustomActivityCommands) nextcapreset(ctx *dgc.Ctx) {
+	cfg, err := config.GetConfig()
+	if err != nil {
+		_ = ctx.RespondText("Failed to get config.")
+		return
+	}
+
+	// Get current preset
+	var currentPreset string
+
+	for name, preset := range cfg.ActivityPresets {
+		if reflect.DeepEqual(preset, cfg.Activity) {
+			currentPreset = name
+			break
+		}
+	}
+
+	// Sort presets alphabetically
+	var keys []string
+	for k := range cfg.ActivityPresets {
+		keys = append(keys, k)
+	}
+
+	slices.Sort(keys)
+
+	// Get next preset
+	nextPreset := 0
+	for i, k := range keys {
+		if k == currentPreset {
+			nextPreset = (i + 1) % len(keys)
+			break
+		}
+	}
+
+	nextPresetName := keys[nextPreset]
+	cfg.Activity = cfg.ActivityPresets[nextPresetName]
+
+	err = cfg.Save()
+	if err != nil {
+		embed.NewEmbed().
+			SetDescription("Failed to load next activity preset.").
+			Send(ctx)
+		return
+	}
+
+	embed.NewEmbed().
+		SetDescription(fmt.Sprintf("Loaded next activity preset `%s`.", nextPresetName)).
 		Send(ctx)
 }

@@ -93,6 +93,13 @@ func (e *EventReactionsCommands) RegisterCommands(router *dgc.Router) {
 		Handler:     e.pinginsult,
 	})
 	router.RegisterCmd(&dgc.Command{
+		Name:        "pingreact",
+		Description: "Reply to pings by adding a reaction",
+		Usage:       "[p]pingreact <toggle/list/clear> [reaction] [server/channel id]",
+		Flags:       []string{CmdFlagDangerous},
+		Handler:     e.pingreact,
+	})
+	router.RegisterCmd(&dgc.Command{
 		Name:        "pingresponse",
 		Description: "Reply to pings with a custom response",
 		Usage:       "[p]pingresponse <toggle/list/clear> [\"response\"] [server/channel id]",
@@ -573,6 +580,17 @@ func (e EventReactionsCommands) pingReaction(ctx *dgc.Ctx, reactionType eventrea
 		eventReaction.System = utils.Arguments["[\"system\"]"]
 		eventReaction.Response = utils.Arguments["[\"response\"]"]
 
+		eventReaction.Reaction = utils.Arguments["[reaction]"]
+		eventReaction.Reaction = strings.ReplaceAll(eventReaction.Reaction, "<", "")
+		eventReaction.Reaction = strings.ReplaceAll(eventReaction.Reaction, ">", "")
+
+		if eventReaction.Reaction == "" && reactionType == eventreactions.PING_REACT {
+			embed.NewEmbed().
+				SetDescription("Reaction cannot be empty!").
+				Send(ctx)
+			return
+		}
+
 		e.toggleReaction(ctx, eventReaction)
 	case "list":
 		reactions := eventreactions.GetAll(reactionType)
@@ -613,6 +631,10 @@ func (e EventReactionsCommands) pingtimeout(ctx *dgc.Ctx) {
 
 func (e EventReactionsCommands) pinginsult(ctx *dgc.Ctx) {
 	e.pingReaction(ctx, eventreactions.PING_INSULT, "insult", 1)
+}
+
+func (e EventReactionsCommands) pingreact(ctx *dgc.Ctx) {
+	e.pingReaction(ctx, eventreactions.PING_REACT, "react", 2)
 }
 
 func (e EventReactionsCommands) pingresponse(ctx *dgc.Ctx) {

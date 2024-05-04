@@ -2,7 +2,6 @@ package commands
 
 import (
 	"fmt"
-	"time"
 
 	"github.com/LightningDev1/LB-Selfbot/selfbot/embed"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/slashcommands"
@@ -19,7 +18,7 @@ func (s SlashCommands) RegisterCommands(router *dgc.Router) {
 	router.RegisterCmd(&dgc.Command{
 		Name:        "searchslash",
 		Description: "Search a slash command",
-		Usage:       "[p]searchslash <#channel> <query>",
+		Usage:       "[p]searchslash <query> [server id]",
 		Flags:       []string{CmdFlagDangerous},
 		Handler:     s.searchslash,
 	})
@@ -98,46 +97,53 @@ func (s SlashCommands) RegisterCommands(router *dgc.Router) {
 }
 
 func (s SlashCommands) searchslash(ctx *dgc.Ctx) {
-	channel, ok := utils.Discord.TryGetChannelFromMention(ctx, ctx.Arguments.Get(0))
-	if !ok {
-		ctx.RespondText("Could not find channel. Make sure to mention it or use the ID.")
+	serverID := utils.Arguments["[server id]"]
+	if serverID == "" {
+		serverID = ctx.Event.GuildID
+	}
+	if serverID == "" {
+		ctx.RespondText("Please provide a server ID or use the command in a server.")
 		return
 	}
 
-	query := utils.Arguments["<query>"]
-
-	commands, _, err := ctx.Session.ChannelApplicationCommandsSearch(&discordgo.ApplicationCommandsSearchParams{
-		ChannelID:           channel.ID,
-		Type:                1,
-		Query:               query,
-		Limit:               20,
-		IncludeApplications: true,
-	})
+	guild, err := utils.Discord.GetGuild(ctx.Session, serverID)
 	if err != nil {
-		ctx.RespondText("An error occurred while getting commands from Discord: " + err.Error())
+		ctx.RespondText("Error: Could not find server.")
 		return
 	}
+
+	commands, applications, err := ctx.Session.GuildApplicationCommandIndex(serverID)
+	if err != nil {
+		ctx.RespondText("An error occurred while getting commands: " + err.Error())
+		return
+	}
+
+	commands = utils.Filter(commands, func(command *discordgo.ApplicationCommand) bool {
+		return utils.Misc.GetDistance(command.Name, utils.Arguments["<query>"]) < 2 ||
+			command.Name == utils.Arguments["<query>"]
+	})
 
 	if len(commands) == 0 {
 		ctx.RespondText("No commands have been found matching the query.")
 		return
 	}
 
-	desc := fmt.Sprintf("Found %d slash command(s) in #%s", len(commands), channel.Name) + "\n\n"
+	desc := fmt.Sprintf("Found %d slash command(s) in %s", len(commands), guild.Name) + "\n\n"
 
 	for _, cmd := range commands {
-		botName := "Unknown"
+		botName := "Unknown Bot"
 
-		bot, ok := utils.Discord.GetUser(ctx.Session, cmd.BotUserID)
-		if ok {
-			botName = bot.Username
+		for _, app := range applications {
+			if app.ID == cmd.ApplicationID {
+				botName = app.Name
+			}
 		}
 
 		desc += fmt.Sprintf("`/%s` - %s - %s\n", cmd.Name, botName, cmd.Description)
 	}
 
 	embed.NewEmbed().
-		SetTitle("Slash Commands: " + query).
+		SetTitle("Slash Commands: " + utils.Arguments["<query>"]).
 		SetDescription(desc).
 		Send(ctx)
 }
@@ -149,34 +155,40 @@ func (s SlashCommands) executeslash(ctx *dgc.Ctx) {
 		return
 	}
 
+	if channel.GuildID == "" {
+		ctx.RespondText("This command can only be used in servers.")
+		return
+	}
+
 	bot, ok := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(1))
 	if !ok {
 		ctx.RespondText("Could not find bot. Make sure to mention it or use the ID.")
 		return
 	}
 
-	commands, _, err := ctx.Session.ChannelApplicationCommandsSearch(&discordgo.ApplicationCommandsSearchParams{
-		ChannelID:           channel.ID,
-		Type:                1,
-		Query:               utils.Arguments["<command>"],
-		Limit:               20,
-		IncludeApplications: true,
-	})
+	commands, applications, err := ctx.Session.GuildApplicationCommandIndex(channel.GuildID)
 	if err != nil {
-		ctx.RespondText("An error occurred while getting commands from Discord: " + err.Error())
+		ctx.RespondText("An error occurred while getting commands: " + err.Error())
 		return
 	}
 
-	rightCommands := utils.Filter(commands, func(command *discordgo.ApplicationCommand) bool {
-		return command.Name == utils.Arguments["<command>"] && command.BotUserID == bot.ID
+	appID := bot.ID
+	for _, app := range applications {
+		if app.BotID == bot.ID {
+			appID = app.ID
+		}
+	}
+
+	commands = utils.Filter(commands, func(command *discordgo.ApplicationCommand) bool {
+		return command.Name == utils.Arguments["<command>"] && command.ApplicationID == appID
 	})
 
-	if len(rightCommands) == 0 {
+	if len(commands) == 0 {
 		ctx.RespondText("No commands have been found matching the query.")
 		return
 	}
 
-	cmd := rightCommands[0]
+	cmd := commands[0]
 
 	opts, err := slashcommands.ArgumentsToCommandOptions(cmd.Options, ctx.Arguments, 3)
 	if err != nil {
@@ -184,11 +196,17 @@ func (s SlashCommands) executeslash(ctx *dgc.Ctx) {
 		return
 	}
 
-	cmd.Options = opts
-
 	err = ctx.Session.Interact(&discordgo.InteractData{
-		Type:          int(discordgo.InteractionApplicationCommand),
-		Data:          cmd,
+		Type: int(discordgo.InteractionApplicationCommand),
+		Data: map[string]any{
+			"version":             cmd.Version,
+			"id":                  cmd.ID,
+			"name":                cmd.Name,
+			"type":                cmd.Type,
+			"options":             opts,
+			"application_command": cmd,
+			"attachments":         []any{},
+		},
 		ChannelID:     channel.ID,
 		GuildID:       channel.GuildID,
 		ApplicationID: cmd.ApplicationID,
@@ -278,50 +296,58 @@ func (s SlashCommands) createscjob(ctx *dgc.Ctx) {
 		return
 	}
 
+	if channel.GuildID == "" {
+		ctx.RespondText("This command can only be used in servers.")
+		return
+	}
+
+	guild, err := utils.Discord.GetGuild(ctx.Session, channel.GuildID)
+	if err != nil {
+		ctx.RespondText("Could not find server: " + err.Error())
+		return
+	}
+
 	bot, ok := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(1))
 	if !ok {
 		ctx.RespondText("Could not find bot. Make sure to mention it or use the ID.")
 		return
 	}
 
-	interval, err := time.ParseDuration(utils.Arguments["<interval>"])
+	interval, err := utils.Misc.ParseDuration(utils.Arguments["<interval>"])
 	if err != nil {
 		ctx.RespondText("An error occurred while parsing the interval. Make sure to use a valid duration (i.e. 30s, 5m, or 5h).")
 		return
 	}
 
-	commandName := utils.Arguments["<command>"]
-
-	commands, _, err := ctx.Session.ChannelApplicationCommandsSearch(&discordgo.ApplicationCommandsSearchParams{
-		ChannelID:           channel.ID,
-		Type:                1,
-		Query:               commandName,
-		Limit:               20,
-		IncludeApplications: true,
-	})
+	commands, applications, err := ctx.Session.GuildApplicationCommandIndex(channel.GuildID)
 	if err != nil {
-		ctx.RespondText("An error occurred while getting commands from Discord: " + err.Error())
+		ctx.RespondText("An error occurred while getting commands: " + err.Error())
 		return
 	}
 
-	rightCommands := utils.Filter(commands, func(command *discordgo.ApplicationCommand) bool {
-		return command.Name == commandName && command.BotUserID == bot.ID
+	appID := bot.ID
+	for _, app := range applications {
+		if app.BotID == bot.ID {
+			appID = app.ID
+		}
+	}
+
+	commands = utils.Filter(commands, func(command *discordgo.ApplicationCommand) bool {
+		return command.Name == utils.Arguments["<command>"] && command.ApplicationID == appID
 	})
 
-	if len(rightCommands) == 0 {
+	if len(commands) == 0 {
 		ctx.RespondText("No commands have been found matching the query.")
 		return
 	}
 
-	command := rightCommands[0]
+	command := commands[0]
 
-	options, err := slashcommands.ArgumentsToCommandOptions(command.Options, ctx.Arguments, 4)
+	_, err = slashcommands.ArgumentsToCommandOptions(command.Options, ctx.Arguments, 4)
 	if err != nil {
 		ctx.RespondText("An error occured while parsing your arguments to command options: " + err.Error())
 		return
 	}
-
-	command.Options = options
 
 	job := &slashcommands.Job{
 		CommandObject: slashcommands.DiscordObject{
@@ -330,15 +356,15 @@ func (s SlashCommands) createscjob(ctx *dgc.Ctx) {
 		},
 		ApplicationObject: slashcommands.DiscordObject{
 			Name: bot.Username,
-			ID:   command.ApplicationID,
+			ID:   appID,
 		},
 		ChannelObject: slashcommands.DiscordObject{
 			Name: channel.Name,
 			ID:   channel.ID,
 		},
 		GuildObject: slashcommands.DiscordObject{
-			Name: channel.GuildID,
-			ID:   channel.GuildID,
+			Name: guild.Name,
+			ID:   guild.ID,
 		},
 		RawArguments: utils.String.RemoveWords(ctx.Arguments.Raw(), 4),
 		IntervalSec:  int(interval.Seconds()),
@@ -401,38 +427,35 @@ func (s SlashCommands) setscjobcommand(ctx *dgc.Ctx) {
 		return
 	}
 
-	commandName := utils.Arguments["<command>"]
-
-	commands, _, err := ctx.Session.ChannelApplicationCommandsSearch(&discordgo.ApplicationCommandsSearchParams{
-		ChannelID:           job.ChannelObject.ID,
-		Type:                1,
-		Query:               commandName,
-		Limit:               20,
-		IncludeApplications: true,
-	})
+	commands, applications, err := ctx.Session.GuildApplicationCommandIndex(job.GuildObject.ID)
 	if err != nil {
-		ctx.RespondText("An error occurred while getting commands from Discord: " + err.Error())
+		ctx.RespondText("An error occurred while getting commands: " + err.Error())
 		return
 	}
 
-	rightCommands := utils.Filter(commands, func(command *discordgo.ApplicationCommand) bool {
-		return command.Name == commandName && command.BotUserID == bot.ID
+	appID := bot.ID
+	for _, app := range applications {
+		if app.BotID == bot.ID {
+			appID = app.ID
+		}
+	}
+
+	commands = utils.Filter(commands, func(command *discordgo.ApplicationCommand) bool {
+		return command.Name == utils.Arguments["<command>"] && command.ApplicationID == appID
 	})
 
-	if len(rightCommands) == 0 {
+	if len(commands) == 0 {
 		ctx.RespondText("No commands have been found matching the query.")
 		return
 	}
 
-	command := rightCommands[0]
+	command := commands[0]
 
-	options, err := slashcommands.ArgumentsToCommandOptions(command.Options, ctx.Arguments, 4)
+	_, err = slashcommands.ArgumentsToCommandOptions(command.Options, ctx.Arguments, 4)
 	if err != nil {
 		ctx.RespondText("An error occured while parsing your arguments to command options: " + err.Error())
 		return
 	}
-
-	command.Options = options
 
 	job.CommandObject = slashcommands.DiscordObject{
 		Name: command.Name,
@@ -481,12 +504,28 @@ func (s SlashCommands) setscjobchannel(ctx *dgc.Ctx) {
 		return
 	}
 
+	if channel.GuildID == "" {
+		ctx.RespondText("This command can only be used in servers.")
+		return
+	}
+
+	guild, err := utils.Discord.GetGuild(ctx.Session, channel.GuildID)
+	if err != nil {
+		ctx.RespondText("Could not find server: " + err.Error())
+		return
+	}
+
 	job.ChannelObject = slashcommands.DiscordObject{
 		Name: channel.Name,
 		ID:   channel.ID,
 	}
 
-	err := job.Load(ctx.Session)
+	job.GuildObject = slashcommands.DiscordObject{
+		Name: guild.Name,
+		ID:   guild.ID,
+	}
+
+	err = job.Load(ctx.Session)
 	if err != nil {
 		ctx.RespondText("An error occurred while loading the job data: " + err.Error())
 		return
@@ -513,7 +552,7 @@ func (s SlashCommands) setscjobinterval(ctx *dgc.Ctx) {
 		return
 	}
 
-	interval, err := time.ParseDuration(utils.Arguments["<interval>"])
+	interval, err := utils.Misc.ParseDuration(utils.Arguments["<interval>"])
 	if err != nil {
 		ctx.RespondText("An error occurred while parsing the interval. Make sure to use a valid duration (i.e. 30s, 5m, or 5h).")
 		return

@@ -317,7 +317,7 @@ func (b BackupCommands) backupaccount(ctx *dgc.Ctx) {
 	avatarFileName := utils.IO.SanitizeFilename("avatar" + b.getSuffix() + ".png")
 	avatarFilePath := path.Join(utils.IO.GetMainFolder(), "Backups", avatarFileName)
 
-	err = utils.IO.WriteBytes(avatarFilePath, httpResponse.BodyBytes)
+	err = utils.IO.WriteBytes(avatarFilePath, httpResponse.Body)
 	if err != nil {
 		ctx.RespondText("Error creating backup: " + err.Error())
 		return

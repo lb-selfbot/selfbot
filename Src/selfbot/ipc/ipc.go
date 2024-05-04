@@ -4,6 +4,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"sync"
 
 	"github.com/LightningDev1/LB-Selfbot/selfbot/config"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/constants"
@@ -48,6 +49,7 @@ var ConfigUpdateCallbacks = []func(*config.Config){}
 type Ipc struct {
 	Upgrader       *websocket.Upgrader
 	Conn           *websocket.Conn
+	WriteMutex     *sync.Mutex
 	Connected      bool
 	Connect        chan struct{}
 	SentRawConsole bool
@@ -55,6 +57,7 @@ type Ipc struct {
 
 func (i *Ipc) Init() {
 	i.Upgrader = &websocket.Upgrader{}
+	i.WriteMutex = &sync.Mutex{}
 	i.Connect = make(chan struct{})
 
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
@@ -90,9 +93,18 @@ func (i *Ipc) Init() {
 }
 
 func (i *Ipc) Write(data interface{}) {
-	if i.Conn != nil {
-		_ = i.Conn.WriteJSON(data)
+	if i.WriteMutex == nil {
+		return
 	}
+
+	i.WriteMutex.Lock()
+	defer i.WriteMutex.Unlock()
+
+	if i.Conn == nil {
+		return
+	}
+
+	_ = i.Conn.WriteJSON(data)
 }
 
 func (i *Ipc) OnConnect() {

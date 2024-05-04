@@ -1096,7 +1096,7 @@ func (*AdministrationCommands) webhooksend(ctx *dgc.Ctx) {
 
 	httpResponse := http.Post(webhookUrl.String(), data)
 	if httpResponse.Error != nil || httpResponse.StatusCode != 204 {
-		_ = ctx.RespondText("Error sending message to webhook: " + httpResponse.Body)
+		_ = ctx.RespondText("Error sending message to webhook: " + string(httpResponse.Body))
 		return
 	}
 
@@ -1986,7 +1986,7 @@ func (*AdministrationCommands) admins(ctx *dgc.Ctx) {
 		return
 	}
 	if len(guild.Channels) == 0 {
-		_ = ctx.RespondText("Error getting server: " + err.Error())
+		_ = ctx.RespondText("Server has no channels!")
 		return
 	}
 	adminString := ""

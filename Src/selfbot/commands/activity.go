@@ -481,45 +481,63 @@ func (a *ActivityCommands) getactivityjson(ctx *dgc.Ctx) {
 		_ = ctx.RespondText("Could not find user")
 		return
 	}
-	mutualServers, err := ctx.Session.UserProfile(user.ID)
-	if err != nil {
-		_ = ctx.RespondText("Could not find user")
-		return
+
+	var guilds []string
+
+	if user.ID == ctx.Session.State.User.ID {
+		for _, guild := range ctx.Session.State.Guilds {
+			guilds = append(guilds, guild.ID)
+		}
+	} else {
+		profile, err := ctx.Session.UserProfile(user.ID)
+		if err != nil {
+			_ = ctx.RespondText("Could not find user")
+			return
+		}
+
+		for _, guild := range profile.MutualGuilds {
+			guilds = append(guilds, guild.ID)
+		}
 	}
-	if len(mutualServers.MutualGuilds) < 1 {
-		_ = ctx.RespondText("User is not in any mutual servers")
-		return
-	}
-	emb := embed.NewEmbed()
-	for _, guild_ := range mutualServers.MutualGuilds {
-		guild, err := utils.Discord.GetGuild(ctx.Session, guild_.ID)
+
+	for _, guildID := range guilds {
+		guild, err := utils.Discord.GetGuild(ctx.Session, guildID)
 		if err != nil {
 			continue
 		}
+
 		member, ok := utils.Discord.GetMember(ctx.Session, guild.ID, user.ID)
-		if !ok {
+		if !ok || member.Presence == nil {
 			continue
 		}
-		if member.Presence == nil {
-			continue
-		}
+
+		emb := embed.NewEmbed()
+
 		for index, activity := range member.Presence.Activities {
 			jsonActivity, _ := json.MarshalIndent(activity, "", "    ")
 			emb.AddField(fmt.Sprintf("Activity %d", index+1), string(jsonActivity))
 		}
-		break
+
+		emb.Send(ctx)
+
+		return
 	}
-	emb.Send(ctx)
+
+	embed.NewEmbed().
+		SetDescription("No activity found").
+		Send(ctx)
 }
 
 func (a *ActivityCommands) setactivityjson(ctx *dgc.Ctx) {
 	rawJson := ctx.Arguments.Raw()
+
 	var activity discordgo.Activity
 	err := json.Unmarshal([]byte(rawJson), &activity)
 	if err != nil {
 		_ = ctx.RespondText("Invalid activity JSON! " + err.Error())
 		return
 	}
+
 	_ = ctx.Session.UpdateStatusComplex(discordgo.UpdateStatusData{
 		Activities: []*discordgo.Activity{&activity},
 		AFK:        true,

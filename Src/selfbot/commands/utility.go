@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/base64"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"go/token"
 	"go/types"
@@ -16,6 +17,7 @@ import (
 	"os/exec"
 	"path"
 	"path/filepath"
+	"regexp"
 	"runtime"
 	"sort"
 	"strconv"
@@ -203,6 +205,12 @@ func (u UtilityCommands) RegisterCommands(router *dgc.Router) {
 		Handler:     u.getembedjson,
 	})
 	router.RegisterCmd(&dgc.Command{
+		Name:        "sendmessagejson",
+		Description: "Send a message using raw JSON data",
+		Usage:       "[p]getmessagejson <#channel> <json>",
+		Handler:     u.sendmessagejson,
+	})
+	router.RegisterCmd(&dgc.Command{
 		Name:        "sendinterval",
 		Description: "Send a message every x seconds (flags: DELETE, INSTANT_DEL)",
 		Usage:       "[p]sendinterval <interval> <amount> <\"message\"> [flags]",
@@ -213,6 +221,12 @@ func (u UtilityCommands) RegisterCommands(router *dgc.Router) {
 		Description: "Create a poll with options",
 		Usage:       "[p]optionpoll <\"question\"> <\"option1\"> <\"option2\">",
 		Handler:     u.optionpoll,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "discordpoll",
+		Description: "Create a native Discord poll (options/emojis split by comma)",
+		Usage:       "[p]discordpoll <duration> <\"question\"> <\"options\"> [\"emojis\"]",
+		Handler:     u.discordpoll,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "checktoken",
@@ -324,6 +338,13 @@ func (u UtilityCommands) RegisterCommands(router *dgc.Router) {
 		Usage:       "[p]sleeppc",
 		Flags:       []string{CmdFlagDangerous, CmdFlagHostingDangerous},
 		Handler:     u.sleeppc,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "hibernatepc",
+		Description: "Hibernate your PC",
+		Usage:       "[p]hibernatepc",
+		Flags:       []string{CmdFlagDangerous, CmdFlagHostingDangerous},
+		Handler:     u.hibernatepc,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "lockpc",
@@ -589,6 +610,21 @@ func (u UtilityCommands) RegisterCommands(router *dgc.Router) {
 		Handler:     u._interface,
 	})
 
+	// PokeTwo utilities
+
+	router.RegisterCmd(&dgc.Command{
+		Name:        "snipepokemon",
+		Description: "Snipe a PokéTwo Pokemon",
+		Usage:       "[p]snipepokemon [#channel]",
+		Handler:     u.snipepokemon,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "detectpokemon",
+		Description: "Detect a PokéTwo Pokemon",
+		Usage:       "[p]detectpokemon [#channel]",
+		Handler:     u.detectpokemon,
+	})
+
 	// Misc utilities
 
 	router.RegisterCmd(&dgc.Command{
@@ -684,8 +720,8 @@ func (u UtilityCommands) RegisterCommands(router *dgc.Router) {
 	router.RegisterCmd(&dgc.Command{
 		Name:        "timezone",
 		Description: "Get information about a timezone",
-		Usage:       "[p]timezone <timezone>",
-		Handler:     u.timezone,
+		Usage:       "[p]timezoneinfo <timezone>",
+		Handler:     u.timezoneinfo,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "calculate",
@@ -759,6 +795,12 @@ func (u UtilityCommands) RegisterCommands(router *dgc.Router) {
 		Usage:       "[p]baconipsum [paragraphs]",
 		Handler:     u.baconipsum,
 	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "previewcolor",
+		Description: "Preview a color",
+		Usage:       "[p]previewcolor <rgb/hex>",
+		Handler:     u.previewcolor,
+	})
 }
 
 // Discord utilities
@@ -786,7 +828,7 @@ func (UtilityCommands) copyserver(ctx *dgc.Ctx) {
 	}
 
 	iconResp := http.Get(guild.IconURL())
-	icon := "data:image/png;base64," + base64.StdEncoding.EncodeToString(iconResp.BodyBytes)
+	icon := "data:image/png;base64," + base64.StdEncoding.EncodeToString(iconResp.Body)
 
 	_, _ = ctx.Session.GuildEdit(newGuild.ID, &discordgo.GuildParams{
 		VerificationLevel:           &guild.VerificationLevel,
@@ -1378,15 +1420,33 @@ func (UtilityCommands) getembedjson(ctx *dgc.Ctx) {
 		Send(ctx)
 }
 
-func (UtilityCommands) sendinterval(ctx *dgc.Ctx) {
-	interval, err := strconv.Atoi(utils.Arguments["<interval>"])
-	if err != nil {
-		_ = ctx.RespondText("Error parsing interval: " + err.Error())
+func (UtilityCommands) sendmessagejson(ctx *dgc.Ctx) {
+	channel, success := utils.Discord.TryGetChannelFromMention(ctx, ctx.Arguments.Get(0))
+	if !success {
+		_ = ctx.RespondText("Could not find channel")
 		return
 	}
 
-	if interval < 1 {
-		_ = ctx.RespondText("Error parsing interval: interval must be at least 1 second")
+	rawData := utils.String.RemoveWords(ctx.Arguments.Raw(), 1)
+
+	var data *discordgo.MessageSend
+	err := json.Unmarshal([]byte(rawData), &data)
+	if err != nil {
+		_ = ctx.RespondText("Error unmarshaling JSON: " + err.Error())
+		return
+	}
+
+	_, err = ctx.Session.ChannelMessageSendComplex(channel.ID, data)
+	if err != nil {
+		_ = ctx.RespondText("Error sending message: " + err.Error())
+		return
+	}
+}
+
+func (UtilityCommands) sendinterval(ctx *dgc.Ctx) {
+	interval, err := utils.Misc.ParseDuration(utils.Arguments["<interval>"])
+	if err != nil {
+		_ = ctx.RespondText("Error parsing interval: " + err.Error())
 		return
 	}
 
@@ -1404,22 +1464,24 @@ func (UtilityCommands) sendinterval(ctx *dgc.Ctx) {
 	message := utils.Arguments["<\"message\">"]
 	flags := utils.Arguments["[flags]"]
 
+	instantDelete := strings.Contains(flags, "INSTANT_DEL")
+	delete := strings.Contains(flags, "DELETE")
+
 	for i := 0; i < amount; i++ {
 		msg, err := ctx.Session.ChannelMessageSend(ctx.Event.ChannelID, message)
 		if err != nil {
 			return
 		}
 
-		if strings.Contains(flags, "INSTANT_DEL") {
+		if instantDelete {
 			_ = ctx.Session.ChannelMessageDelete(ctx.Event.ChannelID, msg.ID)
-		} else if strings.Contains(flags, "DELETE") {
-			go func() {
-				time.Sleep(time.Duration(interval) * time.Second)
-				_ = ctx.Session.ChannelMessageDelete(ctx.Event.ChannelID, msg.ID)
-			}()
 		}
 
-		time.Sleep(time.Duration(interval) * time.Second)
+		time.Sleep(interval)
+
+		if delete {
+			_ = ctx.Session.ChannelMessageDelete(ctx.Event.ChannelID, ctx.Event.Message.ID)
+		}
 	}
 }
 
@@ -1430,9 +1492,79 @@ func (UtilityCommands) optionpoll(ctx *dgc.Ctx) {
 		AddField("👎", utils.Arguments["<\"option2\">"]).
 		Send(ctx)
 
-	if len(messages) != 0 {
+	if len(messages) > 0 {
 		_ = ctx.Session.MessageReactionAdd(ctx.Event.ChannelID, messages[0].ID, "👍")
 		_ = ctx.Session.MessageReactionAdd(ctx.Event.ChannelID, messages[0].ID, "👎")
+	}
+}
+
+func (UtilityCommands) discordpoll(ctx *dgc.Ctx) {
+	duration, err := utils.Misc.ParseDuration(utils.Arguments["<duration>"])
+	if err != nil {
+		_ = ctx.RespondText("Error parsing duration: " + err.Error())
+		return
+	}
+
+	if duration < 1*time.Hour {
+		_ = ctx.RespondText("Error parsing duration: The minimum duration is 1 hour.")
+		return
+	}
+
+	if duration > 168*time.Hour {
+		_ = ctx.RespondText("Error parsing duration: The maximum duration is 7 days.")
+		return
+	}
+
+	question := utils.Arguments["<\"question\">"]
+	options := strings.Split(utils.Arguments["<\"options\">"], ",")
+	emojis := strings.Split(utils.Arguments["[\"emojis\"]"], ",")
+
+	var pollAnswers []discordgo.PollAnswer
+
+	for i, option := range options {
+		if option == "" {
+			continue
+		}
+
+		answer := discordgo.PollAnswer{
+			Media: discordgo.PollMedia{Text: option},
+		}
+
+		if i < len(emojis) && emojis[i] != "" {
+			emojiID := ""
+			emojiName := strings.TrimSpace(emojis[i])
+
+			emojiIDs := regexp.MustCompile(`<a?:.*:(\d+)>`).FindStringSubmatch(emojiName)
+			if len(emojiIDs) > 0 {
+				emojiID = emojiIDs[1]
+				emojiName = ""
+			}
+
+			answer.Media.Emoji = &discordgo.PollEmoji{
+				ID:   emojiID,
+				Name: emojiName,
+			}
+		}
+
+		pollAnswers = append(pollAnswers, answer)
+	}
+
+	if len(pollAnswers) == 0 {
+		_ = ctx.RespondText("Error parsing options: At least one option must be provided.")
+		return
+	}
+
+	_, err = ctx.Session.ChannelMessageSendComplex(ctx.Event.ChannelID, &discordgo.MessageSend{
+		Poll: &discordgo.Poll{
+			Question:         discordgo.PollQuestion{Text: question},
+			Answers:          pollAnswers,
+			AllowMultiselect: false,
+			Duration:         int(duration.Hours()),
+			LayoutType:       1,
+		},
+	})
+	if err != nil {
+		_ = ctx.RespondText("Error sending poll: " + err.Error())
 	}
 }
 
@@ -1616,6 +1748,10 @@ func (UtilityCommands) restartpc(ctx *dgc.Ctx) {
 
 func (UtilityCommands) sleeppc(ctx *dgc.Ctx) {
 	_ = utils.System.SleepPC()
+}
+
+func (UtilityCommands) hibernatepc(ctx *dgc.Ctx) {
+	_ = utils.System.HibernatePC()
 }
 
 func (UtilityCommands) lockpc(ctx *dgc.Ctx) {
@@ -1850,7 +1986,7 @@ func (UtilityCommands) tinyurl(ctx *dgc.Ctx) {
 	}
 	embed.NewEmbed().
 		AddField("URL", sourceUrl).
-		AddField("TinyURL", httpResponse.Body).
+		AddField("TinyURL", string(httpResponse.Body)).
 		Send(ctx)
 }
 
@@ -1860,14 +1996,15 @@ func (UtilityCommands) obfuscateFunc(lang, ext string) func(ctx *dgc.Ctx) {
 	return func(ctx *dgc.Ctx) {
 		script := utils.Arguments["[script/attachment]"]
 
-		if script == "" && len(ctx.Event.Message.Attachments) > 0 {
-			httpResponse := http.Get(ctx.Event.Message.Attachments[0].URL)
+		attachments := ctx.Event.Message.Attachments
+		if script == "" && len(attachments) > 0 {
+			httpResponse := http.Get(attachments[0].URL)
 			if httpResponse.Error != nil {
 				_ = ctx.RespondText("Error getting script: " + httpResponse.Error.Error())
 				return
 			}
 
-			script = httpResponse.Body
+			script = string(httpResponse.Body)
 		}
 
 		if script == "" {
@@ -2271,13 +2408,13 @@ func (UtilityCommands) reversemac(ctx *dgc.Ctx) {
 		_ = ctx.RespondText("An error has occurred.")
 		return
 	}
-	if strings.Contains(httpResponse.Body, "Not Found") {
+	if strings.Contains(string(httpResponse.Body), "Not Found") {
 		embed.NewEmbed().SetDescription("Invalid MAC Address.").Send(ctx)
 		return
 	}
 	embed.NewEmbed().
 		AddField("MAC Address", mac).
-		AddField("Vendor", httpResponse.Body).
+		AddField("Vendor", string(httpResponse.Body)).
 		Send(ctx)
 }
 
@@ -2289,8 +2426,8 @@ func (UtilityCommands) headers(ctx *dgc.Ctx) {
 	}
 
 	var headers string
-	for key, value := range httpResponse.Headers {
-		headers += fmt.Sprintf("%s: %s\n", key, value)
+	for key, value := range httpResponse.Header {
+		headers += fmt.Sprintf("%s: %s\n", key, strings.Join(value, ", "))
 	}
 
 	embed.NewEmbed().
@@ -2307,6 +2444,159 @@ func (UtilityCommands) _interface(ctx *dgc.Ctx) {
 		Send(ctx)
 }
 
+// Poketwo utilities
+
+func (UtilityCommands) getPoketwoMessage(ctx *dgc.Ctx) (*discordgo.Message, error) {
+	channelID := ctx.Event.ChannelID
+	channel, success := utils.Discord.TryGetChannelFromMention(ctx, ctx.Arguments.Get(0))
+	if success {
+		channelID = channel.ID
+	}
+
+	if channelID == "" {
+		_ = ctx.RespondText("Error: invalid channel")
+		return nil, errors.New("invalid channel")
+	}
+
+	messages, err := utils.Discord.GetChannelMessages(ctx.Session, channelID, 100)
+	if err != nil {
+		_ = ctx.RespondText("Error getting messages: " + err.Error())
+		return nil, err
+	}
+
+	for _, m := range messages {
+		isPokeTwo := m.Author.ID == "716390085896962058" &&
+			len(m.Embeds) == 1 &&
+			strings.Contains(m.Embeds[0].Title, "has appeared!") &&
+			m.Embeds[0].Image != nil
+
+		if isPokeTwo {
+			return m, nil
+		}
+	}
+
+	_ = ctx.RespondText("Error: no Poketwo message found in channel")
+	return nil, errors.New("no Poketwo message found")
+}
+
+func (c UtilityCommands) snipepokemon(ctx *dgc.Ctx) {
+	message, err := c.getPoketwoMessage(ctx)
+	if err != nil {
+		return
+	}
+
+	emb := message.Embeds[0]
+
+	// Download the Pokémon image
+	resp := http.Get(emb.Image.URL)
+	if resp.Error != nil {
+		_ = ctx.RespondText("Error downloading image: " + resp.Error.Error())
+		return
+	}
+
+	image := utils.Misc.ImageToBase64(resp.Body)
+
+	cfg, err := config.GetConfig()
+	if err != nil {
+		_ = ctx.RespondText("Error getting config: " + err.Error())
+		return
+	}
+
+	pokemon, _, err := api.PokeTwo(image, &cfg)
+	if err != nil {
+		utils.Logging.Debug("Snipers.CheckPokeTwoSniper: Error getting Pokémon: ", err)
+		return
+	}
+
+	// Catch the Pokémon
+	label := pokemon.NameEnglish
+	switch cfg.Snipers.PokeTwoSniper.CatchLanguage {
+	case "Japanese":
+		label = pokemon.NameJapanese
+	case "JapaneseTransliterated":
+		label = pokemon.NameJapaneseT
+	case "German":
+		label = pokemon.NameGerman
+	case "French":
+		label = pokemon.NameFrench
+	}
+
+	if label == "" {
+		label = pokemon.NameEnglish
+	}
+
+	label = strings.ToLower(label)
+
+	_, err = ctx.Session.ChannelMessageSend(message.ChannelID, "<@716390085896962058> c "+strings.ToLower(label))
+	if err != nil {
+		_ = ctx.RespondText("Error catching Pokémon: " + err.Error())
+		return
+	}
+
+	embed.NewEmbed().
+		SetDescription("Successfully sniped Pokémon").
+		AddField("Pokémon", label).
+		Send(ctx)
+}
+
+func (c UtilityCommands) detectpokemon(ctx *dgc.Ctx) {
+	message, err := c.getPoketwoMessage(ctx)
+	if err != nil {
+		return
+	}
+
+	emb := message.Embeds[0]
+
+	// Download the Pokémon image
+	resp := http.Get(emb.Image.URL)
+	if resp.Error != nil {
+		_ = ctx.RespondText("Error downloading image: " + resp.Error.Error())
+		return
+	}
+
+	image := utils.Misc.ImageToBase64(resp.Body)
+
+	cfg, err := config.GetConfig()
+	if err != nil {
+		_ = ctx.RespondText("Error getting config: " + err.Error())
+		return
+	}
+
+	pokemon, _, err := api.PokeTwo(image, &cfg)
+	if err != nil {
+		utils.Logging.Debug("Snipers.CheckPokeTwoSniper: Error getting Pokémon: ", err)
+		return
+	}
+
+	names := fmt.Sprintf(
+		"🇬🇧: %s\n🇯🇵: %s\n🇯🇵 (transliterated): %s\n🇩🇪: %s\n🇫🇷: %s",
+		pokemon.NameEnglish,
+		pokemon.NameJapanese,
+		pokemon.NameJapaneseT,
+		pokemon.NameGerman,
+		pokemon.NameFrench,
+	)
+
+	info := fmt.Sprintf(
+		"ID: %s\nRegion: %s\nType: %s\nDescription: %s\nEvent: %s\nHeight: %s\nWeight: %s\nHP: %s\nAttack: %s\nDefense: %s",
+		pokemon.ID,
+		pokemon.Region,
+		pokemon.Type,
+		pokemon.Description,
+		pokemon.Event,
+		pokemon.Height,
+		pokemon.Weight,
+		pokemon.HP,
+		pokemon.Attack,
+		pokemon.Defense,
+	)
+
+	embed.NewEmbed().
+		AddField("Names", names).
+		AddField("Info", info).
+		Send(ctx)
+}
+
 // Misc utilities
 
 func (UtilityCommands) tts(ctx *dgc.Ctx) {
@@ -2316,7 +2606,7 @@ func (UtilityCommands) tts(ctx *dgc.Ctx) {
 		return
 	}
 
-	if strings.Contains(httpResponse.Body, "Bad Request") {
+	if httpResponse.StatusCode == 400 {
 		_ = ctx.RespondText("Invalid language. Please use an ISO 639-1 language code. See https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes for more information.")
 		return
 	}
@@ -2324,7 +2614,7 @@ func (UtilityCommands) tts(ctx *dgc.Ctx) {
 	_, _ = ctx.Session.ChannelFileSend(
 		ctx.Event.ChannelID,
 		"tts.mp3",
-		bytes.NewReader(httpResponse.BodyBytes),
+		bytes.NewReader(httpResponse.Body),
 	)
 }
 
@@ -2592,7 +2882,7 @@ func (UtilityCommands) timezones(ctx *dgc.Ctx) {
 		Send(ctx)
 }
 
-func (UtilityCommands) timezone(ctx *dgc.Ctx) {
+func (UtilityCommands) timezoneinfo(ctx *dgc.Ctx) {
 	httpResponse := http.Get("http://worldtimeapi.org/api/timezone/" + utils.Arguments["<timezone>"])
 	if httpResponse.Error != nil {
 		_ = ctx.RespondText("Error getting timezones: " + httpResponse.Error.Error())
@@ -2842,7 +3132,7 @@ func (UtilityCommands) loremipsum(ctx *dgc.Ctx) {
 	}
 
 	embed.NewEmbed().
-		SetDescription(httpResponse.Body).
+		SetDescription(string(httpResponse.Body)).
 		Send(ctx)
 }
 
@@ -2859,6 +3149,48 @@ func (UtilityCommands) baconipsum(ctx *dgc.Ctx) {
 	}
 
 	embed.NewEmbed().
-		SetDescription(httpResponse.Body).
+		SetDescription(string(httpResponse.Body)).
 		Send(ctx)
+}
+
+func (UtilityCommands) previewcolor(ctx *dgc.Ctx) {
+	color := utils.Arguments["<rgb/hex>"]
+	color = strings.ReplaceAll(color, "#", "")
+
+	var r, g, b int
+
+	// Parse hex
+	if len(color) == 6 {
+		r, g, b = utils.Misc.HexToRGB(color)
+	} else {
+		// Parse RGB
+		rgb := strings.Split(color, ",")
+		if len(rgb) != 3 {
+			_ = ctx.RespondText("Invalid RGB format. Use R,G,B (e.g. 255,255,255)")
+			return
+		}
+
+		r, _ = strconv.Atoi(rgb[0])
+		g, _ = strconv.Atoi(rgb[1])
+		b, _ = strconv.Atoi(rgb[2])
+	}
+
+	hex := fmt.Sprintf("%02x%02x%02x", r, g, b)
+	name := "Unknown"
+
+	data, err := http.GetJson("https://www.thecolorapi.com/id?hex=" + hex)
+	if err == nil {
+		name = data.GetPath("name", "value").MustString()
+	}
+
+	embed.NewEmbed().
+		AddField("Color", name).
+		AddField("RGB", fmt.Sprintf("%d, %d, %d", r, g, b)).
+		AddField("Hex", "#"+hex).
+		Send(ctx)
+
+	preview, err := utils.Misc.PreviewColorImage(500, 100, r, g, b)
+	if err == nil {
+		_, _ = ctx.Session.ChannelFileSend(ctx.Event.ChannelID, "color.png", preview)
+	}
 }

@@ -74,6 +74,12 @@ func (e EncodingCommands) RegisterCommands(router *dgc.Router) {
 		Handler:     e.base85,
 	})
 	router.RegisterCmd(&dgc.Command{
+		Name:        "urlencode",
+		Description: "Encodes or decodes text using URL encoding",
+		Usage:       "[p]urlencode <encode/decode> <text>",
+		Handler:     e.urlencode,
+	})
+	router.RegisterCmd(&dgc.Command{
 		Name:        "morsecode",
 		Description: "Encodes or decodes text using morsecode",
 		Usage:       "[p]morsecode <encode/decode> <text>",
@@ -233,6 +239,10 @@ func (EncodingCommands) ascii85(ctx *dgc.Ctx) {
 
 func (EncodingCommands) base85(ctx *dgc.Ctx) {
 	EncodingCommand(ctx, encodings.Base85)
+}
+
+func (EncodingCommands) urlencode(ctx *dgc.Ctx) {
+	EncodingCommand(ctx, encodings.URLEncode)
 }
 
 func (EncodingCommands) morsecode(ctx *dgc.Ctx) {

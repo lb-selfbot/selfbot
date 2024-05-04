@@ -51,6 +51,14 @@ func Parse(text string) string {
 	text = parseVariable(text, "\\$DATE", func(arg string) string {
 		return time.Now().Local().Format("2006-01-02")
 	})
+	text = parseVariable(text, "\\$TIME\\((.*?)\\)", func(arg string) string {
+		loc, err := time.LoadLocation(arg)
+		if err != nil {
+			return time.Now().Local().Format("15:04:05") + " (invalid timezone)"
+		}
+
+		return time.Now().In(loc).Format("15:04:05")
+	})
 	text = parseVariable(text, "\\$TIME", func(arg string) string {
 		return time.Now().Local().Format("15:04:05")
 	})

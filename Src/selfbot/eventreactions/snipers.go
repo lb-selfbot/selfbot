@@ -901,6 +901,61 @@ func (s *Snipers) CheckGiveawaySniper(session *discordgo.Session, m *discordgo.M
 				utils.Logging.Debug("Snipers.CheckGiveawaySniper: Error clicking button: ", err)
 			}
 		}()
+	case "720351927581278219": // Invite Tracker#0478
+		// Win check
+		if utils.Discord.IsUserMentioned(m.Message, session.State.User.ID) {
+			winRegex := regexp.MustCompile(`you won the \*\*(.*?)\*\*`)
+
+			wins := winRegex.FindAllStringSubmatch(m.Content, -1)
+			for _, win := range wins {
+				prize := win[1]
+
+				logging.Logging.GiveawayWon(session, m.Message, prize, s.Account)
+			}
+		}
+
+		// ...
+
+		// Check if the message is a giveaway
+		button, ok := s.getButtonComponent(m.Message, 0)
+		if len(m.Embeds) == 0 || !ok || !strings.Contains(button.Label, "Entry") {
+			break
+		}
+
+		// Get giveaway info
+		prize := m.Embeds[0].Title
+		if s.isBlacklisted(&cfg, prize) {
+			break
+		}
+
+		endsRegex := regexp.MustCompile(`<t:(\d+):R>`)
+		endsMatches := endsRegex.FindStringSubmatch(m.Embeds[0].Description)
+
+		hostRegex := regexp.MustCompile(`<@!?(\d+)>`)
+		hostMatches := hostRegex.FindStringSubmatch(m.Embeds[0].Description)
+
+		if len(endsMatches) == 0 || len(hostMatches) == 0 {
+			break
+		}
+
+		hostID, ends := hostMatches[1], endsMatches[1]
+
+		// Parse UNIX timestamp
+		endsUnix, _ := strconv.ParseInt(ends, 10, 64)
+		endsTime := time.Unix(endsUnix, 0)
+		endsFormat := utils.Misc.FormatDuration(time.Until(endsTime))
+
+		logging.Logging.GiveawayFound(session, m.Message, prize, hostID, endsFormat, s.Account)
+
+		go func() {
+			time.Sleep(s.giveawaySniperSleepDuration(&cfg, &endsTime))
+
+			// Click the enter button
+			err = session.InteractionClick(button, m.Message)
+			if err != nil {
+				utils.Logging.Debug("Snipers.CheckGiveawaySniper: Error clicking button: ", err)
+			}
+		}()
 	default: // Custom bots
 		if !utils.Discord.IsUserInList(session, m.Author.ID, cfg.Snipers.GiveawaySniper.CustomBots) {
 			break
@@ -926,13 +981,17 @@ func (s *Snipers) CheckGiveawaySniper(session *discordgo.Session, m *discordgo.M
 		// Get giveaway info
 		hostRegex := regexp.MustCompile(`\\u003c@!?(.*?)\\u003e`)
 		hostMatches := hostRegex.FindStringSubmatch(rawMessageString)
-		host := strings.Join(hostMatches, ", ")
 
 		endsRegex := regexp.MustCompile(`\\u003ct:(.*?):R\\u003e`)
 		endsMatches := endsRegex.FindStringSubmatch(rawMessageString)
 
+		hostID := ""
 		endsIn := ""
 		var giveawayEnd *time.Time
+
+		if len(hostMatches) > 1 {
+			hostID = hostMatches[1]
+		}
 
 		if len(endsMatches) > 1 {
 			// Parse UNIX timestamp
@@ -942,7 +1001,7 @@ func (s *Snipers) CheckGiveawaySniper(session *discordgo.Session, m *discordgo.M
 			endsIn = utils.Misc.FormatDuration(time.Until(endsTime))
 		}
 
-		logging.Logging.GiveawayFound(session, m.Message, "Unknown (Custom Bot)", host, endsIn, s.Account)
+		logging.Logging.GiveawayFound(session, m.Message, "Unknown (Custom Bot)", hostID, endsIn, s.Account)
 
 		go func() {
 			time.Sleep(s.giveawaySniperSleepDuration(&cfg, giveawayEnd))
@@ -1118,9 +1177,9 @@ func (s *Snipers) CheckPokeTwoSniper(session *discordgo.Session, m *discordgo.Me
 
 		err = api.PokeTwoVerify(session.State.User.ID)
 		if err != nil {
-			utils.Logging.Debug("Snipers.CheckPokeTwoSniper: Error verifying captcha: ", err)
+			utils.Logging.Debug("Snipers.CheckPokeTwoSniper: Error solving captcha: ", err)
 
-			logging.UI.Info("PokéTwo Sniper: Error completing captcha! You need to complete it manually at https://verify.poketwo.net/captcha/" + session.State.User.ID)
+			logging.UI.Info("PokéTwo Sniper: Error solving captcha! You need to solve it manually at https://verify.poketwo.net/captcha/" + session.State.User.ID)
 
 			// Try again after 5 minutes
 			go func() {
@@ -1191,11 +1250,11 @@ func (s *Snipers) CheckPokeTwoSniper(session *discordgo.Session, m *discordgo.Me
 		return
 	}
 
-	image := utils.Misc.ImageToBase64(resp.BodyBytes)
+	image := utils.Misc.ImageToBase64(resp.Body)
 
 	// Detect the Pokémon
 	beforeRequest := time.Now()
-	label, confidence, err := api.PokeTwo(image, &cfg)
+	pokemon, confidence, err := api.PokeTwo(image, &cfg)
 	if err != nil {
 		utils.Logging.Debug("Snipers.CheckPokeTwoSniper: Error getting Pokémon: ", err)
 		return
@@ -1225,6 +1284,24 @@ func (s *Snipers) CheckPokeTwoSniper(session *discordgo.Session, m *discordgo.Me
 	}
 
 	// Catch the Pokémon
+	label := pokemon.NameEnglish
+	switch cfg.Snipers.PokeTwoSniper.CatchLanguage {
+	case "Japanese":
+		label = pokemon.NameJapanese
+	case "JapaneseTransliterated":
+		label = pokemon.NameJapaneseT
+	case "German":
+		label = pokemon.NameGerman
+	case "French":
+		label = pokemon.NameFrench
+	}
+
+	if label == "" {
+		label = pokemon.NameEnglish
+	}
+
+	label = strings.ToLower(label)
+
 	_, err = session.ChannelMessageSend(m.ChannelID, "<@716390085896962058> c "+strings.ToLower(label))
 	if err != nil {
 		utils.Logging.Debug("Snipers.CheckPokeTwoSniper: Error catching Pokémon: ", err)
@@ -1267,7 +1344,7 @@ func (s *Snipers) CheckPokeTwoSniper(session *discordgo.Session, m *discordgo.Me
 			iv = ivMatches[1]
 		}
 
-		logging.Logging.PokeTwoSniper(session, m, pokemon, received, iv, confidence, elapsed)
+		logging.Logging.PokeTwoSniper(session, m, pokemon, received, iv, confidence, elapsed, s.Account)
 
 		// Fake activity
 

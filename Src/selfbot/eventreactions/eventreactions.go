@@ -32,6 +32,7 @@ const (
 	PING_MUTE
 	PING_TIMEOUT
 	PING_INSULT
+	PING_REACT
 	PING_RESPONSE
 	PING_AI_RESPONSE
 
@@ -165,6 +166,24 @@ func Load(session *discordgo.Session, first bool) error {
 	ReactionsMutex.Lock()
 	defer ReactionsMutex.Unlock()
 
+	defer func() {
+		if r := recover(); r != nil {
+			cfg, err := config.GetConfig()
+			if err != nil {
+				return
+			}
+
+			cfg.EventReactions = []byte("[]")
+
+			err = cfg.Save()
+			if err != nil {
+				return
+			}
+
+			utils.Logging.Error("An error occurred while loading event reactions. Event reactions have been reset.")
+		}
+	}()
+
 	cfg, err := config.GetConfig()
 	if err != nil {
 		return err
@@ -186,7 +205,7 @@ func Load(session *discordgo.Session, first bool) error {
 			if err == nil {
 				ActiveReactions = append(ActiveReactions, ignore)
 			}
-		case PING_PING, PING_KICK, PING_BAN, PING_MUTE, PING_TIMEOUT, PING_INSULT, PING_RESPONSE, PING_AI_RESPONSE:
+		case PING_PING, PING_KICK, PING_BAN, PING_MUTE, PING_TIMEOUT, PING_INSULT, PING_REACT, PING_RESPONSE, PING_AI_RESPONSE:
 			ping, err := NewPingFromData(session, reaction.Type, reaction.Data)
 			if err == nil {
 				ActiveReactions = append(ActiveReactions, ping)
@@ -459,12 +478,11 @@ func RegisterHandlers(session *discordgo.Session, router *dgc.Router) {
 		if m.Message == nil || m.Author == nil {
 			return
 		}
+		session.State.MessageAdd(m.Message)
 
 		HandleEvent(session, m)
 
 		TimeDifference = time.Since(utils.Discord.SnowflakeToTime(m.ID))
-
-		session.State.MessageAdd(m.Message)
 
 		websocket.Websocket.CheckNonce()
 	})
@@ -482,6 +500,8 @@ func RegisterHandlers(session *discordgo.Session, router *dgc.Router) {
 		if m.BeforeUpdate == nil {
 			m.BeforeUpdate = m.Message
 		}
+
+		session.State.MessageAdd(m.Message)
 
 		if !IsEventReactionMessage(m.Message) {
 			HandleEvent(session, m)
@@ -501,13 +521,11 @@ func RegisterHandlers(session *discordgo.Session, router *dgc.Router) {
 	})
 
 	session.AddHandler(func(_ *discordgo.Session, m *discordgo.MessageDelete) {
-		if m.Message == nil || m.Author == nil {
+		if m.BeforeDelete == nil {
 			return
 		}
 
-		if m.BeforeDelete == nil {
-			m.BeforeDelete = m.Message
-		}
+		m.Message = m.BeforeDelete
 
 		if !IsEventReactionMessage(m.Message) {
 			HandleEvent(session, m)

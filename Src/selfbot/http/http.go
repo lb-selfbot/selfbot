@@ -18,29 +18,28 @@ var tlsClientOptions = []tls_client.HttpClientOption{
 	tls_client.WithClientProfile(profiles.Chrome_117),
 	tls_client.WithCookieJar(tls_client.NewCookieJar()),
 	tls_client.WithRandomTLSExtensionOrder(),
+	tls_client.WithNotFollowRedirects(),
 }
 
 type HttpResponse struct {
-	Success       bool
-	Error         error
-	Body          string
-	BodyBytes     []byte
-	StatusCode    int
-	Headers       map[string]string
-	HeaderString  string
-	InnerResponse *fhttp.Response
+	*fhttp.Response
+
+	Error error
+	Body  []byte
 }
 
-func (h *HttpResponse) GetHeaders() {
-	h.Headers = make(map[string]string)
+func (h *HttpResponse) GetHeaders() (headers map[string]string) {
+	headers = make(map[string]string)
 
-	for key, value := range h.InnerResponse.Header {
-		h.Headers[key] = strings.Join(value, ", ")
+	for key, value := range h.Header {
+		headers[key] = strings.Join(value, ", ")
 	}
+
+	return
 }
 
 func (h *HttpResponse) Json() *simplejson.Json {
-	jsonData, err := simplejson.NewJson(h.BodyBytes)
+	jsonData, err := simplejson.NewJson(h.Body)
 	if err != nil {
 		return simplejson.New()
 	}
@@ -49,14 +48,7 @@ func (h *HttpResponse) Json() *simplejson.Json {
 }
 
 func errorResponse(err error) *HttpResponse {
-	return &HttpResponse{
-		Success:       false,
-		Error:         err,
-		Body:          "",
-		BodyBytes:     nil,
-		StatusCode:    0,
-		InnerResponse: nil,
-	}
+	return &HttpResponse{Error: err}
 }
 
 func Do(req *fhttp.Request) *HttpResponse {
@@ -79,18 +71,11 @@ func Do(req *fhttp.Request) *HttpResponse {
 		return errorResponse(err)
 	}
 
-	httpResponse := &HttpResponse{
-		Success:       true,
-		Error:         nil,
-		Body:          string(body),
-		BodyBytes:     body,
-		StatusCode:    resp.StatusCode,
-		InnerResponse: resp,
+	return &HttpResponse{
+		Response: resp,
+		Error:    nil,
+		Body:     body,
 	}
-
-	httpResponse.GetHeaders()
-
-	return httpResponse
 }
 
 func Get(url string, headersList ...map[string]string) *HttpResponse {

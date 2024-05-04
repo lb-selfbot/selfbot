@@ -11,6 +11,7 @@ import (
 	"github.com/LightningDev1/LB-Selfbot/selfbot/api"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/config"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/constants"
+	"github.com/LightningDev1/LB-Selfbot/selfbot/data"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/http"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/utils"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/variables"
@@ -673,7 +674,23 @@ func (e *Embed) sendWebhookEmbed(ctx *dgc.Ctx) error {
 }
 
 func (e *Embed) SendWebhook(webhookUrl string) *http.HttpResponse {
+	cfg, err := config.GetConfig()
+	if err != nil {
+		return &http.HttpResponse{Error: err}
+	}
+
+	content := ""
+
+	if cfg.Webhooks.PingSelf {
+		content += "<@!" + data.UserID + ">\n"
+	}
+
+	if cfg.Webhooks.PingEveryone {
+		content += "@everyone\n"
+	}
+
 	return http.Post(webhookUrl, map[string]any{
+		"content":    content,
 		"embeds":     []any{e},
 		"username":   "LightningBot Webhook Notifications",
 		"avatar_url": "https://lightning-bot.com/logo.png",
