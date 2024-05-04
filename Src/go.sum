@@ -53,6 +53,8 @@ github.com/LightningDev1/dgc v1.1.4-0.20231130125735-679db2635a21 h1:BM2o+E+E5oy
 github.com/LightningDev1/dgc v1.1.4-0.20231130125735-679db2635a21/go.mod h1:+Aq4v/Mk75ZkWQqDfu1pYHoTELT+iJMFM8EctWAp0nE=
 github.com/LightningDev1/discordgo v0.26.6-0.20240414123952-c9f01a5b4daa h1:cP2fUHoWUOHXICmyokHe6gq7cOubipJ+GRfMsPUXlGw=
 github.com/LightningDev1/discordgo v0.26.6-0.20240414123952-c9f01a5b4daa/go.mod h1:jk57qerszzTaO6r5JNbPu1+spf+peqX4UJv9UMBPgzk=
+github.com/LightningDev1/discordgo v0.26.6-0.20240504133526-303a90555458 h1:KIC7BnJwcfR4MMUHHKL31eCzLFqV9/mLH/727xblsQs=
+github.com/LightningDev1/discordgo v0.26.6-0.20240504133526-303a90555458/go.mod h1:jk57qerszzTaO6r5JNbPu1+spf+peqX4UJv9UMBPgzk=
 github.com/LightningDev1/go-foreground v0.0.0-20240212172534-661cc0000e42 h1:3nkZh2ygGSuK/+CT0O9IG4Yho7WIO6QgzMwxEcn9xyc=
 github.com/LightningDev1/go-foreground v0.0.0-20240212172534-661cc0000e42/go.mod h1:VMeeC7SlbdMWtn59r8E47a0GZgmPwNd9btqlDi6Ql+Y=
 github.com/LightningDev1/go-privnote v0.1.1 h1:uBV2vDFJ4FG5oj7YMiKpHBKm5OPY7hnFB5inOEJuE3c=
