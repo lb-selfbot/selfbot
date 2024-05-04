@@ -158,7 +158,7 @@ func Main() {
 				if ctx.Event.Author == nil {
 					return false
 				}
-	
+
 				if ctx.Event.Author.ID == session.State.User.ID {
 					return true
 				}
