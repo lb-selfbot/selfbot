@@ -15,6 +15,7 @@ import (
 
 	"github.com/LightningDev1/LB-Selfbot/selfbot/api"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/config"
+	"github.com/LightningDev1/LB-Selfbot/selfbot/data"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/http"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/logging"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/utils"
@@ -34,14 +35,10 @@ type GiftCode struct {
 }
 
 type Snipers struct {
-	Account       string
-	SetupComplete bool
+	Account string
 
 	CheckedGiftCodes  []string
 	GiftCodesByAuthor map[string][]GiftCode
-
-	CountryCode     string
-	PaymentSourceID string
 
 	PrivnoteClient *privnote.Client
 
@@ -77,43 +74,7 @@ func (*Snipers) Data() map[string]any {
 	return map[string]any{}
 }
 
-func (s *Snipers) Setup(session *discordgo.Session) {
-	if s.SetupComplete {
-		return
-	}
-	s.SetupComplete = true
-
-	// Get payment source
-	resp, err := session.Request("GET", "https://discord.com/api/v9/users/@me/billing/payment-sources", nil)
-	if err != nil {
-		utils.Logging.Debug("Snipers.Setup: Error getting payment sources: ", err)
-		return
-	}
-
-	json, err := simplejson.NewJson(resp)
-	if err != nil {
-		utils.Logging.Debug("Snipers.Setup: Error parsing payment sources: ", err)
-		return
-	}
-
-	// No payment sources
-	if len(json.MustArray()) == 0 {
-		return
-	}
-
-	for i := 0; i < len(json.MustArray()); i++ {
-		source := json.GetIndex(i)
-
-		if i == 0 || source.Get("default").MustBool() {
-			s.PaymentSourceID = source.Get("id").MustString()
-			s.CountryCode = source.Get("country").MustString()
-		}
-	}
-}
-
 func (s *Snipers) Handler(session *discordgo.Session, event any) {
-	s.Setup(session)
-
 	cfg, err := config.GetConfig()
 	if err != nil {
 		utils.Logging.Debug("Snipers.Handler: Error getting config: ", err)
@@ -209,19 +170,26 @@ func (s *Snipers) CheckNitroSniper(session *discordgo.Session, m *discordgo.Mess
 			"with_subscription_plan": true,
 		}
 
-		if s.CountryCode != "" {
-			payload["country_code"] = s.CountryCode
+		if data.CountryCode != "" {
+			payload["country_code"] = data.CountryCode
 		}
 
-		if s.PaymentSourceID != "" {
-			payload["payment_source_id"] = s.PaymentSourceID
+		if data.PaymentSourceID != "" {
+			payload["payment_source_id"] = data.PaymentSourceID
 		}
+
+		headers := make(map[string]string)
+		for k, v := range session.Headers {
+			headers[k] = v
+		}
+
+		headers["Authorization"] = data.Token
 
 		beforeRequest := time.Now()
-		resp, _ := session.Request("POST", url, payload)
+		resp := http.Post(url, payload, headers)
 		elapsed := time.Since(beforeRequest)
 
-		respString := string(resp)
+		respString := string(resp.Body)
 
 		// Code has been redeemed
 		if strings.Contains(respString, "subscription_plan") {
@@ -248,7 +216,7 @@ func (s *Snipers) CheckNitroSniper(session *discordgo.Session, m *discordgo.Mess
 		}
 
 		// Unknown status, try to parse JSON
-		json, err := simplejson.NewJson(resp)
+		json, err := simplejson.NewJson(resp.Body)
 		if err != nil {
 			json = simplejson.New()
 		}

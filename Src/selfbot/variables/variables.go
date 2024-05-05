@@ -8,7 +8,6 @@ import (
 	"time"
 
 	"github.com/LightningDev1/LB-Selfbot/selfbot/api"
-	"github.com/LightningDev1/LB-Selfbot/selfbot/config"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/constants"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/data"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/spotify"
@@ -165,12 +164,7 @@ func Parse(text string) string {
 
 	// Spotify
 	text = parseVariable(text, "\\$SONGNAME", func(arg string) string {
-		cfg, err := config.GetConfig()
-		if err != nil {
-			return ""
-		}
-
-		song, err := spotify.API.GetCurrentlyPlaying(cfg.Account.Discord.Token)
+		song, err := spotify.API.GetCurrentlyPlaying(data.Token)
 		if err != nil {
 			return ""
 		}
@@ -178,12 +172,7 @@ func Parse(text string) string {
 		return song.Get("name").MustString()
 	})
 	text = parseVariable(text, "\\$SONGARTIST", func(arg string) string {
-		cfg, err := config.GetConfig()
-		if err != nil {
-			return ""
-		}
-
-		song, err := spotify.API.GetCurrentlyPlaying(cfg.Account.Discord.Token)
+		song, err := spotify.API.GetCurrentlyPlaying(data.Token)
 		if err != nil {
 			return ""
 		}
@@ -191,12 +180,7 @@ func Parse(text string) string {
 		return strings.Join(utils.Spotify.GetSongArtists(song), ", ")
 	})
 	text = parseVariable(text, "\\$SONGALBUM", func(arg string) string {
-		cfg, err := config.GetConfig()
-		if err != nil {
-			return ""
-		}
-
-		song, err := spotify.API.GetCurrentlyPlaying(cfg.Account.Discord.Token)
+		song, err := spotify.API.GetCurrentlyPlaying(data.Token)
 		if err != nil {
 			return ""
 		}
@@ -204,12 +188,7 @@ func Parse(text string) string {
 		return song.GetPath("album", "name").MustString()
 	})
 	text = parseVariable(text, "\\$SONGDURATION", func(arg string) string {
-		cfg, err := config.GetConfig()
-		if err != nil {
-			return ""
-		}
-
-		song, err := spotify.API.GetCurrentlyPlaying(cfg.Account.Discord.Token)
+		song, err := spotify.API.GetCurrentlyPlaying(data.Token)
 		if err != nil {
 			return ""
 		}
@@ -219,12 +198,7 @@ func Parse(text string) string {
 		return fmt.Sprintf("%d:%02d", duration/60, duration%60)
 	})
 	text = parseVariable(text, "\\$SONGCOVER", func(arg string) string {
-		cfg, err := config.GetConfig()
-		if err != nil {
-			return ""
-		}
-
-		song, err := spotify.API.GetCurrentlyPlaying(cfg.Account.Discord.Token)
+		song, err := spotify.API.GetCurrentlyPlaying(data.Token)
 		if err != nil {
 			return ""
 		}
@@ -241,12 +215,7 @@ func Parse(text string) string {
 		return "spotify:" + urlSplit[len(urlSplit)-1]
 	})
 	text = parseVariable(text, "\\$SONGLINK", func(arg string) string {
-		cfg, err := config.GetConfig()
-		if err != nil {
-			return ""
-		}
-
-		song, err := spotify.API.GetCurrentlyPlaying(cfg.Account.Discord.Token)
+		song, err := spotify.API.GetCurrentlyPlaying(data.Token)
 		if err != nil {
 			return ""
 		}

@@ -7,3 +7,7 @@ var Guilds int
 var Friends int
 var AvatarImageKey string
 var UserID string
+
+var PaymentSourceID string
+var CountryCode string
+var Token string

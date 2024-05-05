@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/LightningDev1/LB-Selfbot/selfbot/config"
+	"github.com/LightningDev1/LB-Selfbot/selfbot/data"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/logging"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/sessions"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/slashcommands"
@@ -14,6 +15,7 @@ import (
 	"github.com/LightningDev1/LB-Selfbot/selfbot/websocket"
 	"github.com/LightningDev1/dgc"
 	"github.com/LightningDev1/discordgo"
+	"github.com/bitly/go-simplejson"
 )
 
 // Event reaction types
@@ -469,6 +471,37 @@ func RegisterHandlers(session *discordgo.Session, router *dgc.Router) {
 
 		// Start event reactions
 		go StartLoading(session, router)
+
+		// Setup snipers
+		go func() {
+			resp, err := session.Request("GET", "https://discord.com/api/v9/users/@me/billing/payment-sources", nil)
+			if err != nil {
+				utils.Logging.Error("Error getting payment sources: ", err)
+				return
+			}
+
+			json, err := simplejson.NewJson(resp)
+			if err != nil {
+				utils.Logging.Error("Error parsing payment sources: ", err)
+				return
+			}
+
+			// No payment sources
+			if len(json.MustArray()) == 0 {
+				return
+			}
+
+			for i := 0; i < len(json.MustArray()); i++ {
+				source := json.GetIndex(i)
+
+				if i == 0 || source.Get("default").MustBool() {
+					data.PaymentSourceID = source.Get("id").MustString()
+					data.CountryCode = source.Get("country").MustString()
+				}
+			}
+		}()
+
+		data.Token = session.Identify.Token
 
 		logging.Logging.OnReady(router, ready)
 	})

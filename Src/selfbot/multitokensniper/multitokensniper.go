@@ -85,7 +85,7 @@ func Init(mainSession *discordgo.Session, cfg config.Config) {
 
 	for _, token := range cfg.Snipers.Tokens {
 		// Check if the token is already in use
-		if token == cfg.Account.Discord.Token {
+		if token == mainSession.Identify.Token {
 			return
 		}
 
