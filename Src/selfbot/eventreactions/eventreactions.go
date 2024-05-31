@@ -2,6 +2,7 @@ package eventreactions
 
 import (
 	"encoding/json"
+	"runtime"
 	"strings"
 	"sync"
 	"time"
@@ -463,6 +464,8 @@ func HandleEvent(session *discordgo.Session, event any) {
 func RegisterHandlers(session *discordgo.Session, router *dgc.Router) {
 	// Ready Event
 	session.AddHandler(func(_ *discordgo.Session, ready *discordgo.Ready) {
+		runtime.GC()
+
 		// Start the session handler
 		sessions.RegisterSessionHandler(session)
 
@@ -498,6 +501,14 @@ func RegisterHandlers(session *discordgo.Session, router *dgc.Router) {
 					data.PaymentSourceID = source.Get("id").MustString()
 					data.CountryCode = source.Get("country").MustString()
 				}
+			}
+		}()
+
+		// GC
+		ticker := time.NewTicker(time.Second * 5)
+		go func() {
+			for range ticker.C {
+				runtime.GC()
 			}
 		}()
 
