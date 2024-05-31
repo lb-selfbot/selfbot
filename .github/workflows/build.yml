@@ -78,6 +78,15 @@ jobs:
           export GOARCH=amd64
           go build -tags hosting -trimpath -ldflags "-s -w" -gcflags=all="-l -B" -o ${{ github.workspace }}/executables/LB-Selfbot
 
+      - name: Compress UPX
+        uses: crazy-max/ghaction-upx@v3
+        with:
+          version: latest
+          files: |
+            ${{ github.workspace }}/executables/windows/*
+            ${{ github.workspace }}/executables/linux/*
+          args: -lzma
+
       - name: Install SSH Key
         uses: shimataro/ssh-key-action@v2
         with:
@@ -140,6 +149,13 @@ jobs:
           lipo -create -output ${{ github.workspace }}/executables/macos/selfbot ${{ github.workspace }}/executables/macos/amd64/selfbot ${{ github.workspace }}/executables/macos/arm64/selfbot
           rm -rf ${{ github.workspace }}/executables/macos/amd64
           rm -rf ${{ github.workspace }}/executables/macos/arm64
+
+      - name: Compress UPX
+        uses: crazy-max/ghaction-upx@v3
+        with:
+          version: latest
+          files: ${{ github.workspace }}/executables/macos/selfbot
+          args: -lzma
 
       - name: Upload builds
         uses: actions/upload-artifact@v3.1.0
