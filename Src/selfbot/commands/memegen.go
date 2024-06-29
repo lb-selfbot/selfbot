@@ -140,7 +140,7 @@ func (MemeGenCommands) randommeme(ctx *dgc.Ctx) {
 	meme := memes.GetIndex(rand.Intn(memesLen))
 	templateId := meme.Get("id").MustString()
 
-	uri := "https://api.imgflip.com/caption_image?template_id=%s&username=LightningBotSB&password=LightningBotSB&text0=%s&text1=%s"
+	uri := "https://api.imgflip.com/caption_image?template_id=%s&username=LightningBotSB2&password=LightningBotSB2&text0=%s&text1=%s"
 	uri = fmt.Sprintf(uri, templateId, url.QueryEscape(utils.Arguments["<\"top\">"]), url.QueryEscape(utils.Arguments["<\"bottom\">"]))
 
 	image, err := http.GetJson(uri)
@@ -156,7 +156,7 @@ func (MemeGenCommands) randommeme(ctx *dgc.Ctx) {
 }
 
 func (MemeGenCommands) custommeme(ctx *dgc.Ctx) {
-	uri := "https://api.imgflip.com/caption_image?template_id=%s&username=LightningBotSB&password=LightningBotSB&text0=%s&text1=%s"
+	uri := "https://api.imgflip.com/caption_image?template_id=%s&username=LightningBotSB2&password=LightningBotSB2&text0=%s&text1=%s"
 	uri = fmt.Sprintf(uri, url.QueryEscape(utils.Arguments["<template id>"]), url.QueryEscape(utils.Arguments["<\"top\">"]), url.QueryEscape(utils.Arguments["<\"bottom\">"]))
 
 	image, err := http.GetJson(uri)
@@ -174,7 +174,7 @@ func (MemeGenCommands) generateFunc(templateID string) func(ctx *dgc.Ctx) {
 	// variable will always be the last element in the command array.
 
 	return func(ctx *dgc.Ctx) {
-		uri := "https://api.imgflip.com/caption_image?template_id=%s&username=LightningBotSB&password=LightningBotSB&text0=%s&text1=%s"
+		uri := "https://api.imgflip.com/caption_image?template_id=%s&username=LightningBotSB2&password=LightningBotSB2&text0=%s&text1=%s"
 		uri = fmt.Sprintf(uri, templateID, url.QueryEscape(utils.Arguments["<\"top\">"]), url.QueryEscape(utils.Arguments["<\"bottom\">"]))
 
 		image, err := http.GetJson(uri)
