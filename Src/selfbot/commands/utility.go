@@ -306,7 +306,7 @@ func (u UtilityCommands) RegisterCommands(router *dgc.Router) {
 		Name:        "openfolder",
 		Description: "Open the LightningBot folder",
 		Usage:       "[p]openfolder",
-		Flags:       []string{CmdFlagHostingDangerous},
+		Flags:       []string{CmdFlagDangerous, CmdFlagHostingDangerous},
 		Handler:     u.openfolder,
 	})
 
