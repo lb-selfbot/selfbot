@@ -25,72 +25,72 @@ type EventReactionType int
 
 const (
 	// Ignore reactions
-	IGNORE_USER EventReactionType = iota
-	IGNORE_GUILD
+	IGNORE_USER  EventReactionType = 0
+	IGNORE_GUILD EventReactionType = 1
 
 	// Ping reactions
-	PING_PING
-	PING_KICK
-	PING_BAN
-	PING_MUTE
-	PING_TIMEOUT
-	PING_INSULT
-	PING_REACT
-	PING_RESPONSE
-	PING_AI_RESPONSE
+	PING_PING    EventReactionType = 2
+	PING_KICK    EventReactionType = 3
+	PING_BAN     EventReactionType = 4
+	PING_MUTE    EventReactionType = 5
+	PING_TIMEOUT EventReactionType = 6
+	PING_INSULT  EventReactionType = 7
+	PING_REACT   EventReactionType = 8
+	PING_RESPONSE EventReactionType = 9
+	PING_AI_RESPONSE EventReactionType = 10
 
 	// Mirror reactions
-	MIRROR_GUILD
-	MIRROR_CHANNEL
+	MIRROR_GUILD EventReactionType = 11
+	MIRROR_CHANNEL EventReactionType = 12
 
 	// Responder reactions
-	RESPONDER
-	AI_RESPONDER
+	RESPONDER EventReactionType = 13
+	AI_RESPONDER EventReactionType = 14
 
 	// Message reactions
-	COPY
-	REPLY_COPY
-	MOCK
-	PIN_SPAM
-	REACT_SPAM
-	DELETE_MESSAGES
-	KEYWORD_NOTIFIER
+	COPY EventReactionType = 15
+	REPLY_COPY EventReactionType = 16
+	MOCK EventReactionType = 17
+	PIN_SPAM EventReactionType = 18
+	REACT_SPAM EventReactionType = 19
+	DELETE_MESSAGES EventReactionType = 20
+	KEYWORD_NOTIFIER EventReactionType = 21
 
 	// Snipers
-	SNIPERS
+	SNIPERS EventReactionType = 22
 
 	// AFK
-	AFK_RESPONDER
+	AFK_RESPONDER EventReactionType = 23
 
 	// Phishing
-	ANTI_PHISHING
+	ANTI_PHISHING EventReactionType = 24
 
 	// Protections
-	PROTECTIONS
+	PROTECTIONS EventReactionType = 25
 
 	// Notifiers
-	NOTIFIERS
+	NOTIFIERS EventReactionType = 26
 
 	// Selfbot detection
-	SELFBOT_DETECTION
+	SELFBOT_DETECTION EventReactionType = 27
 
 	// Remove reactions
-	REMOVE_REACTIONS
+	REMOVE_REACTIONS EventReactionType = 28
 
 	// Force disconnect
-	FORCE_DISCONNECT
+	FORCE_DISCONNECT EventReactionType = 29
 
 	// Force nick
-	FORCE_NICK
+	FORCE_NICK EventReactionType = 30
 
 	// Force kick
-	FORCE_KICK
+	FORCE_KICK EventReactionType = 31
 
 	// No leave
-	NO_LEAVE
+	NO_LEAVE EventReactionType = 32
 
 	// Anti group chat
-	ANTI_GROUP_CHAT
+	ANTI_GROUP_CHAT EventReactionType = 33
 )
 
 func defaultEventReactions() []EventReaction {
