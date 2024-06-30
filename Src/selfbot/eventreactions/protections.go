@@ -72,7 +72,7 @@ func (p *Protections) MessageCreateHandler(session *discordgo.Session, message *
 		return
 	}
 
-	isDM := utils.Discord.IsDM(message.Message)
+	isDM := utils.Discord.IsDM(session, message.Message)
 
 	if cfg.Protections.AntiMassDM && time.Since(p.LastBlock) > 5*time.Minute && isDM {
 		messages, _ := utils.Discord.GetChannelMessages(session, message.ChannelID, 100)

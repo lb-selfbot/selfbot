@@ -632,11 +632,17 @@ func (DiscordUtils) Impersonate(s *discordgo.Session, user *discordgo.User, cont
 	})
 }
 
-func (DiscordUtils) IsDM(message *discordgo.Message) bool {
+func (DiscordUtils) IsDM(session *discordgo.Session, message *discordgo.Message) bool {
 	if message == nil {
 		return false
 	}
 
+	stateChannel, err := session.State.Channel(message.ChannelID)
+	if err == nil {
+		return stateChannel.Type == discordgo.ChannelTypeDM
+	}
+
+	// Fallback check
 	return message.GuildID == "" && // No server
 		(message.Type == discordgo.MessageTypeDefault || message.Type == discordgo.MessageTypeReply) && // Normal message
 		message.Flags&discordgo.MessageFlagsEphemeral == 0 // Not ephemeral

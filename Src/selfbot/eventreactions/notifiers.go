@@ -64,7 +64,7 @@ func (n *Notifiers) MessageCreateHandler(session *discordgo.Session, message *di
 		return
 	}
 
-	isDM := utils.Discord.IsDM(message.Message)
+	isDM := utils.Discord.IsDM(session, message.Message)
 
 	// DM Notifier
 	if isDM && cfg.Events.DMNotifier {
@@ -85,7 +85,7 @@ func (n *Notifiers) MessageUpdateHandler(session *discordgo.Session, message *di
 		return
 	}
 
-	isDM := utils.Discord.IsDM(message.Message)
+	isDM := utils.Discord.IsDM(session, message.Message)
 
 	//  DM Edit Notifier
 	if isDM && cfg.Events.DMEditNotifier {
@@ -99,7 +99,7 @@ func (n *Notifiers) MessageDeleteHandler(session *discordgo.Session, message *di
 		return
 	}
 
-	isDM := utils.Discord.IsDM(message.Message)
+	isDM := utils.Discord.IsDM(session, message.Message)
 	dmNotifier := cfg.Events.DMDeleteNotifier && isDM
 	messageNotifier := cfg.Events.MessageDeleteNotifier && !isDM
 

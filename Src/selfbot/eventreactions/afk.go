@@ -81,7 +81,7 @@ func (a *AFK) Handler(session *discordgo.Session, event any) {
 	}
 
 	activatedOnPing := cfg.AFK.OnPing && utils.Discord.IsUserMentioned(message.Message, session.State.User.ID)
-	activatedOnDM := cfg.AFK.OnDM && utils.Discord.IsDM(message.Message)
+	activatedOnDM := cfg.AFK.OnDM && utils.Discord.IsDM(session, message.Message)
 
 	if !(activatedOnPing || activatedOnDM) {
 		return
