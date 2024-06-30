@@ -31,7 +31,7 @@ func (p ProtectionsCommands) RegisterCommands(router *dgc.Router) {
 	router.RegisterCmd(&dgc.Command{
 		Name:        "antimassdm",
 		Description: "Turn anti mass DM on or off",
-		Usage:       "[p]antimassmd <on/off>",
+		Usage:       "[p]antimassdm <on/off>",
 		Flags:       []string{CmdFlagDangerous},
 		Handler:     p.antimassdm,
 	})
