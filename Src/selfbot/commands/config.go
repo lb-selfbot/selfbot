@@ -529,6 +529,13 @@ func (c ConfigCommands) RegisterCommands(router *dgc.Router) {
 		Handler:     c.addsnipertoken,
 	})
 	router.RegisterCmd(&dgc.Command{
+		Name:        "addsnipertokens",
+		Description: "Add multiple tokens to the sniper (separated by commas)",
+		Usage:       "[p]addsnipertokens <tokens>",
+		Flags:       []string{CmdFlagDangerous},
+		Handler:     c.addsnipertokens,
+	})
+	router.RegisterCmd(&dgc.Command{
 		Name:        "rmsnipertoken",
 		Description: "Remove a token from the multi token sniper",
 		Usage:       "[p]rmsnipertoken <token>",
@@ -2167,7 +2174,7 @@ func (ConfigCommands) addsnipertoken(ctx *dgc.Ctx) {
 		return
 	}
 
-	entry := utils.String.RemoveWords(ctx.Arguments.Raw(), 1)
+	entry := ctx.Arguments.Raw()
 
 	if utils.SliceContains(cfg.Snipers.Tokens, entry) {
 		_ = ctx.RespondText("That token is already in the multi token sniper!")
@@ -2178,7 +2185,35 @@ func (ConfigCommands) addsnipertoken(ctx *dgc.Ctx) {
 	_ = cfg.Save()
 
 	embed.NewEmbed().
-		SetDescription("Added token the multi token sniper").
+		SetDescription("Added token to the multi token sniper.").
+		Send(ctx)
+}
+
+func (ConfigCommands) addsnipertokens(ctx *dgc.Ctx) {
+	cfg, err := config.GetConfig()
+	if err != nil {
+		_ = ctx.RespondText("Error getting config")
+		return
+	}
+
+	tokens := strings.Split(ctx.Arguments.Raw(), ",")
+	added := 0
+
+	for _, token := range tokens {
+		token = strings.TrimSpace(token)
+
+		if utils.SliceContains(cfg.Snipers.Tokens, token) {
+			continue
+		}
+
+		cfg.Snipers.Tokens = append(cfg.Snipers.Tokens, token)
+		added++
+	}
+	
+	_ = cfg.Save()
+
+	embed.NewEmbed().
+		SetDescription(fmt.Sprintf("Added %d tokens to the multi token sniper.", added)).
 		Send(ctx)
 }
 
@@ -2189,7 +2224,7 @@ func (ConfigCommands) rmsnipertoken(ctx *dgc.Ctx) {
 		return
 	}
 
-	entry := utils.String.RemoveWords(ctx.Arguments.Raw(), 1)
+	entry := ctx.Arguments.Raw()
 
 	if !utils.SliceContains(cfg.Snipers.Tokens, entry) {
 		_ = ctx.RespondText("That token is already not in the multi token sniper!")
@@ -2200,7 +2235,7 @@ func (ConfigCommands) rmsnipertoken(ctx *dgc.Ctx) {
 	_ = cfg.Save()
 
 	embed.NewEmbed().
-		SetDescription("Added token the multi token sniper").
+		SetDescription("Removed token from the multi token sniper.").
 		Send(ctx)
 }
 
