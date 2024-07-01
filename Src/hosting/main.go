@@ -228,7 +228,10 @@ func Main() {
 
 					utils.Arguments = arguments
 
-					eventreactions.UsedCommands.Add(ctx)
+					if ctx.Command.Name != "repeat" {
+						eventreactions.UsedCommands.Add(ctx)
+					}
+					
 					data.UsedCommands++
 
 					logging.Logging.CommandUsed(ctx.Command.Name)
