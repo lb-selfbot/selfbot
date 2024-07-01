@@ -8,6 +8,7 @@ import (
 	"github.com/LightningDev1/LB-Selfbot/selfbot/errorhandler"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/eventreactions"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/logging"
+	"github.com/LightningDev1/LB-Selfbot/selfbot/constants"
 	"github.com/LightningDev1/discordgo"
 )
 
@@ -78,12 +79,19 @@ func (s *SniperInstance) Start() error {
 
 var SniperInstances = []*SniperInstance{}
 
+var maxHostingTokens = 5
+
 func Init(mainSession *discordgo.Session, cfg config.Config) {
 	if !cfg.Snipers.MultiTokenSniper {
 		return
 	}
 
-	for _, token := range cfg.Snipers.Tokens {
+	tokens := cfg.Snipers.Tokens
+	if len(tokens) > maxHostingTokens && constants.HOSTING {
+		tokens = tokens[:maxHostingTokens]
+	}
+
+	for _, token := range tokens {
 		// Check if the token is already in use
 		if token == mainSession.Identify.Token {
 			return
