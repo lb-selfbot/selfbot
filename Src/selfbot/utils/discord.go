@@ -256,6 +256,11 @@ func (DiscordUtils) DeleteMessages(session *discordgo.Session, channelID, userID
 				continue
 			}
 
+			// Check if the message is deletable
+			if !(m.Type == discordgo.MessageTypeDefault || m.Type == discordgo.MessageTypeReply) {
+				continue
+			}
+
 			// Delete message
 			err := session.ChannelMessageDelete(channelID, m.ID)
 			if err != nil {
