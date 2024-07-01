@@ -301,13 +301,13 @@ func Main(discordgoDebug bool) {
 				return false
 			}
 
-			if cfg.Sharing.ShareAll || utils.SliceContains([]string{"help", "search", "repeat"}, ctx.Command.Name) {
-				return true
-			}
-
 			if utils.SliceContains(ctx.Command.Flags, commands.CmdFlagDangerous) && cfg.Sharing.BlockDangerousCommands {
 				logging.Logging.BlockedDangerousCommand(ctx.Event.Author, ctx.Command.Name)
 				return false
+			}
+
+			if cfg.Sharing.ShareAll || utils.SliceContains([]string{"help", "search", "repeat"}, ctx.Command.Name) {
+				return true
 			}
 
 			categoryName := ""
