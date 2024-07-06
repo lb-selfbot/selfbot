@@ -571,6 +571,10 @@ func RegisterHandlers(session *discordgo.Session, router *dgc.Router) {
 
 		m.Message = m.BeforeDelete
 
+		if m.Message == nil || m.Author == nil {
+			return
+		}
+
 		if !IsEventReactionMessage(m.Message) {
 			HandleEvent(session, m)
 		}
