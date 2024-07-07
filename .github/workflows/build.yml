@@ -76,7 +76,7 @@ jobs:
 
           # Hosting build
           export GOARCH=amd64
-          go build -tags hosting -trimpath -ldflags "-s -w" -gcflags=all="-l -B" -o ${{ github.workspace }}/executables/LB-Selfbot
+          go build -tags hosting,timetzdata -trimpath -ldflags "-s -w" -gcflags=all="-l -B" -o ${{ github.workspace }}/executables/LB-Selfbot
 
       - name: Compress UPX
         uses: crazy-max/ghaction-upx@v3
