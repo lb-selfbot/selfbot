@@ -672,10 +672,11 @@ func (DiscordUtils) FormatStatusEmoji(status discordgo.Status) string {
 
 func (DiscordUtils) FormatClientStatus(clientStatus discordgo.ClientStatus) string {
 	return fmt.Sprintf(
-		"Desktop: %s\nMobile: %s\nWeb: %s",
+		"Desktop: %s\nMobile: %s\nWeb: %s\nConsole: %s\n",
 		Discord.FormatStatusEmoji(clientStatus.Desktop),
 		Discord.FormatStatusEmoji(clientStatus.Mobile),
 		Discord.FormatStatusEmoji(clientStatus.Web),
+		Discord.FormatStatusEmoji(clientStatus.Embedded),
 	)
 }
 
