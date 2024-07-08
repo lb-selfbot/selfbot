@@ -549,6 +549,12 @@ func (f FunCommands) RegisterCommands(router *dgc.Router) {
 		Usage:       "[p]randomcolor",
 		Handler:     f.randomcolor,
 	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "pickupline",
+		Description: "Generate a pickup line",
+		Usage:       "[p]pickupline",
+		Handler:     f.pickupline,
+	})
 }
 
 func (FunCommands) eightball(ctx *dgc.Ctx) {
@@ -1612,4 +1618,16 @@ func (FunCommands) randomcolor(ctx *dgc.Ctx) {
 	if err == nil {
 		_, _ = ctx.Session.ChannelFileSend(ctx.Event.ChannelID, "color.png", preview)
 	}
+}
+
+func (FunCommands) pickupline(ctx *dgc.Ctx) {
+	data, err := http.GetJson("https://api.popcat.xyz/pickuplines")
+	if err != nil {
+		_ = ctx.RespondText("An error has occurred.")
+		return
+	}
+
+	embed.NewEmbed().
+		AddField("Pickup Line", data.Get("pickupline").MustString()).
+		Send(ctx)
 }
