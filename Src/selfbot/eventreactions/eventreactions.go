@@ -29,31 +29,31 @@ const (
 	IGNORE_GUILD EventReactionType = 1
 
 	// Ping reactions
-	PING_PING    EventReactionType = 2
-	PING_KICK    EventReactionType = 3
-	PING_BAN     EventReactionType = 4
-	PING_MUTE    EventReactionType = 5
-	PING_TIMEOUT EventReactionType = 6
-	PING_INSULT  EventReactionType = 7
-	PING_REACT   EventReactionType = 8
-	PING_RESPONSE EventReactionType = 9
+	PING_PING        EventReactionType = 2
+	PING_KICK        EventReactionType = 3
+	PING_BAN         EventReactionType = 4
+	PING_MUTE        EventReactionType = 5
+	PING_TIMEOUT     EventReactionType = 6
+	PING_INSULT      EventReactionType = 7
+	PING_REACT       EventReactionType = 8
+	PING_RESPONSE    EventReactionType = 9
 	PING_AI_RESPONSE EventReactionType = 10
 
 	// Mirror reactions
-	MIRROR_GUILD EventReactionType = 11
+	MIRROR_GUILD   EventReactionType = 11
 	MIRROR_CHANNEL EventReactionType = 12
 
 	// Responder reactions
-	RESPONDER EventReactionType = 13
+	RESPONDER    EventReactionType = 13
 	AI_RESPONDER EventReactionType = 14
 
 	// Message reactions
-	COPY EventReactionType = 15
-	REPLY_COPY EventReactionType = 16
-	MOCK EventReactionType = 17
-	PIN_SPAM EventReactionType = 18
-	REACT_SPAM EventReactionType = 19
-	DELETE_MESSAGES EventReactionType = 20
+	COPY             EventReactionType = 15
+	REPLY_COPY       EventReactionType = 16
+	MOCK             EventReactionType = 17
+	PIN_SPAM         EventReactionType = 18
+	REACT_SPAM       EventReactionType = 19
+	DELETE_MESSAGES  EventReactionType = 20
 	KEYWORD_NOTIFIER EventReactionType = 21
 
 	// Snipers
@@ -505,7 +505,7 @@ func RegisterHandlers(session *discordgo.Session, router *dgc.Router) {
 		}()
 
 		// GC
-		ticker := time.NewTicker(time.Second * 5)
+		ticker := time.NewTicker(time.Second * 10)
 		go func() {
 			for range ticker.C {
 				runtime.GC()
