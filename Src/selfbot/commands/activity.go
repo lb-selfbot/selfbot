@@ -181,6 +181,12 @@ func (a *ActivityCommands) RegisterCommands(router *dgc.Router, session *discord
 		Usage:       "[p]setactivityjson <json>",
 		Handler:     a.setactivityjson,
 	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "copyactivity",
+		Description: "Copy a user's activity",
+		Usage:       "[p]copyactivity <json>",
+		Handler:     a.copyactivity,
+	})
 
 	statuses := []string{"online", "dnd", "idle", "invisible"}
 	activityTypes := []string{"listening", "watching", "playing", "streaming", "competing"}
@@ -543,4 +549,58 @@ func (a *ActivityCommands) setactivityjson(ctx *dgc.Ctx) {
 		AFK:        true,
 		Status:     sessions.Status,
 	})
+}
+
+func (a *ActivityCommands) copyactivity(ctx *dgc.Ctx) {
+	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
+	if !success {
+		_ = ctx.RespondText("Could not find user")
+		return
+	}
+
+	var guilds []string
+
+	if user.ID == ctx.Session.State.User.ID {
+		for _, guild := range ctx.Session.State.Guilds {
+			guilds = append(guilds, guild.ID)
+		}
+	} else {
+		profile, err := ctx.Session.UserProfile(user.ID)
+		if err != nil {
+			_ = ctx.RespondText("Could not find user")
+			return
+		}
+
+		for _, guild := range profile.MutualGuilds {
+			guilds = append(guilds, guild.ID)
+		}
+	}
+
+	for _, guildID := range guilds {
+		guild, err := utils.Discord.GetGuild(ctx.Session, guildID)
+		if err != nil {
+			continue
+		}
+
+		member, ok := utils.Discord.GetMember(ctx.Session, guild.ID, user.ID)
+		if !ok || member.Presence == nil {
+			continue
+		}
+
+		ctx.Session.UpdateStatusComplex(discordgo.UpdateStatusData{
+			Activities: member.Presence.Activities,
+			AFK: false,
+			Status: sessions.Status,
+		})
+
+		embed.NewEmbed().
+			SetDescription("Successfully copied user's activity!").
+			Send(ctx)
+
+		return
+	}
+
+	embed.NewEmbed().
+		SetDescription("No activity found").
+		Send(ctx)
 }
