@@ -549,6 +549,24 @@ func (f FunCommands) RegisterCommands(router *dgc.Router) {
 		Usage:       "[p]randomcolor",
 		Handler:     f.randomcolor,
 	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "pickupline",
+		Description: "Generate a pickup line",
+		Usage:       "[p]pickupline",
+		Handler:     f.pickupline,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "elementinfo",
+		Description: "Get info about a periodic table element",
+		Usage:       "[p]elementinfo <element>",
+		Handler:     f.elementinfo,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "randomelement",
+		Description: "Get info about a random periodic table element",
+		Usage:       "[p]randomelement",
+		Handler:     f.randomelement,
+	})
 }
 
 func (FunCommands) eightball(ctx *dgc.Ctx) {
@@ -1612,4 +1630,56 @@ func (FunCommands) randomcolor(ctx *dgc.Ctx) {
 	if err == nil {
 		_, _ = ctx.Session.ChannelFileSend(ctx.Event.ChannelID, "color.png", preview)
 	}
+}
+
+func (FunCommands) pickupline(ctx *dgc.Ctx) {
+	data, err := http.GetJson("https://api.popcat.xyz/pickuplines")
+	if err != nil {
+		_ = ctx.RespondText("An error has occurred.")
+		return
+	}
+
+	embed.NewEmbed().
+		AddField("Pickup Line", data.Get("pickupline").MustString()).
+		Send(ctx)
+}
+
+func (FunCommands) elementinfo(ctx *dgc.Ctx) {
+	data, err := http.GetJson("https://api.popcat.xyz/periodic-table?element=" + url.QueryEscape(ctx.Arguments.Raw()))
+	if err != nil {
+		_ = ctx.RespondText("An error has occurred.")
+		return
+	}
+
+	embed.NewEmbed().
+		AddField("Element Name", data.Get("name").MustString()).
+		AddField("Element Symbol", data.Get("symbol").MustString()).
+		AddField("Atomic Number", fmt.Sprint(data.Get("atomic_number").MustInt())).
+		AddField("Atomic Mass", fmt.Sprint(data.Get("atomic_mass").MustFloat64())).
+		AddField("Period", fmt.Sprint(data.Get("period").MustInt())).
+		AddField("Phase", data.Get("phase").MustString()).
+		AddField("Discovered By", data.Get("discovered_by").MustString()).
+		AddField("Summary", data.Get("summary").MustString()).
+		SetImage(data.Get("image").MustString()).
+		Send(ctx)
+}
+
+func (FunCommands) randomelement(ctx *dgc.Ctx) {
+	data, err := http.GetJson("https://api.popcat.xyz/periodic-table/random")
+	if err != nil {
+		_ = ctx.RespondText("An error has occurred.")
+		return
+	}
+
+	embed.NewEmbed().
+		AddField("Element Name", data.Get("name").MustString()).
+		AddField("Element Symbol", data.Get("symbol").MustString()).
+		AddField("Atomic Number", fmt.Sprint(data.Get("atomic_number").MustInt())).
+		AddField("Atomic Mass", fmt.Sprint(data.Get("atomic_mass").MustFloat64())).
+		AddField("Period", fmt.Sprint(data.Get("period").MustInt())).
+		AddField("Phase", data.Get("phase").MustString()).
+		AddField("Discovered By", data.Get("discovered_by").MustString()).
+		AddField("Summary", data.Get("summary").MustString()).
+		SetImage(data.Get("image").MustString()).
+		Send(ctx)
 }
