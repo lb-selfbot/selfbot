@@ -801,6 +801,12 @@ func (u UtilityCommands) RegisterCommands(router *dgc.Router) {
 		Usage:       "[p]previewcolor <rgb/hex>",
 		Handler:     u.previewcolor,
 	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "generatekey",
+		Description: "Generate a random license key (X or x for letters, 9 for numbers)",
+		Usage:       "[p]generatekey <format> [amount]",
+		Handler:     u.generatekey,
+	})
 }
 
 // Discord utilities
@@ -1224,7 +1230,7 @@ func (UtilityCommands) editsnipe(ctx *dgc.Ctx) {
 		embed.NewEmbed().
 			SetDescription("No deleted message was found in this channel!").
 			Send(ctx)
-			return
+		return
 	}
 
 	message := messages[len(messages)-1]
@@ -3205,4 +3211,37 @@ func (UtilityCommands) previewcolor(ctx *dgc.Ctx) {
 	if err == nil {
 		_, _ = ctx.Session.ChannelFileSend(ctx.Event.ChannelID, "color.png", preview)
 	}
+}
+
+func (UtilityCommands) generatekey(ctx *dgc.Ctx) {
+	format := utils.Arguments["<format>"]
+	amount, _ := strconv.Atoi(utils.Arguments["[amount]"])
+	if amount == 0 {
+		amount = 1
+	}
+
+	var keys []string
+
+	for i := 0; i < amount; i++ {
+		var key string
+
+		for _, char := range format {
+			switch char {
+			case 'x':
+				key += utils.Random.String(1, constants.ALPHABET)
+			case 'X':
+				key += strings.ToUpper(utils.Random.String(1, constants.ALPHABET))
+			case '9':
+				key += strconv.Itoa(utils.Random.Number(0, 10))
+			default:
+				key += string(char)
+			}
+		}
+
+		keys = append(keys, key)
+	}
+
+	embed.NewEmbed().
+		AddField("License Keys", strings.Join(keys, "\n")).
+		Send(ctx)
 }
