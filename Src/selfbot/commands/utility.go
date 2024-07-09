@@ -1186,16 +1186,27 @@ func (UtilityCommands) snipe(ctx *dgc.Ctx) {
 		embed.NewEmbed().
 			SetDescription("No deleted message was found in this channel!").
 			Send(ctx)
-	} else {
-		message := messages[len(messages)-1]
-		emb := embed.NewEmbed()
-		if message.Author != nil {
-			emb.AddField("Author", message.Author.String()+" | "+message.Author.ID)
-		}
-		emb.AddField("Sent At", utils.Discord.SnowflakeToTime(message.ID).Format(time.RFC1123))
-		emb.AddField("Content", message.Content)
-		emb.Send(ctx)
+		return
 	}
+
+	formatted := ""
+
+	for i, message := range messages {
+		if i > 5 {
+			break
+		}
+
+		formatted += fmt.Sprintf(
+			"[%s] [%s]: %s\n\n",
+			utils.Discord.SnowflakeToTime(message.ID).Format(time.RFC1123),
+			message.Author.String()+" | "+message.Author.ID,
+			message.Content,
+		)
+	}
+
+	embed.NewEmbed().
+		AddField("Deleted Messages", formatted).
+		Send(ctx)
 }
 
 func (UtilityCommands) editsnipe(ctx *dgc.Ctx) {
@@ -1213,17 +1224,18 @@ func (UtilityCommands) editsnipe(ctx *dgc.Ctx) {
 		embed.NewEmbed().
 			SetDescription("No deleted message was found in this channel!").
 			Send(ctx)
-	} else {
-		message := messages[len(messages)-1]
-		emb := embed.NewEmbed()
-		if message.Author != nil {
-			emb.AddField("Author", message.Author.String()+" | "+message.Author.ID)
-		}
-		emb.AddField("Sent At", utils.Discord.SnowflakeToTime(message.ID).Format(time.RFC1123))
-		emb.AddField("Old Content", message.BeforeUpdate.Content)
-		emb.AddField("New Content", message.Content)
-		emb.Send(ctx)
+			return
 	}
+
+	message := messages[len(messages)-1]
+	emb := embed.NewEmbed()
+	if message.Author != nil {
+		emb.AddField("Author", message.Author.String()+" | "+message.Author.ID)
+	}
+	emb.AddField("Sent At", utils.Discord.SnowflakeToTime(message.ID).Format(time.RFC1123))
+	emb.AddField("Old Content", message.BeforeUpdate.Content)
+	emb.AddField("New Content", message.Content)
+	emb.Send(ctx)
 }
 
 func (UtilityCommands) firstmessage(ctx *dgc.Ctx) {
