@@ -807,6 +807,12 @@ func (u UtilityCommands) RegisterCommands(router *dgc.Router) {
 		Usage:       "[p]generatekey <format> [amount]",
 		Handler:     u.generatekey,
 	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "timestamp",
+		Description: "Create a Discord timestamp",
+		Usage:       "[p]timestamp <time>",
+		Handler:     u.timestamp,
+	})
 }
 
 // Discord utilities
@@ -3244,4 +3250,12 @@ func (UtilityCommands) generatekey(ctx *dgc.Ctx) {
 	embed.NewEmbed().
 		AddField("License Keys", strings.Join(keys, "\n")).
 		Send(ctx)
+}
+
+func (UtilityCommands) timestamp(ctx *dgc.Ctx) {
+	timestamp, _ := api.GPT(
+		"Create a UNIX timestamp from the given date or time. Respond with the timestamp ONLY, do NOT explain. The current time is " + time.Now().Format("2006-01-02 15:04:05") + ", in UNIX: " + strconv.FormatInt(time.Now().Unix(), 10),
+		ctx.Arguments.Raw(),
+	)
+	ctx.RespondText("<t:"+timestamp+">")
 }
