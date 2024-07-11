@@ -584,4 +584,19 @@ func (_Logging) PokeTwoSniper(session *discordgo.Session, message *discordgo.Mes
 		Show()
 }
 
+func (_Logging) Reminder(reminder config.Reminder) {
+	cfg, err := config.GetConfig()
+	if err != nil {
+		return
+	}
+
+	UI.Notification("Reminder: " + reminder.Content)
+	NewConsoleMessage().
+		SetTitle("Reminder").
+		SetColor("#C1EFFF").
+		AddInfo("Message", reminder.Content).
+		SetWebhookURL(cfg.Webhooks.Misc).
+		Show()
+}
+
 var Logging = _Logging{}

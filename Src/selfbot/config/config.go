@@ -115,6 +115,12 @@ func ActivityFromDiscord(activity *discordgo.Activity) Activity {
 	}
 }
 
+type Reminder struct {
+	ID      int       `json:"ID"`
+	Content string    `json:"Content"`
+	At      time.Time `json:"At"`
+}
+
 type Config struct {
 	Account struct {
 		LightningBot struct {
@@ -235,6 +241,7 @@ type Config struct {
 	SlashCommandJobs json.RawMessage   `json:"SlashCommandJobs"`
 	EventReactions   json.RawMessage   `json:"EventReactions"`
 	Tags             map[string]string `json:"Tags"`
+	Reminders        []Reminder        `json:"Reminders"`
 }
 
 var (

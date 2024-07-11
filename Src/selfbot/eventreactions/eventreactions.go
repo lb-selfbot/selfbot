@@ -10,6 +10,7 @@ import (
 	"github.com/LightningDev1/LB-Selfbot/selfbot/config"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/data"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/logging"
+	"github.com/LightningDev1/LB-Selfbot/selfbot/reminder"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/sessions"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/slashcommands"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/utils"
@@ -471,6 +472,9 @@ func RegisterHandlers(session *discordgo.Session, router *dgc.Router) {
 
 		// Start slash command jobs
 		go slashcommands.StartJobs(session)
+
+		// Start reminders
+		go reminder.StartReminder()
 
 		// Start event reactions
 		go StartLoading(session, router)

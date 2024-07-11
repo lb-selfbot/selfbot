@@ -631,6 +631,27 @@ func (u UtilityCommands) RegisterCommands(router *dgc.Router) {
 		Handler:     u.detectpokemon,
 	})
 
+	// Reminder utilities
+
+	router.RegisterCmd(&dgc.Command{
+		Name:        "setreminder",
+		Description: "Set a reminder",
+		Usage:       "[p]setreminder <duration> <message>",
+		Handler:     u.setreminder,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "listreminders",
+		Description: "List all reminders",
+		Usage:       "[p]listreminders",
+		Handler:     u.listreminders,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "deletereminder",
+		Description: "Delete a reminder",
+		Usage:       "[p]deletereminder <id>",
+		Handler:     u.deletereminder,
+	})
+
 	// Misc utilities
 
 	router.RegisterCmd(&dgc.Command{
@@ -2676,6 +2697,99 @@ func (c UtilityCommands) detectpokemon(ctx *dgc.Ctx) {
 	embed.NewEmbed().
 		AddField("Names", names).
 		AddField("Info", info).
+		Send(ctx)
+}
+
+// Reminder utilities
+
+func (UtilityCommands) setreminder(ctx *dgc.Ctx) {
+	duration, err := time.ParseDuration(ctx.Arguments.Get(0).Raw())
+	if err != nil {
+		_ = ctx.RespondText("Invalid duration.")
+		return
+	}
+
+	if duration.Seconds() < 5 {
+		_ = ctx.RespondText("Duration must be at least 5 seconds.")
+		return
+	
+	}
+
+	message := utils.String.RemoveWords(ctx.Arguments.Raw(), 1)
+
+	cfg, err := config.GetConfig()
+	if err != nil {
+		_ = ctx.RespondText("Error getting config: " + err.Error())
+		return
+	}
+
+	cfg.Reminders = append(cfg.Reminders, config.Reminder{
+		ID: utils.Random.Number(100000, 999999),
+		Content: message,
+		At: time.Now().Add(duration),
+	})
+
+	err = cfg.Save()
+	if err != nil {
+		_ = ctx.RespondText("Error saving config: " + err.Error())
+		return
+	}
+
+	embed.NewEmbed().
+		SetDescription("Successfully set reminder!").
+		Send(ctx)
+}
+
+func (UtilityCommands) listreminders(ctx *dgc.Ctx) {
+	cfg, err := config.GetConfig()
+	if err != nil {
+		_ = ctx.RespondText("Error getting config: " + err.Error())
+		return
+	}
+
+	if len(cfg.Reminders) == 0 {
+		_ = ctx.RespondText("No reminders have been set!")
+		return
+	}
+
+	var reminders []string
+	for _, reminder := range cfg.Reminders {
+		reminders = append(reminders, fmt.Sprintf("**ID: %d**: %s - %s", reminder.ID, reminder.Content, reminder.At.Format(time.RFC1123)))
+	}
+
+	embed.NewEmbed().
+		AddField("Reminders", strings.Join(reminders, "\n")).
+		Send(ctx)
+}
+
+func (UtilityCommands) deletereminder(ctx *dgc.Ctx) {
+	id, err := strconv.Atoi(ctx.Arguments.Get(0).Raw())
+	if err != nil {
+		_ = ctx.RespondText("Invalid ID.")
+		return
+	}
+
+	cfg, err := config.GetConfig()
+	if err != nil {
+		_ = ctx.RespondText("Error getting config: " + err.Error())
+		return
+	}
+
+	for i, reminder := range cfg.Reminders {
+		if reminder.ID == id {
+			cfg.Reminders = append(cfg.Reminders[:i], cfg.Reminders[i+1:]...)
+			break
+		}
+	}
+
+	err = cfg.Save()
+	if err != nil {
+		_ = ctx.RespondText("Error saving config: " + err.Error())
+		return
+	}
+
+	embed.NewEmbed().
+		SetDescription("Successfully deleted reminder!").
 		Send(ctx)
 }
 
