@@ -86,9 +86,10 @@ func (n *Notifiers) MessageUpdateHandler(session *discordgo.Session, message *di
 	}
 
 	isDM := utils.Discord.IsDM(session, message.Message)
+	embedded := message.Embeds != nil && len(message.Embeds) > 0
 
 	//  DM Edit Notifier
-	if isDM && cfg.Events.DMEditNotifier {
+	if isDM && !embedded && cfg.Events.DMEditNotifier {
 		logging.Logging.DMEditNotifier(message.Message, message.BeforeUpdate.Content, message.Content)
 	}
 }

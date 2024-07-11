@@ -8,6 +8,7 @@ import (
 
 	"github.com/LightningDev1/LB-Selfbot/selfbot/api"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/config"
+	"github.com/LightningDev1/LB-Selfbot/selfbot/logging"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/utils"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/variables"
 	"github.com/LightningDev1/discordgo"
@@ -123,7 +124,7 @@ func (a *AFK) Handler(session *discordgo.Session, event any) {
 
 	time.Sleep(2 * time.Second)
 
-	if a.IsActive(&cfg) || time.Since(LastAFKMessage) < 10*time.Second {
+	if a.IsActive(&cfg) || time.Since(LastAFKMessage) < 60*time.Second {
 		return
 	}
 
@@ -142,11 +143,19 @@ func (a *AFK) Handler(session *discordgo.Session, event any) {
 		}
 	}
 
+	logging.Logging.AFKMessageSent(session, message.Message, afkMessage)
+
 	if cfg.AFK.Reply {
 		m, err := session.ChannelMessageSendReply(message.ChannelID, afkMessage, message.Reference())
+		if err == nil {
+			err = session.MessageUnack(message.ChannelID, message.ID, 1)
+		}
 		HandleMessage(m, err)
 	} else {
 		m, err := session.ChannelMessageSend(message.ChannelID, afkMessage)
+		if err == nil {
+			err = session.MessageUnack(message.ChannelID, message.ID, 1)
+		}
 		HandleMessage(m, err)
 	}
 }

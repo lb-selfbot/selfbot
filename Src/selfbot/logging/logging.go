@@ -599,4 +599,28 @@ func (_Logging) Reminder(reminder config.Reminder) {
 		Show()
 }
 
+func (_Logging) AFKMessageSent(session *discordgo.Session, message *discordgo.Message, response string) {
+	cfg, err := config.GetConfig()
+	if err != nil {
+		return
+	}
+
+	guildName := utils.Discord.GetGuildName(session, message.GuildID)
+	channelName := utils.Discord.GetChannelName(session, message.ChannelID)
+
+	UI.Notification("AFK Responder: Sent AFK message in " + guildName + " | " + channelName + " to " + message.Author.String())
+	NewConsoleMessage().
+		SetTitle("AFK Responder").
+		SetColor("#C1EFFF").
+		AddInfo("", "Sent AFK message").
+		AddInfo("Server", guildName).
+		AddInfo("Channel", channelName).
+		AddInfo("Author", message.Author.String()).
+		AddInfo("Content", message.Content).
+		AddInfo("Response", response).
+		AddInfo("Message Link", message.GetLink()).
+		SetWebhookURL(cfg.Webhooks.Misc).
+		Show()
+}
+
 var Logging = _Logging{}

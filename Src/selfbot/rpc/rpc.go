@@ -31,6 +31,21 @@ func getActivityType(activityType string) discordgo.ActivityType {
 	}
 }
 
+func getPlatform(platform string) string {
+	switch platform {
+	case "PS4":
+		return "ps4"
+	case "PS5":
+		return "ps5"
+	case "Xbox":
+		return "xbox"
+	case "Samsung":
+		return "samsung"
+	default:
+		return ""
+	}
+}
+
 func getButtons(cfg *config.Config) []*client.Button {
 	var buttons []*client.Button
 
@@ -175,6 +190,7 @@ func setRPC(session *discordgo.Session, cfg *config.Config, startTime time.Time)
 				ButtonURLs: buttonUrls,
 			},
 			ApplicationID: &appID,
+			Platform:      getPlatform(cfg.Activity.Platform),
 		}
 
 		if cfg.Activity.Type == "Streaming" {

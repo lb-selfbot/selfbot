@@ -40,6 +40,7 @@ type Activity struct {
 	Enabled        bool   `json:"Enabled"`
 	ActivityType   string `json:"ActivityType"`
 	Type           string `json:"Type"`
+	Platform       string `json:"Platform"`
 	ClientID       string `json:"ClientID"`
 	Name           string `json:"Name"`
 	State          string `json:"State"`
@@ -75,6 +76,21 @@ func ActivityFromDiscord(activity *discordgo.Activity) Activity {
 		activityType = "Playing"
 	}
 
+	var platform string
+
+	switch activity.Platform {
+	case "ps4":
+		platform = "PS4"
+	case "ps5":
+		platform = "PS5"
+	case "xbox":
+		platform = "Xbox"
+	case "samsung":
+		platform = "Samsung"
+	default:
+		platform = "Default"
+	}
+
 	clientID := "898932653049393172"
 	if activity.ApplicationID != nil {
 		clientID = *activity.ApplicationID
@@ -97,6 +113,7 @@ func ActivityFromDiscord(activity *discordgo.Activity) Activity {
 		Enabled:        true,
 		ActivityType:   "CustomActivity",
 		Type:           activityType,
+		Platform:       platform,
 		ClientID:       clientID,
 		Name:           activity.Name,
 		State:          activity.State,

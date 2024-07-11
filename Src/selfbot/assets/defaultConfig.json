@@ -57,6 +57,7 @@
     "Enabled": false,
     "ActivityType": "CustomActivity",
     "Type": "Playing",
+    "Platform": "Default",
     "ClientID": "898932653049393172",
     "Name": "LightningBot",
     "State": "Using LightningBot $VERSION",

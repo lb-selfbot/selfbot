@@ -120,7 +120,22 @@ func (t TrollingCommands) RegisterCommands(router *dgc.Router) {
 		Name:        "impersonate",
 		Description: "Impersonate a user using a webhook",
 		Usage:       "[p]impersonate <user> <text>",
+		Flags:       []string{CmdFlagDangerous},
 		Handler:     t.impersonate,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "fakepings",
+		Description: "Get fake pinged in a channel",
+		Usage:       "[p]fakepings <amount> [channel]",
+		Flags:       []string{CmdFlagDangerous},
+		Handler:     t.fakepings,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "billionpings",
+		Description: "Get a billion pings in a channel",
+		Usage:       "[p]billionpings [channel]",
+		Flags:       []string{CmdFlagDangerous},
+		Handler:     t.billionpings,
 	})
 }
 
@@ -287,6 +302,67 @@ func (TrollingCommands) impersonate(ctx *dgc.Ctx) {
 	text := utils.String.RemoveWords(ctx.Arguments.Raw(), 1)
 
 	_, err := utils.Discord.Impersonate(ctx.Session, user, text, ctx.Event.ChannelID)
+	if err != nil {
+		_ = ctx.RespondText("An error has occurred: " + err.Error())
+		return
+	}
+}
+
+func (TrollingCommands) fakepings(ctx *dgc.Ctx) {
+	amount, err := strconv.Atoi(utils.Arguments["<amount>"])
+	if err != nil {
+		_ = ctx.RespondText("Argument <amount> must be a number.")
+		return
+	}
+
+	if amount < 1 || amount > 1000000000 {
+		_ = ctx.RespondText("Amount must be between 1 and 1000000000")
+		return
+	}
+
+	channel, success := utils.Discord.TryGetChannelFromMentionWithDefault(ctx, ctx.Arguments.Get(1))
+	if !success {
+		_ = ctx.RespondText("Could not find channel")
+		return
+	}
+
+	messages, err := utils.Discord.GetChannelMessages(ctx.Session, channel.ID, 10)
+	if err != nil {
+		_ = ctx.RespondText("An error has occurred: " + err.Error())
+		return
+	}
+
+	if len(messages) == 0 {
+		_ = ctx.RespondText("No messages found in channel")
+		return
+	}
+
+	err = ctx.Session.MessageUnack(channel.ID, messages[0].ID, amount)
+	if err != nil {
+		_ = ctx.RespondText("An error has occurred: " + err.Error())
+		return
+	}
+}
+
+func (TrollingCommands) billionpings(ctx *dgc.Ctx) {
+	channel, success := utils.Discord.TryGetChannelFromMentionWithDefault(ctx, ctx.Arguments.Get(0))
+	if !success {
+		_ = ctx.RespondText("Could not find channel")
+		return
+	}
+
+	messages, err := utils.Discord.GetChannelMessages(ctx.Session, channel.ID, 10)
+	if err != nil {
+		_ = ctx.RespondText("An error has occurred: " + err.Error())
+		return
+	}
+
+	if len(messages) == 0 {
+		_ = ctx.RespondText("No messages found in channel")
+		return
+	}
+
+	err = ctx.Session.MessageUnack(channel.ID, messages[0].ID, 1000000000)
 	if err != nil {
 		_ = ctx.RespondText("An error has occurred: " + err.Error())
 		return
