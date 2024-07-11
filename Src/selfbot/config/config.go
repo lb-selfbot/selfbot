@@ -57,6 +57,64 @@ type Activity struct {
 	Button2URL     string `json:"Button2URL"`
 }
 
+func ActivityFromDiscord(activity *discordgo.Activity) Activity {
+	var activityType string
+
+	switch activity.Type {
+	case discordgo.ActivityTypeGame:
+		activityType = "Playing"
+	case discordgo.ActivityTypeStreaming:
+		activityType = "Streaming"
+	case discordgo.ActivityTypeListening:
+		activityType = "Listening"
+	case discordgo.ActivityTypeWatching:
+		activityType = "Watching"
+	case discordgo.ActivityTypeCompeting:
+		activityType = "Competing"
+	default:
+		activityType = "Playing"
+	}
+
+	clientID := "898932653049393172"
+	if activity.ApplicationID != nil {
+		clientID = *activity.ApplicationID
+	}
+
+	var assets discordgo.Assets
+	if activity.Assets != nil {
+		assets = *activity.Assets
+	}
+
+	var button1, button2 string
+	if len(activity.Buttons) > 0 {
+		button1 = activity.Buttons[0]
+	}
+	if len(activity.Buttons) > 1 {
+		button2 = activity.Buttons[1]
+	}
+
+	return Activity{
+		Enabled:        true,
+		ActivityType:   "CustomActivity",
+		Type:           activityType,
+		ClientID:       clientID,
+		Name:           activity.Name,
+		State:          activity.State,
+		Details:        activity.Details,
+		Invitable:      false,
+		Time:           activity.Timestamps != nil,
+		StreamingURL:   activity.URL,
+		LargeImage:     assets.LargeImageID,
+		LargeImageText: assets.LargeText,
+		SmallImage:     assets.SmallImageID,
+		SmallImageText: assets.SmallText,
+		Button1Label:   button1,
+		Button1URL:     "",
+		Button2Label:   button2,
+		Button2URL:     "",
+	}
+}
+
 type Config struct {
 	Account struct {
 		LightningBot struct {

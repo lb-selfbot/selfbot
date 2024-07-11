@@ -811,7 +811,13 @@ func (u UtilityCommands) RegisterCommands(router *dgc.Router) {
 		Name:        "timestamp",
 		Description: "Create a Discord timestamp",
 		Usage:       "[p]timestamp <time>",
-		Handler:     u.timestamp,
+		Handler:     u.timestampCommand(""),
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "reltimestamp",
+		Description: "Create a relative Discord timestamp",
+		Usage:       "[p]reltimestamp <time>",
+		Handler:     u.timestampCommand(":R"),
 	})
 }
 
@@ -3252,10 +3258,25 @@ func (UtilityCommands) generatekey(ctx *dgc.Ctx) {
 		Send(ctx)
 }
 
-func (UtilityCommands) timestamp(ctx *dgc.Ctx) {
-	timestamp, _ := api.GPT(
-		"Create a UNIX timestamp from the given date or time. Respond with the timestamp ONLY, do NOT explain. The current time is " + time.Now().Format("2006-01-02 15:04:05") + ", in UNIX: " + strconv.FormatInt(time.Now().Unix(), 10),
-		ctx.Arguments.Raw(),
-	)
-	ctx.RespondText("<t:"+timestamp+">")
+func (UtilityCommands) timestampCommand(flags string) func(ctx *dgc.Ctx) {
+	return func(ctx *dgc.Ctx) {
+		timestamp, err := api.GPT(utils.Misc.CreateAISystemTimestamp(), ctx.Arguments.Raw())
+		if err != nil {
+			_ = ctx.RespondText("An error has occurred while parsing the timestamp.")
+			return
+		}
+
+		if timestamp == "UNABLE" {
+			_ = ctx.RespondText("Please provide a valid date/time.")
+			return
+		}
+
+		time, err := time.Parse(time.RFC3339, timestamp)
+		if err != nil {
+			_ = ctx.RespondText("An error has occurred while parsing the timestamp.")
+			return
+		}
+
+		_ = ctx.RespondText(fmt.Sprintf("<t:%d%s>", time.Unix(), flags))
+	}
 }

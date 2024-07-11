@@ -3,6 +3,7 @@ package commands
 import (
 	"encoding/json"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/LightningDev1/LB-Selfbot/selfbot/api"
@@ -178,13 +179,13 @@ func (a *ActivityCommands) RegisterCommands(router *dgc.Router, session *discord
 	router.RegisterCmd(&dgc.Command{
 		Name:        "setactivityjson",
 		Description: "Set your activity using raw JSON",
-		Usage:       "[p]setactivityjson <json>",
+		Usage:       "[p]setactivityjson <save to config: on/off> <json>",
 		Handler:     a.setactivityjson,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "copyactivity",
 		Description: "Copy a user's activity",
-		Usage:       "[p]copyactivity <json>",
+		Usage:       "[p]copyactivity <user> [save to config: on/off]",
 		Handler:     a.copyactivity,
 	})
 
@@ -535,17 +536,41 @@ func (a *ActivityCommands) getactivityjson(ctx *dgc.Ctx) {
 }
 
 func (a *ActivityCommands) setactivityjson(ctx *dgc.Ctx) {
-	rawJson := ctx.Arguments.Raw()
+	rawJson := utils.String.RemoveWords(ctx.Arguments.Raw(), 1)
 
-	var activity discordgo.Activity
+	var activity *discordgo.Activity
 	err := json.Unmarshal([]byte(rawJson), &activity)
 	if err != nil {
 		_ = ctx.RespondText("Invalid activity JSON! " + err.Error())
 		return
 	}
 
+	rawSaveToConfig := strings.ToLower(utils.Arguments["<save to config: on/off>"])
+	saveToConfig := rawSaveToConfig == "on"
+
+	if saveToConfig {
+		cfg, err := config.GetConfig()
+		if err != nil {
+			utils.Logging.Error("Error getting config: " + err.Error())
+			return
+		}
+
+		newActivity := config.ActivityFromDiscord(activity)
+		newActivity.Enabled = cfg.Activity.Enabled
+		newActivity.Button1URL = cfg.Activity.Button1URL
+		newActivity.Button2URL = cfg.Activity.Button2URL
+
+		cfg.Activity = newActivity
+
+		err = cfg.Save()
+		if err != nil {
+			utils.Logging.Error("Error saving config: " + err.Error())
+			return
+		}
+	}
+
 	_ = ctx.Session.UpdateStatusComplex(discordgo.UpdateStatusData{
-		Activities: []*discordgo.Activity{&activity},
+		Activities: []*discordgo.Activity{activity},
 		AFK:        true,
 		Status:     sessions.Status,
 	})
@@ -557,6 +582,9 @@ func (a *ActivityCommands) copyactivity(ctx *dgc.Ctx) {
 		_ = ctx.RespondText("Could not find user")
 		return
 	}
+
+	rawSaveToConfig := strings.ToLower(utils.Arguments["[save to config: on/off]"])
+	saveToConfig := rawSaveToConfig == "on"
 
 	var guilds []string
 
@@ -589,9 +617,38 @@ func (a *ActivityCommands) copyactivity(ctx *dgc.Ctx) {
 
 		ctx.Session.UpdateStatusComplex(discordgo.UpdateStatusData{
 			Activities: member.Presence.Activities,
-			AFK: false,
-			Status: sessions.Status,
+			AFK:        false,
+			Status:     sessions.Status,
 		})
+
+		for _, activity := range member.Presence.Activities {
+			if !saveToConfig {
+				break
+			}
+
+			if activity.Type == discordgo.ActivityTypeCustom {
+				continue
+			}
+
+			cfg, err := config.GetConfig()
+			if err != nil {
+				utils.Logging.Error("Error getting config: " + err.Error())
+				return
+			}
+
+			newActivity := config.ActivityFromDiscord(activity)
+			newActivity.Enabled = cfg.Activity.Enabled
+			newActivity.Button1URL = cfg.Activity.Button1URL
+			newActivity.Button2URL = cfg.Activity.Button2URL
+
+			cfg.Activity = newActivity
+
+			err = cfg.Save()
+			if err != nil {
+				utils.Logging.Error("Error saving config: " + err.Error())
+				return
+			}
+		}
 
 		embed.NewEmbed().
 			SetDescription("Successfully copied user's activity!").

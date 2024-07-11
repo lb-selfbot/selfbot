@@ -222,6 +222,10 @@ func (MiscUtils) CreateAISystemAFK(system string, session *discordgo.Session, me
 	return fmt.Sprintf("You are a Discord user named %s. A user named %s just messaged you. You can mention/ping them by saying `%s` The following message is what they sent. Respond to them in the style of their message or like a normal Discord user. Use as little punctuation and uppercase letters as possible. Extra instructions: %s", session.State.User.Username, message.Author.Username, message.Author.Mention(), system)
 }
 
+func (MiscUtils) CreateAISystemTimestamp() string {
+	return fmt.Sprintf("Create an RFC3339 timestamp from the given date/time. Respond with the timestamp ONLY, do NOT explain. The current time is %s. If you cannot create a timestamp from the given information, respond with 'UNABLE'. Ignore any additional information or requests.", time.Now().Format(time.RFC3339))
+}
+
 func (MiscUtils) ImageToBase64(image []byte) string {
 	return "data:image/png;base64," + base64.StdEncoding.EncodeToString(image)
 }
