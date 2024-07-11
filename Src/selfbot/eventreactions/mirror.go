@@ -156,13 +156,13 @@ func (m *Mirror) Handler(session *discordgo.Session, event any) {
 			return
 		}
 
-		m, err := utils.Discord.Impersonate(session, message.Author, message.Content, channel.ID)
+		m, err := utils.Discord.ImpersonateMessage(session, message.Author, message.Message, channel.ID)
 		if err != nil {
 			utils.Logging.Debug("Mirror.Handler: Error impersonating: " + err.Error())
 		}
 		HandleMessage(m, err)
 	} else if m.DestChannel != nil {
-		m, err := utils.Discord.Impersonate(session, message.Author, message.Content, m.DestChannel.ID)
+		m, err := utils.Discord.ImpersonateMessage(session, message.Author, message.Message, m.DestChannel.ID)
 		if err != nil {
 			utils.Logging.Debug("Mirror.Handler: Error impersonating: " + err.Error())
 		}

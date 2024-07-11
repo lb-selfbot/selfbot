@@ -506,6 +506,12 @@ func (u UtilityCommands) RegisterCommands(router *dgc.Router) {
 		Usage:       "[p]deletetag <tag>",
 		Handler:     u.deletetag,
 	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "renametag",
+		Description: "Rename a tag",
+		Usage:       "[p]renametag <before> <after>",
+		Handler:     u.renametag,
+	})
 
 	// Creditcard commands
 
@@ -1214,11 +1220,23 @@ func (UtilityCommands) snipe(ctx *dgc.Ctx) {
 			break
 		}
 
+		var attachments []string
+
+		for _, attachment := range message.Attachments {
+			attachments = append(attachments, utils.Misc.Or(attachment.URL, attachment.ProxyURL))
+		}
+
+		var fmtAttachments string
+		if len(attachments) > 0 {
+			fmtAttachments = "\n" + strings.Join(attachments, " , ")
+		}
+
 		formatted += fmt.Sprintf(
-			"[%s] [%s]: %s\n\n",
+			"[%s] [%s]: %s%s\n\n",
 			utils.Discord.SnowflakeToTime(message.ID).Format(time.RFC1123),
 			message.Author.String()+" | "+message.Author.ID,
 			message.Content,
+			fmtAttachments,
 		)
 	}
 
@@ -2204,6 +2222,40 @@ func (UtilityCommands) deletetag(ctx *dgc.Ctx) {
 
 	embed.NewEmbed().
 		SetDescription("Successfully deleted tag").
+		Send(ctx)
+}
+
+func (UtilityCommands) renametag(ctx *dgc.Ctx) {
+	cfg, err := config.GetConfig()
+	if err != nil {
+		_ = ctx.RespondText("Error getting config: " + err.Error())
+		return
+	}
+
+	if cfg.Tags == nil {
+		cfg.Tags = map[string]string{}
+	}
+
+	before := utils.Arguments["<before>"]
+	after := utils.Arguments["<after>"]
+
+	tag, ok := cfg.Tags[before]
+	if !ok {
+		_ = ctx.RespondText("Error: tag does not exist")
+		return
+	}
+
+	cfg.Tags[after] = tag
+	delete(cfg.Tags, before)
+
+	err = cfg.Save()
+	if err != nil {
+		_ = ctx.RespondText("Error saving config: " + err.Error())
+		return
+	}
+
+	embed.NewEmbed().
+		SetDescription(fmt.Sprintf("Successfully renamed tag %s to %s!", before, after)).
 		Send(ctx)
 }
 

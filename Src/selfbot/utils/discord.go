@@ -86,6 +86,19 @@ func (d DiscordUtils) TryGetChannelFromMention(ctx *dgc.Ctx, mention *dgc.Argume
 	return channel, true
 }
 
+func (d DiscordUtils) TryGetChannelFromMentionWithDefault(ctx *dgc.Ctx, mention *dgc.Argument) (*discordgo.Channel, bool) {
+	channelID := Misc.Or(mention.AsChannelMentionID(), mention.Raw())
+	if channelID == "" {
+		channelID = ctx.Event.ChannelID
+	}
+	
+	channel, err := d.GetChannel(ctx.Session, channelID)
+	if err != nil {
+		return nil, false
+	}
+	return channel, true
+}
+
 func (DiscordUtils) TryGetRoleFromMention(ctx *dgc.Ctx, mention *dgc.Argument) (*discordgo.Role, bool) {
 	roleID := Misc.Or(mention.AsRoleMentionID(), mention.Raw())
 	role, err := ctx.Session.State.Role(ctx.Event.GuildID, roleID)
@@ -614,7 +627,7 @@ func (DiscordUtils) UserChannelPermissions(session *discordgo.Session, guildID s
 	return session.State.UserChannelPermissions(userID, channelID)
 }
 
-func (DiscordUtils) Impersonate(s *discordgo.Session, user *discordgo.User, content, channelID string) (*discordgo.Message, error) {
+func (DiscordUtils) ImpersonateMessage(s *discordgo.Session, user *discordgo.User, message *discordgo.Message, channelID string) (*discordgo.Message, error) {
 	webhooks, err := s.ChannelWebhooks(channelID)
 	if err != nil {
 		return nil, err
@@ -633,8 +646,13 @@ func (DiscordUtils) Impersonate(s *discordgo.Session, user *discordgo.User, cont
 	return s.WebhookExecute(webhook.ID, webhook.Token, true, &discordgo.WebhookParams{
 		Username:  user.Username,
 		AvatarURL: user.AvatarURL(""),
-		Content:   content,
+		Content:   message.Content,
+		Embeds:    message.Embeds,
 	})
+}
+
+func (DiscordUtils) Impersonate(s *discordgo.Session, user *discordgo.User, content, channelID string) (*discordgo.Message, error) {
+	return Discord.ImpersonateMessage(s, user, &discordgo.Message{Content: content}, channelID)
 }
 
 func (DiscordUtils) IsDM(session *discordgo.Session, message *discordgo.Message) bool {
@@ -826,6 +844,10 @@ func (DiscordUtils) IsUserMentioned(message *discordgo.Message, userID string) b
 	}
 
 	return false
+}
+
+func (DiscordUtils) WebhookURL(id, token string) string {
+	return fmt.Sprintf("https://discord.com/api/webhooks/%s/%s", id, token)
 }
 
 var Discord = &DiscordUtils{}
