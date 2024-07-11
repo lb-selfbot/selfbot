@@ -182,6 +182,18 @@ func (m *AdministrationCommands) RegisterCommands(router *dgc.Router) {
 		Handler:     m.ackmessage,
 	})
 	router.RegisterCmd(&dgc.Command{
+		Name:        "listwebhooks",
+		Description: "List all webhooks in a channel",
+		Usage:       "[p]listwebhooks [channel]",
+		Handler:     m.listwebhooks,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "createwebhook",
+		Description: "List all webhooks in a channel",
+		Usage:       "[p]createwebhook [channel] [name]",
+		Handler:     m.createwebhook,
+	})
+	router.RegisterCmd(&dgc.Command{
 		Name:        "webhookinfo",
 		Description: "Get info about a webhook",
 		Usage:       "[p]webhookinfo <webhook url>",
@@ -1046,6 +1058,63 @@ func (*AdministrationCommands) ackmessage(ctx *dgc.Ctx) {
 
 // Webhook Control
 
+func (*AdministrationCommands) listwebhooks(ctx *dgc.Ctx) {
+	channel, success := utils.Discord.TryGetChannelFromMentionWithDefault(ctx, ctx.Arguments.Get(0))
+	if !success {
+		_ = ctx.RespondText("Could not find channel")
+		return
+	}
+
+	webhooks, err := ctx.Session.ChannelWebhooks(channel.ID)
+	if err != nil {
+		_ = ctx.RespondText("Error getting webhooks: " + err.Error())
+		return
+	}
+
+	if len(webhooks) == 0 {
+		_ = ctx.RespondText("No webhooks found in channel")
+		return
+	}
+
+	var fmtWebhooks []string
+
+	for _, webhook := range webhooks {
+		fmtWebhooks = append(
+			fmtWebhooks,
+			webhook.Name+" - "+utils.Discord.WebhookURL(webhook.ID, webhook.Token),
+		)
+	}
+
+	embed.NewEmbed().
+		SetDescription("Webhooks in "+channel.Mention()).
+		AddField("Webhooks", strings.Join(fmtWebhooks, "\n")).
+		Send(ctx)
+}
+
+func (*AdministrationCommands) createwebhook(ctx *dgc.Ctx) {
+	channel, success := utils.Discord.TryGetChannelFromMentionWithDefault(ctx, ctx.Arguments.Get(0))
+	if !success {
+		_ = ctx.RespondText("Could not find channel")
+		return
+	}
+
+	name := utils.Arguments["[name]"]
+	if name == "" {
+		name = "LightningBot Webhook"
+	}
+
+	webhook, err := ctx.Session.WebhookCreate(channel.ID, name, "")
+	if err != nil {
+		_ = ctx.RespondText("Error creating webhook: " + err.Error())
+		return
+	}
+
+	embed.NewEmbed().
+		SetDescription("Successfully created webhook!").
+		AddField("Webhook", webhook.Name+" - "+utils.Discord.WebhookURL(webhook.ID, webhook.Token)).
+		Send(ctx)
+}
+
 func (*AdministrationCommands) webhookinfo(ctx *dgc.Ctx) {
 	webhookUrl, err := url.Parse(utils.Arguments["<webhook url>"])
 	if err != nil {
@@ -1075,6 +1144,7 @@ func (*AdministrationCommands) webhookinfo(ctx *dgc.Ctx) {
 		AddField("Server ID", webhookInfo.Get("guild_id").MustString()).
 		AddField("Application ID", webhookInfo.Get("application_id").MustString()).
 		AddField("Token", webhookInfo.Get("token").MustString()).
+		AddField("URL", webhookUrl.String()).
 		Send(ctx)
 }
 
