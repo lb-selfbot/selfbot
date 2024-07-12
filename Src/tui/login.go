@@ -13,10 +13,10 @@ import (
 var (
 	focusedStyle = lipgloss.NewStyle().Foreground(mainColor)
 	blurredStyle = lipgloss.NewStyle().Foreground(lipgloss.Color("240"))
-	cursorStyle  = focusedStyle.Copy()
+	cursorStyle  = focusedStyle
 	noStyle      = lipgloss.NewStyle()
 
-	focusedButton = focusedStyle.Copy().Render("[ Continue ]")
+	focusedButton = focusedStyle.Render("[ Continue ]")
 	blurredButton = fmt.Sprintf("[ %s ]", blurredStyle.Render("Continue"))
 )
 
