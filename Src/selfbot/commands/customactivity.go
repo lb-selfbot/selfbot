@@ -15,194 +15,159 @@ import (
 
 type CustomActivityCommands struct{}
 
-func (r CustomActivityCommands) RegisterCommands(router *dgc.Router) {
+func (c CustomActivityCommands) RegisterCommands(router *dgc.Router) {
 	router.StartCategory("CustomActivity", "Commands to set a custom Discord activity")
+
 	router.RegisterCmd(&dgc.Command{
-		Name:        "caenabled",
-		Description: "Turn Custom Activity on or off",
-		Usage:       "[p]caenabled <on/off>",
-		Handler:     r.caenabled,
+		Name:        "cactivity",
+		Description: "Get, set or toggle Custom Activity",
+		Usage:       "[p]cactivity <get/set/toggle> [on/off]",
+		Flags:       []string{CmdFlagDangerous},
+		Handler:     c.cactivity,
 	})
+
 	router.RegisterCmd(&dgc.Command{
 		Name:        "caconnectiontype",
-		Description: "Set Custom Activity connection type",
-		Usage:       "[p]caconnectiontype <rpc/custom>",
-		Handler:     r.caconnectiontype,
+		Description: "Get or set the Custom Activity connection type",
+		Usage:       "[p]caconnectiontype <get/set/values> [value]",
+		Flags:       []string{CmdFlagDangerous},
+		Handler:     c.caconnectiontype,
 	})
+
 	router.RegisterCmd(&dgc.Command{
 		Name:        "catype",
-		Description: "Set custom activity type",
-		Usage:       "[p]cactivitytype <playing/listening/watching/streaming/competing/spotify>",
-		Handler:     r.caconnectiontype,
+		Description: "Get or set the Custom Activity type",
+		Usage:       "[p]catype <get/set/values> [value]",
+		Flags:       []string{CmdFlagDangerous},
+		Handler:     c.catype,
 	})
+
 	router.RegisterCmd(&dgc.Command{
-		Name:        "caplaying",
-		Description: "Set Custom Activity to playing",
-		Usage:       "[p]caplaying",
-		Handler:     r.caplaying,
+		Name:        "caplatform",
+		Description: "Get or set the Custom Activity platform",
+		Usage:       "[p]caplatform <get/set/values> [value]",
+		Flags:       []string{CmdFlagDangerous},
+		Handler:     c.caplatform,
 	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "calistening",
-		Description: "Set Custom Activity to listening",
-		Usage:       "[p]calistening",
-		Handler:     r.calistening,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "cawatching",
-		Description: "Set Custom Activity to watching",
-		Usage:       "[p]cawatching",
-		Handler:     r.cawatching,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "castreaming",
-		Description: "Set Custom Activity to streaming",
-		Usage:       "[p]castreaming",
-		Handler:     r.castreaming,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "cacompeting",
-		Description: "Set Custom Activity to competing",
-		Usage:       "[p]cacompeting",
-		Handler:     r.cacompeting,
-	})
+
 	router.RegisterCmd(&dgc.Command{
 		Name:        "caclientid",
-		Description: "Set the RPC client id",
-		Usage:       "[p]caclientid <client id>",
-		Handler:     r.caclientid,
+		Description: "Get or set the Custom Activity Client ID",
+		Usage:       "[p]caclientid <get/set> [value]",
+		Flags:       []string{CmdFlagDangerous},
+		Handler:     c.caclientid,
 	})
+
 	router.RegisterCmd(&dgc.Command{
 		Name:        "caname",
-		Description: "Set the Custom Activity name",
-		Usage:       "[p]caname [text]",
-		Handler:     r.caname,
+		Description: "Get or set the Custom Activity Name",
+		Usage:       "[p]caname <get/set> [value]",
+		Flags:       []string{CmdFlagDangerous},
+		Handler:     c.caname,
 	})
+
 	router.RegisterCmd(&dgc.Command{
 		Name:        "castate",
-		Description: "Set the Custom Activity state",
-		Usage:       "[p]castate [text]",
-		Handler:     r.castate,
+		Description: "Get or set the Custom Activity State",
+		Usage:       "[p]castate <get/set> [value]",
+		Flags:       []string{CmdFlagDangerous},
+		Handler:     c.castate,
 	})
+
 	router.RegisterCmd(&dgc.Command{
 		Name:        "cadetails",
-		Description: "Set the Custom Activity details",
-		Usage:       "[p]cadetails [text]",
-		Handler:     r.cadetails,
+		Description: "Get or set the Custom Activity Details",
+		Usage:       "[p]cadetails <get/set> [value]",
+		Flags:       []string{CmdFlagDangerous},
+		Handler:     c.cadetails,
 	})
+
 	router.RegisterCmd(&dgc.Command{
 		Name:        "cainvitable",
-		Description: "Set if Custom Activity is invitable",
-		Usage:       "[p]cainvitable <on/off>",
-		Handler:     r.cainvitable,
+		Description: "Get, set or toggle if RPC is invitable",
+		Usage:       "[p]cainvitable <get/set/toggle> [on/off]",
+		Flags:       []string{CmdFlagDangerous},
+		Handler:     c.cainvitable,
 	})
+
 	router.RegisterCmd(&dgc.Command{
 		Name:        "catime",
-		Description: "Turn Custom Activity time on or off",
-		Usage:       "[p]catime <on/off>",
-		Handler:     r.catime,
+		Description: "Get, set or toggle if Custom Activity shows time",
+		Usage:       "[p]catime <get/set/toggle> [on/off]",
+		Flags:       []string{CmdFlagDangerous},
+		Handler:     c.catime,
 	})
+
 	router.RegisterCmd(&dgc.Command{
 		Name:        "castreamingurl",
-		Description: "Set the URL for the streaming activity",
-		Usage:       "[p]castreamingurl [url]",
-		Handler:     r.castreamingurl,
+		Description: "Get or set the URL for the Streaming activity",
+		Usage:       "[p]castreamingurl <get/set> [value]",
+		Flags:       []string{CmdFlagDangerous},
+		Handler:     c.castreamingurl,
 	})
+
+	// TODO: Improve
 	router.RegisterCmd(&dgc.Command{
 		Name:        "cacreateimagekey",
 		Description: "Create an image key for a Custom Activity",
 		Usage:       "[p]cacreateimagekey <image url>",
-		Handler:     r.cacreateimagekey,
+		Handler:     c.cacreateimagekey,
 	})
+
 	router.RegisterCmd(&dgc.Command{
 		Name:        "calargeimage",
-		Description: "Set the Custom Activity large image key",
-		Usage:       "[p]calargeimage [image]",
-		Handler:     r.calargeimage,
+		Description: "Get or set the Custom Activity large image key",
+		Usage:       "[p]calargeimage <get/set> [value]",
+		Flags:       []string{CmdFlagDangerous},
+		Handler:     c.calargeimage,
 	})
+
 	router.RegisterCmd(&dgc.Command{
 		Name:        "calargetext",
-		Description: "Set the Custom Activity large image text",
-		Usage:       "[p]calargetext [text]",
-		Handler:     r.calargetext,
+		Description: "Get or set the Custom Activity large image text",
+		Usage:       "[p]calargetext <get/set> [value]",
+		Flags:       []string{CmdFlagDangerous},
+		Handler:     c.calargetext,
 	})
+
 	router.RegisterCmd(&dgc.Command{
 		Name:        "casmallimage",
-		Description: "Set the Custom Activity small image",
-		Usage:       "[p]casmallimage [image]",
-		Handler:     r.casmallimage,
+		Description: "Get or set the Custom Activity small image key",
+		Usage:       "[p]casmallimage <get/set> [value]",
+		Flags:       []string{CmdFlagDangerous},
+		Handler:     c.casmallimage,
 	})
+
 	router.RegisterCmd(&dgc.Command{
 		Name:        "casmalltext",
-		Description: "Set the Custom Activity small image text",
-		Usage:       "[p]casmalltext [text]",
-		Handler:     r.casmalltext,
+		Description: "Get or set the Custom Activity small image text",
+		Usage:       "[p]casmalltext <get/set> [value]",
+		Flags:       []string{CmdFlagDangerous},
+		Handler:     c.casmalltext,
 	})
+
 	router.RegisterCmd(&dgc.Command{
-		Name:        "cabutton1text",
-		Description: "Set the RPC first button text",
-		Usage:       "[p]cabutton1text [text]",
-		Handler:     r.cabutton1text,
+		Name:        "cabutton1",
+		Description: "Get or set the label and URL of the first button",
+		Usage:       "[p]cabutton1 <get/set> [label] [url]",
+		Flags:       []string{CmdFlagDangerous},
+		Handler:     c.cabutton1,
 	})
+
 	router.RegisterCmd(&dgc.Command{
-		Name:        "cabutton1url",
-		Description: "Set the RPC first button url",
-		Usage:       "[p]cabutton1url [url]",
-		Handler:     r.cabutton1url,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "cabutton2text",
-		Description: "Set the RPC second button text",
-		Usage:       "[p]cabutton2text [text]",
-		Handler:     r.cabutton2text,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "cabutton2url",
-		Description: "Set the RPC second button url",
-		Usage:       "[p]cabutton2url [url]",
-		Handler:     r.cabutton2url,
+		Name:        "cabutton2",
+		Description: "Get or set the label and URL of the second button",
+		Usage:       "[p]cabutton2 <get/set> [label] [url]",
+		Flags:       []string{CmdFlagDangerous},
+		Handler:     c.cabutton2,
 	})
 
 	router.RegisterCmd(&dgc.Command{
 		Name:        "capresets",
-		Description: "List all Custom Activity presets",
-		Usage:       "[p]capresets",
-		Handler:     r.capresets,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "clearcapresets",
-		Description: "Clear all Custom Activity presets",
-		Usage:       "[p]clearcapresets",
-		Handler:     r.clearcapresets,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "savecapreset",
-		Description: "Save current activity as a preset",
-		Usage:       "[p]savecapreset <name>",
-		Handler:     r.savecapreset,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "loadcapreset",
-		Description: "Load a Custom Activity preset",
-		Usage:       "[p]loadcapreset <name>",
-		Handler:     r.loadcapreset,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "deletecapreset",
-		Description: "Delete a Custom Activity preset",
-		Usage:       "[p]deletecapreset <name>",
-		Handler:     r.deletecapreset,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "currentcapreset",
-		Description: "Get the name of the current Custom Activity preset",
-		Usage:       "[p]currentcapreset",
-		Handler:     r.currentcapreset,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "nextcapreset",
-		Description: "Load the next Custom Activity preset",
-		Usage:       "[p]nextcapreset",
-		Handler:     r.nextcapreset,
+		Description: "Manage Custom Activity presets",
+		Usage:       "[p]capresets <get/load/next/save/rm/list/clear> [name]",
+		Flags:       []string{CmdFlagDangerous},
+		Handler:     c.capresets,
 	})
 }
 
