@@ -24,10 +24,16 @@ func (r CustomActivityCommands) RegisterCommands(router *dgc.Router) {
 		Handler:     r.caenabled,
 	})
 	router.RegisterCmd(&dgc.Command{
-		Name:        "cactivitytype",
+		Name:        "caconnectiontype",
+		Description: "Set Custom Activity connection type",
+		Usage:       "[p]caconnectiontype <rpc/custom>",
+		Handler:     r.caconnectiontype,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "catype",
 		Description: "Set custom activity type",
-		Usage:       "[p]cactivitytype <rpc/custom>",
-		Handler:     r.cactivitytype,
+		Usage:       "[p]cactivitytype <playing/listening/watching/streaming/competing/spotify>",
+		Handler:     r.caconnectiontype,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "caplaying",
@@ -220,7 +226,7 @@ func (CustomActivityCommands) caenabled(ctx *dgc.Ctx) {
 		Send(ctx)
 }
 
-func (CustomActivityCommands) cactivitytype(ctx *dgc.Ctx) {
+func (CustomActivityCommands) caconnectiontype(ctx *dgc.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
 		_ = ctx.RespondText("Failed to get config.")
