@@ -189,11 +189,11 @@ func setRPC(session *discordgo.Session, cfg *config.Config, startTime time.Time)
 		switch cfg.Activity.Type {
 		case "Spotify":
 			activity = &discordgo.Activity{
-				Type: discordgo.ActivityType(2),
-				Name: "Spotify",
+				Type:    discordgo.ActivityType(2),
+				Name:    "Spotify",
 				State:   utils.String.Limit(variables.Parse(cfg.Activity.State), 128),
 				Details: utils.String.Limit(variables.Parse(cfg.Activity.Details), 128),
-				Assets: assets,
+				Assets:  assets,
 				Timestamps: &discordgo.TimeStamps{
 					StartTimestamp: time.Now().Unix() - 4140000,
 					EndTimestamp:   time.Now().Unix() - 3880000,
@@ -210,8 +210,8 @@ func setRPC(session *discordgo.Session, cfg *config.Config, startTime time.Time)
 				Details:    utils.String.Limit(variables.Parse(cfg.Activity.Details), 128),
 				Timestamps: getDGTimestamps(cfg.Activity.Time, startTime),
 				Type:       getActivityType(cfg.Activity.Type),
-				Assets: assets,
-				Buttons: buttons,
+				Assets:     assets,
+				Buttons:    buttons,
 				Metadata: &discordgo.ActivityMetadata{
 					ButtonURLs: buttonUrls,
 				},

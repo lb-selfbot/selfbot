@@ -231,7 +231,7 @@ func Main() {
 					if ctx.Command.Name != "repeat" {
 						eventreactions.UsedCommands.Add(ctx)
 					}
-					
+
 					data.UsedCommands++
 
 					logging.Logging.CommandUsed(ctx.Command.Name)

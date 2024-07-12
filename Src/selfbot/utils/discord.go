@@ -91,7 +91,7 @@ func (d DiscordUtils) TryGetChannelFromMentionWithDefault(ctx *dgc.Ctx, mention 
 	if channelID == "" {
 		channelID = ctx.Event.ChannelID
 	}
-	
+
 	channel, err := d.GetChannel(ctx.Session, channelID)
 	if err != nil {
 		return nil, false

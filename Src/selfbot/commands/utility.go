@@ -2712,7 +2712,7 @@ func (UtilityCommands) setreminder(ctx *dgc.Ctx) {
 	if duration.Seconds() < 5 {
 		_ = ctx.RespondText("Duration must be at least 5 seconds.")
 		return
-	
+
 	}
 
 	message := utils.String.RemoveWords(ctx.Arguments.Raw(), 1)
@@ -2724,9 +2724,9 @@ func (UtilityCommands) setreminder(ctx *dgc.Ctx) {
 	}
 
 	cfg.Reminders = append(cfg.Reminders, config.Reminder{
-		ID: utils.Random.Number(100000, 999999),
+		ID:      utils.Random.Number(100000, 999999),
 		Content: message,
-		At: time.Now().Add(duration),
+		At:      time.Now().Add(duration),
 	})
 
 	err = cfg.Save()
