@@ -18,529 +18,238 @@ import (
 type ConfigCommands struct{}
 
 func (c ConfigCommands) RegisterCommands(router *dgc.Router) {
-	router.StartCategory("Config", "Change your config")
+	router.StartCategory("Config", "Change the bot's config")
 
 	router.RegisterCmd(&dgc.Command{
-		Name:        "getcommandprefix",
-		Description: "Get your current command prefix",
-		Usage:       "[p]getcommandprefix",
-		Flags:       []string{CmdFlagDangerous},
-		Handler:     c.getcommandprefix,
-	})
-	router.RegisterCmd(&dgc.Command{
 		Name:        "commandprefix",
-		Description: "Set your command prefix",
-		Usage:       "[p]commandprefix <prefix>",
+		Description: "Get or set the command prefix",
+		Usage:       "[p]commandprefix <get/set> [value]",
 		Flags:       []string{CmdFlagDangerous},
 		Handler:     c.commandprefix,
 	})
 
 	router.RegisterCmd(&dgc.Command{
-		Name:        "getcommandmode",
-		Description: "Get your current command mode",
-		Usage:       "[p]getcommandmode",
-		Flags:       []string{CmdFlagDangerous},
-		Handler:     c.getcommandmode,
-	})
-	router.RegisterCmd(&dgc.Command{
 		Name:        "commandmode",
-		Description: "Set your command mode",
-		Usage:       "[p]commandmode <codeblock/text/indent/webhookembed/urlembed>",
+		Description: "Get or set the command mode",
+		Usage:       "[p]commandmode <get/set/values> [value]",
 		Flags:       []string{CmdFlagDangerous},
 		Handler:     c.commandmode,
 	})
 
 	router.RegisterCmd(&dgc.Command{
-		Name:        "gettitle",
-		Description: "Get your current title",
-		Usage:       "[p]gettitle",
-		Flags:       []string{CmdFlagDangerous},
-		Handler:     c.gettitle,
-	})
-	router.RegisterCmd(&dgc.Command{
 		Name:        "title",
-		Description: "Set your title",
-		Usage:       "[p]title [title]",
+		Description: "Get or set the title",
+		Usage:       "[p]title <get/set> [value]",
 		Flags:       []string{CmdFlagDangerous},
 		Handler:     c.title,
 	})
 
 	router.RegisterCmd(&dgc.Command{
-		Name:        "getfooter",
-		Description: "Get your current footer",
-		Usage:       "[p]getfooter",
-		Flags:       []string{CmdFlagDangerous},
-		Handler:     c.getfooter,
-	})
-	router.RegisterCmd(&dgc.Command{
 		Name:        "footer",
-		Description: "Set your footer",
-		Usage:       "[p]footer [footer]",
+		Description: "Get or set the footer",
+		Usage:       "[p]footer <get/set> [value]",
 		Flags:       []string{CmdFlagDangerous},
 		Handler:     c.footer,
 	})
 
 	router.RegisterCmd(&dgc.Command{
-		Name:        "getdelresponses",
-		Description: "Get your current delete responses setting",
-		Usage:       "[p]getdelresponses",
-		Flags:       []string{CmdFlagDangerous},
-		Handler:     c.getdelresponses,
-	})
-	router.RegisterCmd(&dgc.Command{
 		Name:        "delresponses",
-		Description: "Set if the bot should delete responses to commands",
-		Usage:       "[p]delresponses <on/off>",
+		Description: "Get, set or toggle if the bot should delete responses to commands",
+		Usage:       "[p]delresponses <get/set/toggle> [on/off]",
 		Flags:       []string{CmdFlagDangerous},
 		Handler:     c.delresponses,
 	})
 
 	router.RegisterCmd(&dgc.Command{
-		Name:        "getdelresponsesdelay",
-		Description: "Get your current delete responses delay",
-		Usage:       "[p]getdelresponsesdelay",
-		Flags:       []string{CmdFlagDangerous},
-		Handler:     c.getdelresponsesdelay,
-	})
-	router.RegisterCmd(&dgc.Command{
 		Name:        "delresponsesdelay",
-		Description: "Set the delay before deleting responses",
-		Usage:       "[p]delresponsesdelay <seconds>",
+		Description: "Get or set the delay before deleting responses",
+		Usage:       "[p]delresponsesdelay <get/set> [value]",
 		Flags:       []string{CmdFlagDangerous},
 		Handler:     c.delresponsesdelay,
 	})
 
 	router.RegisterCmd(&dgc.Command{
-		Name:        "getdelcommands",
-		Description: "Get your current delete commands setting",
-		Usage:       "[p]getdelcommands",
-		Flags:       []string{CmdFlagDangerous},
-		Handler:     c.getdelcommands,
-	})
-	router.RegisterCmd(&dgc.Command{
 		Name:        "delcommands",
-		Description: "Set if the bot should delete commands",
-		Usage:       "[p]delcommands <on/off>",
+		Description: "Get, set or toggle if the bot should delete commands",
+		Usage:       "[p]delcommands <get/set/toggle> [on/off]",
 		Flags:       []string{CmdFlagDangerous},
 		Handler:     c.delcommands,
 	})
 
 	router.RegisterCmd(&dgc.Command{
-		Name:        "getmobilefriendly",
-		Description: "Get your current mobile friendly setting",
-		Usage:       "[p]getmobilefriendly",
-		Flags:       []string{CmdFlagDangerous},
-		Handler:     c.getmobilefriendly,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "mobilefriendly",
-		Description: "Make the embeds mobile friendly",
-		Usage:       "[p]mobilefriendly <on/off>",
-		Flags:       []string{CmdFlagDangerous},
-		Handler:     c.mobilefriendly,
-	})
-
-	router.RegisterCmd(&dgc.Command{
-		Name:        "getclientspoof",
-		Description: "Get your current client spoof setting",
-		Usage:       "[p]getclientspoof",
-		Flags:       []string{CmdFlagDangerous},
-		Handler:     c.getclientspoof,
-	})
-	router.RegisterCmd(&dgc.Command{
 		Name:        "clientspoof",
-		Description: "Set your client spoof",
-		Usage:       "[p]clientspoof <desktop/web/mobile>",
+		Description: "Get or set the bot's client spoof",
+		Usage:       "[p]clientspoof <get/set/values> [value]",
 		Flags:       []string{CmdFlagDangerous},
 		Handler:     c.clientspoof,
 	})
 
 	router.RegisterCmd(&dgc.Command{
-		Name:        "gettimezone",
-		Description: "Get your current timezone setting",
-		Usage:       "[p]gettimezone",
-		Flags:       []string{CmdFlagDangerous},
-		Handler:     c.gettimezone,
-	})
-	router.RegisterCmd(&dgc.Command{
 		Name:        "timezone",
-		Description: "Set your timezone",
-		Usage:       "[p]timezone <timezone>",
+		Description: "Get or set the timezone",
+		Usage:       "[p]timezone <get/set> [value]",
 		Flags:       []string{CmdFlagDangerous},
 		Handler:     c.timezone,
 	})
 
 	router.RegisterCmd(&dgc.Command{
-		Name:        "getcmdaliases",
-		Description: "Get your current command aliases",
-		Usage:       "[p]getcmdaliases",
+		Name:        "aliases",
+		Description: "Get, add, remove or clear command aliases",
+		Usage:       "[p]aliases <get/add/rm/clear> [alias] [command]",
 		Flags:       []string{CmdFlagDangerous},
-		Handler:     c.getcmdaliases,
+		Handler:     c.aliases,
 	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "addcmdalias",
-		Description: "Add a command alias",
-		Usage:       "[p]addcmdalias <alias> <command>",
-		Flags:       []string{CmdFlagDangerous},
-		Handler:     c.addcmdalias,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "rmcmdalias",
-		Description: "Remove a command alias",
-		Usage:       "[p]rmcmdalias <alias>",
-		Flags:       []string{CmdFlagDangerous},
-		Handler:     c.rmcmdalias,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "getnotifications",
-		Description: "Get your current notifications setting",
-		Usage:       "[p]getnotifications",
-		Flags:       []string{CmdFlagDangerous},
-		Handler:     c.getnotifications,
-	})
+
 	router.RegisterCmd(&dgc.Command{
 		Name:        "notifications",
-		Description: "Turn toast notifications on or off",
-		Usage:       "[p]notifications <on/off>",
+		Description: "Get, set, toggle, or get an example of toast notifications",
+		Usage:       "[p]notifications <get/set/toggle/example> [on/off]",
 		Flags:       []string{CmdFlagDangerous},
 		Handler:     c.notifications,
 	})
 
 	router.RegisterCmd(&dgc.Command{
-		Name:        "examplenotification",
-		Description: "Show an example notification",
-		Usage:       "[p]examplenotification",
-		Flags:       []string{CmdFlagDangerous},
-		Handler:     c.examplenotification,
-	})
-
-	router.RegisterCmd(&dgc.Command{
-		Name:        "getnitrosniper",
-		Description: "Get your current nitro sniper setting",
-		Usage:       "[p]getnitrosniper",
-		Flags:       []string{CmdFlagDangerous},
-		Handler:     c.getnitrosniper,
-	})
-	router.RegisterCmd(&dgc.Command{
 		Name:        "nitrosniper",
-		Description: "Turn the nitro sniper on or off",
-		Usage:       "[p]nitrosniper <on/off>",
+		Description: "Get, set or toggle the Nitro Sniper",
+		Usage:       "[p]nitrosniper <get/set/toggle> [on/off]",
 		Flags:       []string{CmdFlagDangerous},
 		Handler:     c.nitrosniper,
 	})
 
 	router.RegisterCmd(&dgc.Command{
-		Name:        "getgiveawaysniper",
-		Description: "Get your current giveaway sniper setting",
-		Usage:       "[p]getgiveawaysniper",
-		Flags:       []string{CmdFlagDangerous},
-		Handler:     c.getgiveawaysniper,
-	})
-	router.RegisterCmd(&dgc.Command{
 		Name:        "giveawaysniper",
-		Description: "Turn the giveaway sniper on or off",
-		Usage:       "[p]giveawaysniper <on/off>",
+		Description: "Get, set or toggle the Giveaway Sniper",
+		Usage:       "[p]giveawaysniper <get/set/toggle> [on/off]",
 		Flags:       []string{CmdFlagDangerous},
 		Handler:     c.giveawaysniper,
 	})
 
 	router.RegisterCmd(&dgc.Command{
-		Name:        "getgsnipersleep",
-		Description: "Get your current giveaway sniper sleep",
-		Usage:       "[p]getgsnipersleep",
+		Name:        "giveawaysnipersleep",
+		Description: "Get or set the Giveaway Sniper sleep delay",
+		Usage:       "[p]giveawaysnipersleep <get/set> [value]",
 		Flags:       []string{CmdFlagDangerous},
-		Handler:     c.getgsnipersleep,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "gsnipersleep",
-		Description: "Set the delay before the bot enters a giveaway",
-		Usage:       "[p]gsnipersleep <seconds>",
-		Flags:       []string{CmdFlagDangerous},
-		Handler:     c.gsnipersleep,
+		Handler:     c.giveawaysnipersleep,
 	})
 
 	router.RegisterCmd(&dgc.Command{
-		Name:        "getcustombots",
-		Description: "Get a list of current custom bots",
-		Usage:       "[p]getcustombots",
+		Name:        "customgiveawaybots",
+		Description: "Get, add, remove or clear custom giveaway bots",
+		Usage:       "[p]customgiveawaybots <get/add/rm/clear> [bot]",
 		Flags:       []string{CmdFlagDangerous},
-		Handler:     c.getcustombots,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "addcustombot",
-		Description: "Add a custom bot for the giveaway sniper",
-		Usage:       "[p]addcustombot <user>",
-		Flags:       []string{CmdFlagDangerous},
-		Handler:     c.addcustombot,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "removecustombot",
-		Description: "Remove a custom bot",
-		Usage:       "[p]removecustombot <user>",
-		Flags:       []string{CmdFlagDangerous},
-		Handler:     c.removecustombot,
+		Handler:     c.customgiveawaybots,
 	})
 
 	router.RegisterCmd(&dgc.Command{
-		Name:        "getsniperblacklist",
-		Description: "Get the list of sniper blacklist entries",
-		Usage:       "[p]getsniperblacklist",
+		Name:        "sniperblacklist",
+		Description: "Get, add, remove or clear the sniper blacklist",
+		Usage:       "[p]sniperblacklist <get/add/rm/clear> [value]",
 		Flags:       []string{CmdFlagDangerous},
-		Handler:     c.getsniperblacklist,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "addsniperblacklist",
-		Description: "Add to the sniper blacklist",
-		Usage:       "[p]addsniperblacklist <text>",
-		Flags:       []string{CmdFlagDangerous},
-		Handler:     c.addsniperblacklist,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "rmsniperblacklist",
-		Description: "Remove from the sniper blacklist",
-		Usage:       "[p]rmsniperblacklist <text>",
-		Flags:       []string{CmdFlagDangerous},
-		Handler:     c.rmsniperblacklist,
+		Handler:     c.sniperblacklist,
 	})
 
 	router.RegisterCmd(&dgc.Command{
-		Name:        "getsniperserverbl",
-		Description: "Get the list of sniper server blacklist entries",
-		Usage:       "[p]getsniperserverbl",
+		Name:        "sniperserverblacklist",
+		Description: "Get, add, remove or clear the sniper server blacklist",
+		Usage:       "[p]sniperserverblacklist <get/add/rm/clear> [server id]",
 		Flags:       []string{CmdFlagDangerous},
-		Handler:     c.getsniperserverbl,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "addsniperserverbl",
-		Description: "Add a server to the sniper blacklist",
-		Usage:       "[p]addsniperserverbl <server id>",
-		Flags:       []string{CmdFlagDangerous},
-		Handler:     c.addsniperserverbl,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "rmsniperserverbl",
-		Description: "Remove a server from the sniper blacklist",
-		Usage:       "[p]rmsniperserverbl <server id>",
-		Flags:       []string{CmdFlagDangerous},
-		Handler:     c.rmsniperserverbl,
+		Handler:     c.sniperserverblacklist,
 	})
 
-	router.RegisterCmd(&dgc.Command{
-		Name:        "getgsniperbots",
-		Description: "Get the list of custom giveaway sniper bots",
-		Usage:       "[p]getgsniperbots",
-		Flags:       []string{CmdFlagDangerous},
-		Handler:     c.getgsniperbots,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "addgsniperbot",
-		Description: "Add a bot to the custom bot list",
-		Usage:       "[p]addgsniperbot <user>",
-		Flags:       []string{CmdFlagDangerous},
-		Handler:     c.addgsniperbot,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "removegsniperbot",
-		Description: "Remove a bot from the custom bot list",
-		Usage:       "[p]removegsniperbot <user>",
-		Flags:       []string{CmdFlagDangerous},
-		Handler:     c.removegsniperbot,
-	})
-
-	router.RegisterCmd(&dgc.Command{
-		Name:        "getmultitokensniper",
-		Description: "Get your current multi token sniper setting",
-		Usage:       "[p]getmultitokensniper",
-		Flags:       []string{CmdFlagDangerous},
-		Handler:     c.getmultitokensniper,
-	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "multitokensniper",
-		Description: "Turn the multi token sniper on or off",
-		Usage:       "[p]multitokensniper <on/off>",
+		Description: "Get, set or toggle the Multi Token Sniper",
+		Usage:       "[p]multitokensniper <get/set/toggle> [on/off]",
 		Flags:       []string{CmdFlagDangerous},
 		Handler:     c.multitokensniper,
 	})
 
 	router.RegisterCmd(&dgc.Command{
-		Name:        "getprivnotesniper",
-		Description: "Get your current Privnote sniper setting",
-		Usage:       "[p]getprivnotesniper",
+		Name:        "snipertokens",
+		Description: "Get, add, remove or clear Multi Token Sniper tokens",
+		Usage:       "[p]snipertokens <get/add/rm/clear> [value]",
 		Flags:       []string{CmdFlagDangerous},
-		Handler:     c.getprivnotesniper,
+		Handler:     c.snipertokens,
 	})
+
 	router.RegisterCmd(&dgc.Command{
 		Name:        "privnotesniper",
-		Description: "Turn the Privnote sniper on or off",
-		Usage:       "[p]privnotesniper <on/off>",
+		Description: "Get, set or toggle the Privnote Sniper",
+		Usage:       "[p]privnotesniper <get/set/toggle> [on/off]",
 		Flags:       []string{CmdFlagDangerous},
 		Handler:     c.privnotesniper,
 	})
 
 	router.RegisterCmd(&dgc.Command{
-		Name:        "getpoketwosniper",
-		Description: "Get your current PokéTwo sniper setting",
-		Usage:       "[p]getpoketwosniper",
-		Flags:       []string{CmdFlagDangerous},
-		Handler:     c.getpoketwosniper,
-	})
-	router.RegisterCmd(&dgc.Command{
 		Name:        "poketwosniper",
-		Description: "Turn the PokéTwo sniper on or off",
-		Usage:       "[p]poketwosniper <on/off>",
+		Description: "Get, set or toggle the PokéTwo Sniper",
+		Usage:       "[p]poketwosniper <get/set/toggle> [on/off]",
 		Flags:       []string{CmdFlagDangerous},
 		Handler:     c.poketwosniper,
 	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "getpoketwosleep",
-		Description: "Get your current PokéTwo sniper sleep setting",
-		Usage:       "[p]getpoketwosleep",
-		Flags:       []string{CmdFlagDangerous},
-		Handler:     c.getpoketwosleep,
-	})
+
 	router.RegisterCmd(&dgc.Command{
 		Name:        "poketwosleep",
-		Description: "Set the delay before a Pokémon is caught",
-		Usage:       "[p]poketwosleep <seconds>",
+		Description: "Get or set the PokéTwo Sniper catch delay",
+		Usage:       "[p]poketwosleep <get/set> [value]",
 		Flags:       []string{CmdFlagDangerous},
 		Handler:     c.poketwosleep,
 	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "getpoketworandomsleep",
-		Description: "Get your current PokéTwo random sleep setting",
-		Usage:       "[p]getpoketworandomsleep",
-		Flags:       []string{CmdFlagDangerous},
-		Handler:     c.getpoketworandomsleep,
-	})
+
 	router.RegisterCmd(&dgc.Command{
 		Name:        "poketworandomsleep",
-		Description: "Turn PokéTwo random sleep on or off",
-		Usage:       "[p]poketworandomsleep <on/off>",
+		Description: "Get, set or toggle the PokéTwo Sniper random sleep",
+		Usage:       "[p]poketworandomsleep <get/set/toggle> [on/off]",
 		Flags:       []string{CmdFlagDangerous},
 		Handler:     c.poketworandomsleep,
 	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "getpoketwotimeout",
-		Description: "Get your current PokéTwo sniper timeout",
-		Usage:       "[p]getpoketwotimeout",
-		Flags:       []string{CmdFlagDangerous},
-		Handler:     c.getpoketwotimeout,
-	})
+
 	router.RegisterCmd(&dgc.Command{
 		Name:        "poketwotimeout",
-		Description: "Set a timeout for the PokéTwo sniper",
-		Usage:       "[p]poketwotimeout <seconds>",
+		Description: "Get or set the PokéTwo Sniper timeout",
+		Usage:       "[p]poketwotimeout <get/set> [value]",
 		Flags:       []string{CmdFlagDangerous},
 		Handler:     c.poketwotimeout,
 	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "getpoketwotyping",
-		Description: "Get your current PokéTwo typing setting",
-		Usage:       "[p]getpoketwotyping",
-		Flags:       []string{CmdFlagDangerous},
-		Handler:     c.getpoketwotyping,
-	})
+
 	router.RegisterCmd(&dgc.Command{
 		Name:        "poketwotyping",
-		Description: "Turn PokéTwo typing on or off",
-		Usage:       "[p]poketwotyping <on/off>",
+		Description: "Get, set or toggle the PokéTwo typing",
+		Usage:       "[p]poketwotyping <get/set/toggle> [on/off]",
 		Flags:       []string{CmdFlagDangerous},
 		Handler:     c.poketwotyping,
 	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "getpoketwocatchrate",
-		Description: "Get your current PokéTwo catch rate",
-		Usage:       "[p]getpoketwocatchrate",
-		Flags:       []string{CmdFlagDangerous},
-		Handler:     c.getpoketwocatchrate,
-	})
+
 	router.RegisterCmd(&dgc.Command{
 		Name:        "poketwocatchrate",
-		Description: "Set your PokéTwo catch rate",
-		Usage:       "[p]poketwocatchrate <percentage>",
+		Description: "Get or set the PokéTwo catch rate",
+		Usage:       "[p]poketwocatchrate <get/set> [percentage]",
 		Flags:       []string{CmdFlagDangerous},
 		Handler:     c.poketwocatchrate,
 	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "getpoketwofakeactivity",
-		Description: "Get your current PokéTwo fake activity setting",
-		Usage:       "[p]getpoketwofakeactivity",
-		Flags:       []string{CmdFlagDangerous},
-		Handler:     c.getpoketwofakeactivity,
-	})
+
 	router.RegisterCmd(&dgc.Command{
 		Name:        "poketwofakeactivity",
-		Description: "Turn PokéTwo fake activity on or off",
-		Usage:       "[p]poketwofakeactivity <on/off>",
+		Description: "Get, set or toggle the PokéTwo fake activity",
+		Usage:       "[p]poketwofakeactivity <get/set/toggle> [on/off]",
 		Flags:       []string{CmdFlagDangerous},
 		Handler:     c.poketwofakeactivity,
 	})
 
 	router.RegisterCmd(&dgc.Command{
-		Name:        "getpoketwochannels",
-		Description: "Get the list of PokéTwo catch channels",
-		Usage:       "[p]getpoketwochannels",
+		Name:        "poketwochannels",
+		Description: "Get, add, remove or clear PokéTwo channels",
+		Usage:       "[p]poketwochannels <get/add/rm/clear> [channel]",
 		Flags:       []string{CmdFlagDangerous},
-		Handler:     c.getpoketwochannels,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "addpoketwochannel",
-		Description: "Add a channel to the PokéTwo catch channels",
-		Usage:       "[p]addpoketwochannel <channel>",
-		Flags:       []string{CmdFlagDangerous},
-		Handler:     c.addpoketwochannel,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "rmpoketwochannel",
-		Description: "Remove a channel from the PokéTwo catch channels",
-		Usage:       "[p]rmpoketwochannel <channel>",
-		Flags:       []string{CmdFlagDangerous},
-		Handler:     c.rmpoketwochannel,
-	})
-
-	router.RegisterCmd(&dgc.Command{
-		Name:        "getpoketwolanguage",
-		Description: "Get your current PokéTwo catch language",
-		Usage:       "[p]getpoketwolanguage",
-		Flags:       []string{CmdFlagDangerous},
-		Handler:     c.getpoketwolanguage,
+		Handler:     c.poketwochannels,
 	})
 
 	router.RegisterCmd(&dgc.Command{
 		Name:        "poketwolanguage",
-		Description: "Get your current PokéTwo catch language",
-		Usage:       "[p]poketwolanguage <language>",
+		Description: "Get or set the PokéTwo Sniper catch language",
+		Usage:       "[p]poketwolanguage <get/set/values> [language]",
 		Flags:       []string{CmdFlagDangerous},
 		Handler:     c.poketwolanguage,
-	})
-
-	router.RegisterCmd(&dgc.Command{
-		Name:        "getsnipertokens",
-		Description: "Get list of multi token sniper tokens",
-		Usage:       "[p]getsnipertokens",
-		Flags:       []string{CmdFlagDangerous},
-		Handler:     c.getsnipertokens,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "addsnipertoken",
-		Description: "Add a token to the multi token sniper",
-		Usage:       "[p]addsnipertoken <token>",
-		Flags:       []string{CmdFlagDangerous},
-		Handler:     c.addsnipertoken,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "addsnipertokens",
-		Description: "Add multiple tokens to the sniper (separated by commas)",
-		Usage:       "[p]addsnipertokens <tokens>",
-		Flags:       []string{CmdFlagDangerous},
-		Handler:     c.addsnipertokens,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "rmsnipertoken",
-		Description: "Remove a token from the multi token sniper",
-		Usage:       "[p]rmsnipertoken <token>",
-		Flags:       []string{CmdFlagDangerous},
-		Handler:     c.rmsnipertoken,
 	})
 
 	router.RegisterCmd(&dgc.Command{
@@ -560,406 +269,212 @@ func (c ConfigCommands) RegisterCommands(router *dgc.Router) {
 	})
 
 	router.RegisterCmd(&dgc.Command{
-		Name:        "getwnitro",
-		Description: "Get the current nitro sniper webhook",
-		Usage:       "[p]getwnitro",
+		Name:        "wnitrosniper",
+		Description: "Get or set the Nitro Sniper webhook",
+		Usage:       "[p]wnitrosniper <get/set> [webhook url]",
 		Flags:       []string{CmdFlagDangerous},
-		Handler:     c.getwnitro,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "wnitro",
-		Description: "Set the nitro sniper webhook",
-		Usage:       "[p]wnitro [webhook url]",
-		Flags:       []string{CmdFlagDangerous},
-		Handler:     c.wnitro,
+		Handler:     c.wnitrosniper,
 	})
 
 	router.RegisterCmd(&dgc.Command{
-		Name:        "getwgiveaway",
-		Description: "Get the current giveaway sniper webhook",
-		Usage:       "[p]getwgiveaway",
+		Name:        "wgiveawaysniper",
+		Description: "Get or set the Giveaway Sniper webhook",
+		Usage:       "[p]wgiveawaysniper <get/set> [webhook url]",
 		Flags:       []string{CmdFlagDangerous},
-		Handler:     c.getwgiveaway,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "wgiveaway",
-		Description: "Set the giveaway sniper webhook",
-		Usage:       "[p]wgiveaway [webhook url]",
-		Flags:       []string{CmdFlagDangerous},
-		Handler:     c.wgiveaway,
+		Handler:     c.wgiveawaysniper,
 	})
 
-	router.RegisterCmd(&dgc.Command{
-		Name:        "getwselfbotdetection",
-		Description: "Get the current selfbot detection webhook",
-		Usage:       "[p]getwselfbotdetection",
-		Flags:       []string{CmdFlagDangerous},
-		Handler:     c.getwselfbotdetection,
-	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "wselfbotdetection",
-		Description: "Set the selfbot detection webhook",
-		Usage:       "[p]wselfbotdetection [webhook url]",
+		Description: "Get or set the Selfbot Detection webhook",
+		Usage:       "[p]wselfbotdetection <get/set> [webhook url]",
 		Flags:       []string{CmdFlagDangerous},
 		Handler:     c.wselfbotdetection,
 	})
 
 	router.RegisterCmd(&dgc.Command{
-		Name:        "getwstaffdetection",
-		Description: "Get the current staff detection webhook",
-		Usage:       "[p]getwstaffdetection",
-		Flags:       []string{CmdFlagDangerous},
-		Handler:     c.getwstaffdetection,
-	})
-	router.RegisterCmd(&dgc.Command{
 		Name:        "wstaffdetection",
-		Description: "Set the staff detection webhook",
-		Usage:       "[p]wstaffdetection [webhook url]",
+		Description: "Get or set the Staff Detection webhook",
+		Usage:       "[p]wstaffdetection <get/set> [webhook url]",
 		Flags:       []string{CmdFlagDangerous},
 		Handler:     c.wstaffdetection,
 	})
 
 	router.RegisterCmd(&dgc.Command{
-		Name:        "getwnotifiers",
-		Description: "Get the current notifiers webhook",
-		Usage:       "[p]getwnotifiers",
-		Flags:       []string{CmdFlagDangerous},
-		Handler:     c.getwnotifiers,
-	})
-	router.RegisterCmd(&dgc.Command{
 		Name:        "wnotifiers",
-		Description: "Set the notifiers webhook",
-		Usage:       "[p]wnotifiers [webhook url]",
+		Description: "Get or set the Notifiers webhook",
+		Usage:       "[p]wnotifiers <get/set> [webhook url]",
 		Flags:       []string{CmdFlagDangerous},
 		Handler:     c.wnotifiers,
 	})
 
 	router.RegisterCmd(&dgc.Command{
-		Name:        "getwpingdetection",
-		Description: "Get the current ping detection webhook",
-		Usage:       "[p]getwpingdetection",
-		Flags:       []string{CmdFlagDangerous},
-		Handler:     c.getwpingdetection,
-	})
-	router.RegisterCmd(&dgc.Command{
 		Name:        "wpingdetection",
-		Description: "Set the ping detection webhook",
-		Usage:       "[p]wpingdetection [webhook url]",
+		Description: "Get or set the Ping Detection webhook",
+		Usage:       "[p]wpingdetection <get/set> [webhook url]",
 		Flags:       []string{CmdFlagDangerous},
 		Handler:     c.wpingdetection,
 	})
 
 	router.RegisterCmd(&dgc.Command{
-		Name:        "getwmisc",
-		Description: "Get the current misc webhook",
-		Usage:       "[p]getwmisc",
-		Flags:       []string{CmdFlagDangerous},
-		Handler:     c.getwmisc,
-	})
-	router.RegisterCmd(&dgc.Command{
 		Name:        "wmisc",
-		Description: "Set the misc webhook",
-		Usage:       "[p]wmisc [webhook url]",
+		Description: "Get or set the Miscellaneous webhook",
+		Usage:       "[p]wmisc <get/set> [webhook url]",
 		Flags:       []string{CmdFlagDangerous},
 		Handler:     c.wmisc,
 	})
 
 	router.RegisterCmd(&dgc.Command{
-		Name:        "getwsessions",
-		Description: "Get the current sessions webhook",
-		Usage:       "[p]getwsessions",
-		Flags:       []string{CmdFlagDangerous},
-		Handler:     c.getwsessions,
-	})
-	router.RegisterCmd(&dgc.Command{
 		Name:        "wsessions",
-		Description: "Set the sessions webhook",
-		Usage:       "[p]wsessions [webhook url]",
+		Description: "Get or set the Sessions webhook",
+		Usage:       "[p]wsessions <get/set> [webhook url]",
 		Flags:       []string{CmdFlagDangerous},
 		Handler:     c.wsessions,
 	})
 
 	router.RegisterCmd(&dgc.Command{
-		Name:        "getwpingself",
-		Description: "Get the current webhook ping self setting",
-		Usage:       "[p]getwsessions",
-		Flags:       []string{CmdFlagDangerous},
-		Handler:     c.getwpingself,
-	})
-	router.RegisterCmd(&dgc.Command{
 		Name:        "wpingself",
-		Description: "Set the webhook ping self setting",
-		Usage:       "[p]wpingself <on/off>",
+		Description: "Get, set or toggle Ping Self for webhooks",
+		Usage:       "[p]wpingself <get/set/toggle> [on/off]",
 		Flags:       []string{CmdFlagDangerous},
 		Handler:     c.wpingself,
 	})
 
 	router.RegisterCmd(&dgc.Command{
-		Name:        "getwpingeveryone",
-		Description: "Get the current webhook ping everyone setting",
-		Usage:       "[p]getwpingeveryone",
-		Flags:       []string{CmdFlagDangerous},
-		Handler:     c.getwpingeveryone,
-	})
-	router.RegisterCmd(&dgc.Command{
 		Name:        "wpingeveryone",
-		Description: "Set the webhook ping everyone setting",
-		Usage:       "[p]wpingeveryone <on/off>",
+		Description: "Get, set or toggle Ping Everyone for webhooks",
+		Usage:       "[p]wpingeveryone <get/set/toggle> [on/off]",
 		Flags:       []string{CmdFlagDangerous},
 		Handler:     c.wpingeveryone,
 	})
 
 	router.RegisterCmd(&dgc.Command{
-		Name:        "getbannotifier",
-		Description: "Get the current ban notifier value",
-		Usage:       "[p]getbannotifier",
-		Flags:       []string{CmdFlagDangerous},
-		Handler:     c.getbannotifier,
-	})
-	router.RegisterCmd(&dgc.Command{
 		Name:        "bannotifier",
-		Description: "Turn ban notifier on or off",
-		Usage:       "[p]bannotifier <on/off>",
+		Description: "Get, set or toggle the Ban Notifier",
+		Usage:       "[p]bannotifier <get/set/toggle> [on/off]",
 		Flags:       []string{CmdFlagDangerous},
 		Handler:     c.bannotifier,
 	})
 
 	router.RegisterCmd(&dgc.Command{
-		Name:        "getstaffdetection",
-		Description: "Get the current staff detection value",
-		Usage:       "[p]getstaffdetection",
-		Flags:       []string{CmdFlagDangerous},
-		Handler:     c.getstaffdetection,
-	})
-	router.RegisterCmd(&dgc.Command{
 		Name:        "staffdetection",
-		Description: "Turn staff detection on or off",
-		Usage:       "[p]staffdetection <on/off>",
+		Description: "Get, set or toggle the Staff Detection",
+		Usage:       "[p]staffdetection <get/set/toggle> [on/off]",
 		Flags:       []string{CmdFlagDangerous},
 		Handler:     c.staffdetection,
 	})
 
 	router.RegisterCmd(&dgc.Command{
-		Name:        "getpingdetection",
-		Description: "Get the current ping detection value",
-		Usage:       "[p]getpingdetection",
-		Flags:       []string{CmdFlagDangerous},
-		Handler:     c.getpingdetection,
-	})
-	router.RegisterCmd(&dgc.Command{
 		Name:        "pingdetection",
-		Description: "Turn ping detection on or off",
-		Usage:       "[p]pingdetection <on/off>",
+		Description: "Get, set or toggle the Ping Detection",
+		Usage:       "[p]pingdetection <get/set/toggle> [on/off]",
 		Flags:       []string{CmdFlagDangerous},
 		Handler:     c.pingdetection,
 	})
 
 	router.RegisterCmd(&dgc.Command{
-		Name:        "getticketnotifier",
-		Description: "Get the current ticket notifier value",
-		Usage:       "[p]getticketnotifier",
-		Flags:       []string{CmdFlagDangerous},
-		Handler:     c.getticketnotifier,
-	})
-	router.RegisterCmd(&dgc.Command{
 		Name:        "ticketnotifier",
-		Description: "Turn ticket notifier on or off",
-		Usage:       "[p]ticketnotifier <on/off>",
+		Description: "Get, set or toggle the Ticket Notifier",
+		Usage:       "[p]ticketnotifier <get/set/toggle> [on/off]",
 		Flags:       []string{CmdFlagDangerous},
 		Handler:     c.ticketnotifier,
 	})
 
 	router.RegisterCmd(&dgc.Command{
-		Name:        "getsessionconnect",
-		Description: "Get the current session connected value",
-		Usage:       "[p]getsessionconnect",
+		Name:        "sessionconnected",
+		Description: "Get, set or toggle the Session Connected Notifier",
+		Usage:       "[p]sessionconnected <get/set/toggle> [on/off]",
 		Flags:       []string{CmdFlagDangerous},
-		Handler:     c.getsessionconnect,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "sessionconnect",
-		Description: "Turn session connected notifier on or off",
-		Usage:       "[p]sessionconnect <on/off>",
-		Flags:       []string{CmdFlagDangerous},
-		Handler:     c.sessionconnect,
+		Handler:     c.sessionconnected,
 	})
 
 	router.RegisterCmd(&dgc.Command{
-		Name:        "getsessiondisconnect",
-		Description: "Get the current session disconnected value",
-		Usage:       "[p]getsessiondisconnect",
+		Name:        "sessiondisconnected",
+		Description: "Get, set or toggle the Session Disconnected Notifier",
+		Usage:       "[p]sessiondisconnected <get/set/toggle> [on/off]",
 		Flags:       []string{CmdFlagDangerous},
-		Handler:     c.getsessiondisconnect,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "sessiondisconnect",
-		Description: "Turn session disconnected notifier on or off",
-		Usage:       "[p]sessiondisconnect <on/off>",
-		Flags:       []string{CmdFlagDangerous},
-		Handler:     c.sessiondisconnect,
+		Handler:     c.sessiondisconnected,
 	})
 
-	router.RegisterCmd(&dgc.Command{
-		Name:        "getselfbotdetection",
-		Description: "Get the current selfbot detection value",
-		Usage:       "[p]getselfbotdetection",
-		Flags:       []string{CmdFlagDangerous},
-		Handler:     c.getselfbotdetection,
-	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "selfbotdetection",
-		Description: "Turn selfbot detection on or off",
-		Usage:       "[p]selfbotdetection <on/off>",
+		Description: "Get, set or toggle the Selfbot Detection",
+		Usage:       "[p]selfbotdetection <get/set/toggle> [on/off]",
 		Flags:       []string{CmdFlagDangerous},
 		Handler:     c.selfbotdetection,
 	})
 
 	router.RegisterCmd(&dgc.Command{
-		Name:        "getdmtypingnotifier",
-		Description: "Get the current DM typing notifier value",
-		Usage:       "[p]getdmtypingnotifier",
-		Flags:       []string{CmdFlagDangerous},
-		Handler:     c.getdmtypingnotifier,
-	})
-	router.RegisterCmd(&dgc.Command{
 		Name:        "dmtypingnotifier",
-		Description: "Turn the DM typing notifier on or off",
-		Usage:       "[p]dmtypingnotifier <on/off>",
+		Description: "Get, set or toggle the DM Typing Notifier",
+		Usage:       "[p]dmtypingnotifier <get/set/toggle> [on/off]",
 		Flags:       []string{CmdFlagDangerous},
 		Handler:     c.dmtypingnotifier,
 	})
 
 	router.RegisterCmd(&dgc.Command{
-		Name:        "getdmnotifier",
-		Description: "Get the current DM notifier value",
-		Usage:       "[p]getdmnotifier",
-		Flags:       []string{CmdFlagDangerous},
-		Handler:     c.getdmnotifier,
-	})
-	router.RegisterCmd(&dgc.Command{
 		Name:        "dmnotifier",
-		Description: "Turn the DM notifier on or off",
-		Usage:       "[p]dmnotifier <on/off>",
+		Description: "Get, set or toggle the DM Notifier",
+		Usage:       "[p]dmnotifier <get/set/toggle> [on/off]",
 		Flags:       []string{CmdFlagDangerous},
 		Handler:     c.dmnotifier,
 	})
 
 	router.RegisterCmd(&dgc.Command{
-		Name:        "getdmeditnotifier",
-		Description: "Get the current DM edit notifier value",
-		Usage:       "[p]getdmeditnotifier",
-		Flags:       []string{CmdFlagDangerous},
-		Handler:     c.getdmeditnotifier,
-	})
-	router.RegisterCmd(&dgc.Command{
 		Name:        "dmeditnotifier",
-		Description: "Turn the DM edit notifier on or off",
-		Usage:       "[p]dmeditnotifier <on/off>",
+		Description: "Get, set or toggle the DM Edit Notifier",
+		Usage:       "[p]dmeditnotifier <get/set/toggle> [on/off]",
 		Flags:       []string{CmdFlagDangerous},
 		Handler:     c.dmeditnotifier,
 	})
 
 	router.RegisterCmd(&dgc.Command{
-		Name:        "getdmdeletenotifier",
-		Description: "Get the current DM delete notifier value",
-		Usage:       "[p]getdmdeletenotifier",
-		Flags:       []string{CmdFlagDangerous},
-		Handler:     c.getdmdeletenotifier,
-	})
-	router.RegisterCmd(&dgc.Command{
 		Name:        "dmdeletenotifier",
-		Description: "Turn the DM delete notifier on or off",
-		Usage:       "[p]dmdeletenotifier <on/off>",
+		Description: "Get, set or toggle the DM Delete Notifier",
+		Usage:       "[p]dmdeletenotifier <get/set/toggle> [on/off]",
 		Flags:       []string{CmdFlagDangerous},
 		Handler:     c.dmdeletenotifier,
 	})
 
 	router.RegisterCmd(&dgc.Command{
-		Name:        "getmsgdeletenotifier",
-		Description: "Get the current message delete notifier value",
-		Usage:       "[p]getmsgdeletenotifier",
-		Flags:       []string{CmdFlagDangerous},
-		Handler:     c.getmsgdeletenotifier,
-	})
-	router.RegisterCmd(&dgc.Command{
 		Name:        "messagedeletenotifier",
-		Description: "Turn the message delete notifier on or off",
-		Usage:       "[p]messagedeletenotifier <on/off>",
+		Description: "Get, set or toggle the Message Delete Notifier",
+		Usage:       "[p]messagedeletenotifier <get/set/toggle> [on/off]",
 		Flags:       []string{CmdFlagDangerous},
 		Handler:     c.messagedeletenotifier,
 	})
 
 	router.RegisterCmd(&dgc.Command{
-		Name:        "getuitheme",
-		Description: "Get the current UI theme",
-		Usage:       "[p]getuitheme",
-		Flags:       []string{CmdFlagDangerous},
-		Handler:     c.getuitheme,
-	})
-	router.RegisterCmd(&dgc.Command{
 		Name:        "uitheme",
-		Description: "Change the UI theme",
-		Usage:       "[p]uitheme <light/dark>",
+		Description: "Get or set the UI theme",
+		Usage:       "[p]uitheme <get/set/values> [value]",
 		Flags:       []string{CmdFlagDangerous},
 		Handler:     c.uitheme,
 	})
 
 	router.RegisterCmd(&dgc.Command{
-		Name:        "gethidetosystray",
-		Description: "Get the current hide to system tray value",
-		Usage:       "[p]gethidetosystray",
-		Flags:       []string{CmdFlagDangerous},
-		Handler:     c.gethidetosystray,
-	})
-	router.RegisterCmd(&dgc.Command{
 		Name:        "hidetosystray",
-		Description: "Turn hide to system tray on or off",
-		Usage:       "[p]hidetosystray <on/off>",
+		Description: "Get, set or toggle Hide UI To Systray",
+		Usage:       "[p]hidetosystray <get/set/toggle> [on/off]",
 		Flags:       []string{CmdFlagDangerous},
 		Handler:     c.hidetosystray,
 	})
 
 	router.RegisterCmd(&dgc.Command{
-		Name:        "getrunonstartup",
-		Description: "Get the current run on startup value",
-		Usage:       "[p]getrunonstartup",
+		Name:        "runuionstartup",
+		Description: "Get, set or toggle Run UI on Startup",
+		Usage:       "[p]runuionstartup <get/set/toggle> [on/off]",
 		Flags:       []string{CmdFlagDangerous},
-		Handler:     c.getrunonstartup,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "runonstartup",
-		Description: "Turn run on startup on or off",
-		Usage:       "[p]runonstartup <on/off>",
-		Flags:       []string{CmdFlagDangerous},
-		Handler:     c.runonstartup,
+		Handler:     c.runuionstartup,
 	})
 
 	router.RegisterCmd(&dgc.Command{
-		Name:        "getrunsbonstartup",
-		Description: "Get the current run selfbot on startup value",
-		Usage:       "[p]getrunsbonstartup",
+		Name:        "runbotonstartup",
+		Description: "Get, set or toggle Run Selfbot on Startup",
+		Usage:       "[p]runbotonstartup <get/set/toggle> [on/off]",
 		Flags:       []string{CmdFlagDangerous},
-		Handler:     c.getrunsbonstartup,
+		Handler:     c.runbotonstartup,
 	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "runsbonstartup",
-		Description: "Turn run selfbot on startup on or off",
-		Usage:       "[p]runsbonstartup <on/off>",
-		Flags:       []string{CmdFlagDangerous},
-		Handler:     c.runsbonstartup,
-	})
-}
-
-func (ConfigCommands) getcommandprefix(ctx *dgc.Ctx) {
-	cfg, err := config.GetConfig()
-	if err != nil {
-		_ = ctx.RespondText("Error getting config")
-		return
-	}
-
-	embed.NewEmbed().
-		AddField("Command Prefix", cfg.Selfbot.CommandPrefix).
-		Send(ctx)
 }
 
 func (ConfigCommands) commandprefix(ctx *dgc.Ctx) {
@@ -969,24 +484,27 @@ func (ConfigCommands) commandprefix(ctx *dgc.Ctx) {
 		return
 	}
 
-	cfg.Selfbot.CommandPrefix = utils.Arguments["<prefix>"]
-	_ = cfg.Save()
+	switch utils.Arguments["<get/set>"] {
+	case "get":
+		embed.NewEmbed().
+			AddField("Command Prefix", cfg.Selfbot.CommandPrefix).
+			Send(ctx)
+	case "set":
+		value := utils.Arguments["[value]"]
+		if value == "" {
+			_ = ctx.RespondText("You must provide a value to set!")
+			return
+		}
 
-	embed.NewEmbed().
-		SetDescription("Command prefix set to " + utils.Arguments["<prefix>"]).
-		Send(ctx)
-}
+		cfg.Selfbot.CommandPrefix = value
+		_ = cfg.Save()
 
-func (ConfigCommands) getcommandmode(ctx *dgc.Ctx) {
-	cfg, err := config.GetConfig()
-	if err != nil {
-		_ = ctx.RespondText("Error getting config")
-		return
+		embed.NewEmbed().
+			SetDescription("Command prefix set to " + value).
+			Send(ctx)
+	default:
+		_ = ctx.RespondText("Invalid <get/set> argument. Use `get` or `set`.")
 	}
-
-	embed.NewEmbed().
-		AddField("Command Mode", cfg.Selfbot.CommandMode).
-		Send(ctx)
 }
 
 func (ConfigCommands) commandmode(ctx *dgc.Ctx) {
@@ -996,31 +514,32 @@ func (ConfigCommands) commandmode(ctx *dgc.Ctx) {
 		return
 	}
 
-	mode := utils.String.Capitalize(utils.Arguments["<codeblock/text/indent/webhookembed/urlembed>"])
-	if !utils.SliceContains([]string{"Codeblock", "Text", "Indent", "Webhookembed", "Urlembed"}, mode) {
-		_ = ctx.RespondText("Invalid command mode.")
-		return
+	switch utils.Arguments["<get/set/values>"] {
+	case "get":
+		embed.NewEmbed().
+			AddField("Command Mode", cfg.Selfbot.CommandMode).
+			Send(ctx)
+	case "set":
+		value := utils.String.Capitalize(utils.Arguments["[value]"])
+		if !utils.SliceContains([]string{"Codeblock", "Text", "Indent", "Webhookembed", "Urlembed"}, value) {
+			_ = ctx.RespondText("Invalid command mode. Use `[p]commandmode values` to get a list of available command modes.")
+			return
+		}
+
+		cfg.Selfbot.CommandMode = strings.ReplaceAll(value, "Webhookembed", "WebhookEmbed")
+		cfg.Selfbot.CommandMode = strings.ReplaceAll(cfg.Selfbot.CommandMode, "Urlembed", "URLEmbed")
+		_ = cfg.Save()
+
+		embed.NewEmbed().
+			SetDescription("Command mode set to " + cfg.Selfbot.CommandMode).
+			Send(ctx)
+	case "values":
+		embed.NewEmbed().
+			SetDescription("Available command modes: Codeblock, Text, Indent, WebhookEmbed, URLEmbed").
+			Send(ctx)
+	default:
+		_ = ctx.RespondText("Invalid <get/set/values> argument. Use `get` or `set` or `values`.")
 	}
-
-	cfg.Selfbot.CommandMode = strings.ReplaceAll(mode, "Webhookembed", "WebhookEmbed")
-	cfg.Selfbot.CommandMode = strings.ReplaceAll(cfg.Selfbot.CommandMode, "Urlembed", "URLEmbed")
-	_ = cfg.Save()
-
-	embed.NewEmbed().
-		SetDescription("Command mode set to " + cfg.Selfbot.CommandMode).
-		Send(ctx)
-}
-
-func (ConfigCommands) gettitle(ctx *dgc.Ctx) {
-	cfg, err := config.GetConfig()
-	if err != nil {
-		_ = ctx.RespondText("Error getting config")
-		return
-	}
-
-	embed.NewEmbed().
-		AddField("Title", cfg.Selfbot.Title).
-		Send(ctx)
 }
 
 func (ConfigCommands) title(ctx *dgc.Ctx) {
@@ -1030,24 +549,23 @@ func (ConfigCommands) title(ctx *dgc.Ctx) {
 		return
 	}
 
-	cfg.Selfbot.Title = ctx.Arguments.Raw()
-	_ = cfg.Save()
+	switch utils.Arguments["<get/set>"] {
+	case "get":
+		embed.NewEmbed().
+			AddField("Title", cfg.Selfbot.Title).
+			Send(ctx)
+	case "set":
+		value := utils.String.RemoveWords(ctx.Arguments.Raw(), 1)
 
-	embed.NewEmbed().
-		SetDescription("Title set to " + cfg.Selfbot.Title).
-		Send(ctx)
-}
+		cfg.Selfbot.Title = value
+		_ = cfg.Save()
 
-func (ConfigCommands) getfooter(ctx *dgc.Ctx) {
-	cfg, err := config.GetConfig()
-	if err != nil {
-		_ = ctx.RespondText("Error getting config")
-		return
+		embed.NewEmbed().
+			SetDescription("Title set to " + value).
+			Send(ctx)
+	default:
+		_ = ctx.RespondText("Invalid <get/set> argument. Use `get` or `set`.")
 	}
-
-	embed.NewEmbed().
-		AddField("Footer", cfg.Selfbot.Footer).
-		Send(ctx)
 }
 
 func (ConfigCommands) footer(ctx *dgc.Ctx) {
@@ -1057,24 +575,23 @@ func (ConfigCommands) footer(ctx *dgc.Ctx) {
 		return
 	}
 
-	cfg.Selfbot.Footer = ctx.Arguments.Raw()
-	_ = cfg.Save()
+	switch utils.Arguments["<get/set>"] {
+	case "get":
+		embed.NewEmbed().
+			AddField("Footer", cfg.Selfbot.Footer).
+			Send(ctx)
+	case "set":
+		value := utils.String.RemoveWords(ctx.Arguments.Raw(), 1)
 
-	embed.NewEmbed().
-		SetDescription("Footer set to " + cfg.Selfbot.Footer).
-		Send(ctx)
-}
+		cfg.Selfbot.Footer = value
+		_ = cfg.Save()
 
-func (ConfigCommands) getdelresponses(ctx *dgc.Ctx) {
-	cfg, err := config.GetConfig()
-	if err != nil {
-		_ = ctx.RespondText("Error getting config")
-		return
+		embed.NewEmbed().
+			SetDescription("Footer set to " + value).
+			Send(ctx)
+	default:
+		_ = ctx.RespondText("Invalid <get/set> argument. Use `get` or `set`.")
 	}
-
-	embed.NewEmbed().
-		AddField("Delete Responses", utils.Misc.FormatBoolOnOff(cfg.Selfbot.DeleteResponses)).
-		Send(ctx)
 }
 
 func (ConfigCommands) delresponses(ctx *dgc.Ctx) {
@@ -1084,30 +601,34 @@ func (ConfigCommands) delresponses(ctx *dgc.Ctx) {
 		return
 	}
 
-	toggle := strings.ToLower(utils.Arguments["<on/off>"])
-	if toggle != "on" && toggle != "off" {
-		_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
-		return
+	switch utils.Arguments["<get/set/toggle>"] {
+	case "get":
+		embed.NewEmbed().
+			AddField("Delete Responses", utils.Misc.FormatBoolOnOff(cfg.Selfbot.DeleteResponses)).
+			Send(ctx)
+	case "set":
+		toggle := strings.ToLower(utils.Arguments["[on/off]"])
+		if toggle != "on" && toggle != "off" {
+			_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
+			return
+		}
+
+		cfg.Selfbot.DeleteResponses = toggle == "on"
+		_ = cfg.Save()
+
+		embed.NewEmbed().
+			SetDescription("Turned " + toggle + " delete responses").
+			Send(ctx)
+	case "toggle":
+		cfg.Selfbot.DeleteResponses = !cfg.Selfbot.DeleteResponses
+		_ = cfg.Save()
+
+		embed.NewEmbed().
+			SetDescription("Turned " + utils.Misc.FormatBoolOnOff(cfg.Selfbot.DeleteResponses) + " delete responses").
+			Send(ctx)
+	default:
+		_ = ctx.RespondText("Invalid <get/set/toggle> argument. Use `get` or `set` or `toggle`.")
 	}
-
-	cfg.Selfbot.DeleteResponses = toggle == "on"
-	_ = cfg.Save()
-
-	embed.NewEmbed().
-		SetDescription("Turned " + toggle + " delete responses").
-		Send(ctx)
-}
-
-func (ConfigCommands) getdelresponsesdelay(ctx *dgc.Ctx) {
-	cfg, err := config.GetConfig()
-	if err != nil {
-		_ = ctx.RespondText("Error getting config")
-		return
-	}
-
-	embed.NewEmbed().
-		AddField("Delete Responses Delay", fmt.Sprintf("%d seconds", cfg.Selfbot.DeleteResponsesDelay)).
-		Send(ctx)
 }
 
 func (ConfigCommands) delresponsesdelay(ctx *dgc.Ctx) {
@@ -1117,30 +638,31 @@ func (ConfigCommands) delresponsesdelay(ctx *dgc.Ctx) {
 		return
 	}
 
-	delay, err := strconv.Atoi(utils.Arguments["<seconds>"])
-	if err != nil {
-		_ = ctx.RespondText("Argument <seconds> must be a number.")
-		return
+	switch utils.Arguments["<get/set>"] {
+	case "get":
+		formatted := utils.Misc.FormatDuration(time.Duration(cfg.Selfbot.DeleteResponsesDelay) * time.Second)
+
+		embed.NewEmbed().
+			AddField("Delete Responses Delay", formatted).
+			Send(ctx)
+	case "set":
+		delay, err := time.ParseDuration(utils.Arguments["[value]"])
+		if err != nil {
+			_ = ctx.RespondText("Invalid duration: " + err.Error())
+			return
+		}
+
+		cfg.Selfbot.DeleteResponsesDelay = int(delay.Seconds())
+		_ = cfg.Save()
+
+		formatted := utils.Misc.FormatDuration(time.Duration(cfg.Selfbot.DeleteResponsesDelay) * time.Second)
+
+		embed.NewEmbed().
+			SetDescription(fmt.Sprintf("Delete responses delay set to %s.", formatted)).
+			Send(ctx)
+	default:
+		_ = ctx.RespondText("Invalid <get/set> argument. Use `get` or `set`.")
 	}
-
-	cfg.Selfbot.DeleteResponsesDelay = delay
-	_ = cfg.Save()
-
-	embed.NewEmbed().
-		SetDescription(fmt.Sprintf("Delete responses delay set to %d seconds", cfg.Selfbot.DeleteResponsesDelay)).
-		Send(ctx)
-}
-
-func (ConfigCommands) getdelcommands(ctx *dgc.Ctx) {
-	cfg, err := config.GetConfig()
-	if err != nil {
-		_ = ctx.RespondText("Error getting config")
-		return
-	}
-
-	embed.NewEmbed().
-		AddField("Delete Commands", utils.Misc.FormatBoolOnOff(cfg.Selfbot.DeleteCommands)).
-		Send(ctx)
 }
 
 func (ConfigCommands) delcommands(ctx *dgc.Ctx) {
@@ -1150,63 +672,34 @@ func (ConfigCommands) delcommands(ctx *dgc.Ctx) {
 		return
 	}
 
-	toggle := strings.ToLower(utils.Arguments["<on/off>"])
-	if toggle != "on" && toggle != "off" {
-		_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
-		return
+	switch utils.Arguments["<get/set/toggle>"] {
+	case "get":
+		embed.NewEmbed().
+			AddField("Delete Commands", utils.Misc.FormatBoolOnOff(cfg.Selfbot.DeleteCommands)).
+			Send(ctx)
+	case "set":
+		toggle := strings.ToLower(utils.Arguments["[on/off]"])
+		if toggle != "on" && toggle != "off" {
+			_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
+			return
+		}
+
+		cfg.Selfbot.DeleteCommands = toggle == "on"
+		_ = cfg.Save()
+
+		embed.NewEmbed().
+			SetDescription("Turned " + toggle + " delete commands").
+			Send(ctx)
+	case "toggle":
+		cfg.Selfbot.DeleteCommands = !cfg.Selfbot.DeleteCommands
+		_ = cfg.Save()
+
+		embed.NewEmbed().
+			SetDescription("Turned " + utils.Misc.FormatBoolOnOff(cfg.Selfbot.DeleteCommands) + " delete commands").
+			Send(ctx)
+	default:
+		_ = ctx.RespondText("Invalid <get/set/toggle> argument. Use `get` or `set` or `toggle`.")
 	}
-
-	cfg.Selfbot.DeleteCommands = toggle == "on"
-	_ = cfg.Save()
-
-	embed.NewEmbed().
-		SetDescription("Turned " + toggle + " delete commands").
-		Send(ctx)
-}
-
-func (ConfigCommands) getmobilefriendly(ctx *dgc.Ctx) {
-	cfg, err := config.GetConfig()
-	if err != nil {
-		_ = ctx.RespondText("Error getting config")
-		return
-	}
-
-	embed.NewEmbed().
-		AddField("Mobile Friendly", utils.Misc.FormatBoolOnOff(cfg.Selfbot.MobileFriendly)).
-		Send(ctx)
-}
-
-func (ConfigCommands) mobilefriendly(ctx *dgc.Ctx) {
-	cfg, err := config.GetConfig()
-	if err != nil {
-		_ = ctx.RespondText("Error getting config")
-		return
-	}
-
-	toggle := strings.ToLower(utils.Arguments["<on/off>"])
-	if toggle != "on" && toggle != "off" {
-		_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
-		return
-	}
-
-	cfg.Selfbot.MobileFriendly = toggle == "on"
-	_ = cfg.Save()
-
-	embed.NewEmbed().
-		SetDescription("Turned " + toggle + " mobile friendly").
-		Send(ctx)
-}
-
-func (ConfigCommands) getclientspoof(ctx *dgc.Ctx) {
-	cfg, err := config.GetConfig()
-	if err != nil {
-		_ = ctx.RespondText("Error getting config")
-		return
-	}
-
-	embed.NewEmbed().
-		AddField("Client", cfg.Selfbot.Client).
-		Send(ctx)
 }
 
 func (ConfigCommands) clientspoof(ctx *dgc.Ctx) {
@@ -1216,38 +709,31 @@ func (ConfigCommands) clientspoof(ctx *dgc.Ctx) {
 		return
 	}
 
-	client := utils.String.Capitalize(utils.Arguments["<desktop/web/mobile>"])
-	if !utils.SliceContains([]string{"Desktop", "Web", "Mobile"}, client) {
-		_ = ctx.RespondText("Invalid client.")
-		return
+	switch utils.Arguments["<get/set/values>"] {
+	case "get":
+		embed.NewEmbed().
+			AddField("Client", cfg.Selfbot.Client).
+			Send(ctx)
+	case "set":
+		client := utils.String.Capitalize(utils.Arguments["[value]"])
+		if !utils.SliceContains([]string{"Desktop", "Web", "Mobile"}, client) {
+			_ = ctx.RespondText("Invalid client.")
+			return
+		}
+
+		cfg.Selfbot.Client = client
+		_ = cfg.Save()
+
+		embed.NewEmbed().
+			SetDescription("Client set to " + cfg.Selfbot.Client).
+			Send(ctx)
+	case "values":
+		embed.NewEmbed().
+			SetDescription("Available client spoof values: Desktop, Web, Mobile").
+			Send(ctx)
+	default:
+		_ = ctx.RespondText("Invalid <get/set/values> argument. Use `get` or `set` or `values`.")
 	}
-
-	cfg.Selfbot.CommandMode = client
-	_ = cfg.Save()
-
-	embed.NewEmbed().
-		SetDescription("Client set to " + cfg.Selfbot.CommandMode).
-		Send(ctx)
-}
-
-func (ConfigCommands) gettimezone(ctx *dgc.Ctx) {
-	cfg, err := config.GetConfig()
-	if err != nil {
-		_ = ctx.RespondText("Error getting config")
-		return
-	}
-
-	location, err := time.LoadLocation(cfg.Selfbot.Timezone)
-	if err != nil {
-		location = time.UTC
-	}
-
-	currTime := time.Now().In(location).Format("15:04:05")
-
-	embed.NewEmbed().
-		AddField("Timezone", cfg.Selfbot.Timezone).
-		AddField("Current Time", currTime).
-		Send(ctx)
 }
 
 func (ConfigCommands) timezone(ctx *dgc.Ctx) {
@@ -1257,107 +743,115 @@ func (ConfigCommands) timezone(ctx *dgc.Ctx) {
 		return
 	}
 
-	timezone := utils.Arguments["<timezone>"]
-	if _, err := time.LoadLocation(timezone); err != nil {
-		_ = ctx.RespondText("Invalid timezone: " + err.Error())
-		return
+	switch utils.Arguments["<get/set>"] {
+	case "get":
+		location, err := time.LoadLocation(cfg.Selfbot.Timezone)
+		if err != nil {
+			location = time.UTC
+		}
+
+		currTime := time.Now().In(location).Format("15:04:05")
+
+		embed.NewEmbed().
+			AddField("Timezone", cfg.Selfbot.Timezone).
+			AddField("Current Time", currTime).
+			Send(ctx)
+	case "set":
+		timezone := utils.Arguments["[value]"]
+		if _, err := time.LoadLocation(timezone); err != nil {
+			_ = ctx.RespondText("Invalid timezone: " + err.Error())
+			return
+		}
+
+		cfg.Selfbot.Timezone = timezone
+		_ = cfg.Save()
+
+		embed.NewEmbed().
+			SetDescription("Timezone set to " + cfg.Selfbot.Timezone).
+			Send(ctx)
+	default:
+		_ = ctx.RespondText("Invalid <get/set> argument. Use `get` or `set`.")
 	}
-
-	cfg.Selfbot.Timezone = timezone
-	_ = cfg.Save()
-
-	embed.NewEmbed().
-		SetDescription("Timezone set to " + cfg.Selfbot.Timezone).
-		Send(ctx)
 }
 
-func (ConfigCommands) getcmdaliases(ctx *dgc.Ctx) {
+func (ConfigCommands) aliases(ctx *dgc.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
 		_ = ctx.RespondText("Error getting config.")
 		return
 	}
 
-	prefix := cfg.Selfbot.CommandPrefix
-	var aliases []string
+	switch utils.Arguments["<get/add/rm/clear>"] {
+	case "get":
+		prefix := cfg.Selfbot.CommandPrefix
+		var aliases []string
 
-	for alias, command := range cfg.Selfbot.CommandAliases {
-		aliases = append(aliases, fmt.Sprintf("%s%s - %s%s", prefix, alias, prefix, command))
+		for alias, command := range cfg.Selfbot.CommandAliases {
+			aliases = append(aliases, fmt.Sprintf("%s%s - %s%s", prefix, alias, prefix, command))
+		}
+
+		if len(aliases) == 0 {
+			aliases = append(aliases, "No aliases set.")
+		}
+
+		embed.NewEmbed().
+			AddField("Command Aliases", strings.Join(aliases, "\n")).
+			Send(ctx)
+	case "add":
+		alias, cmd := utils.Arguments["[alias]"], utils.Arguments["[command]"]
+
+		if alias == "" || cmd == "" {
+			_ = ctx.RespondText("You must provide an alias and a command.")
+			return
+		}
+
+		if _, ok := cfg.Selfbot.CommandAliases[alias]; ok {
+			_ = ctx.RespondText("Alias already exists.")
+			return
+		}
+
+		if ctx.Router.GetCmd(cmd) == nil {
+			_ = ctx.RespondText("Command does not exist.")
+			return
+		}
+
+		cfg.Selfbot.CommandAliases[alias] = cmd
+		_ = cfg.Save()
+
+		_ = eventreactions.LoadAliases(ctx.Router)
+
+		embed.NewEmbed().
+			SetDescription(fmt.Sprintf("Added alias `%s` for command `%s`.", alias, cmd)).
+			Send(ctx)
+	case "rm":
+		alias := utils.Arguments["[alias]"]
+
+		cmd, ok := cfg.Selfbot.CommandAliases[alias]
+		if !ok {
+			_ = ctx.RespondText("Alias doesn't exist.")
+			return
+		}
+
+		delete(cfg.Selfbot.CommandAliases, alias)
+		_ = cfg.Save()
+
+		_ = eventreactions.LoadAliases(ctx.Router)
+
+		embed.NewEmbed().
+			SetDescription(fmt.Sprintf("Removed alias `%s` for command `%s`.", alias, cmd)).
+			Send(ctx)
+	case "clear":
+		cfg.Selfbot.CommandAliases = make(map[string]string)
+		_ = cfg.Save()
+
+		_ = eventreactions.LoadAliases(ctx.Router)
+
+		embed.NewEmbed().
+			SetDescription("Cleared all aliases.").
+			Send(ctx)
+	default:
+		_ = ctx.RespondText("Invalid <get/add/rm/clear> argument. Use `get`, `add`, `rm`, or `clear`.")
 	}
-
-	if len(aliases) == 0 {
-		aliases = append(aliases, "No aliases set.")
-	}
-
-	embed.NewEmbed().
-		AddField("Command Aliases", strings.Join(aliases, "\n")).
-		Send(ctx)
-}
-
-func (ConfigCommands) addcmdalias(ctx *dgc.Ctx) {
-	cfg, err := config.GetConfig()
-	if err != nil {
-		_ = ctx.RespondText("Error getting config.")
-		return
-	}
-
-	alias, cmd := utils.Arguments["<alias>"], utils.Arguments["<command>"]
-
-	if _, ok := cfg.Selfbot.CommandAliases[alias]; ok {
-		_ = ctx.RespondText("Alias already exists.")
-		return
-	}
-
-	if ctx.Router.GetCmd(cmd) == nil {
-		_ = ctx.RespondText("Command does not exist.")
-		return
-	}
-
-	cfg.Selfbot.CommandAliases[alias] = cmd
-	_ = cfg.Save()
-
-	_ = eventreactions.LoadAliases(ctx.Router)
-
-	embed.NewEmbed().
-		SetDescription(fmt.Sprintf("Added alias `%s` for command `%s`.", alias, cmd)).
-		Send(ctx)
-}
-
-func (ConfigCommands) rmcmdalias(ctx *dgc.Ctx) {
-	cfg, err := config.GetConfig()
-	if err != nil {
-		_ = ctx.RespondText("Error getting config.")
-		return
-	}
-
-	alias := utils.Arguments["<alias>"]
-
-	cmd, ok := cfg.Selfbot.CommandAliases[alias]
-	if !ok {
-		_ = ctx.RespondText("Alias doesn't exist.")
-		return
-	}
-
-	delete(cfg.Selfbot.CommandAliases, alias)
-	_ = cfg.Save()
-
-	_ = eventreactions.LoadAliases(ctx.Router)
-
-	embed.NewEmbed().
-		SetDescription(fmt.Sprintf("Removed alias `%s` for command `%s`.", alias, cmd)).
-		Send(ctx)
-}
-
-func (ConfigCommands) getnotifications(ctx *dgc.Ctx) {
-	cfg, err := config.GetConfig()
-	if err != nil {
-		_ = ctx.RespondText("Error getting config")
-		return
-	}
-
-	embed.NewEmbed().
-		AddField("Notifications", utils.Misc.FormatBoolOnOff(cfg.Notifications.Enabled)).
-		Send(ctx)
 }
 
 func (ConfigCommands) notifications(ctx *dgc.Ctx) {
@@ -1367,34 +861,41 @@ func (ConfigCommands) notifications(ctx *dgc.Ctx) {
 		return
 	}
 
-	toggle := strings.ToLower(utils.Arguments["<on/off>"])
-	if toggle != "on" && toggle != "off" {
-		_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
-		return
+	switch utils.Arguments["<get/set/toggle/example>"] {
+	case "get":
+		embed.NewEmbed().
+			AddField("Notifications", utils.Misc.FormatBoolOnOff(cfg.Notifications.Enabled)).
+			Send(ctx)
+	case "set":
+		toggle := strings.ToLower(utils.Arguments["[on/off]"])
+		if toggle != "on" && toggle != "off" {
+			_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
+			return
+		}
+
+		cfg.Notifications.Enabled = toggle == "on"
+		_ = cfg.Save()
+
+		embed.NewEmbed().
+			SetDescription("Turned " + toggle + " notifications").
+			Send(ctx)
+	case "toggle":
+		cfg.Notifications.Enabled = !cfg.Notifications.Enabled
+		_ = cfg.Save()
+
+		embed.NewEmbed().
+			SetDescription("Turned " + utils.Misc.FormatBoolOnOff(cfg.Notifications.Enabled) + " notifications").
+			Send(ctx)
+	case "example":
+		logging.UI.Notification("This is an example notification.")
+
+		embed.NewEmbed().
+			SetDescription("Sent an example notification.").
+			Send(ctx)
+
+	default:
+		_ = ctx.RespondText("Invalid <get/set/toggle/example> argument. Use `get` or `set` or `toggle` or `example`.")
 	}
-
-	cfg.Notifications.Enabled = toggle == "on"
-	_ = cfg.Save()
-
-	embed.NewEmbed().
-		SetDescription("Turned " + toggle + " notifications").
-		Send(ctx)
-}
-
-func (ConfigCommands) examplenotification(ctx *dgc.Ctx) {
-	logging.UI.Notification("This is an example notification.")
-}
-
-func (ConfigCommands) getnitrosniper(ctx *dgc.Ctx) {
-	cfg, err := config.GetConfig()
-	if err != nil {
-		_ = ctx.RespondText("Error getting config")
-		return
-	}
-
-	embed.NewEmbed().
-		AddField("Nitro Sniper", utils.Misc.FormatBoolOnOff(cfg.Snipers.NitroSniper)).
-		Send(ctx)
 }
 
 func (ConfigCommands) nitrosniper(ctx *dgc.Ctx) {
@@ -1404,30 +905,34 @@ func (ConfigCommands) nitrosniper(ctx *dgc.Ctx) {
 		return
 	}
 
-	toggle := strings.ToLower(utils.Arguments["<on/off>"])
-	if toggle != "on" && toggle != "off" {
-		_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
-		return
+	switch utils.Arguments["<get/set/toggle>"] {
+	case "get":
+		embed.NewEmbed().
+			AddField("Nitro Sniper", utils.Misc.FormatBoolOnOff(cfg.Snipers.NitroSniper)).
+			Send(ctx)
+	case "set":
+		toggle := strings.ToLower(utils.Arguments["[on/off]"])
+		if toggle != "on" && toggle != "off" {
+			_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
+			return
+		}
+
+		cfg.Snipers.NitroSniper = toggle == "on"
+		_ = cfg.Save()
+
+		embed.NewEmbed().
+			SetDescription("Turned " + toggle + " nitro sniper").
+			Send(ctx)
+	case "toggle":
+		cfg.Snipers.NitroSniper = !cfg.Snipers.NitroSniper
+		_ = cfg.Save()
+
+		embed.NewEmbed().
+			SetDescription("Turned " + utils.Misc.FormatBoolOnOff(cfg.Snipers.NitroSniper) + " nitro sniper").
+			Send(ctx)
+	default:
+		_ = ctx.RespondText("Invalid <get/set/toggle> argument. Use `get` or `set` or `toggle`.")
 	}
-
-	cfg.Snipers.NitroSniper = toggle == "on"
-	_ = cfg.Save()
-
-	embed.NewEmbed().
-		SetDescription("Turned " + toggle + " nitro sniper").
-		Send(ctx)
-}
-
-func (ConfigCommands) getgiveawaysniper(ctx *dgc.Ctx) {
-	cfg, err := config.GetConfig()
-	if err != nil {
-		_ = ctx.RespondText("Error getting config")
-		return
-	}
-
-	embed.NewEmbed().
-		AddField("Giveaway Sniper", utils.Misc.FormatBoolOnOff(cfg.Snipers.GiveawaySniper.Enabled)).
-		Send(ctx)
 }
 
 func (ConfigCommands) giveawaysniper(ctx *dgc.Ctx) {
@@ -1437,304 +942,269 @@ func (ConfigCommands) giveawaysniper(ctx *dgc.Ctx) {
 		return
 	}
 
-	toggle := strings.ToLower(utils.Arguments["<on/off>"])
-	if toggle != "on" && toggle != "off" {
-		_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
-		return
-	}
-
-	cfg.Snipers.GiveawaySniper.Enabled = toggle == "on"
-	_ = cfg.Save()
-
-	embed.NewEmbed().
-		SetDescription("Turned " + toggle + " giveaway sniper").
-		Send(ctx)
-}
-
-func (ConfigCommands) getgsnipersleep(ctx *dgc.Ctx) {
-	cfg, err := config.GetConfig()
-	if err != nil {
-		_ = ctx.RespondText("Error getting config")
-		return
-	}
-
-	embed.NewEmbed().
-		AddField("Giveaway Sniper Sleep", fmt.Sprintf("%d seconds", cfg.Snipers.GiveawaySniper.Sleep)).
-		Send(ctx)
-}
-
-func (ConfigCommands) gsnipersleep(ctx *dgc.Ctx) {
-	cfg, err := config.GetConfig()
-	if err != nil {
-		_ = ctx.RespondText("Error getting config")
-		return
-	}
-
-	delay, err := strconv.Atoi(utils.Arguments["<seconds>"])
-	if err != nil {
-		_ = ctx.RespondText("Argument <seconds> must be a number.")
-		return
-	}
-
-	cfg.Snipers.GiveawaySniper.Sleep = delay
-	_ = cfg.Save()
-
-	embed.NewEmbed().
-		SetDescription(fmt.Sprintf("Giveaway sniper sleep set to %d seconds", cfg.Snipers.GiveawaySniper.Sleep)).
-		Send(ctx)
-}
-
-func (ConfigCommands) getcustombots(ctx *dgc.Ctx) {
-	cfg, _ := config.GetConfig()
-
-	botString := ""
-	for _, userID := range cfg.Snipers.GiveawaySniper.CustomBots {
-		user, ok := utils.Discord.GetUser(ctx.Session, userID)
-		if !ok {
-			botString += fmt.Sprintf("%s - %s\n", "Unknown", userID)
-			continue
+	switch utils.Arguments["<get/set/toggle>"] {
+	case "get":
+		embed.NewEmbed().
+			AddField("Giveaway Sniper", utils.Misc.FormatBoolOnOff(cfg.Snipers.GiveawaySniper.Enabled)).
+			Send(ctx)
+	case "set":
+		toggle := strings.ToLower(utils.Arguments["[on/off]"])
+		if toggle != "on" && toggle != "off" {
+			_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
+			return
 		}
 
-		botString += fmt.Sprintf("%s - %s\n", user.Username, userID)
-	}
+		cfg.Snipers.GiveawaySniper.Enabled = toggle == "on"
+		_ = cfg.Save()
 
-	embed.NewEmbed().
-		AddField("Custom Bots", botString).
-		Send(ctx)
+		embed.NewEmbed().
+			SetDescription("Turned " + toggle + " giveaway sniper").
+			Send(ctx)
+	case "toggle":
+		cfg.Snipers.GiveawaySniper.Enabled = !cfg.Snipers.GiveawaySniper.Enabled
+		_ = cfg.Save()
+
+		embed.NewEmbed().
+			SetDescription("Turned " + utils.Misc.FormatBoolOnOff(cfg.Snipers.GiveawaySniper.Enabled) + " giveaway sniper").
+			Send(ctx)
+	default:
+		_ = ctx.RespondText("Invalid <get/set/toggle> argument. Use `get` or `set` or `toggle`.")
+	}
 }
 
-func (ConfigCommands) addcustombot(ctx *dgc.Ctx) {
-	user, ok := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
-	if !ok {
-		_ = ctx.RespondText("Could not find bot.")
-		return
-	}
-
-	cfg, _ := config.GetConfig()
-
-	if utils.SliceContains(cfg.Snipers.GiveawaySniper.CustomBots, user.ID) {
-		_ = ctx.RespondText("Bot is already in the custom bots list.")
-		return
-	}
-
-	cfg.Snipers.GiveawaySniper.CustomBots = append(cfg.Snipers.GiveawaySniper.CustomBots, user.ID)
-
-	_ = cfg.Save()
-}
-
-func (ConfigCommands) removecustombot(ctx *dgc.Ctx) {
-	user, ok := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
-	if !ok {
-		_ = ctx.RespondText("Could not find bot.")
-		return
-	}
-
-	cfg, _ := config.GetConfig()
-
-	if !utils.SliceContains(cfg.Snipers.GiveawaySniper.CustomBots, user.ID) {
-		_ = ctx.RespondText("Bot is already not in the custom bots list.")
-		return
-	}
-
-	cfg.Snipers.GiveawaySniper.CustomBots = utils.RemoveSliceItem(cfg.Snipers.GiveawaySniper.CustomBots, user.ID)
-
-	_ = cfg.Save()
-}
-
-func (ConfigCommands) getsniperblacklist(ctx *dgc.Ctx) {
+func (ConfigCommands) giveawaysnipersleep(ctx *dgc.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
 		_ = ctx.RespondText("Error getting config")
 		return
 	}
 
-	embed.NewEmbed().
-		AddField("Giveaway Sniper Blacklist", strings.Join(cfg.Snipers.Blacklist, ", ")).
-		Send(ctx)
+	switch utils.Arguments["<get/set>"] {
+	case "get":
+		formatted := utils.Misc.FormatDuration(time.Duration(cfg.Snipers.GiveawaySniper.Sleep) * time.Second)
+
+		embed.NewEmbed().
+			AddField("Giveaway Sniper Sleep", formatted).
+			Send(ctx)
+	case "set":
+		delay, err := time.ParseDuration(utils.Arguments["[value]"])
+		if err != nil {
+			_ = ctx.RespondText("Invalid duration: " + err.Error())
+			return
+		}
+
+		cfg.Snipers.GiveawaySniper.Sleep = int(delay.Seconds())
+		_ = cfg.Save()
+
+		formatted := utils.Misc.FormatDuration(time.Duration(cfg.Snipers.GiveawaySniper.Sleep) * time.Second)
+
+		embed.NewEmbed().
+			SetDescription(fmt.Sprintf("Giveaway sniper sleep set to %s.", formatted)).
+			Send(ctx)
+	default:
+		_ = ctx.RespondText("Invalid <get/set> argument. Use `get` or `set`.")
+	}
 }
 
-func (ConfigCommands) addsniperblacklist(ctx *dgc.Ctx) {
+func (ConfigCommands) customgiveawaybots(ctx *dgc.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
-		_ = ctx.RespondText("Error getting config")
+		_ = ctx.RespondText("Error getting config.")
 		return
 	}
 
-	entry := utils.String.RemoveWords(ctx.Arguments.Raw(), 1)
+	switch utils.Arguments["<get/add/rm/clear>"] {
+	case "get":
+		botString := ""
+		for _, userID := range cfg.Snipers.GiveawaySniper.CustomBots {
+			user, ok := utils.Discord.GetUser(ctx.Session, userID)
+			if !ok {
+				botString += fmt.Sprintf("%s - %s\n", "Unknown", userID)
+				continue
+			}
 
-	if utils.SliceContains(cfg.Snipers.Blacklist, entry) {
-		_ = ctx.RespondText("That is already in the blacklist!")
-		return
+			botString += fmt.Sprintf("%s - %s\n", user.Username, userID)
+		}
+
+		if botString == "" {
+			botString = "No custom bots set."
+		}
+
+		embed.NewEmbed().
+			AddField("Custom Giveaway Bots", botString).
+			Send(ctx)
+	case "add":
+		bot, ok := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(1))
+		if !ok {
+			_ = ctx.RespondText("Could not find bot.")
+			return
+		}
+
+		if utils.SliceContains(cfg.Snipers.GiveawaySniper.CustomBots, bot.ID) {
+			_ = ctx.RespondText("Bot is already in the custom bots list.")
+			return
+		}
+
+		cfg.Snipers.GiveawaySniper.CustomBots = append(cfg.Snipers.GiveawaySniper.CustomBots, bot.ID)
+
+		_ = cfg.Save()
+
+		embed.NewEmbed().
+			SetDescription(fmt.Sprintf("Added %s to the custom giveaway bots list.", bot.Mention())).
+			Send(ctx)
+	case "rm":
+		bot, ok := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(1))
+		if !ok {
+			_ = ctx.RespondText("Could not find bot.")
+			return
+		}
+
+		if !utils.SliceContains(cfg.Snipers.GiveawaySniper.CustomBots, bot.ID) {
+			_ = ctx.RespondText("Bot already isn't in the custom bots list.")
+			return
+		}
+
+		cfg.Snipers.GiveawaySniper.CustomBots = utils.RemoveSliceItem(cfg.Snipers.GiveawaySniper.CustomBots, bot.ID)
+
+		_ = cfg.Save()
+
+		embed.NewEmbed().
+			SetDescription(fmt.Sprintf("Removed %s from the custom giveaway bots list.", bot.Mention())).
+			Send(ctx)
+	case "clear":
+		cfg.Snipers.GiveawaySniper.CustomBots = []string{}
+		_ = cfg.Save()
+
+		embed.NewEmbed().
+			SetDescription("Cleared all custom giveaway bots.").
+			Send(ctx)
+	default:
+		_ = ctx.RespondText("Invalid <get/add/rm/clear> argument. Use `get`, `add`, `rm`, or `clear`.")
 	}
-
-	cfg.Snipers.Blacklist = append(cfg.Snipers.Blacklist, entry)
-	_ = cfg.Save()
-
-	embed.NewEmbed().
-		SetDescription("Added " + entry + " to the sniper blacklist").
-		Send(ctx)
 }
 
-func (ConfigCommands) rmsniperblacklist(ctx *dgc.Ctx) {
+func (ConfigCommands) sniperblacklist(ctx *dgc.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
-		_ = ctx.RespondText("Error getting config")
+		_ = ctx.RespondText("Error getting config.")
 		return
 	}
 
-	entry := utils.String.RemoveWords(ctx.Arguments.Raw(), 1)
+	switch utils.Arguments["<get/add/rm/clear>"] {
+	case "get":
+		embed.NewEmbed().
+			AddField("Giveaway Sniper Blacklist", strings.Join(cfg.Snipers.Blacklist, ", ")).
+			Send(ctx)
+	case "add":
+		entry := utils.String.RemoveWords(ctx.Arguments.Raw(), 1)
 
-	if !utils.SliceContains(cfg.Snipers.Blacklist, entry) {
-		_ = ctx.RespondText("That is already not in the blacklist!")
-		return
+		if utils.SliceContains(cfg.Snipers.Blacklist, entry) {
+			_ = ctx.RespondText("Value is already in the blacklist!")
+			return
+		}
+
+		cfg.Snipers.Blacklist = append(cfg.Snipers.Blacklist, entry)
+		_ = cfg.Save()
+
+		embed.NewEmbed().
+			SetDescription("Added " + entry + " to the sniper blacklist.").
+			Send(ctx)
+	case "rm":
+		entry := utils.String.RemoveWords(ctx.Arguments.Raw(), 1)
+
+		if !utils.SliceContains(cfg.Snipers.Blacklist, entry) {
+			_ = ctx.RespondText("Value already isn't in the blacklist!")
+			return
+		}
+
+		cfg.Snipers.Blacklist = utils.RemoveSliceItem(cfg.Snipers.Blacklist, entry)
+		_ = cfg.Save()
+
+		embed.NewEmbed().
+			SetDescription("Removed " + entry + " from the sniper blacklist.").
+			Send(ctx)
+	case "clear":
+		cfg.Snipers.Blacklist = []string{}
+		_ = cfg.Save()
+
+		embed.NewEmbed().
+			SetDescription("Cleared all sniper blacklist entries.").
+			Send(ctx)
+	default:
+		_ = ctx.RespondText("Invalid <get/add/rm/clear> argument. Use `get`, `add`, `rm`, or `clear`.")
 	}
-
-	cfg.Snipers.Blacklist = utils.RemoveSliceItem(cfg.Snipers.Blacklist, entry)
-	_ = cfg.Save()
-
-	embed.NewEmbed().
-		SetDescription("Removed " + entry + " from the sniper blacklist").
-		Send(ctx)
 }
 
-func (ConfigCommands) getsniperserverbl(ctx *dgc.Ctx) {
+func (ConfigCommands) sniperserverblacklist(ctx *dgc.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
-		_ = ctx.RespondText("Error getting config")
+		_ = ctx.RespondText("Error getting config.")
 		return
 	}
 
-	embed.NewEmbed().
-		AddField("Giveaway Sniper Server Blacklist", strings.Join(cfg.Snipers.ServerBlacklist, ", ")).
-		Send(ctx)
-}
+	switch utils.Arguments["<get/add/rm/clear>"] {
+	case "get":
+		var servers []string
 
-func (ConfigCommands) addsniperserverbl(ctx *dgc.Ctx) {
-	cfg, err := config.GetConfig()
-	if err != nil {
-		_ = ctx.RespondText("Error getting config")
-		return
+		for _, serverID := range cfg.Snipers.ServerBlacklist {
+			guild, err := utils.Discord.GetGuild(ctx.Session, serverID)
+			if err != nil {
+				servers = append(servers, serverID)
+				continue
+			}
+
+			servers = append(servers, guild.Name+" ("+guild.ID+")")
+		}
+
+		embed.NewEmbed().
+			AddField("Sniper Server Blacklist", strings.Join(servers, ", ")).
+			Send(ctx)
+	case "add":
+		guild, err := utils.Discord.GetGuild(ctx.Session, utils.Misc.Or(utils.Arguments["[server id]"], ctx.Event.GuildID))
+		if err != nil {
+			_ = ctx.RespondText("Could not find server.")
+			return
+		}
+
+		if utils.SliceContains(cfg.Snipers.ServerBlacklist, guild.ID) {
+			_ = ctx.RespondText(fmt.Sprintf("Server %s is already in the blacklist!", guild.Name))
+			return
+		}
+
+		cfg.Snipers.ServerBlacklist = append(cfg.Snipers.ServerBlacklist, guild.ID)
+		_ = cfg.Save()
+
+		embed.NewEmbed().
+			SetDescription(fmt.Sprintf("Added %s to the sniper server blacklist.", guild.Name)).
+			Send(ctx)
+	case "rm":
+		guild, err := utils.Discord.GetGuild(ctx.Session, utils.Misc.Or(utils.Arguments["[server id]"], ctx.Event.GuildID))
+		if err != nil {
+			_ = ctx.RespondText("Could not find server.")
+			return
+		}
+
+		if !utils.SliceContains(cfg.Snipers.ServerBlacklist, guild.ID) {
+			_ = ctx.RespondText(fmt.Sprintf("Server %s already isn't in the blacklist!", guild.Name))
+			return
+		}
+
+		cfg.Snipers.ServerBlacklist = utils.RemoveSliceItem(cfg.Snipers.ServerBlacklist, guild.ID)
+		_ = cfg.Save()
+
+		embed.NewEmbed().
+			SetDescription(fmt.Sprintf("Removed %s from the sniper server blacklist.", guild.Name)).
+			Send(ctx)
+	case "clear":
+		cfg.Snipers.ServerBlacklist = []string{}
+		_ = cfg.Save()
+
+		embed.NewEmbed().
+			SetDescription("Cleared all sniper server blacklist entries.").
+			Send(ctx)
+	default:
+		_ = ctx.RespondText("Invalid <get/add/rm/clear> argument. Use `get`, `add`, `rm`, or `clear`.")
 	}
-
-	guild, err := utils.Discord.GetGuild(ctx.Session, utils.Misc.Or(utils.Arguments["<server id>"], ctx.Event.GuildID))
-	if err != nil {
-		_ = ctx.RespondText("Could not find server.")
-		return
-	}
-
-	if utils.SliceContains(cfg.Snipers.ServerBlacklist, guild.ID) {
-		_ = ctx.RespondText("Server is already in the blacklist!")
-		return
-	}
-
-	cfg.Snipers.ServerBlacklist = append(cfg.Snipers.ServerBlacklist, guild.ID)
-	_ = cfg.Save()
-
-	embed.NewEmbed().
-		SetDescription(fmt.Sprintf("Added %s to the server blacklist.", guild.Name)).
-		Send(ctx)
-}
-
-func (ConfigCommands) rmsniperserverbl(ctx *dgc.Ctx) {
-	cfg, err := config.GetConfig()
-	if err != nil {
-		_ = ctx.RespondText("Error getting config")
-		return
-	}
-
-	guild, err := utils.Discord.GetGuild(ctx.Session, utils.Misc.Or(utils.Arguments["<server id>"], ctx.Event.GuildID))
-	if err != nil {
-		_ = ctx.RespondText("Could not find server.")
-		return
-	}
-
-	if !utils.SliceContains(cfg.Snipers.ServerBlacklist, guild.ID) {
-		_ = ctx.RespondText("Server is already not in the blacklist!")
-		return
-	}
-
-	cfg.Snipers.ServerBlacklist = utils.RemoveSliceItem(cfg.Snipers.ServerBlacklist, guild.ID)
-	_ = cfg.Save()
-
-	embed.NewEmbed().
-		SetDescription(fmt.Sprintf("Removed %s from the server blacklist.", guild.Name)).
-		Send(ctx)
-}
-
-func (ConfigCommands) getgsniperbots(ctx *dgc.Ctx) {
-	cfg, err := config.GetConfig()
-	if err != nil {
-		_ = ctx.RespondText("Error getting config")
-		return
-	}
-
-	embed.NewEmbed().
-		AddField("Giveaway Sniper Custom Bots", strings.Join(cfg.Snipers.GiveawaySniper.CustomBots, ", ")).
-		Send(ctx)
-}
-
-func (ConfigCommands) addgsniperbot(ctx *dgc.Ctx) {
-	cfg, err := config.GetConfig()
-	if err != nil {
-		_ = ctx.RespondText("Error getting config")
-		return
-	}
-
-	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
-	if !success {
-		_ = ctx.RespondText("Could not find bot.")
-		return
-	}
-
-	if utils.SliceContains(cfg.Snipers.GiveawaySniper.CustomBots, user.ID) {
-		_ = ctx.RespondText(fmt.Sprintf("%s is already in the custom bot list.", user.String()))
-		return
-	}
-
-	cfg.Snipers.GiveawaySniper.CustomBots = append(cfg.Snipers.GiveawaySniper.CustomBots, user.ID)
-	_ = cfg.Save()
-
-	embed.NewEmbed().
-		SetDescription(fmt.Sprintf("Added %s to the custom giveaway sniper bot list.", user.String())).
-		Send(ctx)
-}
-
-func (ConfigCommands) removegsniperbot(ctx *dgc.Ctx) {
-	cfg, err := config.GetConfig()
-	if err != nil {
-		_ = ctx.RespondText("Error getting config")
-		return
-	}
-
-	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
-	if !success {
-		_ = ctx.RespondText("Could not find bot.")
-		return
-	}
-
-	if !utils.SliceContains(cfg.Snipers.GiveawaySniper.CustomBots, user.ID) {
-		_ = ctx.RespondText(fmt.Sprintf("%s is not in the custom bot list.", user.String()))
-		return
-	}
-
-	cfg.Snipers.GiveawaySniper.CustomBots = utils.RemoveSliceItem(cfg.Snipers.GiveawaySniper.CustomBots, user.ID)
-	_ = cfg.Save()
-
-	embed.NewEmbed().
-		SetDescription(fmt.Sprintf("Removed %s from the custom giveaway sniper bot list.", user.String())).
-		Send(ctx)
-}
-
-func (ConfigCommands) getprivnotesniper(ctx *dgc.Ctx) {
-	cfg, err := config.GetConfig()
-	if err != nil {
-		_ = ctx.RespondText("Error getting config")
-		return
-	}
-
-	embed.NewEmbed().
-		AddField("Privnote Sniper", utils.Misc.FormatBoolOnOff(cfg.Snipers.PrivnoteSniper)).
-		Send(ctx)
 }
 
 func (ConfigCommands) privnotesniper(ctx *dgc.Ctx) {
@@ -1744,30 +1214,34 @@ func (ConfigCommands) privnotesniper(ctx *dgc.Ctx) {
 		return
 	}
 
-	toggle := strings.ToLower(utils.Arguments["<on/off>"])
-	if toggle != "on" && toggle != "off" {
-		_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
-		return
+	switch utils.Arguments["<get/set/toggle>"] {
+	case "get":
+		embed.NewEmbed().
+			AddField("Privnote Sniper", utils.Misc.FormatBoolOnOff(cfg.Snipers.PrivnoteSniper)).
+			Send(ctx)
+	case "set":
+		toggle := strings.ToLower(utils.Arguments["[on/off]"])
+		if toggle != "on" && toggle != "off" {
+			_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
+			return
+		}
+
+		cfg.Snipers.PrivnoteSniper = toggle == "on"
+		_ = cfg.Save()
+
+		embed.NewEmbed().
+			SetDescription("Turned " + toggle + " Privnote sniper").
+			Send(ctx)
+	case "toggle":
+		cfg.Snipers.PrivnoteSniper = !cfg.Snipers.PrivnoteSniper
+		_ = cfg.Save()
+
+		embed.NewEmbed().
+			SetDescription("Turned " + utils.Misc.FormatBoolOnOff(cfg.Snipers.PrivnoteSniper) + " Privnote sniper").
+			Send(ctx)
+	default:
+		_ = ctx.RespondText("Invalid <get/set/toggle> argument. Use `get` or `set` or `toggle`.")
 	}
-
-	cfg.Snipers.PrivnoteSniper = toggle == "on"
-	_ = cfg.Save()
-
-	embed.NewEmbed().
-		SetDescription("Turned " + toggle + " Privnote sniper").
-		Send(ctx)
-}
-
-func (ConfigCommands) getmultitokensniper(ctx *dgc.Ctx) {
-	cfg, err := config.GetConfig()
-	if err != nil {
-		_ = ctx.RespondText("Error getting config")
-		return
-	}
-
-	embed.NewEmbed().
-		AddField("Multi Token Sniper", utils.Misc.FormatBoolOnOff(cfg.Snipers.MultiTokenSniper)).
-		Send(ctx)
 }
 
 func (ConfigCommands) multitokensniper(ctx *dgc.Ctx) {
@@ -1777,30 +1251,34 @@ func (ConfigCommands) multitokensniper(ctx *dgc.Ctx) {
 		return
 	}
 
-	toggle := strings.ToLower(utils.Arguments["<on/off>"])
-	if toggle != "on" && toggle != "off" {
-		_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
-		return
+	switch utils.Arguments["<get/set/toggle>"] {
+	case "get":
+		embed.NewEmbed().
+			AddField("Multi Token Sniper", utils.Misc.FormatBoolOnOff(cfg.Snipers.MultiTokenSniper)).
+			Send(ctx)
+	case "set":
+		toggle := strings.ToLower(utils.Arguments["[on/off]"])
+		if toggle != "on" && toggle != "off" {
+			_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
+			return
+		}
+
+		cfg.Snipers.MultiTokenSniper = toggle == "on"
+		_ = cfg.Save()
+
+		embed.NewEmbed().
+			SetDescription("Turned " + toggle + " multi token sniper").
+			Send(ctx)
+	case "toggle":
+		cfg.Snipers.MultiTokenSniper = !cfg.Snipers.MultiTokenSniper
+		_ = cfg.Save()
+
+		embed.NewEmbed().
+			SetDescription("Turned " + utils.Misc.FormatBoolOnOff(cfg.Snipers.MultiTokenSniper) + " multi token sniper").
+			Send(ctx)
+	default:
+		_ = ctx.RespondText("Invalid <get/set/toggle> argument. Use `get` or `set` or `toggle`.")
 	}
-
-	cfg.Snipers.MultiTokenSniper = toggle == "on"
-	_ = cfg.Save()
-
-	embed.NewEmbed().
-		SetDescription("Turned " + toggle + " multi token sniper").
-		Send(ctx)
-}
-
-func (ConfigCommands) getpoketwosniper(ctx *dgc.Ctx) {
-	cfg, err := config.GetConfig()
-	if err != nil {
-		_ = ctx.RespondText("Error getting config")
-		return
-	}
-
-	embed.NewEmbed().
-		AddField("PokéTwo Sniper", utils.Misc.FormatBoolOnOff(cfg.Snipers.PokeTwoSniper.Enabled)).
-		Send(ctx)
 }
 
 func (ConfigCommands) poketwosniper(ctx *dgc.Ctx) {
@@ -1810,30 +1288,34 @@ func (ConfigCommands) poketwosniper(ctx *dgc.Ctx) {
 		return
 	}
 
-	toggle := strings.ToLower(utils.Arguments["<on/off>"])
-	if toggle != "on" && toggle != "off" {
-		_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
-		return
+	switch utils.Arguments["<get/set/toggle>"] {
+	case "get":
+		embed.NewEmbed().
+			AddField("PokéTwo Sniper", utils.Misc.FormatBoolOnOff(cfg.Snipers.PokeTwoSniper.Enabled)).
+			Send(ctx)
+	case "set":
+		toggle := strings.ToLower(utils.Arguments["[on/off]"])
+		if toggle != "on" && toggle != "off" {
+			_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
+			return
+		}
+
+		cfg.Snipers.PokeTwoSniper.Enabled = toggle == "on"
+		_ = cfg.Save()
+
+		embed.NewEmbed().
+			SetDescription("Turned " + toggle + " PokéTwo sniper").
+			Send(ctx)
+	case "toggle":
+		cfg.Snipers.PokeTwoSniper.Enabled = !cfg.Snipers.PokeTwoSniper.Enabled
+		_ = cfg.Save()
+
+		embed.NewEmbed().
+			SetDescription("Turned " + utils.Misc.FormatBoolOnOff(cfg.Snipers.PokeTwoSniper.Enabled) + " PokéTwo sniper").
+			Send(ctx)
+	default:
+		_ = ctx.RespondText("Invalid <get/set/toggle> argument. Use `get` or `set` or `toggle`.")
 	}
-
-	cfg.Snipers.PokeTwoSniper.Enabled = toggle == "on"
-	_ = cfg.Save()
-
-	embed.NewEmbed().
-		SetDescription("Turned " + toggle + " PokéTwo sniper").
-		Send(ctx)
-}
-
-func (ConfigCommands) getpoketwosleep(ctx *dgc.Ctx) {
-	cfg, err := config.GetConfig()
-	if err != nil {
-		_ = ctx.RespondText("Error getting config")
-		return
-	}
-
-	embed.NewEmbed().
-		AddField("PokéTwo Sniper Sleep", fmt.Sprintf("%d seconds", cfg.Snipers.PokeTwoSniper.Sleep)).
-		Send(ctx)
 }
 
 func (ConfigCommands) poketwosleep(ctx *dgc.Ctx) {
@@ -1843,30 +1325,31 @@ func (ConfigCommands) poketwosleep(ctx *dgc.Ctx) {
 		return
 	}
 
-	delay, err := strconv.Atoi(utils.Arguments["<seconds>"])
-	if err != nil {
-		_ = ctx.RespondText("Argument <seconds> must be a number.")
-		return
+	switch utils.Arguments["<get/set>"] {
+	case "get":
+		formatted := utils.Misc.FormatDuration(time.Duration(cfg.Snipers.PokeTwoSniper.Sleep) * time.Second)
+
+		embed.NewEmbed().
+			AddField("PokéTwo Sniper Sleep", formatted).
+			Send(ctx)
+	case "set":
+		delay, err := time.ParseDuration(utils.Arguments["[value]"])
+		if err != nil {
+			_ = ctx.RespondText("Invalid duration: " + err.Error())
+			return
+		}
+
+		cfg.Snipers.PokeTwoSniper.Sleep = int(delay.Seconds())
+		_ = cfg.Save()
+
+		formatted := utils.Misc.FormatDuration(time.Duration(cfg.Snipers.PokeTwoSniper.Sleep) * time.Second)
+
+		embed.NewEmbed().
+			SetDescription(fmt.Sprintf("PokéTwo sniper sleep set to %s.", formatted)).
+			Send(ctx)
+	default:
+		_ = ctx.RespondText("Invalid <get/set> argument. Use `get` or `set`.")
 	}
-
-	cfg.Snipers.PokeTwoSniper.Sleep = delay
-	_ = cfg.Save()
-
-	embed.NewEmbed().
-		SetDescription(fmt.Sprintf("PokéTwo sniper sleep set to %d seconds", cfg.Snipers.PokeTwoSniper.Sleep)).
-		Send(ctx)
-}
-
-func (ConfigCommands) getpoketworandomsleep(ctx *dgc.Ctx) {
-	cfg, err := config.GetConfig()
-	if err != nil {
-		_ = ctx.RespondText("Error getting config")
-		return
-	}
-
-	embed.NewEmbed().
-		AddField("PokéTwo Random Sleep", utils.Misc.FormatBoolOnOff(cfg.Snipers.PokeTwoSniper.RandomSleep)).
-		Send(ctx)
 }
 
 func (ConfigCommands) poketworandomsleep(ctx *dgc.Ctx) {
@@ -1876,30 +1359,34 @@ func (ConfigCommands) poketworandomsleep(ctx *dgc.Ctx) {
 		return
 	}
 
-	toggle := strings.ToLower(utils.Arguments["<on/off>"])
-	if toggle != "on" && toggle != "off" {
-		_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
-		return
+	switch utils.Arguments["<get/set/toggle>"] {
+	case "get":
+		embed.NewEmbed().
+			AddField("PokéTwo Random Sleep", utils.Misc.FormatBoolOnOff(cfg.Snipers.PokeTwoSniper.RandomSleep)).
+			Send(ctx)
+	case "set":
+		toggle := strings.ToLower(utils.Arguments["[on/off]"])
+		if toggle != "on" && toggle != "off" {
+			_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
+			return
+		}
+
+		cfg.Snipers.PokeTwoSniper.RandomSleep = toggle == "on"
+		_ = cfg.Save()
+
+		embed.NewEmbed().
+			SetDescription("Turned " + toggle + " PokéTwo random sleep").
+			Send(ctx)
+	case "toggle":
+		cfg.Snipers.PokeTwoSniper.RandomSleep = !cfg.Snipers.PokeTwoSniper.RandomSleep
+		_ = cfg.Save()
+
+		embed.NewEmbed().
+			SetDescription("Turned " + utils.Misc.FormatBoolOnOff(cfg.Snipers.PokeTwoSniper.RandomSleep) + " PokéTwo random sleep").
+			Send(ctx)
+	default:
+		_ = ctx.RespondText("Invalid <get/set/toggle> argument. Use `get` or `set` or `toggle`.")
 	}
-
-	cfg.Snipers.PokeTwoSniper.RandomSleep = toggle == "on"
-	_ = cfg.Save()
-
-	embed.NewEmbed().
-		SetDescription("Turned " + toggle + " PokéTwo random sleep").
-		Send(ctx)
-}
-
-func (ConfigCommands) getpoketwotimeout(ctx *dgc.Ctx) {
-	cfg, err := config.GetConfig()
-	if err != nil {
-		_ = ctx.RespondText("Error getting config")
-		return
-	}
-
-	embed.NewEmbed().
-		AddField("PokéTwo Sniper Timeout", fmt.Sprintf("%d seconds", cfg.Snipers.PokeTwoSniper.Timeout)).
-		Send(ctx)
 }
 
 func (ConfigCommands) poketwotimeout(ctx *dgc.Ctx) {
@@ -1909,30 +1396,31 @@ func (ConfigCommands) poketwotimeout(ctx *dgc.Ctx) {
 		return
 	}
 
-	timeout, err := strconv.Atoi(utils.Arguments["<seconds>"])
-	if err != nil {
-		_ = ctx.RespondText("Argument <seconds> must be a number.")
-		return
+	switch utils.Arguments["<get/set>"] {
+	case "get":
+		formatted := utils.Misc.FormatDuration(time.Duration(cfg.Snipers.PokeTwoSniper.Timeout) * time.Second)
+
+		embed.NewEmbed().
+			AddField("PokéTwo Sniper Timeout", formatted).
+			Send(ctx)
+	case "set":
+		delay, err := time.ParseDuration(utils.Arguments["[value]"])
+		if err != nil {
+			_ = ctx.RespondText("Invalid duration: " + err.Error())
+			return
+		}
+
+		cfg.Snipers.PokeTwoSniper.Timeout = int(delay.Seconds())
+		_ = cfg.Save()
+
+		formatted := utils.Misc.FormatDuration(time.Duration(cfg.Snipers.PokeTwoSniper.Timeout) * time.Second)
+
+		embed.NewEmbed().
+			SetDescription(fmt.Sprintf("PokéTwo sniper tiumeout set to %s.", formatted)).
+			Send(ctx)
+	default:
+		_ = ctx.RespondText("Invalid <get/set> argument. Use `get` or `set`.")
 	}
-
-	cfg.Snipers.PokeTwoSniper.Timeout = timeout
-	_ = cfg.Save()
-
-	embed.NewEmbed().
-		SetDescription(fmt.Sprintf("PokéTwo sniper timeout set to %d seconds", cfg.Snipers.PokeTwoSniper.Timeout)).
-		Send(ctx)
-}
-
-func (ConfigCommands) getpoketwotyping(ctx *dgc.Ctx) {
-	cfg, err := config.GetConfig()
-	if err != nil {
-		_ = ctx.RespondText("Error getting config")
-		return
-	}
-
-	embed.NewEmbed().
-		AddField("PokéTwo Typing", utils.Misc.FormatBoolOnOff(cfg.Snipers.PokeTwoSniper.Typing)).
-		Send(ctx)
 }
 
 func (ConfigCommands) poketwotyping(ctx *dgc.Ctx) {
@@ -1942,30 +1430,34 @@ func (ConfigCommands) poketwotyping(ctx *dgc.Ctx) {
 		return
 	}
 
-	toggle := strings.ToLower(utils.Arguments["<on/off>"])
-	if toggle != "on" && toggle != "off" {
-		_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
-		return
+	switch utils.Arguments["<get/set/toggle>"] {
+	case "get":
+		embed.NewEmbed().
+			AddField("PokéTwo Typing", utils.Misc.FormatBoolOnOff(cfg.Snipers.PokeTwoSniper.Typing)).
+			Send(ctx)
+	case "set":
+		toggle := strings.ToLower(utils.Arguments["[on/off]"])
+		if toggle != "on" && toggle != "off" {
+			_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
+			return
+		}
+
+		cfg.Snipers.PokeTwoSniper.Typing = toggle == "on"
+		_ = cfg.Save()
+
+		embed.NewEmbed().
+			SetDescription("Turned " + toggle + " PokéTwo typing").
+			Send(ctx)
+	case "toggle":
+		cfg.Snipers.PokeTwoSniper.Typing = !cfg.Snipers.PokeTwoSniper.Typing
+		_ = cfg.Save()
+
+		embed.NewEmbed().
+			SetDescription("Turned " + utils.Misc.FormatBoolOnOff(cfg.Snipers.PokeTwoSniper.Typing) + " PokéTwo typing").
+			Send(ctx)
+	default:
+		_ = ctx.RespondText("Invalid <get/set/toggle> argument. Use `get` or `set` or `toggle`.")
 	}
-
-	cfg.Snipers.PokeTwoSniper.Typing = toggle == "on"
-	_ = cfg.Save()
-
-	embed.NewEmbed().
-		SetDescription("Turned " + toggle + " PokéTwo typing").
-		Send(ctx)
-}
-
-func (ConfigCommands) getpoketwocatchrate(ctx *dgc.Ctx) {
-	cfg, err := config.GetConfig()
-	if err != nil {
-		_ = ctx.RespondText("Error getting config")
-		return
-	}
-
-	embed.NewEmbed().
-		AddField("PokéTwo Catch Rate", fmt.Sprintf("%d%%", cfg.Snipers.PokeTwoSniper.CatchRate)).
-		Send(ctx)
 }
 
 func (ConfigCommands) poketwocatchrate(ctx *dgc.Ctx) {
@@ -1975,30 +1467,27 @@ func (ConfigCommands) poketwocatchrate(ctx *dgc.Ctx) {
 		return
 	}
 
-	catchRate, err := strconv.Atoi(strings.ReplaceAll(utils.Arguments["<percentage>"], "%", ""))
-	if err != nil || catchRate < 0 || catchRate > 100 {
-		_ = ctx.RespondText("Argument <percentage> must be a percentage in the format `0-100%`.")
-		return
+	switch utils.Arguments["<get/set>"] {
+	case "get":
+		embed.NewEmbed().
+			AddField("PokéTwo Catch Rate", fmt.Sprintf("%d%%", cfg.Snipers.PokeTwoSniper.CatchRate)).
+			Send(ctx)
+	case "set":
+		catchRate, err := strconv.Atoi(strings.ReplaceAll(utils.Arguments["[percentage]"], "%", ""))
+		if err != nil || catchRate < 1 || catchRate > 100 {
+			_ = ctx.RespondText("Argument [percentage] must be a percentage in the format `1-100%`.")
+			return
+		}
+
+		cfg.Snipers.PokeTwoSniper.CatchRate = catchRate
+		_ = cfg.Save()
+
+		embed.NewEmbed().
+			SetDescription(fmt.Sprintf("PokéTwo catch rate set to %d%%", cfg.Snipers.PokeTwoSniper.CatchRate)).
+			Send(ctx)
+	default:
+		_ = ctx.RespondText("Invalid <get/set> argument. Use `get` or `set`.")
 	}
-
-	cfg.Snipers.PokeTwoSniper.CatchRate = catchRate
-	_ = cfg.Save()
-
-	embed.NewEmbed().
-		SetDescription(fmt.Sprintf("PokéTwo catch rate set to %d%%", cfg.Snipers.PokeTwoSniper.CatchRate)).
-		Send(ctx)
-}
-
-func (ConfigCommands) getpoketwofakeactivity(ctx *dgc.Ctx) {
-	cfg, err := config.GetConfig()
-	if err != nil {
-		_ = ctx.RespondText("Error getting config")
-		return
-	}
-
-	embed.NewEmbed().
-		AddField("PokéTwo Fake Activity", utils.Misc.FormatBoolOnOff(cfg.Snipers.PokeTwoSniper.FakeActivity)).
-		Send(ctx)
 }
 
 func (ConfigCommands) poketwofakeactivity(ctx *dgc.Ctx) {
@@ -2008,112 +1497,112 @@ func (ConfigCommands) poketwofakeactivity(ctx *dgc.Ctx) {
 		return
 	}
 
-	toggle := strings.ToLower(utils.Arguments["<on/off>"])
-	if toggle != "on" && toggle != "off" {
-		_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
-		return
-	}
-
-	cfg.Snipers.PokeTwoSniper.FakeActivity = toggle == "on"
-	_ = cfg.Save()
-
-	embed.NewEmbed().
-		SetDescription("Turned " + toggle + " PokéTwo fake activity").
-		Send(ctx)
-}
-
-func (ConfigCommands) getpoketwochannels(ctx *dgc.Ctx) {
-	cfg, err := config.GetConfig()
-	if err != nil {
-		_ = ctx.RespondText("Error getting config")
-		return
-	}
-
-	var channels []string
-
-	for _, channelID := range cfg.Snipers.PokeTwoSniper.Channels {
-		channel, err := utils.Discord.GetChannel(ctx.Session, channelID)
-		if err == nil {
-			guildName := "Unknown server"
-
-			guild, err := utils.Discord.GetGuild(ctx.Session, channel.GuildID)
-			if err == nil {
-				guildName = guild.Name
-			}
-
-			channels = append(channels, fmt.Sprintf("%s - %s (%s)", channel.Mention(), channel.ID, guildName))
-		} else {
-			channels = append(channels, channelID)
+	switch utils.Arguments["<get/set/toggle>"] {
+	case "get":
+		embed.NewEmbed().
+			AddField("PokéTwo Fake Activity", utils.Misc.FormatBoolOnOff(cfg.Snipers.PokeTwoSniper.FakeActivity)).
+			Send(ctx)
+	case "set":
+		toggle := strings.ToLower(utils.Arguments["[on/off]"])
+		if toggle != "on" && toggle != "off" {
+			_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
+			return
 		}
-	}
 
-	embed.NewEmbed().
-		AddField("PokéTwo Sniper Channels", strings.Join(channels, "\n")).
-		Send(ctx)
+		cfg.Snipers.PokeTwoSniper.FakeActivity = toggle == "on"
+		_ = cfg.Save()
+
+		embed.NewEmbed().
+			SetDescription("Turned " + toggle + " PokéTwo fake activity").
+			Send(ctx)
+	case "toggle":
+		cfg.Snipers.PokeTwoSniper.FakeActivity = !cfg.Snipers.PokeTwoSniper.FakeActivity
+		_ = cfg.Save()
+
+		embed.NewEmbed().
+			SetDescription("Turned " + utils.Misc.FormatBoolOnOff(cfg.Snipers.PokeTwoSniper.FakeActivity) + " PokéTwo fake activity").
+			Send(ctx)
+	default:
+		_ = ctx.RespondText("Invalid <get/set/toggle> argument. Use `get` or `set` or `toggle`.")
+	}
 }
 
-func (ConfigCommands) addpoketwochannel(ctx *dgc.Ctx) {
+func (ConfigCommands) poketwochannels(ctx *dgc.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
 		_ = ctx.RespondText("Error getting config")
 		return
 	}
 
-	channel, success := utils.Discord.TryGetChannelFromMention(ctx, ctx.Arguments.Get(0))
-	if !success {
-		_ = ctx.RespondText("Could not find channel")
-		return
+	switch utils.Arguments["<get/add/rm>"] {
+	case "get":
+		var channels []string
+
+		for _, channelID := range cfg.Snipers.PokeTwoSniper.Channels {
+			channel, err := utils.Discord.GetChannel(ctx.Session, channelID)
+			if err == nil {
+				guildName := "Unknown server"
+
+				guild, err := utils.Discord.GetGuild(ctx.Session, channel.GuildID)
+				if err == nil {
+					guildName = guild.Name
+				}
+
+				channels = append(channels, fmt.Sprintf("%s - %s (%s)", channel.Mention(), channel.ID, guildName))
+			} else {
+				channels = append(channels, channelID)
+			}
+		}
+
+		embed.NewEmbed().
+			AddField("PokéTwo Sniper Channels", strings.Join(channels, "\n")).
+			Send(ctx)
+	case "add":
+		channel, success := utils.Discord.TryGetChannelFromMention(ctx, ctx.Arguments.Get(1))
+		if !success {
+			_ = ctx.RespondText("Could not find channel")
+			return
+		}
+
+		if utils.SliceContains(cfg.Snipers.PokeTwoSniper.Channels, channel.ID) {
+			_ = ctx.RespondText("Channel is already in the catch list!")
+			return
+		}
+
+		cfg.Snipers.PokeTwoSniper.Channels = append(cfg.Snipers.PokeTwoSniper.Channels, channel.ID)
+		_ = cfg.Save()
+
+		embed.NewEmbed().
+			SetDescription(fmt.Sprintf("Added %s to the PokéTwo sniper catch list.", channel.Mention())).
+			Send(ctx)
+	case "rm":
+		channel, success := utils.Discord.TryGetChannelFromMention(ctx, ctx.Arguments.Get(1))
+		if !success {
+			_ = ctx.RespondText("Could not find channel")
+			return
+		}
+
+		if !utils.SliceContains(cfg.Snipers.PokeTwoSniper.Channels, channel.ID) {
+			_ = ctx.RespondText("Channel is not in the catch list!")
+			return
+		}
+
+		cfg.Snipers.PokeTwoSniper.Channels = utils.RemoveSliceItem(cfg.Snipers.PokeTwoSniper.Channels, channel.ID)
+		_ = cfg.Save()
+
+		embed.NewEmbed().
+			SetDescription(fmt.Sprintf("Removed %s from the PokéTwo sniper catch list.", channel.Mention())).
+			Send(ctx)
+	case "clear":
+		cfg.Snipers.PokeTwoSniper.Channels = []string{}
+		_ = cfg.Save()
+
+		embed.NewEmbed().
+			SetDescription("Cleared all PokéTwo sniper channels.").
+			Send(ctx)
+	default:
+		_ = ctx.RespondText("Invalid <get/add/rm/clear> argument. Use `get`, `add`, `rm`, or `clear`.")
 	}
-
-	if utils.SliceContains(cfg.Snipers.PokeTwoSniper.Channels, channel.ID) {
-		_ = ctx.RespondText("Channel is already in the catch list!")
-		return
-	}
-
-	cfg.Snipers.PokeTwoSniper.Channels = append(cfg.Snipers.PokeTwoSniper.Channels, channel.ID)
-	_ = cfg.Save()
-
-	embed.NewEmbed().
-		SetDescription(fmt.Sprintf("Added %s to the PokéTwo sniper catch list.", channel.Mention())).
-		Send(ctx)
-}
-
-func (ConfigCommands) rmpoketwochannel(ctx *dgc.Ctx) {
-	cfg, err := config.GetConfig()
-	if err != nil {
-		_ = ctx.RespondText("Error getting config")
-		return
-	}
-
-	channel, success := utils.Discord.TryGetChannelFromMention(ctx, ctx.Arguments.Get(0))
-	if !success {
-		_ = ctx.RespondText("Could not find channel")
-		return
-	}
-
-	if !utils.SliceContains(cfg.Snipers.PokeTwoSniper.Channels, channel.ID) {
-		_ = ctx.RespondText("Channel is not in the catch list!")
-		return
-	}
-
-	cfg.Snipers.PokeTwoSniper.Channels = utils.RemoveSliceItem(cfg.Snipers.PokeTwoSniper.Channels, channel.ID)
-	_ = cfg.Save()
-
-	embed.NewEmbed().
-		SetDescription(fmt.Sprintf("Removed %s from the PokéTwo sniper catch list.", channel.Mention())).
-		Send(ctx)
-}
-
-func (ConfigCommands) getpoketwolanguage(ctx *dgc.Ctx) {
-	cfg, err := config.GetConfig()
-	if err != nil {
-		_ = ctx.RespondText("Error getting config")
-		return
-	}
-
-	embed.NewEmbed().
-		AddField("PokéTwo Catch Language", cfg.Snipers.PokeTwoSniper.CatchLanguage).
-		Send(ctx)
 }
 
 func (ConfigCommands) poketwolanguage(ctx *dgc.Ctx) {
@@ -2123,120 +1612,107 @@ func (ConfigCommands) poketwolanguage(ctx *dgc.Ctx) {
 		return
 	}
 
-	language := strings.ToLower(utils.Arguments["<language>"])
-	if !utils.SliceContains([]string{"english", "en", "japanese", "ja", "japanese_t", "ja_t", "french", "fr", "german", "de"}, language) {
-		_ = ctx.RespondText("Invalid language. Use `english`/`en`, `japanese`/`ja`, `japanese_t`/`ja_t` (transliterated), `french`/`fr`, or `german`/`de`.")
-		return
-	}
-
-	switch language {
-	case "en":
-	case "english":
-		cfg.Snipers.PokeTwoSniper.CatchLanguage = "English"
-	case "ja":
-	case "japanese":
-		cfg.Snipers.PokeTwoSniper.CatchLanguage = "Japanese"
-	case "ja_t":
-	case "japanese_t":
-		cfg.Snipers.PokeTwoSniper.CatchLanguage = "JapaneseTransliterated"
-	case "fr":
-	case "french":
-		cfg.Snipers.PokeTwoSniper.CatchLanguage = "French"
-	case "de":
-	case "german":
-		cfg.Snipers.PokeTwoSniper.CatchLanguage = "German"
-	}
-
-	_ = cfg.Save()
-
-	embed.NewEmbed().
-		SetDescription(fmt.Sprintf("PokéTwo catch language set to %s.", cfg.Snipers.PokeTwoSniper.CatchLanguage)).
-		Send(ctx)
-
-}
-
-func (ConfigCommands) getsnipertokens(ctx *dgc.Ctx) {
-	cfg, err := config.GetConfig()
-	if err != nil {
-		_ = ctx.RespondText("Error getting config")
-		return
-	}
-
-	embed.NewEmbed().
-		AddField("Sniper Tokens", strings.Join(cfg.Snipers.Tokens, ", ")).
-		Send(ctx)
-}
-
-func (ConfigCommands) addsnipertoken(ctx *dgc.Ctx) {
-	cfg, err := config.GetConfig()
-	if err != nil {
-		_ = ctx.RespondText("Error getting config")
-		return
-	}
-
-	entry := ctx.Arguments.Raw()
-
-	if utils.SliceContains(cfg.Snipers.Tokens, entry) {
-		_ = ctx.RespondText("That token is already in the multi token sniper!")
-		return
-	}
-
-	cfg.Snipers.Tokens = append(cfg.Snipers.Tokens, entry)
-	_ = cfg.Save()
-
-	embed.NewEmbed().
-		SetDescription("Added token to the multi token sniper.").
-		Send(ctx)
-}
-
-func (ConfigCommands) addsnipertokens(ctx *dgc.Ctx) {
-	cfg, err := config.GetConfig()
-	if err != nil {
-		_ = ctx.RespondText("Error getting config")
-		return
-	}
-
-	tokens := strings.Split(ctx.Arguments.Raw(), ",")
-	added := 0
-
-	for _, token := range tokens {
-		token = strings.TrimSpace(token)
-
-		if utils.SliceContains(cfg.Snipers.Tokens, token) {
-			continue
+	switch utils.Arguments["<get/set/values>"] {
+	case "get":
+		embed.NewEmbed().
+			AddField("PokéTwo Catch Language", cfg.Snipers.PokeTwoSniper.CatchLanguage).
+			Send(ctx)
+	case "set":
+		language := strings.ToLower(utils.Arguments["[language]"])
+		if !utils.SliceContains([]string{"english", "en", "japanese", "ja", "japanese_t", "ja_t", "french", "fr", "german", "de"}, language) {
+			_ = ctx.RespondText("Invalid language. `[p]poketwolanguages values` to view all available values.")
+			return
 		}
 
-		cfg.Snipers.Tokens = append(cfg.Snipers.Tokens, token)
-		added++
-	}
-	
-	_ = cfg.Save()
+		switch language {
+		case "en", "english":
+			cfg.Snipers.PokeTwoSniper.CatchLanguage = "English"
+		case "ja", "japanese":
+			cfg.Snipers.PokeTwoSniper.CatchLanguage = "Japanese"
+		case "ja_t", "japanese_t":
+			cfg.Snipers.PokeTwoSniper.CatchLanguage = "JapaneseTransliterated"
+		case "fr", "french":
+			cfg.Snipers.PokeTwoSniper.CatchLanguage = "French"
+		case "de", "german":
+			cfg.Snipers.PokeTwoSniper.CatchLanguage = "German"
+		}
 
-	embed.NewEmbed().
-		SetDescription(fmt.Sprintf("Added %d tokens to the multi token sniper.", added)).
-		Send(ctx)
+		_ = cfg.Save()
+
+		embed.NewEmbed().
+			SetDescription(fmt.Sprintf("PokéTwo catch language set to %s.", cfg.Snipers.PokeTwoSniper.CatchLanguage)).
+			Send(ctx)
+	case "values":
+		embed.NewEmbed().
+			SetDescription("Valid languages: `english`/`en`, `japanese`/`ja`, `japanese_t`/`ja_t` (transliterated), `french`/`fr`, `german`/`de`.").
+			Send(ctx)
+	default:
+		_ = ctx.RespondText("Invalid <get/set/values> argument. Use `get`, `set`, or `values`.")
+	}
 }
 
-func (ConfigCommands) rmsnipertoken(ctx *dgc.Ctx) {
+func (ConfigCommands) snipertokens(ctx *dgc.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
 		_ = ctx.RespondText("Error getting config")
 		return
 	}
 
-	entry := ctx.Arguments.Raw()
+	switch utils.Arguments["<get/add/rm/clear>"] {
+	case "get":
+		embed.NewEmbed().
+			AddField("Sniper Tokens", strings.Join(cfg.Snipers.Tokens, ", ")).
+			Send(ctx)
+	case "add":
+		entries := strings.Split(ctx.Arguments.Raw(), ",")
 
-	if !utils.SliceContains(cfg.Snipers.Tokens, entry) {
-		_ = ctx.RespondText("That token is already not in the multi token sniper!")
-		return
+		var added int
+
+		for _, entry := range entries {
+			entry = strings.TrimSpace(entry)
+
+			if utils.SliceContains(cfg.Snipers.Tokens, entry) {
+				continue
+			}
+
+			cfg.Snipers.Tokens = append(cfg.Snipers.Tokens, entry)
+			added++
+		}
+		_ = cfg.Save()
+
+		embed.NewEmbed().
+			SetDescription(fmt.Sprintf("Added %d token(s) to the multi token sniper.", added)).
+			Send(ctx)
+	case "rm":
+		entries := strings.Split(ctx.Arguments.Raw(), ",")
+
+		var added int
+
+		for _, entry := range entries {
+			entry = strings.TrimSpace(entry)
+
+			if !utils.SliceContains(cfg.Snipers.Tokens, entry) {
+				continue
+			}
+
+			cfg.Snipers.Tokens = append(cfg.Snipers.Tokens, entry)
+			added++
+		}
+		_ = cfg.Save()
+
+		embed.NewEmbed().
+			SetDescription(fmt.Sprintf("Removed %d token(s) from the multi token sniper.", added)).
+			Send(ctx)
+	case "clear":
+		cfg.Snipers.Tokens = []string{}
+		_ = cfg.Save()
+
+		embed.NewEmbed().
+			SetDescription("Cleared all sniper tokens.").
+			Send(ctx)
+	default:
+		_ = ctx.RespondText("Invalid <get/add/rm/clear> argument. Use `get`, `add`, `rm`, or `clear`.")
 	}
-
-	cfg.Snipers.Tokens = utils.RemoveSliceItem(cfg.Snipers.Tokens, entry)
-	_ = cfg.Save()
-
-	embed.NewEmbed().
-		SetDescription("Removed token from the multi token sniper.").
-		Send(ctx)
 }
 
 func createWebhookChannel(ctx *dgc.Ctx, serverID, categoryID, name string) (string, error) {
@@ -2285,6 +1761,10 @@ func (ConfigCommands) setupwebhooks(ctx *dgc.Ctx) {
 	cfg.Webhooks.Sessions, _ = createWebhookChannel(ctx, serverID, category.ID, "sessions")
 
 	_ = cfg.Save()
+
+	embed.NewEmbed().
+		SetDescription("Webhooks setup successfully.").
+		Send(ctx)
 }
 
 func (ConfigCommands) wall(ctx *dgc.Ctx) {
@@ -2294,86 +1774,70 @@ func (ConfigCommands) wall(ctx *dgc.Ctx) {
 		return
 	}
 
-	cfg.Webhooks.NitroSniper = utils.Arguments["[webhook url]"]
-	cfg.Webhooks.GiveawaySniper = utils.Arguments["[webhook url]"]
-	cfg.Webhooks.SelfbotDetection = utils.Arguments["[webhook url]"]
-	cfg.Webhooks.StaffDetection = utils.Arguments["[webhook url]"]
-	cfg.Webhooks.Notifiers = utils.Arguments["[webhook url]"]
-	cfg.Webhooks.PingDetection = utils.Arguments["[webhook url]"]
-	cfg.Webhooks.Misc = utils.Arguments["[webhook url]"]
-	cfg.Webhooks.Sessions = utils.Arguments["[webhook url]"]
+	webhookURL := utils.Arguments["[webhook url]"]
+
+	cfg.Webhooks.NitroSniper = webhookURL
+	cfg.Webhooks.GiveawaySniper = webhookURL
+	cfg.Webhooks.SelfbotDetection = webhookURL
+	cfg.Webhooks.StaffDetection = webhookURL
+	cfg.Webhooks.Notifiers = webhookURL
+	cfg.Webhooks.PingDetection = webhookURL
+	cfg.Webhooks.Misc = webhookURL
+	cfg.Webhooks.Sessions = webhookURL
 
 	_ = cfg.Save()
 
 	embed.NewEmbed().
-		SetDescription("Set all webhooks to " + utils.Arguments["[webhook url]"]).
+		SetDescription("Set all webhooks to " + webhookURL).
 		Send(ctx)
 }
 
-func (ConfigCommands) getwnitro(ctx *dgc.Ctx) {
+func (ConfigCommands) wnitrosniper(ctx *dgc.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
 		_ = ctx.RespondText("Error getting config")
 		return
 	}
 
-	embed.NewEmbed().
-		AddField("Nitro Sniper Webhook", cfg.Webhooks.NitroSniper).
-		Send(ctx)
+	switch utils.Arguments["<get/set>"] {
+	case "get":
+		embed.NewEmbed().
+			AddField("Nitro Sniper Webhook", cfg.Webhooks.NitroSniper).
+			Send(ctx)
+	case "set":
+		cfg.Webhooks.NitroSniper = utils.Arguments["[webhook url]"]
+		_ = cfg.Save()
+
+		embed.NewEmbed().
+			SetDescription("Set nitro sniper webhook to " + utils.Arguments["[webhook url]"]).
+			Send(ctx)
+	default:
+		_ = ctx.RespondText("Invalid <get/set> argument. Use `get` or `set`.")
+	}
 }
 
-func (ConfigCommands) wnitro(ctx *dgc.Ctx) {
+func (ConfigCommands) wgiveawaysniper(ctx *dgc.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
 		_ = ctx.RespondText("Error getting config")
 		return
 	}
 
-	cfg.Webhooks.NitroSniper = utils.Arguments["[webhook url]"]
-	_ = cfg.Save()
+	switch utils.Arguments["<get/set>"] {
+	case "get":
+		embed.NewEmbed().
+			AddField("Giveaway Sniper Webhook", cfg.Webhooks.GiveawaySniper).
+			Send(ctx)
+	case "set":
+		cfg.Webhooks.GiveawaySniper = utils.Arguments["[webhook url]"]
+		_ = cfg.Save()
 
-	embed.NewEmbed().
-		SetDescription("Set nitro sniper webhook to " + utils.Arguments["[webhook url]"]).
-		Send(ctx)
-}
-
-func (ConfigCommands) getwgiveaway(ctx *dgc.Ctx) {
-	cfg, err := config.GetConfig()
-	if err != nil {
-		_ = ctx.RespondText("Error getting config")
-		return
+		embed.NewEmbed().
+			SetDescription("Set giveaway sniper webhook to " + utils.Arguments["[webhook url]"]).
+			Send(ctx)
+	default:
+		_ = ctx.RespondText("Invalid <get/set> argument. Use `get` or `set`.")
 	}
-
-	embed.NewEmbed().
-		AddField("Giveaway Sniper Webhook", cfg.Webhooks.GiveawaySniper).
-		Send(ctx)
-}
-
-func (ConfigCommands) wgiveaway(ctx *dgc.Ctx) {
-	cfg, err := config.GetConfig()
-	if err != nil {
-		_ = ctx.RespondText("Error getting config")
-		return
-	}
-
-	cfg.Webhooks.GiveawaySniper = utils.Arguments["[webhook url]"]
-	_ = cfg.Save()
-
-	embed.NewEmbed().
-		SetDescription("Set giveaway sniper webhook to " + utils.Arguments["[webhook url]"]).
-		Send(ctx)
-}
-
-func (ConfigCommands) getwselfbotdetection(ctx *dgc.Ctx) {
-	cfg, err := config.GetConfig()
-	if err != nil {
-		_ = ctx.RespondText("Error getting config")
-		return
-	}
-
-	embed.NewEmbed().
-		AddField("Selfbot Detection Webhook", cfg.Webhooks.SelfbotDetection).
-		Send(ctx)
 }
 
 func (ConfigCommands) wselfbotdetection(ctx *dgc.Ctx) {
@@ -2383,24 +1847,21 @@ func (ConfigCommands) wselfbotdetection(ctx *dgc.Ctx) {
 		return
 	}
 
-	cfg.Webhooks.SelfbotDetection = utils.Arguments["[webhook url]"]
-	_ = cfg.Save()
+	switch utils.Arguments["<get/set>"] {
+	case "get":
+		embed.NewEmbed().
+			AddField("Selfbot Detection Webhook", cfg.Webhooks.SelfbotDetection).
+			Send(ctx)
+	case "set":
+		cfg.Webhooks.SelfbotDetection = utils.Arguments["[webhook url]"]
+		_ = cfg.Save()
 
-	embed.NewEmbed().
-		SetDescription("Set selfbot detection webhook to " + utils.Arguments["[webhook url]"]).
-		Send(ctx)
-}
-
-func (ConfigCommands) getwstaffdetection(ctx *dgc.Ctx) {
-	cfg, err := config.GetConfig()
-	if err != nil {
-		_ = ctx.RespondText("Error getting config")
-		return
+		embed.NewEmbed().
+			SetDescription("Set selfbot detection webhook to " + utils.Arguments["[webhook url]"]).
+			Send(ctx)
+	default:
+		_ = ctx.RespondText("Invalid <get/set> argument. Use `get` or `set`.")
 	}
-
-	embed.NewEmbed().
-		AddField("Staff Detection Webhook", cfg.Webhooks.StaffDetection).
-		Send(ctx)
 }
 
 func (ConfigCommands) wstaffdetection(ctx *dgc.Ctx) {
@@ -2410,24 +1871,21 @@ func (ConfigCommands) wstaffdetection(ctx *dgc.Ctx) {
 		return
 	}
 
-	cfg.Webhooks.StaffDetection = utils.Arguments["[webhook url]"]
-	_ = cfg.Save()
+	switch utils.Arguments["<get/set>"] {
+	case "get":
+		embed.NewEmbed().
+			AddField("Staff Detection Webhook", cfg.Webhooks.StaffDetection).
+			Send(ctx)
+	case "set":
+		cfg.Webhooks.StaffDetection = utils.Arguments["[webhook url]"]
+		_ = cfg.Save()
 
-	embed.NewEmbed().
-		SetDescription("Set staff detection webhook to " + utils.Arguments["[webhook url]"]).
-		Send(ctx)
-}
-
-func (ConfigCommands) getwnotifiers(ctx *dgc.Ctx) {
-	cfg, err := config.GetConfig()
-	if err != nil {
-		_ = ctx.RespondText("Error getting config")
-		return
+		embed.NewEmbed().
+			SetDescription("Set staff detection webhook to " + utils.Arguments["[webhook url]"]).
+			Send(ctx)
+	default:
+		_ = ctx.RespondText("Invalid <get/set> argument. Use `get` or `set`.")
 	}
-
-	embed.NewEmbed().
-		AddField("Notifiers Webhook", cfg.Webhooks.Notifiers).
-		Send(ctx)
 }
 
 func (ConfigCommands) wnotifiers(ctx *dgc.Ctx) {
@@ -2437,24 +1895,21 @@ func (ConfigCommands) wnotifiers(ctx *dgc.Ctx) {
 		return
 	}
 
-	cfg.Webhooks.Notifiers = utils.Arguments["[webhook url]"]
-	_ = cfg.Save()
+	switch utils.Arguments["<get/set>"] {
+	case "get":
+		embed.NewEmbed().
+			AddField("Notifiers Webhook", cfg.Webhooks.Notifiers).
+			Send(ctx)
+	case "set":
+		cfg.Webhooks.Notifiers = utils.Arguments["[webhook url]"]
+		_ = cfg.Save()
 
-	embed.NewEmbed().
-		SetDescription("Set notifiers webhook to " + utils.Arguments["[webhook url]"]).
-		Send(ctx)
-}
-
-func (ConfigCommands) getwpingdetection(ctx *dgc.Ctx) {
-	cfg, err := config.GetConfig()
-	if err != nil {
-		_ = ctx.RespondText("Error getting config")
-		return
+		embed.NewEmbed().
+			SetDescription("Set notifiers webhook to " + utils.Arguments["[webhook url]"]).
+			Send(ctx)
+	default:
+		_ = ctx.RespondText("Invalid <get/set> argument. Use `get` or `set`.")
 	}
-
-	embed.NewEmbed().
-		AddField("Ping Detection Webhook", cfg.Webhooks.PingDetection).
-		Send(ctx)
 }
 
 func (ConfigCommands) wpingdetection(ctx *dgc.Ctx) {
@@ -2464,24 +1919,21 @@ func (ConfigCommands) wpingdetection(ctx *dgc.Ctx) {
 		return
 	}
 
-	cfg.Webhooks.PingDetection = utils.Arguments["[webhook url]"]
-	_ = cfg.Save()
+	switch utils.Arguments["<get/set>"] {
+	case "get":
+		embed.NewEmbed().
+			AddField("Ping Detection Webhook", cfg.Webhooks.PingDetection).
+			Send(ctx)
+	case "set":
+		cfg.Webhooks.PingDetection = utils.Arguments["[webhook url]"]
+		_ = cfg.Save()
 
-	embed.NewEmbed().
-		SetDescription("Set ping detection webhook to " + utils.Arguments["[webhook url]"]).
-		Send(ctx)
-}
-
-func (ConfigCommands) getwmisc(ctx *dgc.Ctx) {
-	cfg, err := config.GetConfig()
-	if err != nil {
-		_ = ctx.RespondText("Error getting config")
-		return
+		embed.NewEmbed().
+			SetDescription("Set ping detection webhook to " + utils.Arguments["[webhook url]"]).
+			Send(ctx)
+	default:
+		_ = ctx.RespondText("Invalid <get/set> argument. Use `get` or `set`.")
 	}
-
-	embed.NewEmbed().
-		AddField("Misc Webhook", cfg.Webhooks.Misc).
-		Send(ctx)
 }
 
 func (ConfigCommands) wmisc(ctx *dgc.Ctx) {
@@ -2491,24 +1943,21 @@ func (ConfigCommands) wmisc(ctx *dgc.Ctx) {
 		return
 	}
 
-	cfg.Webhooks.Misc = utils.Arguments["[webhook url]"]
-	_ = cfg.Save()
+	switch utils.Arguments["<get/set>"] {
+	case "get":
+		embed.NewEmbed().
+			AddField("Misc Webhook", cfg.Webhooks.Misc).
+			Send(ctx)
+	case "set":
+		cfg.Webhooks.Misc = utils.Arguments["[webhook url]"]
+		_ = cfg.Save()
 
-	embed.NewEmbed().
-		SetDescription("Set misc webhook to " + utils.Arguments["[webhook url]"]).
-		Send(ctx)
-}
-
-func (ConfigCommands) getwsessions(ctx *dgc.Ctx) {
-	cfg, err := config.GetConfig()
-	if err != nil {
-		_ = ctx.RespondText("Error getting config")
-		return
+		embed.NewEmbed().
+			SetDescription("Set misc webhook to " + utils.Arguments["[webhook url]"]).
+			Send(ctx)
+	default:
+		_ = ctx.RespondText("Invalid <get/set> argument. Use `get` or `set`.")
 	}
-
-	embed.NewEmbed().
-		AddField("Sessions Webhook", cfg.Webhooks.Sessions).
-		Send(ctx)
 }
 
 func (ConfigCommands) wsessions(ctx *dgc.Ctx) {
@@ -2518,24 +1967,21 @@ func (ConfigCommands) wsessions(ctx *dgc.Ctx) {
 		return
 	}
 
-	cfg.Webhooks.Sessions = utils.Arguments["[webhook url]"]
-	_ = cfg.Save()
+	switch utils.Arguments["<get/set>"] {
+	case "get":
+		embed.NewEmbed().
+			AddField("Sessions Webhook", cfg.Webhooks.Sessions).
+			Send(ctx)
+	case "set":
+		cfg.Webhooks.Sessions = utils.Arguments["[webhook url]"]
+		_ = cfg.Save()
 
-	embed.NewEmbed().
-		SetDescription("Set sessions webhook to " + utils.Arguments["[webhook url]"]).
-		Send(ctx)
-}
-
-func (ConfigCommands) getwpingself(ctx *dgc.Ctx) {
-	cfg, err := config.GetConfig()
-	if err != nil {
-		_ = ctx.RespondText("Error getting config")
-		return
+		embed.NewEmbed().
+			SetDescription("Set sessions webhook to " + utils.Arguments["[webhook url]"]).
+			Send(ctx)
+	default:
+		_ = ctx.RespondText("Invalid <get/set> argument. Use `get` or `set`.")
 	}
-
-	embed.NewEmbed().
-		AddField("Webhook Ping Self", utils.Misc.FormatBoolOnOff(cfg.Webhooks.PingSelf)).
-		Send(ctx)
 }
 
 func (ConfigCommands) wpingself(ctx *dgc.Ctx) {
@@ -2545,30 +1991,34 @@ func (ConfigCommands) wpingself(ctx *dgc.Ctx) {
 		return
 	}
 
-	toggle := strings.ToLower(utils.Arguments["<on/off>"])
-	if toggle != "on" && toggle != "off" {
-		_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
-		return
+	switch utils.Arguments["<get/set/toggle>"] {
+	case "get":
+		embed.NewEmbed().
+			AddField("Webhook Ping Self", utils.Misc.FormatBoolOnOff(cfg.Webhooks.PingSelf)).
+			Send(ctx)
+	case "set":
+		toggle := strings.ToLower(utils.Arguments["[on/off]"])
+		if toggle != "on" && toggle != "off" {
+			_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
+			return
+		}
+
+		cfg.Webhooks.PingSelf = toggle == "on"
+		_ = cfg.Save()
+
+		embed.NewEmbed().
+			SetDescription("Turned " + toggle + " webhook ping self").
+			Send(ctx)
+	case "toggle":
+		cfg.Webhooks.PingSelf = !cfg.Webhooks.PingSelf
+		_ = cfg.Save()
+
+		embed.NewEmbed().
+			SetDescription("Turned " + utils.Misc.FormatBoolOnOff(cfg.Webhooks.PingSelf) + " webhook ping self").
+			Send(ctx)
+	default:
+		_ = ctx.RespondText("Invalid <get/set/toggle> argument. Use `get` or `set` or `toggle`.")
 	}
-
-	cfg.Webhooks.PingSelf = toggle == "on"
-	_ = cfg.Save()
-
-	embed.NewEmbed().
-		SetDescription("Turned " + toggle + " webhook ping self").
-		Send(ctx)
-}
-
-func (ConfigCommands) getwpingeveryone(ctx *dgc.Ctx) {
-	cfg, err := config.GetConfig()
-	if err != nil {
-		_ = ctx.RespondText("Error getting config")
-		return
-	}
-
-	embed.NewEmbed().
-		AddField("Webhook Ping Everyone", utils.Misc.FormatBoolOnOff(cfg.Webhooks.PingEveryone)).
-		Send(ctx)
 }
 
 func (ConfigCommands) wpingeveryone(ctx *dgc.Ctx) {
@@ -2578,30 +2028,34 @@ func (ConfigCommands) wpingeveryone(ctx *dgc.Ctx) {
 		return
 	}
 
-	toggle := strings.ToLower(utils.Arguments["<on/off>"])
-	if toggle != "on" && toggle != "off" {
-		_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
-		return
+	switch utils.Arguments["<get/set/toggle>"] {
+	case "get":
+		embed.NewEmbed().
+			AddField("Webhook Ping Everyone", utils.Misc.FormatBoolOnOff(cfg.Webhooks.PingEveryone)).
+			Send(ctx)
+	case "set":
+		toggle := strings.ToLower(utils.Arguments["[on/off]"])
+		if toggle != "on" && toggle != "off" {
+			_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
+			return
+		}
+
+		cfg.Webhooks.PingEveryone = toggle == "on"
+		_ = cfg.Save()
+
+		embed.NewEmbed().
+			SetDescription("Turned " + toggle + " webhook ping everyone").
+			Send(ctx)
+	case "toggle":
+		cfg.Webhooks.PingEveryone = !cfg.Webhooks.PingEveryone
+		_ = cfg.Save()
+
+		embed.NewEmbed().
+			SetDescription("Turned " + utils.Misc.FormatBoolOnOff(cfg.Webhooks.PingEveryone) + " webhook ping everyone").
+			Send(ctx)
+	default:
+		_ = ctx.RespondText("Invalid <get/set/toggle> argument. Use `get` or `set` or `toggle`.")
 	}
-
-	cfg.Webhooks.PingEveryone = toggle == "on"
-	_ = cfg.Save()
-
-	embed.NewEmbed().
-		SetDescription("Turned " + toggle + " webhook ping everyone").
-		Send(ctx)
-}
-
-func (ConfigCommands) getbannotifier(ctx *dgc.Ctx) {
-	cfg, err := config.GetConfig()
-	if err != nil {
-		_ = ctx.RespondText("Error getting config")
-		return
-	}
-
-	embed.NewEmbed().
-		AddField("Ban Notifier", utils.Misc.FormatBoolOnOff(cfg.Events.BanNotifier)).
-		Send(ctx)
 }
 
 func (ConfigCommands) bannotifier(ctx *dgc.Ctx) {
@@ -2611,30 +2065,34 @@ func (ConfigCommands) bannotifier(ctx *dgc.Ctx) {
 		return
 	}
 
-	toggle := strings.ToLower(utils.Arguments["<on/off>"])
-	if toggle != "on" && toggle != "off" {
-		_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
-		return
+	switch utils.Arguments["<get/set/toggle>"] {
+	case "get":
+		embed.NewEmbed().
+			AddField("Ban Notifier", utils.Misc.FormatBoolOnOff(cfg.Events.BanNotifier)).
+			Send(ctx)
+	case "set":
+		toggle := strings.ToLower(utils.Arguments["[on/off]"])
+		if toggle != "on" && toggle != "off" {
+			_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
+			return
+		}
+
+		cfg.Events.BanNotifier = toggle == "on"
+		_ = cfg.Save()
+
+		embed.NewEmbed().
+			SetDescription("Turned " + toggle + " ban notifier").
+			Send(ctx)
+	case "toggle":
+		cfg.Events.BanNotifier = !cfg.Events.BanNotifier
+		_ = cfg.Save()
+
+		embed.NewEmbed().
+			SetDescription("Turned " + utils.Misc.FormatBoolOnOff(cfg.Events.BanNotifier) + " ban notifier").
+			Send(ctx)
+	default:
+		_ = ctx.RespondText("Invalid <get/set/toggle> argument. Use `get` or `set` or `toggle`.")
 	}
-
-	cfg.Events.BanNotifier = toggle == "on"
-	_ = cfg.Save()
-
-	embed.NewEmbed().
-		SetDescription("Turned " + toggle + " ban notifier").
-		Send(ctx)
-}
-
-func (ConfigCommands) getstaffdetection(ctx *dgc.Ctx) {
-	cfg, err := config.GetConfig()
-	if err != nil {
-		_ = ctx.RespondText("Error getting config")
-		return
-	}
-
-	embed.NewEmbed().
-		AddField("Staff Detection", utils.Misc.FormatBoolOnOff(cfg.Events.DiscordStaffDetection)).
-		Send(ctx)
 }
 
 func (ConfigCommands) staffdetection(ctx *dgc.Ctx) {
@@ -2644,62 +2102,71 @@ func (ConfigCommands) staffdetection(ctx *dgc.Ctx) {
 		return
 	}
 
-	toggle := strings.ToLower(utils.Arguments["<on/off>"])
-	if toggle != "on" && toggle != "off" {
-		_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
-		return
+	switch utils.Arguments["<get/set/toggle>"] {
+	case "get":
+		embed.NewEmbed().
+			AddField("Staff Detection", utils.Misc.FormatBoolOnOff(cfg.Events.DiscordStaffDetection)).
+			Send(ctx)
+	case "set":
+		toggle := strings.ToLower(utils.Arguments["[on/off]"])
+		if toggle != "on" && toggle != "off" {
+			_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
+			return
+		}
+
+		cfg.Events.DiscordStaffDetection = toggle == "on"
+		_ = cfg.Save()
+
+		embed.NewEmbed().
+			SetDescription("Turned " + toggle + " staff detection").
+			Send(ctx)
+	case "toggle":
+		cfg.Events.DiscordStaffDetection = !cfg.Events.DiscordStaffDetection
+		_ = cfg.Save()
+
+		embed.NewEmbed().
+			SetDescription("Turned " + utils.Misc.FormatBoolOnOff(cfg.Events.DiscordStaffDetection) + " staff detection").
+			Send(ctx)
+	default:
+		_ = ctx.RespondText("Invalid <get/set/toggle> argument. Use `get` or `set` or `toggle`.")
 	}
-
-	cfg.Events.DiscordStaffDetection = toggle == "on"
-	_ = cfg.Save()
-
-	embed.NewEmbed().
-		SetDescription("Turned " + toggle + " staff detection").
-		Send(ctx)
-}
-
-func (ConfigCommands) getpingdetection(ctx *dgc.Ctx) {
-	cfg, err := config.GetConfig()
-	if err != nil {
-		_ = ctx.RespondText("Error getting config")
-		return
-	}
-
-	embed.NewEmbed().
-		AddField("Ping Detection", utils.Misc.FormatBoolOnOff(cfg.Events.GhostPingDetection)).
-		Send(ctx)
 }
 
 func (ConfigCommands) pingdetection(ctx *dgc.Ctx) {
-	toggle := strings.ToLower(utils.Arguments["<on/off>"])
-	if toggle != "on" && toggle != "off" {
-		_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
-		return
-	}
 	cfg, err := config.GetConfig()
 	if err != nil {
 		_ = ctx.RespondText("Error getting config")
 		return
 	}
 
-	cfg.Events.GhostPingDetection = toggle == "on"
-	_ = cfg.Save()
+	switch utils.Arguments["<get/set/toggle>"] {
+	case "get":
+		embed.NewEmbed().
+			AddField("Ping Detection", utils.Misc.FormatBoolOnOff(cfg.Events.GhostPingDetection)).
+			Send(ctx)
+	case "set":
+		toggle := strings.ToLower(utils.Arguments["[on/off]"])
+		if toggle != "on" && toggle != "off" {
+			_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
+			return
+		}
 
-	embed.NewEmbed().
-		SetDescription("Turned " + toggle + " ping detection").
-		Send(ctx)
-}
+		cfg.Events.GhostPingDetection = toggle == "on"
+		_ = cfg.Save()
 
-func (ConfigCommands) getticketnotifier(ctx *dgc.Ctx) {
-	cfg, err := config.GetConfig()
-	if err != nil {
-		_ = ctx.RespondText("Error getting config")
-		return
+		embed.NewEmbed().
+			SetDescription("Turned " + toggle + " ping detection").
+			Send(ctx)
+	case "toggle":
+		cfg.Events.GhostPingDetection = !cfg.Events.GhostPingDetection
+		_ = cfg.Save()
+
+		embed.NewEmbed().
+			SetDescription("Turned " + utils.Misc.FormatBoolOnOff(cfg.Events.GhostPingDetection) + " ping detection").
+			Send(ctx)
+	default:
+		_ = ctx.RespondText("Invalid <get/set/toggle> argument. Use `get` or `set` or `toggle`.")
 	}
-
-	embed.NewEmbed().
-		AddField("Ticket Notifier", utils.Misc.FormatBoolOnOff(cfg.Events.TicketNotifier)).
-		Send(ctx)
 }
 
 func (ConfigCommands) ticketnotifier(ctx *dgc.Ctx) {
@@ -2709,96 +2176,108 @@ func (ConfigCommands) ticketnotifier(ctx *dgc.Ctx) {
 		return
 	}
 
-	toggle := strings.ToLower(utils.Arguments["<on/off>"])
-	if toggle != "on" && toggle != "off" {
-		_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
-		return
+	switch utils.Arguments["<get/set/toggle>"] {
+	case "get":
+		embed.NewEmbed().
+			AddField("Ticket Notifier", utils.Misc.FormatBoolOnOff(cfg.Events.TicketNotifier)).
+			Send(ctx)
+	case "set":
+		toggle := strings.ToLower(utils.Arguments["[on/off]"])
+		if toggle != "on" && toggle != "off" {
+			_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
+			return
+		}
+
+		cfg.Events.TicketNotifier = toggle == "on"
+		_ = cfg.Save()
+
+		embed.NewEmbed().
+			SetDescription("Turned " + toggle + " ticket notifier").
+			Send(ctx)
+	case "toggle":
+		cfg.Events.TicketNotifier = !cfg.Events.TicketNotifier
+		_ = cfg.Save()
+
+		embed.NewEmbed().
+			SetDescription("Turned " + utils.Misc.FormatBoolOnOff(cfg.Events.TicketNotifier) + " ticket notifier").
+			Send(ctx)
+	default:
+		_ = ctx.RespondText("Invalid <get/set/toggle> argument. Use `get` or `set` or `toggle`.")
 	}
-
-	cfg.Events.TicketNotifier = toggle == "on"
-	_ = cfg.Save()
-
-	embed.NewEmbed().
-		SetDescription("Turned " + toggle + " ticket notifier").
-		Send(ctx)
 }
 
-func (ConfigCommands) getsessionconnect(ctx *dgc.Ctx) {
+func (ConfigCommands) sessionconnected(ctx *dgc.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
 		_ = ctx.RespondText("Error getting config")
 		return
 	}
 
-	embed.NewEmbed().
-		AddField("Session Connected Notifier", utils.Misc.FormatBoolOnOff(cfg.Events.SessionConnected)).
-		Send(ctx)
+	switch utils.Arguments["<get/set/toggle>"] {
+	case "get":
+		embed.NewEmbed().
+			AddField("Session Connected Notifier", utils.Misc.FormatBoolOnOff(cfg.Events.SessionConnected)).
+			Send(ctx)
+	case "set":
+		toggle := strings.ToLower(utils.Arguments["[on/off]"])
+		if toggle != "on" && toggle != "off" {
+			_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
+			return
+		}
+
+		cfg.Events.SessionConnected = toggle == "on"
+		_ = cfg.Save()
+
+		embed.NewEmbed().
+			SetDescription("Turned " + toggle + " session connected notifier").
+			Send(ctx)
+	case "toggle":
+		cfg.Events.SessionConnected = !cfg.Events.SessionConnected
+		_ = cfg.Save()
+
+		embed.NewEmbed().
+			SetDescription("Turned " + utils.Misc.FormatBoolOnOff(cfg.Events.SessionConnected) + " session connected notifier").
+			Send(ctx)
+	default:
+		_ = ctx.RespondText("Invalid <get/set/toggle> argument. Use `get` or `set` or `toggle`.")
+	}
 }
 
-func (ConfigCommands) sessionconnect(ctx *dgc.Ctx) {
+func (ConfigCommands) sessiondisconnected(ctx *dgc.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
 		_ = ctx.RespondText("Error getting config")
 		return
 	}
 
-	toggle := strings.ToLower(utils.Arguments["<on/off>"])
-	if toggle != "on" && toggle != "off" {
-		_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
-		return
+	switch utils.Arguments["<get/set/toggle>"] {
+	case "get":
+		embed.NewEmbed().
+			AddField("Session Disconnected Notifier", utils.Misc.FormatBoolOnOff(cfg.Events.SessionDisconnected)).
+			Send(ctx)
+	case "set":
+		toggle := strings.ToLower(utils.Arguments["[on/off]"])
+		if toggle != "on" && toggle != "off" {
+			_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
+			return
+		}
+
+		cfg.Events.SessionDisconnected = toggle == "on"
+		_ = cfg.Save()
+
+		embed.NewEmbed().
+			SetDescription("Turned " + toggle + " session disconnected notifier").
+			Send(ctx)
+	case "toggle":
+		cfg.Events.SessionDisconnected = !cfg.Events.SessionDisconnected
+		_ = cfg.Save()
+
+		embed.NewEmbed().
+			SetDescription("Turned " + utils.Misc.FormatBoolOnOff(cfg.Events.SessionDisconnected) + " session disconnected notifier").
+			Send(ctx)
+	default:
+		_ = ctx.RespondText("Invalid <get/set/toggle> argument. Use `get` or `set` or `toggle`.")
 	}
-
-	cfg.Events.SessionConnected = toggle == "on"
-	_ = cfg.Save()
-
-	embed.NewEmbed().
-		SetDescription("Turned " + toggle + " session connected notifier").
-		Send(ctx)
-}
-
-func (ConfigCommands) getsessiondisconnect(ctx *dgc.Ctx) {
-	cfg, err := config.GetConfig()
-	if err != nil {
-		_ = ctx.RespondText("Error getting config")
-		return
-	}
-
-	embed.NewEmbed().
-		AddField("Session Disconnected Notifier", utils.Misc.FormatBoolOnOff(cfg.Events.SessionDisconnected)).
-		Send(ctx)
-}
-
-func (ConfigCommands) sessiondisconnect(ctx *dgc.Ctx) {
-	cfg, err := config.GetConfig()
-	if err != nil {
-		_ = ctx.RespondText("Error getting config")
-		return
-	}
-
-	toggle := strings.ToLower(utils.Arguments["<on/off>"])
-	if toggle != "on" && toggle != "off" {
-		_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
-		return
-	}
-
-	cfg.Events.SessionDisconnected = toggle == "on"
-	_ = cfg.Save()
-
-	embed.NewEmbed().
-		SetDescription("Turned " + toggle + " session disconnected notifier").
-		Send(ctx)
-}
-
-func (ConfigCommands) getselfbotdetection(ctx *dgc.Ctx) {
-	cfg, err := config.GetConfig()
-	if err != nil {
-		_ = ctx.RespondText("Error getting config")
-		return
-	}
-
-	embed.NewEmbed().
-		AddField("Selfbot Detection", utils.Misc.FormatBoolOnOff(cfg.Events.SelfbotDetection)).
-		Send(ctx)
 }
 
 func (ConfigCommands) selfbotdetection(ctx *dgc.Ctx) {
@@ -2808,30 +2287,34 @@ func (ConfigCommands) selfbotdetection(ctx *dgc.Ctx) {
 		return
 	}
 
-	toggle := strings.ToLower(utils.Arguments["<on/off>"])
-	if toggle != "on" && toggle != "off" {
-		_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
-		return
+	switch utils.Arguments["<get/set/toggle>"] {
+	case "get":
+		embed.NewEmbed().
+			AddField("Selfbot Detection", utils.Misc.FormatBoolOnOff(cfg.Events.SelfbotDetection)).
+			Send(ctx)
+	case "set":
+		toggle := strings.ToLower(utils.Arguments["[on/off]"])
+		if toggle != "on" && toggle != "off" {
+			_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
+			return
+		}
+
+		cfg.Events.SelfbotDetection = toggle == "on"
+		_ = cfg.Save()
+
+		embed.NewEmbed().
+			SetDescription("Turned " + toggle + " selfbot detection").
+			Send(ctx)
+	case "toggle":
+		cfg.Events.SelfbotDetection = !cfg.Events.SelfbotDetection
+		_ = cfg.Save()
+
+		embed.NewEmbed().
+			SetDescription("Turned " + utils.Misc.FormatBoolOnOff(cfg.Events.SelfbotDetection) + " selfbot detection").
+			Send(ctx)
+	default:
+		_ = ctx.RespondText("Invalid <get/set/toggle> argument. Use `get` or `set` or `toggle`.")
 	}
-
-	cfg.Events.SelfbotDetection = toggle == "on"
-	_ = cfg.Save()
-
-	embed.NewEmbed().
-		SetDescription("Turned " + toggle + " selfbot detection").
-		Send(ctx)
-}
-
-func (ConfigCommands) getdmtypingnotifier(ctx *dgc.Ctx) {
-	cfg, err := config.GetConfig()
-	if err != nil {
-		_ = ctx.RespondText("Error getting config")
-		return
-	}
-
-	embed.NewEmbed().
-		AddField("DM Typing Notifier", utils.Misc.FormatBoolOnOff(cfg.Events.DMTypingNotifier)).
-		Send(ctx)
 }
 
 func (ConfigCommands) dmtypingnotifier(ctx *dgc.Ctx) {
@@ -2841,30 +2324,34 @@ func (ConfigCommands) dmtypingnotifier(ctx *dgc.Ctx) {
 		return
 	}
 
-	toggle := strings.ToLower(utils.Arguments["<on/off>"])
-	if toggle != "on" && toggle != "off" {
-		_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
-		return
+	switch utils.Arguments["<get/set/toggle>"] {
+	case "get":
+		embed.NewEmbed().
+			AddField("DM Typing Notifier", utils.Misc.FormatBoolOnOff(cfg.Events.DMTypingNotifier)).
+			Send(ctx)
+	case "set":
+		toggle := strings.ToLower(utils.Arguments["[on/off]"])
+		if toggle != "on" && toggle != "off" {
+			_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
+			return
+		}
+
+		cfg.Events.DMTypingNotifier = toggle == "on"
+		_ = cfg.Save()
+
+		embed.NewEmbed().
+			SetDescription("Turned " + toggle + " DM typing notifier").
+			Send(ctx)
+	case "toggle":
+		cfg.Events.DMTypingNotifier = !cfg.Events.DMTypingNotifier
+		_ = cfg.Save()
+
+		embed.NewEmbed().
+			SetDescription("Turned " + utils.Misc.FormatBoolOnOff(cfg.Events.DMTypingNotifier) + " DM typing notifier").
+			Send(ctx)
+	default:
+		_ = ctx.RespondText("Invalid <get/set/toggle> argument. Use `get` or `set` or `toggle`.")
 	}
-
-	cfg.Events.DMTypingNotifier = toggle == "on"
-	_ = cfg.Save()
-
-	embed.NewEmbed().
-		SetDescription("Turned " + toggle + " DM typing notifier").
-		Send(ctx)
-}
-
-func (ConfigCommands) getdmnotifier(ctx *dgc.Ctx) {
-	cfg, err := config.GetConfig()
-	if err != nil {
-		_ = ctx.RespondText("Error getting config")
-		return
-	}
-
-	embed.NewEmbed().
-		AddField("DM Notifier", utils.Misc.FormatBoolOnOff(cfg.Events.DMNotifier)).
-		Send(ctx)
 }
 
 func (ConfigCommands) dmnotifier(ctx *dgc.Ctx) {
@@ -2874,30 +2361,34 @@ func (ConfigCommands) dmnotifier(ctx *dgc.Ctx) {
 		return
 	}
 
-	toggle := strings.ToLower(utils.Arguments["<on/off>"])
-	if toggle != "on" && toggle != "off" {
-		_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
-		return
+	switch utils.Arguments["<get/set/toggle>"] {
+	case "get":
+		embed.NewEmbed().
+			AddField("DM Notifier", utils.Misc.FormatBoolOnOff(cfg.Events.DMNotifier)).
+			Send(ctx)
+	case "set":
+		toggle := strings.ToLower(utils.Arguments["[on/off]"])
+		if toggle != "on" && toggle != "off" {
+			_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
+			return
+		}
+
+		cfg.Events.DMNotifier = toggle == "on"
+		_ = cfg.Save()
+
+		embed.NewEmbed().
+			SetDescription("Turned " + toggle + " DM notifier").
+			Send(ctx)
+	case "toggle":
+		cfg.Events.DMNotifier = !cfg.Events.DMNotifier
+		_ = cfg.Save()
+
+		embed.NewEmbed().
+			SetDescription("Turned " + utils.Misc.FormatBoolOnOff(cfg.Events.DMNotifier) + " DM notifier").
+			Send(ctx)
+	default:
+		_ = ctx.RespondText("Invalid <get/set/toggle> argument. Use `get` or `set` or `toggle`.")
 	}
-
-	cfg.Events.DMNotifier = toggle == "on"
-	_ = cfg.Save()
-
-	embed.NewEmbed().
-		SetDescription("Turned " + toggle + " DM notifier").
-		Send(ctx)
-}
-
-func (ConfigCommands) getdmdeletenotifier(ctx *dgc.Ctx) {
-	cfg, err := config.GetConfig()
-	if err != nil {
-		_ = ctx.RespondText("Error getting config")
-		return
-	}
-
-	embed.NewEmbed().
-		AddField("DM Delete Notifier", utils.Misc.FormatBoolOnOff(cfg.Events.DMDeleteNotifier)).
-		Send(ctx)
 }
 
 func (ConfigCommands) dmdeletenotifier(ctx *dgc.Ctx) {
@@ -2907,30 +2398,34 @@ func (ConfigCommands) dmdeletenotifier(ctx *dgc.Ctx) {
 		return
 	}
 
-	toggle := strings.ToLower(utils.Arguments["<on/off>"])
-	if toggle != "on" && toggle != "off" {
-		_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
-		return
+	switch utils.Arguments["<get/set/toggle>"] {
+	case "get":
+		embed.NewEmbed().
+			AddField("DM Delete Notifier", utils.Misc.FormatBoolOnOff(cfg.Events.DMDeleteNotifier)).
+			Send(ctx)
+	case "set":
+		toggle := strings.ToLower(utils.Arguments["[on/off]"])
+		if toggle != "on" && toggle != "off" {
+			_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
+			return
+		}
+
+		cfg.Events.DMDeleteNotifier = toggle == "on"
+		_ = cfg.Save()
+
+		embed.NewEmbed().
+			SetDescription("Turned " + toggle + " DM delete notifier").
+			Send(ctx)
+	case "toggle":
+		cfg.Events.DMDeleteNotifier = !cfg.Events.DMDeleteNotifier
+		_ = cfg.Save()
+
+		embed.NewEmbed().
+			SetDescription("Turned " + utils.Misc.FormatBoolOnOff(cfg.Events.DMDeleteNotifier) + " DM delete notifier").
+			Send(ctx)
+	default:
+		_ = ctx.RespondText("Invalid <get/set/toggle> argument. Use `get` or `set` or `toggle`.")
 	}
-
-	cfg.Events.DMDeleteNotifier = toggle == "on"
-	_ = cfg.Save()
-
-	embed.NewEmbed().
-		SetDescription("Turned " + toggle + " DM delete notifier").
-		Send(ctx)
-}
-
-func (ConfigCommands) getdmeditnotifier(ctx *dgc.Ctx) {
-	cfg, err := config.GetConfig()
-	if err != nil {
-		_ = ctx.RespondText("Error getting config")
-		return
-	}
-
-	embed.NewEmbed().
-		AddField("DM Edit Notifier", utils.Misc.FormatBoolOnOff(cfg.Events.DMEditNotifier)).
-		Send(ctx)
 }
 
 func (ConfigCommands) dmeditnotifier(ctx *dgc.Ctx) {
@@ -2940,176 +2435,214 @@ func (ConfigCommands) dmeditnotifier(ctx *dgc.Ctx) {
 		return
 	}
 
-	toggle := strings.ToLower(utils.Arguments["<on/off>"])
-	if toggle != "on" && toggle != "off" {
-		_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
-		return
+	switch utils.Arguments["<get/set/toggle>"] {
+	case "get":
+		embed.NewEmbed().
+			AddField("DM Edit Notifier", utils.Misc.FormatBoolOnOff(cfg.Events.DMEditNotifier)).
+			Send(ctx)
+	case "set":
+		toggle := strings.ToLower(utils.Arguments["[on/off]"])
+		if toggle != "on" && toggle != "off" {
+			_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
+			return
+		}
+
+		cfg.Events.DMEditNotifier = toggle == "on"
+		_ = cfg.Save()
+
+		embed.NewEmbed().
+			SetDescription("Turned " + toggle + " DM edit notifier").
+			Send(ctx)
+	case "toggle":
+		cfg.Events.DMEditNotifier = !cfg.Events.DMEditNotifier
+		_ = cfg.Save()
+
+		embed.NewEmbed().
+			SetDescription("Turned " + utils.Misc.FormatBoolOnOff(cfg.Events.DMEditNotifier) + " DM edit notifier").
+			Send(ctx)
+	default:
+		_ = ctx.RespondText("Invalid <get/set/toggle> argument. Use `get` or `set` or `toggle`.")
 	}
-
-	cfg.Events.DMEditNotifier = toggle == "on"
-	_ = cfg.Save()
-
-	embed.NewEmbed().
-		SetDescription("Turned " + toggle + " DM edit notifier").
-		Send(ctx)
-}
-
-func (ConfigCommands) getmsgdeletenotifier(ctx *dgc.Ctx) {
-	cfg, err := config.GetConfig()
-	if err != nil {
-		_ = ctx.RespondText("Error getting config")
-		return
-	}
-
-	embed.NewEmbed().
-		AddField("Message Delete Notifier", utils.Misc.FormatBoolOnOff(cfg.Events.MessageDeleteNotifier)).
-		Send(ctx)
 }
 
 func (ConfigCommands) messagedeletenotifier(ctx *dgc.Ctx) {
-	toggle := strings.ToLower(utils.Arguments["<on/off>"])
-	if toggle != "on" && toggle != "off" {
-		_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
-		return
-	}
 	cfg, err := config.GetConfig()
 	if err != nil {
 		_ = ctx.RespondText("Error getting config")
 		return
 	}
 
-	cfg.Events.MessageDeleteNotifier = toggle == "on"
-	_ = cfg.Save()
+	switch utils.Arguments["<get/set/toggle>"] {
+	case "get":
+		embed.NewEmbed().
+			AddField("Message Delete Notifier", utils.Misc.FormatBoolOnOff(cfg.Events.MessageDeleteNotifier)).
+			Send(ctx)
+	case "set":
+		toggle := strings.ToLower(utils.Arguments["[on/off]"])
+		if toggle != "on" && toggle != "off" {
+			_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
+			return
+		}
 
-	embed.NewEmbed().
-		SetDescription("Turned " + toggle + " message delete notifiernotifier").
-		Send(ctx)
-}
+		cfg.Events.MessageDeleteNotifier = toggle == "on"
+		_ = cfg.Save()
 
-func (ConfigCommands) getuitheme(ctx *dgc.Ctx) {
-	cfg, err := config.GetConfig()
-	if err != nil {
-		_ = ctx.RespondText("Error getting config")
-		return
+		embed.NewEmbed().
+			SetDescription("Turned " + toggle + " message delete notifier").
+			Send(ctx)
+	case "toggle":
+		cfg.Events.MessageDeleteNotifier = !cfg.Events.MessageDeleteNotifier
+		_ = cfg.Save()
+
+		embed.NewEmbed().
+			SetDescription("Turned " + utils.Misc.FormatBoolOnOff(cfg.Events.MessageDeleteNotifier) + " message delete notifier").
+			Send(ctx)
+	default:
+		_ = ctx.RespondText("Invalid <get/set/toggle> argument. Use `get` or `set` or `toggle`.")
 	}
-
-	embed.NewEmbed().
-		AddField("UI Theme", cfg.UI.Theme).
-		Send(ctx)
 }
 
 func (ConfigCommands) uitheme(ctx *dgc.Ctx) {
-	theme := strings.ToLower(utils.Arguments["<light/dark>"])
-	if theme != "light" && theme != "dark" {
-		_ = ctx.RespondText("Invalid value. Use `light` or `dark`.")
-		return
-	}
 	cfg, err := config.GetConfig()
 	if err != nil {
 		_ = ctx.RespondText("Error getting config")
 		return
 	}
 
-	cfg.UI.Theme = utils.String.Capitalize(theme)
-	_ = cfg.Save()
+	switch utils.Arguments["<get/set>"] {
+	case "get":
+		embed.NewEmbed().
+			AddField("UI Theme", cfg.UI.Theme).
+			Send(ctx)
+	case "set":
+		theme := strings.ToLower(utils.Arguments["[value]"])
+		if theme != "light" && theme != "dark" {
+			_ = ctx.RespondText("Invalid value. Use `light` or `dark`.")
+			return
+		}
 
-	embed.NewEmbed().
-		SetDescription("Set UI theme to " + cfg.UI.Theme).
-		Send(ctx)
-}
+		cfg.UI.Theme = utils.String.Capitalize(theme)
+		_ = cfg.Save()
 
-func (ConfigCommands) gethidetosystray(ctx *dgc.Ctx) {
-	cfg, err := config.GetConfig()
-	if err != nil {
-		_ = ctx.RespondText("Error getting config")
-		return
+		embed.NewEmbed().
+			SetDescription("Set UI theme to " + cfg.UI.Theme).
+			Send(ctx)
+	case "values":
+		embed.NewEmbed().
+			SetDescription("Valid themes: `light`, `dark`.").
+			Send(ctx)
+	default:
+		_ = ctx.RespondText("Invalid <get/set/values> argument. Use `get`, `set`, or `values`.")
 	}
-
-	embed.NewEmbed().
-		AddField("Hide to System Tray", utils.Misc.FormatBoolOnOff(cfg.UI.HideToSystemTray)).
-		Send(ctx)
 }
 
 func (ConfigCommands) hidetosystray(ctx *dgc.Ctx) {
-	toggle := strings.ToLower(utils.Arguments["<on/off>"])
-	if toggle != "on" && toggle != "off" {
-		_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
-		return
-	}
 	cfg, err := config.GetConfig()
 	if err != nil {
 		_ = ctx.RespondText("Error getting config")
 		return
 	}
 
-	cfg.UI.HideToSystemTray = toggle == "on"
-	_ = cfg.Save()
+	switch utils.Arguments["<get/set/toggle>"] {
+	case "get":
+		embed.NewEmbed().
+			AddField("Hide to System Tray", utils.Misc.FormatBoolOnOff(cfg.UI.HideToSystemTray)).
+			Send(ctx)
+	case "set":
+		toggle := strings.ToLower(utils.Arguments["[on/off]"])
+		if toggle != "on" && toggle != "off" {
+			_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
+			return
+		}
 
-	embed.NewEmbed().
-		SetDescription("Turned " + toggle + " hide to system tray").
-		Send(ctx)
+		cfg.UI.HideToSystemTray = toggle == "on"
+		_ = cfg.Save()
+
+		embed.NewEmbed().
+			SetDescription("Turned " + toggle + " hide to system tray").
+			Send(ctx)
+	case "toggle":
+		cfg.UI.HideToSystemTray = !cfg.UI.HideToSystemTray
+		_ = cfg.Save()
+
+		embed.NewEmbed().
+			SetDescription("Turned " + utils.Misc.FormatBoolOnOff(cfg.UI.HideToSystemTray) + " hide to system tray").
+			Send(ctx)
+	default:
+		_ = ctx.RespondText("Invalid <get/set/toggle> argument. Use `get` or `set` or `toggle`.")
+	}
 }
 
-func (ConfigCommands) getrunonstartup(ctx *dgc.Ctx) {
+func (ConfigCommands) runuionstartup(ctx *dgc.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
 		_ = ctx.RespondText("Error getting config")
 		return
 	}
 
-	embed.NewEmbed().
-		AddField("Run On Startup", utils.Misc.FormatBoolOnOff(cfg.UI.RunOnStartup)).
-		Send(ctx)
+	switch utils.Arguments["<get/set/toggle>"] {
+	case "get":
+		embed.NewEmbed().
+			AddField("Run UI On Startup", utils.Misc.FormatBoolOnOff(cfg.UI.RunOnStartup)).
+			Send(ctx)
+	case "set":
+		toggle := strings.ToLower(utils.Arguments["[on/off]"])
+		if toggle != "on" && toggle != "off" {
+			_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
+			return
+		}
+
+		cfg.UI.RunOnStartup = toggle == "on"
+		_ = cfg.Save()
+
+		embed.NewEmbed().
+			SetDescription("Turned " + toggle + " run UI on startup").
+			Send(ctx)
+	case "toggle":
+		cfg.UI.RunOnStartup = !cfg.UI.RunOnStartup
+		_ = cfg.Save()
+
+		embed.NewEmbed().
+			SetDescription("Turned " + utils.Misc.FormatBoolOnOff(cfg.UI.RunOnStartup) + " run UI on startup").
+			Send(ctx)
+	default:
+		_ = ctx.RespondText("Invalid <get/set/toggle> argument. Use `get` or `set` or `toggle`.")
+	}
 }
 
-func (ConfigCommands) runonstartup(ctx *dgc.Ctx) {
-	toggle := strings.ToLower(utils.Arguments["<on/off>"])
-	if toggle != "on" && toggle != "off" {
-		_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
-		return
-	}
+func (ConfigCommands) runbotonstartup(ctx *dgc.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
 		_ = ctx.RespondText("Error getting config")
 		return
 	}
 
-	cfg.UI.RunOnStartup = toggle == "on"
-	_ = cfg.Save()
+	switch utils.Arguments["<get/set/toggle>"] {
+	case "get":
+		embed.NewEmbed().
+			AddField("Run Selfbot On Startup", utils.Misc.FormatBoolOnOff(cfg.UI.RunSelfbotOnStartup)).
+			Send(ctx)
+	case "set":
+		toggle := strings.ToLower(utils.Arguments["[on/off]"])
+		if toggle != "on" && toggle != "off" {
+			_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
+			return
+		}
 
-	embed.NewEmbed().
-		SetDescription("Turned " + toggle + " run on startup").
-		Send(ctx)
-}
+		cfg.UI.RunSelfbotOnStartup = toggle == "on"
+		_ = cfg.Save()
 
-func (ConfigCommands) getrunsbonstartup(ctx *dgc.Ctx) {
-	cfg, err := config.GetConfig()
-	if err != nil {
-		_ = ctx.RespondText("Error getting config")
-		return
+		embed.NewEmbed().
+			SetDescription("Turned " + toggle + " run selfbot on startup").
+			Send(ctx)
+	case "toggle":
+		cfg.UI.RunSelfbotOnStartup = !cfg.UI.RunSelfbotOnStartup
+		_ = cfg.Save()
+
+		embed.NewEmbed().
+			SetDescription("Turned " + utils.Misc.FormatBoolOnOff(cfg.UI.RunSelfbotOnStartup) + " run selfbot on startup").
+			Send(ctx)
+	default:
+		_ = ctx.RespondText("Invalid <get/set/toggle> argument. Use `get` or `set` or `toggle`.")
 	}
-
-	embed.NewEmbed().
-		AddField("Run Selfbot On Startup", utils.Misc.FormatBoolOnOff(cfg.UI.RunSelfbotOnStartup)).
-		Send(ctx)
-}
-
-func (ConfigCommands) runsbonstartup(ctx *dgc.Ctx) {
-	toggle := strings.ToLower(utils.Arguments["<on/off>"])
-	if toggle != "on" && toggle != "off" {
-		_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
-		return
-	}
-	cfg, err := config.GetConfig()
-	if err != nil {
-		_ = ctx.RespondText("Error getting config")
-		return
-	}
-
-	cfg.UI.RunSelfbotOnStartup = toggle == "on"
-	_ = cfg.Save()
-
-	embed.NewEmbed().
-		SetDescription("Turned " + toggle + " run selfbot on startup").
-		Send(ctx)
 }
