@@ -48,9 +48,10 @@ func Init() error {
 			Username: cfg.Account.LightningBot.Username,
 		})
 		scope.SetExtras(map[string]any{
-			"version":    constants.VERSION,
-			"username":   cfg.Account.LightningBot.Username,
-			"start_time": constants.START_TIME.Format("2006-01-02 15:04:05"),
+			"version":     constants.VERSION,
+			"environment": environment,
+			"username":    cfg.Account.LightningBot.Username,
+			"start_time":  constants.START_TIME.Format("2006-01-02 15:04:05"),
 		})
 	})
 
