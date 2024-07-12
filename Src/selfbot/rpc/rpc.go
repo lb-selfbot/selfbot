@@ -31,7 +31,11 @@ func getActivityType(activityType string) discordgo.ActivityType {
 	}
 }
 
-func getPlatform(platform string) string {
+func getPlatform(activityType, platform string) string {
+	if activityType != "Playing" {
+		return ""
+	}
+
 	switch platform {
 	case "PS4":
 		return "ps4"
@@ -173,24 +177,47 @@ func setRPC(session *discordgo.Session, cfg *config.Config, startTime time.Time)
 			appID = cfg.Activity.ClientID
 		}
 
-		activity := &discordgo.Activity{
-			Name:       utils.String.Limit(variables.Parse(cfg.Activity.Name), 128),
-			State:      utils.String.Limit(variables.Parse(cfg.Activity.State), 128),
-			Details:    utils.String.Limit(variables.Parse(cfg.Activity.Details), 128),
-			Timestamps: getDGTimestamps(cfg.Activity.Time, startTime),
-			Type:       getActivityType(cfg.Activity.Type),
-			Assets: &discordgo.Assets{
-				LargeImageID: variables.Parse(cfg.Activity.LargeImage),
-				LargeText:    utils.String.Limit(variables.Parse(cfg.Activity.LargeImageText), 128),
-				SmallImageID: variables.Parse(cfg.Activity.SmallImage),
-				SmallText:    utils.String.Limit(variables.Parse(cfg.Activity.SmallImageText), 128),
-			},
-			Buttons: buttons,
-			Metadata: &discordgo.ActivityMetadata{
-				ButtonURLs: buttonUrls,
-			},
-			ApplicationID: &appID,
-			Platform:      getPlatform(cfg.Activity.Platform),
+		assets := &discordgo.Assets{
+			LargeImageID: variables.Parse(cfg.Activity.LargeImage),
+			LargeText:    utils.String.Limit(variables.Parse(cfg.Activity.LargeImageText), 128),
+			SmallImageID: variables.Parse(cfg.Activity.SmallImage),
+			SmallText:    utils.String.Limit(variables.Parse(cfg.Activity.SmallImageText), 128),
+		}
+
+		var activity *discordgo.Activity
+
+		switch cfg.Activity.Type {
+		case "Spotify":
+			activity = &discordgo.Activity{
+				Type: discordgo.ActivityType(2),
+				Name: "Spotify",
+				State:   utils.String.Limit(variables.Parse(cfg.Activity.State), 128),
+				Details: utils.String.Limit(variables.Parse(cfg.Activity.Details), 128),
+				Assets: assets,
+				Timestamps: &discordgo.TimeStamps{
+					StartTimestamp: time.Now().Unix() - 4140000,
+					EndTimestamp:   time.Now().Unix() - 3880000,
+				},
+				Party: &discordgo.Party{
+					ID: "spotify:" + session.State.User.ID,
+				},
+				Flags: 48,
+			}
+		default:
+			activity = &discordgo.Activity{
+				Name:       utils.String.Limit(variables.Parse(cfg.Activity.Name), 128),
+				State:      utils.String.Limit(variables.Parse(cfg.Activity.State), 128),
+				Details:    utils.String.Limit(variables.Parse(cfg.Activity.Details), 128),
+				Timestamps: getDGTimestamps(cfg.Activity.Time, startTime),
+				Type:       getActivityType(cfg.Activity.Type),
+				Assets: assets,
+				Buttons: buttons,
+				Metadata: &discordgo.ActivityMetadata{
+					ButtonURLs: buttonUrls,
+				},
+				ApplicationID: &appID,
+				Platform:      getPlatform(cfg.Activity.Type, cfg.Activity.Platform),
+			}
 		}
 
 		if cfg.Activity.Type == "Streaming" {
@@ -203,7 +230,6 @@ func setRPC(session *discordgo.Session, cfg *config.Config, startTime time.Time)
 
 		return session.UpdateStatusComplex(discordgo.UpdateStatusData{
 			Activities: []*discordgo.Activity{activity},
-			Game:       nil,
 			AFK:        true,
 			Status:     sessions.Status,
 		})
