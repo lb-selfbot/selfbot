@@ -380,8 +380,8 @@ func RemoveAll(reactionType EventReactionType) {
 	ReactionsMutex.Lock()
 	defer ReactionsMutex.Unlock()
 
-	for i, r := range ActiveReactions {
-		if r.Type() == reactionType {
+	for i := len(ActiveReactions) - 1; i >= 0; i-- {
+		if ActiveReactions[i].Type() == reactionType {
 			ActiveReactions = append(ActiveReactions[:i], ActiveReactions[i+1:]...)
 		}
 	}
