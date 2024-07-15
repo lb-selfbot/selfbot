@@ -7,7 +7,7 @@ require (
 	github.com/LightningDev1/beeep v0.1.0
 	github.com/LightningDev1/chromiumdp v0.0.0-20231128154929-66ef7c9d7fb7
 	github.com/LightningDev1/dgc v1.1.4-0.20231130125735-679db2635a21
-	github.com/LightningDev1/discordgo v0.26.6-0.20240711165249-448bb6610394
+	github.com/LightningDev1/discordgo v0.26.6-0.20240715071802-e0637d4317d3
 	github.com/LightningDev1/go-foreground v0.0.0-20240212172534-661cc0000e42
 	github.com/LightningDev1/go-privnote v0.1.1
 	github.com/LightningDev1/screenshot v0.0.0-20230719145300-c8d3633174bf
