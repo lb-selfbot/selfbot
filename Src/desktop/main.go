@@ -225,7 +225,7 @@ func Main(discordgoDebug bool) {
 	}
 
 	session.Token = token
-	session.State.MaxMessageCount = 200
+	session.State.MaxMessageCount = 50
 	session.SetIdentify(cfg.GetClient())
 
 	session.LogLevel = discordgo.LogWarning
@@ -336,7 +336,7 @@ func Main(discordgoDebug bool) {
 						return
 					}
 
-					if cfg.Selfbot.DeleteCommands {
+					if cfg.Selfbot.DeleteCommands && ctx.Event.ID != "0" {
 						go func() {
 							_ = ctx.Session.ChannelMessageDelete(ctx.Event.Message.ChannelID, ctx.Event.Message.ID)
 						}()
