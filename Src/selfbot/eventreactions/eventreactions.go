@@ -381,7 +381,7 @@ func Remove(reaction EventReaction) {
 		}
 	}
 
-	Save()
+	_ = Save()
 }
 
 // RemoveAll removes all event reactions of a certain type
@@ -395,7 +395,7 @@ func RemoveAll(reactionType EventReactionType) {
 		}
 	}
 
-	Save()
+	_ = Save()
 }
 
 // Clear clears all event reactions
@@ -405,7 +405,7 @@ func Clear() {
 
 	ActiveReactions = defaultEventReactions()
 
-	Save()
+	_ = Save()
 }
 
 // HandleMessage adds a message to the list of event reaction messages
@@ -547,7 +547,8 @@ func RegisterHandlers(session *discordgo.Session, router *dgc.Router) {
 		if m.Message == nil || m.Author == nil {
 			return
 		}
-		session.State.MessageAdd(m.Message)
+		
+		_ = session.State.MessageAdd(m.Message)
 
 		HandleEvent(session, m)
 
@@ -570,7 +571,7 @@ func RegisterHandlers(session *discordgo.Session, router *dgc.Router) {
 			m.BeforeUpdate = m.Message
 		}
 
-		session.State.MessageAdd(m.Message)
+		_ = session.State.MessageAdd(m.Message)
 
 		if !IsEventReactionMessage(m.Message) {
 			HandleEvent(session, m)
