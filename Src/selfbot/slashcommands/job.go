@@ -1,7 +1,6 @@
 package slashcommands
 
 import (
-	"crypto/md5"
 	"fmt"
 	"time"
 
@@ -10,8 +9,10 @@ import (
 	"github.com/LightningDev1/discordgo"
 )
 
+// commandCache is a cache for application commands.
 var commandCache = make(map[string]*discordgo.ApplicationCommand)
 
+// DiscordObject represents a Discord object with a name and ID.
 type DiscordObject struct {
 	Name string `json:"Name"`
 	ID   string `json:"ID"`
@@ -21,32 +22,36 @@ type DiscordObject struct {
 // The jobs are stored in a JSON file and are loaded on startup.
 // The jobs are then executed by the job handler.
 type Job struct {
-	// The name and ID of the application command
+	// The name of the job
+	Name string `json:"Name"`
+
+	// The Discord object of the application command
 	CommandObject DiscordObject `json:"Command"`
 
-	// The name and ID of the application
+	// The Discord object of the application
 	ApplicationObject DiscordObject `json:"Application"`
 
-	// The name and ID of the channel
+	// The Discord object of the channel
 	ChannelObject DiscordObject `json:"Channel"`
 
-	// The name and ID of the guild
+	// The Discord object of the guild
 	GuildObject DiscordObject `json:"Guild"`
 
 	// The raw arguments to execute the command with
 	RawArguments string `json:"RawArguments"`
 
+	// The last execution time of the job
+	LastExecution time.Time `json:"LastExecution"`
+
 	// The interval to execute the command at
 	IntervalSec int `json:"Interval"`
 
-	//////////////////////////////////////////////////////////////////
-	// The following fields are initialized when the job is started //
-	//////////////////////////////////////////////////////////////////
+	// The paused state of the job
+	Paused bool `json:"Paused"`
 
-	// The ID of the job (calculated from the MD5 hash)
-	ID string `json:"-"`
+	// Runtime fields
 
-	// The application command to execute
+	// The fetched application command
 	Command *discordgo.ApplicationCommand `json:"-"`
 
 	// The command options
@@ -59,21 +64,19 @@ type Job struct {
 	Interval time.Duration `json:"-"`
 }
 
-func (j *Job) CalculateID() string {
-	cID := j.CommandObject.ID
-	aID := j.ApplicationObject.ID
-	chID := j.ChannelObject.ID
-	gID := j.GuildObject.ID
-	args := j.RawArguments
-	interval := fmt.Sprint(j.IntervalSec)
+// NextExecution returns the next execution time of the job.
+func (j *Job) NextExecution() time.Time {
+	if j.LastExecution.IsZero() {
+		return time.Now()
+	}
 
-	byteRepresentation := []byte(cID + aID + chID + gID + args + interval)
-
-	return fmt.Sprintf("%x", md5.Sum(byteRepresentation))
+	return j.LastExecution.Add(j.Interval)
 }
 
+// GetCommand gets the application command of the job.
 func (j *Job) GetCommand(session *discordgo.Session) (*discordgo.ApplicationCommand, error) {
-	if command, ok := commandCache[j.ID]; ok {
+	cmdID := CommandIdentifier(j)
+	if command, ok := commandCache[cmdID]; ok {
 		return command, nil
 	}
 
@@ -90,29 +93,22 @@ func (j *Job) GetCommand(session *discordgo.Session) (*discordgo.ApplicationComm
 		return nil, fmt.Errorf("no commands found")
 	}
 
-	commandCache[j.ID] = commands[0]
+	commandCache[cmdID] = commands[0]
 
 	return commands[0], nil
 }
 
-func (j *Job) GetArguments() *dgc.Arguments {
-	return dgc.ParseArguments(j.RawArguments)
-}
-
-func (j *Job) Load(session *discordgo.Session) error {
-	j.ID = j.CalculateID()
-	j.Arguments = j.GetArguments()
+// Load loads the job from the configuration.
+func (j *Job) Load(session *discordgo.Session) (err error) {
+	j.Arguments = dgc.ParseArguments(j.RawArguments)
 
 	if j.Command == nil {
-		command, err := j.GetCommand(session)
+		j.Command, err = j.GetCommand(session)
 		if err != nil {
 			return err
 		}
-
-		j.Command = command
 	}
 
-	var err error
 	j.Options, err = ArgumentsToCommandOptions(j.Command.Options, j.Arguments, 0)
 	if err != nil {
 		return err
@@ -123,7 +119,8 @@ func (j *Job) Load(session *discordgo.Session) error {
 	return nil
 }
 
-func (j *Job) ExecuteInteraction(session *discordgo.Session) error {
+// Interact executes the job's slash command.
+func (j *Job) Interact(session *discordgo.Session) error {
 	if j.Command == nil {
 		return fmt.Errorf("command is nil")
 	}

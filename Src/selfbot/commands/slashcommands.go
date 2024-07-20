@@ -2,6 +2,8 @@ package commands
 
 import (
 	"fmt"
+	"strings"
+	"time"
 
 	"github.com/LightningDev1/LB-Selfbot/selfbot/embed"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/slashcommands"
@@ -50,7 +52,7 @@ func (s SlashCommands) RegisterCommands(router *dgc.Router) {
 	router.RegisterCmd(&dgc.Command{
 		Name:        "getscjob",
 		Description: "Get info about a slash command job",
-		Usage:       "[p]getscjob <job id>",
+		Usage:       "[p]getscjob <job name>",
 		Flags:       []string{CmdFlagDangerous},
 		Handler:     s.getscjob,
 	})
@@ -58,7 +60,7 @@ func (s SlashCommands) RegisterCommands(router *dgc.Router) {
 	router.RegisterCmd(&dgc.Command{
 		Name:        "createscjob",
 		Description: "Create a slash command job",
-		Usage:       "[p]createscjob <#channel> <@bot> <interval> <command> [options...]",
+		Usage:       "[p]createscjob <job name> <#channel> <@bot> <interval> <command> [options...]",
 		Flags:       []string{CmdFlagDangerous},
 		Handler:     s.createscjob,
 	})
@@ -66,7 +68,7 @@ func (s SlashCommands) RegisterCommands(router *dgc.Router) {
 	router.RegisterCmd(&dgc.Command{
 		Name:        "deletescjob",
 		Description: "Delete a slash command job",
-		Usage:       "[p]deletescjob <job id>",
+		Usage:       "[p]deletescjob <job name>",
 		Flags:       []string{CmdFlagDangerous},
 		Handler:     s.deletescjob,
 	})
@@ -74,7 +76,7 @@ func (s SlashCommands) RegisterCommands(router *dgc.Router) {
 	router.RegisterCmd(&dgc.Command{
 		Name:        "setscjobcommand",
 		Description: "Set a job's command",
-		Usage:       "[p]setscjobcommand <job id> <@bot> <command> [options...]",
+		Usage:       "[p]setscjobcommand <job name> <@bot> <command> [options...]",
 		Flags:       []string{CmdFlagDangerous},
 		Handler:     s.setscjobcommand,
 	})
@@ -82,17 +84,25 @@ func (s SlashCommands) RegisterCommands(router *dgc.Router) {
 	router.RegisterCmd(&dgc.Command{
 		Name:        "setscjobchannel",
 		Description: "Set a job's channel",
-		Usage:       "[p]setscjobcommand <job id> <#channel>",
+		Usage:       "[p]setscjobcommand <job name> <#channel>",
 		Flags:       []string{CmdFlagDangerous},
 		Handler:     s.setscjobchannel,
 	})
 
 	router.RegisterCmd(&dgc.Command{
 		Name:        "setscjobinterval",
-		Description: "Set a job's interval (in seconds)",
-		Usage:       "[p]setscjobinterval <job id> <interval>",
+		Description: "Set a job's interval",
+		Usage:       "[p]setscjobinterval <job name> <interval>",
 		Flags:       []string{CmdFlagDangerous},
 		Handler:     s.setscjobinterval,
+	})
+
+	router.RegisterCmd(&dgc.Command{
+		Name:        "setscjobpaused",
+		Description: "Pause or unpause a job",
+		Usage:       "[p]setscjobpaused <job name> <on/off>",
+		Flags:       []string{CmdFlagDangerous},
+		Handler:     s.setscjobpaused,
 	})
 }
 
@@ -237,6 +247,9 @@ func (s SlashCommands) listscjobs(ctx *dgc.Ctx) {
 	}
 
 	for _, job := range slashcommands.Jobs {
+		jobID := slashcommands.JobIdentifier(job)
+		handler := slashcommands.GetJobHandler(job.Name, jobID)
+
 		cmd := job.CommandObject
 		channel := job.ChannelObject
 		guild := job.GuildObject
@@ -246,28 +259,34 @@ func (s SlashCommands) listscjobs(ctx *dgc.Ctx) {
 			args = " " + args
 		}
 
+		paused := utils.Misc.FormatBoolYesNo(job.Paused)
+		running := utils.Misc.FormatBoolYesNo(handler.IsRunning())
+
 		text := fmt.Sprintf("Command: `/%s%s` (%s)\n", cmd.Name, args, cmd.ID)
 		text += fmt.Sprintf("Channel: #%s (%s)\n", channel.Name, channel.ID)
 		text += fmt.Sprintf("Server: %s (%s)\n", guild.Name, guild.ID)
 		text += fmt.Sprintf("Interval: %s\n", utils.Misc.FormatDuration(job.Interval))
+		text += fmt.Sprintf("Paused: %s | Is Running: %s\n", paused, running)
 
-		embed.AddField("ID: "+job.ID, text)
+		embed.AddField("Name: "+job.Name, text)
 	}
 
 	embed.Send(ctx)
 }
 
 func (s SlashCommands) getscjob(ctx *dgc.Ctx) {
-	id := utils.Arguments["<job id>"]
+	name := utils.Arguments["<job name>"]
 
-	job := slashcommands.GetJobByID(id)
+	job := slashcommands.GetJobByName(name)
 	if job == nil {
-		ctx.RespondText("Could not find a job with ID `" + id + "`")
+		ctx.RespondText("Could not find a job with name `" + name + "`")
 		return
 	}
 
-	jobHandler := slashcommands.GetHandlerForJob(job)
-	timeUntilNext := jobHandler.TimeUntilNextInteraction()
+	id := slashcommands.JobIdentifier(job)
+	handler := slashcommands.GetJobHandler(job.Name, id)
+
+	timeUntilNext := time.Until(job.NextExecution())
 
 	cmd := job.CommandObject
 	channel := job.ChannelObject
@@ -280,17 +299,21 @@ func (s SlashCommands) getscjob(ctx *dgc.Ctx) {
 
 	embed.NewEmbed().
 		SetTitle("Slash command job information").
+		AddField("Name", job.Name).
 		AddField("Command", fmt.Sprintf("`/%s%s` (%s)", cmd.Name, args, cmd.ID)).
 		AddField("Channel", fmt.Sprintf("#%s (%s)", channel.Name, channel.ID)).
 		AddField("Server", fmt.Sprintf("%s (%s)", guild.Name, guild.ID)).
 		AddField("Interval", utils.Misc.FormatDuration(job.Interval)).
-		AddField("Job handler is running", utils.Misc.FormatBoolYesNo(jobHandler.IsJobRunning())).
+		AddField("Paused", utils.Misc.FormatBoolYesNo(job.Paused)).
+		AddField("Job handler is running", utils.Misc.FormatBoolYesNo(handler.IsRunning())).
 		AddField("Time until next interaction", utils.Misc.FormatDuration(timeUntilNext)).
 		Send(ctx)
 }
 
 func (s SlashCommands) createscjob(ctx *dgc.Ctx) {
-	channel, ok := utils.Discord.TryGetChannelFromMention(ctx, ctx.Arguments.Get(0))
+	name := utils.Arguments["<job name>"]
+
+	channel, ok := utils.Discord.TryGetChannelFromMention(ctx, ctx.Arguments.Get(1))
 	if !ok {
 		ctx.RespondText("Could not find channel. Make sure to mention it or use the ID.")
 		return
@@ -307,7 +330,7 @@ func (s SlashCommands) createscjob(ctx *dgc.Ctx) {
 		return
 	}
 
-	bot, ok := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(1))
+	bot, ok := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(2))
 	if !ok {
 		ctx.RespondText("Could not find bot. Make sure to mention it or use the ID.")
 		return
@@ -343,13 +366,14 @@ func (s SlashCommands) createscjob(ctx *dgc.Ctx) {
 
 	command := commands[0]
 
-	_, err = slashcommands.ArgumentsToCommandOptions(command.Options, ctx.Arguments, 4)
+	_, err = slashcommands.ArgumentsToCommandOptions(command.Options, ctx.Arguments, 5)
 	if err != nil {
 		ctx.RespondText("An error occured while parsing your arguments to command options: " + err.Error())
 		return
 	}
 
 	job := &slashcommands.Job{
+		Name: name,
 		CommandObject: slashcommands.DiscordObject{
 			Name: command.Name,
 			ID:   command.ID,
@@ -366,7 +390,7 @@ func (s SlashCommands) createscjob(ctx *dgc.Ctx) {
 			Name: guild.Name,
 			ID:   guild.ID,
 		},
-		RawArguments: utils.String.RemoveWords(ctx.Arguments.Raw(), 4),
+		RawArguments: utils.String.RemoveWords(ctx.Arguments.Raw(), 5),
 		IntervalSec:  int(interval.Seconds()),
 
 		// Set command so the job handler won't have to fetch it again
@@ -387,16 +411,16 @@ func (s SlashCommands) createscjob(ctx *dgc.Ctx) {
 
 	embed.NewEmbed().
 		SetDescription("Successfully created slash command job!").
-		AddField("Job ID", job.ID).
+		AddField("Job Name", job.Name).
 		Send(ctx)
 }
 
 func (s SlashCommands) deletescjob(ctx *dgc.Ctx) {
-	id := utils.Arguments["<job id>"]
+	name := utils.Arguments["<job name>"]
 
-	job := slashcommands.GetJobByID(id)
+	job := slashcommands.GetJobByName(name)
 	if job == nil {
-		ctx.RespondText("Could not find a job with ID `" + id + "`")
+		ctx.RespondText("Could not find a job with name `" + name + "`")
 		return
 	}
 
@@ -408,16 +432,16 @@ func (s SlashCommands) deletescjob(ctx *dgc.Ctx) {
 
 	embed.NewEmbed().
 		SetDescription("Successfully deleted slash command job!").
-		AddField("Job ID", job.ID).
+		AddField("Job Name", job.Name).
 		Send(ctx)
 }
 
 func (s SlashCommands) setscjobcommand(ctx *dgc.Ctx) {
-	id := utils.Arguments["<job id>"]
+	name := utils.Arguments["<job name>"]
 
-	job := slashcommands.GetJobByID(id)
+	job := slashcommands.GetJobByName(name)
 	if job == nil {
-		ctx.RespondText("Could not find a job with ID `" + id + "`")
+		ctx.RespondText("Could not find a job with name `" + name + "`")
 		return
 	}
 
@@ -485,16 +509,17 @@ func (s SlashCommands) setscjobcommand(ctx *dgc.Ctx) {
 
 	embed.NewEmbed().
 		SetDescription("Successfully updated slash command job").
-		AddField("Job ID", job.ID).
+		AddField("Job Name", job.Name).
+		AddField("Command", fmt.Sprintf("`/%s%s` (%s)", command.Name, job.RawArguments, command.ID)).
 		Send(ctx)
 }
 
 func (s SlashCommands) setscjobchannel(ctx *dgc.Ctx) {
-	id := utils.Arguments["<job id>"]
+	name := utils.Arguments["<job name>"]
 
-	job := slashcommands.GetJobByID(id)
+	job := slashcommands.GetJobByName(name)
 	if job == nil {
-		ctx.RespondText("Could not find a job with ID `" + id + "`")
+		ctx.RespondText("Could not find a job with name `" + name + "`")
 		return
 	}
 
@@ -539,16 +564,17 @@ func (s SlashCommands) setscjobchannel(ctx *dgc.Ctx) {
 
 	embed.NewEmbed().
 		SetDescription("Successfully updated slash command job").
-		AddField("Job ID", job.ID).
+		AddField("Job Name", job.Name).
+		AddField("Channel", channel.Mention()).
 		Send(ctx)
 }
 
 func (s SlashCommands) setscjobinterval(ctx *dgc.Ctx) {
-	id := utils.Arguments["<job id>"]
+	name := utils.Arguments["<job name>"]
 
-	job := slashcommands.GetJobByID(id)
+	job := slashcommands.GetJobByName(name)
 	if job == nil {
-		ctx.RespondText("Could not find a job with ID `" + id + "`")
+		ctx.RespondText("Could not find a job with name `" + name + "`")
 		return
 	}
 
@@ -574,6 +600,43 @@ func (s SlashCommands) setscjobinterval(ctx *dgc.Ctx) {
 
 	embed.NewEmbed().
 		SetDescription("Successfully updated slash command job").
-		AddField("Job ID", job.ID).
+		AddField("Job Name", job.Name).
+		AddField("Interval", utils.Misc.FormatDuration(job.Interval)).
+		Send(ctx)
+}
+
+func (s SlashCommands) setscjobpaused(ctx *dgc.Ctx) {
+	name := utils.Arguments["<job name>"]
+
+	job := slashcommands.GetJobByName(name)
+	if job == nil {
+		ctx.RespondText("Could not find a job with name `" + name + "`")
+		return
+	}
+
+	toggle := strings.ToLower(utils.Arguments["<on/off>"])
+	if toggle != "on" && toggle != "off" {
+		_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
+		return
+	}
+
+	job.Paused = toggle == "on"
+
+	err := job.Load(ctx.Session)
+	if err != nil {
+		ctx.RespondText("An error occurred while loading the job data: " + err.Error())
+		return
+	}
+
+	err = slashcommands.SaveJobs()
+	if err != nil {
+		ctx.RespondText("An error occurred while saving the jobs: " + err.Error())
+		return
+	}
+
+	embed.NewEmbed().
+		SetDescription("Successfully updated slash command job").
+		AddField("Job Name", job.Name).
+		AddField("Paused", toggle).
 		Send(ctx)
 }

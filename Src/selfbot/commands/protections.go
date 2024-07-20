@@ -1,6 +1,7 @@
 package commands
 
 import (
+	"fmt"
 	"strings"
 
 	"github.com/LightningDev1/LB-Selfbot/selfbot/api"
@@ -14,252 +15,472 @@ type ProtectionsCommands struct{}
 
 func (p ProtectionsCommands) RegisterCommands(router *dgc.Router) {
 	router.StartCategory("Protections", "Protection commands")
+
 	router.RegisterCmd(&dgc.Command{
 		Name:        "antiphishing",
-		Description: "Turn anti phishing on or off",
-		Usage:       "[p]antiphishing <on/off>",
+		Description: "Get, set or toggle Anti Phishing",
+		Usage:       "[p]antiphishing <get/set/toggle> [on/off]",
 		Flags:       []string{CmdFlagDangerous},
 		Handler:     p.antiphishing,
 	})
+
 	router.RegisterCmd(&dgc.Command{
 		Name:        "antifriendrequest",
-		Description: "Turn anti friend request spam on or off",
-		Usage:       "[p]antifriendrequest <on/off>",
+		Description: "Get, set or toggle Anti Friend Request Spam",
+		Usage:       "[p]antifriendrequest <get/set/toggle> [on/off]",
 		Flags:       []string{CmdFlagDangerous},
 		Handler:     p.antifriendrequest,
 	})
+
 	router.RegisterCmd(&dgc.Command{
 		Name:        "antimassdm",
-		Description: "Turn anti mass DM on or off",
-		Usage:       "[p]antimassdm <on/off>",
+		Description: "Get, set or toggle Anti Mass DM / DM Spam",
+		Usage:       "[p]antimassdm <get/set/toggle> [on/off]",
 		Flags:       []string{CmdFlagDangerous},
 		Handler:     p.antimassdm,
 	})
+
 	router.RegisterCmd(&dgc.Command{
 		Name:        "protectedservers",
-		Description: "Get a list of protected servers",
-		Usage:       "[p]protectedservers",
+		Description: "Get, add, remove or clear the protected servers list",
+		Usage:       "[p]protectedservers <get/add/rm/clear> [server id]",
 		Flags:       []string{CmdFlagDangerous},
 		Handler:     p.protectedservers,
 	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "protectserver",
-		Description: "Protect a server",
-		Usage:       "[p]protectserver <server id>",
-		Flags:       []string{CmdFlagDangerous},
-		Handler:     p.protectserver,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "unprotectserver",
-		Description: "Protect a server",
-		Usage:       "[p]protectserver <server id>",
-		Flags:       []string{CmdFlagDangerous},
-		Handler:     p.unprotectserver,
-	})
+
 	router.RegisterCmd(&dgc.Command{
 		Name:        "antiinvite",
-		Description: "Turn anti invite on or off",
-		Usage:       "[p]antiinvite <on/off>",
+		Description: "Get, set or toggle Anti Invite (Server Protections)",
+		Usage:       "[p]antiinvite <get/set/toggle> [on/off]",
 		Flags:       []string{CmdFlagDangerous},
 		Handler:     p.antiinvite,
 	})
+
 	router.RegisterCmd(&dgc.Command{
 		Name:        "antispam",
-		Description: "Turn anti spam on or off",
-		Usage:       "[p]antispam <on/off>",
+		Description: "Get, set or toggle Anti Spam (Server Protections)",
+		Usage:       "[p]antispam <get/set/toggle> [on/off]",
 		Flags:       []string{CmdFlagDangerous},
 		Handler:     p.antispam,
 	})
+
 	router.RegisterCmd(&dgc.Command{
 		Name:        "antiupper",
-		Description: "Turn anti upper on or off",
-		Usage:       "[p]antiupper <on/off>",
+		Description: "Get, set or toggle Anti Upper (Server Protections)",
+		Usage:       "[p]antiupper <get/set/toggle> [on/off]",
 		Flags:       []string{CmdFlagDangerous},
 		Handler:     p.antiupper,
 	})
+
 	router.RegisterCmd(&dgc.Command{
 		Name:        "antidelete",
-		Description: "Turn anti delete on or off",
-		Usage:       "[p]antidelete <on/off>",
+		Description: "Get, set or toggle Anti Delete (Server Protections)",
+		Usage:       "[p]antidelete <get/set/toggle> [on/off]",
 		Flags:       []string{CmdFlagDangerous},
 		Handler:     p.antidelete,
 	})
+
 	router.RegisterCmd(&dgc.Command{
-		Name:        "closedm",
-		Description: "Close your DMs",
-		Usage:       "[p]closedm",
+		Name:        "dm",
+		Description: "Open or close DM's from everyone",
+		Usage:       "[p]dm <open/close>",
 		Flags:       []string{CmdFlagDangerous},
-		Handler:     p.closedm,
+		Handler:     p.dm,
 	})
+
 	router.RegisterCmd(&dgc.Command{
-		Name:        "opendm",
-		Description: "Allow DMs from everyone",
-		Usage:       "[p]opendm",
+		Name:        "friendrequests",
+		Description: "Allow or deny new friend requests",
+		Usage:       "[p]friendrequests <allow/deny>",
 		Flags:       []string{CmdFlagDangerous},
-		Handler:     p.opendm,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "enablefriendrequests",
-		Description: "Enable friend requests",
-		Usage:       "[p]enablefriendrequests",
-		Flags:       []string{CmdFlagDangerous},
-		Handler:     p.enablefriendrequests,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "disablefriendrequests",
-		Description: "Disable friend requests",
-		Usage:       "[p]disablefriendrequests",
-		Flags:       []string{CmdFlagDangerous},
-		Handler:     p.disablefriendrequests,
+		Handler:     p.friendrequests,
 	})
 }
 
 func (p ProtectionsCommands) antiphishing(ctx *dgc.Ctx) {
-	toggle := strings.ToLower(utils.Arguments["<on/off>"])
-	if toggle != "on" && toggle != "off" {
-		_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
+	cfg, err := config.GetConfig()
+	if err != nil {
+		_ = ctx.RespondText("Error getting config")
 		return
 	}
-	cfg, _ := config.GetConfig()
-	cfg.Protections.AntiPhishing = toggle == "on"
-	_ = cfg.Save()
+
+	switch utils.Arguments["<get/set/toggle>"] {
+	case "get":
+		embed.NewEmbed().
+			AddField("Anti Phishing", utils.Misc.FormatBoolOnOff(cfg.Protections.AntiPhishing)).
+			Send(ctx)
+	case "set":
+		toggle := strings.ToLower(utils.Arguments["[on/off]"])
+		if toggle != "on" && toggle != "off" {
+			_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
+			return
+		}
+
+		cfg.Protections.AntiPhishing = toggle == "on"
+		_ = cfg.Save()
+
+		embed.NewEmbed().
+			SetDescription("Turned " + toggle + " Anti Phishing").
+			Send(ctx)
+	case "toggle":
+		cfg.Protections.AntiPhishing = !cfg.Protections.AntiPhishing
+		_ = cfg.Save()
+
+		embed.NewEmbed().
+			SetDescription("Turned " + utils.Misc.FormatBoolOnOff(cfg.Protections.AntiPhishing) + " Anti Phishing").
+			Send(ctx)
+	default:
+		_ = ctx.RespondText("Invalid <get/set/toggle> argument. Use `get` or `set` or `toggle`.")
+	}
 }
 
 func (p ProtectionsCommands) antifriendrequest(ctx *dgc.Ctx) {
-	toggle := strings.ToLower(utils.Arguments["<on/off>"])
-	if toggle != "on" && toggle != "off" {
-		_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
+	cfg, err := config.GetConfig()
+	if err != nil {
+		_ = ctx.RespondText("Error getting config")
 		return
 	}
-	cfg, _ := config.GetConfig()
-	cfg.Protections.AntiFriendRequest = toggle == "on"
-	_ = cfg.Save()
+
+	switch utils.Arguments["<get/set/toggle>"] {
+	case "get":
+		embed.NewEmbed().
+			AddField("Anti Friend Request Spam", utils.Misc.FormatBoolOnOff(cfg.Protections.AntiFriendRequest)).
+			Send(ctx)
+	case "set":
+		toggle := strings.ToLower(utils.Arguments["[on/off]"])
+		if toggle != "on" && toggle != "off" {
+			_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
+			return
+		}
+
+		cfg.Protections.AntiFriendRequest = toggle == "on"
+		_ = cfg.Save()
+
+		embed.NewEmbed().
+			SetDescription("Turned " + toggle + " Anti Friend Request Spam").
+			Send(ctx)
+	case "toggle":
+		cfg.Protections.AntiFriendRequest = !cfg.Protections.AntiFriendRequest
+		_ = cfg.Save()
+
+		embed.NewEmbed().
+			SetDescription("Turned " + utils.Misc.FormatBoolOnOff(cfg.Protections.AntiFriendRequest) + " Anti Friend Request Spam").
+			Send(ctx)
+	default:
+		_ = ctx.RespondText("Invalid <get/set/toggle> argument. Use `get` or `set` or `toggle`.")
+	}
 }
 
 func (p ProtectionsCommands) antimassdm(ctx *dgc.Ctx) {
-	toggle := strings.ToLower(utils.Arguments["<on/off>"])
-	if toggle != "on" && toggle != "off" {
-		_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
+	cfg, err := config.GetConfig()
+	if err != nil {
+		_ = ctx.RespondText("Error getting config")
 		return
 	}
-	cfg, _ := config.GetConfig()
-	cfg.Protections.AntiMassDM = toggle == "on"
-	_ = cfg.Save()
+
+	switch utils.Arguments["<get/set/toggle>"] {
+	case "get":
+		embed.NewEmbed().
+			AddField("Anti Mass DM / DM Spam", utils.Misc.FormatBoolOnOff(cfg.Protections.AntiMassDM)).
+			Send(ctx)
+	case "set":
+		toggle := strings.ToLower(utils.Arguments["[on/off]"])
+		if toggle != "on" && toggle != "off" {
+			_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
+			return
+		}
+
+		cfg.Protections.AntiMassDM = toggle == "on"
+		_ = cfg.Save()
+
+		embed.NewEmbed().
+			SetDescription("Turned " + toggle + " Anti Mass DM / DM Spam").
+			Send(ctx)
+	case "toggle":
+		cfg.Protections.AntiMassDM = !cfg.Protections.AntiMassDM
+		_ = cfg.Save()
+
+		embed.NewEmbed().
+			SetDescription("Turned " + utils.Misc.FormatBoolOnOff(cfg.Protections.AntiMassDM) + " Anti Mass DM / DM Spam").
+			Send(ctx)
+	default:
+		_ = ctx.RespondText("Invalid <get/set/toggle> argument. Use `get` or `set` or `toggle`.")
+	}
 }
 
 func (ProtectionsCommands) protectedservers(ctx *dgc.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
-		_ = ctx.RespondText("Could not get config.")
+		_ = ctx.RespondText("Error getting config.")
 		return
 	}
 
-	var servers []string
+	switch utils.Arguments["<get/add/rm/clear>"] {
+	case "get":
+		var servers []string
 
-	for _, s := range cfg.Protections.ServerProtections.ProtectedServers {
-		if name := utils.Discord.GetGuildName(ctx.Session, s); name != "No Server" {
-			servers = append(servers, "- "+name+" ("+s+")")
-		} else {
-			servers = append(servers, "- "+s)
+		for _, serverID := range cfg.Protections.ServerProtections.ProtectedServers {
+			guild, err := utils.Discord.GetGuild(ctx.Session, serverID)
+			if err != nil {
+				servers = append(servers, serverID)
+				continue
+			}
+
+			servers = append(servers, guild.Name+" ("+guild.ID+")")
 		}
-	}
 
-	embed.NewEmbed().
-		AddField("Protected Servers", strings.Join(servers, "\n")).
-		Send(ctx)
-}
+		embed.NewEmbed().
+			AddField("Protected Servers List", strings.Join(servers, ", ")).
+			Send(ctx)
+	case "add":
+		guild, err := utils.Discord.GetGuild(ctx.Session, utils.Misc.Or(utils.Arguments["[server id]"], ctx.Event.GuildID))
+		if err != nil {
+			_ = ctx.RespondText("Could not find server.")
+			return
+		}
 
-func (p ProtectionsCommands) protectserver(ctx *dgc.Ctx) {
-	guild, err := utils.Discord.GetGuild(ctx.Session, utils.Misc.Or(utils.Arguments["<server id>"], ctx.Event.GuildID))
-	if err != nil {
-		_ = ctx.RespondText("Could not find server.")
-		return
-	}
-	cfg, _ := config.GetConfig()
-	if utils.SliceContains(cfg.Protections.ServerProtections.ProtectedServers, guild.ID) {
-		_ = ctx.RespondText("Server is already ignored.")
-		return
-	}
-	cfg.Protections.ServerProtections.ProtectedServers = append(cfg.Protections.ServerProtections.ProtectedServers, guild.ID)
-	_ = cfg.Save()
-}
+		if utils.SliceContains(cfg.Protections.ServerProtections.ProtectedServers, guild.ID) {
+			_ = ctx.RespondText(fmt.Sprintf("Server %s is already in the Protected Servers List!", guild.Name))
+			return
+		}
 
-func (p ProtectionsCommands) unprotectserver(ctx *dgc.Ctx) {
-	guild, err := utils.Discord.GetGuild(ctx.Session, utils.Misc.Or(utils.Arguments["<server id>"], ctx.Event.GuildID))
-	if err != nil {
-		_ = ctx.RespondText("Could not find server.")
-		return
+		cfg.Protections.ServerProtections.ProtectedServers = append(cfg.Protections.ServerProtections.ProtectedServers, guild.ID)
+		_ = cfg.Save()
+
+		embed.NewEmbed().
+			SetDescription(fmt.Sprintf("Added %s to the Protected Servers List.", guild.Name)).
+			Send(ctx)
+	case "rm":
+		guild, err := utils.Discord.GetGuild(ctx.Session, utils.Misc.Or(utils.Arguments["[server id]"], ctx.Event.GuildID))
+		if err != nil {
+			_ = ctx.RespondText("Could not find server.")
+			return
+		}
+
+		if !utils.SliceContains(cfg.Protections.ServerProtections.ProtectedServers, guild.ID) {
+			_ = ctx.RespondText(fmt.Sprintf("Server %s already isn't in the Protected Servers List!", guild.Name))
+			return
+		}
+
+		cfg.Protections.ServerProtections.ProtectedServers = utils.RemoveSliceItem(cfg.Protections.ServerProtections.ProtectedServers, guild.ID)
+		_ = cfg.Save()
+
+		embed.NewEmbed().
+			SetDescription(fmt.Sprintf("Removed %s from the Protected Servers List.", guild.Name)).
+			Send(ctx)
+	case "clear":
+		cfg.Protections.ServerProtections.ProtectedServers = []string{}
+		_ = cfg.Save()
+
+		embed.NewEmbed().
+			SetDescription("Cleared all Protected Servers List entries.").
+			Send(ctx)
+	default:
+		_ = ctx.RespondText("Invalid <get/add/rm/clear> argument. Use `get`, `add`, `rm`, or `clear`.")
 	}
-	cfg, _ := config.GetConfig()
-	if !utils.SliceContains(cfg.Protections.ServerProtections.ProtectedServers, guild.ID) {
-		_ = ctx.RespondText("Server is already not ignored.")
-		return
-	}
-	cfg.Protections.ServerProtections.ProtectedServers = utils.RemoveSliceItem(cfg.Protections.ServerProtections.ProtectedServers, guild.ID)
-	_ = cfg.Save()
 }
 
 func (p ProtectionsCommands) antiinvite(ctx *dgc.Ctx) {
-	toggle := strings.ToLower(utils.Arguments["<on/off>"])
-	if toggle != "on" && toggle != "off" {
-		_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
+	cfg, err := config.GetConfig()
+	if err != nil {
+		_ = ctx.RespondText("Error getting config")
 		return
 	}
-	cfg, _ := config.GetConfig()
-	cfg.Protections.ServerProtections.AntiInvite = toggle == "on"
-	_ = cfg.Save()
+
+	switch utils.Arguments["<get/set/toggle>"] {
+	case "get":
+		embed.NewEmbed().
+			AddField("Anti Invite (Server Protections)", utils.Misc.FormatBoolOnOff(cfg.Protections.ServerProtections.AntiInvite)).
+			Send(ctx)
+	case "set":
+		toggle := strings.ToLower(utils.Arguments["[on/off]"])
+		if toggle != "on" && toggle != "off" {
+			_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
+			return
+		}
+
+		cfg.Protections.ServerProtections.AntiInvite = toggle == "on"
+		_ = cfg.Save()
+
+		embed.NewEmbed().
+			SetDescription("Turned " + toggle + " Anti Invite (Server Protections)").
+			Send(ctx)
+	case "toggle":
+		cfg.Protections.ServerProtections.AntiInvite = !cfg.Protections.ServerProtections.AntiInvite
+		_ = cfg.Save()
+
+		embed.NewEmbed().
+			SetDescription("Turned " + utils.Misc.FormatBoolOnOff(cfg.Protections.ServerProtections.AntiInvite) + " Anti Invite (Server Protections)").
+			Send(ctx)
+	default:
+		_ = ctx.RespondText("Invalid <get/set/toggle> argument. Use `get` or `set` or `toggle`.")
+	}
 }
 
 func (p ProtectionsCommands) antispam(ctx *dgc.Ctx) {
-	toggle := strings.ToLower(utils.Arguments["<on/off>"])
-	if toggle != "on" && toggle != "off" {
-		_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
+	cfg, err := config.GetConfig()
+	if err != nil {
+		_ = ctx.RespondText("Error getting config")
 		return
 	}
-	cfg, _ := config.GetConfig()
-	cfg.Protections.ServerProtections.AntiSpam = toggle == "on"
-	_ = cfg.Save()
+
+	switch utils.Arguments["<get/set/toggle>"] {
+	case "get":
+		embed.NewEmbed().
+			AddField("Anti Spam (Server Protections)", utils.Misc.FormatBoolOnOff(cfg.Protections.ServerProtections.AntiSpam)).
+			Send(ctx)
+	case "set":
+		toggle := strings.ToLower(utils.Arguments["[on/off]"])
+		if toggle != "on" && toggle != "off" {
+			_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
+			return
+		}
+
+		cfg.Protections.ServerProtections.AntiSpam = toggle == "on"
+		_ = cfg.Save()
+
+		embed.NewEmbed().
+			SetDescription("Turned " + toggle + " Anti Spam (Server Protections)").
+			Send(ctx)
+	case "toggle":
+		cfg.Protections.ServerProtections.AntiSpam = !cfg.Protections.ServerProtections.AntiSpam
+		_ = cfg.Save()
+
+		embed.NewEmbed().
+			SetDescription("Turned " + utils.Misc.FormatBoolOnOff(cfg.Protections.ServerProtections.AntiSpam) + " Anti Spam (Server Protections)").
+			Send(ctx)
+	default:
+		_ = ctx.RespondText("Invalid <get/set/toggle> argument. Use `get` or `set` or `toggle`.")
+	}
 }
 
 func (p ProtectionsCommands) antiupper(ctx *dgc.Ctx) {
-	toggle := strings.ToLower(utils.Arguments["<on/off>"])
-	if toggle != "on" && toggle != "off" {
-		_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
+	cfg, err := config.GetConfig()
+	if err != nil {
+		_ = ctx.RespondText("Error getting config")
 		return
 	}
-	cfg, _ := config.GetConfig()
-	cfg.Protections.ServerProtections.AntiUpper = toggle == "on"
-	_ = cfg.Save()
+
+	switch utils.Arguments["<get/set/toggle>"] {
+	case "get":
+		embed.NewEmbed().
+			AddField("Anti Upper (Server Protections)", utils.Misc.FormatBoolOnOff(cfg.Protections.ServerProtections.AntiUpper)).
+			Send(ctx)
+	case "set":
+		toggle := strings.ToLower(utils.Arguments["[on/off]"])
+		if toggle != "on" && toggle != "off" {
+			_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
+			return
+		}
+
+		cfg.Protections.ServerProtections.AntiUpper = toggle == "on"
+		_ = cfg.Save()
+
+		embed.NewEmbed().
+			SetDescription("Turned " + toggle + " Anti Upper (Server Protections)").
+			Send(ctx)
+	case "toggle":
+		cfg.Protections.ServerProtections.AntiUpper = !cfg.Protections.ServerProtections.AntiUpper
+		_ = cfg.Save()
+
+		embed.NewEmbed().
+			SetDescription("Turned " + utils.Misc.FormatBoolOnOff(cfg.Protections.ServerProtections.AntiUpper) + " Anti Upper (Server Protections)").
+			Send(ctx)
+	default:
+		_ = ctx.RespondText("Invalid <get/set/toggle> argument. Use `get` or `set` or `toggle`.")
+	}
 }
 
 func (p ProtectionsCommands) antidelete(ctx *dgc.Ctx) {
-	toggle := strings.ToLower(utils.Arguments["<on/off>"])
-	if toggle != "on" && toggle != "off" {
-		_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
+	cfg, err := config.GetConfig()
+	if err != nil {
+		_ = ctx.RespondText("Error getting config")
 		return
 	}
-	cfg, _ := config.GetConfig()
-	cfg.Protections.ServerProtections.AntiDelete = toggle == "on"
-	_ = cfg.Save()
+
+	switch utils.Arguments["<get/set/toggle>"] {
+	case "get":
+		embed.NewEmbed().
+			AddField("Anti Delete (Server Protections)", utils.Misc.FormatBoolOnOff(cfg.Protections.ServerProtections.AntiDelete)).
+			Send(ctx)
+	case "set":
+		toggle := strings.ToLower(utils.Arguments["[on/off]"])
+		if toggle != "on" && toggle != "off" {
+			_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
+			return
+		}
+
+		cfg.Protections.ServerProtections.AntiDelete = toggle == "on"
+		_ = cfg.Save()
+
+		embed.NewEmbed().
+			SetDescription("Turned " + toggle + " Anti Delete (Server Protections)").
+			Send(ctx)
+	case "toggle":
+		cfg.Protections.ServerProtections.AntiDelete = !cfg.Protections.ServerProtections.AntiDelete
+		_ = cfg.Save()
+
+		embed.NewEmbed().
+			SetDescription("Turned " + utils.Misc.FormatBoolOnOff(cfg.Protections.ServerProtections.AntiDelete) + " Anti Delete (Server Protections)").
+			Send(ctx)
+	default:
+		_ = ctx.RespondText("Invalid <get/set/toggle> argument. Use `get` or `set` or `toggle`.")
+	}
 }
 
-func (ProtectionsCommands) opendm(ctx *dgc.Ctx) {
-	_ = api.ChangeSettings(ctx.Session, "/settings", map[string]any{"restricted_guilds": []any{}})
-}
+func (ProtectionsCommands) dm(ctx *dgc.Ctx) {
+	var err error
+	var action string
 
-func (ProtectionsCommands) closedm(ctx *dgc.Ctx) {
-	var guildIDs []string
-	for _, g := range ctx.Session.State.Guilds {
-		guildIDs = append(guildIDs, g.ID)
+	switch utils.Arguments["<open/close>"] {
+	case "open":
+		err = api.ChangeSettings(ctx.Session, "/settings", map[string]any{"restricted_guilds": []any{}})
+		action = "Opened"
+	case "close":
+		var guildIDs []string
+		for _, g := range ctx.Session.State.Guilds {
+			guildIDs = append(guildIDs, g.ID)
+		}
+
+		err = api.ChangeSettings(ctx.Session, "/settings", map[string]any{"restricted_guilds": guildIDs})
+		action = "Closed"
+	default:
+		_ = ctx.RespondText("Invalid <open/close> argument. Use `open` or `close`.")
+		return
 	}
 
-	_ = api.ChangeSettings(ctx.Session, "/settings", map[string]any{"restricted_guilds": guildIDs})
+	if err != nil {
+		_ = ctx.RespondText("Error changing settings: " + err.Error())
+		return
+	}
+
+	embed.NewEmbed().
+		SetDescription(action + " DM's from everyone!").
+		Send(ctx)
 }
 
-func (ProtectionsCommands) enablefriendrequests(ctx *dgc.Ctx) {
-	_ = api.AllowFriendRequestsFrom(ctx.Session, []string{"all"})
-}
+func (ProtectionsCommands) friendrequests(ctx *dgc.Ctx) {
+	var err error
+	var action string
 
-func (ProtectionsCommands) disablefriendrequests(ctx *dgc.Ctx) {
-	_ = api.AllowFriendRequestsFrom(ctx.Session, []string{})
+	switch utils.Arguments["<allow/deny>"] {
+	case "allow":
+		err = api.AllowFriendRequestsFrom(ctx.Session, []string{"all"})
+		action = "Allowed"
+	case "deny":
+		err = api.AllowFriendRequestsFrom(ctx.Session, []string{})
+		action = "Denied"
+	default:
+		_ = ctx.RespondText("Invalid <allow/deny> argument. Use `allow` or `deny`.")
+		return
+	}
+
+	if err != nil {
+		_ = ctx.RespondText("Error changing settings: " + err.Error())
+		return
+	}
+
+	embed.NewEmbed().
+		SetDescription(action + " friend requests from everyone!").
+		Send(ctx)
 }

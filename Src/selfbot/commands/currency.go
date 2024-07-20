@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"math"
 	"net/url"
+	"strconv"
 	"strings"
 
 	"github.com/LightningDev1/LB-Selfbot/selfbot/embed"
@@ -87,6 +88,19 @@ func (c CurrencyCommands) RegisterCommands(router *dgc.Router) {
 		Description: "Get price information from a (crypto)currency",
 		Usage:       "[p]priceinfo <from symbol> [to symbol]",
 		Handler:     c.priceinfo,
+	})
+
+	router.RegisterCmd(&dgc.Command{
+		Name:        "searchsymbol",
+		Description: "Search for a stock market symbol",
+		Usage:       "[p]searchsymbol <query>",
+		Handler:     c.searchsymbol,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "symbolinfo",
+		Description: "Get information about a stock market symbol",
+		Usage:       "[p]symbolinfo <symbol>",
+		Handler:     c.symbolinfo,
 	})
 }
 
@@ -206,6 +220,77 @@ func (CurrencyCommands) priceinfo(ctx *dgc.Ctx) {
 
 	for k, v := range parsed {
 		emb.AddField(k, v)
+	}
+
+	emb.Send(ctx)
+}
+
+func (CurrencyCommands) searchsymbol(ctx *dgc.Ctx) {
+	uri := fmt.Sprintf(
+		"https://www.alphavantage.co/query?function=SYMBOL_SEARCH&keywords=%s&apikey=KBJ3RJS2JAYNH3WD",
+		url.QueryEscape(ctx.Arguments.Raw()),
+	)
+
+	httpResponse := http.Get(uri)
+	if httpResponse.Error != nil {
+		ctx.RespondText("An error occurred: " + httpResponse.Error.Error())
+		return
+	}
+
+	bestMatches := httpResponse.Json().Get("bestMatches")
+
+	if len(bestMatches.MustArray()) == 0 {
+		ctx.RespondText("No results found")
+		return
+	}
+
+	emb := embed.NewEmbed()
+
+	for i := range bestMatches.MustArray() {
+		stock := bestMatches.GetIndex(i)
+
+		info := fmt.Sprintf(
+			"Symbol: %s\nName: %s",
+			stock.Get("1. symbol").MustString(),
+			stock.Get("2. name").MustString(),
+		)
+
+		emb.AddField("Result "+strconv.Itoa(i+1), info)
+	}
+
+	emb.Send(ctx)
+}
+
+func (CurrencyCommands) symbolinfo(ctx *dgc.Ctx) {
+	symbol := strings.ToUpper(ctx.Arguments.Raw())
+
+	uri := fmt.Sprintf(
+		"https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=%s&apikey=KBJ3RJS2JAYNH3WD",
+		symbol,
+	)
+
+	httpResponse := http.Get(uri)
+	if httpResponse.Error != nil {
+		ctx.RespondText("An error occurred: " + httpResponse.Error.Error())
+		return
+	}
+
+	globalQuote := httpResponse.Json().Get("Global Quote")
+
+	if len(globalQuote.MustMap()) == 0 {
+		ctx.RespondText("No results found")
+		return
+	}
+
+	emb := embed.NewEmbed().
+		SetDescription(fmt.Sprintf("Stock info for %s", symbol))
+
+	for key := range globalQuote.MustMap() {
+		data := globalQuote.Get(key).MustString()
+
+		key = strings.Split(key, ". ")[1]
+
+		emb.AddField(utils.String.Capitalize(key), data)
 	}
 
 	emb.Send(ctx)

@@ -93,6 +93,30 @@ func (c ConfigCommands) RegisterCommands(router *dgc.Router) {
 	})
 
 	router.RegisterCmd(&dgc.Command{
+		Name:        "embedcolor",
+		Description: "Get or set the Embed Color (for URL Embeds)",
+		Usage:       "[p]embedcolor <get/set> [hex color]",
+		Flags:       []string{CmdFlagDangerous},
+		Handler:     c.embedcolor,
+	})
+
+	router.RegisterCmd(&dgc.Command{
+		Name:        "embedimage",
+		Description: "Get or set the Embed Image (for URL Embeds)",
+		Usage:       "[p]embedimage <get/set> [url]",
+		Flags:       []string{CmdFlagDangerous},
+		Handler:     c.embedimage,
+	})
+
+	router.RegisterCmd(&dgc.Command{
+		Name:        "embedurl",
+		Description: "Get or set the Embed URL (for URL Embeds)",
+		Usage:       "[p]embedurl <get/set> [url]",
+		Flags:       []string{CmdFlagDangerous},
+		Handler:     c.embedurl,
+	})
+
+	router.RegisterCmd(&dgc.Command{
 		Name:        "aliases",
 		Description: "Get, add, remove or clear command aliases",
 		Usage:       "[p]aliases <get/add/rm/clear> [alias] [command]",
@@ -335,7 +359,7 @@ func (c ConfigCommands) RegisterCommands(router *dgc.Router) {
 	router.RegisterCmd(&dgc.Command{
 		Name:        "wpingself",
 		Description: "Get, set or toggle Ping Self for webhooks",
-		Usage:       "[p]wpingself <get/set/toggle> [on/off]",
+		Usage:       "[p]wpingself <get/set/values> [value]",
 		Flags:       []string{CmdFlagDangerous},
 		Handler:     c.wpingself,
 	})
@@ -343,7 +367,7 @@ func (c ConfigCommands) RegisterCommands(router *dgc.Router) {
 	router.RegisterCmd(&dgc.Command{
 		Name:        "wpingeveryone",
 		Description: "Get, set or toggle Ping Everyone for webhooks",
-		Usage:       "[p]wpingeveryone <get/set/toggle> [on/off]",
+		Usage:       "[p]wpingeveryone <get/set/values> [value]",
 		Flags:       []string{CmdFlagDangerous},
 		Handler:     c.wpingeveryone,
 	})
@@ -520,14 +544,24 @@ func (ConfigCommands) commandmode(ctx *dgc.Ctx) {
 			AddField("Command Mode", cfg.Selfbot.CommandMode).
 			Send(ctx)
 	case "set":
-		value := utils.String.Capitalize(utils.Arguments["[value]"])
-		if !utils.SliceContains([]string{"Codeblock", "Text", "Indent", "Webhookembed", "Urlembed"}, value) {
+		value := strings.ToLower(utils.Arguments["[value]"])
+
+		switch value {
+		case "codeblock":
+			cfg.Selfbot.CommandMode = "Codeblock"
+		case "text":
+			cfg.Selfbot.CommandMode = "Text"
+		case "indent":
+			cfg.Selfbot.CommandMode = "Indent"
+		case "webhookembed":
+			cfg.Selfbot.CommandMode = "WebhookEmbed"
+		case "urlembed":
+			cfg.Selfbot.CommandMode = "URLEmbed"
+		default:
 			_ = ctx.RespondText("Invalid command mode. Use `[p]commandmode values` to get a list of available command modes.")
 			return
 		}
 
-		cfg.Selfbot.CommandMode = strings.ReplaceAll(value, "Webhookembed", "WebhookEmbed")
-		cfg.Selfbot.CommandMode = strings.ReplaceAll(cfg.Selfbot.CommandMode, "Urlembed", "URLEmbed")
 		_ = cfg.Save()
 
 		embed.NewEmbed().
@@ -646,7 +680,7 @@ func (ConfigCommands) delresponsesdelay(ctx *dgc.Ctx) {
 			AddField("Delete Responses Delay", formatted).
 			Send(ctx)
 	case "set":
-		delay, err := time.ParseDuration(utils.Arguments["[value]"])
+		delay, err := utils.Misc.ParseDuration(utils.Arguments["[value]"])
 		if err != nil {
 			_ = ctx.RespondText("Invalid duration: " + err.Error())
 			return
@@ -715,21 +749,30 @@ func (ConfigCommands) clientspoof(ctx *dgc.Ctx) {
 			AddField("Client", cfg.Selfbot.Client).
 			Send(ctx)
 	case "set":
-		client := utils.String.Capitalize(utils.Arguments["[value]"])
-		if !utils.SliceContains([]string{"Desktop", "Web", "Mobile"}, client) {
-			_ = ctx.RespondText("Invalid client.")
+		value := strings.ToLower(utils.Arguments["[value]"])
+
+		switch value {
+		case "desktop":
+			cfg.Selfbot.Client = "Desktop"
+		case "web":
+			cfg.Selfbot.Client = "Web"
+		case "mobile":
+			cfg.Selfbot.Client = "Mobile"
+		case "console":
+			cfg.Selfbot.Client = "Console"
+		default:
+			_ = ctx.RespondText("Invalid client. Use `[p]clientspoof values` to get a list of available clients.")
 			return
 		}
 
-		cfg.Selfbot.Client = client
 		_ = cfg.Save()
 
 		embed.NewEmbed().
-			SetDescription("Client set to " + cfg.Selfbot.Client).
+			SetDescription("Client Spoof set to " + cfg.Selfbot.Client).
 			Send(ctx)
 	case "values":
 		embed.NewEmbed().
-			SetDescription("Available client spoof values: Desktop, Web, Mobile").
+			SetDescription("Available client spoof values: Desktop, Web, Mobile, Console").
 			Send(ctx)
 	default:
 		_ = ctx.RespondText("Invalid <get/set/values> argument. Use `get` or `set` or `values`.")
@@ -768,6 +811,94 @@ func (ConfigCommands) timezone(ctx *dgc.Ctx) {
 
 		embed.NewEmbed().
 			SetDescription("Timezone set to " + cfg.Selfbot.Timezone).
+			Send(ctx)
+	default:
+		_ = ctx.RespondText("Invalid <get/set> argument. Use `get` or `set`.")
+	}
+}
+
+func (ConfigCommands) embedcolor(ctx *dgc.Ctx) {
+	cfg, err := config.GetConfig()
+	if err != nil {
+		_ = ctx.RespondText("Error getting config")
+		return
+	}
+
+	switch utils.Arguments["<get/set>"] {
+	case "get":
+		embed.NewEmbed().
+			AddField("Embed Color", cfg.Selfbot.EmbedColor).
+			Send(ctx)
+	case "set":
+		color := strings.TrimPrefix(utils.Arguments["[hex color]"], "#")
+		if len(color) != 6 {
+			_ = ctx.RespondText("Invalid hex color. Use a 6-digit hex color.")
+			return
+		}
+
+		_, _, _, err := utils.Misc.HexToRGB(color)
+		if err != nil {
+			_ = ctx.RespondText("Invalid hex color: " + err.Error() + ". Use a 6-digit hex color.")
+			return
+		}
+
+		cfg.Selfbot.EmbedColor = color
+		_ = cfg.Save()
+
+		embed.NewEmbed().
+			SetDescription("Embed Color set to " + cfg.Selfbot.EmbedColor).
+			Send(ctx)
+	default:
+		_ = ctx.RespondText("Invalid <get/set> argument. Use `get` or `set`.")
+	}
+}
+
+func (ConfigCommands) embedimage(ctx *dgc.Ctx) {
+	cfg, err := config.GetConfig()
+	if err != nil {
+		_ = ctx.RespondText("Error getting config")
+		return
+	}
+
+	switch utils.Arguments["<get/set>"] {
+	case "get":
+		embed.NewEmbed().
+			AddField("Embed Image", cfg.Selfbot.EmbedImage).
+			Send(ctx)
+	case "set":
+		url := utils.Arguments["[url]"]
+
+		cfg.Selfbot.EmbedImage = url
+		_ = cfg.Save()
+
+		embed.NewEmbed().
+			SetDescription("Embed Image set to " + cfg.Selfbot.EmbedImage).
+			Send(ctx)
+	default:
+		_ = ctx.RespondText("Invalid <get/set> argument. Use `get` or `set`.")
+	}
+}
+
+func (ConfigCommands) embedurl(ctx *dgc.Ctx) {
+	cfg, err := config.GetConfig()
+	if err != nil {
+		_ = ctx.RespondText("Error getting config")
+		return
+	}
+
+	switch utils.Arguments["<get/set>"] {
+	case "get":
+		embed.NewEmbed().
+			AddField("Embed URL", cfg.Selfbot.EmbedURL).
+			Send(ctx)
+	case "set":
+		url := utils.Arguments["[url]"]
+
+		cfg.Selfbot.EmbedURL = url
+		_ = cfg.Save()
+
+		embed.NewEmbed().
+			SetDescription("Embed URL set to " + cfg.Selfbot.EmbedURL).
 			Send(ctx)
 	default:
 		_ = ctx.RespondText("Invalid <get/set> argument. Use `get` or `set`.")
@@ -987,7 +1118,7 @@ func (ConfigCommands) giveawaysnipersleep(ctx *dgc.Ctx) {
 			AddField("Giveaway Sniper Sleep", formatted).
 			Send(ctx)
 	case "set":
-		delay, err := time.ParseDuration(utils.Arguments["[value]"])
+		delay, err := utils.Misc.ParseDuration(utils.Arguments["[value]"])
 		if err != nil {
 			_ = ctx.RespondText("Invalid duration: " + err.Error())
 			return
@@ -1333,7 +1464,7 @@ func (ConfigCommands) poketwosleep(ctx *dgc.Ctx) {
 			AddField("PokéTwo Sniper Sleep", formatted).
 			Send(ctx)
 	case "set":
-		delay, err := time.ParseDuration(utils.Arguments["[value]"])
+		delay, err := utils.Misc.ParseDuration(utils.Arguments["[value]"])
 		if err != nil {
 			_ = ctx.RespondText("Invalid duration: " + err.Error())
 			return
@@ -1404,7 +1535,7 @@ func (ConfigCommands) poketwotimeout(ctx *dgc.Ctx) {
 			AddField("PokéTwo Sniper Timeout", formatted).
 			Send(ctx)
 	case "set":
-		delay, err := time.ParseDuration(utils.Arguments["[value]"])
+		delay, err := utils.Misc.ParseDuration(utils.Arguments["[value]"])
 		if err != nil {
 			_ = ctx.RespondText("Invalid duration: " + err.Error())
 			return
@@ -1619,10 +1750,6 @@ func (ConfigCommands) poketwolanguage(ctx *dgc.Ctx) {
 			Send(ctx)
 	case "set":
 		language := strings.ToLower(utils.Arguments["[language]"])
-		if !utils.SliceContains([]string{"english", "en", "japanese", "ja", "japanese_t", "ja_t", "french", "fr", "german", "de"}, language) {
-			_ = ctx.RespondText("Invalid language. `[p]poketwolanguages values` to view all available values.")
-			return
-		}
 
 		switch language {
 		case "en", "english":
@@ -1635,6 +1762,9 @@ func (ConfigCommands) poketwolanguage(ctx *dgc.Ctx) {
 			cfg.Snipers.PokeTwoSniper.CatchLanguage = "French"
 		case "de", "german":
 			cfg.Snipers.PokeTwoSniper.CatchLanguage = "German"
+		default:
+			_ = ctx.RespondText("Invalid language. `[p]poketwolanguages values` to view all available values.")
+			return
 		}
 
 		_ = cfg.Save()
@@ -1991,33 +2121,37 @@ func (ConfigCommands) wpingself(ctx *dgc.Ctx) {
 		return
 	}
 
-	switch utils.Arguments["<get/set/toggle>"] {
+	switch utils.Arguments["<get/set/values>"] {
 	case "get":
 		embed.NewEmbed().
-			AddField("Webhook Ping Self", utils.Misc.FormatBoolOnOff(cfg.Webhooks.PingSelf)).
+			AddField("Webhook Ping Self", cfg.Webhooks.PingSelfMode).
 			Send(ctx)
 	case "set":
-		toggle := strings.ToLower(utils.Arguments["[on/off]"])
-		if toggle != "on" && toggle != "off" {
-			_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
+		value := strings.ToLower(utils.Arguments["[value]"])
+
+		switch value {
+		case "disabled":
+			cfg.Webhooks.PingSelfMode = "Disabled"
+		case "always":
+			cfg.Webhooks.PingSelfMode = "Always"
+		case "important":
+			cfg.Webhooks.PingSelfMode = "Important"
+		default:
+			_ = ctx.RespondText("Invalid Webhook Ping Self mode. Use `[p]wpingself values` to get a list of available modes.")
 			return
 		}
 
-		cfg.Webhooks.PingSelf = toggle == "on"
 		_ = cfg.Save()
 
 		embed.NewEmbed().
-			SetDescription("Turned " + toggle + " webhook ping self").
+			SetDescription("Webhook Ping Self set to " + cfg.Webhooks.PingSelfMode).
 			Send(ctx)
-	case "toggle":
-		cfg.Webhooks.PingSelf = !cfg.Webhooks.PingSelf
-		_ = cfg.Save()
-
+	case "values":
 		embed.NewEmbed().
-			SetDescription("Turned " + utils.Misc.FormatBoolOnOff(cfg.Webhooks.PingSelf) + " webhook ping self").
+			SetDescription("Available Webhook Ping Self modes: Disabled, Always, Important").
 			Send(ctx)
 	default:
-		_ = ctx.RespondText("Invalid <get/set/toggle> argument. Use `get` or `set` or `toggle`.")
+		_ = ctx.RespondText("Invalid <get/set/values> argument. Use `get`, `set`, or `values`.")
 	}
 }
 
@@ -2028,33 +2162,37 @@ func (ConfigCommands) wpingeveryone(ctx *dgc.Ctx) {
 		return
 	}
 
-	switch utils.Arguments["<get/set/toggle>"] {
+	switch utils.Arguments["<get/set/values>"] {
 	case "get":
 		embed.NewEmbed().
-			AddField("Webhook Ping Everyone", utils.Misc.FormatBoolOnOff(cfg.Webhooks.PingEveryone)).
+			AddField("Webhook Ping Everyone", cfg.Webhooks.PingEveryoneMode).
 			Send(ctx)
 	case "set":
-		toggle := strings.ToLower(utils.Arguments["[on/off]"])
-		if toggle != "on" && toggle != "off" {
-			_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
+		value := strings.ToLower(utils.Arguments["[value]"])
+
+		switch value {
+		case "disabled":
+			cfg.Webhooks.PingEveryoneMode = "Disabled"
+		case "always":
+			cfg.Webhooks.PingEveryoneMode = "Always"
+		case "important":
+			cfg.Webhooks.PingEveryoneMode = "Important"
+		default:
+			_ = ctx.RespondText("Invalid Webhook Ping Everyone mode. Use `[p]wpingeveryone values` to get a list of available modes.")
 			return
 		}
 
-		cfg.Webhooks.PingEveryone = toggle == "on"
 		_ = cfg.Save()
 
 		embed.NewEmbed().
-			SetDescription("Turned " + toggle + " webhook ping everyone").
+			SetDescription("Webhook Ping Everyone set to " + cfg.Webhooks.PingEveryoneMode).
 			Send(ctx)
-	case "toggle":
-		cfg.Webhooks.PingEveryone = !cfg.Webhooks.PingEveryone
-		_ = cfg.Save()
-
+	case "values":
 		embed.NewEmbed().
-			SetDescription("Turned " + utils.Misc.FormatBoolOnOff(cfg.Webhooks.PingEveryone) + " webhook ping everyone").
+			SetDescription("Available Webhook Ping Everyone modes: Disabled, Always, Important").
 			Send(ctx)
 	default:
-		_ = ctx.RespondText("Invalid <get/set/toggle> argument. Use `get` or `set` or `toggle`.")
+		_ = ctx.RespondText("Invalid <get/set/values> argument. Use `get`, `set`, or `values`.")
 	}
 }
 
@@ -2509,7 +2647,7 @@ func (ConfigCommands) uitheme(ctx *dgc.Ctx) {
 		return
 	}
 
-	switch utils.Arguments["<get/set>"] {
+	switch utils.Arguments["<get/set/values>"] {
 	case "get":
 		embed.NewEmbed().
 			AddField("UI Theme", cfg.UI.Theme).

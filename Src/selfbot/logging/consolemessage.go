@@ -14,6 +14,7 @@ type ConsoleMessage struct {
 	Title      string
 	Color      string
 	WebhookURL string
+	Important  bool
 	Info       *list.List
 }
 
@@ -32,6 +33,11 @@ func (c *ConsoleMessage) SetWebhookURL(webhookURL string) *ConsoleMessage {
 	return c
 }
 
+func (c *ConsoleMessage) SetImportant(important bool) *ConsoleMessage {
+	c.Important = important
+	return c
+}
+
 func (c *ConsoleMessage) AddInfo(key, value string) *ConsoleMessage {
 	c.Info.PushBack([]string{key, value})
 	return c
@@ -45,7 +51,7 @@ func (c *ConsoleMessage) AddInfoConditional(key, value string, condition bool) *
 }
 
 func (c *ConsoleMessage) Show() {
-	r, g, b := utils.Misc.HexToRGB(c.Color)
+	r, g, b, _ := utils.Misc.HexToRGB(c.Color)
 	timeFormat := Console.Colored(time.Now().Local().Format("2006-01-02 15:04:05"), 193, 239, 255, false)
 	message := Console.Colored("[", 238, 238, 238, false) + timeFormat + Console.Colored("] ", 238, 238, 238, false) + Console.Colored(c.Title, r, g, b, false) + "\n"
 
@@ -76,7 +82,7 @@ func (c *ConsoleMessage) Show() {
 			}
 		}
 
-		emb.SendWebhook(c.WebhookURL)
+		emb.SendWebhook(c.WebhookURL, c.Important)
 	}
 }
 

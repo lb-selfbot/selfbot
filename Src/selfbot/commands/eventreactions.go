@@ -2,8 +2,8 @@ package commands
 
 import (
 	"fmt"
-	"strconv"
 	"strings"
+	"time"
 
 	"github.com/LightningDev1/LB-Selfbot/selfbot/config"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/embed"
@@ -243,174 +243,116 @@ func (e *EventReactionsCommands) RegisterCommands(router *dgc.Router) {
 		Flags:       []string{CmdFlagDangerous},
 		Handler:     e.antigroupchat,
 	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "antideletemessages",
+		Description: "Prevent users from deleting your messages",
+		Usage:       "[p]antideletemessages <toggle/list/clear> [channel]",
+		Flags:       []string{CmdFlagDangerous},
+		Handler:     e.antideletemessages,
+	})
 
 	// AFK
 
 	router.RegisterCmd(&dgc.Command{
-		Name:        "getafkenabled",
-		Description: "Get the current AFK responder setting",
-		Usage:       "[p]getafkenabled",
+		Name:        "afkresponder",
+		Description: "Get, set or toggle the AFK Responder",
+		Usage:       "[p]afkresponder <get/set/toggle> [on/off]",
 		Flags:       []string{CmdFlagDangerous},
-		Handler:     e.getafkenabled,
+		Handler:     e.afkresponder,
 	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "afkenabled",
-		Description: "Turn the AFK responder on or off",
-		Usage:       "[p]afkenabled <on/off>",
-		Flags:       []string{CmdFlagDangerous},
-		Handler:     e.afkenabled,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "getafkonping",
-		Description: "Get the current AFK on ping setting",
-		Usage:       "[p]getafkonping",
-		Flags:       []string{CmdFlagDangerous},
-		Handler:     e.getafkonping,
-	})
+
 	router.RegisterCmd(&dgc.Command{
 		Name:        "afkonping",
-		Description: "Set if an AFK message should be sent on ping",
-		Usage:       "[p]afkonping <on/off>",
+		Description: "Get, set or toggle if AFK message should be sent on ping",
+		Usage:       "[p]afkonping <get/set/toggle> [on/off]",
 		Flags:       []string{CmdFlagDangerous},
 		Handler:     e.afkonping,
 	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "getafkondm",
-		Description: "Get the current AFK on DM setting",
-		Usage:       "[p]getafkondm",
-		Flags:       []string{CmdFlagDangerous},
-		Handler:     e.getafkondm,
-	})
+
 	router.RegisterCmd(&dgc.Command{
 		Name:        "afkondm",
-		Description: "Set if an AFK message should be sent on DM",
-		Usage:       "[p]afkondm <on/off>",
+		Description: "Get, set or toggle if AFK message should be sent on DM",
+		Usage:       "[p]afkondm <get/set/toggle> [on/off]",
 		Flags:       []string{CmdFlagDangerous},
 		Handler:     e.afkondm,
 	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "getafkdelay",
-		Description: "Get the current AFK delay setting",
-		Usage:       "[p]getafkdelay",
-		Flags:       []string{CmdFlagDangerous},
-		Handler:     e.getafkdelay,
-	})
+
 	router.RegisterCmd(&dgc.Command{
 		Name:        "afkdelay",
-		Description: "Set delay before sending AFK message",
-		Usage:       "[p]afkdelay <seconds>",
+		Description: "Get or set the delay before sending AFK message",
+		Usage:       "[p]afkdelay <get/set> [value]",
 		Flags:       []string{CmdFlagDangerous},
 		Handler:     e.afkdelay,
 	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "getafkrandomdelay",
-		Description: "Get the current AFK random delay setting",
-		Usage:       "[p]getafkrandomdelay",
-		Flags:       []string{CmdFlagDangerous},
-		Handler:     e.getafkrandomdelay,
-	})
+
 	router.RegisterCmd(&dgc.Command{
 		Name:        "afkrandomdelay",
-		Description: "Set the AFK random delay setting",
-		Usage:       "[p]afkrandomdelay <on/off>",
+		Description: "Get, set or toggle if AFK delay is random",
+		Usage:       "[p]afkrandomdelay <get/set/toggle> [on/off]",
 		Flags:       []string{CmdFlagDangerous},
 		Handler:     e.afkrandomdelay,
 	})
+
 	router.RegisterCmd(&dgc.Command{
-		Name:        "getafkmustbeinactive",
-		Description: "Get the current must be inactive setting",
-		Usage:       "[p]getafkmustbeinactive",
+		Name:        "afkinactive",
+		Description: "Get, set or toggle if AFK messages are only sent when inactive",
+		Usage:       "[p]afkinactive <get/set/toggle> [on/off]",
 		Flags:       []string{CmdFlagDangerous},
-		Handler:     e.getafkmustbeinactive,
+		Handler:     e.afkinactive,
 	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "afkmustbeinactive",
-		Description: "Only send AFK messages when inactive",
-		Usage:       "[p]afkmustbeinactive <on/off>",
-		Flags:       []string{CmdFlagDangerous},
-		Handler:     e.afkmustbeinactive,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "getafkinactivetimeout",
-		Description: "Get the current inactive timeout",
-		Usage:       "[p]getafkinactivetimeout",
-		Flags:       []string{CmdFlagDangerous},
-		Handler:     e.getafkinactivetimeout,
-	})
+
 	router.RegisterCmd(&dgc.Command{
 		Name:        "afkinactivetimeout",
-		Description: "Minimum inactive time before being AFK",
-		Usage:       "[p]afkinactivetimeout <seconds>",
+		Description: "Get or set the timeout before being considered inactive",
+		Usage:       "[p]afkinactivetimeout <get/set> [value]",
 		Flags:       []string{CmdFlagDangerous},
 		Handler:     e.afkinactivetimeout,
 	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "getafktyping",
-		Description: "Get the current AFK typing setting",
-		Usage:       "[p]getafktyping",
-		Flags:       []string{CmdFlagDangerous},
-		Handler:     e.getafktyping,
-	})
+
 	router.RegisterCmd(&dgc.Command{
 		Name:        "afktyping",
-		Description: "Set if the bot should show typing before sending message",
-		Usage:       "[p]afktyping <on/off>",
+		Description: "Get, set or toggle if the AFK Responder should show typing",
+		Usage:       "[p]afktyping <get/set/toggle> [on/off]",
 		Flags:       []string{CmdFlagDangerous},
 		Handler:     e.afktyping,
 	})
+
 	router.RegisterCmd(&dgc.Command{
-		Name:        "getafkairesponse",
-		Description: "Get the current AFK AI response setting",
-		Usage:       "[p]getafkairesponse",
+		Name:        "afkai",
+		Description: "Get, set or toggle if the AFK Responder should use AI",
+		Usage:       "[p]afkai <get/set/toggle> [on/off]",
 		Flags:       []string{CmdFlagDangerous},
-		Handler:     e.getafkairesponse,
+		Handler:     e.afkai,
 	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "afkairesponse",
-		Description: "AI responder will use AI to generate response",
-		Usage:       "[p]afkairesponse <on/off>",
-		Flags:       []string{CmdFlagDangerous},
-		Handler:     e.afkairesponse,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "getafkmessage",
-		Description: "Get the current AFK message",
-		Usage:       "[p]getafkmessage",
-		Flags:       []string{CmdFlagDangerous},
-		Handler:     e.getafkmessage,
-	})
+
 	router.RegisterCmd(&dgc.Command{
 		Name:        "afkmessage",
-		Description: "Set the AFK message",
-		Usage:       "[p]afkmessage <text>",
+		Description: "Get or set the AFK message (or instructions for AI if enabled)",
+		Usage:       "[p]afkmessage <get/set> [value]",
 		Flags:       []string{CmdFlagDangerous},
 		Handler:     e.afkmessage,
 	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "getafktriggertype",
-		Description: "Get the current AFK trigger type",
-		Usage:       "[p]getafktriggertype",
-		Flags:       []string{CmdFlagDangerous},
-		Handler:     e.getafktriggertype,
-	})
+
 	router.RegisterCmd(&dgc.Command{
 		Name:        "afktriggertype",
-		Description: "Set the AFK trigger type",
-		Usage:       "[p]afktriggertype <type>",
+		Description: "Get or set the AFK Triggerlist type",
+		Usage:       "[p]afktriggertype <get/set/values> [type]",
 		Flags:       []string{CmdFlagDangerous},
 		Handler:     e.afktriggertype,
 	})
+
 	router.RegisterCmd(&dgc.Command{
 		Name:        "afktriggerusers",
-		Description: "Add/remove/list users that trigger AFK message",
-		Usage:       "[p]afktriggerusers <add/rm/list> [@user]",
+		Description: "Get, add, remove or clear users that trigger AFK message",
+		Usage:       "[p]afktriggerusers <get/add/rm/clear> [user]",
 		Flags:       []string{CmdFlagDangerous},
 		Handler:     e.afktriggerusers,
 	})
+
 	router.RegisterCmd(&dgc.Command{
 		Name:        "afktriggerservers",
-		Description: "Add/remove/list servers that trigger AFK message",
-		Usage:       "[p]afktriggerservers <add/rm/list> [server id]",
+		Description: "Get, add, remove or clear servers that trigger AFK message",
+		Usage:       "[p]afktriggerservers <get/add/rm/clear> [server id]",
 		Flags:       []string{CmdFlagDangerous},
 		Handler:     e.afktriggerservers,
 	})
@@ -1336,51 +1278,70 @@ func (e EventReactionsCommands) antigroupchat(ctx *dgc.Ctx) {
 	}
 }
 
+func (e EventReactionsCommands) antideletemessages(ctx *dgc.Ctx) {
+	switch strings.ToLower(utils.Arguments["<toggle/list/clear>"]) {
+	case "toggle":
+		channel, success := utils.Discord.TryGetChannelFromMentionWithDefault(ctx, ctx.Arguments.Get(1))
+		if !success {
+			_ = ctx.RespondText("Could not find channel")
+			return
+		}
+
+		e.toggleReaction(ctx, eventreactions.NewAntiDeleteMessages(channel))
+	case "list":
+		reactions := eventreactions.GetAll(eventreactions.ANTI_DELETE_MESSAGES)
+
+		e.mapReactions(ctx, reactions, "There are no anti delete messages.", "Anti Delete Messages")
+	case "clear":
+		eventreactions.RemoveAll(eventreactions.ANTI_DELETE_MESSAGES)
+
+		embed.NewEmbed().
+			SetDescription("Cleared all anti delete messages.").
+			Send(ctx)
+	default:
+		embed.NewEmbed().
+			SetDescription("Invalid toggle/list/clear argument").
+			Send(ctx)
+	}
+}
+
 // AFK
 
-func (EventReactionsCommands) getafkenabled(ctx *dgc.Ctx) {
+func (EventReactionsCommands) afkresponder(ctx *dgc.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
 		_ = ctx.RespondText("Error getting config")
 		return
 	}
 
-	embed.NewEmbed().
-		SetDescription(fmt.Sprintf("AFK responder is currently %s", utils.Misc.FormatBoolOnOff(cfg.AFK.Enabled))).
-		Send(ctx)
-}
+	switch utils.Arguments["<get/set/toggle>"] {
+	case "get":
+		embed.NewEmbed().
+			AddField("AFK Responder", utils.Misc.FormatBoolOnOff(cfg.AFK.Enabled)).
+			Send(ctx)
+	case "set":
+		toggle := strings.ToLower(utils.Arguments["[on/off]"])
+		if toggle != "on" && toggle != "off" {
+			_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
+			return
+		}
 
-func (EventReactionsCommands) afkenabled(ctx *dgc.Ctx) {
-	cfg, err := config.GetConfig()
-	if err != nil {
-		_ = ctx.RespondText("Error getting config")
-		return
+		cfg.AFK.Enabled = toggle == "on"
+		_ = cfg.Save()
+
+		embed.NewEmbed().
+			SetDescription("Turned " + toggle + " AFK Responder").
+			Send(ctx)
+	case "toggle":
+		cfg.AFK.Enabled = !cfg.AFK.Enabled
+		_ = cfg.Save()
+
+		embed.NewEmbed().
+			SetDescription("Turned " + utils.Misc.FormatBoolOnOff(cfg.AFK.Enabled) + " AFK Responder").
+			Send(ctx)
+	default:
+		_ = ctx.RespondText("Invalid <get/set/toggle> argument. Use `get`, `set` or `toggle`.")
 	}
-
-	toggle := strings.ToLower(utils.Arguments["<on/off>"])
-	if toggle != "on" && toggle != "off" {
-		_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
-		return
-	}
-
-	cfg.AFK.Enabled = toggle == "on"
-	_ = cfg.Save()
-
-	embed.NewEmbed().
-		SetDescription("Turned " + toggle + " the AFK responder.").
-		Send(ctx)
-}
-
-func (EventReactionsCommands) getafkonping(ctx *dgc.Ctx) {
-	cfg, err := config.GetConfig()
-	if err != nil {
-		_ = ctx.RespondText("Error getting config")
-		return
-	}
-
-	embed.NewEmbed().
-		SetDescription(fmt.Sprintf("AFK responder is currently %s on pings", utils.Misc.FormatBoolOnOff(cfg.AFK.OnPing))).
-		Send(ctx)
 }
 
 func (EventReactionsCommands) afkonping(ctx *dgc.Ctx) {
@@ -1390,30 +1351,34 @@ func (EventReactionsCommands) afkonping(ctx *dgc.Ctx) {
 		return
 	}
 
-	toggle := strings.ToLower(utils.Arguments["<on/off>"])
-	if toggle != "on" && toggle != "off" {
-		_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
-		return
+	switch utils.Arguments["<get/set/toggle>"] {
+	case "get":
+		embed.NewEmbed().
+			AddField("AFK On Ping", utils.Misc.FormatBoolOnOff(cfg.AFK.OnPing)).
+			Send(ctx)
+	case "set":
+		toggle := strings.ToLower(utils.Arguments["[on/off]"])
+		if toggle != "on" && toggle != "off" {
+			_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
+			return
+		}
+
+		cfg.AFK.OnPing = toggle == "on"
+		_ = cfg.Save()
+
+		embed.NewEmbed().
+			SetDescription("Turned " + toggle + " AFK On Ping").
+			Send(ctx)
+	case "toggle":
+		cfg.AFK.OnPing = !cfg.AFK.OnPing
+		_ = cfg.Save()
+
+		embed.NewEmbed().
+			SetDescription("Turned " + utils.Misc.FormatBoolOnOff(cfg.AFK.OnPing) + " AFK On Ping").
+			Send(ctx)
+	default:
+		_ = ctx.RespondText("Invalid <get/set/toggle> argument. Use `get`, `set` or `toggle`.")
 	}
-
-	cfg.AFK.OnPing = toggle == "on"
-	_ = cfg.Save()
-
-	embed.NewEmbed().
-		SetDescription("Turned " + toggle + " the AFK responder on pings.").
-		Send(ctx)
-}
-
-func (EventReactionsCommands) getafkondm(ctx *dgc.Ctx) {
-	cfg, err := config.GetConfig()
-	if err != nil {
-		_ = ctx.RespondText("Error getting config")
-		return
-	}
-
-	embed.NewEmbed().
-		SetDescription(fmt.Sprintf("AFK responder is currently %s on DMs", utils.Misc.FormatBoolOnOff(cfg.AFK.OnDM))).
-		Send(ctx)
 }
 
 func (EventReactionsCommands) afkondm(ctx *dgc.Ctx) {
@@ -1423,30 +1388,34 @@ func (EventReactionsCommands) afkondm(ctx *dgc.Ctx) {
 		return
 	}
 
-	toggle := strings.ToLower(utils.Arguments["<on/off>"])
-	if toggle != "on" && toggle != "off" {
-		_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
-		return
+	switch utils.Arguments["<get/set/toggle>"] {
+	case "get":
+		embed.NewEmbed().
+			AddField("AFK On DM", utils.Misc.FormatBoolOnOff(cfg.AFK.OnDM)).
+			Send(ctx)
+	case "set":
+		toggle := strings.ToLower(utils.Arguments["[on/off]"])
+		if toggle != "on" && toggle != "off" {
+			_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
+			return
+		}
+
+		cfg.AFK.OnDM = toggle == "on"
+		_ = cfg.Save()
+
+		embed.NewEmbed().
+			SetDescription("Turned " + toggle + " AFK On DM").
+			Send(ctx)
+	case "toggle":
+		cfg.AFK.OnDM = !cfg.AFK.OnDM
+		_ = cfg.Save()
+
+		embed.NewEmbed().
+			SetDescription("Turned " + utils.Misc.FormatBoolOnOff(cfg.AFK.OnDM) + " AFK On DM").
+			Send(ctx)
+	default:
+		_ = ctx.RespondText("Invalid <get/set/toggle> argument. Use `get`, `set` or `toggle`.")
 	}
-
-	cfg.AFK.OnDM = toggle == "on"
-	_ = cfg.Save()
-
-	embed.NewEmbed().
-		SetDescription("Turned " + toggle + " the AFK responder on DMs.").
-		Send(ctx)
-}
-
-func (EventReactionsCommands) getafkdelay(ctx *dgc.Ctx) {
-	cfg, err := config.GetConfig()
-	if err != nil {
-		_ = ctx.RespondText("Error getting config")
-		return
-	}
-
-	embed.NewEmbed().
-		SetDescription(fmt.Sprintf("AFK delay is currently %d seconds", cfg.AFK.Delay)).
-		Send(ctx)
 }
 
 func (EventReactionsCommands) afkdelay(ctx *dgc.Ctx) {
@@ -1456,30 +1425,31 @@ func (EventReactionsCommands) afkdelay(ctx *dgc.Ctx) {
 		return
 	}
 
-	delay, err := strconv.Atoi(utils.Arguments["<seconds>"])
-	if err != nil {
-		_ = ctx.RespondText("Argument <seconds> must be a number.")
-		return
+	switch utils.Arguments["<get/set>"] {
+	case "get":
+		formatted := utils.Misc.FormatDuration(time.Duration(cfg.AFK.Delay) * time.Second)
+
+		embed.NewEmbed().
+			AddField("AFK Delay", formatted).
+			Send(ctx)
+	case "set":
+		delay, err := utils.Misc.ParseDuration(utils.Arguments["[value]"])
+		if err != nil {
+			_ = ctx.RespondText("Invalid duration: " + err.Error())
+			return
+		}
+
+		cfg.AFK.Delay = int(delay.Seconds())
+		_ = cfg.Save()
+
+		formatted := utils.Misc.FormatDuration(time.Duration(cfg.AFK.Delay) * time.Second)
+
+		embed.NewEmbed().
+			SetDescription(fmt.Sprintf("AFK Delay set to %s.", formatted)).
+			Send(ctx)
+	default:
+		_ = ctx.RespondText("Invalid <get/set> argument. Use `get` or `set`.")
 	}
-
-	cfg.AFK.Delay = delay
-	_ = cfg.Save()
-
-	embed.NewEmbed().
-		SetDescription(fmt.Sprintf("AFK delay set to %d seconds", delay)).
-		Send(ctx)
-}
-
-func (EventReactionsCommands) getafkrandomdelay(ctx *dgc.Ctx) {
-	cfg, err := config.GetConfig()
-	if err != nil {
-		_ = ctx.RespondText("Error getting config")
-		return
-	}
-
-	embed.NewEmbed().
-		SetDescription(fmt.Sprintf("AFK random delay is currently %s", utils.Misc.FormatBoolOnOff(cfg.AFK.RandomDelay))).
-		Send(ctx)
 }
 
 func (EventReactionsCommands) afkrandomdelay(ctx *dgc.Ctx) {
@@ -1489,63 +1459,71 @@ func (EventReactionsCommands) afkrandomdelay(ctx *dgc.Ctx) {
 		return
 	}
 
-	toggle := strings.ToLower(utils.Arguments["<on/off>"])
-	if toggle != "on" && toggle != "off" {
-		_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
-		return
+	switch utils.Arguments["<get/set/toggle>"] {
+	case "get":
+		embed.NewEmbed().
+			AddField("AFK Random Delay", utils.Misc.FormatBoolOnOff(cfg.AFK.RandomDelay)).
+			Send(ctx)
+	case "set":
+		toggle := strings.ToLower(utils.Arguments["[on/off]"])
+		if toggle != "on" && toggle != "off" {
+			_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
+			return
+		}
+
+		cfg.AFK.RandomDelay = toggle == "on"
+		_ = cfg.Save()
+
+		embed.NewEmbed().
+			SetDescription("Turned " + toggle + " AFK Random Delay").
+			Send(ctx)
+	case "toggle":
+		cfg.AFK.RandomDelay = !cfg.AFK.RandomDelay
+		_ = cfg.Save()
+
+		embed.NewEmbed().
+			SetDescription("Turned " + utils.Misc.FormatBoolOnOff(cfg.AFK.RandomDelay) + " AFK Random Delay").
+			Send(ctx)
+	default:
+		_ = ctx.RespondText("Invalid <get/set/toggle> argument. Use `get`, `set` or `toggle`.")
 	}
-
-	cfg.AFK.RandomDelay = toggle == "on"
-	_ = cfg.Save()
-
-	embed.NewEmbed().
-		SetDescription("Turned " + toggle + " random delay.").
-		Send(ctx)
 }
 
-func (EventReactionsCommands) getafkmustbeinactive(ctx *dgc.Ctx) {
+func (EventReactionsCommands) afkinactive(ctx *dgc.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
 		_ = ctx.RespondText("Error getting config")
 		return
 	}
 
-	embed.NewEmbed().
-		SetDescription(fmt.Sprintf("AFK must be inactive is currently %s", utils.Misc.FormatBoolOnOff(cfg.AFK.MustBeInactive))).
-		Send(ctx)
-}
+	switch utils.Arguments["<get/set/toggle>"] {
+	case "get":
+		embed.NewEmbed().
+			AddField("AFK Must Be Inactive", utils.Misc.FormatBoolOnOff(cfg.AFK.MustBeInactive)).
+			Send(ctx)
+	case "set":
+		toggle := strings.ToLower(utils.Arguments["[on/off]"])
+		if toggle != "on" && toggle != "off" {
+			_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
+			return
+		}
 
-func (EventReactionsCommands) afkmustbeinactive(ctx *dgc.Ctx) {
-	cfg, err := config.GetConfig()
-	if err != nil {
-		_ = ctx.RespondText("Error getting config")
-		return
+		cfg.AFK.MustBeInactive = toggle == "on"
+		_ = cfg.Save()
+
+		embed.NewEmbed().
+			SetDescription("Turned " + toggle + " AFK Must Be Inactive").
+			Send(ctx)
+	case "toggle":
+		cfg.AFK.MustBeInactive = !cfg.AFK.MustBeInactive
+		_ = cfg.Save()
+
+		embed.NewEmbed().
+			SetDescription("Turned " + utils.Misc.FormatBoolOnOff(cfg.AFK.MustBeInactive) + " AFK Must Be Inactive").
+			Send(ctx)
+	default:
+		_ = ctx.RespondText("Invalid <get/set/toggle> argument. Use `get`, `set` or `toggle`.")
 	}
-
-	toggle := strings.ToLower(utils.Arguments["<on/off>"])
-	if toggle != "on" && toggle != "off" {
-		_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
-		return
-	}
-
-	cfg.AFK.MustBeInactive = toggle == "on"
-	_ = cfg.Save()
-
-	embed.NewEmbed().
-		SetDescription("Turned " + toggle + " must be inactive.").
-		Send(ctx)
-}
-
-func (EventReactionsCommands) getafkinactivetimeout(ctx *dgc.Ctx) {
-	cfg, err := config.GetConfig()
-	if err != nil {
-		_ = ctx.RespondText("Error getting config")
-		return
-	}
-
-	embed.NewEmbed().
-		SetDescription(fmt.Sprintf("AFK inactive timeout is currently %d seconds", cfg.AFK.InactiveTimeout)).
-		Send(ctx)
 }
 
 func (EventReactionsCommands) afkinactivetimeout(ctx *dgc.Ctx) {
@@ -1555,30 +1533,31 @@ func (EventReactionsCommands) afkinactivetimeout(ctx *dgc.Ctx) {
 		return
 	}
 
-	timeout, err := strconv.Atoi(utils.Arguments["<seconds>"])
-	if err != nil {
-		_ = ctx.RespondText("Argument <seconds> must be a number.")
-		return
+	switch utils.Arguments["<get/set>"] {
+	case "get":
+		formatted := utils.Misc.FormatDuration(time.Duration(cfg.AFK.InactiveTimeout) * time.Second)
+
+		embed.NewEmbed().
+			AddField("AFK Inactive Timeout", formatted).
+			Send(ctx)
+	case "set":
+		delay, err := utils.Misc.ParseDuration(utils.Arguments["[value]"])
+		if err != nil {
+			_ = ctx.RespondText("Invalid duration: " + err.Error())
+			return
+		}
+
+		cfg.AFK.InactiveTimeout = int(delay.Seconds())
+		_ = cfg.Save()
+
+		formatted := utils.Misc.FormatDuration(time.Duration(cfg.AFK.InactiveTimeout) * time.Second)
+
+		embed.NewEmbed().
+			SetDescription(fmt.Sprintf("AFK Inactive Timeout set to %s.", formatted)).
+			Send(ctx)
+	default:
+		_ = ctx.RespondText("Invalid <get/set> argument. Use `get` or `set`.")
 	}
-
-	cfg.AFK.InactiveTimeout = timeout
-	_ = cfg.Save()
-
-	embed.NewEmbed().
-		SetDescription(fmt.Sprintf("AFK inactive timeout set to %d seconds", timeout)).
-		Send(ctx)
-}
-
-func (EventReactionsCommands) getafktyping(ctx *dgc.Ctx) {
-	cfg, err := config.GetConfig()
-	if err != nil {
-		_ = ctx.RespondText("Error getting config")
-		return
-	}
-
-	embed.NewEmbed().
-		SetDescription(fmt.Sprintf("AFK typing is currently %s", utils.Misc.FormatBoolOnOff(cfg.AFK.Typing))).
-		Send(ctx)
 }
 
 func (EventReactionsCommands) afktyping(ctx *dgc.Ctx) {
@@ -1588,63 +1567,71 @@ func (EventReactionsCommands) afktyping(ctx *dgc.Ctx) {
 		return
 	}
 
-	toggle := strings.ToLower(utils.Arguments["<on/off>"])
-	if toggle != "on" && toggle != "off" {
-		_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
-		return
+	switch utils.Arguments["<get/set/toggle>"] {
+	case "get":
+		embed.NewEmbed().
+			AddField("AFK Typing", utils.Misc.FormatBoolOnOff(cfg.AFK.Typing)).
+			Send(ctx)
+	case "set":
+		toggle := strings.ToLower(utils.Arguments["[on/off]"])
+		if toggle != "on" && toggle != "off" {
+			_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
+			return
+		}
+
+		cfg.AFK.Typing = toggle == "on"
+		_ = cfg.Save()
+
+		embed.NewEmbed().
+			SetDescription("Turned " + toggle + " AFK Typing").
+			Send(ctx)
+	case "toggle":
+		cfg.AFK.Typing = !cfg.AFK.Typing
+		_ = cfg.Save()
+
+		embed.NewEmbed().
+			SetDescription("Turned " + utils.Misc.FormatBoolOnOff(cfg.AFK.Typing) + " AFK Typing").
+			Send(ctx)
+	default:
+		_ = ctx.RespondText("Invalid <get/set/toggle> argument. Use `get`, `set` or `toggle`.")
 	}
-
-	cfg.AFK.Typing = toggle == "on"
-	_ = cfg.Save()
-
-	embed.NewEmbed().
-		SetDescription("Turned " + toggle + " typing.").
-		Send(ctx)
 }
 
-func (EventReactionsCommands) getafkairesponse(ctx *dgc.Ctx) {
+func (EventReactionsCommands) afkai(ctx *dgc.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
 		_ = ctx.RespondText("Error getting config")
 		return
 	}
 
-	embed.NewEmbed().
-		SetDescription(fmt.Sprintf("AFK AI response is currently %s", utils.Misc.FormatBoolOnOff(cfg.AFK.Typing))).
-		Send(ctx)
-}
+	switch utils.Arguments["<get/set/toggle>"] {
+	case "get":
+		embed.NewEmbed().
+			AddField("AFK AI Response", utils.Misc.FormatBoolOnOff(cfg.AFK.AI)).
+			Send(ctx)
+	case "set":
+		toggle := strings.ToLower(utils.Arguments["[on/off]"])
+		if toggle != "on" && toggle != "off" {
+			_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
+			return
+		}
 
-func (EventReactionsCommands) afkairesponse(ctx *dgc.Ctx) {
-	cfg, err := config.GetConfig()
-	if err != nil {
-		_ = ctx.RespondText("Error getting config")
-		return
+		cfg.AFK.AI = toggle == "on"
+		_ = cfg.Save()
+
+		embed.NewEmbed().
+			SetDescription("Turned " + toggle + " AFK AI Response").
+			Send(ctx)
+	case "toggle":
+		cfg.AFK.AI = !cfg.AFK.AI
+		_ = cfg.Save()
+
+		embed.NewEmbed().
+			SetDescription("Turned " + utils.Misc.FormatBoolOnOff(cfg.AFK.AI) + " AFK AI Response").
+			Send(ctx)
+	default:
+		_ = ctx.RespondText("Invalid <get/set/toggle> argument. Use `get`, `set` or `toggle`.")
 	}
-
-	toggle := strings.ToLower(utils.Arguments["<on/off>"])
-	if toggle != "on" && toggle != "off" {
-		_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
-		return
-	}
-
-	cfg.AFK.AI = toggle == "on"
-	_ = cfg.Save()
-
-	embed.NewEmbed().
-		SetDescription("Turned " + toggle + " AI response.").
-		Send(ctx)
-}
-
-func (EventReactionsCommands) getafkmessage(ctx *dgc.Ctx) {
-	cfg, err := config.GetConfig()
-	if err != nil {
-		_ = ctx.RespondText("Error getting config")
-		return
-	}
-
-	embed.NewEmbed().
-		SetDescription("AFK message is currently " + cfg.AFK.Message).
-		Send(ctx)
 }
 
 func (EventReactionsCommands) afkmessage(ctx *dgc.Ctx) {
@@ -1654,24 +1641,23 @@ func (EventReactionsCommands) afkmessage(ctx *dgc.Ctx) {
 		return
 	}
 
-	cfg.AFK.Message = ctx.Arguments.Raw()
-	_ = cfg.Save()
+	switch utils.Arguments["<get/set>"] {
+	case "get":
+		embed.NewEmbed().
+			AddField("AFK Message", cfg.AFK.Message).
+			Send(ctx)
+	case "set":
+		value := utils.String.RemoveWords(ctx.Arguments.Raw(), 1)
 
-	embed.NewEmbed().
-		SetDescription("AFK message set to " + cfg.AFK.Message).
-		Send(ctx)
-}
+		cfg.AFK.Message = value
+		_ = cfg.Save()
 
-func (EventReactionsCommands) getafktriggertype(ctx *dgc.Ctx) {
-	cfg, err := config.GetConfig()
-	if err != nil {
-		_ = ctx.RespondText("Error getting config")
-		return
+		embed.NewEmbed().
+			SetDescription("AFK Message set to " + value).
+			Send(ctx)
+	default:
+		_ = ctx.RespondText("Invalid <get/set> argument. Use `get` or `set`.")
 	}
-
-	embed.NewEmbed().
-		SetDescription("AFK trigger type is currently " + cfg.AFK.TriggerList.Type).
-		Send(ctx)
 }
 
 func (EventReactionsCommands) afktriggertype(ctx *dgc.Ctx) {
@@ -1681,18 +1667,38 @@ func (EventReactionsCommands) afktriggertype(ctx *dgc.Ctx) {
 		return
 	}
 
-	arg := strings.ToLower(utils.Arguments["<type>"])
-	if !utils.SliceContains([]string{"global", "whitelist", "blacklist"}, arg) {
-		_ = ctx.RespondText("Invalid value. Use `Global`, `Whitelist`, or `Blacklist`.")
-		return
+	switch utils.Arguments["<get/set/values>"] {
+	case "get":
+		embed.NewEmbed().
+			AddField("AFK Trigger Type", cfg.AFK.TriggerList.Type).
+			Send(ctx)
+	case "set":
+		value := strings.ToLower(utils.Arguments["[type]"])
+
+		switch value {
+		case "global":
+			cfg.AFK.TriggerList.Type = "Global"
+		case "whitelist":
+			cfg.AFK.TriggerList.Type = "Whitelist"
+		case "blacklist":
+			cfg.AFK.TriggerList.Type = "Blacklist"
+		default:
+			_ = ctx.RespondText("Invalid trigger type. Use `[p]afktriggertype values` to get a list of available types.")
+			return
+		}
+
+		_ = cfg.Save()
+
+		embed.NewEmbed().
+			SetDescription("AFK Trigger Type set to " + cfg.Selfbot.Client).
+			Send(ctx)
+	case "values":
+		embed.NewEmbed().
+			SetDescription("Available AFK Trigger Type values: `Global`, `Whitelist`, `Blacklist`.").
+			Send(ctx)
+	default:
+		_ = ctx.RespondText("Invalid <get/set/values> argument. Use `get` or `set` or `values`.")
 	}
-
-	cfg.AFK.TriggerList.Type = utils.String.Capitalize(arg)
-	_ = cfg.Save()
-
-	embed.NewEmbed().
-		SetDescription("AFK trigger type set to " + cfg.AFK.Message).
-		Send(ctx)
 }
 
 func (EventReactionsCommands) afktriggerusers(ctx *dgc.Ctx) {
@@ -1702,7 +1708,26 @@ func (EventReactionsCommands) afktriggerusers(ctx *dgc.Ctx) {
 		return
 	}
 
-	switch strings.ToLower(utils.Arguments["<add/rm/list>"]) {
+	switch strings.ToLower(utils.Arguments["<get/add/rm/clear>"]) {
+	case "get":
+		userString := ""
+		for _, userID := range cfg.AFK.TriggerList.Users {
+			user, ok := utils.Discord.GetUser(ctx.Session, userID)
+			if !ok {
+				userString += fmt.Sprintf("%s - %s\n", "Unknown", userID)
+				continue
+			}
+
+			userString += fmt.Sprintf("%s - %s\n", user.Username, userID)
+		}
+
+		if userString == "" {
+			userString = "No users set."
+		}
+
+		embed.NewEmbed().
+			AddField("AFK Triggerlist Users", userString).
+			Send(ctx)
 	case "add":
 		user, ok := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(1))
 		if !ok {
@@ -1712,16 +1737,18 @@ func (EventReactionsCommands) afktriggerusers(ctx *dgc.Ctx) {
 			return
 		}
 
-		cfg.AFK.TriggerList.Users = append(cfg.AFK.TriggerList.Users, user.ID)
-
-		err = cfg.Save()
-		if err != nil {
-			embed.NewEmbed().
-				SetDescription("Error saving config: " + err.Error()).
-				Send(ctx)
+		if utils.SliceContains(cfg.AFK.TriggerList.Users, user.ID) {
+			_ = ctx.RespondText("User is already in the AFK Triggerlist.")
 			return
 		}
 
+		cfg.AFK.TriggerList.Users = append(cfg.AFK.TriggerList.Users, user.ID)
+
+		_ = cfg.Save()
+
+		embed.NewEmbed().
+			SetDescription(fmt.Sprintf("Added %s to the AFK Triggerlist.", user.Mention())).
+			Send(ctx)
 	case "rm":
 		user, ok := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(1))
 		if !ok {
@@ -1731,35 +1758,27 @@ func (EventReactionsCommands) afktriggerusers(ctx *dgc.Ctx) {
 			return
 		}
 
-		cfg.AFK.TriggerList.Users = utils.RemoveSliceItem(cfg.AFK.TriggerList.Users, user.ID)
-
-		err = cfg.Save()
-		if err != nil {
-			embed.NewEmbed().
-				SetDescription("Error saving config: " + err.Error()).
-				Send(ctx)
+		if !utils.SliceContains(cfg.AFK.TriggerList.Users, user.ID) {
+			_ = ctx.RespondText("User already isn't in the AFK Triggerlist.")
 			return
 		}
-	case "list":
-		var users []string
 
-		for _, id := range cfg.AFK.TriggerList.Users {
-			user, ok := utils.Discord.GetUser(ctx.Session, id)
-			if ok {
-				users = append(users, "- "+user.Username+" ("+id+")")
-			} else {
-				users = append(users, "- "+id)
-			}
-		}
+		cfg.AFK.TriggerList.Users = utils.RemoveSliceItem(cfg.AFK.TriggerList.Users, user.ID)
+
+		_ = cfg.Save()
 
 		embed.NewEmbed().
-			AddField("AFK Trigger Users", strings.Join(users, "\n")).
+			SetDescription(fmt.Sprintf("Removed %s from the AFK Triggerlist.", user.Mention())).
 			Send(ctx)
+	case "clear":
+		cfg.AFK.TriggerList.Users = []string{}
+		_ = cfg.Save()
 
+		embed.NewEmbed().
+			SetDescription("Cleared all users from the AFK Triggerlist.").
+			Send(ctx)
 	default:
-		embed.NewEmbed().
-			SetDescription("Invalid add/rm/list argument.").
-			Send(ctx)
+		_ = ctx.RespondText("Invalid <get/add/rm/clear> argument. Use `get`, `add`, `rm`, or `clear`.")
 	}
 }
 
@@ -1770,7 +1789,23 @@ func (EventReactionsCommands) afktriggerservers(ctx *dgc.Ctx) {
 		return
 	}
 
-	switch strings.ToLower(utils.Arguments["<add/rm/list>"]) {
+	switch strings.ToLower(utils.Arguments["<get/add/rm/clear>"]) {
+	case "get":
+		var servers []string
+
+		for _, serverID := range cfg.AFK.TriggerList.Servers {
+			guild, err := utils.Discord.GetGuild(ctx.Session, serverID)
+			if err != nil {
+				servers = append(servers, serverID)
+				continue
+			}
+
+			servers = append(servers, guild.Name+" ("+guild.ID+")")
+		}
+
+		embed.NewEmbed().
+			AddField("AFK Triggerlist Servers", strings.Join(servers, ", ")).
+			Send(ctx)
 	case "add":
 		guild, err := utils.Discord.GetGuild(ctx.Session, utils.Misc.Or(utils.Arguments["[server id]"], ctx.Event.GuildID))
 		if err != nil {
@@ -1780,16 +1815,18 @@ func (EventReactionsCommands) afktriggerservers(ctx *dgc.Ctx) {
 			return
 		}
 
-		cfg.AFK.TriggerList.Servers = append(cfg.AFK.TriggerList.Servers, guild.ID)
-
-		err = cfg.Save()
-		if err != nil {
-			embed.NewEmbed().
-				SetDescription("Error saving config: " + err.Error()).
-				Send(ctx)
+		if utils.SliceContains(cfg.AFK.TriggerList.Servers, guild.ID) {
+			_ = ctx.RespondText(fmt.Sprintf("Server %s is already in the AFK Triggerlist!", guild.Name))
 			return
 		}
 
+		cfg.AFK.TriggerList.Servers = append(cfg.AFK.TriggerList.Servers, guild.ID)
+
+		_ = cfg.Save()
+
+		embed.NewEmbed().
+			SetDescription(fmt.Sprintf("Added %s to the AFK Triggerlist.", guild.Name)).
+			Send(ctx)
 	case "rm":
 		guild, err := utils.Discord.GetGuild(ctx.Session, utils.Misc.Or(utils.Arguments["[server id]"], ctx.Event.GuildID))
 		if err != nil {
@@ -1799,33 +1836,26 @@ func (EventReactionsCommands) afktriggerservers(ctx *dgc.Ctx) {
 			return
 		}
 
-		cfg.AFK.TriggerList.Servers = utils.RemoveSliceItem(cfg.AFK.TriggerList.Servers, guild.ID)
-
-		err = cfg.Save()
-		if err != nil {
-			embed.NewEmbed().
-				SetDescription("Error saving config: " + err.Error()).
-				Send(ctx)
+		if !utils.SliceContains(cfg.AFK.TriggerList.Servers, guild.ID) {
+			_ = ctx.RespondText(fmt.Sprintf("Server %s already isn't in the AFK Triggerlist!", guild.Name))
 			return
 		}
-	case "list":
-		var servers []string
 
-		for _, s := range cfg.AFK.TriggerList.Servers {
-			if name := utils.Discord.GetGuildName(ctx.Session, s); name != "No Server" {
-				servers = append(servers, "- "+name+" ("+s+")")
-			} else {
-				servers = append(servers, "- "+s)
-			}
-		}
+		cfg.AFK.TriggerList.Servers = utils.RemoveSliceItem(cfg.AFK.TriggerList.Servers, guild.ID)
+
+		_ = cfg.Save()
 
 		embed.NewEmbed().
-			AddField("AFK Trigger Servers", strings.Join(servers, "\n")).
+			SetDescription(fmt.Sprintf("Removed %s from the AFK Triggerlist.", guild.Name)).
 			Send(ctx)
+	case "clear":
+		cfg.AFK.TriggerList.Servers = []string{}
+		_ = cfg.Save()
 
+		embed.NewEmbed().
+			SetDescription("Cleared all servers from the AFK Triggerlist.").
+			Send(ctx)
 	default:
-		embed.NewEmbed().
-			SetDescription("Invalid add/rm/list argument.").
-			Send(ctx)
+		_ = ctx.RespondText("Invalid <get/add/rm/clear> argument. Use `get`, `add`, `rm`, or `clear`.")
 	}
 }

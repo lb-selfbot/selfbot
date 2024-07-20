@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"net/url"
 	"strings"
 	"time"
 
@@ -460,26 +459,6 @@ func (e *Embed) ToIndent() []string {
 	return append(strings_, newStr)
 }
 
-func (e *Embed) URLEmbedGen(urlEmbed api.URLEmbed) string {
-	const host = "https://embed.ched.rip/api/embed?"
-
-	values := url.Values{
-		"title":         {urlEmbed.Title},
-		"description":   {urlEmbed.Description},
-		"url":           {urlEmbed.URL},
-		"color":         {urlEmbed.Color},
-		"image":         {urlEmbed.Image},
-		"large":         {fmt.Sprintf("%t", urlEmbed.Large)},
-		"video":         {urlEmbed.Video},
-		"provider_name": {urlEmbed.ProviderName},
-		"provider_url":  {urlEmbed.ProviderURL},
-		"author_name":   {urlEmbed.AuthorName},
-		"author_url":    {urlEmbed.AuthorURL},
-	}
-
-	return host + values.Encode()
-}
-
 func (e *Embed) ToURLEmbed() []string {
 	// Generate description
 	description := ""
@@ -514,15 +493,17 @@ func (e *Embed) ToURLEmbed() []string {
 
 	descriptions = append(descriptions, current)
 
+	cfg, _ := config.GetConfig()
+
 	// Generate embeds
 	embeds := []api.URLEmbed{}
 
 	embeds = append(embeds, api.URLEmbed{
 		Title:       e.Title,
 		Description: descriptions[0],
-		URL:         "https://lightning-bot.com/",
-		Color:       "3990c1",
-		Image:       "https://lightning-bot.com/logo.png",
+		URL:         utils.Misc.Or(cfg.Selfbot.EmbedURL, "https://lightning-bot.com/"),
+		Color:       utils.Misc.Or(cfg.Selfbot.EmbedColor, "3990c1"),
+		Image:       utils.Misc.Or(cfg.Selfbot.EmbedImage, "https://lightning-bot.com/logo.png"),
 	})
 
 	if e.Author != nil {
@@ -533,7 +514,7 @@ func (e *Embed) ToURLEmbed() []string {
 	for _, description := range descriptions[1:] {
 		embeds = append(embeds, api.URLEmbed{
 			Description: description,
-			Color:       "3990c1",
+			Color:       utils.Misc.Or(cfg.Selfbot.EmbedColor, "3990c1"),
 		})
 	}
 
@@ -673,7 +654,7 @@ func (e *Embed) sendWebhookEmbed(ctx *dgc.Ctx) error {
 	return err
 }
 
-func (e *Embed) SendWebhook(webhookUrl string) *http.HttpResponse {
+func (e *Embed) SendWebhook(webhookUrl string, important bool) *http.HttpResponse {
 	cfg, err := config.GetConfig()
 	if err != nil {
 		return &http.HttpResponse{Error: err}
@@ -681,12 +662,32 @@ func (e *Embed) SendWebhook(webhookUrl string) *http.HttpResponse {
 
 	content := ""
 
-	if cfg.Webhooks.PingSelf {
+	switch cfg.Webhooks.PingSelfMode {
+	case "Disabled":
+		break
+	case "Always":
 		content += "<@!" + data.UserID + ">\n"
+	case "Important":
+		if important {
+			content += "<@!" + data.UserID + ">\n"
+		}
+	default:
+		cfg.Webhooks.PingSelfMode = "Disabled"
+		_ = cfg.Save()
 	}
 
-	if cfg.Webhooks.PingEveryone {
+	switch cfg.Webhooks.PingEveryoneMode {
+	case "Disabled":
+		break
+	case "Always":
 		content += "@everyone\n"
+	case "Important":
+		if important {
+			content += "@everyone\n"
+		}
+	default:
+		cfg.Webhooks.PingEveryoneMode = "Disabled"
+		_ = cfg.Save()
 	}
 
 	return http.Post(webhookUrl, map[string]any{

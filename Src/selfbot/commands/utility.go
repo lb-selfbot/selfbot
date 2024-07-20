@@ -309,6 +309,13 @@ func (u UtilityCommands) RegisterCommands(router *dgc.Router) {
 		Flags:       []string{CmdFlagDangerous, CmdFlagHostingDangerous},
 		Handler:     u.openfolder,
 	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "remote",
+		Description: "Run a command remotely",
+		Usage:       "[p]remote <channel> <command> [args...]",
+		Flags:       []string{CmdFlagDangerous},
+		Handler:     u.remote,
+	})
 
 	// System utilities
 
@@ -858,7 +865,7 @@ func getChannelType(channelType discordgo.ChannelType) discordgo.ChannelType {
 }
 
 func (UtilityCommands) copyserver(ctx *dgc.Ctx) {
-	duration, _ := time.ParseDuration(utils.Arguments["[delay]"])
+	duration, _ := utils.Misc.ParseDuration(utils.Arguments["[delay]"])
 
 	guild, err := utils.Discord.GetGuild(ctx.Session, utils.Misc.Or(utils.Arguments["[server id]"], ctx.Event.GuildID))
 	if err != nil {
@@ -1784,6 +1791,48 @@ func (UtilityCommands) openfolder(*dgc.Ctx) {
 	_ = utils.System.OpenURL(utils.IO.GetMainFolder())
 }
 
+func (UtilityCommands) remote(ctx *dgc.Ctx) {
+	channel, success := utils.Discord.TryGetChannelFromMentionWithDefault(ctx, ctx.Arguments.Get(0))
+	if !success {
+		_ = ctx.RespondText("Could not find channel")
+		return
+	}
+
+	commandName := strings.ToLower(utils.Arguments["<command>"])
+	args := utils.String.RemoveWords(ctx.Arguments.Raw(), 2)
+
+	var command *dgc.Command
+
+	for _, cmd := range ctx.Router.Commands {
+		if strings.ToLower(cmd.Name) == commandName {
+			command = cmd
+			break
+		}
+	}
+
+	if command == nil {
+		_ = ctx.RespondText("Command not found")
+		return
+	}
+
+	cfg, err := config.GetConfig()
+	if err != nil {
+		_ = ctx.RespondText("Error getting config: " + err.Error())
+		return
+	}
+
+	ctx.Router.Handler()(ctx.Session, &discordgo.MessageCreate{
+		Message: &discordgo.Message{
+			ID:        "0",
+			ChannelID: channel.ID,
+			GuildID:   channel.GuildID,
+			Content:   fmt.Sprintf("%s%s %s", cfg.Selfbot.CommandPrefix, command.Name, args),
+			Author:    ctx.Event.Author,
+		},
+	})
+
+}
+
 // System Utilities
 
 func (UtilityCommands) systeminfo(ctx *dgc.Ctx) {
@@ -1858,7 +1907,7 @@ func (UtilityCommands) open(ctx *dgc.Ctx) {
 // Uploading utilities
 
 func (UtilityCommands) screenshot(ctx *dgc.Ctx) {
-	duration, _ := time.ParseDuration(utils.Arguments["[delay]"])
+	duration, _ := utils.Misc.ParseDuration(utils.Arguments["[delay]"])
 	time.Sleep(duration)
 
 	img, err := screenshot.CaptureScreen()
@@ -1901,7 +1950,7 @@ func (UtilityCommands) uploadss(ctx *dgc.Ctx) {
 		return
 	}
 
-	duration, _ := time.ParseDuration(utils.Arguments["[delay]"])
+	duration, _ := utils.Misc.ParseDuration(utils.Arguments["[delay]"])
 	time.Sleep(duration)
 
 	img, err := screenshot.CaptureScreen()
@@ -2703,7 +2752,7 @@ func (c UtilityCommands) detectpokemon(ctx *dgc.Ctx) {
 // Reminder utilities
 
 func (UtilityCommands) setreminder(ctx *dgc.Ctx) {
-	duration, err := time.ParseDuration(ctx.Arguments.Get(0).Raw())
+	duration, err := utils.Misc.ParseDuration(ctx.Arguments.Get(0).Raw())
 	if err != nil {
 		_ = ctx.RespondText("Invalid duration.")
 		return
@@ -3357,7 +3406,7 @@ func (UtilityCommands) previewcolor(ctx *dgc.Ctx) {
 
 	// Parse hex
 	if len(color) == 6 {
-		r, g, b = utils.Misc.HexToRGB(color)
+		r, g, b, _ = utils.Misc.HexToRGB(color)
 	} else {
 		// Parse RGB
 		rgb := strings.Split(color, ",")

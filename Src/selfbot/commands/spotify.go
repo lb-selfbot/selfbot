@@ -5,7 +5,6 @@ import (
 	"net/url"
 	"strconv"
 	"strings"
-	"time"
 
 	"github.com/LightningDev1/LB-Selfbot/selfbot/embed"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/http"
@@ -74,20 +73,6 @@ func (s SpotifyCommands) RegisterCommands(router *dgc.Router) {
 		Usage:       "[p]svolume <volume>",
 		Flags:       []string{CmdFlagDangerous},
 		Handler:     s.svolume,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "spresence",
-		Description: "Set a fake Spotify presence (use simageid command for image id)",
-		Usage:       "[p]spresence <on/off> [\"artist\"] [\"song\"] [\"album\"] [image id]",
-		Flags:       []string{CmdFlagDangerous},
-		Handler:     s.spresence,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "simageid",
-		Description: "Get an image id for the spresence command",
-		Usage:       "[p]simageid <song name>",
-		Flags:       []string{CmdFlagDangerous},
-		Handler:     s.simageid,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "sshuffle",
@@ -367,80 +352,6 @@ func (s SpotifyCommands) svolume(ctx *dgc.Ctx) {
 	)
 
 	s.HandleRequest(ctx, httpResponse, fmt.Sprintf("Successfully set volume to: %s.", volumeStr))
-
-}
-
-func (s SpotifyCommands) spresence(ctx *dgc.Ctx) {
-	toggle := strings.ToLower(utils.Arguments["<on/off>"]) == "on"
-
-	if !toggle {
-		_ = ctx.Session.UpdateStatusComplex(discordgo.UpdateStatusData{
-			Game: &discordgo.Activity{
-				Type: discordgo.ActivityType(4),
-			},
-			Activities: []*discordgo.Activity{},
-			AFK:        true,
-			Status:     sessions.Status,
-		})
-		return
-	}
-
-	imageID := utils.Json.Escape(utils.Arguments["[image id]"])
-	if imageID == "" {
-		imageID = "ab67616d0000b2735755e164993798e0c9ef7d7a"
-	}
-
-	_ = ctx.Session.UpdateStatusComplex(discordgo.UpdateStatusData{
-		Activities: []*discordgo.Activity{{
-			Type: discordgo.ActivityType(2),
-			Name: "Spotify",
-			Assets: &discordgo.Assets{
-				LargeImageID: "spotify:" + imageID,
-				LargeText:    utils.Arguments["[\"album\"]"],
-			},
-			Details: utils.Arguments["[\"song\"]"],
-			State:   utils.Arguments["[\"artist\"]"],
-			Timestamps: &discordgo.TimeStamps{
-				StartTimestamp: time.Now().Unix() - 4140000,
-				EndTimestamp:   time.Now().Unix() - 3880000,
-			},
-			Party: &discordgo.Party{
-				ID: "spotify:" + ctx.Session.State.User.ID,
-			},
-			Flags: 48,
-		}},
-		AFK:    true,
-		Status: sessions.Status,
-	})
-}
-
-func (s SpotifyCommands) simageid(ctx *dgc.Ctx) {
-	bearerToken, success := s.GetBearerToken(ctx)
-	if !success {
-		return
-	}
-
-	headers := map[string]string{"Authorization": bearerToken}
-
-	searchUrl := fmt.Sprintf("https://api.spotify.com/v1/search?q=%s&type=track", url.QueryEscape(ctx.Arguments.Raw()))
-
-	httpResponse := http.Get(searchUrl, headers)
-	json := httpResponse.Json()
-
-	song := json.GetPath("tracks", "items").GetIndex(0)
-
-	imageUrl := song.Get("album").Get("images").GetIndex(0).Get("url").MustString()
-	if httpResponse.Error != nil || imageUrl == "" {
-		_ = ctx.RespondText("A Spotify error occured: Song not found.")
-		return
-	}
-
-	splitUrl := strings.Split(imageUrl, "/")
-
-	embed.NewEmbed().
-		AddField("Song", song.Get("name").MustString()).
-		AddField("Image ID", splitUrl[len(splitUrl)-1]).
-		Send(ctx)
 }
 
 func (s SpotifyCommands) sshuffle(ctx *dgc.Ctx) {

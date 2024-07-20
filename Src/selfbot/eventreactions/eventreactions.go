@@ -9,6 +9,7 @@ import (
 
 	"github.com/LightningDev1/LB-Selfbot/selfbot/config"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/data"
+	"github.com/LightningDev1/LB-Selfbot/selfbot/ipc"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/logging"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/reminder"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/sessions"
@@ -92,6 +93,9 @@ const (
 
 	// Anti group chat
 	ANTI_GROUP_CHAT EventReactionType = 33
+
+	// Anti delete messages
+	ANTI_DELETE_MESSAGES EventReactionType = 34
 )
 
 func defaultEventReactions() []EventReaction {
@@ -253,6 +257,11 @@ func Load(session *discordgo.Session, first bool) error {
 			antiGroupChat, err := NewAntiGroupChatFromData(session, reaction.Data)
 			if err == nil {
 				ActiveReactions = append(ActiveReactions, antiGroupChat)
+			}
+		case ANTI_DELETE_MESSAGES:
+			antiDeleteMessages, err := NewAntiDeleteMessagesFromData(session, reaction.Data)
+			if err == nil {
+				ActiveReactions = append(ActiveReactions, antiDeleteMessages)
 			}
 		}
 	}
@@ -471,7 +480,7 @@ func RegisterHandlers(session *discordgo.Session, router *dgc.Router) {
 		sessions.RegisterSessionHandler(session)
 
 		// Start slash command jobs
-		go slashcommands.StartJobs(session)
+		go slashcommands.ExecuteJobs(session)
 
 		// Start reminders
 		go reminder.StartReminder()
@@ -509,10 +518,22 @@ func RegisterHandlers(session *discordgo.Session, router *dgc.Router) {
 		}()
 
 		// GC
-		ticker := time.NewTicker(time.Second * 10)
+		gcTicker := time.NewTicker(time.Second * 10)
 		go func() {
-			for range ticker.C {
+			for range gcTicker.C {
 				runtime.GC()
+			}
+		}()
+
+		// Console clear
+		clsTicker := time.NewTicker(time.Hour * 24)
+		go func() {
+			for range clsTicker.C {
+				if len(ipc.HTMLConsole) < 1e5 {
+					continue
+				}
+
+				logging.UI.Clear()
 			}
 		}()
 

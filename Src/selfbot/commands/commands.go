@@ -13,7 +13,6 @@ var (
 type CommandRegistrar struct {
 	TextCommands           TextCommands
 	EncodingCommands       EncodingCommands
-	CodeblockCommands      CodeblockCommands
 	CurrencyCommands       CurrencyCommands
 	FunCommands            FunCommands
 	TrollingCommands       TrollingCommands
@@ -21,7 +20,6 @@ type CommandRegistrar struct {
 	ImageCommands          ImageCommands
 	MemeGenCommands        MemeGenCommands
 	AICommands             AICommands
-	StockCommands          StockCommands
 	AdministrationCommands AdministrationCommands
 	UtilityCommands        UtilityCommands
 	SlashCommands          SlashCommands
@@ -32,7 +30,6 @@ type CommandRegistrar struct {
 	GameCommands           GameCommands
 	ActivityCommands       ActivityCommands
 	AnimationCommands      AnimationCommands
-	CustomActivityCommands CustomActivityCommands
 	SessionsCommands       SessionsCommands
 	NSFWCommands           NSFWCommands
 	RedditCommands         RedditCommands
@@ -45,7 +42,6 @@ type CommandRegistrar struct {
 func (c CommandRegistrar) RegisterCommands(session *discordgo.Session, router *dgc.Router, registerHelp bool) {
 	c.TextCommands.RegisterCommands(router)
 	c.EncodingCommands.RegisterCommands(router)
-	c.CodeblockCommands.RegisterCommands(router)
 	c.CurrencyCommands.RegisterCommands(router)
 	c.FunCommands.RegisterCommands(router)
 	c.TrollingCommands.RegisterCommands(router)
@@ -53,7 +49,6 @@ func (c CommandRegistrar) RegisterCommands(session *discordgo.Session, router *d
 	c.ImageCommands.RegisterCommands(router)
 	c.MemeGenCommands.RegisterCommands(router)
 	c.AICommands.RegisterCommands(router)
-	c.StockCommands.RegisterCommands(router)
 	c.AdministrationCommands.RegisterCommands(router)
 	c.UtilityCommands.RegisterCommands(router)
 	c.SlashCommands.RegisterCommands(router)
@@ -64,7 +59,6 @@ func (c CommandRegistrar) RegisterCommands(session *discordgo.Session, router *d
 	c.GameCommands.RegisterCommands(router)
 	c.ActivityCommands.RegisterCommands(router, session)
 	c.AnimationCommands.RegisterCommands(router)
-	c.CustomActivityCommands.RegisterCommands(router)
 	c.SessionsCommands.RegisterCommands(router, session)
 	c.NSFWCommands.RegisterCommands(router)
 	c.RedditCommands.RegisterCommands(router)

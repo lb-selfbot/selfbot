@@ -129,6 +129,7 @@ func (_Logging) NitroSniper(session *discordgo.Session, message *discordgo.Messa
 		AddInfo("Message Link", message.GetLink()).
 		AddInfoConditional("On Account", account, account != "").
 		SetWebhookURL(cfg.Webhooks.NitroSniper).
+		SetImportant(status == "Redeemed Nitro").
 		Show()
 }
 
@@ -149,6 +150,7 @@ func (_Logging) PrivnoteSniper(session *discordgo.Session, message *discordgo.Me
 		AddInfo("Message Link", message.GetLink()).
 		AddInfoConditional("On Account", account, account != "").
 		SetWebhookURL(cfg.Webhooks.Misc).
+		SetImportant(status == "Saved Note").
 		Show()
 }
 
@@ -398,6 +400,7 @@ func (_Logging) GiveawayWon(session *discordgo.Session, message *discordgo.Messa
 		AddInfo("Message Link", message.GetLink()).
 		AddInfoConditional("On Account", account, account != "").
 		SetWebhookURL(cfg.Webhooks.GiveawaySniper).
+		SetImportant(true).
 		Show()
 }
 
@@ -461,6 +464,10 @@ func (_Logging) SessionDisconnected(id, os, client string) {
 }
 
 func (_Logging) SlashCommandJobs(amount int) {
+	if amount == 0 {
+		return
+	}
+
 	cfg, err := config.GetConfig()
 	if err != nil {
 		return
@@ -555,6 +562,7 @@ func (_Logging) KeywordNotifier(session *discordgo.Session, message *discordgo.M
 		AddInfo("Keyword", keyword).
 		AddInfo("Message Link", message.GetLink()).
 		SetWebhookURL(cfg.Webhooks.Misc).
+		SetImportant(true).
 		Show()
 }
 
@@ -581,6 +589,7 @@ func (_Logging) PokeTwoSniper(session *discordgo.Session, message *discordgo.Mes
 		AddInfo("Message Link", message.GetLink()).
 		AddInfoConditional("On Account", account, account != "").
 		SetWebhookURL(cfg.Webhooks.Misc).
+		SetImportant(true).
 		Show()
 }
 
@@ -596,6 +605,7 @@ func (_Logging) Reminder(reminder config.Reminder) {
 		SetColor("#C1EFFF").
 		AddInfo("Message", reminder.Content).
 		SetWebhookURL(cfg.Webhooks.Misc).
+		SetImportant(true).
 		Show()
 }
 

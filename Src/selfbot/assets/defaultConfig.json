@@ -55,6 +55,7 @@
   },
   "Activity": {
     "Enabled": false,
+    "PauseForOtherActivity": false,
     "ActivityType": "CustomActivity",
     "Type": "Playing",
     "Platform": "Default",
@@ -81,10 +82,12 @@
     "DeleteResponses": true,
     "DeleteResponsesDelay": 300,
     "Footer": "LightningBot $VERSION",
-    "MobileFriendly": false,
     "Title": "LightningBot",
     "Client": "Desktop",
     "Timezone": "Local",
+    "EmbedColor": "3990c1",
+    "EmbedImage": "https://lightning-bot.com/logo.png",
+    "EmbedURL": "https://lightning-bot.com/",
     "CommandAliases": {}
   },
   "Sharing": {

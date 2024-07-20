@@ -38,6 +38,7 @@ func (t *TriggerList) IsTriggered(session *discordgo.Session, userID string, gui
 
 type Activity struct {
 	Enabled        bool   `json:"Enabled"`
+	PauseForOther  bool   `json:"PauseForOther"`
 	ActivityType   string `json:"ActivityType"`
 	Type           string `json:"Type"`
 	Platform       string `json:"Platform"`
@@ -184,8 +185,8 @@ type Config struct {
 		PingDetection    string `json:"PingDetection"`
 		Misc             string `json:"Misc"`
 		Sessions         string `json:"Sessions"`
-		PingSelf         bool   `json:"PingSelf"`
-		PingEveryone     bool   `json:"PingEveryone"`
+		PingSelfMode     string `json:"PingSelfMode"`
+		PingEveryoneMode string `json:"PingEveryoneMode"`
 	} `json:"Webhooks"`
 	Events struct {
 		BanNotifier           bool `json:"BanNotifier"`
@@ -217,9 +218,11 @@ type Config struct {
 		DeleteResponses      bool              `json:"DeleteResponses"`
 		DeleteResponsesDelay int               `json:"DeleteResponsesDelay"`
 		DeleteCommands       bool              `json:"DeleteCommands"`
-		MobileFriendly       bool              `json:"MobileFriendly"`
 		Client               string            `json:"Client"`
 		Timezone             string            `json:"Timezone"`
+		EmbedColor           string            `json:"EmbedColor"`
+		EmbedImage           string            `json:"EmbedImage"`
+		EmbedURL             string            `json:"EmbedURL"`
 		CommandAliases       map[string]string `json:"CommandAliases"`
 	}
 	Protections struct {
@@ -275,9 +278,11 @@ func (c Config) GetClient() discordgo.Identify {
 		return discordgo.IdentifyWeb
 	case "Desktop":
 		return discordgo.IdentifyDiscordClient
+	case "Console":
+		return discordgo.IdentifyEmbedded
+	default:
+		return discordgo.IdentifyDiscordClient
 	}
-
-	return discordgo.IdentifyDiscordClient
 }
 
 func (c Config) GetTimezone() *time.Location {

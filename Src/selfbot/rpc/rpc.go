@@ -31,22 +31,22 @@ func getActivityType(activityType string) discordgo.ActivityType {
 	}
 }
 
-func getPlatform(activityType, platform string) string {
+func getPlatform(activityType, platform string) (string, string) {
 	if activityType != "Playing" {
-		return ""
+		return "", ""
 	}
 
 	switch platform {
 	case "PS4":
-		return "ps4"
+		return "ps4", "f01b97df8a090da"
 	case "PS5":
-		return "ps5"
+		return "ps5", "f01b97df8a090da"
 	case "Xbox":
-		return "xbox"
+		return "xbox", "f01b97df8a090da"
 	case "Samsung":
-		return "samsung"
+		return "samsung", "f01b97df8a090da"
 	default:
-		return ""
+		return "", ""
 	}
 }
 
@@ -111,6 +111,41 @@ func setRPC(session *discordgo.Session, cfg *config.Config, startTime time.Time)
 	if !cfg.Activity.Enabled {
 		client.Logout()
 		return nil
+	}
+
+	if cfg.Activity.PauseForOther {
+		var hasOther bool
+		var selfHasActivity bool
+
+		for _, gSession := range sessions.GatewaySessions {
+			if gSession.SessionID == session.State.SessionID {
+				selfHasActivity = len(gSession.Activities) > 0
+				continue
+			}
+
+			for _, activity := range gSession.Activities {
+				if activity.Type == discordgo.ActivityTypeCustom {
+					continue
+				}
+
+				hasOther = true
+				break
+			}
+		}
+
+		if hasOther {
+			client.Logout()
+
+			if selfHasActivity {
+				return session.UpdateStatusComplex(discordgo.UpdateStatusData{
+					Activities: []*discordgo.Activity{},
+					AFK:        true,
+					Status:     sessions.Status,
+				})
+			}
+
+			return nil
+		}
 	}
 
 	switch cfg.Activity.ActivityType {
@@ -184,6 +219,8 @@ func setRPC(session *discordgo.Session, cfg *config.Config, startTime time.Time)
 			SmallText:    utils.String.Limit(variables.Parse(cfg.Activity.SmallImageText), 128),
 		}
 
+		platform, platformID := getPlatform(cfg.Activity.Type, cfg.Activity.Platform)
+
 		var activity *discordgo.Activity
 
 		switch cfg.Activity.Type {
@@ -216,7 +253,8 @@ func setRPC(session *discordgo.Session, cfg *config.Config, startTime time.Time)
 					ButtonURLs: buttonUrls,
 				},
 				ApplicationID: &appID,
-				Platform:      getPlatform(cfg.Activity.Type, cfg.Activity.Platform),
+				Platform:      platform,
+				ID:            platformID,
 			}
 		}
 

@@ -184,6 +184,12 @@ func (t TextCommands) RegisterCommands(router *dgc.Router) {
 		Usage:       "[p]distance <\"text1\"> <\"text2\">",
 		Handler:     t.distance,
 	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "codeblock",
+		Description: "Send a codeblock with syntax highlighting",
+		Usage:       "[p]codeblock <language> <code>",
+		Handler:     t.codeblock,
+	})
 }
 
 func (TextCommands) empty(ctx *dgc.Ctx) {
@@ -475,4 +481,11 @@ func (TextCommands) distance(ctx *dgc.Ctx) {
 		AddField("Text 2", utils.Arguments["<\"text2\">"]).
 		AddField("Distance", fmt.Sprint(distance)).
 		Send(ctx)
+}
+
+func (TextCommands) codeblock(ctx *dgc.Ctx) {
+	language := utils.Arguments["<language>"]
+	code := utils.String.RemoveWords(ctx.Arguments.Raw(), 1)
+
+	_ = ctx.RespondText("```" + strings.ToLower(language) + "\n" + code + "\n```")
 }

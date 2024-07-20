@@ -1,7 +1,10 @@
 package slashcommands
 
 import (
+	"crypto/md5"
 	"errors"
+	"fmt"
+	"strconv"
 
 	"github.com/LightningDev1/LB-Selfbot/selfbot/utils"
 	"github.com/LightningDev1/dgc"
@@ -76,4 +79,20 @@ func ArgumentsToCommandOptions(options []*discordgo.ApplicationCommandOption, ar
 	}
 
 	return options, nil
+}
+
+func CommandIdentifier(j *Job) string {
+	return j.GuildObject.ID + j.ApplicationObject.ID + j.CommandObject.ID
+}
+
+func JobIdentifier(j *Job) string {
+	id := []byte(j.GuildObject.ID +
+		j.ApplicationObject.ID +
+		j.ChannelObject.ID +
+		j.CommandObject.ID +
+		j.Name +
+		j.RawArguments +
+		strconv.Itoa(j.IntervalSec))
+
+	return fmt.Sprintf("%x", md5.Sum(id))
 }

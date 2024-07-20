@@ -108,12 +108,11 @@ func (MiscUtils) FormatDurationShort(duration time.Duration) string {
 
 func (MiscUtils) ParseDuration(text string) (time.Duration, error) {
 	d, err := time.ParseDuration(text)
-	if err != nil && strings.Contains(err.Error(), "missing unit") {
-		text += "s"
-		d, err = time.ParseDuration(text)
+	if err == nil {
+		return d, nil
 	}
 
-	return d, err
+	return time.ParseDuration(text + "s")
 }
 
 // GetDistance returns the Levenshtein distance between two strings.
@@ -155,17 +154,29 @@ func (MiscUtils) Minimum(a, b, c int) int {
 	return c
 }
 
-func (MiscUtils) HexToRGB(hex string) (int, int, int) {
+func (MiscUtils) HexToRGB(hex string) (int, int, int, error) {
 	hex = strings.Replace(hex, "#", "", -1)
 
 	if len(hex) != 6 {
 		return Misc.HexToRGB("#C1EFFF")
 	}
 
-	r, _ := strconv.ParseInt(hex[0:2], 16, 64)
-	g, _ := strconv.ParseInt(hex[2:4], 16, 64)
-	b, _ := strconv.ParseInt(hex[4:6], 16, 64)
-	return int(r), int(g), int(b)
+	r, err := strconv.ParseInt(hex[0:2], 16, 64)
+	if err != nil {
+		return 0, 0, 0, err
+	}
+
+	g, err := strconv.ParseInt(hex[2:4], 16, 64)
+	if err != nil {
+		return 0, 0, 0, err
+	}
+
+	b, err := strconv.ParseInt(hex[4:6], 16, 64)
+	if err != nil {
+		return 0, 0, 0, err
+	}
+
+	return int(r), int(g), int(b), nil
 }
 
 func (MiscUtils) CreateSawtoothWave(width, iterations int) []int {

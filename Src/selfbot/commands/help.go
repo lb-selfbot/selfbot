@@ -220,7 +220,7 @@ func renderDefaultGeneralHelpEmbed(router *dgc.Router) *embed.Embed {
 	for _, category := range router.Categories {
 		// Get the commands in the category, will be empty otherwise
 		category = router.GetCategory(category.Name)
-		categoriesString += fmt.Sprintf("%s - %s\n", category.Name+strings.Repeat(" ", 15-len(category.Name)), category.Description)
+		categoriesString += fmt.Sprintf("%s - %s\n", category.Name+strings.Repeat(" ", 14-len(category.Name)), category.Description)
 	}
 
 	prefix := router.GetPrefixes()[0]
