@@ -313,6 +313,19 @@ func (s SlashCommands) getscjob(ctx *dgc.Ctx) {
 func (s SlashCommands) createscjob(ctx *dgc.Ctx) {
 	name := utils.Arguments["<job name>"]
 
+	var found bool
+	for _, job := range slashcommands.Jobs {
+		if job.Name == name {
+			found = true
+			break
+		}
+	}
+
+	if found {
+		ctx.RespondText("A job with the name `" + name + "` already exists.")
+		return
+	}
+
 	channel, ok := utils.Discord.TryGetChannelFromMention(ctx, ctx.Arguments.Get(1))
 	if !ok {
 		ctx.RespondText("Could not find channel. Make sure to mention it or use the ID.")
