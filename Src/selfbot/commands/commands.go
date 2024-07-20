@@ -23,7 +23,6 @@ type CommandRegistrar struct {
 	AdministrationCommands AdministrationCommands
 	UtilityCommands        UtilityCommands
 	SlashCommands          SlashCommands
-	ConversionCommands     ConversionCommands
 	DumpingCommands        DumpingCommands
 	BackupCommands         BackupCommands
 	SpotifyCommands        SpotifyCommands
@@ -52,7 +51,6 @@ func (c CommandRegistrar) RegisterCommands(session *discordgo.Session, router *d
 	c.AdministrationCommands.RegisterCommands(router)
 	c.UtilityCommands.RegisterCommands(router)
 	c.SlashCommands.RegisterCommands(router)
-	c.ConversionCommands.RegisterCommands(router)
 	c.DumpingCommands.RegisterCommands(router)
 	c.BackupCommands.RegisterCommands(router)
 	c.SpotifyCommands.RegisterCommands(router)
