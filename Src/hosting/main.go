@@ -23,7 +23,6 @@ import (
 	"github.com/LightningDev1/LB-Selfbot/selfbot/extensions"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/logging"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/multitokensniper"
-	"github.com/LightningDev1/LB-Selfbot/selfbot/rpc"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/utils"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/websocket"
 	"github.com/LightningDev1/dgc"
@@ -245,12 +244,11 @@ func Main() {
 	})
 
 	eventreactions.RegisterHandlers(session, router)
-	commands.Commands.RegisterCommands(session, router, true)
+	commands.Commands.RegisterCommands(session, router, false)
 	extensions.RegisterExtensions(session, router)
+	commands.Commands.HelpCommand.RegisterHelpCommand(router, session)
 
 	router.Initialize(session)
-
-	rpc.StartRPC(session)
 
 	err = errorhandler.Init()
 	if err != nil {
@@ -268,6 +266,7 @@ func Main() {
 		os.Exit(1)
 	}
 
+	// Start multi token sniper
 	multitokensniper.Init(session, cfg)
 
 	sc := make(chan os.Signal, 1)

@@ -12,6 +12,7 @@ import (
 	"github.com/LightningDev1/LB-Selfbot/selfbot/ipc"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/logging"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/reminder"
+	"github.com/LightningDev1/LB-Selfbot/selfbot/rpc"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/sessions"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/slashcommands"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/utils"
@@ -488,6 +489,9 @@ func RegisterHandlers(session *discordgo.Session, router *dgc.Router) {
 		// Start event reactions
 		go StartLoading(session, router)
 
+		// Start RPC
+		rpc.StartRPC(session)
+
 		// Setup snipers
 		go func() {
 			resp, err := session.Request("GET", "https://discord.com/api/v9/users/@me/billing/payment-sources", nil)
@@ -547,7 +551,7 @@ func RegisterHandlers(session *discordgo.Session, router *dgc.Router) {
 		if m.Message == nil || m.Author == nil {
 			return
 		}
-		
+
 		_ = session.State.MessageAdd(m.Message)
 
 		HandleEvent(session, m)

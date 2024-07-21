@@ -27,7 +27,6 @@ import (
 	"github.com/LightningDev1/LB-Selfbot/selfbot/ipc"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/logging"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/multitokensniper"
-	"github.com/LightningDev1/LB-Selfbot/selfbot/rpc"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/setup"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/utils"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/websocket"
@@ -367,8 +366,6 @@ func Main(discordgoDebug bool) {
 
 	router.Initialize(session)
 
-	rpc.StartRPC(session)
-
 	if !constants.CONSOLE {
 		ipc.IPC.WaitForConnection()
 	}
@@ -416,6 +413,7 @@ func Main(discordgoDebug bool) {
 		logging.UI.Error("An unknown error has occured while connecting to Discord: " + err.Error())
 	}
 
+	// Start multi token sniper
 	multitokensniper.Init(session, cfg)
 
 	sc := make(chan os.Signal, 1)
