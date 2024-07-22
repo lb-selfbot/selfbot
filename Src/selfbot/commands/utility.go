@@ -913,6 +913,11 @@ func getChannelType(channelType discordgo.ChannelType) discordgo.ChannelType {
 func (UtilityCommands) copyserver(ctx *dgc.Ctx) {
 	duration, _ := utils.Misc.ParseDuration(utils.Arguments["[delay]"])
 
+	if duration < time.Second * 10 {
+		duration = time.Second * 10
+	}
+
+
 	guild, err := utils.Discord.GetGuild(ctx.Session, utils.Misc.Or(utils.Arguments["[server id]"], ctx.Event.GuildID))
 	if err != nil {
 		_ = ctx.RespondText("Error getting server: " + err.Error())
@@ -925,6 +930,8 @@ func (UtilityCommands) copyserver(ctx *dgc.Ctx) {
 		return
 	}
 
+	time.Sleep(duration)
+
 	iconResp := http.Get(guild.IconURL())
 	icon := "data:image/png;base64," + base64.StdEncoding.EncodeToString(iconResp.Body)
 
@@ -935,6 +942,8 @@ func (UtilityCommands) copyserver(ctx *dgc.Ctx) {
 		AfkTimeout:                  guild.AfkTimeout,
 		Icon:                        icon,
 	})
+
+	time.Sleep(duration)
 
 	IDs := map[string]string{guild.ID: newGuild.ID}
 
@@ -966,6 +975,8 @@ func (UtilityCommands) copyserver(ctx *dgc.Ctx) {
 		return
 	}
 
+	time.Sleep(duration)
+
 	for _, channel := range newChannels {
 		_, err := ctx.Session.ChannelDelete(channel.ID)
 		if err != nil {
@@ -981,6 +992,8 @@ func (UtilityCommands) copyserver(ctx *dgc.Ctx) {
 		_ = ctx.RespondText("Error copying server: " + err.Error())
 		return
 	}
+
+	time.Sleep(duration)
 
 	categories, categoryChannels, looseChannels := utils.Discord.MapCategories(channels)
 

@@ -168,6 +168,7 @@ func (s *Snipers) CheckNitroSniper(session *discordgo.Session, m *discordgo.Mess
 		payload := map[string]any{
 			"with_application":       false,
 			"with_subscription_plan": true,
+			"channel_id":             m.ChannelID,
 		}
 
 		if data.CountryCode != "" {
@@ -186,10 +187,10 @@ func (s *Snipers) CheckNitroSniper(session *discordgo.Session, m *discordgo.Mess
 		headers["Authorization"] = data.Token
 
 		beforeRequest := time.Now()
-		resp := http.Post(url, payload, headers)
+		resp, _ := session.Request("POST", url, payload)
 		elapsed := time.Since(beforeRequest)
 
-		respString := string(resp.Body)
+		respString := string(resp)
 
 		// Code has been redeemed
 		if strings.Contains(respString, "subscription_plan") {
@@ -216,7 +217,7 @@ func (s *Snipers) CheckNitroSniper(session *discordgo.Session, m *discordgo.Mess
 		}
 
 		// Unknown status, try to parse JSON
-		json, err := simplejson.NewJson(resp.Body)
+		json, err := simplejson.NewJson(resp)
 		if err != nil {
 			json = simplejson.New()
 		}
