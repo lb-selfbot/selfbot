@@ -52,7 +52,7 @@ func (c CommandRegistrar) RegisterCommands(session *discordgo.Session, router *d
 	c.UtilityCommands.RegisterCommands(router)
 	c.SlashCommands.RegisterCommands(router)
 	c.DumpingCommands.RegisterCommands(router)
-	c.BackupCommands.RegisterCommands(router)
+	// c.BackupCommands.RegisterCommands(router)
 	c.SpotifyCommands.RegisterCommands(router)
 	c.GameCommands.RegisterCommands(router)
 	c.ActivityCommands.RegisterCommands(router, session)
