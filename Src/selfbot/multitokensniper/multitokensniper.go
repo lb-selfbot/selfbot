@@ -27,7 +27,7 @@ type SniperInstance struct {
 	Session *discordgo.Session
 }
 
-func (s *SniperInstance) Start() error {
+func (s *SniperInstance) Start(mainSession *discordgo.Session) error {
 	s.State = StateDisconnected
 
 	var err error
@@ -47,11 +47,11 @@ func (s *SniperInstance) Start() error {
 		s.Guilds = len(ready.Guilds)
 
 		username := fmt.Sprintf("%s (%s)", ready.User.DisplayName, ready.User.Username)
-		snipers = eventreactions.NewSnipers(username)
+		snipers = eventreactions.NewSnipers(mainSession, username)
 	})
 
 	s.Session.AddHandler(func(_ *discordgo.Session, m *discordgo.MessageCreate) {
-		if m.Message == nil || m.Author == nil {
+		if m.Message == nil || m.Author == nil || snipers == nil {
 			return
 		}
 
@@ -109,7 +109,7 @@ func Init(mainSession *discordgo.Session, cfg config.Config) {
 			Token: token,
 		}
 
-		instance.Start()
+		instance.Start(mainSession)
 
 		SniperInstances = append(SniperInstances, instance)
 	}

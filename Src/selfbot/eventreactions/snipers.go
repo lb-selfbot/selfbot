@@ -35,6 +35,7 @@ type GiftCode struct {
 }
 
 type Snipers struct {
+	MainSession *discordgo.Session
 	Account string
 
 	CheckedGiftCodes  []string
@@ -48,8 +49,9 @@ type Snipers struct {
 	LastCatch              time.Time
 }
 
-func NewSnipers(account string) *Snipers {
+func NewSnipers(mainSession *discordgo.Session, account string) *Snipers {
 	return &Snipers{
+		MainSession: mainSession,
 		Account:           account,
 		GiftCodesByAuthor: make(map[string][]GiftCode),
 		PrivnoteClient:    privnote.NewClient(),
@@ -79,6 +81,10 @@ func (s *Snipers) Handler(session *discordgo.Session, event any) {
 	if err != nil {
 		utils.Logging.Debug("Snipers.Handler: Error getting config: ", err)
 		return
+	}
+
+	if s.MainSession == nil {
+		s.MainSession = session
 	}
 
 	switch event := event.(type) {
@@ -187,7 +193,7 @@ func (s *Snipers) CheckNitroSniper(session *discordgo.Session, m *discordgo.Mess
 		headers["Authorization"] = data.Token
 
 		beforeRequest := time.Now()
-		resp, _ := session.Request("POST", url, payload)
+		resp, _ := s.MainSession.Request("POST", url, payload)
 		elapsed := time.Since(beforeRequest)
 
 		respString := string(resp)

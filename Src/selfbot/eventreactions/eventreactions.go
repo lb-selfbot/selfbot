@@ -101,7 +101,7 @@ const (
 
 func defaultEventReactions() []EventReaction {
 	return []EventReaction{
-		NewSnipers(""),
+		NewSnipers(nil, ""),
 		NewAFK(),
 		NewPhishing(),
 		NewNotifiers(),
