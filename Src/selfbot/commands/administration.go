@@ -254,13 +254,6 @@ func (m *AdministrationCommands) RegisterCommands(router *dgc.Router) {
 		Handler:     m.banner,
 	})
 	router.RegisterCmd(&dgc.Command{
-		Name:        "report",
-		Description: "Report a message",
-		Usage:       "[p]report <message link> <reason>",
-		Flags:       []string{CmdFlagDangerous},
-		Handler:     m.report,
-	})
-	router.RegisterCmd(&dgc.Command{
 		Name:        "mute",
 		Description: "Mute a user",
 		Usage:       "[p]mute <user>",
@@ -1356,50 +1349,6 @@ func (*AdministrationCommands) banner(ctx *dgc.Ctx) {
 		return
 	}
 	_ = ctx.RespondText(user.BannerURL(""))
-}
-
-func (*AdministrationCommands) report(ctx *dgc.Ctx) {
-	link := utils.Arguments["<message link>"]
-	reason := utils.Arguments["<reason>"]
-
-	// Verify message link
-	messageUrl, err := url.Parse(link)
-	if err != nil {
-		_ = ctx.RespondText("Invalid message link.")
-		return
-	}
-	urlPathParts := strings.Split(messageUrl.Path, "/")
-	if len(urlPathParts) < 4 {
-		_ = ctx.RespondText("Invalid message link.")
-		return
-	}
-	guildID := urlPathParts[2]
-	channelID := urlPathParts[3]
-	messageID := urlPathParts[4]
-
-	var reasonInt int
-	switch reason {
-	case "illegalcontent":
-		reasonInt = 0
-	case "harassment":
-		reasonInt = 1
-	case "spam":
-	case "phishing":
-		reasonInt = 2
-	case "selfharm":
-		reasonInt = 3
-	case "nsfw":
-		reasonInt = 4
-	default:
-		_ = ctx.RespondText("Argument `<reason>` must be one of: `illegalcontent`, `harassment`, `spam`, `phishing`, `selfharm`, `nsfw`")
-		return
-	}
-
-	_ = api.ReportMessage(ctx.Session, guildID, channelID, messageID, reasonInt)
-
-	embed.NewEmbed().
-		SetDescription("Successfully reported message!").
-		Send(ctx)
 }
 
 func (*AdministrationCommands) mute(ctx *dgc.Ctx) {
