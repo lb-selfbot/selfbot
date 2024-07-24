@@ -30,6 +30,7 @@ import (
 	"github.com/LightningDev1/LB-Selfbot/selfbot/ipc"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/logging"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/uploaders/destinations"
+	"github.com/LightningDev1/discordgo/protos"
 	"github.com/LightningDev1/go-foreground"
 	"github.com/LightningDev1/screenshot"
 	"github.com/bitly/go-simplejson"
@@ -38,6 +39,7 @@ import (
 	"github.com/shirou/gopsutil/disk"
 	"github.com/shirou/gopsutil/host"
 	"github.com/shirou/gopsutil/mem"
+	"google.golang.org/protobuf/types/known/wrapperspb"
 
 	"github.com/LightningDev1/LB-Selfbot/selfbot/api"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/constants"
@@ -491,34 +493,10 @@ func (u UtilityCommands) RegisterCommands(router *dgc.Router) {
 	// Tag utilities
 
 	router.RegisterCmd(&dgc.Command{
-		Name:        "tag",
-		Description: "Send a tag's content",
-		Usage:       "[p]tag <tag>",
-		Handler:     u.tag,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "taglist",
-		Description: "List all tags",
-		Usage:       "[p]taglist",
-		Handler:     u.taglist,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "createtag",
-		Description: "Add a tag",
-		Usage:       "[p]createtag <tag> <content>",
-		Handler:     u.createtag,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "deletetag",
-		Description: "Delete a tag",
-		Usage:       "[p]deletetag <tag>",
-		Handler:     u.deletetag,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "renametag",
-		Description: "Rename a tag",
-		Usage:       "[p]renametag <before> <after>",
-		Handler:     u.renametag,
+		Name:        "tags",
+		Description: "Manage tags",
+		Usage:       "[p]tags <get/add/rm/clear/send> [name] [content]",
+		Handler:     u.tags,
 	})
 
 	// Creditcard commands
@@ -642,26 +620,14 @@ func (u UtilityCommands) RegisterCommands(router *dgc.Router) {
 	// Reminder utilities
 
 	router.RegisterCmd(&dgc.Command{
-		Name:        "setreminder",
-		Description: "Set a reminder",
-		Usage:       "[p]setreminder <duration> <message>",
-		Handler:     u.setreminder,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "listreminders",
-		Description: "List all reminders",
-		Usage:       "[p]listreminders",
-		Handler:     u.listreminders,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "deletereminder",
-		Description: "Delete a reminder",
-		Usage:       "[p]deletereminder <id>",
-		Handler:     u.deletereminder,
+		Name:        "reminders",
+		Description: "Manage your reminders",
+		Usage:       "[p]reminders <get/add/rm/clear> [name] [duration] [message]",
+		Handler:     u.reminders,
 	})
 
 	// Conversion utilities
-	
+
 	router.RegisterCmd(&dgc.Command{
 		Name:        "convertvelocity",
 		Description: "Convert velocity from one unit to another",
@@ -913,10 +879,9 @@ func getChannelType(channelType discordgo.ChannelType) discordgo.ChannelType {
 func (UtilityCommands) copyserver(ctx *dgc.Ctx) {
 	duration, _ := utils.Misc.ParseDuration(utils.Arguments["[delay]"])
 
-	if duration < time.Second * 10 {
+	if duration < time.Second*10 {
 		duration = time.Second * 10
 	}
-
 
 	guild, err := utils.Discord.GetGuild(ctx.Session, utils.Misc.Or(utils.Arguments["[server id]"], ctx.Event.GuildID))
 	if err != nil {
@@ -1418,12 +1383,24 @@ func (UtilityCommands) leavehypesquad(ctx *dgc.Ctx) {
 }
 
 func (UtilityCommands) theme(ctx *dgc.Ctx) {
-	theme := strings.ToLower(utils.Arguments["<light/dark>"])
-	if theme != "light" && theme != "dark" {
+	themeName := strings.ToUpper(utils.Arguments["<light/dark>"])
+
+	theme, ok := protos.PreloadedUserSettings_Theme_value[themeName]
+	if !ok {
 		_ = ctx.RespondText("Error: <light/dark> must be either \"light\" or \"dark\"")
 		return
 	}
-	_ = api.ChangeSettings(ctx.Session, "/settings", map[string]any{"theme": theme})
+
+	ctx.Session.State.UserSettings.Appearance.Theme = protos.PreloadedUserSettings_Theme(theme)
+	err := ctx.Session.UserSettingsUpdate(ctx.Session.State.UserSettings, true)
+	if err != nil {
+		_ = ctx.RespondText("Error setting theme: " + err.Error())
+		return
+	}
+
+	embed.NewEmbed().
+		SetDescription("Theme set successfully!").
+		Send(ctx)
 }
 
 func (UtilityCommands) compact(ctx *dgc.Ctx) {
@@ -1432,7 +1409,17 @@ func (UtilityCommands) compact(ctx *dgc.Ctx) {
 		_ = ctx.RespondText("Error: <on/off> must be either \"on\" or \"off\"")
 		return
 	}
-	_ = api.ChangeSettings(ctx.Session, "/settings", map[string]any{"message_display_compact": toggle == "on"})
+
+	ctx.Session.State.UserSettings.TextAndImages.MessageDisplayCompact = wrapperspb.Bool(toggle == "on")
+	err := ctx.Session.UserSettingsUpdate(ctx.Session.State.UserSettings, true)
+	if err != nil {
+		_ = ctx.RespondText("Error setting theme: " + err.Error())
+		return
+	}
+
+	embed.NewEmbed().
+		SetDescription("Compact mode set successfully!").
+		Send(ctx)
 }
 
 func (UtilityCommands) devmode(ctx *dgc.Ctx) {
@@ -1441,7 +1428,17 @@ func (UtilityCommands) devmode(ctx *dgc.Ctx) {
 		_ = ctx.RespondText("Error: <on/off> must be either \"on\" or \"off\"")
 		return
 	}
-	_ = api.ChangeSettings(ctx.Session, "/settings", map[string]any{"developer_mode": toggle == "on"})
+
+	ctx.Session.State.UserSettings.Appearance.DeveloperMode = toggle == "on"
+	err := ctx.Session.UserSettingsUpdate(ctx.Session.State.UserSettings, true)
+	if err != nil {
+		_ = ctx.RespondText("Error setting theme: " + err.Error())
+		return
+	}
+
+	embed.NewEmbed().
+		SetDescription("Developer mode set successfully!").
+		Send(ctx)
 }
 
 func (UtilityCommands) sessionid(ctx *dgc.Ctx) {
@@ -1456,7 +1453,15 @@ func (UtilityCommands) aboutme(ctx *dgc.Ctx) {
 		bio = arg
 	}
 
-	_ = api.ChangeSettings(ctx.Session, "", map[string]any{"bio": bio})
+	err := api.ChangeSettings(ctx.Session, "/profile", map[string]any{"bio": bio})
+	if err != nil {
+		_ = ctx.RespondText("Error setting bio: " + err.Error())
+		return
+	}
+
+	embed.NewEmbed().
+		SetDescription("Bio set successfully!").
+		Send(ctx)
 }
 
 func (UtilityCommands) displayname(ctx *dgc.Ctx) {
@@ -1465,11 +1470,27 @@ func (UtilityCommands) displayname(ctx *dgc.Ctx) {
 		globalName = arg
 	}
 
-	_ = api.ChangeSettings(ctx.Session, "", map[string]any{"global_name": globalName})
+	err := api.ChangeSettings(ctx.Session, "", map[string]any{"global_name": globalName})
+	if err != nil {
+		_ = ctx.RespondText("Error setting display name: " + err.Error())
+		return
+	}
+
+	embed.NewEmbed().
+		SetDescription("Display name set successfully!").
+		Send(ctx)
 }
 
 func (UtilityCommands) pronouns(ctx *dgc.Ctx) {
-	_ = api.ChangeSettings(ctx.Session, "/profile", map[string]any{"pronouns": ctx.Arguments.Raw()})
+	err := api.ChangeSettings(ctx.Session, "/profile", map[string]any{"pronouns": ctx.Arguments.Raw()})
+	if err != nil {
+		_ = ctx.RespondText("Error setting pronouns: " + err.Error())
+		return
+	}
+
+	embed.NewEmbed().
+		SetDescription("Pronouns set successfully!").
+		Send(ctx)
 }
 
 func (UtilityCommands) nickscan(ctx *dgc.Ctx) {
@@ -1486,6 +1507,7 @@ func (UtilityCommands) nickscan(ctx *dgc.Ctx) {
 			nickText += fmt.Sprintf("%s: %s\n", guild.Name, me.Nick)
 		}
 	}
+
 	embed.NewEmbed().
 		AddField("Nicknames", nickText).
 		Send(ctx)
@@ -2276,116 +2298,80 @@ func (UtilityCommands) addreview(ctx *dgc.Ctx) {
 
 // Tag utilities
 
-func (UtilityCommands) tag(ctx *dgc.Ctx) {
+func (UtilityCommands) tags(ctx *dgc.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
-		_ = ctx.RespondText("Error getting config: " + err.Error())
-		return
-	}
-
-	content, ok := cfg.Tags[ctx.Arguments.Get(0).Raw()]
-	if !ok {
-		_ = ctx.RespondText("Error: tag does not exist")
-		return
-	}
-
-	_ = ctx.RespondText(content)
-}
-
-func (UtilityCommands) taglist(ctx *dgc.Ctx) {
-	cfg, err := config.GetConfig()
-	if err != nil {
-		_ = ctx.RespondText("Error getting config: " + err.Error())
-		return
-	}
-
-	var tagList []string
-
-	for tag := range cfg.Tags {
-		tagList = append(tagList, fmt.Sprintf("%s:\n%s\n", tag, cfg.Tags[tag]))
-	}
-
-	embed.NewEmbed().
-		AddField("Tags", strings.Join(tagList, "\n")).
-		Send(ctx)
-}
-
-func (UtilityCommands) createtag(ctx *dgc.Ctx) {
-	cfg, err := config.GetConfig()
-	if err != nil {
-		_ = ctx.RespondText("Error getting config: " + err.Error())
+		_ = ctx.RespondText("Error getting config.")
 		return
 	}
 
 	if cfg.Tags == nil {
 		cfg.Tags = map[string]string{}
+
+		err = cfg.Save()
+		if err != nil {
+			_ = ctx.RespondText("Error saving config: " + err.Error())
+			return
+		}
 	}
 
-	cfg.Tags[ctx.Arguments.Get(0).Raw()] = strings.Join(strings.Split(ctx.Event.Content, " ")[2:], " ")
+	switch utils.Arguments["<get/set/rm/clear/send>"] {
+	case "get":
+		var tagList []string
 
-	err = cfg.Save()
-	if err != nil {
-		_ = ctx.RespondText("Error saving config: " + err.Error())
-		return
-	}
+		for tag := range cfg.Tags {
+			tagList = append(tagList, fmt.Sprintf("%s:\n%s\n", tag, cfg.Tags[tag]))
+		}
 
-	embed.NewEmbed().
-		SetDescription("Successfully created tag").
-		Send(ctx)
-}
+		embed.NewEmbed().
+			AddField("Tags", strings.Join(tagList, "\n")).
+			Send(ctx)
+	case "add":
+		name := ctx.Arguments.Get(1).Raw()
+		content := utils.String.RemoveWords(ctx.Arguments.Raw(), 2)
 
-func (UtilityCommands) deletetag(ctx *dgc.Ctx) {
-	cfg, err := config.GetConfig()
-	if err != nil {
-		_ = ctx.RespondText("Error getting config: " + err.Error())
-		return
-	}
+		cfg.Tags[name] = content
 
-	delete(cfg.Tags, ctx.Arguments.Get(0).Raw())
+		err = cfg.Save()
+		if err != nil {
+			_ = ctx.RespondText("Error saving config: " + err.Error())
+			return
+		}
 
-	err = cfg.Save()
-	if err != nil {
-		_ = ctx.RespondText("Error saving config: " + err.Error())
-		return
-	}
+		embed.NewEmbed().
+			SetDescription("Successfully created tag.").
+			Send(ctx)
+	case "rm":
+		delete(cfg.Tags, ctx.Arguments.Get(1).Raw())
 
-	embed.NewEmbed().
-		SetDescription("Successfully deleted tag").
-		Send(ctx)
-}
+		err = cfg.Save()
+		if err != nil {
+			_ = ctx.RespondText("Error saving config: " + err.Error())
+			return
+		}
 
-func (UtilityCommands) renametag(ctx *dgc.Ctx) {
-	cfg, err := config.GetConfig()
-	if err != nil {
-		_ = ctx.RespondText("Error getting config: " + err.Error())
-		return
-	}
-
-	if cfg.Tags == nil {
+		embed.NewEmbed().
+			SetDescription("Successfully deleted tag").
+			Send(ctx)
+	case "clear":
 		cfg.Tags = map[string]string{}
+		_ = cfg.Save()
+
+		embed.NewEmbed().
+			SetDescription("Cleared all tags.").
+			Send(ctx)
+	case "send":
+		name := ctx.Arguments.Get(1).Raw()
+		content, ok := cfg.Tags[name]
+		if !ok {
+			_ = ctx.RespondText("That tag does not exist!")
+			return
+		}
+
+		_ = ctx.RespondText(content)
+	default:
+		_ = ctx.RespondText("Invalid <get/add/rm/clear/send> argument. Use `get`, `add`, `rm`, `clear`, or `send`.")
 	}
-
-	before := utils.Arguments["<before>"]
-	after := utils.Arguments["<after>"]
-
-	tag, ok := cfg.Tags[before]
-	if !ok {
-		_ = ctx.RespondText("Error: tag does not exist")
-		return
-	}
-
-	cfg.Tags[after] = tag
-	delete(cfg.Tags, before)
-
-	err = cfg.Save()
-	if err != nil {
-		_ = ctx.RespondText("Error saving config: " + err.Error())
-		return
-	}
-
-	embed.NewEmbed().
-		SetDescription(fmt.Sprintf("Successfully renamed tag %s to %s!", before, after)).
-		Send(ctx)
 }
 
 // Creditcard commands
@@ -2810,95 +2796,122 @@ func (c UtilityCommands) detectpokemon(ctx *dgc.Ctx) {
 
 // Reminder utilities
 
-func (UtilityCommands) setreminder(ctx *dgc.Ctx) {
-	duration, err := utils.Misc.ParseDuration(ctx.Arguments.Get(0).Raw())
-	if err != nil {
-		_ = ctx.RespondText("Invalid duration.")
-		return
-	}
-
-	if duration.Seconds() < 5 {
-		_ = ctx.RespondText("Duration must be at least 5 seconds.")
-		return
-
-	}
-
-	message := utils.String.RemoveWords(ctx.Arguments.Raw(), 1)
-
+func (UtilityCommands) reminders(ctx *dgc.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
-		_ = ctx.RespondText("Error getting config: " + err.Error())
+		_ = ctx.RespondText("Error getting config.")
 		return
 	}
 
-	cfg.Reminders = append(cfg.Reminders, config.Reminder{
-		ID:      utils.Random.Number(100000, 999999),
-		Content: message,
-		At:      time.Now().Add(duration),
-	})
-
-	err = cfg.Save()
-	if err != nil {
-		_ = ctx.RespondText("Error saving config: " + err.Error())
-		return
-	}
-
-	embed.NewEmbed().
-		SetDescription("Successfully set reminder!").
-		Send(ctx)
-}
-
-func (UtilityCommands) listreminders(ctx *dgc.Ctx) {
-	cfg, err := config.GetConfig()
-	if err != nil {
-		_ = ctx.RespondText("Error getting config: " + err.Error())
-		return
-	}
-
-	if len(cfg.Reminders) == 0 {
-		_ = ctx.RespondText("No reminders have been set!")
-		return
-	}
-
-	var reminders []string
+	var updated bool
 	for _, reminder := range cfg.Reminders {
-		reminders = append(reminders, fmt.Sprintf("**ID: %d**: %s - %s", reminder.ID, reminder.Content, reminder.At.Format(time.RFC1123)))
+		if reminder.Name != "" {
+			continue
+		}
+
+		reminder.Name = fmt.Sprintf("reminder-%d", reminder.ID)
+		updated = true
 	}
 
-	embed.NewEmbed().
-		AddField("Reminders", strings.Join(reminders, "\n")).
-		Send(ctx)
-}
-
-func (UtilityCommands) deletereminder(ctx *dgc.Ctx) {
-	id, err := strconv.Atoi(ctx.Arguments.Get(0).Raw())
-	if err != nil {
-		_ = ctx.RespondText("Invalid ID.")
-		return
-	}
-
-	cfg, err := config.GetConfig()
-	if err != nil {
-		_ = ctx.RespondText("Error getting config: " + err.Error())
-		return
-	}
-
-	for i, reminder := range cfg.Reminders {
-		if reminder.ID == id {
-			cfg.Reminders = append(cfg.Reminders[:i], cfg.Reminders[i+1:]...)
-			break
+	if updated {
+		err = cfg.Save()
+		if err != nil {
+			_ = ctx.RespondText("Error saving config.")
+			return
 		}
 	}
 
-	err = cfg.Save()
-	if err != nil {
-		_ = ctx.RespondText("Error saving config: " + err.Error())
-		return
-	}
+	switch utils.Arguments["<get/set/rm/clear>"] {
+	case "get":
+		if len(cfg.Reminders) == 0 {
+			_ = ctx.RespondText("No reminders have been set!")
+			return
+		}
 
-	embed.NewEmbed().
-		SetDescription("Successfully deleted reminder!").
-		Send(ctx)
+		var reminders []string
+		for _, reminder := range cfg.Reminders {
+			reminders = append(reminders, fmt.Sprintf("**ID: %d**: %s - %s", reminder.ID, reminder.Content, reminder.At.Format(time.RFC1123)))
+		}
+
+		embed.NewEmbed().
+			AddField("Reminders", strings.Join(reminders, "\n")).
+			Send(ctx)
+	case "add":
+		name := ctx.Arguments.Get(1).Raw()
+
+		var exists bool
+		for _, reminder := range cfg.Reminders {
+			if reminder.Name != name {
+				continue
+			}
+
+			exists = true
+			break
+		}
+
+		if exists {
+			_ = ctx.RespondText("Reminder with that name already exists.")
+			return
+		}
+
+		duration, err := utils.Misc.ParseDuration(ctx.Arguments.Get(2).Raw())
+		if err != nil {
+			_ = ctx.RespondText("Invalid duration.")
+			return
+		}
+
+		if duration.Seconds() < 5 {
+			_ = ctx.RespondText("Duration must be at least 5 seconds.")
+			return
+		}
+
+		message := utils.String.RemoveWords(ctx.Arguments.Raw(), 3)
+
+		cfg.Reminders = append(cfg.Reminders, config.Reminder{
+			Name:    ctx.Arguments.Get(1).Raw(),
+			Content: message,
+			At:      time.Now().Add(duration),
+		})
+
+		err = cfg.Save()
+		if err != nil {
+			_ = ctx.RespondText("Error saving config: " + err.Error())
+			return
+		}
+
+		embed.NewEmbed().
+			SetDescription("Successfully set reminder!").
+			Send(ctx)
+	case "rm":
+		name := ctx.Arguments.Get(1).Raw()
+		if name == "" {
+			_ = ctx.RespondText("Invalid name.")
+			return
+		}
+
+		cfg.Reminders = utils.Filter(cfg.Reminders, func(r config.Reminder) bool {
+			return r.Name != name
+		})
+
+		err = cfg.Save()
+		if err != nil {
+			_ = ctx.RespondText("Error saving config: " + err.Error())
+			return
+		}
+
+		embed.NewEmbed().
+			SetDescription("Successfully deleted reminder!").
+			Send(ctx)
+	case "clear":
+		cfg.Reminders = []config.Reminder{}
+		_ = cfg.Save()
+
+		embed.NewEmbed().
+			SetDescription("Cleared all reminders.").
+			Send(ctx)
+	default:
+		_ = ctx.RespondText("Invalid <get/add/rm/clear> argument. Use `get`, `add`, `rm`, or `clear`.")
+	}
 }
 
 // Conversion utilities
@@ -3235,7 +3248,7 @@ func (UtilityCommands) wikipedia(ctx *dgc.Ctx) {
 		_ = ctx.RespondText("An error has occurred.")
 		return
 	}
-	
+
 	if len(article) > 2000 {
 		article = article[:2000]
 	}
