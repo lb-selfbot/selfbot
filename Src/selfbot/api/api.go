@@ -245,21 +245,6 @@ func Translate(text, language string) *TranslateResult {
 	}
 }
 
-func ReportMessage(session *discordgo.Session, guildID, channelID, messageID string, reason int) error {
-	_, err := session.Request(
-		"POST",
-		"https://discord.com/api/v9/report",
-		map[string]any{
-			"channel_id": channelID,
-			"guild_id":   guildID,
-			"message_id": messageID,
-			"reason":     reason,
-		},
-	)
-
-	return err
-}
-
 func GoogleSearch(query string) (*simplejson.Json, error) {
 	url := fmt.Sprintf("https://api.lightning-bot.com/api/v3/misc/search?query=%s", url.QueryEscape(query))
 
