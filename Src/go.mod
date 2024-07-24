@@ -1,6 +1,6 @@
 module github.com/LightningDev1/LB-Selfbot
 
-go 1.21.1
+go 1.22
 
 require (
 	fyne.io/fyne/v2 v2.5.0
