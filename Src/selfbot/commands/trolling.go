@@ -1,6 +1,7 @@
 package commands
 
 import (
+	"encoding/base64"
 	"fmt"
 	"strconv"
 	"strings"
@@ -9,7 +10,6 @@ import (
 	"github.com/LightningDev1/discordgo"
 
 	"github.com/LightningDev1/LB-Selfbot/selfbot/constants"
-	"github.com/LightningDev1/LB-Selfbot/selfbot/encodings"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/utils"
 	"github.com/LightningDev1/dgc"
 )
@@ -157,7 +157,8 @@ func (TrollingCommands) token(ctx *dgc.Ctx) {
 		_ = ctx.RespondText("Could not find user.")
 		return
 	}
-	_ = ctx.RespondText(encodings.Base64(user.ID, false))
+
+	_ = ctx.RespondText(base64.StdEncoding.EncodeToString([]byte(user.ID)))
 }
 
 func (TrollingCommands) trollnitro(ctx *dgc.Ctx) {

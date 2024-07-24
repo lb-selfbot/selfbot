@@ -7,6 +7,7 @@ import (
 
 	"github.com/LightningDev1/LB-Selfbot/selfbot/constants"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/embed"
+	"github.com/LightningDev1/LB-Selfbot/selfbot/encodings"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/utils"
 	"github.com/LightningDev1/dgc"
 	"github.com/common-nighthawk/go-figure"
@@ -190,6 +191,64 @@ func (t TextCommands) RegisterCommands(router *dgc.Router) {
 		Usage:       "[p]codeblock <language> <code>",
 		Handler:     t.codeblock,
 	})
+
+	// Encoding commands
+
+	router.RegisterCmd(&dgc.Command{
+		Name:        "encodings",
+		Description: "Get a list of all available encodings",
+		Usage:       "[p]encodings",
+		Handler:     t.encodings,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "encode",
+		Description: "Encode text using a specified encoding",
+		Usage:       "[p]encode <encoding> <text>",
+		Handler:     t.encode,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "decode",
+		Description: "Decode text using a specified encoding",
+		Usage:       "[p]decode <encoding> <text>",
+		Handler:     t.decode,
+	})
+
+	// Hashing commands
+
+	router.RegisterCmd(&dgc.Command{
+		Name:        "hashes",
+		Description: "Get a list of all available hashes",
+		Usage:       "[p]hashes",
+		Handler:     t.hashes,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "hash",
+		Description: "Hash text using a specified hash",
+		Usage:       "[p]hash <hash> <text>",
+		Handler:     t.hash,
+	})
+
+	// Encryption commands
+
+	router.RegisterCmd(&dgc.Command{
+		Name:        "encryptions",
+		Description: "Get a list of all available encryptions",
+		Usage:       "[p]encryptions",
+		Handler:     t.encryptions,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "encrypt",
+		Description: "Encrypt text using a specified encryption",
+		Usage:       "[p]encrypt <encryption> <\"key\"> <\"text\">",
+		Handler:     t.encrypt,
+	})
+	router.RegisterCmd(&dgc.Command{
+		Name:        "decrypt",
+		Description: "Decrypt text using a specified encryption",
+		Usage:       "[p]decrypt <encryption> <\"key\"> <\"text\">",
+		Handler:     t.decrypt,
+	})
+
 }
 
 func (TextCommands) empty(ctx *dgc.Ctx) {
@@ -488,4 +547,149 @@ func (TextCommands) codeblock(ctx *dgc.Ctx) {
 	code := utils.String.RemoveWords(ctx.Arguments.Raw(), 1)
 
 	_ = ctx.RespondText("```" + strings.ToLower(language) + "\n" + code + "\n```")
+}
+
+func (TextCommands) encodings(ctx *dgc.Ctx) {
+	var encodingNames []string
+	for name := range encodings.Encodings {
+		encodingNames = append(encodingNames, name)
+	}
+
+	embed.NewEmbed().
+		AddField("Available Encodings", strings.Join(encodingNames, ", ")).
+		Send(ctx)
+}
+
+func (TextCommands) encode(ctx *dgc.Ctx) {
+	encodingName := ctx.Arguments.Get(0).Raw()
+	text := utils.String.RemoveWords(ctx.Arguments.Raw(), 1)
+
+	encoding, ok := encodings.Encodings[encodingName]
+	if !ok {
+		_ = ctx.RespondText("Invalid encoding! Use `[p]encodings` to get a list of all available encodings.")
+		return
+	}
+
+	encoded, err := encoding.Encode(text)
+	if err != nil {
+		_ = ctx.RespondText("An error has occurred: " + err.Error())
+		return
+	}
+
+	embed.NewEmbed().
+		AddField("Text", text).
+		AddField("Encoded", encoded).
+		Send(ctx)
+}
+
+func (TextCommands) decode(ctx *dgc.Ctx) {
+	encodingName := ctx.Arguments.Get(0).Raw()
+	text := utils.String.RemoveWords(ctx.Arguments.Raw(), 1)
+
+	encoding, ok := encodings.Encodings[encodingName]
+	if !ok {
+		_ = ctx.RespondText("Invalid encoding! Use `[p]encodings` to get a list of all available encodings.")
+		return
+	}
+
+	if encoding.Decode == nil {
+		encoding.Decode = encoding.Encode
+	}
+
+	decoded, err := encoding.Decode(text)
+	if err != nil {
+		_ = ctx.RespondText("An error has occurred: " + err.Error())
+		return
+	}
+
+	embed.NewEmbed().
+		AddField("Text", text).
+		AddField("Decoded", decoded).
+		Send(ctx)
+}
+
+func (TextCommands) hashes(ctx *dgc.Ctx) {
+	var hashNames []string
+	for name := range encodings.Hashes {
+		hashNames = append(hashNames, name)
+	}
+
+	embed.NewEmbed().
+		AddField("Available Hashes", strings.Join(hashNames, ", ")).
+		Send(ctx)
+}
+
+func (TextCommands) hash(ctx *dgc.Ctx) {
+	hashName := ctx.Arguments.Get(0).Raw()
+	text := utils.String.RemoveWords(ctx.Arguments.Raw(), 1)
+
+	hashFunc, ok := encodings.Hashes[hashName]
+	if !ok {
+		_ = ctx.RespondText("Invalid hash! Use `[p]hashes` to get a list of all available hashes.")
+		return
+	}
+
+	hashed := hashFunc(text)
+
+	embed.NewEmbed().
+		AddField("Text", text).
+		AddField("Hashed", hashed).
+		Send(ctx)
+}
+
+func (TextCommands) encryptions(ctx *dgc.Ctx) {
+	var encryptionNames []string
+	for name := range encodings.Encryptions {
+		encryptionNames = append(encryptionNames, name)
+	}
+
+	embed.NewEmbed().
+		AddField("Available Encryptions", strings.Join(encryptionNames, ", ")).
+		Send(ctx)
+}
+
+func (TextCommands) encrypt(ctx *dgc.Ctx) {
+	encryptionName := ctx.Arguments.Get(0).Raw()
+	key := utils.Arguments["<\"key\">"]
+	text := utils.Arguments["<\"text\">"]
+
+	encryption, ok := encodings.Encryptions[encryptionName]
+	if !ok {
+		_ = ctx.RespondText("Invalid encryption! Use `[p]encryptions` to get a list of all available encryptions.")
+		return
+	}
+
+	encrypted, err := encryption.Encrypt(text, key)
+	if err != nil {
+		_ = ctx.RespondText("An error has occurred: " + err.Error())
+		return
+	}
+
+	embed.NewEmbed().
+		AddField("Text", text).
+		AddField("Encrypted", encrypted).
+		Send(ctx)
+}
+
+func (TextCommands) decrypt(ctx *dgc.Ctx) {
+	encryptionName := ctx.Arguments.Get(0).Raw()
+	key := utils.Arguments["<\"key\">"]
+	text := utils.Arguments["<\"text\">"]
+
+	encryption, ok := encodings.Encryptions[encryptionName]
+	if !ok {
+		_ = ctx.RespondText("Invalid encryption! Use `[p]encryptions` to get a list of all available encryptions.")
+		return
+	}
+
+	encrypted, err := encryption.Decrypt(text, key)
+	if err != nil {
+		_ = ctx.RespondText("An error has occurred: " + err.Error())
+		return
+	}
+
+	embed.NewEmbed().
+		AddField("Text", text).
+		AddField("Decrypted", encrypted).
+		Send(ctx)
 }
