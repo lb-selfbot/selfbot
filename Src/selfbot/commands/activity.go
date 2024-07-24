@@ -287,12 +287,9 @@ func (a *ActivityCommands) setCustomStatus(session *discordgo.Session, status st
 
 func (a *ActivityCommands) status(ctx *dgc.Ctx) {
 	status := strings.ToLower(ctx.Arguments.Get(0).Raw())
-
+	
 	switch status {
-	case "online":
-	case "dnd":
-	case "idle":
-	case "invisible":
+	case "online", "dnd", "idle", "invisible":
 		err := a.setStatus(ctx.Session, status)
 		if err != nil {
 			_ = ctx.RespondText("An error occurred while changing your status: " + err.Error())
