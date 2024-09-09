@@ -18,5 +18,7 @@ func main() {
 		},
 	}
 
+	debug.SetMemoryLimit(300 * 1 << 20)
+
 	mobile.Main()
 }

@@ -148,5 +148,7 @@ func init() {
 func main() {
 	initArgs()
 
+	debug.SetMemoryLimit(300 * 1 << 20)
+
 	desktop.Main(discordgoDebug)
 }
