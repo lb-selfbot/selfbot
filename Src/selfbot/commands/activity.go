@@ -17,6 +17,8 @@ import (
 	"github.com/LightningDev1/LB-Selfbot/selfbot/utils"
 	"github.com/LightningDev1/dgc"
 	"github.com/LightningDev1/discordgo"
+	"github.com/LightningDev1/discordgo/protos"
+	"google.golang.org/protobuf/types/known/wrapperspb"
 )
 
 type ActivityCommands struct{}
@@ -246,7 +248,8 @@ func (a *ActivityCommands) setStatus(session *discordgo.Session, status string) 
 	sessions.LastStatusChange = time.Now()
 	sessions.Status = status
 
-	err := api.ChangeSettings(session, "/settings", map[string]any{"status": status})
+	session.State.UserSettings.Status.Status = wrapperspb.String(status)
+	err := session.UserSettingsUpdate(session.State.UserSettings, true)
 	if err != nil {
 		return err
 	}
@@ -258,36 +261,37 @@ func (a *ActivityCommands) setStatus(session *discordgo.Session, status string) 
 }
 
 func (a *ActivityCommands) setCustomStatus(session *discordgo.Session, status string) error {
-	if status == "" {
-		err := api.ChangeSettings(session, "/settings", map[string]any{"custom_status": nil})
-		if err != nil {
-			return err
+	var customStatus *protos.PreloadedUserSettings_CustomStatus
+	var activity *discordgo.Activity
+
+	if status != "" {
+		customStatus = &protos.PreloadedUserSettings_CustomStatus{
+			Text: status,
 		}
 
-		return session.UpdateStatusComplex(discordgo.UpdateStatusData{})
+		activity = &discordgo.Activity{
+			Type:  discordgo.ActivityTypeCustom,
+			Name:  "Custom Status",
+			State: status,
+		}
 	}
 
-	err := api.ChangeSettings(session, "/settings", map[string]any{
-		"custom_status": map[string]any{"text": status},
-	})
+	session.State.UserSettings.Status.CustomStatus = customStatus
+	err := session.UserSettingsUpdate(session.State.UserSettings, true)
 	if err != nil {
 		return err
 	}
 
 	return session.UpdateStatusComplex(discordgo.UpdateStatusData{
-		Activities: []*discordgo.Activity{{
-			Type:  discordgo.ActivityTypeCustom,
-			Name:  "Custom Status",
-			State: status,
-		}},
-		AFK:    true,
-		Status: sessions.Status,
+		Activities: []*discordgo.Activity{activity},
+		AFK:        true,
+		Status:     sessions.Status,
 	})
 }
 
 func (a *ActivityCommands) status(ctx *dgc.Ctx) {
 	status := strings.ToLower(ctx.Arguments.Get(0).Raw())
-	
+
 	switch status {
 	case "online", "dnd", "idle", "invisible":
 		err := a.setStatus(ctx.Session, status)

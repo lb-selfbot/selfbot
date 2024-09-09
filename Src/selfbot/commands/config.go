@@ -18,7 +18,7 @@ import (
 type ConfigCommands struct{}
 
 func (c ConfigCommands) RegisterCommands(router *dgc.Router) {
-	router.StartCategory("Config", "Change the bot's config")
+	router.StartCategory("Config", "Modify the bot's configuration")
 
 	router.RegisterCmd(&dgc.Command{
 		Name:        "commandprefix",

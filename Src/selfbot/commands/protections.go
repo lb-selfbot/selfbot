@@ -2,6 +2,7 @@ package commands
 
 import (
 	"fmt"
+	"strconv"
 	"strings"
 
 	"github.com/LightningDev1/LB-Selfbot/selfbot/api"
@@ -432,17 +433,23 @@ func (ProtectionsCommands) dm(ctx *dgc.Ctx) {
 	var err error
 	var action string
 
-	switch utils.Arguments["<open/close>"] {
+	switch strings.ToLower(utils.Arguments["<open/close>"]) {
 	case "open":
-		err = api.ChangeSettings(ctx.Session, "/settings", map[string]any{"restricted_guilds": []any{}})
+		ctx.Session.State.UserSettings.Privacy.RestrictedGuildIds = []uint64{}
+		err = ctx.Session.UserSettingsUpdate(ctx.Session.State.UserSettings, true)
+
 		action = "Opened"
 	case "close":
-		var guildIDs []string
+		var guildIDs []uint64
 		for _, g := range ctx.Session.State.Guilds {
-			guildIDs = append(guildIDs, g.ID)
+			id, _ := strconv.Atoi(g.ID)
+
+			guildIDs = append(guildIDs, uint64(id))
 		}
 
-		err = api.ChangeSettings(ctx.Session, "/settings", map[string]any{"restricted_guilds": guildIDs})
+		ctx.Session.State.UserSettings.Privacy.RestrictedGuildIds = guildIDs
+		err = ctx.Session.UserSettingsUpdate(ctx.Session.State.UserSettings, true)
+
 		action = "Closed"
 	default:
 		_ = ctx.RespondText("Invalid <open/close> argument. Use `open` or `close`.")
@@ -465,10 +472,10 @@ func (ProtectionsCommands) friendrequests(ctx *dgc.Ctx) {
 
 	switch utils.Arguments["<allow/deny>"] {
 	case "allow":
-		err = api.AllowFriendRequestsFrom(ctx.Session, []string{"all"})
+		err = api.AllowFriendRequests(ctx.Session, true)
 		action = "Allowed"
 	case "deny":
-		err = api.AllowFriendRequestsFrom(ctx.Session, []string{})
+		err = api.AllowFriendRequests(ctx.Session, false)
 		action = "Denied"
 	default:
 		_ = ctx.RespondText("Invalid <allow/deny> argument. Use `allow` or `deny`.")

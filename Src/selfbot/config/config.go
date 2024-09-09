@@ -134,9 +134,12 @@ func ActivityFromDiscord(activity *discordgo.Activity) Activity {
 }
 
 type Reminder struct {
-	ID      int       `json:"ID"`
+	Name    string    `json:"Name"`
 	Content string    `json:"Content"`
 	At      time.Time `json:"At"`
+
+	// Deprecated
+	ID *int `json:"ID,omitempty"`
 }
 
 type Config struct {

@@ -13,7 +13,7 @@ import (
 type AICommands struct{}
 
 func (a *AICommands) RegisterCommands(router *dgc.Router) {
-	router.StartCategory("AI", "Interact with AIs")
+	router.StartCategory("AI", "Interact with AI's")
 
 	router.RegisterCmd(&dgc.Command{
 		Name:        "chatgpt",

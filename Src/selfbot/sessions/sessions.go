@@ -1,6 +1,7 @@
 package sessions
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/LightningDev1/LB-Selfbot/selfbot/logging"
@@ -24,9 +25,14 @@ func RegisterSessionHandler(session *discordgo.Session) {
 
 func onSessionsReplace(session *discordgo.Session, replace *discordgo.SessionsReplace) {
 	parseStatus(session, replace.Sessions, true)
-	GatewaySessions = filterSessions(replace.Sessions)
+	newSessions := filterSessions(replace.Sessions)
 
-	_ = refreshLoginSessions(session)
+	// Refresh login sessions if a new session is added
+	if len(newSessions) > len(GatewaySessions) {
+		_ = refreshLoginSessions(session)
+	}
+
+	GatewaySessions = newSessions
 }
 
 func filterSessions(sessions []*discordgo.GatewaySession) []*discordgo.GatewaySession {
@@ -74,14 +80,7 @@ func parseStatus(session *discordgo.Session, sessions []*discordgo.GatewaySessio
 }
 
 func getFallbackStatus(session *discordgo.Session) string {
-	status := "idle"
-
-	settings, err := session.UserSettings()
-	if err == nil {
-		status = settings["status"].(string)
-	}
-
-	return status
+	return session.State.UserSettings.Status.Status.Value
 }
 
 func setStatus(session *discordgo.Session, status string, isReplace bool) {
@@ -104,6 +103,7 @@ func setStatus(session *discordgo.Session, status string, isReplace bool) {
 }
 
 func refreshLoginSessions(session *discordgo.Session) error {
+	fmt.Println("refreshLoginSessions")
 	sessions, err := session.LoginSessions()
 	if err != nil {
 		return err

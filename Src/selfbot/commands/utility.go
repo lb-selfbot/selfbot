@@ -70,22 +70,10 @@ func (u UtilityCommands) RegisterCommands(router *dgc.Router) {
 		Handler:     u.copychannel,
 	})
 	router.RegisterCmd(&dgc.Command{
-		Name:        "leaveservers",
-		Description: "Leave all of your servers",
-		Usage:       "[p]leaveservers",
-		Handler:     u.leaveservers,
-	})
-	router.RegisterCmd(&dgc.Command{
 		Name:        "leavegroups",
 		Description: "Leave all of your groups",
 		Usage:       "[p]leavegroups [silent: on/off]",
 		Handler:     u.leavegroups,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "unfriendall",
-		Description: "Remove all of your friends",
-		Usage:       "[p]unfriendall",
-		Handler:     u.unfriendall,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "adminservers",
@@ -889,7 +877,12 @@ func (UtilityCommands) copyserver(ctx *dgc.Ctx) {
 		return
 	}
 
-	newGuild, err := ctx.Session.GuildCreate(fmt.Sprintf("%s - Copy", guild.Name))
+	name := fmt.Sprintf("%s - Copy", guild.Name)
+	if len(name) > 100 {
+		name = name[:99]
+	}
+
+	newGuild, err := ctx.Session.GuildCreate(name)
 	if err != nil {
 		_ = ctx.RespondText("Error copying server: " + err.Error())
 		return
@@ -1116,17 +1109,6 @@ func (UtilityCommands) copychannel(ctx *dgc.Ctx) {
 	}
 }
 
-func (UtilityCommands) leaveservers(ctx *dgc.Ctx) {
-	for _, guild := range ctx.Session.State.Guilds {
-		err := ctx.Session.GuildLeave(guild.ID)
-		if err != nil {
-			_ = ctx.RespondText("Error leaving server: " + err.Error())
-		}
-
-		time.Sleep(2 * time.Second)
-	}
-}
-
 func (UtilityCommands) leavegroups(ctx *dgc.Ctx) {
 	rawSilentToggle := strings.ToLower(utils.Arguments["[silent leave: on/off]"])
 	silentToggle := rawSilentToggle == "on"
@@ -1140,24 +1122,6 @@ func (UtilityCommands) leavegroups(ctx *dgc.Ctx) {
 
 			time.Sleep(2 * time.Second)
 		}
-	}
-}
-
-func (UtilityCommands) unfriendall(ctx *dgc.Ctx) {
-	rels, err := ctx.Session.UserRelationships()
-	if err != nil {
-		_ = ctx.RespondText("Error getting relationships: " + err.Error())
-		return
-	}
-
-	for _, rel := range rels {
-		err = ctx.Session.UserRelationshipDelete(rel.User.ID)
-		if err != nil {
-			_ = ctx.RespondText("Error removing friend: " + err.Error())
-			return
-		}
-
-		time.Sleep(2 * time.Second)
 	}
 }
 
@@ -1921,11 +1885,38 @@ func (UtilityCommands) systeminfo(ctx *dgc.Ctx) {
 	if runtime.GOOS == "windows" {
 		path = "C:"
 	}
-	hostStat, _ := host.Info()
-	cpuStat, _ := cpu.Info()
+
+	hostStat, err := host.Info()
+	if err != nil {
+		_ = ctx.RespondText("Error getting host info: " + err.Error())
+		return
+	}
+
+	cpuStat, err := cpu.Info()
+	if err != nil {
+		_ = ctx.RespondText("Error getting cpu info: " + err.Error())
+		return
+	}
+
+	if len(cpuStat) < 1 {
+		_ = ctx.RespondText("Error getting cpu info: No CPUs found")
+		return
+	}
+
 	cpuInfo := cpuStat[0]
-	vmStat, _ := mem.VirtualMemory()
-	diskStat, _ := disk.Usage(path)
+
+	vmStat, err := mem.VirtualMemory()
+	if err != nil {
+		_ = ctx.RespondText("Error getting memory info: " + err.Error())
+		return
+	}
+
+	diskStat, err := disk.Usage(path)
+	if err != nil {
+		_ = ctx.RespondText("Error getting disk info: " + err.Error())
+		return
+	}
+
 	embed.NewEmbed().
 		SetDescription("System Information").
 		AddField("OS", utils.String.Capitalize(hostStat.OS)).

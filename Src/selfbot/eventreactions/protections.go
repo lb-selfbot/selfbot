@@ -1,6 +1,7 @@
 package eventreactions
 
 import (
+	"strconv"
 	"time"
 	"unicode"
 
@@ -98,17 +99,15 @@ func (p *Protections) MessageCreateHandler(session *discordgo.Session, message *
 
 		_ = session.MessageAck(message.ChannelID, message.ID)
 
-		var guildIDs []string
+		var guildIDs []uint64
 		for _, g := range session.State.Guilds {
-			guildIDs = append(guildIDs, g.ID)
+			id, _ := strconv.Atoi(g.ID)
+
+			guildIDs = append(guildIDs, uint64(id))
 		}
 
-		settings, err := session.UserSettings()
-		if err != nil {
-			return
-		}
-
-		err = api.ChangeSettings(session, "/settings", map[string]any{"restricted_guilds": guildIDs})
+		session.State.UserSettings.Privacy.RestrictedGuildIds = guildIDs
+		err := session.UserSettingsUpdate(session.State.UserSettings, true)
 		if err != nil {
 			return
 		}
@@ -121,9 +120,11 @@ func (p *Protections) MessageCreateHandler(session *discordgo.Session, message *
 			// Enable DMs after 5 minutes
 			time.Sleep(5 * 60)
 
-			_ = api.ChangeSettings(session, "/settings", map[string]any{
-				"restricted_guilds": settings["restricted_guilds"],
-			})
+			session.State.UserSettings.Privacy.RestrictedGuildIds = []uint64{}
+			err := session.UserSettingsUpdate(session.State.UserSettings, true)
+			if err != nil {
+				return
+			}
 		}()
 	}
 
@@ -251,14 +252,14 @@ func (p *Protections) RelationshipAddHandler(session *discordgo.Session, relatio
 		}
 
 		_ = session.UserRelationshipDelete(relationship.User.ID)
-		_ = api.AllowFriendRequestsFrom(session, []string{})
+		_ = api.AllowFriendRequests(session, false)
 
 		logging.Logging.FriendRequestSpamBlocked()
 
 		go func() {
 			time.Sleep(5 * time.Minute)
 
-			_ = api.AllowFriendRequestsFrom(session, []string{"all"})
+			_ = api.AllowFriendRequests(session, true)
 		}()
 	}()
 }

@@ -768,11 +768,21 @@ func (FunCommands) slot(ctx *dgc.Ctx) {
 			SetDescription(text).
 			ToString("load")[0]
 	}
-	message, _ := ctx.Session.ChannelMessageSend(ctx.Event.ChannelID, getEmbed(false))
+	
+	message, err := ctx.Session.ChannelMessageSend(ctx.Event.ChannelID, getEmbed(false))
+	if err != nil {
+		return
+	}
+
 	for i := 0; i < 5; i++ {
 		time.Sleep(500 * time.Millisecond)
-		_, _ = ctx.Session.ChannelMessageEdit(message.ChannelID, message.ID, getEmbed(false))
+		
+		_, err = ctx.Session.ChannelMessageEdit(message.ChannelID, message.ID, getEmbed(false))
+		if err != nil {
+			return
+		}
 	}
+
 	_, _ = ctx.Session.ChannelMessageEdit(message.ChannelID, message.ID, getEmbed(true))
 }
 

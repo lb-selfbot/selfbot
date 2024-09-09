@@ -15,7 +15,7 @@ import (
 
 var tlsClientOptions = []tls_client.HttpClientOption{
 	tls_client.WithTimeoutSeconds(120),
-	tls_client.WithClientProfile(profiles.Chrome_117),
+	tls_client.WithClientProfile(profiles.Chrome_124),
 	tls_client.WithCookieJar(tls_client.NewCookieJar()),
 	tls_client.WithRandomTLSExtensionOrder(),
 	tls_client.WithNotFollowRedirects(),

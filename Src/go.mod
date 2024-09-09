@@ -6,14 +6,14 @@ require (
 	fyne.io/fyne/v2 v2.5.0
 	github.com/LightningDev1/beeep v0.1.0
 	github.com/LightningDev1/chromiumdp v0.0.0-20231128154929-66ef7c9d7fb7
-	github.com/LightningDev1/dgc v1.1.4-0.20231130125735-679db2635a21
-	github.com/LightningDev1/discordgo v0.26.6-0.20240722174809-e0040789e127
+	github.com/LightningDev1/dgc v1.1.4-0.20240904172416-89e028f8bd82
+	github.com/LightningDev1/discordgo v0.26.6-0.20240817171644-39ad14baddc8
 	github.com/LightningDev1/go-foreground v0.0.0-20240212172534-661cc0000e42
 	github.com/LightningDev1/go-privnote v0.1.1
 	github.com/LightningDev1/screenshot v0.0.0-20230719145300-c8d3633174bf
 	github.com/bitly/go-simplejson v0.5.1
 	github.com/bogdanfinn/fhttp v0.5.28
-	github.com/bogdanfinn/tls-client v1.7.6
+	github.com/bogdanfinn/tls-client v1.7.7
 	github.com/brianvoe/gofakeit/v6 v6.28.0
 	github.com/charmbracelet/bubbles v0.18.0
 	github.com/charmbracelet/bubbletea v0.26.6
@@ -31,10 +31,10 @@ require (
 	github.com/robert-nix/ansihtml v1.0.1
 	github.com/shirou/gopsutil v3.21.11+incompatible
 	github.com/traefik/yaegi v0.16.1
-	golang.org/x/crypto v0.25.0
-	golang.org/x/sys v0.22.0
-	golang.org/x/term v0.22.0
-	golang.org/x/text v0.16.0
+	golang.org/x/crypto v0.26.0
+	golang.org/x/sys v0.24.0
+	golang.org/x/term v0.23.0
+	golang.org/x/text v0.17.0
 )
 
 require (
@@ -93,7 +93,7 @@ require (
 	github.com/nu7hatch/gouuid v0.0.0-20131221200532-179d4d0c4d8d // indirect
 	github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2 // indirect
 	github.com/progrium/macdriver v0.5.0-preview.0.20240129182626-6a98f82290e5 // indirect
-	github.com/quic-go/quic-go v0.45.1 // indirect
+	github.com/quic-go/quic-go v0.46.0 // indirect
 	github.com/rivo/uniseg v0.4.7 // indirect
 	github.com/rymdport/portal v0.2.3 // indirect
 	github.com/sahilm/fuzzy v0.1.1 // indirect
@@ -110,8 +110,9 @@ require (
 	github.com/zekroTJA/timedmap v1.5.2 // indirect
 	golang.org/x/image v0.18.0 // indirect
 	golang.org/x/mobile v0.0.0-20240716161057-1ad2df20a8b6 // indirect
-	golang.org/x/net v0.27.0 // indirect
-	golang.org/x/sync v0.7.0 // indirect
+	golang.org/x/net v0.28.0 // indirect
+	golang.org/x/sync v0.8.0 // indirect
+	google.golang.org/protobuf v1.34.2 // indirect
 	gopkg.in/natefinch/npipe.v2 v2.0.0-20160621034901-c1b8fa8bdcce // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )

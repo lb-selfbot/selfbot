@@ -12,7 +12,6 @@ var (
 
 type CommandRegistrar struct {
 	TextCommands           TextCommands
-	EncodingCommands       EncodingCommands
 	CurrencyCommands       CurrencyCommands
 	FunCommands            FunCommands
 	TrollingCommands       TrollingCommands
@@ -28,7 +27,6 @@ type CommandRegistrar struct {
 	SpotifyCommands        SpotifyCommands
 	GameCommands           GameCommands
 	ActivityCommands       ActivityCommands
-	AnimationCommands      AnimationCommands
 	SessionsCommands       SessionsCommands
 	NSFWCommands           NSFWCommands
 	RedditCommands         RedditCommands
@@ -40,7 +38,6 @@ type CommandRegistrar struct {
 
 func (c CommandRegistrar) RegisterCommands(session *discordgo.Session, router *dgc.Router, registerHelp bool) {
 	c.TextCommands.RegisterCommands(router)
-	c.EncodingCommands.RegisterCommands(router)
 	c.CurrencyCommands.RegisterCommands(router)
 	c.FunCommands.RegisterCommands(router)
 	c.TrollingCommands.RegisterCommands(router)
@@ -52,11 +49,10 @@ func (c CommandRegistrar) RegisterCommands(session *discordgo.Session, router *d
 	c.UtilityCommands.RegisterCommands(router)
 	c.SlashCommands.RegisterCommands(router)
 	c.DumpingCommands.RegisterCommands(router)
-	// c.BackupCommands.RegisterCommands(router)
+	c.BackupCommands.RegisterCommands(router)
 	c.SpotifyCommands.RegisterCommands(router)
 	c.GameCommands.RegisterCommands(router)
 	c.ActivityCommands.RegisterCommands(router, session)
-	c.AnimationCommands.RegisterCommands(router)
 	c.SessionsCommands.RegisterCommands(router, session)
 	c.NSFWCommands.RegisterCommands(router)
 	c.RedditCommands.RegisterCommands(router)

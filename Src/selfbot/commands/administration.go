@@ -2090,12 +2090,7 @@ func (*AdministrationCommands) invite(ctx *dgc.Ctx) {
 		return
 	}
 
-	invite, err := ctx.Session.ChannelInviteCreate(channelID, discordgo.Invite{
-		MaxAge:    ageInt,
-		MaxUses:   usesInt,
-		Temporary: false,
-		Unique:    true,
-	})
+	invite, err := ctx.Session.ChannelInviteCreate(channelID, ageInt, usesInt, false)
 	if err != nil {
 		_ = ctx.RespondText("Error creating invite: " + err.Error())
 		return

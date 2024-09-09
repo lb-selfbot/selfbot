@@ -15,6 +15,7 @@ import (
 	"github.com/LightningDev1/LB-Selfbot/selfbot/config"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/utils"
 	"github.com/LightningDev1/discordgo"
+	"google.golang.org/protobuf/types/known/wrapperspb"
 
 	"github.com/LightningDev1/LB-Selfbot/selfbot/constants"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/http"
@@ -328,10 +329,12 @@ func Obfuscate(lang, code string) string {
 		map[string]any{"lang": lang, "code": code},
 	)
 
-	return utils.Misc.Or(
-		resp.Get("code").MustString(),
-		"An error has occurred: "+err.Error(),
-	)
+	code = resp.Get("code").MustString()
+	if code == "" {
+		return "An error has occurred: " + err.Error()
+	}
+
+	return code
 }
 
 type URLEmbed struct {
@@ -528,16 +531,14 @@ func ChangeSettings(session *discordgo.Session, path string, settings map[string
 	return err
 }
 
-func AllowFriendRequestsFrom(session *discordgo.Session, types []string) error {
-	newSettings := map[string]any{
-		"friend_source_flags": map[string]any{
-			"all":            utils.SliceContains(types, "all"),
-			"mutual_friends": utils.SliceContains(types, "mutual_friends"),
-			"mutual_guilds":  utils.SliceContains(types, "mutual_guilds"),
-		},
+func AllowFriendRequests(session *discordgo.Session, allow bool) error {
+	if allow {
+		session.State.UserSettings.Privacy.FriendSourceFlags = wrapperspb.UInt32(14)
+	} else {
+		session.State.UserSettings.Privacy.FriendSourceFlags = wrapperspb.UInt32(0)
 	}
 
-	return ChangeSettings(session, "/settings", newSettings)
+	return session.UserSettingsUpdate(session.State.UserSettings, true)
 }
 
 // AI
