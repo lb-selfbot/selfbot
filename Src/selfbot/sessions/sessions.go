@@ -1,7 +1,6 @@
 package sessions
 
 import (
-	"fmt"
 	"time"
 
 	"github.com/LightningDev1/LB-Selfbot/selfbot/logging"
@@ -103,7 +102,6 @@ func setStatus(session *discordgo.Session, status string, isReplace bool) {
 }
 
 func refreshLoginSessions(session *discordgo.Session) error {
-	fmt.Println("refreshLoginSessions")
 	sessions, err := session.LoginSessions()
 	if err != nil {
 		return err

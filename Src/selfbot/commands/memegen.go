@@ -3,8 +3,8 @@ package commands
 import (
 	"fmt"
 	"math/rand"
-	"net/url"
 
+	"github.com/LightningDev1/LB-Selfbot/selfbot/api"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/embed"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/http"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/utils"
@@ -138,34 +138,28 @@ func (MemeGenCommands) randommeme(ctx *dgc.Ctx) {
 
 	// Get a random meme from the list
 	meme := memes.GetIndex(rand.Intn(memesLen))
-	templateId := meme.Get("id").MustString()
+	templateID := meme.Get("id").MustString()
 
-	uri := "https://api.imgflip.com/caption_image?template_id=%s&username=LightningBotSB2&password=LightningBotSB2&text0=%s&text1=%s"
-	uri = fmt.Sprintf(uri, templateId, url.QueryEscape(utils.Arguments["<\"top\">"]), url.QueryEscape(utils.Arguments["<\"bottom\">"]))
-
-	image, err := http.GetJson(uri)
+	image, err := api.CreateMeme(templateID, utils.Arguments["<\"top\">"], utils.Arguments["<\"bottom\">"])
 	if err != nil {
-		_ = ctx.RespondText("An error has occurred.")
+		_ = ctx.RespondText("An error has occurred: " + err.Error())
 		return
 	}
 
 	embed.NewEmbed().
 		AddField("Used Meme", meme.Get("name").MustString()).
-		SetImage(image.GetPath("data", "url").MustString()).
+		SetImage(image).
 		Send(ctx)
 }
 
 func (MemeGenCommands) custommeme(ctx *dgc.Ctx) {
-	uri := "https://api.imgflip.com/caption_image?template_id=%s&username=LightningBotSB2&password=LightningBotSB2&text0=%s&text1=%s"
-	uri = fmt.Sprintf(uri, url.QueryEscape(utils.Arguments["<template id>"]), url.QueryEscape(utils.Arguments["<\"top\">"]), url.QueryEscape(utils.Arguments["<\"bottom\">"]))
-
-	image, err := http.GetJson(uri)
+	image, err := api.CreateMeme(utils.Arguments["<template id>"], utils.Arguments["<\"top\">"], utils.Arguments["<\"bottom\">"])
 	if err != nil {
-		_ = ctx.RespondText("An error has occurred.")
+		_ = ctx.RespondText("An error has occurred: " + err.Error())
 		return
 	}
 
-	_ = ctx.RespondText(image.GetPath("data", "url").MustString())
+	_ = ctx.RespondText(image)
 }
 
 func (MemeGenCommands) generateFunc(templateID string) func(ctx *dgc.Ctx) {
@@ -174,15 +168,12 @@ func (MemeGenCommands) generateFunc(templateID string) func(ctx *dgc.Ctx) {
 	// variable will always be the last element in the command array.
 
 	return func(ctx *dgc.Ctx) {
-		uri := "https://api.imgflip.com/caption_image?template_id=%s&username=LightningBotSB2&password=LightningBotSB2&text0=%s&text1=%s"
-		uri = fmt.Sprintf(uri, templateID, url.QueryEscape(utils.Arguments["<\"top\">"]), url.QueryEscape(utils.Arguments["<\"bottom\">"]))
-
-		image, err := http.GetJson(uri)
+		image, err := api.CreateMeme(templateID, utils.Arguments["<\"top\">"], utils.Arguments["<\"bottom\">"])
 		if err != nil {
-			_ = ctx.RespondText("An error has occurred.")
+			_ = ctx.RespondText("An error has occurred: " + err.Error())
 			return
 		}
 
-		_ = ctx.RespondText(image.GetPath("data", "url").MustString())
+		_ = ctx.RespondText(image)
 	}
 }

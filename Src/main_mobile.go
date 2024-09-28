@@ -5,6 +5,7 @@ package main
 import (
 	"context"
 	"net"
+	"runtime/debug"
 
 	"github.com/LightningDev1/LB-Selfbot/mobile"
 )

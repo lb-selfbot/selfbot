@@ -31,6 +31,31 @@ func CreatePaste(text string) (string, error) {
 	return "https://paste.lightning-bot.com/%s" + resp.Get("key").MustString(), nil
 }
 
+func CreateMeme(templateID, text0, text1 string) (string, error) {
+	cfg, err := config.GetConfig()
+	if err != nil {
+		return "An error has occurred: " + err.Error(), err
+	}
+
+	resp, err := http.PostJson("https://api.lightning-bot.com/api/v3/selfbot/memegen", map[string]any{
+		"username":    cfg.Account.LightningBot.Username,
+		"password":    cfg.Account.LightningBot.Password,
+		"template_id": templateID,
+		"text0":       text0,
+		"text1":       text1,
+	})
+	if err != nil {
+		return "An error has occurred: " + err.Error(), err
+	}
+
+	imageURL := resp.Get("url").MustString()
+	if imageURL == "" {
+		return "An error has occurred: " + resp.Get("error").MustString(), fmt.Errorf("empty response")
+	}
+
+	return imageURL, nil
+}
+
 func Ping(host string) (time.Duration, error) {
 	beforeRequest := time.Now()
 

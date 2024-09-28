@@ -83,7 +83,7 @@ func (u UtilityCommands) RegisterCommands(router *dgc.Router) {
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "admingroups",
-		Description: "See all groupds you have owner in",
+		Description: "See all groups you are the owner of",
 		Usage:       "[p]admingroups",
 		Handler:     u.admingroups,
 	})

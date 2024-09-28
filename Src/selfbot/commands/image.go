@@ -203,10 +203,10 @@ func (i ImageCommands) RegisterCommands(router *dgc.Router) {
 		Handler:     i.lesbian,
 	})
 	router.RegisterCmd(&dgc.Command{
-		Name:        "bixesual",
-		Description: "Add a bixesual border to the user",
-		Usage:       "[p]bixesual <user>",
-		Handler:     i.bixesual,
+		Name:        "bisexual",
+		Description: "Add a bisexual border to the user",
+		Usage:       "[p]bisexual <user>",
+		Handler:     i.bisexual,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "trans",
@@ -1278,7 +1278,7 @@ func (ImageCommands) lesbian(ctx *dgc.Ctx) {
 	_ = ctx.RespondText(fmt.Sprintf("https://some-random-api.com/canvas/lesbian?avatar=%s", url.QueryEscape(user.AvatarURL(""))))
 }
 
-func (ImageCommands) bixesual(ctx *dgc.Ctx) {
+func (ImageCommands) bisexual(ctx *dgc.Ctx) {
 	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
 		user = ctx.Event.Author

@@ -5,6 +5,7 @@ package main
 import (
 	"context"
 	"net"
+	"runtime/debug"
 
 	"github.com/LightningDev1/LB-Selfbot/hosting"
 )
@@ -21,6 +22,6 @@ func init() {
 
 func main() {
 	debug.SetMemoryLimit(300 * 1 << 20)
-	
+
 	hosting.Main()
 }
