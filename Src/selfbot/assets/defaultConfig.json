@@ -88,7 +88,8 @@
     "EmbedColor": "3990c1",
     "EmbedImage": "https://lightning-bot.com/logo.png",
     "EmbedURL": "https://lightning-bot.com/",
-    "CommandAliases": {}
+    "CommandAliases": {},
+    "ForceSubscribedServers": []
   },
   "Sharing": {
     "ShareAll": false,

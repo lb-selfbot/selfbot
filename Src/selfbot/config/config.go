@@ -214,19 +214,20 @@ type Config struct {
 		RunSelfbotOnStartup bool   `json:"RunSelfbotOnStartup"`
 	} `json:"UI"`
 	Selfbot struct {
-		CommandPrefix        string            `json:"CommandPrefix"`
-		CommandMode          string            `json:"CommandMode"`
-		Title                string            `json:"Title"`
-		Footer               string            `json:"Footer"`
-		DeleteResponses      bool              `json:"DeleteResponses"`
-		DeleteResponsesDelay int               `json:"DeleteResponsesDelay"`
-		DeleteCommands       bool              `json:"DeleteCommands"`
-		Client               string            `json:"Client"`
-		Timezone             string            `json:"Timezone"`
-		EmbedColor           string            `json:"EmbedColor"`
-		EmbedImage           string            `json:"EmbedImage"`
-		EmbedURL             string            `json:"EmbedURL"`
-		CommandAliases       map[string]string `json:"CommandAliases"`
+		CommandPrefix          string            `json:"CommandPrefix"`
+		CommandMode            string            `json:"CommandMode"`
+		Title                  string            `json:"Title"`
+		Footer                 string            `json:"Footer"`
+		DeleteResponses        bool              `json:"DeleteResponses"`
+		DeleteResponsesDelay   int               `json:"DeleteResponsesDelay"`
+		DeleteCommands         bool              `json:"DeleteCommands"`
+		Client                 string            `json:"Client"`
+		Timezone               string            `json:"Timezone"`
+		EmbedColor             string            `json:"EmbedColor"`
+		EmbedImage             string            `json:"EmbedImage"`
+		EmbedURL               string            `json:"EmbedURL"`
+		CommandAliases         map[string]string `json:"CommandAliases"`
+		ForceSubscribedServers []string          `json:"ForceSubscribedServers"`
 	}
 	Protections struct {
 		AntiPhishing      bool `json:"AntiPhishing"`

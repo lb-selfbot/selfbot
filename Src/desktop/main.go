@@ -226,6 +226,7 @@ func Main(discordgoDebug bool) {
 	session.Token = token
 	session.State.MaxMessageCount = 50
 	session.SetIdentify(cfg.GetClient())
+	session.ForceSubscribeGuildIDs = cfg.Selfbot.ForceSubscribedServers
 
 	session.LogLevel = discordgo.LogWarning
 

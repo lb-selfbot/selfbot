@@ -117,6 +117,14 @@ func (c ConfigCommands) RegisterCommands(router *dgc.Router) {
 	})
 
 	router.RegisterCmd(&dgc.Command{
+		Name:        "forcesubscribedservers",
+		Description: "Get, add, remove or clear force subscribed servers",
+		Usage:       "[p]forcesubscribedservers <get/add/rm/clear> [server id]",
+		Flags:       []string{CmdFlagDangerous},
+		Handler:     c.forcesubscribedservers,
+	})
+
+	router.RegisterCmd(&dgc.Command{
 		Name:        "aliases",
 		Description: "Get, add, remove or clear command aliases",
 		Usage:       "[p]aliases <get/add/rm/clear> [alias] [command]",
@@ -902,6 +910,78 @@ func (ConfigCommands) embedurl(ctx *dgc.Ctx) {
 			Send(ctx)
 	default:
 		_ = ctx.RespondText("Invalid <get/set> argument. Use `get` or `set`.")
+	}
+}
+
+func (ConfigCommands) forcesubscribedservers(ctx *dgc.Ctx) {
+	cfg, err := config.GetConfig()
+	if err != nil {
+		_ = ctx.RespondText("Error getting config.")
+		return
+	}
+
+	switch utils.Arguments["<get/add/rm/clear>"] {
+	case "get":
+		var servers []string
+
+		for _, serverID := range cfg.Selfbot.ForceSubscribedServers {
+			guild, err := utils.Discord.GetGuild(ctx.Session, serverID)
+			if err != nil {
+				servers = append(servers, serverID)
+				continue
+			}
+
+			servers = append(servers, guild.Name+" ("+guild.ID+")")
+		}
+
+		embed.NewEmbed().
+			AddField("Force Subscribed Servers", strings.Join(servers, ", ")).
+			Send(ctx)
+	case "add":
+		guild, err := utils.Discord.GetGuild(ctx.Session, utils.Misc.Or(utils.Arguments["[server id]"], ctx.Event.GuildID))
+		if err != nil {
+			_ = ctx.RespondText("Could not find server.")
+			return
+		}
+
+		if utils.SliceContains(cfg.Selfbot.ForceSubscribedServers, guild.ID) {
+			_ = ctx.RespondText(fmt.Sprintf("Server %s is already force subscribed!", guild.Name))
+			return
+		}
+
+		cfg.Selfbot.ForceSubscribedServers = append(cfg.Selfbot.ForceSubscribedServers, guild.ID)
+		_ = cfg.Save()
+
+		embed.NewEmbed().
+			SetDescription(fmt.Sprintf("Added %s to the force subscribed servers list.", guild.Name)).
+			Send(ctx)
+	case "rm":
+		guild, err := utils.Discord.GetGuild(ctx.Session, utils.Misc.Or(utils.Arguments["[server id]"], ctx.Event.GuildID))
+		if err != nil {
+			_ = ctx.RespondText("Could not find server.")
+			return
+		}
+
+		if !utils.SliceContains(cfg.Selfbot.ForceSubscribedServers, guild.ID) {
+			_ = ctx.RespondText(fmt.Sprintf("Server %s already isn't force subscribed!", guild.Name))
+			return
+		}
+
+		cfg.Selfbot.ForceSubscribedServers = utils.RemoveSliceItem(cfg.Selfbot.ForceSubscribedServers, guild.ID)
+		_ = cfg.Save()
+
+		embed.NewEmbed().
+			SetDescription(fmt.Sprintf("Removed %s from the force subscribed servers list.", guild.Name)).
+			Send(ctx)
+	case "clear":
+		cfg.Selfbot.ForceSubscribedServers = []string{}
+		_ = cfg.Save()
+
+		embed.NewEmbed().
+			SetDescription("Cleared all force subscribed servers.").
+			Send(ctx)
+	default:
+		_ = ctx.RespondText("Invalid <get/add/rm/clear> argument. Use `get`, `add`, `rm`, or `clear`.")
 	}
 }
 
