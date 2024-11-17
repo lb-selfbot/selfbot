@@ -1745,7 +1745,7 @@ func (ConfigCommands) poketwochannels(ctx *dgc.Ctx) {
 		return
 	}
 
-	switch utils.Arguments["<get/add/rm>"] {
+	switch utils.Arguments["<get/add/rm/clear>"] {
 	case "get":
 		var channels []string
 
