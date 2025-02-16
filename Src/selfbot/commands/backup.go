@@ -55,7 +55,7 @@ func (b BackupCommands) RegisterCommands(router *dgc.Router) {
 
 	router.RegisterCmd(&dgc.Command{
 		Name:        "bgifs",
-		Description: "Backup or restore your saved GIF's",
+		Description: "Backup or restore your saved GIFs",
 		Usage:       "[p]bgifs <backup/restore> [backup name]",
 		Flags:       []string{CmdFlagDangerous},
 		Handler:     b.bgifs,

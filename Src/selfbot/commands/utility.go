@@ -32,13 +32,13 @@ import (
 	"github.com/LightningDev1/LB-Selfbot/selfbot/uploaders/destinations"
 	"github.com/LightningDev1/discordgo/protos"
 	"github.com/LightningDev1/go-foreground"
-	"github.com/LightningDev1/screenshot"
 	"github.com/bitly/go-simplejson"
+	"github.com/kbinani/screenshot"
 	"github.com/kkdai/youtube/v2"
-	"github.com/shirou/gopsutil/cpu"
-	"github.com/shirou/gopsutil/disk"
-	"github.com/shirou/gopsutil/host"
-	"github.com/shirou/gopsutil/mem"
+	"github.com/shirou/gopsutil/v4/cpu"
+	"github.com/shirou/gopsutil/v4/disk"
+	"github.com/shirou/gopsutil/v4/host"
+	"github.com/shirou/gopsutil/v4/mem"
 	"google.golang.org/protobuf/types/known/wrapperspb"
 
 	"github.com/LightningDev1/LB-Selfbot/selfbot/api"
@@ -1982,7 +1982,7 @@ func (UtilityCommands) screenshot(ctx *dgc.Ctx) {
 	duration, _ := utils.Misc.ParseDuration(utils.Arguments["[delay]"])
 	time.Sleep(duration)
 
-	img, err := screenshot.CaptureScreen()
+	img, err := screenshot.CaptureDisplay(0)
 	if err != nil {
 		_ = ctx.RespondText("Error capturing screenshot: " + err.Error())
 		return
@@ -2025,7 +2025,7 @@ func (UtilityCommands) uploadss(ctx *dgc.Ctx) {
 	duration, _ := utils.Misc.ParseDuration(utils.Arguments["[delay]"])
 	time.Sleep(duration)
 
-	img, err := screenshot.CaptureScreen()
+	img, err := screenshot.CaptureDisplay(0)
 	if err != nil {
 		_ = ctx.RespondText("Error capturing screenshot: " + err.Error())
 		return
