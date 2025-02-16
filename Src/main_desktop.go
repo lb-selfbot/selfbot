@@ -18,7 +18,7 @@ import (
 	"github.com/bitly/go-simplejson"
 
 	"github.com/LightningDev1/LB-Selfbot/browserautomation"
-	"github.com/LightningDev1/LB-Selfbot/desktop"
+	"github.com/LightningDev1/LB-Selfbot/cmd/desktop"
 	"github.com/LightningDev1/LB-Selfbot/savedtokens"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/api"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/commands"

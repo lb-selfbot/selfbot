@@ -7,7 +7,7 @@ import (
 	"net"
 	"runtime/debug"
 
-	"github.com/LightningDev1/LB-Selfbot/hosting"
+	"github.com/LightningDev1/LB-Selfbot/cmd/hosting"
 )
 
 func init() {
