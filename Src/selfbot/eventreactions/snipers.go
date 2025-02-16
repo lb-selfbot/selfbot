@@ -36,7 +36,7 @@ type GiftCode struct {
 
 type Snipers struct {
 	MainSession *discordgo.Session
-	Account string
+	Account     string
 
 	CheckedGiftCodes  []string
 	GiftCodesByAuthor map[string][]GiftCode
@@ -51,7 +51,7 @@ type Snipers struct {
 
 func NewSnipers(mainSession *discordgo.Session, account string) *Snipers {
 	return &Snipers{
-		MainSession: mainSession,
+		MainSession:       mainSession,
 		Account:           account,
 		GiftCodesByAuthor: make(map[string][]GiftCode),
 		PrivnoteClient:    privnote.NewClient(),

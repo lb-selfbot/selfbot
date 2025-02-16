@@ -83,7 +83,7 @@ func (j *JobHandler) Execute(session *discordgo.Session) error {
 			if job.Paused {
 				continue
 			}
-			
+
 			// Execute the job's interaction.
 			err := job.Interact(session)
 			if err != nil {

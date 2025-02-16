@@ -15,6 +15,7 @@ import (
 
 	_websocket "github.com/gorilla/websocket"
 
+	"github.com/LightningDev1/LB-Selfbot/internal/tui"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/assets"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/commands"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/config"
@@ -30,7 +31,6 @@ import (
 	"github.com/LightningDev1/LB-Selfbot/selfbot/setup"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/utils"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/websocket"
-	"github.com/LightningDev1/LB-Selfbot/internal/tui"
 	"github.com/LightningDev1/dgc"
 	"github.com/LightningDev1/discordgo"
 )
