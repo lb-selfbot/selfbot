@@ -52,7 +52,7 @@ jobs:
           CGO_ENABLED: 1
           GOOS: "windows"
         run: |
-          cd Src
+          cd src
           export GOARCH=386
           garble -seed=U4Nxq2YSVm6ivvOejQbElA== build -tags desktop,timetzdata -trimpath -ldflags "-s -w" -gcflags=all="-l -B" -o ${{ github.workspace }}/executables/windows/386/selfbot.exe
           export GOARCH=amd64
@@ -64,7 +64,7 @@ jobs:
           CGO_ENABLED: 0
           GOOS: "linux"
         run: |
-          cd Src
+          cd src
           export GOARCH=386
           garble -seed=U4Nxq2YSVm6ivvOejQbElA== build -tags desktop,timetzdata -trimpath -ldflags "-s -w" -gcflags=all="-l -B" -o ${{ github.workspace }}/executables/linux/386/selfbot
           export GOARCH=amd64
@@ -142,7 +142,7 @@ jobs:
           CGO_ENABLED: 1
           GOOS: "darwin"
         run: |
-          cd Src
+          cd src
           export GOARCH=amd64
           garble -seed=U4Nxq2YSVm6ivvOejQbElA== build -tags desktop,timetzdata -trimpath -ldflags "-s -w" -gcflags=all="-l -B" -o ${{ github.workspace }}/executables/macos/amd64/selfbot
           export GOARCH=arm64

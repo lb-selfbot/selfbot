@@ -17,7 +17,7 @@ jobs:
           go-version: ">=1.22"
 
       - name: Change directory
-        run: cd Src
+        run: cd src
 
       - name: Check diff between gofmt and code
         run: diff <(gofmt -d .) <(echo -n)
@@ -34,10 +34,10 @@ jobs:
           go-version: ">=1.22"
 
       - name: Run go vet
-        run: cd Src && go vet -x ./...
+        run: cd src && go vet -x ./...
 
       - name: Run GolangCI-Lint
         uses: golangci/golangci-lint-action@v3
         with:
           version: v1.54.2
-          working-directory: Src
+          working-directory: src

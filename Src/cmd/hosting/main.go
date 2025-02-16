@@ -3,17 +3,15 @@
 package hosting
 
 import (
+	"context"
 	"fmt"
 	_ "net/http/pprof"
 	"os"
 	"os/signal"
-	"path/filepath"
-	"runtime"
 	"strings"
 	"syscall"
 
-	_websocket "github.com/gorilla/websocket"
-
+	"github.com/LightningDev1/LB-Selfbot/internal/startup"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/commands"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/config"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/constants"
@@ -29,121 +27,81 @@ import (
 	"github.com/LightningDev1/discordgo"
 )
 
-func onWebsocketError(err error, closeCode int) {
-	switch closeCode {
-	case 3004, 3010:
-		logging.UI.Error("Your LightningBot credentials are invalid! Please re-enter them in the Config tab.")
-	case 3011:
-		logging.UI.Error("Your free trial has expired! Please purchase a license key to continue using LightningBot.")
-	case 3003:
-		logging.UI.Error("WS Error 3003: " + err.Error())
-	case 3006:
-		logging.UI.Error("Another selfbot has connected using your LightningBot account! This instance will now exit.")
-	default:
-		logging.UI.Error("An unexpected error has occurred while connecting to the websocket: " + err.Error())
-	}
-
-	os.Exit(1)
-}
-
-func Main() {
-	username := os.Getenv("USERNAME")
-	password := os.Getenv("PASSWORD")
-	token := os.Getenv("TOKEN")
-	mainFolder := os.Getenv("MAIN_FOLDER")
-	debug := os.Getenv("DEBUG") == "true"
-
+func Main(ctx context.Context) error {
 	constants.CONSOLE = true
 	constants.HOSTING = true
 
-	// Setup instance
-	session, _ := discordgo.New(token)
-	session.State.TrackVoice = false
-	session.ErrorHandler = errorhandler.ErrorHandler
+	username := os.Getenv("USERNAME")
+	password := os.Getenv("PASSWORD")
+	token := os.Getenv("TOKEN")
+	debug := os.Getenv("DEBUG") == "true"
 
-	utils.IO.MainFolderOverride = mainFolder
+	if username == "" || password == "" || token == "" {
+		return fmt.Errorf("USERNAME, PASSWORD, and TOKEN environment variables are required")
+	}
 
-	err := utils.IO.CreateFolders()
+	// Setup logging
+	startup.SetupLogging(debug)
+
+	// Initialize websocket connection
+	if err := initWebsocket(username, password); err != nil {
+		return fmt.Errorf("init websocket: %w", err)
+	}
+
+	// Create Discord session
+	session, err := startup.CreateDiscordSession(token, debug)
 	if err != nil {
-		logging.UI.Error("Error creating folders: " + err.Error())
-		os.Exit(1)
+		return fmt.Errorf("create discord session: %w", err)
 	}
 
-	if utils.IO.IsFirstLaunch() {
-		err = config.GetDefaultConfig().Save()
-		if err != nil {
-			logging.UI.Error("Error creating config: " + err.Error())
-			os.Exit(1)
-		}
+	// Initialize error handler
+	if err := errorhandler.Init(); err != nil {
+		logging.UI.Error("Error initializing error handler: " + err.Error())
 	}
+
+	// Setup command router and handlers
+	_ = setupRouter(session)
+
+	// Open Discord connection
+	if err := session.Open(); err != nil {
+		return fmt.Errorf("open discord connection: %w", err)
+	}
+	defer session.Close()
 
 	cfg, err := config.GetConfig()
 	if err != nil {
-		logging.UI.Error("Error loading config: " + err.Error())
+		return fmt.Errorf("get config: %w", err)
+	}
+
+	// Start multi token sniper
+	multitokensniper.Init(session, cfg)
+
+	// Wait for context cancellation
+	<-ctx.Done()
+	return nil
+}
+
+func initWebsocket(username, password string) error {
+	websocket.Websocket.LogError = func(err error, closeCode int) {
+		switch closeCode {
+		case 3004, 3010:
+			logging.UI.Error("Your LightningBot credentials are invalid! Please re-enter them in the Config tab.")
+		case 3011:
+			logging.UI.Error("Your free trial has expired! Please purchase a license key to continue using LightningBot.")
+		case 3003:
+			logging.UI.Error("WS Error 3003: " + err.Error())
+		case 3006:
+			logging.UI.Error("Another selfbot has connected using your LightningBot account! This instance will now exit.")
+		default:
+			logging.UI.Error("An unexpected error has occurred while connecting to the websocket: " + err.Error())
+		}
 		os.Exit(1)
 	}
 
-	websocket.Websocket.LogError = onWebsocketError
-	err = websocket.Websocket.Init(
-		username,
-		password,
-	)
-	if err != nil {
-		if closeError, ok := err.(*_websocket.CloseError); ok {
-			onWebsocketError(err, closeError.Code)
-		}
+	return websocket.Websocket.Init(username, password)
+}
 
-		logging.UI.Error("Error connecting to websocket: " + err.Error())
-	}
-
-	session.SetIdentify(cfg.GetClient())
-	session.State.MaxMessageCount = 50
-	session.LogLevel = discordgo.LogWarning
-	session.ForceSubscribeGuildIDs = cfg.Selfbot.ForceSubscribedServers
-
-	if debug {
-		session.LogLevel = discordgo.LogDebug
-	}
-
-	logPath := filepath.Join(utils.IO.GetMainFolder(), "LB.log")
-
-	// Remove log file if it exists
-	_ = utils.IO.Write(logPath, "")
-
-	discordgo.Logger = func(msgL, caller int, format string, a ...interface{}) {
-		pc, file, line, _ := runtime.Caller(caller + 1)
-
-		files := strings.Split(file, "/")
-		file = files[len(files)-1]
-
-		name := runtime.FuncForPC(pc).Name()
-		fns := strings.Split(name, ".")
-		name = fns[len(fns)-1]
-
-		msg := fmt.Sprintf(format, a...)
-
-		if strings.Contains(msg, "unknown event") && !debug {
-			// Ignore unknown event errors in release mode
-			return
-		}
-
-		msg = fmt.Sprintf("[DG%d] %s:%d:%s() %s\n", msgL, file, line, name, msg)
-
-		// Write log to file
-		f, err := os.OpenFile(logPath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0666)
-		if err != nil {
-			return
-		}
-
-		_, _ = f.WriteString(msg)
-
-		f.Close()
-
-		if msgL == discordgo.LogError {
-			logging.UI.Error("DGC error: " + msg)
-		}
-	}
-
+func setupRouter(session *discordgo.Session) *dgc.Router {
 	router := dgc.Create(&dgc.Router{
 		PrefixFunc: func() []string {
 			cfg, err := config.GetConfig()
@@ -251,26 +209,26 @@ func Main() {
 
 	router.Initialize(session)
 
-	err = errorhandler.Init()
-	if err != nil {
-		logging.UI.Error("Error initializing error handler: " + err.Error())
-	}
+	return router
+}
 
-	err = session.Open()
-	if err != nil {
-		if strings.Contains(err.Error(), "Authentication failed") {
-			logging.UI.Error("Invalid token provided")
-		} else {
-			logging.UI.Error("Error opening connection: " + err.Error())
-		}
+func main() {
+	// Setup graceful shutdown
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
 
+	// Create shutdown channel
+	shutdown := make(chan os.Signal, 1)
+	signal.Notify(shutdown, syscall.SIGINT, syscall.SIGTERM)
+
+	go func() {
+		<-shutdown
+		cancel()
+	}()
+
+	// Start hosting mode
+	if err := Main(ctx); err != nil {
+		logging.UI.Error("Error in hosting mode: " + err.Error())
 		os.Exit(1)
 	}
-
-	// Start multi token sniper
-	multitokensniper.Init(session, cfg)
-
-	sc := make(chan os.Signal, 1)
-	signal.Notify(sc, syscall.SIGINT, syscall.SIGTERM)
-	<-sc
 }
