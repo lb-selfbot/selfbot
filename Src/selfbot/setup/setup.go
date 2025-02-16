@@ -6,7 +6,7 @@ import (
 
 	"github.com/LightningDev1/LB-Selfbot/selfbot/api"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/utils"
-	"github.com/LightningDev1/LB-Selfbot/tui"
+	"github.com/LightningDev1/LB-Selfbot/internal/tui"
 	"github.com/LightningDev1/discordgo"
 	"golang.org/x/term"
 )

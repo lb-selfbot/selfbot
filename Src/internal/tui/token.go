@@ -1,10 +1,11 @@
 package tui
 
 import (
+	"context"
 	"os"
 	"strings"
 
-	"github.com/LightningDev1/LB-Selfbot/browserautomation"
+	"github.com/LightningDev1/LB-Selfbot/internal/browser"
 	"github.com/LightningDev1/LB-Selfbot/savedtokens"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/utils"
 	"github.com/charmbracelet/bubbles/list"
@@ -66,16 +67,8 @@ func loginWithBrowser() string {
 		_, _ = program.Run()
 	}()
 
-	var token string
-
-	login := browserautomation.WebLogin{
-		TokenCallback: func(_token string) error {
-			token = _token
-			return nil
-		},
-	}
-
-	if err := login.Start(); err != nil {
+	token, err := browser.RunWebLogin(context.Background())
+	if err != nil {
 		model.Quit()
 		program.Quit()
 		reset()

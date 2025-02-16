@@ -17,8 +17,8 @@ import (
 	"github.com/LightningDev1/discordgo"
 	"github.com/bitly/go-simplejson"
 
-	"github.com/LightningDev1/LB-Selfbot/browserautomation"
 	"github.com/LightningDev1/LB-Selfbot/cmd/desktop"
+	"github.com/LightningDev1/LB-Selfbot/internal/browser"
 	"github.com/LightningDev1/LB-Selfbot/savedtokens"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/api"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/commands"
@@ -73,46 +73,55 @@ func initArgs() {
 	}
 
 	if strings.Contains(args, "-weblogin") {
-		login := browserautomation.WebLogin{
-			TokenCallback: func(token string) error {
-				s, err := discordgo.New("")
-				if err != nil {
-					return err
-				}
-
-				resp, err := api.GetTokenData(s, token)
-				if err != nil {
-					return err
-				}
-
-				tokenData, err := simplejson.NewJson(resp)
-				if err != nil {
-					return err
-				}
-
-				user := discordgo.User{
-					ID:       tokenData.Get("id").MustString(),
-					Avatar:   tokenData.Get("avatar").MustString(),
-					Username: tokenData.Get("username").MustString(),
-					Token:    token,
-				}
-
-				return json.NewEncoder(os.Stdout).Encode(map[string]string{
-					"token":    user.Token,
-					"username": user.Username,
-					"id":       user.ID,
-					"avatar":   user.AvatarURL(""),
-				})
-			},
-		}
-
-		if err := login.Start(); err != nil {
+		token, err := browser.RunWebLogin(context.Background())
+		if err != nil {
 			_ = json.NewEncoder(os.Stdout).Encode(map[string]string{
 				"error": err.Error(),
 			})
 
 			os.Exit(1)
 		}
+
+		s, err := discordgo.New("")
+		if err != nil {
+			_ = json.NewEncoder(os.Stdout).Encode(map[string]string{
+				"error": err.Error(),
+			})
+
+			os.Exit(1)
+		}
+
+		resp, err := api.GetTokenData(s, token)
+		if err != nil {
+			_ = json.NewEncoder(os.Stdout).Encode(map[string]string{
+				"error": err.Error(),
+			})
+
+			os.Exit(1)
+		}
+
+		tokenData, err := simplejson.NewJson(resp)
+		if err != nil {
+			_ = json.NewEncoder(os.Stdout).Encode(map[string]string{
+				"error": err.Error(),
+			})
+
+			os.Exit(1)
+		}
+
+		user := discordgo.User{
+			ID:       tokenData.Get("id").MustString(),
+			Avatar:   tokenData.Get("avatar").MustString(),
+			Username: tokenData.Get("username").MustString(),
+			Token:    token,
+		}
+
+		_ = json.NewEncoder(os.Stdout).Encode(map[string]string{
+			"token":    user.Token,
+			"username": user.Username,
+			"id":       user.ID,
+			"avatar":   user.AvatarURL(""),
+		})
 
 		os.Exit(0)
 	}

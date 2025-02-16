@@ -30,7 +30,7 @@ import (
 	"github.com/LightningDev1/LB-Selfbot/selfbot/setup"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/utils"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/websocket"
-	"github.com/LightningDev1/LB-Selfbot/tui"
+	"github.com/LightningDev1/LB-Selfbot/internal/tui"
 	"github.com/LightningDev1/dgc"
 	"github.com/LightningDev1/discordgo"
 )
