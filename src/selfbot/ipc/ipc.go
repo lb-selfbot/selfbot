@@ -92,7 +92,7 @@ func (i *Ipc) Init() {
 	}()
 }
 
-func (i *Ipc) Write(data interface{}) {
+func (i *Ipc) Write(data any) {
 	if i.WriteMutex == nil {
 		return
 	}

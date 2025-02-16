@@ -27,6 +27,8 @@ import (
 	"github.com/LightningDev1/discordgo"
 )
 
+var session *discordgo.Session
+
 func Main(ctx context.Context) error {
 	constants.CONSOLE = true
 	constants.HOSTING = true
@@ -40,44 +42,52 @@ func Main(ctx context.Context) error {
 		return fmt.Errorf("USERNAME, PASSWORD, and TOKEN environment variables are required")
 	}
 
-	// Setup logging
-	startup.SetupLogging(debug)
-
-	// Initialize websocket connection
-	if err := initWebsocket(username, password); err != nil {
-		return fmt.Errorf("init websocket: %w", err)
+	if err := initialize(debug); err != nil {
+		return fmt.Errorf("initialize: %w", err)
 	}
 
-	// Create Discord session
-	session, err := startup.CreateDiscordSession(token, debug)
-	if err != nil {
-		return fmt.Errorf("create discord session: %w", err)
+	if err := setupConnections(username, password, token, debug); err != nil {
+		return fmt.Errorf("setup connections: %w", err)
 	}
-
-	// Initialize error handler
-	if err := errorhandler.Init(); err != nil {
-		logging.UI.Error("Error initializing error handler: " + err.Error())
-	}
-
-	// Setup command router and handlers
-	_ = setupRouter(session)
-
-	// Open Discord connection
-	if err := session.Open(); err != nil {
-		return fmt.Errorf("open discord connection: %w", err)
-	}
-	defer session.Close()
 
 	cfg, err := config.GetConfig()
 	if err != nil {
 		return fmt.Errorf("get config: %w", err)
 	}
 
-	// Start multi token sniper
 	multitokensniper.Init(session, cfg)
 
-	// Wait for context cancellation
 	<-ctx.Done()
+	return nil
+}
+
+func initialize(debug bool) error {
+	startup.SetupLogging(debug)
+	return nil
+}
+
+func setupConnections(username, password, token string, debug bool) error {
+	if err := initWebsocket(username, password); err != nil {
+		return fmt.Errorf("init websocket: %w", err)
+	}
+
+	var err error
+	session, err = startup.CreateDiscordSession(token, debug)
+	if err != nil {
+		return fmt.Errorf("create discord session: %w", err)
+	}
+
+	if err := errorhandler.Init(); err != nil {
+		logging.UI.Error("Error initializing error handler: " + err.Error())
+	}
+
+	_ = setupRouter(session)
+
+	if err := session.Open(); err != nil {
+		return fmt.Errorf("open discord connection: %w", err)
+	}
+	defer session.Close()
+
 	return nil
 }
 

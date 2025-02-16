@@ -34,6 +34,8 @@ import (
 	"github.com/bitly/go-simplejson"
 )
 
+var session *discordgo.Session
+
 // ProcessArgs processes command line arguments and returns false if the program should exit
 func ProcessArgs() bool {
 	args := strings.Join(os.Args, " ")
@@ -155,45 +157,60 @@ func ProcessArgs() bool {
 
 // Entry point for desktop mode
 func Main(ctx context.Context) error {
-	// Process command line args
 	if !ProcessArgs() {
 		return nil
 	}
 
-	// Initialize basics
-	if err := startup.InitializeBasics(); err != nil {
-		return fmt.Errorf("initialize basics: %w", err)
+	if err := initialize(); err != nil {
+		return fmt.Errorf("initialize: %w", err)
 	}
 
-	// Setup DNS resolver
-	startup.SetupDNSResolver()
-
-	// Setup logging
-	startup.SetupLogging(constants.DEBUG)
-
-	// Handle first launch setup
-	if err := handleFirstLaunch(); err != nil {
-		return fmt.Errorf("first launch setup: %w", err)
-	}
-
-	// Get credentials
 	username, password, token, err := getCredentials()
 	if err != nil {
 		return fmt.Errorf("get credentials: %w", err)
 	}
 
-	// Initialize IPC if not in console mode
+	if err := setupConnections(username, password, token); err != nil {
+		return fmt.Errorf("setup connections: %w", err)
+	}
+
+	cfg, err := config.GetConfig()
+	if err != nil {
+		return fmt.Errorf("get config: %w", err)
+	}
+
+	multitokensniper.Init(session, cfg)
+
+	<-ctx.Done()
+	return nil
+}
+
+func initialize() error {
+	if err := startup.InitializeBasics(); err != nil {
+		return fmt.Errorf("initialize basics: %w", err)
+	}
+
+	startup.SetupDNSResolver()
+	startup.SetupLogging(constants.DEBUG)
+
+	if err := handleFirstLaunch(); err != nil {
+		return fmt.Errorf("first launch setup: %w", err)
+	}
+
+	return nil
+}
+
+func setupConnections(username, password, token string) error {
 	if !constants.CONSOLE {
 		ipc.IPC.Init()
 	}
 
-	// Setup websocket connection
 	if err := initWebsocket(username, password); err != nil {
 		return fmt.Errorf("init websocket: %w", err)
 	}
 
-	// Create Discord session
-	session, err := startup.CreateDiscordSession(token, constants.DEBUG)
+	var err error
+	session, err = startup.CreateDiscordSession(token, constants.DEBUG)
 	if err != nil {
 		if isAuthError(err) {
 			return handleAuthError(token)
@@ -201,22 +218,18 @@ func Main(ctx context.Context) error {
 		return fmt.Errorf("create discord session: %w", err)
 	}
 
-	// Initialize error handler
 	if err := errorhandler.Init(); err != nil {
 		logging.UI.Error("Error initializing error handler: " + err.Error())
 	}
 
-	// Wait for IPC and websocket connections
 	if !constants.CONSOLE {
 		ipc.IPC.WaitForConnection()
 	}
 	websocket.Websocket.WaitUntilReady()
 	websocket.Websocket.CheckNonce()
 
-	// Setup command router
 	_ = setupRouter(session)
 
-	// Open Discord connection
 	if err := session.Open(); err != nil {
 		if isAuthError(err) {
 			return handleAuthError(token)
@@ -225,16 +238,6 @@ func Main(ctx context.Context) error {
 	}
 	defer session.Close()
 
-	cfg, err := config.GetConfig()
-	if err != nil {
-		return fmt.Errorf("get config: %w", err)
-	}
-
-	// Start multi token sniper
-	multitokensniper.Init(session, cfg)
-
-	// Wait for context cancellation
-	<-ctx.Done()
 	return nil
 }
 

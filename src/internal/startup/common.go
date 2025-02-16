@@ -71,7 +71,7 @@ func CreateDiscordSession(token string, debug bool) (*discordgo.Session, error) 
 func SetupLogging(debug bool) {
 	logPath := filepath.Join(utils.IO.GetMainFolder(), "LB.log")
 
-	discordgo.Logger = func(msgL, caller int, format string, a ...interface{}) {
+	discordgo.Logger = func(msgL, caller int, format string, a ...any) {
 		pc, file, line, _ := runtime.Caller(caller + 1)
 
 		files := strings.Split(file, "/")
