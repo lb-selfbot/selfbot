@@ -8,16 +8,11 @@ import (
 
 	"github.com/charmbracelet/bubbles/list"
 	tea "github.com/charmbracelet/bubbletea"
-	"github.com/charmbracelet/lipgloss"
 )
 
 var (
-	listWidth  = 20
+	listWidth  = 60
 	listHeight = 14
-
-	titleStyle        = lipgloss.NewStyle().Foreground(mainColor).Bold(true)
-	itemStyle         = lipgloss.NewStyle().PaddingLeft(4)
-	selectedItemStyle = lipgloss.NewStyle().PaddingLeft(2).Foreground(mainColor).Bold(true)
 )
 
 // List item
@@ -54,8 +49,7 @@ func (d itemDelegate) Render(w io.Writer, m list.Model, index int, listItem list
 
 // List model
 type listModel struct {
-	list list.Model
-
+	list     list.Model
 	Choice   ListItem
 	quitting bool
 }
@@ -69,6 +63,9 @@ func NewListModel(items []list.Item, title string) *listModel {
 	model.list.SetFilteringEnabled(false)
 	model.list.SetShowHelp(false)
 	model.list.Styles.Title = titleStyle
+	model.list.Styles.FilterPrompt = inputStyle
+	model.list.Styles.FilterCursor = inputStyle
+	model.list.SetShowFilter(false)
 
 	return model
 }
@@ -96,7 +93,10 @@ func (m *listModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			} else {
 				m.quitting = true
 			}
+			return m, tea.Quit
 
+		case "q":
+			m.quitting = true
 			return m, tea.Quit
 		}
 	}
@@ -112,7 +112,7 @@ func (m *listModel) View() string {
 	}
 
 	if m.Choice.Index == 0 {
-		return "\n" + m.list.View()
+		return baseStyle.Render("\n" + m.list.View())
 	}
 
 	return ""

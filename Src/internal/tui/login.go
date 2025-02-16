@@ -38,10 +38,12 @@ func NewLoginModel(title string) *loginModel {
 		t = textinput.New()
 		t.Cursor.Style = cursorStyle
 		t.CharLimit = 256
+		t.Width = listWidth - 4
 
 		switch i {
 		case 0:
 			t.Placeholder = "Username"
+			t.TextStyle = inputStyle
 			t.Focus()
 		case 1:
 			t.Placeholder = "Password"
@@ -63,22 +65,17 @@ func (m *loginModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		switch msg.String() {
-		case "ctrl+c":
+		case "ctrl+c", "esc":
 			m.exiting = true
-
 			return m, tea.Quit
 
-		// Set focus to next input
 		case "tab", "shift+tab", "enter", "up", "down":
 			s := msg.String()
 
-			// Did the user press enter while the submit button was focused?
-			// If so, exit.
 			if s == "enter" && m.focusIndex == len(m.inputs) {
 				return m, tea.Quit
 			}
 
-			// Cycle indexes
 			if s == "up" || s == "shift+tab" {
 				m.focusIndex--
 			} else {
@@ -94,13 +91,11 @@ func (m *loginModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			cmds := make([]tea.Cmd, len(m.inputs))
 			for i := 0; i <= len(m.inputs)-1; i++ {
 				if i == m.focusIndex {
-					// Set focused state
 					cmds[i] = m.inputs[i].Focus()
 					m.inputs[i].PromptStyle = focusedStyle
 					m.inputs[i].TextStyle = focusedStyle
 					continue
 				}
-				// Remove focused state
 				m.inputs[i].Blur()
 				m.inputs[i].PromptStyle = noStyle
 				m.inputs[i].TextStyle = noStyle
@@ -110,17 +105,13 @@ func (m *loginModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 	}
 
-	// Handle character input and blinking
 	cmd := m.updateInputs(msg)
-
 	return m, cmd
 }
 
 func (m *loginModel) updateInputs(msg tea.Msg) tea.Cmd {
 	cmds := make([]tea.Cmd, len(m.inputs))
 
-	// Only text inputs with Focus() set will respond, so it's safe to simply
-	// update all of them here without any further logic.
 	for i := range m.inputs {
 		m.inputs[i], cmds[i] = m.inputs[i].Update(msg)
 	}
@@ -130,7 +121,7 @@ func (m *loginModel) updateInputs(msg tea.Msg) tea.Cmd {
 
 func (m *loginModel) View() string {
 	if m.exiting {
-		return ""
+		os.Exit(0)
 	}
 
 	var b strings.Builder
@@ -150,7 +141,7 @@ func (m *loginModel) View() string {
 	}
 	fmt.Fprintf(&b, "\n\n  %s", *button)
 
-	return b.String()
+	return baseStyle.Render(b.String())
 }
 
 func GetLogin(title string) (string, string) {

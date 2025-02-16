@@ -23,6 +23,7 @@ import (
 	"github.com/LightningDev1/LB-Selfbot/selfbot/api"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/commands"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/constants"
+	"github.com/LightningDev1/LB-Selfbot/selfbot/utils"
 )
 
 var discordgoDebug = false
@@ -69,6 +70,11 @@ func initArgs() {
 
 		_ = json.NewEncoder(os.Stdout).Encode(data)
 
+		os.Exit(0)
+	}
+
+	if strings.Contains(args, "-openfolder") {
+		_ = utils.System.OpenURL(utils.IO.GetMainFolder())
 		os.Exit(0)
 	}
 

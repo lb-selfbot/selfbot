@@ -22,6 +22,8 @@ func NewTextInputModel(prompt, placeholder string, hidden bool) *textInputModel 
 	ti.Focus()
 	ti.CharLimit = 256
 	ti.Width = listWidth
+	ti.PromptStyle = inputStyle
+	ti.TextStyle = inputStyle
 
 	if hidden {
 		ti.EchoMode = textinput.EchoPassword
@@ -46,16 +48,15 @@ func (m *textInputModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tea.KeyMsg:
 		switch msg.Type {
 		case tea.KeyEnter:
-			m.quitting = true
-
-			return m, tea.Quit
+			if m.textInput.Value() != "" {
+				m.quitting = true
+				return m, tea.Quit
+			}
 		case tea.KeyCtrlC:
 			m.exiting = true
-
 			return m, tea.Quit
 		}
 
-	// We handle errors just like any other message
 	case errMsg:
 		m.err = msg
 		return m, nil
@@ -74,11 +75,18 @@ func (m *textInputModel) View() string {
 		return ""
 	}
 
-	return fmt.Sprintf(
-		"\n  %s\n\n%s",
-		titleStyle.Render(m.prompt),
-		itemStyle.Render(m.textInput.View()),
-	) + "\n"
+	var view string
+	if m.err != nil {
+		view = errorStyle.Render(m.err.Error())
+	} else {
+		view = fmt.Sprintf(
+			"\n  %s\n\n%s",
+			titleStyle.Render(m.prompt),
+			m.textInput.View(),
+		)
+	}
+
+	return baseStyle.Render(view) + "\n"
 }
 
 func (m *textInputModel) Value() string {
