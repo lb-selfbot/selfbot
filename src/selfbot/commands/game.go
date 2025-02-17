@@ -6,6 +6,7 @@ import (
 	"regexp"
 	"strings"
 
+	"github.com/LightningDev1/LB-Selfbot/internal/random"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/embed"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/http"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/utils"
@@ -200,7 +201,7 @@ func (GameCommands) fnrandomplaylist(ctx *dgc.Ctx) {
 		_ = ctx.RespondText("An error has occurred.")
 		return
 	}
-	playlist := playlists.Get("data").GetIndex(utils.Random.Number(0, len(playlists.Get("data").MustArray())-1))
+	playlist := playlists.Get("data").GetIndex(random.Int(0, len(playlists.Get("data").MustArray())-1))
 	embed.NewEmbed().
 		SetDescription("Random Fortnite Playlist").
 		AddField("ID", playlist.Get("id").MustString("None")).
@@ -218,7 +219,7 @@ func (GameCommands) fnrandombanner(ctx *dgc.Ctx) {
 		_ = ctx.RespondText("An error has occurred.")
 		return
 	}
-	banner := banners.Get("data").GetIndex(utils.Random.Number(0, len(banners.Get("data").MustArray())-1))
+	banner := banners.Get("data").GetIndex(random.Int(0, len(banners.Get("data").MustArray())-1))
 	embed.NewEmbed().
 		SetDescription("Random Fortnite Banner").
 		SetImage(banner.GetPath("images", "icon").MustString()).
@@ -287,7 +288,7 @@ func (GameCommands) fnrandomcosmetic(ctx *dgc.Ctx) {
 		_ = ctx.RespondText("An error has occurred.")
 		return
 	}
-	cosmetic := cosmetics.Get("data").GetIndex(utils.Random.Number(0, len(cosmetics.Get("data").MustArray())-1))
+	cosmetic := cosmetics.Get("data").GetIndex(random.Int(0, len(cosmetics.Get("data").MustArray())-1))
 	image := cosmetic.GetPath("images", "featured").MustString()
 	if image == "" {
 		image = cosmetic.GetPath("images", "icon").MustString()

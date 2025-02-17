@@ -1271,7 +1271,7 @@ func (*ActivityCommands) cacreatespotifykey(ctx *dgc.Ctx) {
 
 	imageUrl := song.Get("album").Get("images").GetIndex(0).Get("url").MustString()
 	if httpResponse.Error != nil || imageUrl == "" {
-		_ = ctx.RespondText("A Spotify error occured: Song not found.")
+		_ = ctx.RespondText("A Spotify error occurred: Song not found.")
 		return
 	}
 

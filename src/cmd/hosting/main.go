@@ -8,6 +8,7 @@ import (
 	_ "net/http/pprof"
 	"os"
 	"os/signal"
+	"slices"
 	"strings"
 	"syscall"
 
@@ -136,17 +137,17 @@ func setupRouter(session *discordgo.Session) *dgc.Router {
 					return false
 				}
 
-				if !utils.SliceContains(cfg.Sharing.SharedUsers, ctx.Event.Author.ID) &&
-					!utils.SliceContains(cfg.Sharing.SharedUsers, ctx.Event.Author.String()) {
+				if !slices.Contains(cfg.Sharing.SharedUsers, ctx.Event.Author.ID) &&
+					!slices.Contains(cfg.Sharing.SharedUsers, ctx.Event.Author.String()) {
 					return false
 				}
 
-				if utils.SliceContains(ctx.Command.Flags, commands.CmdFlagDangerous) && cfg.Sharing.BlockDangerousCommands {
+				if slices.Contains(ctx.Command.Flags, commands.CmdFlagDangerous) && cfg.Sharing.BlockDangerousCommands {
 					logging.Logging.BlockedDangerousCommand(ctx.Event.Author, ctx.Command.Name)
 					return false
 				}
 
-				if cfg.Sharing.ShareAll || utils.SliceContains([]string{"help", "search", "repeat"}, ctx.Command.Name) {
+				if cfg.Sharing.ShareAll || slices.Contains([]string{"help", "search", "repeat"}, ctx.Command.Name) {
 					return true
 				}
 
@@ -159,14 +160,14 @@ func setupRouter(session *discordgo.Session) *dgc.Router {
 						return true
 					}
 				}
-				return utils.SliceContains(cfg.Sharing.SharedCommands, ctx.Command.Name)
+				return slices.Contains(cfg.Sharing.SharedCommands, ctx.Command.Name)
 			}()
 
 			if !isAllowed {
 				return false
 			}
 
-			if utils.SliceContains(ctx.Command.Flags, commands.CmdFlagHostingDangerous) {
+			if slices.Contains(ctx.Command.Flags, commands.CmdFlagHostingDangerous) {
 				logging.Logging.BlockedHostingDangerousCommand(ctx.Command.Name)
 				return false
 			}

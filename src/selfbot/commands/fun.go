@@ -7,6 +7,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/LightningDev1/LB-Selfbot/internal/random"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/api"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/embed"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/http"
@@ -593,7 +594,7 @@ func (FunCommands) eightball(ctx *dgc.Ctx) {
 		"Outlook not so good",
 		"Very doubtful",
 	}
-	answer := utils.RandomChoice(possibleAnswers)
+	answer := random.Choice(possibleAnswers)
 	embed.NewEmbed().
 		AddField("Question", question).
 		AddField("Answer", answer).
@@ -608,7 +609,7 @@ func (FunCommands) howgay(ctx *dgc.Ctx) {
 	}
 	embed.NewEmbed().
 		AddField("User", user.String()).
-		AddField("Gay Percentage", utils.Random.Percentage()).
+		AddField("Gay Percentage", random.Percentage()).
 		Send(ctx)
 }
 
@@ -620,12 +621,12 @@ func (FunCommands) howsimp(ctx *dgc.Ctx) {
 	}
 	embed.NewEmbed().
 		AddField("User", user.String()).
-		AddField("Simp Percentage", utils.Random.Percentage()).
+		AddField("Simp Percentage", random.Percentage()).
 		Send(ctx)
 }
 
 func (FunCommands) penis(ctx *dgc.Ctx) {
-	penisLength := utils.Random.Number(1, 20)
+	penisLength := random.Int(1, 20)
 	penis := "8"
 	for i := 0; i < penisLength; i++ {
 		penis += "="
@@ -651,7 +652,7 @@ func (FunCommands) ego(ctx *dgc.Ctx) {
 	}
 	embed.NewEmbed().
 		AddField("User", user.String()).
-		AddField("Ego", utils.Random.Percentage()).
+		AddField("Ego", random.Percentage()).
 		Send(ctx)
 }
 
@@ -663,7 +664,7 @@ func (FunCommands) iqtest(ctx *dgc.Ctx) {
 	}
 	embed.NewEmbed().
 		AddField("User", user.String()).
-		AddField("IQ", fmt.Sprint(utils.Random.Number(1, 200))).
+		AddField("IQ", fmt.Sprint(random.Int(1, 200))).
 		Send(ctx)
 }
 
@@ -748,9 +749,9 @@ func (FunCommands) topic(ctx *dgc.Ctx) {
 func (FunCommands) slot(ctx *dgc.Ctx) {
 	slots := strings.Split("🍎🍊🍐🍋🍉🍇🍓🍒", "")
 	getSlot := func() (string, string) {
-		left := utils.RandomChoice(slots)
-		mid := utils.RandomChoice(slots)
-		right := utils.RandomChoice(slots)
+		left := random.Choice(slots)
+		mid := random.Choice(slots)
+		right := random.Choice(slots)
 		text := "No matches, you lost!"
 		if left == mid && mid == right {
 			text = "3 in a row, you win!"
@@ -1013,7 +1014,7 @@ func (FunCommands) trivia(ctx *dgc.Ctx) {
 
 	answers := data.Get("incorrect_answers").MustStringArray()
 	answers = append(answers, data.Get("correct_answer").MustString())
-	answers = utils.RandomShuffle(answers)
+	answers = random.Shuffle(answers)
 
 	embed.NewEmbed().
 		AddField("Question", html.UnescapeString(data.Get("question").MustString())).
@@ -1026,7 +1027,7 @@ func (FunCommands) trivia(ctx *dgc.Ctx) {
 
 func (FunCommands) dice(ctx *dgc.Ctx) {
 	embed.NewEmbed().
-		SetDescription(fmt.Sprintf("You rolled: %d", utils.Random.Number(1, 6))).
+		SetDescription(fmt.Sprintf("You rolled: %d", random.Int(1, 6))).
 		Send(ctx)
 }
 
@@ -1039,7 +1040,7 @@ func (FunCommands) randomemoji(ctx *dgc.Ctx) {
 		_ = ctx.RespondText("An error has occurred.")
 		return
 	}
-	emoji := utils.RandomChoice(emojis)
+	emoji := random.Choice(emojis)
 	_ = ctx.RespondText(emoji.MessageFormat())
 }
 
@@ -1058,12 +1059,12 @@ func (FunCommands) randomchannel(ctx *dgc.Ctx) {
 			channels = append(channels[index:], channels[index+1:]...)
 		}
 	}
-	channel := utils.RandomChoice(channels)
+	channel := random.Choice(channels)
 	_ = ctx.RespondText(channel.Mention())
 }
 
 func (FunCommands) choose(ctx *dgc.Ctx) {
-	choice := utils.RandomChoice(strings.Split(ctx.Arguments.Raw(), " "))
+	choice := random.Choice(strings.Split(ctx.Arguments.Raw(), " "))
 	embed.NewEmbed().
 		SetDescription(fmt.Sprintf("I choose: %s", choice)).
 		Send(ctx)
@@ -1151,7 +1152,7 @@ func (FunCommands) rps(ctx *dgc.Ctx) {
 	}
 	embed.NewEmbed().
 		AddField("Your choice", choice).
-		AddField("Bot's choice", utils.RandomChoice([]string{"rock", "paper", "scissors"})).
+		AddField("Bot's choice", random.Choice([]string{"rock", "paper", "scissors"})).
 		Send(ctx)
 }
 
@@ -1163,7 +1164,7 @@ func (FunCommands) covidtest(ctx *dgc.Ctx) {
 	}
 	embed.NewEmbed().
 		AddField("User", user.String()).
-		AddField("Result", utils.RandomChoice([]string{"Positive", "Negative"})).
+		AddField("Result", random.Choice([]string{"Positive", "Negative"})).
 		Send(ctx)
 }
 
@@ -1343,7 +1344,7 @@ func (FunCommands) rickroll(ctx *dgc.Ctx) {
 }
 
 func (FunCommands) coinflip(ctx *dgc.Ctx) {
-	choice := utils.RandomChoice([]string{"Heads!", "Tails!"})
+	choice := random.Choice([]string{"Heads!", "Tails!"})
 	images := map[string]string{
 		"Heads!": "https://www.ssaurel.com/blog/wp-content/uploads/2017/01/heads.png",
 		"Tails!": "https://www.ssaurel.com/blog/wp-content/uploads/2017/01/tails.png",
@@ -1506,7 +1507,7 @@ func (FunCommands) randomword(ctx *dgc.Ctx) {
 	}
 
 	words := json.Get("data")
-	word := words.GetIndex(utils.Random.Number(0, len(words.MustArray()))).Get("word")
+	word := words.GetIndex(random.Int(0, len(words.MustArray()))).Get("word")
 
 	embed.NewEmbed().
 		AddField("Random Word", word.Get("value").MustString()).
@@ -1521,7 +1522,7 @@ func (FunCommands) randomweirdword(ctx *dgc.Ctx) {
 	}
 
 	words := json.Get("data")
-	word := words.GetIndex(utils.Random.Number(0, len(words.MustArray()))).Get("word")
+	word := words.GetIndex(random.Int(0, len(words.MustArray()))).Get("word")
 
 	embed.NewEmbed().
 		AddField("Random Weird Word", word.Get("value").MustString()).
@@ -1544,7 +1545,7 @@ func (FunCommands) startupidea(ctx *dgc.Ctx) {
 func (FunCommands) fakeperson(ctx *dgc.Ctx) {
 	embed.NewEmbed().
 		SetDescription("Fake Person").
-		SetImage("https://thispersondoesnotexist.com?" + fmt.Sprint(utils.Random.Number(1000, 9999))).
+		SetImage("https://thispersondoesnotexist.com?" + fmt.Sprint(random.Int(1000, 9999))).
 		Send(ctx)
 }
 
@@ -1621,7 +1622,7 @@ func (FunCommands) paranoia(ctx *dgc.Ctx) {
 }
 
 func (FunCommands) randomcolor(ctx *dgc.Ctx) {
-	r, g, b := utils.Random.Number(0, 255), utils.Random.Number(0, 255), utils.Random.Number(0, 255)
+	r, g, b := random.Int(0, 255), random.Int(0, 255), random.Int(0, 255)
 	hex := fmt.Sprintf("%02x%02x%02x", r, g, b)
 	name := "Unknown"
 

@@ -54,9 +54,9 @@ jobs:
         run: |
           cd src
           export GOARCH=386
-          garble -seed=U4Nxq2YSVm6ivvOejQbElA== build -tags desktop,timetzdata -trimpath -ldflags "-s -w" -gcflags=all="-l -B" -o ${{ github.workspace }}/executables/windows/386/selfbot.exe
+          garble -seed=U4Nxq2YSVm6ivvOejQbElA== build ./cmd/desktop -tags timetzdata -trimpath -ldflags "-s -w" -gcflags=all="-l -B" -o ${{ github.workspace }}/executables/windows/386/selfbot.exe
           export GOARCH=amd64
-          garble -seed=U4Nxq2YSVm6ivvOejQbElA== build -tags desktop,timetzdata -trimpath -ldflags "-s -w" -gcflags=all="-l -B" -o ${{ github.workspace }}/executables/windows/amd64/selfbot.exe
+          garble -seed=U4Nxq2YSVm6ivvOejQbElA== build ./cmd/desktop -tags timetzdata -trimpath -ldflags "-s -w" -gcflags=all="-l -B" -o ${{ github.workspace }}/executables/windows/amd64/selfbot.exe
 
       - name: Build for Linux
         env:
@@ -66,17 +66,17 @@ jobs:
         run: |
           cd src
           export GOARCH=386
-          garble -seed=U4Nxq2YSVm6ivvOejQbElA== build -tags desktop,timetzdata -trimpath -ldflags "-s -w" -gcflags=all="-l -B" -o ${{ github.workspace }}/executables/linux/386/selfbot
+          garble -seed=U4Nxq2YSVm6ivvOejQbElA== build ./cmd/desktop -tags timetzdata -trimpath -ldflags "-s -w" -gcflags=all="-l -B" -o ${{ github.workspace }}/executables/linux/386/selfbot
           export GOARCH=amd64
-          garble -seed=U4Nxq2YSVm6ivvOejQbElA== build -tags desktop,timetzdata -trimpath -ldflags "-s -w" -gcflags=all="-l -B" -o ${{ github.workspace }}/executables/linux/amd64/selfbot
+          garble -seed=U4Nxq2YSVm6ivvOejQbElA== build ./cmd/desktop -tags timetzdata -trimpath -ldflags "-s -w" -gcflags=all="-l -B" -o ${{ github.workspace }}/executables/linux/amd64/selfbot
           export GOARCH=arm
-          garble -seed=U4Nxq2YSVm6ivvOejQbElA== build -tags desktop,timetzdata -trimpath -ldflags "-s -w" -gcflags=all="-l -B" -o ${{ github.workspace }}/executables/linux/arm/selfbot
+          garble -seed=U4Nxq2YSVm6ivvOejQbElA== build ./cmd/desktop -tags timetzdata -trimpath -ldflags "-s -w" -gcflags=all="-l -B" -o ${{ github.workspace }}/executables/linux/arm/selfbot
           export GOARCH=arm64
-          garble -seed=U4Nxq2YSVm6ivvOejQbElA== build -tags desktop,timetzdata -trimpath -ldflags "-s -w" -gcflags=all="-l -B" -o ${{ github.workspace }}/executables/linux/arm64/selfbot
+          garble -seed=U4Nxq2YSVm6ivvOejQbElA== build ./cmd/desktop -tags timetzdata -trimpath -ldflags "-s -w" -gcflags=all="-l -B" -o ${{ github.workspace }}/executables/linux/arm64/selfbot
 
           # Hosting build
           export GOARCH=amd64
-          go build -tags hosting,timetzdata -trimpath -ldflags "-s -w" -gcflags=all="-l -B" -o ${{ github.workspace }}/executables/LB-Selfbot
+          go build ./cmd/hosting -tags timetzdata -trimpath -ldflags "-s -w" -gcflags=all="-l -B" -o ${{ github.workspace }}/executables/LB-Selfbot
 
       - name: Compress UPX
         uses: crazy-max/ghaction-upx@v3
@@ -144,9 +144,9 @@ jobs:
         run: |
           cd src
           export GOARCH=amd64
-          garble -seed=U4Nxq2YSVm6ivvOejQbElA== build -tags desktop,timetzdata -trimpath -ldflags "-s -w" -gcflags=all="-l -B" -o ${{ github.workspace }}/executables/macos/amd64/selfbot
+          garble -seed=U4Nxq2YSVm6ivvOejQbElA== build ./cmd/desktop -tags timetzdata -trimpath -ldflags "-s -w" -gcflags=all="-l -B" -o ${{ github.workspace }}/executables/macos/amd64/selfbot
           export GOARCH=arm64
-          garble -seed=U4Nxq2YSVm6ivvOejQbElA== build -tags desktop,timetzdata -trimpath -ldflags "-s -w" -gcflags=all="-l -B" -o ${{ github.workspace }}/executables/macos/arm64/selfbot
+          garble -seed=U4Nxq2YSVm6ivvOejQbElA== build ./cmd/desktop -tags timetzdata -trimpath -ldflags "-s -w" -gcflags=all="-l -B" -o ${{ github.workspace }}/executables/macos/arm64/selfbot
 
       - name: Combine amd64 and arm64
         run: |

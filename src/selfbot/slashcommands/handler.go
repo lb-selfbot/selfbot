@@ -2,6 +2,7 @@ package slashcommands
 
 import (
 	"fmt"
+	"slices"
 	"sync/atomic"
 	"time"
 
@@ -148,7 +149,7 @@ func ExecuteJobs(session *discordgo.Session) {
 		// Remove job handlers for jobs that no longer exist.
 		for _, handler := range jobHandlers {
 			// If the handler's job ID is in the list of job IDs, continue.
-			if utils.SliceContains(jobIDs, handler.JobID) {
+			if slices.Contains(jobIDs, handler.JobID) {
 				continue
 			}
 

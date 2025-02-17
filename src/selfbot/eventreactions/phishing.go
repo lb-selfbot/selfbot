@@ -2,6 +2,7 @@ package eventreactions
 
 import (
 	"net/url"
+	"slices"
 	"strings"
 
 	"github.com/LightningDev1/LB-Selfbot/selfbot/config"
@@ -72,8 +73,8 @@ func (p *Phishing) Handler(session *discordgo.Session, event any) {
 
 		hostname := link.Hostname()
 
-		isPhishing := utils.SliceContains(PhishingDomains, hostname)
-		isSuspicious := utils.SliceContains(SuspiciousDomains, hostname)
+		isPhishing := slices.Contains(PhishingDomains, hostname)
+		isSuspicious := slices.Contains(SuspiciousDomains, hostname)
 
 		if isPhishing || isSuspicious {
 			_ = session.MessageAck(message.ChannelID, message.ID)

@@ -2,6 +2,7 @@ package slashcommands
 
 import (
 	"encoding/json"
+	"slices"
 	"sync"
 
 	"github.com/LightningDev1/LB-Selfbot/selfbot/config"
@@ -54,7 +55,7 @@ func LoadJobs(session *discordgo.Session) error {
 	// Remove invalid jobs.
 	if len(invalidJobNames) > 0 {
 		Jobs = utils.Filter(Jobs, func(job *Job) bool {
-			return !utils.SliceContains(invalidJobNames, job.Name)
+			return !slices.Contains(invalidJobNames, job.Name)
 		})
 
 		_ = SaveJobs()

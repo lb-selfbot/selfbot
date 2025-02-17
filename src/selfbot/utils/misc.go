@@ -258,16 +258,6 @@ func (MiscUtils) PreviewColorImage(x, y, r, g, b int) (io.Reader, error) {
 
 var Misc = &MiscUtils{}
 
-// SliceContains checks if a slice has a certain item
-func SliceContains[T comparable](s []T, e T) bool {
-	for _, v := range s {
-		if v == e {
-			return true
-		}
-	}
-	return false
-}
-
 // RemoveSliceItem removes an item from a slice
 func RemoveSliceItem[T comparable](s []T, e T) []T {
 	for i, v := range s {

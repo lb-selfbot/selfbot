@@ -2,6 +2,7 @@ package commands
 
 import (
 	"fmt"
+	"slices"
 	"strconv"
 	"strings"
 
@@ -240,7 +241,7 @@ func (ProtectionsCommands) protectedservers(ctx *dgc.Ctx) {
 			return
 		}
 
-		if utils.SliceContains(cfg.Protections.ServerProtections.ProtectedServers, guild.ID) {
+		if slices.Contains(cfg.Protections.ServerProtections.ProtectedServers, guild.ID) {
 			_ = ctx.RespondText(fmt.Sprintf("Server %s is already in the Protected Servers List!", guild.Name))
 			return
 		}
@@ -258,7 +259,7 @@ func (ProtectionsCommands) protectedservers(ctx *dgc.Ctx) {
 			return
 		}
 
-		if !utils.SliceContains(cfg.Protections.ServerProtections.ProtectedServers, guild.ID) {
+		if !slices.Contains(cfg.Protections.ServerProtections.ProtectedServers, guild.ID) {
 			_ = ctx.RespondText(fmt.Sprintf("Server %s already isn't in the Protected Servers List!", guild.Name))
 			return
 		}

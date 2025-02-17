@@ -9,6 +9,7 @@ import (
 
 	"github.com/LightningDev1/discordgo"
 
+	"github.com/LightningDev1/LB-Selfbot/internal/random"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/constants"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/utils"
 	"github.com/LightningDev1/dgc"
@@ -162,7 +163,7 @@ func (TrollingCommands) token(ctx *dgc.Ctx) {
 }
 
 func (TrollingCommands) trollnitro(ctx *dgc.Ctx) {
-	_ = ctx.RespondText(fmt.Sprintf("discord\u2024gift/%s %s https://i.imgur.com/0WSpeC1.png", utils.Random.String(16), constants.INVISIBLE_TEXT))
+	_ = ctx.RespondText(fmt.Sprintf("discord\u2024gift/%s %s https://i.imgur.com/0WSpeC1.png", random.String(16), constants.INVISIBLE_TEXT))
 }
 
 func (TrollingCommands) fakenitro(ctx *dgc.Ctx) {
@@ -172,7 +173,7 @@ func (TrollingCommands) fakenitro(ctx *dgc.Ctx) {
 		return
 	}
 	for i := 0; i < amount; i++ {
-		_ = ctx.RespondText("https://discord.gift/" + utils.Random.String(16))
+		_ = ctx.RespondText("https://discord.gift/" + random.String(16))
 	}
 }
 
@@ -254,7 +255,7 @@ func (TrollingCommands) voicemove(ctx *dgc.Ctx) {
 			break
 		}
 
-		channel := utils.RandomChoice(channels)
+		channel := random.Choice(channels)
 		currentChannel := ctx.Session.VoiceConnections[ctx.Event.GuildID]
 
 		if currentChannel != nil && currentChannel.ChannelID == channel.ID {

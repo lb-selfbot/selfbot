@@ -202,7 +202,7 @@ func (s SlashCommands) executeslash(ctx *dgc.Ctx) {
 
 	opts, err := slashcommands.ArgumentsToCommandOptions(cmd.Options, ctx.Arguments, 3)
 	if err != nil {
-		ctx.RespondText("An error occured while parsing your arguments to command options: " + err.Error())
+		ctx.RespondText("An error occurred while parsing your arguments to command options: " + err.Error())
 		return
 	}
 
@@ -381,7 +381,7 @@ func (s SlashCommands) createscjob(ctx *dgc.Ctx) {
 
 	_, err = slashcommands.ArgumentsToCommandOptions(command.Options, ctx.Arguments, 5)
 	if err != nil {
-		ctx.RespondText("An error occured while parsing your arguments to command options: " + err.Error())
+		ctx.RespondText("An error occurred while parsing your arguments to command options: " + err.Error())
 		return
 	}
 
@@ -490,7 +490,7 @@ func (s SlashCommands) setscjobcommand(ctx *dgc.Ctx) {
 
 	_, err = slashcommands.ArgumentsToCommandOptions(command.Options, ctx.Arguments, 4)
 	if err != nil {
-		ctx.RespondText("An error occured while parsing your arguments to command options: " + err.Error())
+		ctx.RespondText("An error occurred while parsing your arguments to command options: " + err.Error())
 		return
 	}
 

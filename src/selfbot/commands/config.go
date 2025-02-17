@@ -2,6 +2,7 @@ package commands
 
 import (
 	"fmt"
+	"slices"
 	"strconv"
 	"strings"
 	"time"
@@ -944,7 +945,7 @@ func (ConfigCommands) forcesubscribedservers(ctx *dgc.Ctx) {
 			return
 		}
 
-		if utils.SliceContains(cfg.Selfbot.ForceSubscribedServers, guild.ID) {
+		if slices.Contains(cfg.Selfbot.ForceSubscribedServers, guild.ID) {
 			_ = ctx.RespondText(fmt.Sprintf("Server %s is already force subscribed!", guild.Name))
 			return
 		}
@@ -962,7 +963,7 @@ func (ConfigCommands) forcesubscribedservers(ctx *dgc.Ctx) {
 			return
 		}
 
-		if !utils.SliceContains(cfg.Selfbot.ForceSubscribedServers, guild.ID) {
+		if !slices.Contains(cfg.Selfbot.ForceSubscribedServers, guild.ID) {
 			_ = ctx.RespondText(fmt.Sprintf("Server %s already isn't force subscribed!", guild.Name))
 			return
 		}
@@ -1251,7 +1252,7 @@ func (ConfigCommands) customgiveawaybots(ctx *dgc.Ctx) {
 			return
 		}
 
-		if utils.SliceContains(cfg.Snipers.GiveawaySniper.CustomBots, bot.ID) {
+		if slices.Contains(cfg.Snipers.GiveawaySniper.CustomBots, bot.ID) {
 			_ = ctx.RespondText("Bot is already in the custom bots list.")
 			return
 		}
@@ -1270,7 +1271,7 @@ func (ConfigCommands) customgiveawaybots(ctx *dgc.Ctx) {
 			return
 		}
 
-		if !utils.SliceContains(cfg.Snipers.GiveawaySniper.CustomBots, bot.ID) {
+		if !slices.Contains(cfg.Snipers.GiveawaySniper.CustomBots, bot.ID) {
 			_ = ctx.RespondText("Bot already isn't in the custom bots list.")
 			return
 		}
@@ -1309,7 +1310,7 @@ func (ConfigCommands) sniperblacklist(ctx *dgc.Ctx) {
 	case "add":
 		entry := utils.String.RemoveWords(ctx.Arguments.Raw(), 1)
 
-		if utils.SliceContains(cfg.Snipers.Blacklist, entry) {
+		if slices.Contains(cfg.Snipers.Blacklist, entry) {
 			_ = ctx.RespondText("Value is already in the blacklist!")
 			return
 		}
@@ -1323,7 +1324,7 @@ func (ConfigCommands) sniperblacklist(ctx *dgc.Ctx) {
 	case "rm":
 		entry := utils.String.RemoveWords(ctx.Arguments.Raw(), 1)
 
-		if !utils.SliceContains(cfg.Snipers.Blacklist, entry) {
+		if !slices.Contains(cfg.Snipers.Blacklist, entry) {
 			_ = ctx.RespondText("Value already isn't in the blacklist!")
 			return
 		}
@@ -1377,7 +1378,7 @@ func (ConfigCommands) sniperserverblacklist(ctx *dgc.Ctx) {
 			return
 		}
 
-		if utils.SliceContains(cfg.Snipers.ServerBlacklist, guild.ID) {
+		if slices.Contains(cfg.Snipers.ServerBlacklist, guild.ID) {
 			_ = ctx.RespondText(fmt.Sprintf("Server %s is already in the blacklist!", guild.Name))
 			return
 		}
@@ -1395,7 +1396,7 @@ func (ConfigCommands) sniperserverblacklist(ctx *dgc.Ctx) {
 			return
 		}
 
-		if !utils.SliceContains(cfg.Snipers.ServerBlacklist, guild.ID) {
+		if !slices.Contains(cfg.Snipers.ServerBlacklist, guild.ID) {
 			_ = ctx.RespondText(fmt.Sprintf("Server %s already isn't in the blacklist!", guild.Name))
 			return
 		}
@@ -1775,7 +1776,7 @@ func (ConfigCommands) poketwochannels(ctx *dgc.Ctx) {
 			return
 		}
 
-		if utils.SliceContains(cfg.Snipers.PokeTwoSniper.Channels, channel.ID) {
+		if slices.Contains(cfg.Snipers.PokeTwoSniper.Channels, channel.ID) {
 			_ = ctx.RespondText("Channel is already in the catch list!")
 			return
 		}
@@ -1793,7 +1794,7 @@ func (ConfigCommands) poketwochannels(ctx *dgc.Ctx) {
 			return
 		}
 
-		if !utils.SliceContains(cfg.Snipers.PokeTwoSniper.Channels, channel.ID) {
+		if !slices.Contains(cfg.Snipers.PokeTwoSniper.Channels, channel.ID) {
 			_ = ctx.RespondText("Channel is not in the catch list!")
 			return
 		}
@@ -1881,7 +1882,7 @@ func (ConfigCommands) snipertokens(ctx *dgc.Ctx) {
 		for _, entry := range entries {
 			entry = strings.TrimSpace(entry)
 
-			if utils.SliceContains(cfg.Snipers.Tokens, entry) {
+			if slices.Contains(cfg.Snipers.Tokens, entry) {
 				continue
 			}
 
@@ -1901,7 +1902,7 @@ func (ConfigCommands) snipertokens(ctx *dgc.Ctx) {
 		for _, entry := range entries {
 			entry = strings.TrimSpace(entry)
 
-			if !utils.SliceContains(cfg.Snipers.Tokens, entry) {
+			if !slices.Contains(cfg.Snipers.Tokens, entry) {
 				continue
 			}
 

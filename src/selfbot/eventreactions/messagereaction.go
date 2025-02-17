@@ -1,6 +1,7 @@
 package eventreactions
 
 import (
+	"slices"
 	"strings"
 
 	"github.com/LightningDev1/LB-Selfbot/selfbot/api"
@@ -200,7 +201,7 @@ func (m *MessageReaction) Handler(session *discordgo.Session, event any) {
 
 	allowedForSelf := []EventReactionType{REACT_SPAM}
 
-	if message.Author.ID == session.State.User.ID && !utils.SliceContains(allowedForSelf, m.ReactionType) {
+	if message.Author.ID == session.State.User.ID && !slices.Contains(allowedForSelf, m.ReactionType) {
 		return
 	}
 

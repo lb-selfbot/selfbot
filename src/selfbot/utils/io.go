@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"os"
 	"path/filepath"
+	"slices"
 	"strings"
 
 	"github.com/LightningDev1/LB-Selfbot/selfbot/constants"
@@ -40,7 +41,7 @@ func (*IOUtils) SanitizeFilename(filename string) string {
 	if isDots {
 		filename = "__" + filename
 	}
-	if SliceContains(reserved, filename) {
+	if slices.Contains(reserved, filename) {
 		filename = "__" + filename
 	}
 	if len(filename) > 255 {

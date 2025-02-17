@@ -9,6 +9,7 @@ import (
 	"os"
 	"path"
 	"regexp"
+	"slices"
 	"strconv"
 	"strings"
 	"sync"
@@ -513,7 +514,7 @@ func (DiscordUtils) MuteUser(session *discordgo.Session, member *discordgo.Membe
 			continue
 		}
 
-		if SliceContains(member.Roles, role.ID) {
+		if slices.Contains(member.Roles, role.ID) {
 			return fmt.Errorf("user is already muted")
 		}
 
@@ -606,11 +607,11 @@ func (DiscordUtils) IsGuildInList(session *discordgo.Session, guildID string, gu
 		return false
 	}
 
-	return SliceContains(guildsList, guild.ID) || SliceContains(guildsList, guild.Name)
+	return slices.Contains(guildsList, guild.ID) || slices.Contains(guildsList, guild.Name)
 }
 
 func (DiscordUtils) IsUserInList(session *discordgo.Session, userID string, usersList []string) bool {
-	return SliceContains(usersList, userID)
+	return slices.Contains(usersList, userID)
 }
 
 func (DiscordUtils) UserChannelPermissions(session *discordgo.Session, guildID string, channelID string, userID string) (apermissions int64, err error) {

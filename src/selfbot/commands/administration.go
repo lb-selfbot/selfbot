@@ -3,6 +3,7 @@ package commands
 import (
 	"fmt"
 	"net/url"
+	"slices"
 	"sort"
 	"strconv"
 	"strings"
@@ -1393,7 +1394,7 @@ func (*AdministrationCommands) unmute(ctx *dgc.Ctx) {
 			continue
 		}
 
-		if !utils.SliceContains(member.Roles, role.ID) {
+		if !slices.Contains(member.Roles, role.ID) {
 			embed.NewEmbed().
 				SetDescription("User is already unmuted!").
 				Send(ctx)
@@ -2272,7 +2273,7 @@ func (*AdministrationCommands) roleinfo(ctx *dgc.Ctx) {
 	}
 	memberCount := 0
 	for _, member := range guild.Members {
-		if utils.SliceContains(member.Roles, role.ID) {
+		if slices.Contains(member.Roles, role.ID) {
 			memberCount++
 		}
 	}

@@ -54,7 +54,7 @@ func GetLogin() (string, string) {
 	return username, password
 }
 
-func GetToken(session *discordgo.Session) string {
+func GetToken() string {
 	if token, ok := os.LookupEnv("LB_TOKEN"); ok {
 		return token
 	}
@@ -71,15 +71,20 @@ func GetToken(session *discordgo.Session) string {
 		utils.Logging.Error("You must enter a token!")
 		time.Sleep(5 * time.Second)
 
-		return GetToken(session)
+		return GetToken()
 	}
 
-	session.Token = token
+	session, err := discordgo.New(token)
+	if err != nil {
+		utils.Logging.Error("Error initializing session:", err)
+		return GetToken()
+	}
+	session.SetIdentify(discordgo.IdentifyDiscordClient)
 
-	_, err := api.GetTokenData(session, token)
+	_, err = session.User("@me")
 	if err != nil {
 		utils.Logging.Error("That token is invalid! Error:", err)
-		return GetToken(session)
+		return GetToken()
 	}
 
 	return token

@@ -8,14 +8,13 @@ import (
 	"strings"
 
 	"github.com/LightningDev1/LB-Selfbot/selfbot/api"
-	"github.com/LightningDev1/LB-Selfbot/selfbot/utils"
 	"github.com/LightningDev1/discordgo"
 	"github.com/bitly/go-simplejson"
+	"golang.org/x/exp/slices"
 )
 
 var (
-	encryptedTokenRegex = regexp.MustCompile(`dQw4w9WgXcQ:[^\"]*`)
-	plainTokenRegex     = regexp.MustCompile(`[\w-]{24}\.[\w-]{6}\.[\w-]{25,110}|mfa\.[\w-]{84}`)
+	plainTokenRegex = regexp.MustCompile(`[\w-]{24}\.[\w-]{6}\.[\w-]{25,110}|mfa\.[\w-]{84}`)
 )
 
 type SavedTokens struct {
@@ -83,7 +82,7 @@ func searchPlainTokens(content []byte, savedTokens *SavedTokens) {
 		token := string(match)
 
 		// Add the token if it doesn't exist yet
-		if utils.SliceContains(savedTokens.RawTokens, token) {
+		if slices.Contains(savedTokens.RawTokens, token) {
 			continue
 		}
 

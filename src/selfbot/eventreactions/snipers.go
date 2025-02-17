@@ -8,11 +8,13 @@ import (
 	"math/rand"
 	"path/filepath"
 	"regexp"
+	"slices"
 	"strconv"
 	"strings"
 	"time"
 	"unicode"
 
+	"github.com/LightningDev1/LB-Selfbot/internal/random"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/api"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/config"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/data"
@@ -89,7 +91,7 @@ func (s *Snipers) Handler(session *discordgo.Session, event any) {
 
 	switch event := event.(type) {
 	case *discordgo.MessageCreate:
-		if utils.SliceContains(cfg.Snipers.ServerBlacklist, event.GuildID) {
+		if slices.Contains(cfg.Snipers.ServerBlacklist, event.GuildID) {
 			return
 		}
 
@@ -98,7 +100,7 @@ func (s *Snipers) Handler(session *discordgo.Session, event any) {
 		s.CheckPokeTwoSniper(session, event)
 		s.CheckGiveawaySniper(session, event)
 	case *discordgo.MessageUpdate:
-		if utils.SliceContains(cfg.Snipers.ServerBlacklist, event.GuildID) {
+		if slices.Contains(cfg.Snipers.ServerBlacklist, event.GuildID) {
 			return
 		}
 
@@ -139,7 +141,7 @@ func (s *Snipers) CheckNitroSniper(session *discordgo.Session, m *discordgo.Mess
 		code = splitCode[len(splitCode)-1]
 
 		// Check if code has already been checked
-		if utils.SliceContains(s.CheckedGiftCodes, code) {
+		if slices.Contains(s.CheckedGiftCodes, code) {
 			continue
 		}
 
@@ -375,7 +377,7 @@ func (s *Snipers) CheckGiveawaySniper(session *discordgo.Session, m *discordgo.M
 			// Send the solution of the equation
 			solution := typeValue.Value.String()
 
-			time.Sleep(time.Duration(utils.Random.Number(5, 10)) * time.Second)
+			time.Sleep(time.Duration(random.Int(5, 10)) * time.Second)
 
 			err = session.InteractionSubmitModal(m.Message, modal, textInput.CustomID, solution)
 			if err != nil {
@@ -1078,7 +1080,7 @@ func (s *Snipers) CheckGiveawaySniperEdit(session *discordgo.Session, m *discord
 
 		go func() {
 			// Wait until the bot has reacted
-			time.Sleep(time.Duration(utils.Random.Number(5, 30)) * time.Second)
+			time.Sleep(time.Duration(random.Int(5, 30)) * time.Second)
 
 			// Reload the message to get the updated reactions
 			newMessage, err := utils.Discord.GetChannelMessage(session, m.ChannelID, m.ID)
@@ -1140,7 +1142,7 @@ func (s *Snipers) CheckPokeTwoSniper(session *discordgo.Session, m *discordgo.Me
 
 	isPokeTwo := cfg.Snipers.PokeTwoSniper.Enabled && // Sniper is enabled
 		m.Author.ID == "716390085896962058" && // Message is from PokeTwo
-		utils.SliceContains(cfg.Snipers.PokeTwoSniper.Channels, m.ChannelID) // Message is in a sniper channel
+		slices.Contains(cfg.Snipers.PokeTwoSniper.Channels, m.ChannelID) // Message is in a sniper channel
 
 	// Captcha check
 	captchaRegex := regexp.MustCompile(`Whoa there. Please tell us you're human! https://verify.poketwo.net/captcha/(\d+)`)
@@ -1329,9 +1331,9 @@ func (s *Snipers) CheckPokeTwoSniper(session *discordgo.Session, m *discordgo.Me
 			}
 
 			// Wait for random delay --> type --> wait for random delay
-			time.Sleep(time.Second * time.Duration(utils.Random.Number(1, 2)))
+			time.Sleep(time.Second * time.Duration(random.Int(1, 2)))
 			_ = session.ChannelTyping(m.ChannelID)
-			time.Sleep(time.Second * time.Duration(utils.Random.Number(1, 3)))
+			time.Sleep(time.Second * time.Duration(random.Int(1, 3)))
 
 			// Random PokéTwo commands
 			commands := []string{
@@ -1341,7 +1343,7 @@ func (s *Snipers) CheckPokeTwoSniper(session *discordgo.Session, m *discordgo.Me
 
 			_, _ = session.ChannelMessageSend(
 				m.ChannelID,
-				"<@716390085896962058> "+utils.RandomChoice(commands),
+				"<@716390085896962058> "+random.Choice(commands),
 			)
 		}()
 

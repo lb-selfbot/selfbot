@@ -7,12 +7,18 @@ import (
 	"crypto/cipher"
 	"encoding/base64"
 	"encoding/json"
+	"fmt"
 	"os"
+	"regexp"
 	"strings"
 	"unsafe"
 
-	"github.com/LightningDev1/LB-Selfbot/selfbot/utils"
+	"golang.org/x/exp/slices"
 	"golang.org/x/sys/windows"
+)
+
+var (
+	encryptedTokenRegex = regexp.MustCompile(`dQw4w9WgXcQ:[^\"]*`)
 )
 
 func win32CryptUnprotectData(data []byte) ([]byte, error) {
@@ -70,9 +76,9 @@ func getMasterKey() ([]byte, error) {
 	return win32CryptUnprotectData(encryptedKey)
 }
 
-func decryptToken(encrypted []byte) string {
+func decryptToken(encrypted []byte) (string, error) {
 	if len(encrypted) < 32 {
-		return ""
+		return "", fmt.Errorf("invalid token length")
 	}
 
 	iv := encrypted[3:15]
@@ -80,30 +86,30 @@ func decryptToken(encrypted []byte) string {
 
 	key, err := getMasterKey()
 	if err != nil {
-		return ""
+		return "", err
 	}
 
 	block, err := aes.NewCipher(key)
 	if err != nil {
-		return ""
+		return "", err
 	}
 
 	aesGCM, err := cipher.NewGCM(block)
 	if err != nil {
-		return ""
+		return "", err
 	}
 
 	ivSize := len(iv)
 	if len(payload) < ivSize {
-		return ""
+		return "", fmt.Errorf("invalid payload length")
 	}
 
 	plaintext, err := aesGCM.Open(nil, iv, payload, nil)
 	if err != nil {
-		return ""
+		return "", err
 	}
 
-	return string(plaintext)
+	return string(plaintext), nil
 }
 
 func searchEncryptedTokens(content []byte, savedTokens *SavedTokens) {
@@ -115,13 +121,13 @@ func searchEncryptedTokens(content []byte, savedTokens *SavedTokens) {
 			continue
 		}
 
-		token := decryptToken(encryptedToken)
+		token, err := decryptToken(encryptedToken)
 		if err != nil {
 			continue
 		}
 
 		// Add the token if it doesn't exist yet
-		if utils.SliceContains(savedTokens.RawTokens, token) {
+		if slices.Contains(savedTokens.RawTokens, token) {
 			continue
 		}
 

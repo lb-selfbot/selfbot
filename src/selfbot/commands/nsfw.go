@@ -3,6 +3,7 @@ package commands
 import (
 	"fmt"
 
+	"github.com/LightningDev1/LB-Selfbot/internal/random"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/api"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/embed"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/utils"
@@ -55,7 +56,7 @@ func (NSFWCommands) generateFunc(name string, subReddits []string) func(ctx *dgc
 	// If you put the function in the RegisterCommands function, the element
 	// variable will always be the last element in the command array.
 	return func(ctx *dgc.Ctx) {
-		image, success := api.GetImageFromSubreddit(utils.RandomChoice(subReddits))
+		image, success := api.GetImageFromSubreddit(random.Choice(subReddits))
 		if !success {
 			_ = ctx.RespondText("An error has occurred.")
 			return

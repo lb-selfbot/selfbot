@@ -28,7 +28,7 @@ func pad(text []byte, blocksize int) []byte {
 	padding := blocksize - (len(text) % blocksize)
 
 	// Create the padding
-	for i := 0; i < padding; i++ {
+	for range padding {
 		text = append(text, byte(padding))
 	}
 
@@ -82,12 +82,12 @@ func (a AESCBC) Encrypt(text []byte) ([]byte, error) {
 	mode.CryptBlocks(ciphertext, paddedText)
 
 	// Return the encrypted text
-	return []byte(fmt.Sprintf(
+	return fmt.Appendf(nil, 
 		"%s:%s:%s",
 		base64.StdEncoding.EncodeToString(salt),
 		base64.StdEncoding.EncodeToString(iv),
 		base64.StdEncoding.EncodeToString(ciphertext),
-	)), nil
+	), nil
 }
 
 func (a AESCBC) Decrypt(text []byte) ([]byte, error) {

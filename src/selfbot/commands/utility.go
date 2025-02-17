@@ -19,11 +19,13 @@ import (
 	"path/filepath"
 	"regexp"
 	"runtime"
+	"slices"
 	"sort"
 	"strconv"
 	"strings"
 	"time"
 
+	"github.com/LightningDev1/LB-Selfbot/internal/random"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/config"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/conversion"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/eventreactions"
@@ -2908,7 +2910,7 @@ func (UtilityCommands) reminders(ctx *dgc.Ctx) {
 // Conversion utilities
 
 func (UtilityCommands) checkIfUnitValid(ctx *dgc.Ctx, unit string, validUnits []string) bool {
-	isValid := utils.SliceContains(validUnits, strings.ToLower(unit))
+	isValid := slices.Contains(validUnits, strings.ToLower(unit))
 	if isValid {
 		return true
 	}
@@ -3330,7 +3332,7 @@ func (UtilityCommands) passgen(ctx *dgc.Ctx) {
 		return
 	}
 	embed.NewEmbed().
-		AddField("Password", utils.Random.String(charAmount, "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789#$%&")).
+		AddField("Password", random.String(charAmount, "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789#$%&")).
 		Send(ctx)
 }
 
@@ -3593,7 +3595,7 @@ func (UtilityCommands) randomcountry(ctx *dgc.Ctx) {
 
 	countryList := httpResponse.Json()
 
-	country := countryList.GetIndex(utils.Random.Number(0, len(countryList.MustArray())))
+	country := countryList.GetIndex(random.Int(0, len(countryList.MustArray())))
 
 	rawCurrencies := country.Get("currencies").Interface().(map[string]any)
 	var currencies []string
@@ -3714,11 +3716,11 @@ func (UtilityCommands) generatekey(ctx *dgc.Ctx) {
 		for _, char := range format {
 			switch char {
 			case 'x':
-				key += utils.Random.String(1, constants.ALPHABET)
+				key += random.String(1, constants.ALPHABET)
 			case 'X':
-				key += strings.ToUpper(utils.Random.String(1, constants.ALPHABET))
+				key += strings.ToUpper(random.String(1, constants.ALPHABET))
 			case '9':
-				key += strconv.Itoa(utils.Random.Number(0, 10))
+				key += strconv.Itoa(random.Int(0, 10))
 			default:
 				key += string(char)
 			}

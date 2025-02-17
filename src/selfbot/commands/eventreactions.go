@@ -2,6 +2,7 @@ package commands
 
 import (
 	"fmt"
+	"slices"
 	"strings"
 	"time"
 
@@ -1737,7 +1738,7 @@ func (EventReactionsCommands) afktriggerusers(ctx *dgc.Ctx) {
 			return
 		}
 
-		if utils.SliceContains(cfg.AFK.TriggerList.Users, user.ID) {
+		if slices.Contains(cfg.AFK.TriggerList.Users, user.ID) {
 			_ = ctx.RespondText("User is already in the AFK Triggerlist.")
 			return
 		}
@@ -1758,7 +1759,7 @@ func (EventReactionsCommands) afktriggerusers(ctx *dgc.Ctx) {
 			return
 		}
 
-		if !utils.SliceContains(cfg.AFK.TriggerList.Users, user.ID) {
+		if !slices.Contains(cfg.AFK.TriggerList.Users, user.ID) {
 			_ = ctx.RespondText("User already isn't in the AFK Triggerlist.")
 			return
 		}
@@ -1815,7 +1816,7 @@ func (EventReactionsCommands) afktriggerservers(ctx *dgc.Ctx) {
 			return
 		}
 
-		if utils.SliceContains(cfg.AFK.TriggerList.Servers, guild.ID) {
+		if slices.Contains(cfg.AFK.TriggerList.Servers, guild.ID) {
 			_ = ctx.RespondText(fmt.Sprintf("Server %s is already in the AFK Triggerlist!", guild.Name))
 			return
 		}
@@ -1836,7 +1837,7 @@ func (EventReactionsCommands) afktriggerservers(ctx *dgc.Ctx) {
 			return
 		}
 
-		if !utils.SliceContains(cfg.AFK.TriggerList.Servers, guild.ID) {
+		if !slices.Contains(cfg.AFK.TriggerList.Servers, guild.ID) {
 			_ = ctx.RespondText(fmt.Sprintf("Server %s already isn't in the AFK Triggerlist!", guild.Name))
 			return
 		}

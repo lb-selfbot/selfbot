@@ -12,6 +12,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/LightningDev1/LB-Selfbot/internal/random"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/config"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/utils"
 	"github.com/LightningDev1/discordgo"
@@ -150,7 +151,7 @@ func GetImageFromSubreddit(subreddit string) (*RedditPost, bool) {
 		idxSlice[i] = i
 	}
 
-	idxSlice = utils.RandomShuffle(idxSlice)
+	idxSlice = random.Shuffle(idxSlice)
 
 	for i := 0; i < dataLen; i++ {
 		post := data.GetIndex(idxSlice[i])

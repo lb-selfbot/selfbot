@@ -146,7 +146,7 @@ func (s SpotifyCommands) checkResponse(ctx *dgc.Ctx, httpResponse *http.HttpResp
 	errorReason = strings.ReplaceAll(errorReason, "NO_ACTIVE_DEVICE", "No active device found")
 
 	if errorReason != "" {
-		_ = ctx.RespondText(fmt.Sprintf("A Spotify error occured: `%s`", errorReason))
+		_ = ctx.RespondText(fmt.Sprintf("A Spotify error occurred: `%s`", errorReason))
 		return false
 	}
 
@@ -308,7 +308,7 @@ func (s SpotifyCommands) splaying(ctx *dgc.Ctx) {
 	httpResponse := http.Get("https://api.spotify.com/v1/me/player/currently-playing", map[string]string{"Authorization": bearerToken})
 	song, success := httpResponse.Json().CheckGet("item")
 	if httpResponse.Error != nil || !success {
-		_ = ctx.RespondText("A Spotify error occured: No song currently playing")
+		_ = ctx.RespondText("A Spotify error occurred: No song currently playing")
 		return
 	}
 

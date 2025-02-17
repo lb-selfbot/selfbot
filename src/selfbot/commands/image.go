@@ -6,6 +6,7 @@ import (
 	"net/url"
 	"strings"
 
+	"github.com/LightningDev1/LB-Selfbot/internal/random"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/embed"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/http"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/utils"
@@ -1065,7 +1066,7 @@ func (ImageCommands) ytcomment(ctx *dgc.Ctx) {
 }
 
 func (ImageCommands) pokemon(ctx *dgc.Ctx) {
-	_ = ctx.RespondText(fmt.Sprintf("https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/%d.png", utils.Random.Number(1, 898)))
+	_ = ctx.RespondText(fmt.Sprintf("https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/%d.png", random.Int(1, 898)))
 }
 
 func (ImageCommands) wasted(ctx *dgc.Ctx) {
@@ -2558,12 +2559,12 @@ func (ImageCommands) drip(ctx *dgc.Ctx) {
 }
 
 func (ImageCommands) impostor(ctx *dgc.Ctx) {
-	crewmate := utils.RandomChoice([]string{"black", "blue", "brown", "cyan", "darkgreen", "lime", "orange", "pink", "purple", "red", "white", "yellow"})
+	crewmate := random.Choice([]string{"black", "blue", "brown", "cyan", "darkgreen", "lime", "orange", "pink", "purple", "red", "white", "yellow"})
 	_ = ctx.RespondText(fmt.Sprintf("https://vacefron.nl/api/ejected?name=%s&impostor=true&crewmate=%s", ctx.Arguments.Raw(), crewmate))
 }
 
 func (ImageCommands) notimpostor(ctx *dgc.Ctx) {
-	crewmate := utils.RandomChoice([]string{"black", "blue", "brown", "cyan", "darkgreen", "lime", "orange", "pink", "purple", "red", "white", "yellow"})
+	crewmate := random.Choice([]string{"black", "blue", "brown", "cyan", "darkgreen", "lime", "orange", "pink", "purple", "red", "white", "yellow"})
 	_ = ctx.RespondText(fmt.Sprintf("https://vacefron.nl/api/ejected?name=%s&impostor=false&crewmate=%s", ctx.Arguments.Raw(), crewmate))
 }
 

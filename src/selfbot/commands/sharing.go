@@ -2,6 +2,7 @@ package commands
 
 import (
 	"fmt"
+	"slices"
 	"strings"
 
 	"github.com/LightningDev1/LB-Selfbot/selfbot/config"
@@ -92,7 +93,7 @@ func (*SharingCommands) sharedusers(ctx *dgc.Ctx) {
 			return
 		}
 
-		if utils.SliceContains(cfg.Sharing.SharedUsers, user.ID) {
+		if slices.Contains(cfg.Sharing.SharedUsers, user.ID) {
 			_ = ctx.RespondText("User is already in the Shared Users list.")
 			return
 		}
@@ -113,7 +114,7 @@ func (*SharingCommands) sharedusers(ctx *dgc.Ctx) {
 			return
 		}
 
-		if !utils.SliceContains(cfg.Sharing.SharedUsers, user.ID) {
+		if !slices.Contains(cfg.Sharing.SharedUsers, user.ID) {
 			_ = ctx.RespondText("User already isn't in the Shared Users list.")
 			return
 		}
@@ -168,7 +169,7 @@ func (*SharingCommands) sharedcategories(ctx *dgc.Ctx) {
 			return
 		}
 
-		if utils.SliceContains(cfg.Sharing.SharedCategories, entry) {
+		if slices.Contains(cfg.Sharing.SharedCategories, entry) {
 			_ = ctx.RespondText("Category is already in the Shared Categories list!")
 			return
 		}
@@ -198,7 +199,7 @@ func (*SharingCommands) sharedcategories(ctx *dgc.Ctx) {
 			return
 		}
 
-		if !utils.SliceContains(cfg.Sharing.SharedCategories, entry) {
+		if !slices.Contains(cfg.Sharing.SharedCategories, entry) {
 			_ = ctx.RespondText("Category already isn't in the Shared Categories list!")
 			return
 		}
@@ -262,7 +263,7 @@ func (*SharingCommands) sharedcommands(ctx *dgc.Ctx) {
 			return
 		}
 
-		if utils.SliceContains(cfg.Sharing.SharedCommands, entry) {
+		if slices.Contains(cfg.Sharing.SharedCommands, entry) {
 			_ = ctx.RespondText("Command is already in the Shared Commands list!")
 			return
 		}
@@ -292,7 +293,7 @@ func (*SharingCommands) sharedcommands(ctx *dgc.Ctx) {
 			return
 		}
 
-		if !utils.SliceContains(cfg.Sharing.SharedCommands, entry) {
+		if !slices.Contains(cfg.Sharing.SharedCommands, entry) {
 			_ = ctx.RespondText("Command already isn't in the Shared Commands list!")
 			return
 		}
