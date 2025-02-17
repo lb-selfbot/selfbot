@@ -95,37 +95,4 @@ func (SystemUtils) LockPC() error {
 	}
 }
 
-// func (SystemUtils) GetIdleTime() (time.Duration, error) {
-// 	if runtime.GOOS != "windows" {
-// 		return 0, nil
-// 	}
-
-// 	var lastInputInfo struct {
-// 		cbSize uint32
-// 		dwTime uint32
-// 	}
-// 	lastInputInfo.cbSize = uint32(unsafe.Sizeof(lastInputInfo))
-
-// 	_, _, err := System.RunDllFunc("user32.dll", "GetLastInputInfo", uintptr(unsafe.Pointer(&lastInputInfo)))
-// 	if err != nil {
-// 		return 0, err
-// 	}
-
-// 	tickCount, _, err := System.RunDllFunc("kernel32.dll", "GetTickCount")
-// 	if err != nil {
-// 		return 0, err
-// 	}
-
-// 	tickCount32 := uint32(tickCount)
-
-// 	if tickCount32 < lastInputInfo.dwTime {
-// 		const kMaxDWORD = uint32(0xFFFFFFFF)
-// 		timeBeforeWrap := kMaxDWORD - lastInputInfo.dwTime
-// 		timeAfterWrap := tickCount32
-// 		return time.Duration(timeBeforeWrap+timeAfterWrap) * time.Millisecond, nil
-// 	} else {
-// 		return time.Duration(tickCount32-lastInputInfo.dwTime) * time.Millisecond, nil
-// 	}
-// }
-
 var System = &SystemUtils{}

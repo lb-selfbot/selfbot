@@ -25,14 +25,14 @@ import (
 	"strings"
 	"time"
 
+	"github.com/LightningDev1/LB-Selfbot/internal/conversion"
 	"github.com/LightningDev1/LB-Selfbot/internal/random"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/config"
-	"github.com/LightningDev1/LB-Selfbot/selfbot/conversion"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/eventreactions"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/ipc"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/logging"
 
-	"github.com/LightningDev1/LB-Selfbot/selfbot/uploaders/destinations"
+	"github.com/LightningDev1/LB-Selfbot/internal/uploaders/destinations"
 	"github.com/LightningDev1/discordgo/protos"
 	"github.com/LightningDev1/go-foreground"
 	"github.com/bitly/go-simplejson"

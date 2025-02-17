@@ -35,7 +35,7 @@ func (s *SpotifyAPI) GetBearerToken(token string) string {
 		return ""
 	}
 
-	for i := 0; i < len(conns.MustArray()); i++ {
+	for i := range conns.MustArray() {
 		conn := conns.GetIndex(i)
 		if conn.Get("type").MustString() != "spotify" {
 			continue
@@ -95,7 +95,7 @@ func (s *SpotifyAPI) GetSongArtists(song *simplejson.Json) []string {
 
 	artistAmount := len(song.Get("artists").MustArray())
 
-	for i := 0; i < artistAmount; i++ {
+	for i := range artistAmount {
 		artistName := song.Get("artists").GetIndex(i).Get("name").MustString()
 		songArtists = append(songArtists, artistName)
 	}

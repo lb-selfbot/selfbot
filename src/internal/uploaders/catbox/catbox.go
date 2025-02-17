@@ -6,7 +6,7 @@ import (
 	"mime/multipart"
 	"net/http"
 
-	"github.com/LightningDev1/LB-Selfbot/selfbot/uploaders"
+	"github.com/LightningDev1/LB-Selfbot/internal/uploaders"
 )
 
 type Catbox struct{}

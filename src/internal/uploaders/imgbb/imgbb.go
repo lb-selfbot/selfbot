@@ -8,8 +8,8 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/LightningDev1/LB-Selfbot/selfbot/uploaders"
-	"github.com/LightningDev1/LB-Selfbot/selfbot/uploaders/keys"
+	"github.com/LightningDev1/LB-Selfbot/internal/uploaders"
+	"github.com/LightningDev1/LB-Selfbot/internal/uploaders/keys"
 	"github.com/bitly/go-simplejson"
 )
 

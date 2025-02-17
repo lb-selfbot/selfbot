@@ -7,12 +7,12 @@ import (
 	"sync"
 	"time"
 
-	"github.com/LightningDev1/LB-Selfbot/selfbot/config"
 	"github.com/LightningDev1/LB-Selfbot/internal/data"
+	"github.com/LightningDev1/LB-Selfbot/selfbot/config"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/ipc"
+	"github.com/LightningDev1/LB-Selfbot/selfbot/logging"
 
 	"github.com/LightningDev1/LB-Selfbot/selfbot/reminder"
-	"github.com/LightningDev1/LB-Selfbot/selfbot/rpc"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/sessions"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/slashcommands"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/utils"
@@ -490,7 +490,7 @@ func RegisterHandlers(session *discordgo.Session, router *dgc.Router) {
 		go StartLoading(session, router)
 
 		// Start RPC
-		rpc.StartRPC(session)
+		// rpc.StartRPC(session)
 
 		// Setup snipers
 		go func() {

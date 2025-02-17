@@ -1,4 +1,4 @@
-package suleu
+package vgyme
 
 import (
 	"bytes"
@@ -7,18 +7,18 @@ import (
 	"mime/multipart"
 	"net/http"
 
-	"github.com/LightningDev1/LB-Selfbot/selfbot/uploaders"
-	"github.com/LightningDev1/LB-Selfbot/selfbot/uploaders/keys"
+	"github.com/LightningDev1/LB-Selfbot/internal/uploaders"
+	"github.com/LightningDev1/LB-Selfbot/internal/uploaders/keys"
 	"github.com/bitly/go-simplejson"
 )
 
-type SulEU struct{}
+type Vgyme struct{}
 
-func (SulEU) SupportsAllFiles() bool {
-	return true
+func (Vgyme) SupportsAllFiles() bool {
+	return false
 }
 
-func (s SulEU) Upload(file *bytes.Buffer, filename string) (*uploaders.UploadResult, error) {
+func (Vgyme) Upload(file *bytes.Buffer, filename string) (*uploaders.UploadResult, error) {
 	var buf = new(bytes.Buffer)
 	writer := multipart.NewWriter(buf)
 
@@ -32,21 +32,19 @@ func (s SulEU) Upload(file *bytes.Buffer, filename string) (*uploaders.UploadRes
 		return nil, err
 	}
 
-	_ = writer.WriteField("wizard", "true")
-	_ = writer.WriteField("key", keys.SulEUToken)
+	_ = writer.WriteField("userkey", keys.VgymeUserKey)
 
 	err = writer.Close()
 	if err != nil {
 		return nil, err
 	}
 
-	req, err := http.NewRequest("POST", "https://s-ul.eu/api/v1/upload", buf)
+	req, err := http.NewRequest("POST", "https://vgy.me/upload", buf)
 	if err != nil {
 		return nil, err
 	}
 
 	req.Header.Set("Content-Type", writer.FormDataContentType())
-	req.Header.Set("Authorization", "Client-ID "+keys.ImgurClientID)
 
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
@@ -60,16 +58,16 @@ func (s SulEU) Upload(file *bytes.Buffer, filename string) (*uploaders.UploadRes
 	}
 
 	if resp.StatusCode != 200 {
-		return nil, fmt.Errorf("invalid s-ul.eu response: %s", json.MustMap())
+		return nil, fmt.Errorf("invalid vgy.me response: %s", json.MustMap())
 	}
 
-	url := json.Get("url").MustString()
-	if url == "" {
-		return nil, fmt.Errorf("invalid s-ul.eu response: %s", json.MustMap())
+	if json.Get("error").MustBool() {
+		return nil, fmt.Errorf("invalid vgy.me response: %s", json.MustMap())
 	}
+
 	result := &uploaders.UploadResult{
-		URL:       url,
-		DirectURL: url,
+		URL:       json.Get("url").MustString(),
+		DirectURL: json.Get("image").MustString(),
 	}
 
 	return result, nil
