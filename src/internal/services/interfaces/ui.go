@@ -6,6 +6,8 @@ type InfoEntry struct {
 }
 
 type ConsoleMessage struct {
+	uiSvc UIService
+
 	Title      string
 	Color      string
 	WebhookURL string
@@ -13,9 +15,9 @@ type ConsoleMessage struct {
 	Info       []InfoEntry
 }
 
-// NewConsoleMessage initializes a new ConsoleMessage.
-func NewConsoleMessage() *ConsoleMessage {
-	return &ConsoleMessage{}
+// NewConsoleMessage creates a new ConsoleMessage instance.
+func NewConsoleMessage(uiSvc UIService) *ConsoleMessage {
+	return &ConsoleMessage{uiSvc: uiSvc}
 }
 
 // Setter methods with method chaining.
@@ -53,8 +55,8 @@ func (c *ConsoleMessage) AddInfoConditional(key, value string, condition bool) *
 	return c
 }
 
-func (c *ConsoleMessage) Show(ui UIService) error {
-	return ui.ShowConsoleMessage(c)
+func (c *ConsoleMessage) Show() error {
+	return c.uiSvc.ShowConsoleMessage(c)
 }
 
 type UIService interface {
@@ -70,5 +72,6 @@ type UIService interface {
 	AppendConsole(ansi string) error
 	ClearConsole() error
 	SetConsole(ansi string) error
+	NewConsoleMessage() *ConsoleMessage
 	ShowConsoleMessage(c *ConsoleMessage) error
 }

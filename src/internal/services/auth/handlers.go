@@ -35,7 +35,7 @@ func (a *AuthServiceImpl) onHelloAck(msg *WSMessage) error {
 	a.receivedNonce = msg.Data.Nonce
 	a.CheckNonce()
 
-	a.readyChan <- struct{}{}
+	close(a.readyChan)
 
 	return a.SendConfigUpdate()
 }

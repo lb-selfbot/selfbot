@@ -3,34 +3,29 @@ package main
 import (
 	"context"
 	"encoding/json"
-	"errors"
 	"flag"
 	"fmt"
 	"net"
 	"os"
 	"os/signal"
+	"path/filepath"
 	"runtime"
 	"runtime/debug"
-	"strings"
 	"syscall"
 	"time"
-
-	"github.com/gorilla/websocket"
 
 	"github.com/LightningDev1/LB-Selfbot/internal/browser"
 	"github.com/LightningDev1/LB-Selfbot/internal/logging"
 	"github.com/LightningDev1/LB-Selfbot/internal/services"
 	"github.com/LightningDev1/LB-Selfbot/internal/services/interfaces"
 	"github.com/LightningDev1/LB-Selfbot/internal/services/ui"
-	"github.com/LightningDev1/LB-Selfbot/internal/startup"
-	"github.com/LightningDev1/LB-Selfbot/internal/tui"
 	"github.com/LightningDev1/LB-Selfbot/savedtokens"
+	"github.com/LightningDev1/LB-Selfbot/selfbot/assets"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/commands"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/config"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/constants"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/errorhandler"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/http"
-	"github.com/LightningDev1/LB-Selfbot/selfbot/multitokensniper"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/setup"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/utils"
 	"github.com/LightningDev1/dgc"
@@ -215,9 +210,21 @@ func main() {
 		return
 	}
 
-	if err := startup.Initialize(*isVerbose); err != nil {
-		logging.Error("Startup error:", err)
-		os.Exit(1)
+	if err := utils.IO.CreateFolders(); err != nil {
+		_ = services.UI.LogError("Error creating folders: " + err.Error())
+		return
+	}
+
+	// Initialize icon
+	iconFile := filepath.Join(utils.IO.GetMainFolder(), "Logo.png")
+	if !utils.IO.Exists(iconFile) && !constants.HOSTING {
+		icon, err := assets.Assets.ReadFile("Logo.png")
+		if err != nil {
+			logging.Error("Error reading icon file:", err)
+			return
+		}
+
+		_ = utils.IO.WriteBytes(iconFile, icon)
 	}
 
 	if constants.CONSOLE {
@@ -252,17 +259,12 @@ func main() {
 		token = cfg.Account.Discord.Token
 	}
 
-	// TODO: websocket
-	err = services.Auth.Connect(context.Background(), interfaces.AuthCredentials{
+	creds := interfaces.AuthCredentials{
 		Username: username,
 		Password: password,
-	})
-	if err != nil {
-		var wsErr *websocket.CloseError
-		if errors.As(err, &wsErr) {
-			// TODO: asdf
-		}
-		logging.Error("Auth init error:", err)
+	}
+
+	if err = services.Auth.Connect(context.Background(), creds); err != nil {
 		os.Exit(1)
 	}
 
@@ -285,32 +287,16 @@ func main() {
 	}
 
 	if err := services.Discord.Open(); err != nil {
-		if strings.Contains(err.Error(), "Authentication failed") {
-			if !strings.Contains(err.Error(), "Authentication failed") {
-				return
-			}
-
-			if _, ok := os.LookupEnv("LB_TOKEN"); ok {
-				logging.UI.Error("Your Discord token is invalid! Please enter a valid token in the LB_TOKEN environment variable.")
-				os.Exit(1)
-			}
-
-			token := tui.GetToken("Your Discord token is invalid!")
-
-			cfg.Account.Discord.Token = token
-			if err := cfg.Save(); err != nil {
-				logging.Error("Save config error:", err)
-				os.Exit(1)
-			}
-
-			utils.System.Restart()
-		}
-
-		logging.Error("An error has occurred while connecting to Discord:", err)
+		logging.Error("Discord open error:", err)
 		os.Exit(1)
 	}
 
-	multitokensniper.Init(session, cfg)
+	go func() {
+		err := services.MultiTokenSniper.Init(context.Background())
+		if err != nil {
+			_ = services.UI.LogError("Error initializing multi-token sniper: " + err.Error())
+		}
+	}()
 
 	sc := make(chan os.Signal, 1)
 	signal.Notify(sc, syscall.SIGINT, syscall.SIGTERM)

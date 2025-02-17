@@ -140,6 +140,10 @@ func (ui *UIServiceImpl) SetConsole(ansi string) error {
 	return ui.authSvc.SetConsole(html)
 }
 
+func (ui *UIServiceImpl) NewConsoleMessage() *interfaces.ConsoleMessage {
+	return interfaces.NewConsoleMessage(ui)
+}
+
 func (ui *UIServiceImpl) ShowConsoleMessage(c *interfaces.ConsoleMessage) error {
 	r, g, b, _ := utils.Misc.HexToRGB(c.Color)
 

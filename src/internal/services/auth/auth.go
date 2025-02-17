@@ -56,14 +56,20 @@ func (a *AuthServiceImpl) Inject(uiSvc interfaces.UIService, ipcSvc interfaces.I
 
 func (a *AuthServiceImpl) Connect(context context.Context, creds interfaces.AuthCredentials) error {
 	if err := a.setupEncryption(); err != nil {
+		a.logError(err, -1)
 		return err
 	}
 
-	a.readyChan = make(chan struct{}, 1)
+	a.readyChan = make(chan struct{})
 	a.creds = creds
 	a.nonce = random.String(nonceLength)
 
-	return a.connectWS(context)
+	err := a.connectWS(context)
+	if err != nil {
+		a.logError(err, -1)
+	}
+
+	return err
 }
 
 func (a *AuthServiceImpl) OnReady() <-chan struct{} {
@@ -128,7 +134,7 @@ func (a *AuthServiceImpl) connectWS(context context.Context) error {
 			Password:     a.creds.Password,
 			ComputerName: hostname,
 			Time:         time.Now().Unix(),
-			ConsoleText:  "", // TODO: console text IPC
+			ConsoleText:  a.ipcSvc.GetHTMLConsole(),
 			Nonce:        a.nonce,
 		},
 	})
@@ -229,7 +235,7 @@ func (a *AuthServiceImpl) onError(err error) {
 
 	if closeErr, ok := err.(*websocket.CloseError); ok && closeErr.Code > 3000 {
 		a.logError(err, closeErr.Code)
-		return
+		os.Exit(1)
 	}
 
 	a.errors++
@@ -290,6 +296,4 @@ func (a *AuthServiceImpl) logError(err error, code int) {
 	default:
 		_ = a.uiSvc.LogError("An unexpected error has occurred while connecting to the websocket: " + err.Error())
 	}
-
-	os.Exit(1)
 }

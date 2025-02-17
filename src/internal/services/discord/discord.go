@@ -2,34 +2,78 @@ package discord
 
 import (
 	"fmt"
+	"os"
+	"path/filepath"
+	"runtime"
 	"slices"
 	"strings"
 
 	"github.com/LightningDev1/LB-Selfbot/internal/services/interfaces"
+	"github.com/LightningDev1/LB-Selfbot/internal/tui"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/commands"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/config"
+	"github.com/LightningDev1/LB-Selfbot/selfbot/constants"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/data"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/eventreactions"
-	"github.com/LightningDev1/LB-Selfbot/selfbot/extensions"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/utils"
 	"github.com/LightningDev1/dgc"
 	"github.com/LightningDev1/discordgo"
 )
 
 type DiscordServiceImpl struct {
-	authSvc interfaces.AuthService
-	uiSvc   interfaces.UIService
+	authSvc       interfaces.AuthService
+	uiSvc         interfaces.UIService
+	extensionsSvc interfaces.ExtensionsService
 
 	session *discordgo.Session
 	router  *dgc.Router
+
+	verbose bool
 }
 
-func (d *DiscordServiceImpl) Inject(authSvc interfaces.AuthService, uiSvc interfaces.UIService) {
+func (d *DiscordServiceImpl) Inject(authSvc interfaces.AuthService, uiSvc interfaces.UIService, extensionsSvc interfaces.ExtensionsService) {
 	d.authSvc = authSvc
 	d.uiSvc = uiSvc
+	d.extensionsSvc = extensionsSvc
+}
+
+func (d *DiscordServiceImpl) discordgoLogger(msgL int, caller int, format string, a ...interface{}) {
+	pc, file, line, _ := runtime.Caller(caller + 1)
+
+	files := strings.Split(file, "/")
+	file = files[len(files)-1]
+
+	name := runtime.FuncForPC(pc).Name()
+	fns := strings.Split(name, ".")
+	name = fns[len(fns)-1]
+
+	msg := fmt.Sprintf(format, a...)
+
+	if strings.Contains(msg, "unknown event") && !d.verbose {
+		return
+	}
+
+	msg = fmt.Sprintf("[DG%d] %s:%d:%s() %s\n", msgL, file, line, name, msg)
+
+	logPath := filepath.Join(utils.IO.GetMainFolder(), "LB.log")
+	f, err := os.OpenFile(logPath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0666)
+	if err != nil {
+		return
+	}
+	defer f.Close()
+
+	_, _ = f.WriteString(msg)
+
+	if msgL == discordgo.LogError {
+		_ = d.uiSvc.LogError("discordgo error: " + msg)
+	}
 }
 
 func (d *DiscordServiceImpl) Init(token string, verbose bool) error {
+	d.verbose = verbose
+
+	discordgo.Logger = d.discordgoLogger
+
 	d.session, _ = discordgo.New(token)
 
 	cfg, err := config.GetConfig()
@@ -138,7 +182,7 @@ func (d *DiscordServiceImpl) Init(token string, verbose bool) error {
 
 	eventreactions.RegisterHandlers(d.session, d.router)
 	commands.Commands.RegisterCommands(d.session, d.router, false)
-	extensions.RegisterExtensions(d.session, d.router)
+	d.extensionsSvc.Register()
 	commands.Commands.HelpCommand.RegisterHelpCommand(d.router, d.session)
 
 	d.router.Initialize(d.session)
@@ -146,14 +190,47 @@ func (d *DiscordServiceImpl) Init(token string, verbose bool) error {
 	return nil
 }
 
-func (d *DiscordServiceImpl) GetSession() *discordgo.Session {
-	return d.session
-}
-
-func (d *DiscordServiceImpl) GetRouter() *dgc.Router {
-	return d.router
-}
+func (d *DiscordServiceImpl) GetSession() *discordgo.Session { return d.session }
+func (d *DiscordServiceImpl) GetRouter() *dgc.Router         { return d.router }
 
 func (d *DiscordServiceImpl) Open() error {
-	return d.session.Open()
+	err := d.session.Open()
+	if err == nil {
+		return nil
+	}
+
+	// Check if token is invalid
+	if strings.Contains(err.Error(), "Authentication failed") {
+		if !constants.CONSOLE {
+			_ = d.uiSvc.LogError("Your Discord token is invalid! Please re-enter it in the Config tab.")
+			return err
+		}
+
+		if _, ok := os.LookupEnv("LB_TOKEN"); ok {
+			_ = d.uiSvc.LogError("Your Discord token is invalid! Please enter a valid token in the LB_TOKEN environment variable.")
+			return err
+		}
+
+		token := tui.GetToken("Your Discord token is invalid!")
+
+		cfg, err := config.GetConfig()
+		if err != nil {
+			_ = d.uiSvc.LogError("Error loading config:", err)
+			os.Exit(1)
+		}
+
+		cfg.Account.Discord.Token = token
+		if err := cfg.Save(); err != nil {
+			_ = d.uiSvc.LogError("Save config error:", err)
+			os.Exit(1)
+		}
+
+		_ = utils.System.Restart()
+
+		return err
+	}
+
+	_ = d.uiSvc.LogError("An error has occurred while connecting to Discord: " + err.Error())
+
+	return err
 }
