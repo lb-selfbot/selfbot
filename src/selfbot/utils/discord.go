@@ -539,11 +539,13 @@ func (DiscordUtils) MuteUser(session *discordgo.Session, member *discordgo.Membe
 	}
 
 	for _, channel := range channels {
-		if channel.Type == 1 {
-			err = session.ChannelPermissionSet(channel.ID, role.ID, discordgo.PermissionOverwriteTypeRole, 0, discordgo.PermissionSendMessages)
-			if err != nil {
-				return err
-			}
+		if channel.Type != discordgo.ChannelTypeGuildText {
+			continue
+		}
+
+		err = session.ChannelPermissionSet(channel.ID, role.ID, discordgo.PermissionOverwriteTypeRole, 0, discordgo.PermissionSendMessages)
+		if err != nil {
+			return err
 		}
 	}
 
