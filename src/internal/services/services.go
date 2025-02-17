@@ -11,7 +11,9 @@ import (
 	"github.com/LightningDev1/LB-Selfbot/internal/services/reminder"
 	"github.com/LightningDev1/LB-Selfbot/internal/services/rpc"
 	"github.com/LightningDev1/LB-Selfbot/internal/services/sessions"
+	"github.com/LightningDev1/LB-Selfbot/internal/services/spotify"
 	"github.com/LightningDev1/LB-Selfbot/internal/services/ui"
+	"github.com/LightningDev1/LB-Selfbot/internal/services/variables"
 )
 
 type Services struct {
@@ -25,6 +27,8 @@ type Services struct {
 	Reminder         interfaces.ReminderService
 	Sessions         interfaces.SessionsService
 	RPC              interfaces.RPCService
+	Spotify          interfaces.SpotifyService
+	Variables        interfaces.VariablesService
 }
 
 func NewServices() *Services {
@@ -45,6 +49,8 @@ func (s *Services) register() {
 	s.Reminder = &reminder.ReminderServiceImpl{}
 	s.Sessions = &sessions.SessionsServiceImpl{}
 	s.RPC = &rpc.RPCServiceImpl{}
+	s.Spotify = &spotify.SpotifyServiceImpl{}
+	s.Variables = &variables.VariablesServiceImpl{}
 
 	// Inject dependencies
 	s.Auth.Inject(s.UI, s.IPC)
@@ -56,4 +62,6 @@ func (s *Services) register() {
 	s.Reminder.Inject(s.UI)
 	s.Sessions.Inject(s.UI, s.Discord)
 	s.RPC.Inject(s.UI, s.Discord, s.Sessions)
+	s.Spotify.Inject(s.Discord)
+	s.Variables.Inject(s.Discord, s.Extensions, s.Spotify)
 }

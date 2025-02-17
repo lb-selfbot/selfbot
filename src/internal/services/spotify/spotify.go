@@ -5,11 +5,14 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/LightningDev1/LB-Selfbot/internal/services/interfaces"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/http"
 	"github.com/bitly/go-simplejson"
 )
 
-type SpotifyAPI struct {
+type SpotifyServiceImpl struct {
+	discordSvc interfaces.DiscordService
+
 	connName        string
 	connAccessToken string
 	connRetrieved   time.Time
@@ -18,42 +21,42 @@ type SpotifyAPI struct {
 	currentlyPlayingRetrieved time.Time
 }
 
-func (s *SpotifyAPI) formatAsBearerToken(token string) string {
-	return "Bearer " + token
+func (s *SpotifyServiceImpl) Inject(discordSvc interfaces.DiscordService) {
+	s.discordSvc = discordSvc
 }
 
-func (s *SpotifyAPI) GetBearerToken(token string) string {
+func (s *SpotifyServiceImpl) GetBearerToken() string {
 	if s.connName != "" && time.Since(s.connRetrieved).Minutes() < 10 {
 		return s.formatAsBearerToken(s.connAccessToken)
 	}
 
-	conns, err := http.GetJson(
-		"https://discord.com/api/v10/users/@me/connections",
-		map[string]string{"Authorization": token},
-	)
+	session := s.discordSvc.GetSession()
+
+	conns, err := session.UserConnections()
 	if err != nil {
 		return ""
 	}
 
-	for i := range conns.MustArray() {
-		conn := conns.GetIndex(i)
-		if conn.Get("type").MustString() != "spotify" {
+	for _, conn := range conns {
+		if conn.Type != "spotify" {
 			continue
 		}
 
-		s.connName = conn.Get("name").MustString()
-		s.connAccessToken = conn.Get("access_token").MustString()
+		s.connName = conn.Name
+		s.connAccessToken = conn.AccessToken
 		s.connRetrieved = time.Now()
 
-		conn, err := http.GetJson(
-			fmt.Sprintf("https://discord.com/api/v10/users/@me/connections/spotify/%s/access-token", s.connName),
-			map[string]string{"Authorization": token},
-		)
+		data, err := session.Request("GET", fmt.Sprintf("/users/@me/connections/spotify/%s/access-token", s.connName), nil)
 		if err != nil {
 			return ""
 		}
 
-		s.connAccessToken = conn.Get("access_token").MustString()
+		jsonData, err := simplejson.NewJson(data)
+		if err != nil {
+			return ""
+		}
+
+		s.connAccessToken = jsonData.Get("access_token").MustString()
 
 		break
 	}
@@ -61,12 +64,16 @@ func (s *SpotifyAPI) GetBearerToken(token string) string {
 	return s.formatAsBearerToken(s.connAccessToken)
 }
 
-func (s *SpotifyAPI) GetCurrentlyPlaying(token string) (*simplejson.Json, error) {
+func (s *SpotifyServiceImpl) formatAsBearerToken(token string) string {
+	return "Bearer " + token
+}
+
+func (s *SpotifyServiceImpl) GetCurrentlyPlaying() (*simplejson.Json, error) {
 	if s.currentlyPlaying != nil && time.Since(s.currentlyPlayingRetrieved).Seconds() < 10 {
 		return s.currentlyPlaying, nil
 	}
 
-	bearerToken := s.GetBearerToken(token)
+	bearerToken := s.GetBearerToken()
 	if bearerToken == "" {
 		return nil, errors.New("spotify is not connected to your discord account")
 	}
@@ -90,7 +97,7 @@ func (s *SpotifyAPI) GetCurrentlyPlaying(token string) (*simplejson.Json, error)
 	return s.currentlyPlaying, nil
 }
 
-func (s *SpotifyAPI) GetSongArtists(song *simplejson.Json) []string {
+func (s *SpotifyServiceImpl) GetSongArtists(song *simplejson.Json) []string {
 	var songArtists []string
 
 	artistAmount := len(song.Get("artists").MustArray())
@@ -102,5 +109,3 @@ func (s *SpotifyAPI) GetSongArtists(song *simplejson.Json) []string {
 
 	return songArtists
 }
-
-var API = &SpotifyAPI{}

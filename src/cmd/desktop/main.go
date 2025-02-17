@@ -92,7 +92,7 @@ func checkForUpdates(services *services.Services) {
 	os.Exit(0)
 }
 
-func checkFirstLaunch() {
+func checkFirstLaunch(servies *services.Services) {
 	if !utils.IO.IsFirstLaunch() {
 		return
 	}
@@ -101,8 +101,8 @@ func checkFirstLaunch() {
 
 	username, password := setup.GetLogin()
 
-	logging.Console.Clear()
-	logging.Console.PrintBanner()
+	servies.UI.ClearConsole()
+	servies.UI.ShowBanner(ui.BannerConsole)
 
 	token := setup.GetToken()
 
@@ -232,7 +232,7 @@ func main() {
 		_ = services.UI.ShowBanner(ui.BannerConsole)
 
 		checkForUpdates(services)
-		checkFirstLaunch()
+		checkFirstLaunch(services)
 	} else {
 		if err := services.IPC.Serve(); err != nil {
 			logging.Error("IPC serve error:", err)
@@ -292,6 +292,7 @@ func main() {
 	}
 
 	services.Reminder.Start()
+	services.Variables.Init()
 
 	go func() {
 		err := services.MultiTokenSniper.Init(context.Background())
