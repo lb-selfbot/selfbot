@@ -1,7 +1,5 @@
 package interop
 
-import "github.com/LightningDev1/LB-Selfbot/selfbot/logging"
-
 // I/O
 
 func ClearConsole() {

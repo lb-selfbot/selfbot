@@ -8,7 +8,7 @@ import (
 	"github.com/LightningDev1/LB-Selfbot/selfbot/constants"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/errorhandler"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/eventreactions"
-	"github.com/LightningDev1/LB-Selfbot/selfbot/logging"
+
 	"github.com/LightningDev1/discordgo"
 )
 

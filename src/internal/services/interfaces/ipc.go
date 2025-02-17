@@ -1,8 +1,13 @@
 package interfaces
 
+import "github.com/LightningDev1/LB-Selfbot/selfbot/config"
+
 type IPCService interface {
 	Serve() error
 	OnConnect() <-chan struct{}
+
+	GetHTMLConsole() string
+	GetRawConsole() string
 
 	ClearConsole() error
 	SetConsole(ansi, html string) error
@@ -10,4 +15,5 @@ type IPCService interface {
 
 	SendError(text string) error
 	SendRestart() error
+	SendConfigUpdate(cfg *config.Config) error
 }

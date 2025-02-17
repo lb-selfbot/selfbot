@@ -8,7 +8,7 @@ type AuthCredentials struct {
 }
 
 type AuthService interface {
-	Inject(uiSvc UIService)
+	Inject(uiSvc UIService, ipcSvc IPCService)
 
 	Connect(context context.Context, creds AuthCredentials) error
 	OnReady() <-chan struct{}

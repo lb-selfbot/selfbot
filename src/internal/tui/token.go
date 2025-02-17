@@ -6,7 +6,7 @@ import (
 	"strings"
 
 	"github.com/LightningDev1/LB-Selfbot/internal/browser"
-	"github.com/LightningDev1/LB-Selfbot/savedtokens"
+	"github.com/LightningDev1/LB-Selfbot/internal/savedtokens"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/utils"
 	"github.com/charmbracelet/bubbles/list"
 	tea "github.com/charmbracelet/bubbletea"

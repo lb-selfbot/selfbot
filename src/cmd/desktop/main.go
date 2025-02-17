@@ -18,8 +18,10 @@ import (
 	"github.com/gorilla/websocket"
 
 	"github.com/LightningDev1/LB-Selfbot/internal/browser"
+	"github.com/LightningDev1/LB-Selfbot/internal/logging"
 	"github.com/LightningDev1/LB-Selfbot/internal/services"
 	"github.com/LightningDev1/LB-Selfbot/internal/services/interfaces"
+	"github.com/LightningDev1/LB-Selfbot/internal/services/ui"
 	"github.com/LightningDev1/LB-Selfbot/internal/startup"
 	"github.com/LightningDev1/LB-Selfbot/internal/tui"
 	"github.com/LightningDev1/LB-Selfbot/savedtokens"
@@ -28,7 +30,6 @@ import (
 	"github.com/LightningDev1/LB-Selfbot/selfbot/constants"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/errorhandler"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/http"
-	"github.com/LightningDev1/LB-Selfbot/selfbot/logging"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/multitokensniper"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/setup"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/utils"
@@ -52,7 +53,7 @@ var (
 	getSavedTokens  = flag.Bool("savedtokens", false, "Get saved tokens")
 )
 
-func checkForUpdates() {
+func checkForUpdates(services *services.Services) {
 	resp, err := http.PostJson(
 		"https://api.lightning-bot.com/api/v3/selfbot/check-version",
 		map[string]string{
@@ -61,7 +62,7 @@ func checkForUpdates() {
 		},
 	)
 	if err != nil {
-		logging.UI.Error("Error checking for updates: " + err.Error())
+		_ = services.UI.LogError("Error checking for updates: " + err.Error())
 		time.Sleep(3 * time.Second)
 		return
 	}
@@ -73,8 +74,8 @@ func checkForUpdates() {
 		return
 	}
 
-	utils.Logging.Info("LightningBot version", latestVersion, "is now available!")
-	utils.Logging.Info("Opening download page...")
+	logging.Info("LightningBot version", latestVersion, "is now available!")
+	logging.Info("Opening download page...")
 
 	downloadUrl := "https://api.lightning-bot.com/static/executables/"
 
@@ -101,7 +102,7 @@ func checkFirstLaunch() {
 		return
 	}
 
-	utils.Logging.Info("Welcome to LightningBot! Starting setup...")
+	logging.Info("Welcome to LightningBot! Starting setup...")
 
 	username, password := setup.GetLogin()
 
@@ -117,14 +118,14 @@ func checkFirstLaunch() {
 	cfg.Account.Discord.Token = token
 
 	if err := cfg.Save(); err != nil {
-		utils.Logging.Error("Save config error:", err)
+		logging.Error("Save config error:", err)
 		os.Exit(1)
 	}
 }
 
 func main() {
 	if constants.DEBUG {
-		utils.Logging.Warn("Debug mode is enabled")
+		logging.Warn("Debug mode is enabled")
 	}
 
 	flag.Parse()
@@ -215,29 +216,26 @@ func main() {
 	}
 
 	if err := startup.Initialize(*isVerbose); err != nil {
-		utils.Logging.Error("Startup error:", err)
+		logging.Error("Startup error:", err)
 		os.Exit(1)
 	}
 
 	if constants.CONSOLE {
-		logging.Console.Clear()
-		logging.Console.PrintBanner()
+		_ = services.UI.ClearConsole()
+		_ = services.UI.ShowBanner(ui.BannerConsole)
 
-		checkForUpdates()
+		checkForUpdates(services)
 		checkFirstLaunch()
 	} else {
-		err := services.IPC.Serve()
-		if err != nil {
-			utils.Logging.Error("IPC serve error:", err)
+		if err := services.IPC.Serve(); err != nil {
+			logging.Error("IPC serve error:", err)
 			os.Exit(1)
 		}
 	}
 
-	// TODO: init selfbot
-
 	cfg, err := config.GetConfig()
 	if err != nil {
-		utils.Logging.Error("Load config error:", err)
+		logging.Error("Load config error:", err)
 		os.Exit(1)
 	}
 
@@ -264,17 +262,14 @@ func main() {
 		if errors.As(err, &wsErr) {
 			// TODO: asdf
 		}
-		utils.Logging.Error("Auth init error:", err)
+		logging.Error("Auth init error:", err)
 		os.Exit(1)
 	}
 
-	session, err := startup.CreateSession(token, *isVerbose)
-	if err != nil {
-		utils.Logging.Error("Create session error:", err)
+	if err := services.Discord.Init(token, *isVerbose); err != nil {
+		logging.Error("Discord init error:", err)
 		os.Exit(1)
 	}
-
-	_ = startup.CreateRouter(session)
 
 	if !constants.CONSOLE {
 		<-services.IPC.OnConnect()
@@ -285,11 +280,11 @@ func main() {
 	services.Auth.CheckNonce()
 
 	if err := errorhandler.Init(); err != nil {
-		utils.Logging.Error("Error handler init error:", err)
+		logging.Error("Error handler init error:", err)
 		os.Exit(1)
 	}
 
-	if err := session.Open(); err != nil {
+	if err := services.Discord.Open(); err != nil {
 		if strings.Contains(err.Error(), "Authentication failed") {
 			if !strings.Contains(err.Error(), "Authentication failed") {
 				return
@@ -304,14 +299,14 @@ func main() {
 
 			cfg.Account.Discord.Token = token
 			if err := cfg.Save(); err != nil {
-				utils.Logging.Error("Save config error:", err)
+				logging.Error("Save config error:", err)
 				os.Exit(1)
 			}
 
 			utils.System.Restart()
 		}
 
-		utils.Logging.Error("An error has occurred while connecting to Discord:", err)
+		logging.Error("An error has occurred while connecting to Discord:", err)
 		os.Exit(1)
 	}
 

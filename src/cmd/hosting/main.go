@@ -20,7 +20,7 @@ import (
 	"github.com/LightningDev1/LB-Selfbot/selfbot/errorhandler"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/eventreactions"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/extensions"
-	"github.com/LightningDev1/LB-Selfbot/selfbot/logging"
+
 	"github.com/LightningDev1/LB-Selfbot/selfbot/multitokensniper"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/utils"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/websocket"

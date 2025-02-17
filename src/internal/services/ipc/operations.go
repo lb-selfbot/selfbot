@@ -1,6 +1,9 @@
 package ipc
 
-import "github.com/LightningDev1/LB-Selfbot/selfbot/constants"
+import (
+	"github.com/LightningDev1/LB-Selfbot/selfbot/config"
+	"github.com/LightningDev1/LB-Selfbot/selfbot/constants"
+)
 
 func (i *IPCServiceImpl) ClearConsole() error {
 	i.htmlConsole = ""
@@ -71,4 +74,13 @@ func (i *IPCServiceImpl) SendError(text string) error {
 
 func (i *IPCServiceImpl) SendRestart() error {
 	return i.write(&WSMessage{Op: OP_RESTART})
+}
+
+func (i *IPCServiceImpl) SendConfigUpdate(cfg *config.Config) error {
+	// TODO: callbacks
+
+	return i.write(&WSMessage{
+		Op:   OP_CONFIG_UPDATE,
+		Data: WSData{Config: cfg},
+	})
 }

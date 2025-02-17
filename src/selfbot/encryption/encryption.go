@@ -82,7 +82,7 @@ func (a AESCBC) Encrypt(text []byte) ([]byte, error) {
 	mode.CryptBlocks(ciphertext, paddedText)
 
 	// Return the encrypted text
-	return fmt.Appendf(nil, 
+	return fmt.Appendf(nil,
 		"%s:%s:%s",
 		base64.StdEncoding.EncodeToString(salt),
 		base64.StdEncoding.EncodeToString(iv),

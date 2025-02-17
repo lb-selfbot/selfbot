@@ -50,15 +50,13 @@ func (a *AuthServiceImpl) onExit(_ *WSMessage) error {
 }
 
 func (a *AuthServiceImpl) onRestart(_ *WSMessage) error {
-	// TODO: ipc restart
-	return nil
+	return a.ipcSvc.SendRestart()
 }
 
 func (a *AuthServiceImpl) onWebsiteConnect(_ *WSMessage) error {
 	err := a.write(&WSMessage{
-		Op: OP_CONSOLE_SET,
-		// TODO: ipc console
-		// Data: WSData{Text: a.htmlConsole},
+		Op:   OP_CONSOLE_SET,
+		Data: WSData{Text: a.ipcSvc.GetHTMLConsole()},
 	})
 	if err != nil {
 		return fmt.Errorf("failed to send console state: %w", err)
@@ -88,6 +86,5 @@ func (a *AuthServiceImpl) onConfigUpdate(msg *WSMessage) error {
 		return fmt.Errorf("failed to save config: %w", err)
 	}
 
-	// TODO: ipc config update
-	return nil
+	return a.ipcSvc.SendConfigUpdate(msg.Data.Config)
 }

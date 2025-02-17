@@ -3,13 +3,13 @@ package tui
 import (
 	"time"
 
-	"github.com/LightningDev1/LB-Selfbot/selfbot/logging"
+	"github.com/LightningDev1/LB-Selfbot/internal/logging"
 	"github.com/charmbracelet/lipgloss"
 )
 
 type errMsg error
 
-var (
+const (
 	mainColor = lipgloss.Color("#00cbff")
 
 	// Base styles

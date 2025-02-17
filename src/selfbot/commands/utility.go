@@ -31,6 +31,7 @@ import (
 	"github.com/LightningDev1/LB-Selfbot/selfbot/eventreactions"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/ipc"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/logging"
+
 	"github.com/LightningDev1/LB-Selfbot/selfbot/uploaders/destinations"
 	"github.com/LightningDev1/discordgo/protos"
 	"github.com/LightningDev1/go-foreground"

@@ -9,17 +9,21 @@ import (
 	"sync"
 	"time"
 
+	"github.com/LightningDev1/LB-Selfbot/internal/logging"
 	"github.com/LightningDev1/LB-Selfbot/internal/random"
 	"github.com/LightningDev1/LB-Selfbot/internal/services/interfaces"
+	"github.com/LightningDev1/LB-Selfbot/selfbot/config"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/constants"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/encryption"
+	"github.com/LightningDev1/LB-Selfbot/selfbot/setup"
+	"github.com/LightningDev1/LB-Selfbot/selfbot/utils"
 	"github.com/gorilla/websocket"
 )
 
 const (
 	defaultWebsocketURL = "wss://api.lightning-bot.com/api/v3/ws/selfbot"
 	maxErrors           = 20
-	errorWindowMinutes  = 15
+	errorWindow         = 15 * time.Minute
 	pingInterval        = 60 * time.Second
 	reconnectDelay      = 30 * time.Second
 	handshakeDelay      = 100 * time.Millisecond
@@ -27,7 +31,8 @@ const (
 )
 
 type AuthServiceImpl struct {
-	uiSvc interfaces.UIService
+	uiSvc  interfaces.UIService
+	ipcSvc interfaces.IPCService
 
 	conn *websocket.Conn
 	mu   sync.RWMutex
@@ -39,10 +44,14 @@ type AuthServiceImpl struct {
 	nonce string
 
 	receivedNonce string
+
+	errors     int
+	errorStart time.Time
 }
 
-func (a *AuthServiceImpl) Inject(uiSvc interfaces.UIService) {
+func (a *AuthServiceImpl) Inject(uiSvc interfaces.UIService, ipcSvc interfaces.IPCService) {
 	a.uiSvc = uiSvc
+	a.ipcSvc = ipcSvc
 }
 
 func (a *AuthServiceImpl) Connect(context context.Context, creds interfaces.AuthCredentials) error {
@@ -67,7 +76,7 @@ func (a *AuthServiceImpl) CheckNonce() {
 		return
 	}
 
-	// TODO: log security error
+	logging.Error("An AuthWS error has occurred. Error code: " + utils.Random.String(8))
 	os.Exit(1)
 }
 
@@ -137,14 +146,12 @@ func (a *AuthServiceImpl) listen() {
 	for {
 		msg, err := a.read()
 		if err != nil {
-			// TODO: error handling
-			// a.OnError(err)
+			a.onError(err)
 			continue
 		}
 
 		if err := a.onMessage(msg); err != nil {
-			// TODO: error handling
-			// a.OnError(err)
+			a.onError(err)
 			continue
 		}
 	}
@@ -158,8 +165,8 @@ func (a *AuthServiceImpl) ping(context context.Context) {
 		select {
 		case <-ticker.C:
 			if err := a.write(&WSMessage{Op: OP_PING}); err != nil {
-				// TODO: error handling
-				// a.OnError(err)
+				a.onError(err)
+				continue
 			}
 		case <-context.Done():
 			return
@@ -213,4 +220,76 @@ func (a *AuthServiceImpl) write(msg *WSMessage) error {
 	defer a.mu.Unlock()
 
 	return a.conn.WriteMessage(websocket.TextMessage, encrypted)
+}
+
+func (a *AuthServiceImpl) onError(err error) {
+	a.conn = nil
+
+	logging.Error("AuthWS error: " + err.Error())
+
+	if closeErr, ok := err.(*websocket.CloseError); ok && closeErr.Code > 3000 {
+		a.logError(err, closeErr.Code)
+		return
+	}
+
+	a.errors++
+
+	if time.Since(a.errorStart) > errorWindow {
+		a.errors = 1
+		a.errorStart = time.Now()
+	}
+
+	if a.errors > maxErrors && !constants.HOSTING {
+		a.logError(err, -1)
+		os.Exit(1)
+	}
+
+	time.Sleep(reconnectDelay)
+
+	logging.Info("Reconnecting AuthWS...")
+
+	if err := a.connectWS(context.Background()); err != nil {
+		a.onError(err)
+	}
+}
+
+func (a *AuthServiceImpl) logError(err error, code int) {
+	switch code {
+	case 3004, 3010:
+		if !constants.CONSOLE {
+			_ = a.uiSvc.LogError("Your LightningBot credentials are invalid! Please re-enter them in the Config tab.")
+			break
+		}
+
+		logging.Error("Your LightningBot credentials are invalid!")
+
+		username, password := setup.GetLogin()
+
+		cfg, err := config.GetConfig()
+		if err != nil {
+			logging.Error("Error loading config: " + err.Error())
+			os.Exit(0)
+		}
+
+		cfg.Account.LightningBot.Username = username
+		cfg.Account.LightningBot.Password = password
+
+		err = cfg.Save()
+		if err != nil {
+			logging.Error("Error saving config: " + err.Error())
+			os.Exit(1)
+		}
+
+		_ = utils.System.Restart()
+	case 3011:
+		_ = a.uiSvc.LogError("Your free trial has expired! Please purchase a license key to continue using LightningBot.")
+	case 3003:
+		_ = a.uiSvc.LogError("AuthWS Error 3003: " + err.Error())
+	case 3006:
+		_ = a.uiSvc.LogError("Another selfbot has connected using your LightningBot account! This instance will now exit.")
+	default:
+		_ = a.uiSvc.LogError("An unexpected error has occurred while connecting to the websocket: " + err.Error())
+	}
+
+	os.Exit(1)
 }

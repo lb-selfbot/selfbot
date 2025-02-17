@@ -43,6 +43,9 @@ func (i *IPCServiceImpl) OnConnect() <-chan struct{} {
 	return i.connectChan
 }
 
+func (i *IPCServiceImpl) GetHTMLConsole() string { return i.htmlConsole }
+func (i *IPCServiceImpl) GetRawConsole() string  { return i.rawConsole }
+
 func (i *IPCServiceImpl) handleRequest(w http.ResponseWriter, r *http.Request) {
 	var err error
 	i.conn, err = i.upgrader.Upgrade(w, r, nil)

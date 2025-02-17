@@ -4,7 +4,7 @@ import (
 	"time"
 
 	"github.com/LightningDev1/LB-Selfbot/selfbot/config"
-	"github.com/LightningDev1/LB-Selfbot/selfbot/logging"
+
 	"github.com/LightningDev1/LB-Selfbot/selfbot/utils"
 )
 
