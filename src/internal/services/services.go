@@ -8,6 +8,7 @@ import (
 	"github.com/LightningDev1/LB-Selfbot/internal/services/interfaces"
 	"github.com/LightningDev1/LB-Selfbot/internal/services/ipc"
 	"github.com/LightningDev1/LB-Selfbot/internal/services/multitokensniper"
+	"github.com/LightningDev1/LB-Selfbot/internal/services/reminder"
 	"github.com/LightningDev1/LB-Selfbot/internal/services/ui"
 )
 
@@ -19,6 +20,7 @@ type Services struct {
 	Extensions       interfaces.ExtensionsService
 	Backup           interfaces.BackupService
 	MultiTokenSniper interfaces.MultiTokenSniperService
+	Reminder         interfaces.ReminderService
 }
 
 func NewServices() *Services {
@@ -36,6 +38,7 @@ func (s *Services) register() {
 	s.Extensions = &extensions.ExtensionsServiceImpl{}
 	s.Backup = &backup.BackupServiceImpl{}
 	s.MultiTokenSniper = &multitokensniper.MultiTokenSniperServiceImpl{}
+	s.Reminder = &reminder.ReminderServiceImpl{}
 
 	// Inject dependencies
 	s.Auth.Inject(s.UI, s.IPC)
@@ -44,4 +47,5 @@ func (s *Services) register() {
 	s.Extensions.Inject(s.UI, s.Discord)
 	s.Backup.Inject(s.Discord)
 	s.MultiTokenSniper.Inject(s.UI, s.Discord)
+	s.Reminder.Inject(s.UI)
 }

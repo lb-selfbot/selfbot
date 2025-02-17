@@ -291,6 +291,8 @@ func main() {
 		os.Exit(1)
 	}
 
+	services.Reminder.Start()
+
 	go func() {
 		err := services.MultiTokenSniper.Init(context.Background())
 		if err != nil {
