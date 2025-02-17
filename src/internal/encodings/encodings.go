@@ -18,7 +18,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/LightningDev1/LB-Selfbot/selfbot/encryption"
+	"github.com/LightningDev1/LB-Selfbot/internal/encryption"
 	"github.com/darkwyrm/b85"
 	"github.com/mr-tron/base58/base58"
 	"github.com/multiformats/go-base36"

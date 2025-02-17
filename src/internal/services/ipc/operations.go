@@ -1,8 +1,8 @@
 package ipc
 
 import (
+	"github.com/LightningDev1/LB-Selfbot/internal/constants"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/config"
-	"github.com/LightningDev1/LB-Selfbot/selfbot/constants"
 )
 
 func (i *IPCServiceImpl) ClearConsole() error {

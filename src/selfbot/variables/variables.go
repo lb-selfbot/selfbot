@@ -7,9 +7,9 @@ import (
 	"strings"
 	"time"
 
+	"github.com/LightningDev1/LB-Selfbot/internal/constants"
+	"github.com/LightningDev1/LB-Selfbot/internal/data"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/api"
-	"github.com/LightningDev1/LB-Selfbot/selfbot/constants"
-	"github.com/LightningDev1/LB-Selfbot/selfbot/data"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/spotify"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/utils"
 	"github.com/LightningDev1/go-foreground"

@@ -7,7 +7,7 @@ import (
 	"os"
 	"sync"
 
-	"github.com/LightningDev1/LB-Selfbot/selfbot/constants"
+	"github.com/LightningDev1/LB-Selfbot/internal/constants"
 	"github.com/gorilla/websocket"
 )
 

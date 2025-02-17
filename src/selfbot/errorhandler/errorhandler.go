@@ -5,7 +5,7 @@ import (
 	"runtime/debug"
 
 	"github.com/LightningDev1/LB-Selfbot/selfbot/config"
-	"github.com/LightningDev1/LB-Selfbot/selfbot/constants"
+	"github.com/LightningDev1/LB-Selfbot/internal/constants"
 
 	"github.com/LightningDev1/discordgo"
 	"github.com/getsentry/sentry-go"

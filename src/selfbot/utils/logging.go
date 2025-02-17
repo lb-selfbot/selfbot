@@ -5,7 +5,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/LightningDev1/LB-Selfbot/selfbot/constants"
+	"github.com/LightningDev1/LB-Selfbot/internal/constants"
 	"github.com/robert-nix/ansihtml"
 )
 

@@ -44,8 +44,8 @@ import (
 	"github.com/shirou/gopsutil/v4/mem"
 	"google.golang.org/protobuf/types/known/wrapperspb"
 
+	"github.com/LightningDev1/LB-Selfbot/internal/constants"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/api"
-	"github.com/LightningDev1/LB-Selfbot/selfbot/constants"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/embed"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/http"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/utils"

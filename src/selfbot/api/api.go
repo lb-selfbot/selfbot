@@ -18,7 +18,7 @@ import (
 	"github.com/LightningDev1/discordgo"
 	"google.golang.org/protobuf/types/known/wrapperspb"
 
-	"github.com/LightningDev1/LB-Selfbot/selfbot/constants"
+	"github.com/LightningDev1/LB-Selfbot/internal/constants"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/http"
 	"github.com/bitly/go-simplejson"
 )
