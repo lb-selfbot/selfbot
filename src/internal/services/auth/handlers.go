@@ -9,21 +9,21 @@ import (
 
 func (a *AuthServiceImpl) onMessage(msg *WSMessage) error {
 	switch msg.Op {
-	case OP_HELLO_ACK:
+	case OpCodeHelloAck:
 		return a.onHelloAck(msg)
-	case OP_FREE_TRIAL_START:
+	case OpCodeFreeTrialStart:
 		return a.onFreeTrialStart(msg)
-	case OP_EXIT:
+	case OpCodeExit:
 		return a.onExit(msg)
-	case OP_RESTART:
+	case OpCodeRestart:
 		return a.onRestart(msg)
-	case OP_WEBSITE_CONNECT:
+	case OpCodeWebsiteConnect:
 		return a.onWebsiteConnect(msg)
-	case OP_CONFIG_UPDATE:
+	case OpCodeConfigUpdate:
 		return a.onConfigUpdate(msg)
-	case OP_PONG:
+	case OpCodePong:
 		return nil
-	case OP_ANOTHER_SELFBOT_CONNECTED:
+	case OpCodeAnotherSBConnected:
 		// Handled by error handler
 		return nil
 	default:
@@ -55,7 +55,7 @@ func (a *AuthServiceImpl) onRestart(_ *WSMessage) error {
 
 func (a *AuthServiceImpl) onWebsiteConnect(_ *WSMessage) error {
 	err := a.write(&WSMessage{
-		Op:   OP_CONSOLE_SET,
+		Op:   OpCodeConsoleSet,
 		Data: WSData{Text: a.ipcSvc.GetHTMLConsole()},
 	})
 	if err != nil {

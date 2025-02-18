@@ -14,7 +14,6 @@ import (
 
 	"github.com/LightningDev1/LB-Selfbot/selfbot/reminder"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/sessions"
-	"github.com/LightningDev1/LB-Selfbot/selfbot/slashcommands"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/utils"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/websocket"
 	"github.com/LightningDev1/dgc"
@@ -481,7 +480,7 @@ func RegisterHandlers(session *discordgo.Session, router *dgc.Router) {
 		sessions.RegisterSessionHandler(session)
 
 		// Start slash command jobs
-		go slashcommands.ExecuteJobs(session)
+		// go slashcommands.ExecuteJobs(session)
 
 		// Start reminders
 		go reminder.StartReminder()

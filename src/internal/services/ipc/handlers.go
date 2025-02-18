@@ -9,14 +9,14 @@ import (
 
 func (i *IPCServiceImpl) onMessage(msg *WSMessage) error {
 	switch msg.Op {
-	case OP_HELLO:
+	case OpCodeHello:
 		return nil
 
-	case OP_EXIT:
+	case OpCodeExit:
 		os.Exit(0)
 		return nil
 
-	case OP_CONFIG_UPDATE:
+	case OpCodeConfigUpdate:
 		config.SaveConfigFromUI(msg.Data.Config)
 		// TODO: config callbacks
 		return nil

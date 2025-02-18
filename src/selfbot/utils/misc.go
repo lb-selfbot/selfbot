@@ -281,9 +281,9 @@ func Map[T, U any](s []T, f func(T) U) []U {
 func Filter[T any](s []T, f func(T) bool) []T {
 	r := make([]T, len(s))
 	counter := 0
-	for i := 0; i < len(s); i++ {
-		if f(s[i]) {
-			r[counter] = s[i]
+	for _, v := range s {
+		if f(v) {
+			r[counter] = v
 			counter++
 		}
 	}

@@ -13,7 +13,6 @@ import (
 	"github.com/LightningDev1/LB-Selfbot/selfbot/config"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/http"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/utils"
-	"github.com/LightningDev1/LB-Selfbot/selfbot/variables"
 	"github.com/LightningDev1/dgc"
 	"github.com/LightningDev1/discordgo"
 )
@@ -35,21 +34,6 @@ var (
 	LimitField       = 25
 	LimitFooter      = 2048
 )
-
-// NewEmbed returns a new embed object
-func NewEmbed() *Embed {
-	embed := &Embed{&discordgo.MessageEmbed{}, "", ""}
-
-	cfg, err := config.GetConfig()
-	if err != nil {
-		return embed
-	}
-
-	embed.SetTitle(variables.Parse(cfg.Selfbot.Title))
-	embed.SetFooter(variables.Parse(cfg.Selfbot.Footer))
-
-	return embed
-}
 
 // SetTitle ...
 func (e *Embed) SetTitle(name string) *Embed {

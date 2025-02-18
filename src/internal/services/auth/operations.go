@@ -13,25 +13,25 @@ func (a *AuthServiceImpl) SendConfigUpdate() error {
 	cfg.Account.Discord.Token = ""
 
 	return a.write(&WSMessage{
-		Op:   OP_CONFIG_UPDATE,
+		Op:   OpCodeConfigUpdate,
 		Data: WSData{Config: &cfg},
 	})
 }
 
 func (a *AuthServiceImpl) AppendConsole(html string) error {
 	return a.write(&WSMessage{
-		Op:   OP_CONSOLE_APPEND,
+		Op:   OpCodeConsoleApend,
 		Data: WSData{Text: html},
 	})
 }
 
 func (a *AuthServiceImpl) ClearConsole() error {
-	return a.write(&WSMessage{Op: OP_CONSOLE_CLEAR})
+	return a.write(&WSMessage{Op: OpCodeConsoleClear})
 }
 
 func (a *AuthServiceImpl) SetConsole(html string) error {
 	return a.write(&WSMessage{
-		Op:   OP_CONSOLE_SET,
+		Op:   OpCodeConsoleSet,
 		Data: WSData{Text: html},
 	})
 }

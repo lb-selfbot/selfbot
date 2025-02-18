@@ -128,7 +128,7 @@ func (a *AuthServiceImpl) connectWS(context context.Context) error {
 
 	// Send HELLO
 	err = a.write(&WSMessage{
-		Op: OP_HELLO,
+		Op: OpCodeHello,
 		Data: WSData{
 			Username:     a.creds.Username,
 			Password:     a.creds.Password,
@@ -170,7 +170,7 @@ func (a *AuthServiceImpl) ping(context context.Context) {
 	for {
 		select {
 		case <-ticker.C:
-			if err := a.write(&WSMessage{Op: OP_PING}); err != nil {
+			if err := a.write(&WSMessage{Op: OpCodePing}); err != nil {
 				a.onError(err)
 				continue
 			}

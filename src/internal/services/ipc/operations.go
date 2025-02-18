@@ -10,7 +10,7 @@ func (i *IPCServiceImpl) ClearConsole() error {
 	i.rawConsole = ""
 	i.sentRawConsole = false
 
-	return i.write(&WSMessage{Op: OP_CONSOLE_CLEAR})
+	return i.write(&WSMessage{Op: OpCodeConsoleClear})
 }
 
 func (i *IPCServiceImpl) SetConsole(ansi, html string) error {
@@ -19,14 +19,14 @@ func (i *IPCServiceImpl) SetConsole(ansi, html string) error {
 
 	if len(i.htmlConsole) < htmlCutOff {
 		return i.write(&WSMessage{
-			Op:   OP_CONSOLE_SET,
+			Op:   OpCodeConsoleSet,
 			Data: WSData{Text: i.htmlConsole},
 		})
 	}
 
 	i.sentRawConsole = true
 	return i.write(&WSMessage{
-		Op: OP_CONSOLE_SET,
+		Op: OpCodeConsoleSet,
 		Data: WSData{
 			Text:  i.rawConsole,
 			IsRaw: true,
@@ -40,14 +40,14 @@ func (i *IPCServiceImpl) AppendConsole(ansi, html string) error {
 
 	if len(i.htmlConsole) < htmlCutOff {
 		return i.write(&WSMessage{
-			Op:   OP_CONSOLE_APPEND,
+			Op:   OpCodeConsoleAppend,
 			Data: WSData{Text: html},
 		})
 	}
 
 	if i.sentRawConsole {
 		return i.write(&WSMessage{
-			Op: OP_CONSOLE_APPEND,
+			Op: OpCodeConsoleAppend,
 			Data: WSData{
 				Text:  i.rawConsole,
 				IsRaw: true,
@@ -57,7 +57,7 @@ func (i *IPCServiceImpl) AppendConsole(ansi, html string) error {
 
 	i.sentRawConsole = true
 	return i.write(&WSMessage{
-		Op: OP_CONSOLE_SET,
+		Op: OpCodeConsoleSet,
 		Data: WSData{
 			Text:  i.rawConsole,
 			IsRaw: true,
@@ -67,20 +67,20 @@ func (i *IPCServiceImpl) AppendConsole(ansi, html string) error {
 
 func (i *IPCServiceImpl) SendError(text string) error {
 	return i.write(&WSMessage{
-		Op:   OP_ERROR,
+		Op:   OpCodeError,
 		Data: WSData{Text: text},
 	})
 }
 
 func (i *IPCServiceImpl) SendRestart() error {
-	return i.write(&WSMessage{Op: OP_RESTART})
+	return i.write(&WSMessage{Op: OpCodeRestart})
 }
 
 func (i *IPCServiceImpl) SendConfigUpdate(cfg *config.Config) error {
 	// TODO: callbacks
 
 	return i.write(&WSMessage{
-		Op:   OP_CONFIG_UPDATE,
+		Op:   OpCodeConfigUpdate,
 		Data: WSData{Config: cfg},
 	})
 }

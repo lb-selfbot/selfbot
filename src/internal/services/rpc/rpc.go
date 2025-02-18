@@ -9,23 +9,29 @@ import (
 	"github.com/LightningDev1/LB-Selfbot/internal/services/interfaces"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/config"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/utils"
-	"github.com/LightningDev1/LB-Selfbot/selfbot/variables"
 	"github.com/LightningDev1/discordgo"
 	"github.com/hugolgst/rich-go/client"
 )
 
 type RPCServiceImpl struct {
-	uiSvc       interfaces.UIService
-	discordSvc  interfaces.DiscordService
-	sessionsSvc interfaces.SessionsService
+	uiSvc        interfaces.UIService
+	discordSvc   interfaces.DiscordService
+	sessionsSvc  interfaces.SessionsService
+	variablesSvc interfaces.VariablesService
 
 	startTime time.Time
 }
 
-func (r *RPCServiceImpl) Inject(uiSvc interfaces.UIService, discordSvc interfaces.DiscordService, sessionsSvc interfaces.SessionsService) {
+func (r *RPCServiceImpl) Inject(
+	uiSvc interfaces.UIService,
+	discordSvc interfaces.DiscordService,
+	sessionsSvc interfaces.SessionsService,
+	variablesSvc interfaces.VariablesService,
+) {
 	r.uiSvc = uiSvc
 	r.discordSvc = discordSvc
 	r.sessionsSvc = sessionsSvc
+	r.variablesSvc = variablesSvc
 }
 
 func (r *RPCServiceImpl) Start() {
@@ -35,22 +41,21 @@ func (r *RPCServiceImpl) Start() {
 func (r *RPCServiceImpl) start() {
 	r.startTime = time.Now()
 
-	for {
+	timer := time.NewTimer(time.Second * 10)
+	defer timer.Stop()
+
+	for range timer.C {
 		cfg, err := config.GetConfig()
 		if err != nil {
 			_ = r.uiSvc.LogError("Failed to get config: ", err)
-			time.Sleep(time.Second * 5)
 			continue
 		}
 
 		err = r.setRPC(&cfg)
 		if err != nil {
 			_ = r.uiSvc.LogError("Failed to set RPC: ", err)
-			time.Sleep(time.Second * 5)
 			continue
 		}
-
-		time.Sleep(time.Second * 10)
 	}
 }
 
@@ -78,12 +83,12 @@ func (r *RPCServiceImpl) setRPC(cfg *config.Config) error {
 		}
 
 		err = client.SetActivity(client.Activity{
-			Details:    variables.Parse(cfg.Activity.Details),
-			State:      variables.Parse(cfg.Activity.State),
+			Details:    r.variablesSvc.Parse(cfg.Activity.Details),
+			State:      r.variablesSvc.Parse(cfg.Activity.State),
 			LargeImage: cfg.Activity.LargeImage,
-			LargeText:  variables.Parse(cfg.Activity.LargeImageText),
+			LargeText:  r.variablesSvc.Parse(cfg.Activity.LargeImageText),
 			SmallImage: cfg.Activity.SmallImage,
-			SmallText:  variables.Parse(cfg.Activity.SmallImageText),
+			SmallText:  r.variablesSvc.Parse(cfg.Activity.SmallImageText),
 			Buttons:    r.getButtons(cfg),
 			Timestamps: r.getTimestamps(cfg.Activity.Time),
 			Party:      r.getParty(cfg),
@@ -100,17 +105,17 @@ func (r *RPCServiceImpl) setRPC(cfg *config.Config) error {
 		buttonUrls := []string{}
 
 		if cfg.Activity.Button1Label != "" {
-			label := variables.Parse(cfg.Activity.Button1Label)
+			label := r.variablesSvc.Parse(cfg.Activity.Button1Label)
 
 			buttons = append(buttons, utils.String.Limit(label, 31))
-			buttonUrls = append(buttonUrls, variables.Parse(cfg.Activity.Button1URL))
+			buttonUrls = append(buttonUrls, r.variablesSvc.Parse(cfg.Activity.Button1URL))
 		}
 
 		if cfg.Activity.Button2Label != "" {
-			label := variables.Parse(cfg.Activity.Button2Label)
+			label := r.variablesSvc.Parse(cfg.Activity.Button2Label)
 
 			buttons = append(buttons, utils.String.Limit(label, 31))
-			buttonUrls = append(buttonUrls, variables.Parse(cfg.Activity.Button2URL))
+			buttonUrls = append(buttonUrls, r.variablesSvc.Parse(cfg.Activity.Button2URL))
 		}
 
 		appID := "898932653049393172"
@@ -119,10 +124,10 @@ func (r *RPCServiceImpl) setRPC(cfg *config.Config) error {
 		}
 
 		assets := &discordgo.Assets{
-			LargeImageID: variables.Parse(cfg.Activity.LargeImage),
-			LargeText:    utils.String.Limit(variables.Parse(cfg.Activity.LargeImageText), 128),
-			SmallImageID: variables.Parse(cfg.Activity.SmallImage),
-			SmallText:    utils.String.Limit(variables.Parse(cfg.Activity.SmallImageText), 128),
+			LargeImageID: r.variablesSvc.Parse(cfg.Activity.LargeImage),
+			LargeText:    utils.String.Limit(r.variablesSvc.Parse(cfg.Activity.LargeImageText), 128),
+			SmallImageID: r.variablesSvc.Parse(cfg.Activity.SmallImage),
+			SmallText:    utils.String.Limit(r.variablesSvc.Parse(cfg.Activity.SmallImageText), 128),
 		}
 
 		platform, platformID := r.getPlatform(cfg.Activity.Type, cfg.Activity.Platform)
@@ -134,8 +139,8 @@ func (r *RPCServiceImpl) setRPC(cfg *config.Config) error {
 			activity = &discordgo.Activity{
 				Type:    discordgo.ActivityType(2),
 				Name:    "Spotify",
-				State:   utils.String.Limit(variables.Parse(cfg.Activity.State), 128),
-				Details: utils.String.Limit(variables.Parse(cfg.Activity.Details), 128),
+				State:   utils.String.Limit(r.variablesSvc.Parse(cfg.Activity.State), 128),
+				Details: utils.String.Limit(r.variablesSvc.Parse(cfg.Activity.Details), 128),
 				Assets:  assets,
 				Timestamps: &discordgo.TimeStamps{
 					StartTimestamp: time.Now().Unix() - 4140000,
@@ -148,9 +153,9 @@ func (r *RPCServiceImpl) setRPC(cfg *config.Config) error {
 			}
 		default:
 			activity = &discordgo.Activity{
-				Name:       utils.String.Limit(variables.Parse(cfg.Activity.Name), 128),
-				State:      utils.String.Limit(variables.Parse(cfg.Activity.State), 128),
-				Details:    utils.String.Limit(variables.Parse(cfg.Activity.Details), 128),
+				Name:       utils.String.Limit(r.variablesSvc.Parse(cfg.Activity.Name), 128),
+				State:      utils.String.Limit(r.variablesSvc.Parse(cfg.Activity.State), 128),
+				Details:    utils.String.Limit(r.variablesSvc.Parse(cfg.Activity.Details), 128),
 				Timestamps: r.getDGTimestamps(cfg.Activity.Time),
 				Type:       r.getActivityType(cfg.Activity.Type),
 				Assets:     assets,

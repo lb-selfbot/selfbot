@@ -1,10 +1,12 @@
 package tui
 
 import (
+	"os"
 	"time"
 
 	"github.com/LightningDev1/LB-Selfbot/internal/logging"
 	"github.com/charmbracelet/lipgloss"
+	"golang.org/x/term"
 )
 
 type errMsg error
@@ -39,6 +41,10 @@ const (
 				Foreground(mainColor).
 				Bold(true)
 )
+
+func IsSupported() bool {
+	return term.IsTerminal(int(os.Stdin.Fd()))
+}
 
 func reset() {
 	time.Sleep(time.Millisecond * 500)

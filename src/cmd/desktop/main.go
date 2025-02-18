@@ -14,6 +14,7 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/LightningDev1/LB-Selfbot/internal/assets"
 	"github.com/LightningDev1/LB-Selfbot/internal/browser"
 	"github.com/LightningDev1/LB-Selfbot/internal/constants"
 	"github.com/LightningDev1/LB-Selfbot/internal/logging"
@@ -21,10 +22,8 @@ import (
 	"github.com/LightningDev1/LB-Selfbot/internal/services"
 	"github.com/LightningDev1/LB-Selfbot/internal/services/interfaces"
 	"github.com/LightningDev1/LB-Selfbot/internal/services/ui"
-	"github.com/LightningDev1/LB-Selfbot/selfbot/assets"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/commands"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/config"
-	"github.com/LightningDev1/LB-Selfbot/selfbot/errorhandler"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/http"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/setup"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/utils"
@@ -136,6 +135,11 @@ func main() {
 	// Create services
 	services := services.NewServices()
 
+	if err := services.O11y.Init(); err != nil {
+		logging.Error("O11y init error:", err)
+		os.Exit(1)
+	}
+
 	// Handle CLI flags
 	constants.CONSOLE = !*isLaunched
 	constants.PORTABLE = *isPortable
@@ -216,15 +220,10 @@ func main() {
 	}
 
 	// Initialize icon
-	iconFile := filepath.Join(utils.IO.GetMainFolder(), "Logo.png")
-	if !utils.IO.Exists(iconFile) && !constants.HOSTING {
-		icon, err := assets.Assets.ReadFile("Logo.png")
-		if err != nil {
-			logging.Error("Error reading icon file:", err)
-			return
-		}
-
-		_ = utils.IO.WriteBytes(iconFile, icon)
+	err := assets.CopyFile(assets.AssetLogo, filepath.Join(utils.IO.GetMainFolder(), "Logo.png"))
+	if err != nil {
+		logging.Error("Error copying icon file:", err)
+		return
 	}
 
 	if constants.CONSOLE {
@@ -280,11 +279,6 @@ func main() {
 	// Wait for auth to be ready
 	<-services.Auth.OnReady()
 	services.Auth.CheckNonce()
-
-	if err := errorhandler.Init(); err != nil {
-		logging.Error("Error handler init error:", err)
-		os.Exit(1)
-	}
 
 	if err := services.Discord.Open(); err != nil {
 		logging.Error("Discord open error:", err)

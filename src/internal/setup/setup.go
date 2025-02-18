@@ -8,7 +8,6 @@ import (
 	"github.com/LightningDev1/LB-Selfbot/selfbot/api"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/utils"
 	"github.com/LightningDev1/discordgo"
-	"golang.org/x/term"
 )
 
 func GetLogin() (string, string) {
@@ -18,13 +17,14 @@ func GetLogin() (string, string) {
 		}
 	}
 
-	if term.IsTerminal(int(os.Stdin.Fd())) {
-		// Is terminal --> use TUI
-		return tui.GetLogin("Please enter your LightningBot credentials:")
-	}
+	var username, password string
 
-	username := utils.Input.GetString("Please enter your LightningBot username")
-	password := utils.Input.GetString("Please enter your LightningBot password")
+	if tui.IsSupported() {
+		username, password = tui.GetLogin("Please enter your LightningBot credentials:")
+	} else {
+		username = utils.Input.GetString("Please enter your LightningBot username")
+		password = utils.Input.GetString("Please enter your LightningBot password")
+	}
 
 	if username == "" || password == "" {
 		utils.Logging.Error("You must enter a username and password!")
@@ -59,12 +59,13 @@ func GetToken() string {
 		return token
 	}
 
-	if term.IsTerminal(int(os.Stdin.Fd())) {
-		// Is terminal --> use TUI
-		return tui.GetToken()
-	}
+	var token string
 
-	token := utils.Input.GetString("Please enter your Discord token")
+	if tui.IsSupported() {
+		token = tui.GetToken()
+	} else {
+		token = utils.Input.GetString("Please enter your Discord token")
+	}
 
 	// This fixes a bug where the bot tries to DoS Discord when there is no stdin
 	if token == "" {

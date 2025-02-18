@@ -20,16 +20,16 @@ type WSData struct {
 type WSOpCode int
 
 const (
-	OP_CONNECTED      WSOpCode = 98
-	OP_HELLO          WSOpCode = 99
-	OP_EXIT           WSOpCode = 100
-	OP_RESTART        WSOpCode = 101
-	OP_NOTIFICATION   WSOpCode = 102
-	OP_INVALID_TOKEN  WSOpCode = 103
-	OP_ERROR          WSOpCode = 104
-	OP_CONFIG_UPDATE  WSOpCode = 105
-	OP_NEW_TOKEN      WSOpCode = 106
-	OP_CONSOLE_APPEND WSOpCode = 107
-	OP_CONSOLE_CLEAR  WSOpCode = 108
-	OP_CONSOLE_SET    WSOpCode = 109
+	OpCodeConnected     WSOpCode = 98
+	OpCodeHello         WSOpCode = 99
+	OpCodeExit          WSOpCode = 100
+	OpCodeRestart       WSOpCode = 101
+	OpCodeNotification  WSOpCode = 102
+	OpCodeInvalidToken  WSOpCode = 103
+	OpCodeError         WSOpCode = 104
+	OpCodeConfigUpdate  WSOpCode = 105
+	OpCodeNewToken      WSOpCode = 106
+	OpCodeConsoleAppend WSOpCode = 107
+	OpCodeConsoleClear  WSOpCode = 108
+	OpCodeConsoleSet    WSOpCode = 109
 )
