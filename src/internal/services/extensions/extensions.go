@@ -12,7 +12,6 @@ import (
 	"github.com/LightningDev1/LB-Selfbot/internal/services/interfaces"
 	"github.com/LightningDev1/LB-Selfbot/internal/services/ui"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/config"
-	"github.com/LightningDev1/LB-Selfbot/selfbot/embed"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/utils"
 	"github.com/LightningDev1/dgc"
 	"github.com/LightningDev1/discordgo"
@@ -23,12 +22,15 @@ import (
 type ExtensionsServiceImpl struct {
 	uiSvc      interfaces.UIService
 	discordSvc interfaces.DiscordService
+	embedSvc   interfaces.EmbedService
 
 	loadedExtensions int
 }
 
-func (e *ExtensionsServiceImpl) Inject(uiSvc interfaces.UIService, discordSvc interfaces.DiscordService) {
+func (e *ExtensionsServiceImpl) Inject(uiSvc interfaces.UIService, discordSvc interfaces.DiscordService, embedSvc interfaces.EmbedService) {
+	e.uiSvc = uiSvc
 	e.discordSvc = discordSvc
+	e.embedSvc = embedSvc
 }
 
 func (e *ExtensionsServiceImpl) clearConsole() {
@@ -55,7 +57,7 @@ func (e *ExtensionsServiceImpl) Register() {
 			"LogError":          reflect.ValueOf(e.logError),
 			"GetConfig":         reflect.ValueOf(config.GetConfig),
 			"NewConsoleMessage": reflect.ValueOf(e.uiSvc.NewConsoleMessage),
-			"NewEmbed":          reflect.ValueOf(embed.NewEmbed),
+			"NewEmbed":          reflect.ValueOf(e.embedSvc.NewEmbed),
 			"Version":           reflect.ValueOf(&constants.VERSION).Elem(),
 
 			// type definitions

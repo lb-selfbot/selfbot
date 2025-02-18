@@ -60,7 +60,7 @@ func (c *ConsoleMessage) Show() error {
 }
 
 type UIService interface {
-	Inject(authSvc AuthService, ipcSvc IPCService)
+	Inject(authSvc AuthService, ipcSvc IPCService, embedSvc EmbedService)
 
 	ANSIColored(text string, r, g, b int, bold bool) string
 	ShowBanner(flags int) error

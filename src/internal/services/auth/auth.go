@@ -14,8 +14,8 @@ import (
 	"github.com/LightningDev1/LB-Selfbot/internal/logging"
 	"github.com/LightningDev1/LB-Selfbot/internal/random"
 	"github.com/LightningDev1/LB-Selfbot/internal/services/interfaces"
+	"github.com/LightningDev1/LB-Selfbot/internal/setup"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/config"
-	"github.com/LightningDev1/LB-Selfbot/selfbot/setup"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/utils"
 	"github.com/gorilla/websocket"
 )

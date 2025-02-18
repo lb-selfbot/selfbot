@@ -9,7 +9,6 @@ import (
 	"github.com/LightningDev1/LB-Selfbot/internal/constants"
 	"github.com/LightningDev1/LB-Selfbot/internal/services/interfaces"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/config"
-	"github.com/LightningDev1/LB-Selfbot/selfbot/embed"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/utils"
 	"github.com/LightningDev1/beeep"
 	"github.com/common-nighthawk/go-figure"
@@ -17,13 +16,15 @@ import (
 )
 
 type UIServiceImpl struct {
-	authSvc interfaces.AuthService
-	ipcSvc  interfaces.IPCService
+	authSvc  interfaces.AuthService
+	ipcSvc   interfaces.IPCService
+	embedSvc interfaces.EmbedService
 }
 
-func (ui *UIServiceImpl) Inject(authSvc interfaces.AuthService, ipcSvc interfaces.IPCService) {
+func (ui *UIServiceImpl) Inject(authSvc interfaces.AuthService, ipcSvc interfaces.IPCService, embedSvc interfaces.EmbedService) {
 	ui.authSvc = authSvc
 	ui.ipcSvc = ipcSvc
+	ui.embedSvc = embedSvc
 }
 
 func (*UIServiceImpl) ANSIColored(text string, r, g, b int, bold bool) string {
@@ -169,7 +170,7 @@ func (ui *UIServiceImpl) ShowConsoleMessage(c *interfaces.ConsoleMessage) error 
 	}
 
 	if c.WebhookURL != "" {
-		emb := embed.NewEmbed().SetTitle(c.Title)
+		emb := ui.embedSvc.NewEmbed().SetTitle(c.Title)
 
 		for _, info := range c.Info {
 			if info.Key == "" {

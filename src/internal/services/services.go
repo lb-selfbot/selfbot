@@ -4,6 +4,7 @@ import (
 	"github.com/LightningDev1/LB-Selfbot/internal/services/auth"
 	"github.com/LightningDev1/LB-Selfbot/internal/services/backup"
 	"github.com/LightningDev1/LB-Selfbot/internal/services/discord"
+	"github.com/LightningDev1/LB-Selfbot/internal/services/embed"
 	"github.com/LightningDev1/LB-Selfbot/internal/services/extensions"
 	"github.com/LightningDev1/LB-Selfbot/internal/services/interfaces"
 	"github.com/LightningDev1/LB-Selfbot/internal/services/ipc"
@@ -24,6 +25,7 @@ type Services struct {
 	IPC              interfaces.IPCService
 	O11y             interfaces.O11yService
 	Discord          interfaces.DiscordService
+	Embed            interfaces.EmbedService
 	Extensions       interfaces.ExtensionsService
 	Backup           interfaces.BackupService
 	MultiTokenSniper interfaces.MultiTokenSniperService
@@ -48,6 +50,7 @@ func (s *Services) register() {
 	s.IPC = &ipc.IPCServiceImpl{}
 	s.O11y = &o11y.O11yServiceImpl{}
 	s.Discord = &discord.DiscordServiceImpl{}
+	s.Embed = &embed.EmbedServiceImpl{}
 	s.Extensions = &extensions.ExtensionsServiceImpl{}
 	s.Backup = &backup.BackupServiceImpl{}
 	s.MultiTokenSniper = &multitokensniper.MultiTokenSniperServiceImpl{}
@@ -60,10 +63,11 @@ func (s *Services) register() {
 
 	// Inject dependencies
 	s.Auth.Inject(s.UI, s.IPC)
-	s.UI.Inject(s.Auth, s.IPC)
+	s.UI.Inject(s.Auth, s.IPC, s.Embed)
 	s.O11y.Inject(s.UI)
 	s.Discord.Inject(s.Auth, s.UI, s.O11y, s.Extensions)
-	s.Extensions.Inject(s.UI, s.Discord)
+	s.Embed.Inject(s.Variables)
+	s.Extensions.Inject(s.UI, s.Discord, s.Embed)
 	s.Backup.Inject(s.Discord)
 	s.MultiTokenSniper.Inject(s.UI, s.O11y, s.Discord)
 	s.Reminder.Inject(s.UI)
