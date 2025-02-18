@@ -11,7 +11,7 @@ import (
 
 type errMsg error
 
-const (
+var (
 	mainColor = lipgloss.Color("#00cbff")
 
 	// Base styles

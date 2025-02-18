@@ -22,7 +22,7 @@ type loadingModel struct {
 func NewLoadingModel(text string) *loadingModel {
 	s := spinner.New()
 	s.Spinner = spinner.Dot
-	s.Style = baseStyle.Copy().
+	s.Style = baseStyle.
 		Foreground(mainColor).
 		MarginLeft(2)
 	return &loadingModel{spinner: s, text: text}
