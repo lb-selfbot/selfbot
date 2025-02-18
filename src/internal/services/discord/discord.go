@@ -23,6 +23,7 @@ import (
 type DiscordServiceImpl struct {
 	authSvc       interfaces.AuthService
 	uiSvc         interfaces.UIService
+	o11ySvc       interfaces.O11yService
 	extensionsSvc interfaces.ExtensionsService
 
 	session *discordgo.Session
@@ -31,9 +32,10 @@ type DiscordServiceImpl struct {
 	verbose bool
 }
 
-func (d *DiscordServiceImpl) Inject(authSvc interfaces.AuthService, uiSvc interfaces.UIService, extensionsSvc interfaces.ExtensionsService) {
+func (d *DiscordServiceImpl) Inject(authSvc interfaces.AuthService, uiSvc interfaces.UIService, o11ySvc interfaces.O11yService, extensionsSvc interfaces.ExtensionsService) {
 	d.authSvc = authSvc
 	d.uiSvc = uiSvc
+	d.o11ySvc = o11ySvc
 	d.extensionsSvc = extensionsSvc
 }
 
@@ -85,6 +87,7 @@ func (d *DiscordServiceImpl) Init(token string, verbose bool) error {
 	d.session.State.TrackVoice = false
 	d.session.State.MaxMessageCount = 50
 	d.session.SetIdentify(cfg.GetClient())
+	d.session.ErrorHandler = d.o11ySvc.DiscordErrorHandler
 	d.session.ForceSubscribeGuildIDs = cfg.Selfbot.ForceSubscribedServers
 
 	if verbose {

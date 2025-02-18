@@ -8,7 +8,6 @@ import (
 	"github.com/LightningDev1/LB-Selfbot/internal/constants"
 	"github.com/LightningDev1/LB-Selfbot/internal/services/interfaces"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/config"
-	"github.com/LightningDev1/LB-Selfbot/selfbot/errorhandler"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/eventreactions"
 	"github.com/LightningDev1/discordgo"
 )
@@ -32,12 +31,15 @@ type SniperInstance struct {
 
 type MultiTokenSniperServiceImpl struct {
 	uiSvc      interfaces.UIService
+	o11ySvc    interfaces.O11yService
 	discordSvc interfaces.DiscordService
 
 	instances []*SniperInstance
 }
 
-func (m *MultiTokenSniperServiceImpl) Inject(uiSvc interfaces.UIService, discordSvc interfaces.DiscordService) {
+func (m *MultiTokenSniperServiceImpl) Inject(uiSvc interfaces.UIService, o11ySvc interfaces.O11yService, discordSvc interfaces.DiscordService) {
+	m.uiSvc = uiSvc
+	m.o11ySvc = o11ySvc
 	m.discordSvc = discordSvc
 }
 
@@ -99,7 +101,7 @@ func (m *MultiTokenSniperServiceImpl) startInstance(context context.Context, ins
 
 	instance.Session, _ = discordgo.New(instance.Token)
 	instance.Session.SetIdentify(discordgo.IdentifyDiscordClient)
-	instance.Session.ErrorHandler = errorhandler.ErrorHandler
+	instance.Session.ErrorHandler = m.o11ySvc.DiscordErrorHandler
 	instance.Session.StateEnabled = false
 
 	var snipers *eventreactions.Snipers

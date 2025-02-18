@@ -7,6 +7,7 @@ import (
 	"github.com/LightningDev1/LB-Selfbot/internal/constants"
 	"github.com/LightningDev1/LB-Selfbot/internal/services/interfaces"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/config"
+	"github.com/LightningDev1/discordgo"
 	"github.com/getsentry/sentry-go"
 )
 
@@ -78,4 +79,8 @@ func (o *O11yServiceImpl) ReportError(err any) {
 	}
 
 	_ = o.uiSvc.LogError(fmt.Sprintf("An error has occurred: %v\n\nStacktrace: %v", err, debug.Stack()))
+}
+
+func (o *O11yServiceImpl) DiscordErrorHandler(_ *discordgo.Session, err any) {
+	o.ReportError(err)
 }
