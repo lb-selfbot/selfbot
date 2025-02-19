@@ -7,8 +7,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/LightningDev1/LB-Selfbot/internal/utils"
 	"github.com/LightningDev1/LB-Selfbot/internal/assets"
+	"github.com/LightningDev1/LB-Selfbot/internal/utils"
 	"github.com/LightningDev1/discordgo"
 )
 
