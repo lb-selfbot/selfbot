@@ -13,6 +13,8 @@ import (
 )
 
 type Ping struct {
+	eventReactionsSvc interfaces.EventReactionsService
+
 	ReactionType interfaces.EventReactionType
 	Guild        *discordgo.Guild
 	Channel      *discordgo.Channel
@@ -21,11 +23,16 @@ type Ping struct {
 	Reaction     string
 }
 
-func NewPingReaction(reactionType interfaces.EventReactionType, guild *discordgo.Guild, channel *discordgo.Channel) *Ping {
-	return &Ping{ReactionType: reactionType, Guild: guild, Channel: channel}
+func NewPingReaction(eventReactionsSvc interfaces.EventReactionsService, reactionType interfaces.EventReactionType, guild *discordgo.Guild, channel *discordgo.Channel) *Ping {
+	return &Ping{
+		eventReactionsSvc: eventReactionsSvc,
+		ReactionType:      reactionType,
+		Guild:             guild,
+		Channel:           channel,
+	}
 }
 
-func NewPingFromData(session *discordgo.Session, reactionType interfaces.EventReactionType, data map[string]any) (*Ping, error) {
+func NewPingFromData(eventReactionsSvc interfaces.EventReactionsService, session *discordgo.Session, reactionType interfaces.EventReactionType, data map[string]any) (*Ping, error) {
 	var guild *discordgo.Guild
 	var channel *discordgo.Channel
 
@@ -45,7 +52,7 @@ func NewPingFromData(session *discordgo.Session, reactionType interfaces.EventRe
 		return nil, fmt.Errorf("invalid ping data")
 	}
 
-	reaction := NewPingReaction(reactionType, guild, channel)
+	reaction := NewPingReaction(eventReactionsSvc, reactionType, guild, channel)
 
 	reaction.System, _ = data["system"].(string)
 	reaction.Response, _ = data["response"].(string)
@@ -159,7 +166,7 @@ func (p *Ping) Handler(session *discordgo.Session, event any) {
 	switch p.ReactionType {
 	case interfaces.EventReactionPingPing:
 		m, err := session.ChannelMessageSend(message.ChannelID, message.Author.Mention())
-		HandleMessage(m, err)
+		p.eventReactionsSvc.HandleReactionMessage(m, err)
 	case interfaces.EventReactionPingKick:
 		_ = session.GuildMemberDeleteWithReason(message.GuildID, message.Author.ID, "Ping Kick Event Reaction")
 	case interfaces.EventReactionPingBan:
@@ -184,12 +191,12 @@ func (p *Ping) Handler(session *discordgo.Session, event any) {
 		insult := message.Author.Mention() + " " + string(httpResponse.Body)
 
 		m, err := session.ChannelMessageSend(message.ChannelID, insult)
-		HandleMessage(m, err)
+		p.eventReactionsSvc.HandleReactionMessage(m, err)
 	case interfaces.EventReactionPingReact:
 		_ = session.MessageReactionAdd(message.ChannelID, message.ID, p.Reaction)
 	case interfaces.EventReactionPingResponse:
 		m, err := session.ChannelMessageSend(message.ChannelID, p.Response)
-		HandleMessage(m, err)
+		p.eventReactionsSvc.HandleReactionMessage(m, err)
 	case interfaces.EventReactionPingAIResponse:
 		system := utils.Misc.CreateAISystemPing(p.System, session, message.Message)
 		response, err := api.GPT(system, message.Content)
@@ -199,6 +206,6 @@ func (p *Ping) Handler(session *discordgo.Session, event any) {
 		}
 
 		m, err := session.ChannelMessageSend(message.ChannelID, response)
-		HandleMessage(m, err)
+		p.eventReactionsSvc.HandleReactionMessage(m, err)
 	}
 }

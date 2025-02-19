@@ -14,7 +14,6 @@ import (
 	"time"
 	"unicode"
 
-	"github.com/LightningDev1/LB-Selfbot/internal/data"
 	"github.com/LightningDev1/LB-Selfbot/internal/random"
 	"github.com/LightningDev1/LB-Selfbot/internal/services/interfaces"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/api"
@@ -38,7 +37,8 @@ type GiftCode struct {
 }
 
 type Snipers struct {
-	uiSvc interfaces.UIService
+	uiSvc             interfaces.UIService
+	eventReactionsSvc interfaces.EventReactionsService
 
 	MainSession *discordgo.Session
 	Account     string
@@ -54,7 +54,12 @@ type Snipers struct {
 	LastCatch              time.Time
 }
 
-func NewSnipers(uiSvc interfaces.UIService, mainSession *discordgo.Session, account string) *Snipers {
+func NewSnipers(
+	uiSvc interfaces.UIService,
+	eventReactionsSvc interfaces.EventReactionsService,
+	mainSession *discordgo.Session,
+	account string,
+) *Snipers {
 	return &Snipers{
 		uiSvc:          uiSvc,
 		MainSession:    mainSession,
@@ -170,7 +175,7 @@ func (s *Snipers) CheckNitroSniper(session *discordgo.Session, m *discordgo.Mess
 
 		// Check code length
 		if len(code) < 15 || len(code) > 26 {
-			s.uiSvc.NitroSniperFake(session, m, code, "")
+			s.uiSvc.LogNitroSniperFake(m, code, "")
 
 			continue
 		}
@@ -183,20 +188,13 @@ func (s *Snipers) CheckNitroSniper(session *discordgo.Session, m *discordgo.Mess
 			"channel_id":             m.ChannelID,
 		}
 
-		if data.CountryCode != "" {
-			payload["country_code"] = data.CountryCode
+		if cc := s.eventReactionsSvc.GetCountryCode(); cc != "" {
+			payload["country_code"] = cc
 		}
 
-		if data.PaymentSourceID != "" {
-			payload["payment_source_id"] = data.PaymentSourceID
+		if psID := s.eventReactionsSvc.GetPaymentSrcID(); psID != "" {
+			payload["payment_source_id"] = psID
 		}
-
-		headers := make(map[string]string)
-		for k, v := range session.Headers {
-			headers[k] = v
-		}
-
-		headers["Authorization"] = data.Token
 
 		beforeRequest := time.Now()
 		resp, _ := s.MainSession.Request("POST", url, payload)
@@ -206,25 +204,25 @@ func (s *Snipers) CheckNitroSniper(session *discordgo.Session, m *discordgo.Mess
 
 		// Code has been redeemed
 		if strings.Contains(respString, "subscription_plan") {
-			s.uiSvc.NitroSniper(session, m, elapsed, "Redeemed Nitro", code, s.Account)
+			s.uiSvc.LogNitroSniper(m, elapsed, "Redeemed Nitro", code, s.Account)
 			continue
 		}
 
 		// Code has already been redeemed
 		if strings.Contains(respString, "This gift has been redeemed already.") {
-			s.uiSvc.NitroSniper(session, m, elapsed, "Already Redeemed", code, s.Account)
+			s.uiSvc.LogNitroSniper(m, elapsed, "Already Redeemed", code, s.Account)
 			continue
 		}
 
 		// User already has nitro
 		if strings.Contains(respString, "Already purchased") {
-			s.uiSvc.NitroSniper(session, m, elapsed, "Already Purchased", code, s.Account)
+			s.uiSvc.LogNitroSniper(m, elapsed, "Already Purchased", code, s.Account)
 			continue
 		}
 
 		// Invalid code
 		if strings.Contains(respString, "Unknown Gift Code") {
-			s.uiSvc.NitroSniper(session, m, elapsed, "Unknown Code", code, s.Account)
+			s.uiSvc.LogNitroSniper(m, elapsed, "Unknown Code", code, s.Account)
 			continue
 		}
 
@@ -236,7 +234,7 @@ func (s *Snipers) CheckNitroSniper(session *discordgo.Session, m *discordgo.Mess
 
 		status := utils.Misc.Or(json.Get("message").MustString(), "Unknown Status")
 
-		s.uiSvc.NitroSniper(session, m, elapsed, status, code, s.Account)
+		s.uiSvc.LogNitroSniper(m, elapsed, status, code, s.Account)
 	}
 }
 
@@ -285,7 +283,7 @@ func (s *Snipers) CheckPrivnoteSniper(session *discordgo.Session, m *discordgo.M
 			continue
 		}
 
-		s.uiSvc.PrivnoteSniper(session, m, elapsed, "Saved Note", filePath, s.Account)
+		s.uiSvc.LogPrivnoteSniper(m, elapsed, "Saved Note", filePath, s.Account)
 	}
 }
 
@@ -389,7 +387,7 @@ func (s *Snipers) CheckGiveawaySniper(session *discordgo.Session, m *discordgo.M
 			}
 		})
 
-		s.uiSvc.GiveawayFound(session, m.Message, "€10 worth of ZAP Coins", "ZAP-Hosting", "1 hour", s.Account)
+		s.uiSvc.LogGiveawaySniperFound(m.Message, "€10 worth of ZAP Coins", "ZAP-Hosting", "1 hour", s.Account)
 
 		go func() {
 			time.Sleep(s.giveawaySniperSleepDuration(&cfg, nil))
@@ -409,7 +407,7 @@ func (s *Snipers) CheckGiveawaySniper(session *discordgo.Session, m *discordgo.M
 			for _, win := range wins {
 				prize := win[1]
 
-				s.uiSvc.GiveawayWon(session, m.Message, prize, s.Account)
+				s.uiSvc.LogGiveawaySniperWon(m.Message, prize, s.Account)
 			}
 		}
 
@@ -447,7 +445,7 @@ func (s *Snipers) CheckGiveawaySniper(session *discordgo.Session, m *discordgo.M
 			break
 		}
 
-		s.uiSvc.GiveawayFound(session, m.Message, prize, hostID, endsFormat, s.Account)
+		s.uiSvc.LogGiveawaySniperFound(m.Message, prize, hostID, endsFormat, s.Account)
 
 		go func() {
 			time.Sleep(s.giveawaySniperSleepDuration(&cfg, &endsTime))
@@ -470,7 +468,7 @@ func (s *Snipers) CheckGiveawaySniper(session *discordgo.Session, m *discordgo.M
 				continue
 			}
 
-			s.uiSvc.GiveawayWon(session, m.Message, prize, s.Account)
+			s.uiSvc.LogGiveawaySniperWon(m.Message, prize, s.Account)
 		}
 
 		// Check if the message is a giveaway
@@ -495,7 +493,7 @@ func (s *Snipers) CheckGiveawaySniper(session *discordgo.Session, m *discordgo.M
 		hostID := hostMatches[1]
 		endsFormat := utils.Misc.FormatDuration(time.Until(endsTime))
 
-		s.uiSvc.GiveawayFound(session, m.Message, prize, hostID, endsFormat, s.Account)
+		s.uiSvc.LogGiveawaySniperFound(m.Message, prize, hostID, endsFormat, s.Account)
 
 		go func() {
 			time.Sleep(s.giveawaySniperSleepDuration(&cfg, &endsTime))
@@ -522,7 +520,7 @@ func (s *Snipers) CheckGiveawaySniper(session *discordgo.Session, m *discordgo.M
 				continue
 			}
 
-			s.uiSvc.GiveawayWon(session, m.Message, prize, s.Account)
+			s.uiSvc.LogGiveawaySniperWon(m.Message, prize, s.Account)
 		}
 
 		// Check if the message is a giveaway
@@ -552,7 +550,7 @@ func (s *Snipers) CheckGiveawaySniper(session *discordgo.Session, m *discordgo.M
 
 		endsFormat := utils.Misc.FormatDuration(time.Until(endsTime))
 
-		s.uiSvc.GiveawayFound(session, m.Message, prize, hostID, endsFormat, s.Account)
+		s.uiSvc.LogGiveawaySniperFound(m.Message, prize, hostID, endsFormat, s.Account)
 
 		go func() {
 			time.Sleep(s.giveawaySniperSleepDuration(&cfg, &endsTime))
@@ -570,7 +568,7 @@ func (s *Snipers) CheckGiveawaySniper(session *discordgo.Session, m *discordgo.M
 
 			wins := winRegex.FindStringSubmatch(m.Content)
 			if len(wins) > 0 {
-				s.uiSvc.GiveawayWon(session, m.Message, wins[1], s.Account)
+				s.uiSvc.LogGiveawaySniperWon(m.Message, wins[1], s.Account)
 			}
 		}
 
@@ -599,7 +597,7 @@ func (s *Snipers) CheckGiveawaySniper(session *discordgo.Session, m *discordgo.M
 		endsTime := time.Unix(endsUnix, 0)
 		endsFormat := utils.Misc.FormatDuration(time.Until(endsTime))
 
-		s.uiSvc.GiveawayFound(session, m.Message, prize, "", endsFormat, s.Account)
+		s.uiSvc.LogGiveawaySniperFound(m.Message, prize, "", endsFormat, s.Account)
 
 		go func() {
 			time.Sleep(s.giveawaySniperSleepDuration(&cfg, &endsTime))
@@ -622,7 +620,7 @@ func (s *Snipers) CheckGiveawaySniper(session *discordgo.Session, m *discordgo.M
 				continue
 			}
 
-			s.uiSvc.GiveawayWon(session, m.Message, prize, s.Account)
+			s.uiSvc.LogGiveawaySniperWon(m.Message, prize, s.Account)
 		}
 
 		// Check if the message is a giveaway
@@ -654,7 +652,7 @@ func (s *Snipers) CheckGiveawaySniper(session *discordgo.Session, m *discordgo.M
 		endsTime := time.Unix(endsUnix, 0)
 		endsFormat := utils.Misc.FormatDuration(time.Until(endsTime))
 
-		s.uiSvc.GiveawayFound(session, m.Message, prize, hostID, endsFormat, s.Account)
+		s.uiSvc.LogGiveawaySniperFound(m.Message, prize, hostID, endsFormat, s.Account)
 
 		go func() {
 			time.Sleep(s.giveawaySniperSleepDuration(&cfg, &endsTime))
@@ -698,7 +696,7 @@ func (s *Snipers) CheckGiveawaySniper(session *discordgo.Session, m *discordgo.M
 		endsTime := time.Unix(endsUnix, 0)
 		endsFormat := utils.Misc.FormatDuration(time.Until(endsTime))
 
-		s.uiSvc.GiveawayFound(session, m.Message, prize, "", endsFormat, s.Account)
+		s.uiSvc.LogGiveawaySniperFound(m.Message, prize, "", endsFormat, s.Account)
 
 		go func() {
 			time.Sleep(s.giveawaySniperSleepDuration(&cfg, &endsTime))
@@ -723,7 +721,7 @@ func (s *Snipers) CheckGiveawaySniper(session *discordgo.Session, m *discordgo.M
 				prize = m.Embeds[0].Fields[0].Value
 			}
 
-			s.uiSvc.GiveawayWon(session, m.Message, prize, s.Account)
+			s.uiSvc.LogGiveawaySniperWon(m.Message, prize, s.Account)
 		}
 
 		enterButton, enterOK := s.getButtonComponent(m.Message, 0)
@@ -759,7 +757,7 @@ func (s *Snipers) CheckGiveawaySniper(session *discordgo.Session, m *discordgo.M
 			}
 		}
 
-		s.uiSvc.GiveawayFound(session, m.Message, "MEE6", "", endsIn, s.Account)
+		s.uiSvc.LogGiveawaySniperFound(m.Message, "MEE6", "", endsIn, s.Account)
 
 		go func() {
 			time.Sleep(s.giveawaySniperSleepDuration(&cfg, giveawayEnd))
@@ -782,7 +780,7 @@ func (s *Snipers) CheckGiveawaySniper(session *discordgo.Session, m *discordgo.M
 				continue
 			}
 
-			s.uiSvc.GiveawayWon(session, m.Message, prize, s.Account)
+			s.uiSvc.LogGiveawaySniperWon(m.Message, prize, s.Account)
 		}
 
 		// Check if the message is a giveaway
@@ -817,7 +815,7 @@ func (s *Snipers) CheckGiveawaySniper(session *discordgo.Session, m *discordgo.M
 		endsTime := time.Unix(endsUnix, 0)
 		endsFormat := utils.Misc.FormatDuration(time.Until(endsTime))
 
-		s.uiSvc.GiveawayFound(session, m.Message, prize, hostID, endsFormat, s.Account)
+		s.uiSvc.LogGiveawaySniperFound(m.Message, prize, hostID, endsFormat, s.Account)
 
 		go func() {
 			time.Sleep(s.giveawaySniperSleepDuration(&cfg, &endsTime))
@@ -837,7 +835,7 @@ func (s *Snipers) CheckGiveawaySniper(session *discordgo.Session, m *discordgo.M
 			for _, win := range wins {
 				prize := win[1]
 
-				s.uiSvc.GiveawayWon(session, m.Message, prize, s.Account)
+				s.uiSvc.LogGiveawaySniperWon(m.Message, prize, s.Account)
 			}
 		}
 
@@ -871,7 +869,7 @@ func (s *Snipers) CheckGiveawaySniper(session *discordgo.Session, m *discordgo.M
 		endsTime := time.Unix(endsUnix, 0)
 		endsFormat := utils.Misc.FormatDuration(time.Until(endsTime))
 
-		s.uiSvc.GiveawayFound(session, m.Message, prize, hostID, endsFormat, s.Account)
+		s.uiSvc.LogGiveawaySniperFound(m.Message, prize, hostID, endsFormat, s.Account)
 
 		go func() {
 			time.Sleep(s.giveawaySniperSleepDuration(&cfg, &endsTime))
@@ -891,7 +889,7 @@ func (s *Snipers) CheckGiveawaySniper(session *discordgo.Session, m *discordgo.M
 			for _, win := range wins {
 				prize := win[1]
 
-				s.uiSvc.GiveawayWon(session, m.Message, prize, s.Account)
+				s.uiSvc.LogGiveawaySniperWon(m.Message, prize, s.Account)
 			}
 		}
 
@@ -926,7 +924,7 @@ func (s *Snipers) CheckGiveawaySniper(session *discordgo.Session, m *discordgo.M
 		endsTime := time.Unix(endsUnix, 0)
 		endsFormat := utils.Misc.FormatDuration(time.Until(endsTime))
 
-		s.uiSvc.GiveawayFound(session, m.Message, prize, hostID, endsFormat, s.Account)
+		s.uiSvc.LogGiveawaySniperFound(m.Message, prize, hostID, endsFormat, s.Account)
 
 		go func() {
 			time.Sleep(s.giveawaySniperSleepDuration(&cfg, &endsTime))
@@ -982,7 +980,7 @@ func (s *Snipers) CheckGiveawaySniper(session *discordgo.Session, m *discordgo.M
 			endsIn = utils.Misc.FormatDuration(time.Until(endsTime))
 		}
 
-		s.uiSvc.GiveawayFound(session, m.Message, "Unknown (Custom Bot)", hostID, endsIn, s.Account)
+		s.uiSvc.LogGiveawaySniperFound(m.Message, "Unknown (Custom Bot)", hostID, endsIn, s.Account)
 
 		go func() {
 			time.Sleep(s.giveawaySniperSleepDuration(&cfg, giveawayEnd))
@@ -1046,7 +1044,7 @@ func (s *Snipers) CheckGiveawaySniperEdit(session *discordgo.Session, m *discord
 		// Win check
 		if len(m.Embeds) >= 2 && strings.Contains(m.Embeds[0].Title, "WINNER") &&
 			utils.Discord.IsUserMentioned(m.Message, session.State.User.ID) {
-			s.uiSvc.GiveawayWon(session, m.Message, "Rumble Royale", s.Account)
+			s.uiSvc.LogGiveawaySniperWon(m.Message, "Rumble Royale", s.Account)
 		}
 
 		// Check if the message is a giveaway
@@ -1080,7 +1078,7 @@ func (s *Snipers) CheckGiveawaySniperEdit(session *discordgo.Session, m *discord
 
 		host, endsIn := hostMatches[1], endsMatches[1]
 
-		s.uiSvc.GiveawayFound(session, m.Message, "Rumble Royale", host, endsIn, s.Account)
+		s.uiSvc.LogGiveawaySniperFound(m.Message, "Rumble Royale", host, endsIn, s.Account)
 
 		go func() {
 			// Wait until the bot has reacted
@@ -1119,7 +1117,7 @@ func (s *Snipers) CheckGiveawaySniperEdit(session *discordgo.Session, m *discord
 		// Win check
 		if strings.Contains(m.Content, "Giveaway Winner:") &&
 			utils.Discord.IsUserMentioned(m.Message, session.State.User.ID) {
-			s.uiSvc.GiveawayWon(session, m.Message, "€10 worth of ZAP Coins", s.Account)
+			s.uiSvc.LogGiveawaySniperWon(m.Message, "€10 worth of ZAP Coins", s.Account)
 		}
 	case "368521195940741122": // Lawliet#5480
 		// Win check
@@ -1132,7 +1130,7 @@ func (s *Snipers) CheckGiveawaySniperEdit(session *discordgo.Session, m *discord
 
 			prize = prize[2:]
 
-			s.uiSvc.GiveawayWon(session, m.Message, prize, s.Account)
+			s.uiSvc.LogGiveawaySniperWon(m.Message, prize, s.Account)
 		}
 	}
 }
@@ -1325,7 +1323,7 @@ func (s *Snipers) CheckPokeTwoSniper(session *discordgo.Session, m *discordgo.Me
 			iv = ivMatches[1]
 		}
 
-		s.uiSvc.PokeTwoSniper(session, m, pokemon, received, iv, confidence, elapsed, s.Account)
+		s.uiSvc.LogPokeTwoSniper(m, elapsed, confidence, pokemon, received, iv, s.Account)
 
 		// Fake activity
 

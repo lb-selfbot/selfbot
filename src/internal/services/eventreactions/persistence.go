@@ -108,7 +108,7 @@ func (e *EventReactionsServiceImpl) constructReaction(reactionCfg eventReactionC
 	switch reactionCfg.Type {
 	// Default reactions
 	case interfaces.EventReactionSnipers:
-		return impl.NewSnipers(e.uiSvc, session, ""), nil
+		return impl.NewSnipers(e.uiSvc, e, session, ""), nil
 		// return NewSnipers(e.discordSvc, reactionCfg.Data), nil
 	}
 

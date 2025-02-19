@@ -97,7 +97,7 @@ type UIService interface {
 	LogDMTypingNotifier(username string)
 	LogMessageDeleteNotifier(msg *discordgo.Message, attachments []string)
 	LogDiscordStaffDetection(msg *discordgo.Message)
-	LogGhostpingDetection(msg *discordgo.Message)
+	LogGhostPingDetection(msg *discordgo.Message)
 	LogSelfbotDetection(msg *discordgo.Message, selfbot string)
 	LogTicketNotifier(channel *discordgo.Channel)
 	LogKeywordNotifier(msg *discordgo.Message, keyword string)

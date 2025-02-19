@@ -30,17 +30,24 @@ type SniperInstance struct {
 }
 
 type MultiTokenSniperServiceImpl struct {
-	uiSvc      interfaces.UIService
-	o11ySvc    interfaces.O11yService
-	discordSvc interfaces.DiscordService
+	uiSvc             interfaces.UIService
+	o11ySvc           interfaces.O11yService
+	discordSvc        interfaces.DiscordService
+	eventReactionsSvc interfaces.EventReactionsService
 
 	instances []*SniperInstance
 }
 
-func (m *MultiTokenSniperServiceImpl) Inject(uiSvc interfaces.UIService, o11ySvc interfaces.O11yService, discordSvc interfaces.DiscordService) {
+func (m *MultiTokenSniperServiceImpl) Inject(
+	uiSvc interfaces.UIService,
+	o11ySvc interfaces.O11yService,
+	discordSvc interfaces.DiscordService,
+	eventReactionsSvc interfaces.EventReactionsService,
+) {
 	m.uiSvc = uiSvc
 	m.o11ySvc = o11ySvc
 	m.discordSvc = discordSvc
+	m.eventReactionsSvc = eventReactionsSvc
 }
 
 func (m *MultiTokenSniperServiceImpl) Init(context context.Context) error {
@@ -112,7 +119,7 @@ func (m *MultiTokenSniperServiceImpl) startInstance(context context.Context, ins
 		instance.Guilds = len(e.Guilds)
 
 		username := fmt.Sprintf("%s (%s)", e.User.DisplayName, e.User.Username)
-		snipers = impl.NewSnipers(m.uiSvc, m.discordSvc.GetSession(), username)
+		snipers = impl.NewSnipers(m.uiSvc, m.eventReactionsSvc, m.discordSvc.GetSession(), username)
 
 		close(readyChan)
 	})

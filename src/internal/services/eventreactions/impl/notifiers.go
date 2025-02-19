@@ -5,16 +5,17 @@ import (
 
 	"github.com/LightningDev1/LB-Selfbot/internal/services/interfaces"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/config"
-	"github.com/LightningDev1/LB-Selfbot/selfbot/logging"
 
 	"github.com/LightningDev1/LB-Selfbot/selfbot/utils"
 	"github.com/LightningDev1/discordgo"
 )
 
-type Notifiers struct{}
+type Notifiers struct {
+	uiSvc interfaces.UIService
+}
 
-func NewNotifiers() *Notifiers {
-	return &Notifiers{}
+func NewNotifiers(uiSvc interfaces.UIService) *Notifiers {
+	return &Notifiers{uiSvc: uiSvc}
 }
 
 func (n *Notifiers) Type() interfaces.EventReactionType {
@@ -70,14 +71,14 @@ func (n *Notifiers) MessageCreateHandler(session *discordgo.Session, message *di
 
 	// DM Notifier
 	if isDM && cfg.Events.DMNotifier {
-		logging.Logging.DMNotifier(message.Message)
+		n.uiSvc.LogDMNotifier(message.Message)
 	}
 
 	// Discord Staff Detection
 	authorIsEmployee := message.Author.PublicFlags&discordgo.UserFlagDiscordEmployee != 0
 
 	if authorIsEmployee && cfg.Events.DiscordStaffDetection {
-		logging.Logging.DiscordStaffDetection(session, message.Message)
+		n.uiSvc.LogDiscordStaffDetection(message.Message)
 	}
 }
 
@@ -92,7 +93,7 @@ func (n *Notifiers) MessageUpdateHandler(session *discordgo.Session, message *di
 
 	//  DM Edit Notifier
 	if isDM && !embedded && cfg.Events.DMEditNotifier {
-		logging.Logging.DMEditNotifier(message.Message, message.BeforeUpdate.Content, message.Content)
+		n.uiSvc.LogDMEditNotifier(message.Message, message.BeforeUpdate.Content, message.Content)
 	}
 }
 
@@ -131,9 +132,9 @@ func (n *Notifiers) MessageDeleteHandler(session *discordgo.Session, message *di
 		}
 
 		if dmNotifier {
-			logging.Logging.DMDeleteNotifier(message.Message, attachments)
+			n.uiSvc.LogDMDeleteNotifier(message.Message, attachments)
 		} else {
-			logging.Logging.MessageDeleteNotifier(session, message.Message, attachments)
+			n.uiSvc.LogMessageDeleteNotifier(message.Message, attachments)
 		}
 	}()
 
@@ -141,7 +142,7 @@ func (n *Notifiers) MessageDeleteHandler(session *discordgo.Session, message *di
 	mentionsUser := strings.Contains(message.Content, session.State.User.Mention())
 
 	if mentionsUser && cfg.Events.GhostPingDetection {
-		logging.Logging.GhostPingDetection(session, message.Message)
+		n.uiSvc.LogGhostPingDetection(message.Message)
 	}
 }
 
@@ -157,7 +158,7 @@ func (n *Notifiers) GuildBanHandler(session *discordgo.Session, ban *discordgo.G
 
 	// Ban Notifier
 	if cfg.Events.BanNotifier {
-		logging.Logging.BanNotifier(session, ban.GuildID)
+		n.uiSvc.LogBanNotifier(ban.GuildID)
 	}
 }
 
@@ -174,7 +175,7 @@ func (n *Notifiers) ChannelCreateHandler(session *discordgo.Session, channel *di
 		canViewChannel := perms&discordgo.PermissionViewChannel != 0
 
 		if canSendMessages && canViewChannel {
-			logging.Logging.TicketNotifier(session, channel.Channel)
+			n.uiSvc.LogTicketNotifier(channel.Channel)
 		}
 	}
 }
@@ -190,6 +191,6 @@ func (n *Notifiers) TypingStartHandler(session *discordgo.Session, event *discor
 			return
 		}
 
-		logging.Logging.DMTypingNotifier(username)
+		n.uiSvc.LogDMTypingNotifier(username)
 	}
 }

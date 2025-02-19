@@ -9,21 +9,33 @@ import (
 	"github.com/LightningDev1/LB-Selfbot/internal/services/interfaces"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/api"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/config"
-	"github.com/LightningDev1/LB-Selfbot/selfbot/logging"
 
 	"github.com/LightningDev1/LB-Selfbot/selfbot/utils"
-	"github.com/LightningDev1/LB-Selfbot/selfbot/variables"
 	"github.com/LightningDev1/discordgo"
 )
 
-type AFK struct{}
+type AFK struct {
+	uiSvc             interfaces.UIService
+	eventReactionsSvc interfaces.EventReactionsService
+	variablesSvc      interfaces.VariablesService
 
-func NewAFK() *AFK {
-	return &AFK{}
+	lastAFKMessage time.Time
+}
+
+func NewAFK(
+	uiSvc interfaces.UIService,
+	eventReactionsSvc interfaces.EventReactionsService,
+	variablesSvc interfaces.VariablesService,
+) *AFK {
+	return &AFK{
+		uiSvc:             uiSvc,
+		eventReactionsSvc: eventReactionsSvc,
+		variablesSvc:      variablesSvc,
+	}
 }
 
 func (a *AFK) Type() interfaces.EventReactionType {
-	return AFK_RESPONDER
+	return interfaces.EventReactionAFKResponder
 }
 
 func (a *AFK) Description() string {
@@ -37,9 +49,13 @@ func (a *AFK) Equals(other interfaces.EventReaction) bool {
 }
 
 func (a *AFK) HandleLastActivity(session *discordgo.Session, m *discordgo.Message) {
-	if m.Author.ID == session.State.User.ID && !IsEventReactionMessage(m) && time.Since(LastAFKMessage) > 5*time.Second {
-		LastActivity = time.Now()
+	if m.Author.ID != session.State.User.ID ||
+		a.eventReactionsSvc.IsReactionMessage(m) ||
+		time.Since(a.lastAFKMessage) < 5*time.Second {
+		return
 	}
+
+	a.eventReactionsSvc.SetLastActivity()
 }
 
 func (a *AFK) IsActive(cfg *config.Config) bool {
@@ -49,7 +65,7 @@ func (a *AFK) IsActive(cfg *config.Config) bool {
 
 	inactiveTimeout := time.Duration(cfg.AFK.InactiveTimeout) * time.Second
 
-	return time.Since(LastActivity) < inactiveTimeout
+	return time.Since(a.eventReactionsSvc.GetLastActivity()) < inactiveTimeout
 }
 
 func (a *AFK) Data() map[string]any {
@@ -61,9 +77,10 @@ func (a *AFK) GetAFKMessage(m *discordgo.Message, message string) string {
 	message = strings.ReplaceAll(message, "$MENTION", m.Author.Mention())
 	message = strings.ReplaceAll(message, "$MSGLINK", utils.Discord.GetMessageLink(m))
 	message = strings.ReplaceAll(message, "$MSGCONTENT", m.ContentWithMentionsReplaced())
-	message = strings.ReplaceAll(message, "$AFKSINCE", fmt.Sprintf("<t:%d:R>", LastActivity.Unix()))
+	message = strings.ReplaceAll(message, "$AFKSINCE",
+		fmt.Sprintf("<t:%d:R>", a.eventReactionsSvc.GetLastActivity().Unix()))
 
-	message = variables.Parse(message)
+	message = a.variablesSvc.Parse(message)
 
 	return message
 }
@@ -126,11 +143,11 @@ func (a *AFK) Handler(session *discordgo.Session, event any) {
 
 	time.Sleep(2 * time.Second)
 
-	if a.IsActive(&cfg) || time.Since(LastAFKMessage) < 60*time.Second {
+	if a.IsActive(&cfg) || time.Since(a.lastAFKMessage) < 60*time.Second {
 		return
 	}
 
-	LastAFKMessage = time.Now()
+	a.lastAFKMessage = time.Now()
 
 	afkMessage := a.GetAFKMessage(message.Message, cfg.AFK.Message)
 	if cfg.AFK.AI {
@@ -145,19 +162,19 @@ func (a *AFK) Handler(session *discordgo.Session, event any) {
 		}
 	}
 
-	logging.Logging.AFKMessageSent(session, message.Message, afkMessage)
+	a.uiSvc.LogAFKMessage(message.Message, afkMessage)
 
 	if cfg.AFK.Reply {
 		m, err := session.ChannelMessageSendReply(message.ChannelID, afkMessage, message.Reference())
 		if err == nil {
 			err = session.MessageUnack(message.ChannelID, message.ID, 1)
 		}
-		HandleMessage(m, err)
+		a.eventReactionsSvc.HandleReactionMessage(m, err)
 	} else {
 		m, err := session.ChannelMessageSend(message.ChannelID, afkMessage)
 		if err == nil {
 			err = session.MessageUnack(message.ChannelID, message.ID, 1)
 		}
-		HandleMessage(m, err)
+		a.eventReactionsSvc.HandleReactionMessage(m, err)
 	}
 }

@@ -1,6 +1,11 @@
 package interfaces
 
-import "github.com/LightningDev1/discordgo"
+import (
+	"time"
+
+	"github.com/LightningDev1/dgc"
+	"github.com/LightningDev1/discordgo"
+)
 
 type EventReactionType int
 
@@ -105,7 +110,22 @@ type EventReactionsService interface {
 	RemoveReactionsByType(t EventReactionType)
 
 	IsReactionMessage(message *discordgo.Message) bool
+	HandleReactionMessage(message *discordgo.Message, err error)
+
+	GetPinSpamMessages() []*discordgo.Message
+	AddPinSpamMessage(message *discordgo.Message)
 
 	GetEditedMessages(channelID string) []*discordgo.MessageUpdate
 	GetDeletedMessages(channelID string) []*discordgo.Message
+
+	GetUsedCommands() []*dgc.Ctx
+	AddUsedCommand(ctx *dgc.Ctx)
+
+	GetLastActivity() time.Time
+	SetLastActivity()
+
+	GetPaymentSrcID() string
+	GetCountryCode() string
+
+	GetTimeDifference() time.Duration
 }

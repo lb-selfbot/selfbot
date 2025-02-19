@@ -9,7 +9,8 @@ import (
 	"time"
 
 	"github.com/LightningDev1/LB-Selfbot/internal/constants"
-	"github.com/LightningDev1/LB-Selfbot/internal/data"
+	"github.com/LightningDev1/discordgo"
+
 	"github.com/LightningDev1/LB-Selfbot/internal/services/interfaces"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/api"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/utils"
@@ -25,15 +26,22 @@ type variable struct {
 }
 
 type VariablesServiceImpl struct {
-	discordSvc    interfaces.DiscordService
-	extensionsSvc interfaces.ExtensionsService
-	spotifySvc    interfaces.SpotifyService
+	discordSvc        interfaces.DiscordService
+	eventReactionsSvc interfaces.EventReactionsService
+	extensionsSvc     interfaces.ExtensionsService
+	spotifySvc        interfaces.SpotifyService
 
 	variables []variable
 }
 
-func (v *VariablesServiceImpl) Inject(discordSvc interfaces.DiscordService, extensionsSvc interfaces.ExtensionsService, spotifySvc interfaces.SpotifyService) {
+func (v *VariablesServiceImpl) Inject(
+	discordSvc interfaces.DiscordService,
+	eventReactionsSvc interfaces.EventReactionsService,
+	extensionsSvc interfaces.ExtensionsService,
+	spotifySvc interfaces.SpotifyService,
+) {
 	v.discordSvc = discordSvc
+	v.eventReactionsSvc = eventReactionsSvc
 	v.extensionsSvc = extensionsSvc
 	v.spotifySvc = spotifySvc
 }
@@ -77,13 +85,13 @@ func (v *VariablesServiceImpl) Init() {
 		{
 			regex: regexp.MustCompile(`\$USEDCOMMANDS`),
 			valueFunc: func(arg string) string {
-				return strconv.Itoa(data.UsedCommands)
+				return strconv.Itoa(len(v.eventReactionsSvc.GetUsedCommands()))
 			},
 		},
 		{
 			regex: regexp.MustCompile(`\$TOTALCOMMANDS`),
 			valueFunc: func(arg string) string {
-				return strconv.Itoa(data.TotalCommands)
+				return strconv.Itoa(len(v.discordSvc.GetRouter().Commands))
 			},
 		},
 		{
@@ -95,13 +103,17 @@ func (v *VariablesServiceImpl) Init() {
 		{
 			regex: regexp.MustCompile(`\$SERVERS`),
 			valueFunc: func(arg string) string {
-				return strconv.Itoa(data.Guilds)
+				return strconv.Itoa(len(v.discordSvc.GetSession().State.Guilds))
 			},
 		},
 		{
 			regex: regexp.MustCompile(`\$FRIENDS`),
 			valueFunc: func(arg string) string {
-				return strconv.Itoa(data.Friends)
+				friends := utils.Filter(v.discordSvc.GetSession().State.Relationships, func(f *discordgo.Relationship) bool {
+					return f.Type == 1
+				})
+
+				return strconv.Itoa(len(friends))
 			},
 		},
 		{

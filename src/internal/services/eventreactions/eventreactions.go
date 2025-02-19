@@ -104,18 +104,6 @@ func (e *EventReactionsServiceImpl) handleEvent(s *discordgo.Session, event any)
 	}
 }
 
-func (e *EventReactionsServiceImpl) isEventReactionMessage(message *discordgo.Message) bool {
-	e.eventReactionsMsgsMu.Lock()
-	defer e.eventReactionsMsgsMu.Unlock()
-
-	for _, m := range e.eventReactionsMsgs {
-		if m.ID == message.ID {
-			return true
-		}
-	}
-	return false
-}
-
 func (e *EventReactionsServiceImpl) addEditedMessage(message *discordgo.MessageUpdate) {
 	e.editedMsgsMu.Lock()
 	defer e.editedMsgsMu.Unlock()
@@ -165,9 +153,6 @@ func (e *EventReactionsServiceImpl) RemoveReactionsByType(t interfaces.EventReac
 }
 
 func (e *EventReactionsServiceImpl) IsReactionMessage(message *discordgo.Message) bool {
-	e.eventReactionsMsgsMu.Lock()
-	defer e.eventReactionsMsgsMu.Unlock()
-
 	for _, m := range e.eventReactionsMsgs {
 		if m.ID == message.ID {
 			return true
@@ -175,6 +160,31 @@ func (e *EventReactionsServiceImpl) IsReactionMessage(message *discordgo.Message
 	}
 
 	return false
+}
+
+func (e *EventReactionsServiceImpl) HandleReactionMessage(message *discordgo.Message, err error) {
+	if err != nil {
+		return
+	}
+
+	e.eventReactionsMsgsMu.Lock()
+	defer e.eventReactionsMsgsMu.Unlock()
+
+	e.eventReactionsMsgs = append(e.eventReactionsMsgs, message)
+}
+
+func (e *EventReactionsServiceImpl) GetPinSpamMessages() []*discordgo.Message {
+	e.pinSpamMsgsMu.Lock()
+	defer e.pinSpamMsgsMu.Unlock()
+
+	return e.pinSpamMsgs
+}
+
+func (e *EventReactionsServiceImpl) AddPinSpamMessage(message *discordgo.Message) {
+	e.pinSpamMsgsMu.Lock()
+	defer e.pinSpamMsgsMu.Unlock()
+
+	e.pinSpamMsgs = append(e.pinSpamMsgs, message)
 }
 
 func (e *EventReactionsServiceImpl) GetEditedMessages(channelID string) []*discordgo.MessageUpdate {
@@ -189,4 +199,35 @@ func (e *EventReactionsServiceImpl) GetDeletedMessages(channelID string) []*disc
 	defer e.deletedMsgsMu.Unlock()
 
 	return e.deletedMsgs[channelID]
+}
+
+func (e *EventReactionsServiceImpl) GetUsedCommands() []*dgc.Ctx {
+	return e.usedCmds
+}
+
+func (e *EventReactionsServiceImpl) AddUsedCommand(ctx *dgc.Ctx) {
+	e.usedCmdsMu.Lock()
+	defer e.usedCmdsMu.Unlock()
+
+	e.usedCmds = append(e.usedCmds, ctx)
+}
+
+func (e *EventReactionsServiceImpl) GetLastActivity() time.Time {
+	return e.lastActivity
+}
+
+func (e *EventReactionsServiceImpl) SetLastActivity() {
+	e.lastActivity = time.Now()
+}
+
+func (e *EventReactionsServiceImpl) GetPaymentSrcID() string {
+	return e.paymentSrcID
+}
+
+func (e *EventReactionsServiceImpl) GetCountryCode() string {
+	return e.countryCode
+}
+
+func (e *EventReactionsServiceImpl) GetTimeDifference() time.Duration {
+	return e.timeDiff
 }

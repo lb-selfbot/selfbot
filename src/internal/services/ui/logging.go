@@ -363,7 +363,7 @@ func (ui *UIServiceImpl) LogDiscordStaffDetection(msg *discordgo.Message) {
 		Show()
 }
 
-func (ui *UIServiceImpl) LogGhostpingDetection(msg *discordgo.Message) {
+func (ui *UIServiceImpl) LogGhostPingDetection(msg *discordgo.Message) {
 	session := ui.discordSvc.GetSession()
 	guildName := utils.Discord.GetGuildName(session, msg.GuildID)
 	channelName := utils.Discord.GetChannelName(session, msg.ChannelID)

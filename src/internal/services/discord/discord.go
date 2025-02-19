@@ -9,22 +9,22 @@ import (
 	"strings"
 
 	"github.com/LightningDev1/LB-Selfbot/internal/constants"
-	"github.com/LightningDev1/LB-Selfbot/internal/data"
+
 	"github.com/LightningDev1/LB-Selfbot/internal/services/interfaces"
 	"github.com/LightningDev1/LB-Selfbot/internal/tui"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/commands"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/config"
-	"github.com/LightningDev1/LB-Selfbot/selfbot/eventreactions"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/utils"
 	"github.com/LightningDev1/dgc"
 	"github.com/LightningDev1/discordgo"
 )
 
 type DiscordServiceImpl struct {
-	authSvc       interfaces.AuthService
-	uiSvc         interfaces.UIService
-	o11ySvc       interfaces.O11yService
-	extensionsSvc interfaces.ExtensionsService
+	authSvc           interfaces.AuthService
+	uiSvc             interfaces.UIService
+	o11ySvc           interfaces.O11yService
+	eventReactionsSvc interfaces.EventReactionsService
+	extensionsSvc     interfaces.ExtensionsService
 
 	session *discordgo.Session
 	router  *dgc.Router
@@ -32,10 +32,17 @@ type DiscordServiceImpl struct {
 	verbose bool
 }
 
-func (d *DiscordServiceImpl) Inject(authSvc interfaces.AuthService, uiSvc interfaces.UIService, o11ySvc interfaces.O11yService, extensionsSvc interfaces.ExtensionsService) {
+func (d *DiscordServiceImpl) Inject(
+	authSvc interfaces.AuthService,
+	uiSvc interfaces.UIService,
+	o11ySvc interfaces.O11yService,
+	eventReactionsSvc interfaces.EventReactionsService,
+	extensionsSvc interfaces.ExtensionsService,
+) {
 	d.authSvc = authSvc
 	d.uiSvc = uiSvc
 	d.o11ySvc = o11ySvc
+	d.eventReactionsSvc = eventReactionsSvc
 	d.extensionsSvc = extensionsSvc
 }
 
@@ -125,7 +132,7 @@ func (d *DiscordServiceImpl) Init(token string, verbose bool) error {
 			}
 
 			if slices.Contains(ctx.Command.Flags, commands.CmdFlagDangerous) && cfg.Sharing.BlockDangerousCommands {
-				d.uiSvc.LogBlockedDangerousCommand(ctx.Event.Author, ctx.Command.Name)
+				d.uiSvc.LogDangerousCmdBlocked(ctx.Event.Author, ctx.Command.Name)
 				return false
 			}
 
@@ -168,12 +175,10 @@ func (d *DiscordServiceImpl) Init(token string, verbose bool) error {
 					utils.Arguments = arguments
 
 					if ctx.Command.Name != "repeat" {
-						eventreactions.UsedCommands.Add(ctx)
+						d.eventReactionsSvc.AddUsedCommand(ctx)
 					}
 
-					data.UsedCommands++
-
-					d.uiSvc.LogCommandUsed(ctx.Command.Name)
+					d.uiSvc.LogCmdUsed(ctx.Command.Name)
 
 					d.authSvc.CheckNonce()
 
@@ -183,9 +188,12 @@ func (d *DiscordServiceImpl) Init(token string, verbose bool) error {
 		},
 	})
 
-	eventreactions.RegisterHandlers(d.session, d.router)
+	d.eventReactionsSvc.Register()
+
 	commands.Commands.RegisterCommands(d.session, d.router, false)
+
 	d.extensionsSvc.Register()
+	
 	commands.Commands.HelpCommand.RegisterHelpCommand(d.router, d.session)
 
 	d.router.Initialize(d.session)

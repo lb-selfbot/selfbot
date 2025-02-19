@@ -8,7 +8,6 @@ import (
 	"github.com/LightningDev1/LB-Selfbot/internal/services/interfaces"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/config"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/http"
-	"github.com/LightningDev1/LB-Selfbot/selfbot/logging"
 
 	"github.com/LightningDev1/LB-Selfbot/selfbot/utils"
 	"github.com/LightningDev1/discordgo"
@@ -17,11 +16,12 @@ import (
 var PhishingDomains []string
 var SuspiciousDomains []string
 
-type Phishing struct{}
+type Phishing struct {
+	uiSvc interfaces.UIService
+}
 
-func NewPhishing() *Phishing {
+func NewPhishing(uiSvc interfaces.UIService) *Phishing {
 	if len(PhishingDomains) == 0 || len(SuspiciousDomains) == 0 {
-
 		httpResult := http.Get("https://raw.githubusercontent.com/nikolaischunk/discord-phishing-links/main/domain-list.json")
 		PhishingDomains = httpResult.Json().Get("domains").MustStringArray()
 
@@ -29,7 +29,7 @@ func NewPhishing() *Phishing {
 		SuspiciousDomains = httpResult.Json().Get("domains").MustStringArray()
 	}
 
-	return &Phishing{}
+	return &Phishing{uiSvc: uiSvc}
 }
 
 func (p *Phishing) Type() interfaces.EventReactionType {
@@ -80,7 +80,8 @@ func (p *Phishing) Handler(session *discordgo.Session, event any) {
 
 		if isPhishing || isSuspicious {
 			_ = session.MessageAck(message.ChannelID, message.ID)
-			logging.Logging.PhishingDetected(session, message.Message, hostname)
+
+			p.uiSvc.LogPhishingDetection(message.Message, hostname)
 		}
 	}
 }

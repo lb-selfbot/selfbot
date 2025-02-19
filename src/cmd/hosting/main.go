@@ -13,7 +13,7 @@ import (
 	"syscall"
 
 	"github.com/LightningDev1/LB-Selfbot/internal/constants"
-	"github.com/LightningDev1/LB-Selfbot/internal/data"
+
 	"github.com/LightningDev1/LB-Selfbot/internal/startup"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/commands"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/config"

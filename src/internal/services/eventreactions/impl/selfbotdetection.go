@@ -7,7 +7,6 @@ import (
 
 	"github.com/LightningDev1/LB-Selfbot/internal/services/interfaces"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/config"
-	"github.com/LightningDev1/LB-Selfbot/selfbot/logging"
 
 	"github.com/LightningDev1/LB-Selfbot/selfbot/utils"
 	"github.com/LightningDev1/discordgo"
@@ -76,12 +75,17 @@ type DetectionScore struct {
 }
 
 type SelfbotDetection struct {
+	uiSvc             interfaces.UIService
+	eventReactionsSvc interfaces.EventReactionsService
+
 	DetectionScores sync.Map
 }
 
-func NewSelfbotDetection() *SelfbotDetection {
+func NewSelfbotDetection(uiSvc interfaces.UIService, eventReactionsSvc interfaces.EventReactionsService) *SelfbotDetection {
 	return &SelfbotDetection{
-		DetectionScores: sync.Map{},
+		uiSvc:             uiSvc,
+		eventReactionsSvc: eventReactionsSvc,
+		DetectionScores:   sync.Map{},
 	}
 }
 
@@ -114,7 +118,7 @@ func (s *SelfbotDetection) logDetection(score *DetectionScore, session *discordg
 	}
 
 	selfbot := utils.Misc.Or(score.Selfbot, "Unknown")
-	logging.Logging.SelfbotDetection(session, message, selfbot)
+	s.uiSvc.LogSelfbotDetection(message, selfbot)
 	score.Logged = true
 }
 
@@ -174,7 +178,7 @@ func (s *SelfbotDetection) UpdateHandler(session *discordgo.Session, message *di
 
 func (s *SelfbotDetection) DeleteHandler(session *discordgo.Session, message *discordgo.MessageDelete, cfg *config.Config) {
 	score := s.ensureUserEntry(message.Author.ID)
-	timeDiff := time.Since(utils.Discord.SnowflakeToTime(message.ID)) - TimeDifference
+	timeDiff := time.Since(utils.Discord.SnowflakeToTime(message.ID)) - s.eventReactionsSvc.GetTimeDifference()
 	if timeDiff < time.Second*1 {
 		score.Events = append(score.Events, DetectionEvent{
 			Event:   "fast_delete",

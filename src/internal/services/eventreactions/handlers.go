@@ -90,7 +90,7 @@ func (e *EventReactionsServiceImpl) onMessageUpdate(s *discordgo.Session, m *dis
 
 	_ = s.State.MessageAdd(m.Message)
 
-	if !e.isEventReactionMessage(m.Message) {
+	if !e.IsReactionMessage(m.Message) {
 		e.handleEvent(s, m)
 	}
 
@@ -115,7 +115,7 @@ func (e *EventReactionsServiceImpl) onMessageDelete(s *discordgo.Session, m *dis
 		return
 	}
 
-	if !e.isEventReactionMessage(m.Message) {
+	if !e.IsReactionMessage(m.Message) {
 		e.handleEvent(s, m)
 	}
 
@@ -132,7 +132,7 @@ func (e *EventReactionsServiceImpl) onMessageDelete(s *discordgo.Session, m *dis
 func (e *EventReactionsServiceImpl) onMessageReactionAdd(s *discordgo.Session, m *discordgo.MessageReactionAdd) {
 	msg := &discordgo.Message{ID: m.MessageID}
 
-	if !e.isEventReactionMessage(msg) {
+	if !e.IsReactionMessage(msg) {
 		e.handleEvent(s, m)
 	}
 }

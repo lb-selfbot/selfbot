@@ -9,21 +9,23 @@ import (
 )
 
 type Mirror struct {
+	eventReactionsSvc interfaces.EventReactionsService
+
 	SourceGuild   *discordgo.Guild
 	DestGuild     *discordgo.Guild
 	SourceChannel *discordgo.Channel
 	DestChannel   *discordgo.Channel
 }
 
-func NewMirrorGuild(source, dest *discordgo.Guild) *Mirror {
-	return &Mirror{SourceGuild: source, DestGuild: dest}
+func NewMirrorGuild(eventReactionsSvc interfaces.EventReactionsService, source, dest *discordgo.Guild) *Mirror {
+	return &Mirror{eventReactionsSvc: eventReactionsSvc, SourceGuild: source, DestGuild: dest}
 }
 
-func NewMirrorChannel(source, dest *discordgo.Channel) *Mirror {
-	return &Mirror{SourceChannel: source, DestChannel: dest}
+func NewMirrorChannel(eventReactionsSvc interfaces.EventReactionsService, source, dest *discordgo.Channel) *Mirror {
+	return &Mirror{eventReactionsSvc: eventReactionsSvc, SourceChannel: source, DestChannel: dest}
 }
 
-func NewMirrorFromData(session *discordgo.Session, data map[string]any) (*Mirror, error) {
+func NewMirrorFromData(eventReactionsSvc interfaces.EventReactionsService, session *discordgo.Session, data map[string]any) (*Mirror, error) {
 	sourceGuildID, ok := data["source_guild"].(string)
 	if ok {
 		sourceGuild, err := utils.Discord.GetGuild(session, sourceGuildID)
@@ -38,7 +40,7 @@ func NewMirrorFromData(session *discordgo.Session, data map[string]any) (*Mirror
 				destGuild = &discordgo.Guild{ID: destGuildID}
 			}
 
-			return NewMirrorGuild(sourceGuild, destGuild), nil
+			return NewMirrorGuild(eventReactionsSvc, sourceGuild, destGuild), nil
 		} else {
 			utils.Logging.Error("Mirror.NewMirrorFromData: Invalid mirror data")
 			return nil, fmt.Errorf("invalid mirror data")
@@ -59,7 +61,7 @@ func NewMirrorFromData(session *discordgo.Session, data map[string]any) (*Mirror
 				destChannel = &discordgo.Channel{ID: destChannelID}
 			}
 
-			return NewMirrorChannel(sourceChannel, destChannel), nil
+			return NewMirrorChannel(eventReactionsSvc, sourceChannel, destChannel), nil
 		} else {
 			utils.Logging.Error("Mirror.NewMirrorFromData: Invalid mirror data")
 			return nil, fmt.Errorf("invalid mirror data")
@@ -157,17 +159,17 @@ func (m *Mirror) Handler(session *discordgo.Session, event any) {
 			return
 		}
 
-		m, err := utils.Discord.ImpersonateMessage(session, message.Author, message.Message, channel.ID)
+		msg, err := utils.Discord.ImpersonateMessage(session, message.Author, message.Message, channel.ID)
 		if err != nil {
 			utils.Logging.Debug("Mirror.Handler: Error impersonating: " + err.Error())
 		}
-		HandleMessage(m, err)
+		m.eventReactionsSvc.HandleReactionMessage(msg, err)
 	} else if m.DestChannel != nil {
-		m, err := utils.Discord.ImpersonateMessage(session, message.Author, message.Message, m.DestChannel.ID)
+		msg, err := utils.Discord.ImpersonateMessage(session, message.Author, message.Message, m.DestChannel.ID)
 		if err != nil {
 			utils.Logging.Debug("Mirror.Handler: Error impersonating: " + err.Error())
 		}
-		HandleMessage(m, err)
+		m.eventReactionsSvc.HandleReactionMessage(msg, err)
 	} else {
 		utils.Logging.Debug("Mirror.Handler: Invalid ignore type")
 		return

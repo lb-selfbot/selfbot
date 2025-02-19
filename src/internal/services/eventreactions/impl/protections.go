@@ -9,8 +9,6 @@ import (
 	"github.com/LightningDev1/LB-Selfbot/internal/services/interfaces"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/api"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/config"
-	"github.com/LightningDev1/LB-Selfbot/selfbot/embed"
-	"github.com/LightningDev1/LB-Selfbot/selfbot/logging"
 
 	"github.com/LightningDev1/LB-Selfbot/selfbot/utils"
 	"github.com/LightningDev1/dgc"
@@ -24,13 +22,19 @@ type friendRequest struct {
 }
 
 type Protections struct {
+	uiSvc    interfaces.UIService
+	embedSvc interfaces.EmbedService
+
 	NewDMs         []*discordgo.Message
 	FriendRequests []*friendRequest
 	LastBlock      time.Time
 }
 
-func NewProtections() *Protections {
-	return &Protections{}
+func NewProtections(uiSvc interfaces.UIService, embedSvc interfaces.EmbedService) *Protections {
+	return &Protections{
+		uiSvc:    uiSvc,
+		embedSvc: embedSvc,
+	}
 }
 
 func (p *Protections) Type() interfaces.EventReactionType {
@@ -116,7 +120,7 @@ func (p *Protections) MessageCreateHandler(session *discordgo.Session, message *
 
 		p.LastBlock = time.Now()
 
-		logging.Logging.MassDMBlocked()
+		p.uiSvc.LogMassDMBlocked()
 
 		go func() {
 			// Enable DMs after 5 minutes
@@ -157,7 +161,7 @@ func (p *Protections) MessageCreateHandler(session *discordgo.Session, message *
 				return
 			}
 
-			embed.NewEmbed().
+			p.embedSvc.NewEmbed().
 				SetDescription("Invites are not allowed in this server.").
 				Send(ctx)
 		}
@@ -175,7 +179,7 @@ func (p *Protections) MessageCreateHandler(session *discordgo.Session, message *
 					return
 				}
 
-				embed.NewEmbed().
+				p.embedSvc.NewEmbed().
 					SetDescription("Spamming is not allowed in this server.").
 					Send(ctx)
 			}
@@ -196,7 +200,7 @@ func (p *Protections) MessageCreateHandler(session *discordgo.Session, message *
 					return
 				}
 
-				embed.NewEmbed().
+				p.embedSvc.NewEmbed().
 					SetDescription("Uppercase spam is not allowed in this server.").
 					Send(ctx)
 			}
@@ -225,7 +229,7 @@ func (p *Protections) MessageDeleteHandler(session *discordgo.Session, message *
 			return
 		}
 
-		logging.Logging.AntiDelete(session, message.Message)
+		p.uiSvc.LogAntiDelete(message.Message)
 	}
 }
 
@@ -256,7 +260,7 @@ func (p *Protections) RelationshipAddHandler(session *discordgo.Session, relatio
 		_ = session.UserRelationshipDelete(relationship.User.ID)
 		_ = api.AllowFriendRequests(session, false)
 
-		logging.Logging.FriendRequestSpamBlocked()
+		p.uiSvc.LogFriendRequestSpamBlocked()
 
 		go func() {
 			time.Sleep(5 * time.Minute)
