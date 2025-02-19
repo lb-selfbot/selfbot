@@ -14,15 +14,15 @@ import (
 
 	"github.com/LightningDev1/LB-Selfbot/internal/constants"
 
+	"github.com/LightningDev1/LB-Selfbot/internal/config"
 	"github.com/LightningDev1/LB-Selfbot/internal/startup"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/commands"
-	"github.com/LightningDev1/LB-Selfbot/selfbot/config"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/errorhandler"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/eventreactions"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/extensions"
 
+	"github.com/LightningDev1/LB-Selfbot/internal/utils"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/multitokensniper"
-	"github.com/LightningDev1/LB-Selfbot/selfbot/utils"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/websocket"
 	"github.com/LightningDev1/dgc"
 	"github.com/LightningDev1/discordgo"

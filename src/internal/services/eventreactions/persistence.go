@@ -6,9 +6,9 @@ import (
 	"slices"
 	"time"
 
+	"github.com/LightningDev1/LB-Selfbot/internal/config"
 	"github.com/LightningDev1/LB-Selfbot/internal/services/eventreactions/impl"
 	"github.com/LightningDev1/LB-Selfbot/internal/services/interfaces"
-	"github.com/LightningDev1/LB-Selfbot/selfbot/config"
 )
 
 var (

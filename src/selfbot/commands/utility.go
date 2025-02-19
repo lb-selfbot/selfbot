@@ -25,9 +25,9 @@ import (
 	"strings"
 	"time"
 
+	"github.com/LightningDev1/LB-Selfbot/internal/config"
 	"github.com/LightningDev1/LB-Selfbot/internal/conversion"
 	"github.com/LightningDev1/LB-Selfbot/internal/random"
-	"github.com/LightningDev1/LB-Selfbot/selfbot/config"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/eventreactions"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/ipc"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/logging"
@@ -44,11 +44,11 @@ import (
 	"github.com/shirou/gopsutil/v4/mem"
 	"google.golang.org/protobuf/types/known/wrapperspb"
 
+	"github.com/LightningDev1/LB-Selfbot/internal/api"
 	"github.com/LightningDev1/LB-Selfbot/internal/constants"
-	"github.com/LightningDev1/LB-Selfbot/selfbot/api"
+	"github.com/LightningDev1/LB-Selfbot/internal/http"
+	"github.com/LightningDev1/LB-Selfbot/internal/utils"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/embed"
-	"github.com/LightningDev1/LB-Selfbot/selfbot/http"
-	"github.com/LightningDev1/LB-Selfbot/selfbot/utils"
 	"github.com/LightningDev1/dgc"
 	"github.com/LightningDev1/discordgo"
 )

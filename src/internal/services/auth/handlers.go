@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/LightningDev1/LB-Selfbot/selfbot/config"
+	"github.com/LightningDev1/LB-Selfbot/internal/config"
 )
 
 func (a *AuthServiceImpl) onMessage(msg *WSMessage) error {

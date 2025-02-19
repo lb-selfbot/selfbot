@@ -11,7 +11,7 @@ import (
 
 	"github.com/LightningDev1/LB-Selfbot/internal/constants"
 	"github.com/LightningDev1/LB-Selfbot/internal/random"
-	"github.com/LightningDev1/LB-Selfbot/selfbot/utils"
+	"github.com/LightningDev1/LB-Selfbot/internal/utils"
 	"github.com/LightningDev1/dgc"
 )
 

@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/LightningDev1/LB-Selfbot/selfbot/http"
+	"github.com/LightningDev1/LB-Selfbot/internal/http"
 	"github.com/bitly/go-simplejson"
 )
 

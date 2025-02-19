@@ -1,6 +1,6 @@
 package auth
 
-import "github.com/LightningDev1/LB-Selfbot/selfbot/config"
+import "github.com/LightningDev1/LB-Selfbot/internal/config"
 
 // WSMessage represents a websocket message with an operation code and data payload
 type WSMessage struct {

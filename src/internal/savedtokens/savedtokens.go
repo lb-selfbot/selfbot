@@ -7,7 +7,7 @@ import (
 	"runtime"
 	"strings"
 
-	"github.com/LightningDev1/LB-Selfbot/selfbot/api"
+	"github.com/LightningDev1/LB-Selfbot/internal/api"
 	"github.com/LightningDev1/discordgo"
 	"github.com/bitly/go-simplejson"
 	"golang.org/x/exp/slices"

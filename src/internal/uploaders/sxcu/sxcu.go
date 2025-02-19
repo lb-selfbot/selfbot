@@ -12,7 +12,7 @@ import (
 	"strings"
 
 	"github.com/LightningDev1/LB-Selfbot/internal/uploaders"
-	"github.com/LightningDev1/LB-Selfbot/selfbot/utils"
+	"github.com/LightningDev1/LB-Selfbot/internal/utils"
 	"github.com/bitly/go-simplejson"
 )
 

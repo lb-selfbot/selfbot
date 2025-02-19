@@ -1,9 +1,9 @@
 package embed
 
 import (
+	"github.com/LightningDev1/LB-Selfbot/internal/config"
 	"github.com/LightningDev1/LB-Selfbot/internal/embed"
 	"github.com/LightningDev1/LB-Selfbot/internal/services/interfaces"
-	"github.com/LightningDev1/LB-Selfbot/selfbot/config"
 	"github.com/LightningDev1/discordgo"
 )
 

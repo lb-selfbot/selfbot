@@ -1,6 +1,6 @@
 package auth
 
-import "github.com/LightningDev1/LB-Selfbot/selfbot/config"
+import "github.com/LightningDev1/LB-Selfbot/internal/config"
 
 func (a *AuthServiceImpl) SendConfigUpdate() error {
 	cfg, err := config.GetConfig()

@@ -1,6 +1,6 @@
 package interfaces
 
-import "github.com/LightningDev1/LB-Selfbot/selfbot/config"
+import "github.com/LightningDev1/LB-Selfbot/internal/config"
 
 type IPCService interface {
 	Serve() error

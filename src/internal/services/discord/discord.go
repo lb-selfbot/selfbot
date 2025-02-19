@@ -10,11 +10,11 @@ import (
 
 	"github.com/LightningDev1/LB-Selfbot/internal/constants"
 
+	"github.com/LightningDev1/LB-Selfbot/internal/config"
 	"github.com/LightningDev1/LB-Selfbot/internal/services/interfaces"
 	"github.com/LightningDev1/LB-Selfbot/internal/tui"
+	"github.com/LightningDev1/LB-Selfbot/internal/utils"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/commands"
-	"github.com/LightningDev1/LB-Selfbot/selfbot/config"
-	"github.com/LightningDev1/LB-Selfbot/selfbot/utils"
 	"github.com/LightningDev1/dgc"
 	"github.com/LightningDev1/discordgo"
 )
@@ -193,7 +193,7 @@ func (d *DiscordServiceImpl) Init(token string, verbose bool) error {
 	commands.Commands.RegisterCommands(d.session, d.router, false)
 
 	d.extensionsSvc.Register()
-	
+
 	commands.Commands.HelpCommand.RegisterHelpCommand(d.router, d.session)
 
 	d.router.Initialize(d.session)
