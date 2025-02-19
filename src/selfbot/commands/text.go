@@ -8,8 +8,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/LightningDev1/LB-Selfbot/internal/encodings"
 	"github.com/LightningDev1/LB-Selfbot/internal/constants"
+	"github.com/LightningDev1/LB-Selfbot/internal/encodings"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/embed"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/utils"
 	"github.com/LightningDev1/dgc"
