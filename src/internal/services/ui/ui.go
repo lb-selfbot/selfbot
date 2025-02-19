@@ -183,7 +183,8 @@ func (ui *UIServiceImpl) ShowConsoleMessage(c *interfaces.ConsoleMessage) error 
 			emb.AddField(info.Key, info.Value, false)
 		}
 
-		_ = emb.SendWebhook(c.WebhookURL, c.Important)
+		userID := ui.discordSvc.GetSession().State.User.ID
+		_ = emb.SendWebhook(userID, c.WebhookURL, c.Important)
 	}
 
 	return nil

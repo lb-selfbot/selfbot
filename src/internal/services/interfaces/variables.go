@@ -1,7 +1,7 @@
 package interfaces
 
 type VariablesService interface {
-	Inject(discordSvc DiscordService, extensionsSvc ExtensionsService, spotifySvc SpotifyService)
+	Inject(discordSvc DiscordService, eventReactionsSvc EventReactionsService, extensionsSvc ExtensionsService, spotifySvc SpotifyService)
 
 	Init()
 

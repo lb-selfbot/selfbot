@@ -119,7 +119,7 @@ func (v *VariablesServiceImpl) Init() {
 		{
 			regex: regexp.MustCompile(`\$AVATAR`),
 			valueFunc: func(arg string) string {
-				return data.AvatarImageKey
+				return strings.ReplaceAll(v.discordSvc.GetSession().State.User.AvatarURL(""), "https://cdn.discordapp.com/", "mp:")
 			},
 		},
 		{

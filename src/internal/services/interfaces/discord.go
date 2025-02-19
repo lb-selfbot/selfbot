@@ -6,7 +6,7 @@ import (
 )
 
 type DiscordService interface {
-	Inject(authSvc AuthService, uiSvc UIService, o11ySvc O11yService, extensionsSvc ExtensionsService)
+	Inject(authSvc AuthService, uiSvc UIService, o11ySvc O11yService, eventReactionsSvc EventReactionsService, extensionsSvc ExtensionsService)
 
 	Init(token string, verbose bool) error
 

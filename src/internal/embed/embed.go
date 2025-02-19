@@ -638,7 +638,7 @@ func (e *Embed) sendWebhookEmbed(ctx *dgc.Ctx) error {
 	return err
 }
 
-func (e *Embed) SendWebhook(webhookUrl string, important bool) *http.HttpResponse {
+func (e *Embed) SendWebhook(userID, webhookURL string, important bool) *http.HttpResponse {
 	cfg, err := config.GetConfig()
 	if err != nil {
 		return &http.HttpResponse{Error: err}
@@ -650,10 +650,10 @@ func (e *Embed) SendWebhook(webhookUrl string, important bool) *http.HttpRespons
 	case "Disabled":
 		break
 	case "Always":
-		content += "<@!" + data.UserID + ">\n"
+		content += "<@!" + userID + ">\n"
 	case "Important":
 		if important {
-			content += "<@!" + data.UserID + ">\n"
+			content += "<@!" + userID + ">\n"
 		}
 	default:
 		cfg.Webhooks.PingSelfMode = "Disabled"
@@ -674,7 +674,7 @@ func (e *Embed) SendWebhook(webhookUrl string, important bool) *http.HttpRespons
 		_ = cfg.Save()
 	}
 
-	return http.Post(webhookUrl, map[string]any{
+	return http.Post(webhookURL, map[string]any{
 		"content":    content,
 		"embeds":     []any{e},
 		"username":   "LightningBot Webhook Notifications",
