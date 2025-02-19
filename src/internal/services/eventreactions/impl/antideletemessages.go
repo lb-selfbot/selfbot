@@ -1,9 +1,10 @@
-package eventreactions
+package impl
 
 import (
 	"fmt"
 	"strings"
 
+	"github.com/LightningDev1/LB-Selfbot/internal/services/interfaces"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/config"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/utils"
 	"github.com/LightningDev1/discordgo"
@@ -32,8 +33,8 @@ func NewAntiDeleteMessagesFromData(session *discordgo.Session, data map[string]a
 	}
 }
 
-func (a *AntiDeleteMessages) Type() EventReactionType {
-	return ANTI_DELETE_MESSAGES
+func (a *AntiDeleteMessages) Type() interfaces.EventReactionType {
+	return interfaces.EventReactionAntiDeleteMessages
 }
 
 func (a *AntiDeleteMessages) Description() string {
@@ -44,7 +45,7 @@ func (a *AntiDeleteMessages) Description() string {
 	return fmt.Sprintf("Anti Delete Messages - %s", a.Channel.Name)
 }
 
-func (a *AntiDeleteMessages) Equals(other EventReaction) bool {
+func (a *AntiDeleteMessages) Equals(other interfaces.EventReaction) bool {
 	otherAntiDeleteMessages, ok := other.(*AntiDeleteMessages)
 	if !ok {
 		return false

@@ -1,8 +1,9 @@
-package eventreactions
+package impl
 
 import (
 	"fmt"
 
+	"github.com/LightningDev1/LB-Selfbot/internal/services/interfaces"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/utils"
 	"github.com/LightningDev1/discordgo"
 )
@@ -22,15 +23,15 @@ func NewAntiGroupChatFromData(_ *discordgo.Session, data map[string]any) (*AntiG
 	return NewAntiGroupChat(silent), nil
 }
 
-func (a *AntiGroupChat) Type() EventReactionType {
-	return ANTI_GROUP_CHAT
+func (a *AntiGroupChat) Type() interfaces.EventReactionType {
+	return interfaces.EventReactionAntiGroupChat
 }
 
 func (a *AntiGroupChat) Description() string {
 	return fmt.Sprintf("Anti Group Chat (silent: %s)", utils.Misc.FormatBoolYesNo(a.Silent))
 }
 
-func (a *AntiGroupChat) Equals(other EventReaction) bool {
+func (a *AntiGroupChat) Equals(other interfaces.EventReaction) bool {
 	// We shouldn't check silent because the value does not matter
 	// There should only be one AntiGroupChat reaction at once
 	_, ok := other.(*AntiGroupChat)

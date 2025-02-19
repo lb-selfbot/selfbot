@@ -1,4 +1,4 @@
-package eventreactions
+package impl
 
 import (
 	"fmt"
@@ -6,8 +6,10 @@ import (
 	"strings"
 	"time"
 
+	"github.com/LightningDev1/LB-Selfbot/internal/services/interfaces"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/api"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/config"
+	"github.com/LightningDev1/LB-Selfbot/selfbot/logging"
 
 	"github.com/LightningDev1/LB-Selfbot/selfbot/utils"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/variables"
@@ -20,7 +22,7 @@ func NewAFK() *AFK {
 	return &AFK{}
 }
 
-func (a *AFK) Type() EventReactionType {
+func (a *AFK) Type() interfaces.EventReactionType {
 	return AFK_RESPONDER
 }
 
@@ -28,7 +30,7 @@ func (a *AFK) Description() string {
 	return "AFK Responder (default)"
 }
 
-func (a *AFK) Equals(other EventReaction) bool {
+func (a *AFK) Equals(other interfaces.EventReaction) bool {
 	_, ok := other.(*AFK)
 
 	return ok

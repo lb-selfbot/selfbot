@@ -1,5 +1,7 @@
 package interfaces
 
+import "github.com/LightningDev1/discordgo"
+
 type EventReactionType int
 
 const (
@@ -75,14 +77,35 @@ const (
 	EventReactionAntiDeleteMessages EventReactionType = 34
 )
 
+var DefaultEventReactions = []EventReactionType{
+	EventReactionSnipers,
+	EventReactionAFKResponder,
+	EventReactionAntiPhishing,
+	EventReactionNotifiers,
+	EventReactionProtections,
+	EventReactionSelfbotDetection,
+}
+
 type EventReaction interface {
 	Type() EventReactionType
 	Description() string
 	Equals(other EventReaction) bool
 	Data() map[string]any
-	Handler(event any)
+	Handler(session *discordgo.Session, event any)
 }
 
 type EventReactionsService interface {
 	Inject(authSvc AuthService, uiSvc UIService, discordSvc DiscordService, sessionsSvc SessionsService, scJobsSvc SCJobsService, rpcSvc RPCService)
+
+	Register()
+
+	GetAllReactions() []EventReaction
+	GetReactionsByType(t EventReactionType) []EventReaction
+	RemoveAllReactions()
+	RemoveReactionsByType(t EventReactionType)
+
+	IsReactionMessage(message *discordgo.Message) bool
+
+	GetEditedMessages(channelID string) []*discordgo.MessageUpdate
+	GetDeletedMessages(channelID string) []*discordgo.Message
 }

@@ -6,9 +6,9 @@ import (
 	"time"
 
 	"github.com/LightningDev1/LB-Selfbot/internal/constants"
+	"github.com/LightningDev1/LB-Selfbot/internal/services/eventreactions/impl"
 	"github.com/LightningDev1/LB-Selfbot/internal/services/interfaces"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/config"
-	"github.com/LightningDev1/LB-Selfbot/selfbot/eventreactions"
 	"github.com/LightningDev1/discordgo"
 )
 
@@ -80,7 +80,7 @@ func (m *MultiTokenSniperServiceImpl) Init(context context.Context) error {
 			guilds += instance.Guilds
 		}
 
-		// m.uiSvc.MTSConnected(len(m.instances), guilds)
+		m.uiSvc.LogMultiTokenSniper(len(m.instances), guilds)
 	}
 
 	return nil
@@ -104,7 +104,7 @@ func (m *MultiTokenSniperServiceImpl) startInstance(context context.Context, ins
 	instance.Session.ErrorHandler = m.o11ySvc.DiscordErrorHandler
 	instance.Session.StateEnabled = false
 
-	var snipers *eventreactions.Snipers
+	var snipers *impl.Snipers
 	readyChan := make(chan struct{})
 
 	instance.Session.AddHandler(func(s *discordgo.Session, e *discordgo.Ready) {
@@ -112,7 +112,7 @@ func (m *MultiTokenSniperServiceImpl) startInstance(context context.Context, ins
 		instance.Guilds = len(e.Guilds)
 
 		username := fmt.Sprintf("%s (%s)", e.User.DisplayName, e.User.Username)
-		snipers = eventreactions.NewSnipers(m.discordSvc.GetSession(), username)
+		snipers = impl.NewSnipers(m.uiSvc, m.discordSvc.GetSession(), username)
 
 		close(readyChan)
 	})

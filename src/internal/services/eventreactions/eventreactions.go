@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/LightningDev1/LB-Selfbot/internal/services/interfaces"
+	"github.com/LightningDev1/LB-Selfbot/selfbot/utils"
 	"github.com/LightningDev1/dgc"
 	"github.com/LightningDev1/discordgo"
 )
@@ -16,7 +17,6 @@ type EventReactionsServiceImpl struct {
 	sessionsSvc interfaces.SessionsService
 	scJobsSvc   interfaces.SCJobsService
 	rpcSvc      interfaces.RPCService
-	configSvc   interfaces.ConfigService
 
 	reactions   []interfaces.EventReaction
 	reactionsMu sync.Mutex
@@ -65,7 +65,6 @@ func (e *EventReactionsServiceImpl) Inject(
 	sessionsSvc interfaces.SessionsService,
 	scJobsSvc interfaces.SCJobsService,
 	rpcSvc interfaces.RPCService,
-	configSvc interfaces.ConfigService,
 ) {
 	e.authSvc = authSvc
 	e.uiSvc = uiSvc
@@ -73,11 +72,10 @@ func (e *EventReactionsServiceImpl) Inject(
 	e.sessionsSvc = sessionsSvc
 	e.scJobsSvc = scJobsSvc
 	e.rpcSvc = rpcSvc
-	e.configSvc = configSvc
 }
 
 func (e *EventReactionsServiceImpl) Register() {
-	session, router := e.discordSvc.GetSession(), e.discordSvc.GetRouter()
+	session := e.discordSvc.GetSession()
 
 	session.AddHandler(func(_ *discordgo.Session, _ any) { e.authSvc.CheckNonce() })
 
@@ -102,7 +100,7 @@ func (e *EventReactionsServiceImpl) handleEvent(s *discordgo.Session, event any)
 	defer e.reactionsMu.Unlock()
 
 	for _, r := range e.reactions {
-		go r.Handler(event)
+		go r.Handler(s, event)
 	}
 }
 
@@ -138,4 +136,57 @@ func (e *EventReactionsServiceImpl) addDeletedMessage(message *discordgo.Message
 		messages = []*discordgo.Message{}
 	}
 	e.deletedMsgs[message.ChannelID] = append(messages, message)
+}
+
+func (e *EventReactionsServiceImpl) GetAllReactions() []interfaces.EventReaction {
+	return e.reactions
+}
+
+func (e *EventReactionsServiceImpl) GetReactionsByType(t interfaces.EventReactionType) []interfaces.EventReaction {
+	return utils.Filter(e.reactions, func(r interfaces.EventReaction) bool {
+		return r.Type() == t
+	})
+}
+
+func (e *EventReactionsServiceImpl) RemoveAllReactions() {
+	e.reactionsMu.Lock()
+	defer e.reactionsMu.Unlock()
+
+	e.reactions = e.constructDefaultReactions()
+}
+
+func (e *EventReactionsServiceImpl) RemoveReactionsByType(t interfaces.EventReactionType) {
+	e.reactionsMu.Lock()
+	defer e.reactionsMu.Unlock()
+
+	e.reactions = utils.Filter(e.reactions, func(r interfaces.EventReaction) bool {
+		return r.Type() != t
+	})
+}
+
+func (e *EventReactionsServiceImpl) IsReactionMessage(message *discordgo.Message) bool {
+	e.eventReactionsMsgsMu.Lock()
+	defer e.eventReactionsMsgsMu.Unlock()
+
+	for _, m := range e.eventReactionsMsgs {
+		if m.ID == message.ID {
+			return true
+		}
+	}
+
+	return false
+}
+
+func (e *EventReactionsServiceImpl) GetEditedMessages(channelID string) []*discordgo.MessageUpdate {
+	e.editedMsgsMu.Lock()
+	defer e.editedMsgsMu.Unlock()
+
+	return e.editedMsgs[channelID]
+}
+
+func (e *EventReactionsServiceImpl) GetDeletedMessages(channelID string) []*discordgo.Message {
+	e.deletedMsgsMu.Lock()
+	defer e.deletedMsgsMu.Unlock()
+
+	return e.deletedMsgs[channelID]
 }

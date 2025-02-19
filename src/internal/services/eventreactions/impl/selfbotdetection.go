@@ -1,10 +1,11 @@
-package eventreactions
+package impl
 
 import (
 	"strings"
 	"sync"
 	"time"
 
+	"github.com/LightningDev1/LB-Selfbot/internal/services/interfaces"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/config"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/logging"
 
@@ -84,15 +85,15 @@ func NewSelfbotDetection() *SelfbotDetection {
 	}
 }
 
-func (s *SelfbotDetection) Type() EventReactionType {
-	return SELFBOT_DETECTION
+func (s *SelfbotDetection) Type() interfaces.EventReactionType {
+	return interfaces.EventReactionSelfbotDetection
 }
 
 func (s *SelfbotDetection) Description() string {
 	return "Selfbot Detection (default)"
 }
 
-func (s *SelfbotDetection) Equals(other EventReaction) bool {
+func (s *SelfbotDetection) Equals(other interfaces.EventReaction) bool {
 	_, ok := other.(*SelfbotDetection)
 
 	return ok

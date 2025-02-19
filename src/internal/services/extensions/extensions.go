@@ -43,7 +43,7 @@ func (e *ExtensionsServiceImpl) notification(message string) {
 }
 
 func (e *ExtensionsServiceImpl) logError(message string) {
-	_ = e.uiSvc.LogError(message)
+	e.uiSvc.LogError(message)
 }
 
 func (e *ExtensionsServiceImpl) Register() {
@@ -73,7 +73,7 @@ func (e *ExtensionsServiceImpl) Register() {
 	_ = i.Use(exports)
 
 	handleError := func(err error) {
-		_ = e.uiSvc.LogError("An error has occurred while loading extensions: " + err.Error())
+		e.uiSvc.LogError("An error has occurred while loading extensions: " + err.Error())
 		time.Sleep(5 * time.Second)
 	}
 

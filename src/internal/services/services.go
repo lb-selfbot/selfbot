@@ -66,7 +66,7 @@ func (s *Services) register() {
 
 	// Inject dependencies
 	s.Auth.Inject(s.UI, s.IPC)
-	s.UI.Inject(s.Auth, s.IPC, s.Embed)
+	s.UI.Inject(s.Auth, s.IPC, s.Discord, s.Embed)
 	s.O11y.Inject(s.UI)
 	s.Discord.Inject(s.Auth, s.UI, s.O11y, s.Extensions)
 	s.Embed.Inject(s.Variables)

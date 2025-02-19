@@ -67,7 +67,7 @@ func (d *DiscordServiceImpl) discordgoLogger(msgL int, caller int, format string
 	_, _ = f.WriteString(msg)
 
 	if msgL == discordgo.LogError {
-		_ = d.uiSvc.LogError("discordgo error: " + msg)
+		d.uiSvc.LogError("discordgo error: " + msg)
 	}
 }
 
@@ -125,7 +125,7 @@ func (d *DiscordServiceImpl) Init(token string, verbose bool) error {
 			}
 
 			if slices.Contains(ctx.Command.Flags, commands.CmdFlagDangerous) && cfg.Sharing.BlockDangerousCommands {
-				// d.uiSvc.BlockedDangerousCommand(ctx.Event.Author, ctx.Command.Name)
+				d.uiSvc.LogBlockedDangerousCommand(ctx.Event.Author, ctx.Command.Name)
 				return false
 			}
 
@@ -155,7 +155,7 @@ func (d *DiscordServiceImpl) Init(token string, verbose bool) error {
 
 					cfg, err := config.GetConfig()
 					if err != nil {
-						_ = d.uiSvc.LogError("Failed to get config")
+						d.uiSvc.LogError("Failed to get config")
 						return
 					}
 
@@ -173,7 +173,7 @@ func (d *DiscordServiceImpl) Init(token string, verbose bool) error {
 
 					data.UsedCommands++
 
-					// d.uiSvc.CommandUsed(ctx.Command.Name)
+					d.uiSvc.LogCommandUsed(ctx.Command.Name)
 
 					d.authSvc.CheckNonce()
 
@@ -205,12 +205,12 @@ func (d *DiscordServiceImpl) Open() error {
 	// Check if token is invalid
 	if strings.Contains(err.Error(), "Authentication failed") {
 		if !constants.CONSOLE {
-			_ = d.uiSvc.LogError("Your Discord token is invalid! Please re-enter it in the Config tab.")
+			d.uiSvc.LogError("Your Discord token is invalid! Please re-enter it in the Config tab.")
 			return err
 		}
 
 		if _, ok := os.LookupEnv("LB_TOKEN"); ok {
-			_ = d.uiSvc.LogError("Your Discord token is invalid! Please enter a valid token in the LB_TOKEN environment variable.")
+			d.uiSvc.LogError("Your Discord token is invalid! Please enter a valid token in the LB_TOKEN environment variable.")
 			return err
 		}
 
@@ -218,13 +218,13 @@ func (d *DiscordServiceImpl) Open() error {
 
 		cfg, err := config.GetConfig()
 		if err != nil {
-			_ = d.uiSvc.LogError("Error loading config:", err)
+			d.uiSvc.LogError("Error loading config:", err)
 			os.Exit(1)
 		}
 
 		cfg.Account.Discord.Token = token
 		if err := cfg.Save(); err != nil {
-			_ = d.uiSvc.LogError("Save config error:", err)
+			d.uiSvc.LogError("Save config error:", err)
 			os.Exit(1)
 		}
 
@@ -233,7 +233,7 @@ func (d *DiscordServiceImpl) Open() error {
 		return err
 	}
 
-	_ = d.uiSvc.LogError("An error has occurred while connecting to Discord: " + err.Error())
+	d.uiSvc.LogError("An error has occurred while connecting to Discord: " + err.Error())
 
 	return err
 }

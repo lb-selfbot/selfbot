@@ -1,5 +1,12 @@
 package interfaces
 
+import (
+	"time"
+
+	"github.com/LightningDev1/LB-Selfbot/selfbot/config"
+	"github.com/LightningDev1/discordgo"
+)
+
 type InfoEntry struct {
 	Key   string
 	Value string
@@ -60,18 +67,51 @@ func (c *ConsoleMessage) Show() error {
 }
 
 type UIService interface {
-	Inject(authSvc AuthService, ipcSvc IPCService, embedSvc EmbedService)
+	Inject(authSvc AuthService, ipcSvc IPCService, discordSvc DiscordService, embedSvc EmbedService)
 
 	ANSIColored(text string, r, g, b int, bold bool) string
 	ShowBanner(flags int) error
-	ShowNotification(message string) error
+	ShowNotification(format string, e ...any) error
 
-	LogError(format string, e ...any) error
-	LogInfo(format string, e ...any) error
+	LogError(format string, e ...any)
+	LogInfo(format string, e ...any)
 
 	AppendConsole(ansi string) error
 	ClearConsole() error
 	SetConsole(ansi string) error
 	NewConsoleMessage() *ConsoleMessage
 	ShowConsoleMessage(c *ConsoleMessage) error
+
+	LogCmdUsed(cmdName string)
+	LogReady(event *discordgo.Ready, numCmds int)
+	LogNitroSniper(msg *discordgo.Message, elapsed time.Duration, status, code, account string)
+	LogNitroSniperFake(msg *discordgo.Message, code, account string)
+	LogPrivnoteSniper(msg *discordgo.Message, elapsed time.Duration, status, path, account string)
+	LogGiveawaySniperFound(msg *discordgo.Message, prize, host, endsIn, account string)
+	LogGiveawaySniperWon(msg *discordgo.Message, prize, account string)
+	LogPokeTwoSniper(msg *discordgo.Message, elapsed time.Duration, confidence float64, pokemon, received, iv, account string)
+	LogBanNotifier(guildID string)
+	LogDMNotifier(msg *discordgo.Message)
+	LogDMEditNotifier(msg *discordgo.Message, before, after string)
+	LogDMDeleteNotifier(msg *discordgo.Message, attachments []string)
+	LogDMTypingNotifier(username string)
+	LogMessageDeleteNotifier(msg *discordgo.Message, attachments []string)
+	LogDiscordStaffDetection(msg *discordgo.Message)
+	LogGhostpingDetection(msg *discordgo.Message)
+	LogSelfbotDetection(msg *discordgo.Message, selfbot string)
+	LogTicketNotifier(channel *discordgo.Channel)
+	LogKeywordNotifier(msg *discordgo.Message, keyword string)
+	LogPhishingDetection(msg *discordgo.Message, domain string)
+	LogMassDMBlocked()
+	LogFriendRequestSpamBlocked()
+	LogAntiDelete(msg *discordgo.Message)
+	LogAFKMessage(msg *discordgo.Message, response string)
+	LogMultiTokenSniper(numTokens, numGuilds int)
+	LogSessionConnected(id, os, client string)
+	LogSessionDisconnected(id, os, client string)
+	LogSCJobs(numJobs int)
+	LogEventReactions(numReactions int)
+	LogDangerousCmdBlocked(user *discordgo.User, cmd string)
+	LogDangerousHostingCmdBlocked(cmd string)
+	LogReminder(reminder config.Reminder)
 }

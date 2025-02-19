@@ -47,13 +47,13 @@ func (r *RPCServiceImpl) start() {
 	for range timer.C {
 		cfg, err := config.GetConfig()
 		if err != nil {
-			_ = r.uiSvc.LogError("Failed to get config: ", err)
+			r.uiSvc.LogError("Failed to get config: ", err)
 			continue
 		}
 
 		err = r.setRPC(&cfg)
 		if err != nil {
-			_ = r.uiSvc.LogError("Failed to set RPC: ", err)
+			r.uiSvc.LogError("Failed to set RPC: ", err)
 			continue
 		}
 	}
@@ -72,7 +72,7 @@ func (r *RPCServiceImpl) setRPC(cfg *config.Config) error {
 	switch cfg.Activity.ActivityType {
 	case "RPC":
 		if constants.HOSTING {
-			_ = r.uiSvc.LogError("RPC is not supported when hosting the bot. Please use Custom Activity instead.")
+			r.uiSvc.LogError("RPC is not supported when hosting the bot. Please use Custom Activity instead.")
 			cfg.Activity.ActivityType = "CustomActivity"
 			return cfg.Save()
 		}

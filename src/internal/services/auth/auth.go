@@ -263,7 +263,7 @@ func (a *AuthServiceImpl) logError(err error, code int) {
 	switch code {
 	case 3004, 3010:
 		if !constants.CONSOLE {
-			_ = a.uiSvc.LogError("Your LightningBot credentials are invalid! Please re-enter them in the Config tab.")
+			a.uiSvc.LogError("Your LightningBot credentials are invalid! Please re-enter them in the Config tab.")
 			break
 		}
 
@@ -288,12 +288,12 @@ func (a *AuthServiceImpl) logError(err error, code int) {
 
 		_ = utils.System.Restart()
 	case 3011:
-		_ = a.uiSvc.LogError("Your free trial has expired! Please purchase a license key to continue using LightningBot.")
+		a.uiSvc.LogError("Your free trial has expired! Please purchase a license key to continue using LightningBot.")
 	case 3003:
-		_ = a.uiSvc.LogError("AuthWS Error 3003: " + err.Error())
+		a.uiSvc.LogError("AuthWS Error 3003: " + err.Error())
 	case 3006:
-		_ = a.uiSvc.LogError("Another selfbot has connected using your LightningBot account! This instance will now exit.")
+		a.uiSvc.LogError("Another selfbot has connected using your LightningBot account! This instance will now exit.")
 	default:
-		_ = a.uiSvc.LogError("An unexpected error has occurred while connecting to the websocket: " + err.Error())
+		a.uiSvc.LogError("An unexpected error has occurred while connecting to the websocket: " + err.Error())
 	}
 }

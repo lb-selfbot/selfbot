@@ -1,6 +1,7 @@
-package eventreactions
+package impl
 
 import (
+	"github.com/LightningDev1/LB-Selfbot/internal/services/interfaces"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/utils"
 	"github.com/LightningDev1/discordgo"
 )
@@ -48,8 +49,8 @@ func NewForceDisconnectFromData(session *discordgo.Session, data map[string]any)
 	return NewForceDisconnect(guild, channel, user), nil
 }
 
-func (r *ForceDisconnect) Type() EventReactionType {
-	return FORCE_DISCONNECT
+func (r *ForceDisconnect) Type() interfaces.EventReactionType {
+	return interfaces.EventReactionForceDisconnect
 }
 
 func (r *ForceDisconnect) Description() string {
@@ -65,7 +66,7 @@ func (r *ForceDisconnect) Description() string {
 	return "Force Disconnect (" + location + ")"
 }
 
-func (r *ForceDisconnect) Equals(other EventReaction) bool {
+func (r *ForceDisconnect) Equals(other interfaces.EventReaction) bool {
 	otherForceDisconnect, ok := other.(*ForceDisconnect)
 	if !ok {
 		utils.Logging.Debug("ForceDisconnect.Equals: Other is not a ForceDisconnect")

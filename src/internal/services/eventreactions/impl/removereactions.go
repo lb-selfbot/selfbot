@@ -1,6 +1,7 @@
-package eventreactions
+package impl
 
 import (
+	"github.com/LightningDev1/LB-Selfbot/internal/services/interfaces"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/utils"
 	"github.com/LightningDev1/discordgo"
 )
@@ -48,8 +49,8 @@ func NewRemoveReactionsFromData(session *discordgo.Session, data map[string]any)
 	return NewRemoveReactions(guild, channel, user), nil
 }
 
-func (r *RemoveReactions) Type() EventReactionType {
-	return REMOVE_REACTIONS
+func (r *RemoveReactions) Type() interfaces.EventReactionType {
+	return interfaces.EventReactionRemoveReactions
 }
 
 func (r *RemoveReactions) Description() string {
@@ -65,7 +66,7 @@ func (r *RemoveReactions) Description() string {
 	return "Remove Reactions (" + location + ")"
 }
 
-func (r *RemoveReactions) Equals(other EventReaction) bool {
+func (r *RemoveReactions) Equals(other interfaces.EventReaction) bool {
 	otherRemoveReactions, ok := other.(*RemoveReactions)
 	if !ok {
 		utils.Logging.Debug("RemoveReactions.Equals: Other is not a RemoveReactions")

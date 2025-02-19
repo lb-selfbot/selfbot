@@ -24,7 +24,7 @@ func (r *ReminderServiceImpl) start() {
 	for {
 		cfg, err := config.GetConfig()
 		if err != nil {
-			_ = r.uiSvc.LogError("Failed to get config: ", err)
+			r.uiSvc.LogError("Failed to get config: ", err)
 			time.Sleep(time.Second * 5)
 			continue
 		}
@@ -36,13 +36,13 @@ func (r *ReminderServiceImpl) start() {
 				continue
 			}
 
-			// r.uiSvc.LogReminder(reminder)
+			r.uiSvc.LogReminder(reminder)
 
 			cfg.Reminders = utils.RemoveSliceItem(cfg.Reminders, reminder)
 
 			err = cfg.Save()
 			if err != nil {
-				_ = r.uiSvc.LogError("Failed to save config: ", err)
+				r.uiSvc.LogError("Failed to save config: ", err)
 				continue
 			}
 		}

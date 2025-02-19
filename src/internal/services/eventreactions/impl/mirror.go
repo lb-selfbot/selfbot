@@ -1,8 +1,9 @@
-package eventreactions
+package impl
 
 import (
 	"fmt"
 
+	"github.com/LightningDev1/LB-Selfbot/internal/services/interfaces"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/utils"
 	"github.com/LightningDev1/discordgo"
 )
@@ -69,11 +70,11 @@ func NewMirrorFromData(session *discordgo.Session, data map[string]any) (*Mirror
 	return nil, fmt.Errorf("invalid mirror data")
 }
 
-func (m *Mirror) Type() EventReactionType {
+func (m *Mirror) Type() interfaces.EventReactionType {
 	if m.SourceGuild != nil {
-		return MIRROR_GUILD
+		return interfaces.EventReactionMirrorGuild
 	} else if m.SourceChannel != nil {
-		return MIRROR_CHANNEL
+		return interfaces.EventReactionMirrorChannel
 	} else {
 		utils.Logging.Debug("Mirror.Type: Invalid ignore type")
 		return -1
@@ -91,7 +92,7 @@ func (m *Mirror) Description() string {
 	}
 }
 
-func (m *Mirror) Equals(other EventReaction) bool {
+func (m *Mirror) Equals(other interfaces.EventReaction) bool {
 	otherMirror, ok := other.(*Mirror)
 	if !ok {
 		utils.Logging.Debug("Mirror.Equals: Other is not a Mirror")

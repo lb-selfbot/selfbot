@@ -1,6 +1,7 @@
-package eventreactions
+package impl
 
 import (
+	"github.com/LightningDev1/LB-Selfbot/internal/services/interfaces"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/utils"
 	"github.com/LightningDev1/discordgo"
 )
@@ -38,8 +39,8 @@ func NewForceKickFromData(session *discordgo.Session, data map[string]any) (*For
 	return NewForceKick(guild, user), nil
 }
 
-func (f *ForceKick) Type() EventReactionType {
-	return FORCE_KICK
+func (f *ForceKick) Type() interfaces.EventReactionType {
+	return interfaces.EventReactionForceKick
 }
 
 func (f *ForceKick) Description() string {
@@ -52,7 +53,7 @@ func (f *ForceKick) Description() string {
 	return "Force Kick (" + location + ")"
 }
 
-func (f *ForceKick) Equals(other EventReaction) bool {
+func (f *ForceKick) Equals(other interfaces.EventReaction) bool {
 	otherForceKick, ok := other.(*ForceKick)
 	if !ok {
 		utils.Logging.Debug("ForceKick.Equals: Other is not a ForceKick")

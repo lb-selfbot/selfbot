@@ -51,7 +51,7 @@ func (s *SCJobsServiceImpl) start() {
 	for range ticker.C {
 		err := s.LoadJobs()
 		if err != nil {
-			_ = s.uiSvc.LogError("Failed to load SC jobs:", err.Error())
+			s.uiSvc.LogError("Failed to load SC jobs:", err.Error())
 			continue
 		}
 
@@ -65,7 +65,7 @@ func (s *SCJobsServiceImpl) start() {
 		}
 
 		if isFirstIteration {
-			// s.uiSvc.SlashCommandJobs(len(s.jobs))
+			s.uiSvc.LogSCJobs(len(s.jobs))
 			isFirstIteration = false
 		}
 	}

@@ -1,9 +1,10 @@
-package eventreactions
+package impl
 
 import (
 	"slices"
 	"strings"
 
+	"github.com/LightningDev1/LB-Selfbot/internal/services/interfaces"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/api"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/logging"
 
@@ -12,7 +13,7 @@ import (
 )
 
 type MessageReaction struct {
-	ReactionType EventReactionType
+	ReactionType interfaces.EventReactionType
 	Guild        *discordgo.Guild
 	Channel      *discordgo.Channel
 	User         *discordgo.User
@@ -29,11 +30,11 @@ type MessageReaction struct {
 	Keyword string
 }
 
-func NewMessageReaction(rType EventReactionType, g *discordgo.Guild, c *discordgo.Channel, u *discordgo.User) *MessageReaction {
+func NewMessageReaction(rType interfaces.EventReactionType, g *discordgo.Guild, c *discordgo.Channel, u *discordgo.User) *MessageReaction {
 	return &MessageReaction{ReactionType: rType, Guild: g, Channel: c, User: u}
 }
 
-func NewMessageReactionFromData(session *discordgo.Session, reactionType EventReactionType, data map[string]any) (*MessageReaction, error) {
+func NewMessageReactionFromData(session *discordgo.Session, reactionType interfaces.EventReactionType, data map[string]any) (*MessageReaction, error) {
 	var guild *discordgo.Guild
 	var channel *discordgo.Channel
 	var user *discordgo.User
@@ -101,7 +102,7 @@ func NewMessageReactionFromData(session *discordgo.Session, reactionType EventRe
 	}, nil
 }
 
-func (m *MessageReaction) Type() EventReactionType {
+func (m *MessageReaction) Type() interfaces.EventReactionType {
 	return m.ReactionType
 }
 
@@ -130,23 +131,23 @@ func (m *MessageReaction) Description() string {
 	location := " (" + strings.Join(locations, " - ") + ")"
 
 	switch m.ReactionType {
-	case RESPONDER:
+	case interfaces.EventReactionResponder:
 		return "Responder" + location
-	case AI_RESPONDER:
+	case interfaces.EventReactionAIResponder:
 		return "AI Responder" + location
-	case COPY:
+	case interfaces.EventReactionCopy:
 		return "Copy" + location
-	case REPLY_COPY:
+	case interfaces.EventReactionReplyCopy:
 		return "Reply Copy" + location
-	case MOCK:
+	case interfaces.EventReactionMock:
 		return "Mock" + location
-	case PIN_SPAM:
+	case interfaces.EventReactionPinSpam:
 		return "Pin Spam" + location
-	case REACT_SPAM:
+	case interfaces.EventReactionReactSpam:
 		return "React Spam" + location
-	case DELETE_MESSAGES:
+	case interfaces.EventReactionDeleteMessages:
 		return "Delete Messages" + location
-	case KEYWORD_NOTIFIER:
+	case interfaces.EventReactionKeywordNotifier:
 		return "Keyword Notifier" + location
 	default:
 		utils.Logging.Debug("MessageReaction.Description: Unknown reaction type")
@@ -154,7 +155,7 @@ func (m *MessageReaction) Description() string {
 	}
 }
 
-func (m *MessageReaction) Equals(other EventReaction) bool {
+func (m *MessageReaction) Equals(other interfaces.EventReaction) bool {
 	otherMessageReaction, ok := other.(*MessageReaction)
 	if !ok {
 		utils.Logging.Debug("MessageReaction.Equals: Other is not a MessageReaction")
@@ -200,7 +201,7 @@ func (m *MessageReaction) Handler(session *discordgo.Session, event any) {
 		return
 	}
 
-	allowedForSelf := []EventReactionType{REACT_SPAM}
+	allowedForSelf := []interfaces.EventReactionType{interfaces.EventReactionReactSpam}
 
 	if message.Author.ID == session.State.User.ID && !slices.Contains(allowedForSelf, m.ReactionType) {
 		return
@@ -215,10 +216,10 @@ func (m *MessageReaction) Handler(session *discordgo.Session, event any) {
 	}
 
 	switch m.ReactionType {
-	case RESPONDER:
+	case interfaces.EventReactionResponder:
 		m, err := session.ChannelMessageSend(message.ChannelID, m.Response)
 		HandleMessage(m, err)
-	case AI_RESPONDER:
+	case interfaces.EventReactionAIResponder:
 		messages, err := utils.Discord.GetChannelMessages(session, message.ChannelID, 20)
 		if err != nil {
 			utils.Logging.Error("Responder.Handler: Error getting channel messages: " + err.Error())
@@ -235,13 +236,13 @@ func (m *MessageReaction) Handler(session *discordgo.Session, event any) {
 
 		m, err := session.ChannelMessageSend(message.ChannelID, response)
 		HandleMessage(m, err)
-	case COPY:
+	case interfaces.EventReactionCopy:
 		m, err := session.ChannelMessageSendComplex(message.ChannelID, &discordgo.MessageSend{
 			Content:         message.Content,
 			AllowedMentions: &discordgo.MessageAllowedMentions{}, // Disable mentions
 		})
 		HandleMessage(m, err)
-	case REPLY_COPY:
+	case interfaces.EventReactionReplyCopy:
 		m, err := session.ChannelMessageSendComplex(message.ChannelID, &discordgo.MessageSend{
 			Content:         message.Content,
 			AllowedMentions: &discordgo.MessageAllowedMentions{RepliedUser: true},
@@ -252,22 +253,22 @@ func (m *MessageReaction) Handler(session *discordgo.Session, event any) {
 			},
 		})
 		HandleMessage(m, err)
-	case MOCK:
+	case interfaces.EventReactionMock:
 		m, err := session.ChannelMessageSendComplex(message.ChannelID, &discordgo.MessageSend{
 			Content:         utils.String.Mock(message.Content),
 			AllowedMentions: &discordgo.MessageAllowedMentions{}, // Disable mentions
 		})
 		HandleMessage(m, err)
-	case PIN_SPAM:
+	case interfaces.EventReactionPinSpam:
 		err := session.ChannelMessagePin(message.ChannelID, message.ID)
 		if err == nil {
 			PinSpamMessages.Add(message.Message)
 		}
-	case REACT_SPAM:
+	case interfaces.EventReactionReactSpam:
 		_ = session.MessageReactionAdd(message.ChannelID, message.ID, m.Reaction)
-	case DELETE_MESSAGES:
+	case interfaces.EventReactionDeleteMessages:
 		_ = session.ChannelMessageDelete(message.ChannelID, message.ID)
-	case KEYWORD_NOTIFIER:
+	case interfaces.EventReactionKeywordNotifier:
 		if strings.Contains(strings.ToLower(message.Content), strings.ToLower(m.Keyword)) {
 			logging.Logging.KeywordNotifier(session, message.Message, m.Keyword)
 		}

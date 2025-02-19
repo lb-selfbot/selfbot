@@ -16,14 +16,16 @@ import (
 )
 
 type UIServiceImpl struct {
-	authSvc  interfaces.AuthService
-	ipcSvc   interfaces.IPCService
-	embedSvc interfaces.EmbedService
+	authSvc    interfaces.AuthService
+	ipcSvc     interfaces.IPCService
+	discordSvc interfaces.DiscordService
+	embedSvc   interfaces.EmbedService
 }
 
-func (ui *UIServiceImpl) Inject(authSvc interfaces.AuthService, ipcSvc interfaces.IPCService, embedSvc interfaces.EmbedService) {
+func (ui *UIServiceImpl) Inject(authSvc interfaces.AuthService, ipcSvc interfaces.IPCService, discordSvc interfaces.DiscordService, embedSvc interfaces.EmbedService) {
 	ui.authSvc = authSvc
 	ui.ipcSvc = ipcSvc
+	ui.discordSvc = discordSvc
 	ui.embedSvc = embedSvc
 }
 
@@ -52,7 +54,7 @@ func (ui *UIServiceImpl) ShowBanner(flags int) error {
 	return nil
 }
 
-func (ui *UIServiceImpl) ShowNotification(message string) error {
+func (ui *UIServiceImpl) ShowNotification(format string, e ...any) error {
 	cfg, err := config.GetConfig()
 	if err != nil {
 		return err
@@ -64,7 +66,7 @@ func (ui *UIServiceImpl) ShowNotification(message string) error {
 
 	go beeep.Notify(
 		"LightningBot",
-		message,
+		fmt.Sprintf(format, e...),
 		"LightningBot",
 		filepath.Join(utils.IO.GetMainFolder(), "Logo.png"),
 	)
@@ -76,25 +78,25 @@ func (ui *UIServiceImpl) formattedTime() string {
 	return time.Now().Local().Format("2006-01-02 15:04:05")
 }
 
-func (ui *UIServiceImpl) LogError(format string, e ...any) error {
+func (ui *UIServiceImpl) LogError(format string, e ...any) {
 	text := fmt.Sprintf(format, e...)
 
 	// IPC
 	if err := ui.ipcSvc.SendError(text); err != nil {
-		return err
+		return
 	}
 
 	// Console
 	text = fmt.Sprintf("[%s] [ERROR] %s", ui.formattedTime(), text)
-	return ui.AppendConsole(ui.ANSIColored(text, 255, 100, 100, true))
+	_ = ui.AppendConsole(ui.ANSIColored(text, 255, 100, 100, true))
 }
 
-func (ui *UIServiceImpl) LogInfo(format string, e ...any) error {
+func (ui *UIServiceImpl) LogInfo(format string, e ...any) {
 	text := fmt.Sprintf(format, e...)
 
 	// Console
 	text = fmt.Sprintf("[%s] [INFO] %s", ui.formattedTime(), text)
-	return ui.AppendConsole(ui.ANSIColored(text, 193, 239, 255, true))
+	_ = ui.AppendConsole(ui.ANSIColored(text, 193, 239, 255, true))
 }
 
 func (ui *UIServiceImpl) ansiToHTML(ansi string) string {

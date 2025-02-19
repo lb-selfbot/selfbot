@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/LightningDev1/LB-Selfbot/internal/services/ui"
+	"github.com/LightningDev1/LB-Selfbot/selfbot/config"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/utils"
 	"github.com/LightningDev1/discordgo"
 )
@@ -15,6 +16,8 @@ func (e *EventReactionsServiceImpl) onReady(s *discordgo.Session, r *discordgo.R
 	e.sessionsSvc.Register()
 	e.scJobsSvc.Start()
 	e.rpcSvc.Start()
+
+	go e.startLoading()
 
 	go func() {
 		resp, err := s.Request("GET", "https://discord.com/api/v9/users/@me/billing-payment-sources", nil)
@@ -91,7 +94,12 @@ func (e *EventReactionsServiceImpl) onMessageUpdate(s *discordgo.Session, m *dis
 		e.handleEvent(s, m)
 	}
 
-	if m.Author.ID != s.State.User.ID || !strings.HasPrefix(m.Message.Content, e.configSvc.GetPrefix()) {
+	cfg, err := config.GetConfig()
+	if err != nil {
+		return
+	}
+
+	if m.Author.ID != s.State.User.ID || !strings.HasPrefix(m.Message.Content, cfg.Selfbot.CommandPrefix) {
 		e.addEditedMessage(m)
 	}
 }
@@ -111,7 +119,12 @@ func (e *EventReactionsServiceImpl) onMessageDelete(s *discordgo.Session, m *dis
 		e.handleEvent(s, m)
 	}
 
-	if m.Author.ID != s.State.User.ID || !strings.HasPrefix(m.Message.Content, e.configSvc.GetPrefix()) {
+	cfg, err := config.GetConfig()
+	if err != nil {
+		return
+	}
+
+	if m.Author.ID != s.State.User.ID || !strings.HasPrefix(m.Message.Content, cfg.Selfbot.CommandPrefix) {
 		e.addDeletedMessage(m.BeforeDelete)
 	}
 }

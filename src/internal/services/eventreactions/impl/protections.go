@@ -1,4 +1,4 @@
-package eventreactions
+package impl
 
 import (
 	"strconv"
@@ -6,6 +6,7 @@ import (
 	"unicode"
 
 	"github.com/LightningDev1/LB-Selfbot/internal/constants"
+	"github.com/LightningDev1/LB-Selfbot/internal/services/interfaces"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/api"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/config"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/embed"
@@ -32,15 +33,15 @@ func NewProtections() *Protections {
 	return &Protections{}
 }
 
-func (p *Protections) Type() EventReactionType {
-	return PROTECTIONS
+func (p *Protections) Type() interfaces.EventReactionType {
+	return interfaces.EventReactionProtections
 }
 
 func (p *Protections) Description() string {
 	return "Protections (default)"
 }
 
-func (p *Protections) Equals(other EventReaction) bool {
+func (p *Protections) Equals(other interfaces.EventReaction) bool {
 	_, ok := other.(*Protections)
 
 	return ok

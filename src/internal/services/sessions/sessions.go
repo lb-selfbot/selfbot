@@ -59,7 +59,7 @@ func (s *SessionsServiceImpl) onSessionsReplace(session *discordgo.Session, e *d
 	// Refresh login sessions if a new session is added
 	if len(newSessions) > len(s.gatewaySessions) {
 		if err := s.refreshLoginSessions(session); err != nil {
-			_ = s.uiSvc.LogError("Failed to refresh login sessions:", err)
+			s.uiSvc.LogError("Failed to refresh login sessions:", err)
 		}
 	}
 
@@ -172,11 +172,11 @@ func (s *SessionsServiceImpl) findRemovedSessions(currentSessions []*discordgo.L
 }
 
 func (s *SessionsServiceImpl) handleChangedSessions(newSessions, removedSessions []*discordgo.LoginSession) {
-	// for _, session := range newSessions {
-	// 	s.uiSvc.SessionConnected(session.IDHash, session.ClientInfo.OS, session.ClientInfo.Platform)
-	// }
+	for _, session := range newSessions {
+		s.uiSvc.LogSessionConnected(session.IDHash, session.ClientInfo.OS, session.ClientInfo.Platform)
+	}
 
-	// for _, session := range removedSessions {
-	// 	s.uiSvc.SessionDisconnected(session.IDHash, session.ClientInfo.OS, session.ClientInfo.Platform)
-	// }
+	for _, session := range removedSessions {
+		s.uiSvc.LogSessionDisconnected(session.IDHash, session.ClientInfo.OS, session.ClientInfo.Platform)
+	}
 }

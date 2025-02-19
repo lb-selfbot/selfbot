@@ -1,8 +1,9 @@
-package eventreactions
+package impl
 
 import (
 	"strings"
 
+	"github.com/LightningDev1/LB-Selfbot/internal/services/interfaces"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/config"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/logging"
 
@@ -16,15 +17,15 @@ func NewNotifiers() *Notifiers {
 	return &Notifiers{}
 }
 
-func (n *Notifiers) Type() EventReactionType {
-	return NOTIFIERS
+func (n *Notifiers) Type() interfaces.EventReactionType {
+	return interfaces.EventReactionNotifiers
 }
 
 func (n *Notifiers) Description() string {
 	return "Notifiers (default)"
 }
 
-func (n *Notifiers) Equals(other EventReaction) bool {
+func (n *Notifiers) Equals(other interfaces.EventReaction) bool {
 	_, ok := other.(*Notifiers)
 
 	return ok

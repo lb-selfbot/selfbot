@@ -1,10 +1,11 @@
-package eventreactions
+package impl
 
 import (
 	"net/url"
 	"slices"
 	"strings"
 
+	"github.com/LightningDev1/LB-Selfbot/internal/services/interfaces"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/config"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/http"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/logging"
@@ -31,15 +32,15 @@ func NewPhishing() *Phishing {
 	return &Phishing{}
 }
 
-func (p *Phishing) Type() EventReactionType {
-	return ANTI_PHISHING
+func (p *Phishing) Type() interfaces.EventReactionType {
+	return interfaces.EventReactionAntiPhishing
 }
 
 func (p *Phishing) Description() string {
 	return "Anti Phishing (default)"
 }
 
-func (p *Phishing) Equals(other EventReaction) bool {
+func (p *Phishing) Equals(other interfaces.EventReaction) bool {
 	_, ok := other.(*Phishing)
 
 	return ok

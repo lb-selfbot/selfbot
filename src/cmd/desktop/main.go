@@ -56,7 +56,7 @@ func checkForUpdates(services *services.Services) {
 		},
 	)
 	if err != nil {
-		_ = services.UI.LogError("Error checking for updates: " + err.Error())
+		services.UI.LogError("Error checking for updates: " + err.Error())
 		time.Sleep(3 * time.Second)
 		return
 	}
@@ -215,7 +215,7 @@ func main() {
 	}
 
 	if err := utils.IO.CreateFolders(); err != nil {
-		_ = services.UI.LogError("Error creating folders: " + err.Error())
+		services.UI.LogError("Error creating folders: " + err.Error())
 		return
 	}
 
@@ -291,7 +291,7 @@ func main() {
 	go func() {
 		err := services.MultiTokenSniper.Init(context.Background())
 		if err != nil {
-			_ = services.UI.LogError("Error initializing multi-token sniper: " + err.Error())
+			services.UI.LogError("Error initializing multi-token sniper: " + err.Error())
 		}
 	}()
 
