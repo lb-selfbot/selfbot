@@ -68,8 +68,8 @@ func (*SharingCommands) sharedusers(ctx *dgc.Ctx) {
 	case "get":
 		userString := ""
 		for _, userID := range cfg.Sharing.SharedUsers {
-			user, ok := utils.Discord.GetUser(ctx.Session, userID)
-			if !ok {
+			user, err := utils.Discord.GetUser(ctx.Session, userID)
+			if err != nil {
 				userString += fmt.Sprintf("%s - %s\n", "Unknown", userID)
 				continue
 			}

@@ -210,7 +210,7 @@ func (TrollingCommands) hiddenhere(ctx *dgc.Ctx) {
 }
 
 func (TrollingCommands) voicemove(ctx *dgc.Ctx) {
-	guild, err := utils.Discord.GetGuild(ctx.Session, ctx.Event.GuildID)
+	guild, err := utils.Discord.GetGuild(ctx.Session, ctx.Message.GuildID)
 	if err != nil {
 		_ = ctx.RespondText("Error getting server: " + err.Error())
 		return
@@ -222,7 +222,7 @@ func (TrollingCommands) voicemove(ctx *dgc.Ctx) {
 		return
 	}
 
-	if conn, ok := ctx.Session.VoiceConnections[ctx.Event.GuildID]; ok {
+	if conn, ok := ctx.Session.VoiceConnections[ctx.Message.GuildID]; ok {
 		_ = conn.Disconnect()
 	}
 
@@ -256,13 +256,13 @@ func (TrollingCommands) voicemove(ctx *dgc.Ctx) {
 		}
 
 		channel := random.Choice(channels)
-		currentChannel := ctx.Session.VoiceConnections[ctx.Event.GuildID]
+		currentChannel := ctx.Session.VoiceConnections[ctx.Message.GuildID]
 
 		if currentChannel != nil && currentChannel.ChannelID == channel.ID {
 			continue
 		}
 
-		_, err := ctx.Session.ChannelVoiceJoin(ctx.Event.GuildID, channel.ID, false, true)
+		_, err := ctx.Session.ChannelVoiceJoin(ctx.Message.GuildID, channel.ID, false, true)
 		if err != nil {
 			_ = ctx.RespondText("Error joining voice channel: " + err.Error())
 			return
@@ -273,7 +273,7 @@ func (TrollingCommands) voicemove(ctx *dgc.Ctx) {
 		i++
 	}
 
-	if voice, ok := ctx.Session.VoiceConnections[ctx.Event.GuildID]; ok {
+	if voice, ok := ctx.Session.VoiceConnections[ctx.Message.GuildID]; ok {
 		_ = voice.Disconnect()
 	}
 }
@@ -286,7 +286,7 @@ func (TrollingCommands) triggertyping(ctx *dgc.Ctx) {
 	}
 	channel, success := utils.Discord.TryGetChannelFromMention(ctx, ctx.Arguments.Get(1))
 	if !success {
-		channel, _ = utils.Discord.GetChannel(ctx.Session, ctx.Event.ChannelID)
+		channel, _ = utils.Discord.GetChannel(ctx.Session, ctx.Message.ChannelID)
 		if channel == nil {
 			_ = ctx.RespondText("Could not find channel")
 			return
@@ -303,7 +303,7 @@ func (TrollingCommands) impersonate(ctx *dgc.Ctx) {
 	}
 	text := utils.String.RemoveWords(ctx.Arguments.Raw(), 1)
 
-	_, err := utils.Discord.Impersonate(ctx.Session, user, text, ctx.Event.ChannelID)
+	_, err := utils.Discord.Impersonate(ctx.Session, user, text, ctx.Message.ChannelID)
 	if err != nil {
 		_ = ctx.RespondText("An error has occurred: " + err.Error())
 		return

@@ -8,12 +8,12 @@ import (
 	"time"
 
 	"github.com/LightningDev1/LB-Selfbot/internal/constants"
+	"github.com/LightningDev1/LB-Selfbot/internal/router"
 
 	"github.com/LightningDev1/LB-Selfbot/internal/api"
 	"github.com/LightningDev1/LB-Selfbot/internal/config"
 	"github.com/LightningDev1/LB-Selfbot/internal/http"
 	"github.com/LightningDev1/LB-Selfbot/internal/utils"
-	"github.com/LightningDev1/dgc"
 	"github.com/LightningDev1/discordgo"
 )
 
@@ -559,7 +559,7 @@ func (e *Embed) ToString(commandMode string) []string {
 	}
 }
 
-func (e *Embed) Send(ctx *dgc.Ctx) []*discordgo.Message {
+func (e *Embed) Send(ctx *router.Ctx) []*discordgo.Message {
 	cfg, _ := config.GetConfig()
 
 	commandMode := utils.Misc.Or(cfg.Selfbot.CommandMode, "Codeblock")
@@ -577,7 +577,7 @@ func (e *Embed) Send(ctx *dgc.Ctx) []*discordgo.Message {
 	messages := []*discordgo.Message{}
 
 	for _, text := range e.ToString(commandMode) {
-		message, err := ctx.Session.ChannelMessageSend(ctx.Event.ChannelID, text)
+		message, err := ctx.Session.ChannelMessageSend(ctx.Message.ChannelID, text)
 		if err != nil {
 			continue
 		}
@@ -586,7 +586,7 @@ func (e *Embed) Send(ctx *dgc.Ctx) []*discordgo.Message {
 	}
 
 	if e.Image != nil && e.Image.URL != "" {
-		message, err := ctx.Session.ChannelMessageSend(ctx.Event.ChannelID, e.Image.URL)
+		message, err := ctx.Session.ChannelMessageSend(ctx.Message.ChannelID, e.Image.URL)
 		if err == nil {
 			messages = append(messages, message)
 		}
@@ -599,12 +599,12 @@ func (e *Embed) Send(ctx *dgc.Ctx) []*discordgo.Message {
 	return messages
 }
 
-func (e *Embed) sendWebhookEmbed(ctx *dgc.Ctx) error {
-	if ctx.Event.GuildID == "" {
+func (e *Embed) sendWebhookEmbed(ctx *router.Ctx) error {
+	if ctx.Message.GuildID == "" {
 		return errors.New("cannot send webhook embed in DMs")
 	}
 
-	webhooks, err := ctx.Session.ChannelWebhooks(ctx.Event.ChannelID)
+	webhooks, err := ctx.Session.ChannelWebhooks(ctx.Message.ChannelID)
 	if err != nil {
 		return err
 	}
@@ -621,7 +621,7 @@ func (e *Embed) sendWebhookEmbed(ctx *dgc.Ctx) error {
 	}
 
 	if webhook == nil {
-		webhook, err = ctx.Session.WebhookCreate(ctx.Event.ChannelID, "LightningBot", "https://lightning-bot.com/logo.png")
+		webhook, err = ctx.Session.WebhookCreate(ctx.Message.ChannelID, "LightningBot", "https://lightning-bot.com/logo.png")
 		if err != nil {
 			return err
 		}

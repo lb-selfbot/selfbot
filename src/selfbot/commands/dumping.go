@@ -101,7 +101,7 @@ func (d *DumpingCommands) RegisterCommands(router *dgc.Router) {
 func (*DumpingCommands) dumpall(ctx *dgc.Ctx) {
 	channel, success := utils.Discord.TryGetChannelFromMention(ctx, ctx.Arguments.Get(0))
 	if !success {
-		channel, _ = utils.Discord.GetChannel(ctx.Session, ctx.Event.ChannelID)
+		channel, _ = utils.Discord.GetChannel(ctx.Session, ctx.Message.ChannelID)
 	}
 	if channel == nil {
 		_ = ctx.RespondText("Error getting channel")
@@ -148,7 +148,7 @@ func (*DumpingCommands) dumpall(ctx *dgc.Ctx) {
 func (*DumpingCommands) dumpimages(ctx *dgc.Ctx) {
 	channel, success := utils.Discord.TryGetChannelFromMention(ctx, ctx.Arguments.Get(0))
 	if !success {
-		channel, _ = utils.Discord.GetChannel(ctx.Session, ctx.Event.ChannelID)
+		channel, _ = utils.Discord.GetChannel(ctx.Session, ctx.Message.ChannelID)
 	}
 	if channel == nil {
 		_ = ctx.RespondText("Error getting channel")
@@ -190,7 +190,7 @@ func (*DumpingCommands) dumpimages(ctx *dgc.Ctx) {
 func (*DumpingCommands) dumpvideos(ctx *dgc.Ctx) {
 	channel, success := utils.Discord.TryGetChannelFromMention(ctx, ctx.Arguments.Get(0))
 	if !success {
-		channel, _ = utils.Discord.GetChannel(ctx.Session, ctx.Event.ChannelID)
+		channel, _ = utils.Discord.GetChannel(ctx.Session, ctx.Message.ChannelID)
 	}
 	if channel == nil {
 		_ = ctx.RespondText("Error getting channel")
@@ -232,7 +232,7 @@ func (*DumpingCommands) dumpvideos(ctx *dgc.Ctx) {
 func (*DumpingCommands) dumpaudio(ctx *dgc.Ctx) {
 	channel, success := utils.Discord.TryGetChannelFromMention(ctx, ctx.Arguments.Get(0))
 	if !success {
-		channel, _ = utils.Discord.GetChannel(ctx.Session, ctx.Event.ChannelID)
+		channel, _ = utils.Discord.GetChannel(ctx.Session, ctx.Message.ChannelID)
 	}
 	if channel == nil {
 		_ = ctx.RespondText("Error getting channel")
@@ -274,7 +274,7 @@ func (*DumpingCommands) dumpaudio(ctx *dgc.Ctx) {
 func (*DumpingCommands) dumptext(ctx *dgc.Ctx) {
 	channel, success := utils.Discord.TryGetChannelFromMention(ctx, ctx.Arguments.Get(0))
 	if !success {
-		channel, _ = utils.Discord.GetChannel(ctx.Session, ctx.Event.ChannelID)
+		channel, _ = utils.Discord.GetChannel(ctx.Session, ctx.Message.ChannelID)
 	}
 	if channel == nil {
 		_ = ctx.RespondText("Error getting channel")
@@ -316,7 +316,7 @@ func (*DumpingCommands) dumptext(ctx *dgc.Ctx) {
 func (*DumpingCommands) dumpattachments(ctx *dgc.Ctx) {
 	channel, success := utils.Discord.TryGetChannelFromMention(ctx, ctx.Arguments.Get(0))
 	if !success {
-		channel, _ = utils.Discord.GetChannel(ctx.Session, ctx.Event.ChannelID)
+		channel, _ = utils.Discord.GetChannel(ctx.Session, ctx.Message.ChannelID)
 	}
 	if channel == nil {
 		_ = ctx.RespondText("Error getting channel")
@@ -356,7 +356,7 @@ func (*DumpingCommands) dumpfiletype(ctx *dgc.Ctx) {
 
 	channel, success := utils.Discord.TryGetChannelFromMention(ctx, ctx.Arguments.Get(1))
 	if !success {
-		channel, _ = utils.Discord.GetChannel(ctx.Session, ctx.Event.ChannelID)
+		channel, _ = utils.Discord.GetChannel(ctx.Session, ctx.Message.ChannelID)
 	}
 	if channel == nil {
 		_ = ctx.RespondText("Error getting channel")
@@ -400,7 +400,7 @@ func (*DumpingCommands) dumpcontenttype(ctx *dgc.Ctx) {
 
 	channel, success := utils.Discord.TryGetChannelFromMention(ctx, ctx.Arguments.Get(1))
 	if !success {
-		channel, _ = utils.Discord.GetChannel(ctx.Session, ctx.Event.ChannelID)
+		channel, _ = utils.Discord.GetChannel(ctx.Session, ctx.Message.ChannelID)
 	}
 	if channel == nil {
 		_ = ctx.RespondText("Error getting channel")
@@ -440,7 +440,7 @@ func (*DumpingCommands) dumpcontenttype(ctx *dgc.Ctx) {
 }
 
 func (*DumpingCommands) dumpemojis(ctx *dgc.Ctx) {
-	guild, err := utils.Discord.GetGuild(ctx.Session, utils.Misc.Or(utils.Arguments["[server id]"], ctx.Event.GuildID))
+	guild, err := utils.Discord.GetGuild(ctx.Session, utils.Misc.Or(utils.Arguments["[server id]"], ctx.Message.GuildID))
 	if err != nil {
 		_ = ctx.RespondText("Error getting server: " + err.Error())
 		return
@@ -477,7 +477,7 @@ func (*DumpingCommands) dumpemojis(ctx *dgc.Ctx) {
 }
 
 func (*DumpingCommands) dumpstickers(ctx *dgc.Ctx) {
-	guild, err := utils.Discord.GetGuild(ctx.Session, utils.Misc.Or(utils.Arguments["[server id]"], ctx.Event.GuildID))
+	guild, err := utils.Discord.GetGuild(ctx.Session, utils.Misc.Or(utils.Arguments["[server id]"], ctx.Message.GuildID))
 	if err != nil {
 		_ = ctx.RespondText("Error getting server: " + err.Error())
 		return
@@ -516,7 +516,7 @@ func (*DumpingCommands) dumpstickers(ctx *dgc.Ctx) {
 }
 
 func (*DumpingCommands) dumpavatars(ctx *dgc.Ctx) {
-	guild, err := utils.Discord.GetGuild(ctx.Session, utils.Misc.Or(utils.Arguments["[server id]"], ctx.Event.GuildID))
+	guild, err := utils.Discord.GetGuild(ctx.Session, utils.Misc.Or(utils.Arguments["[server id]"], ctx.Message.GuildID))
 	if err != nil {
 		_ = ctx.RespondText("Error getting server: " + err.Error())
 		return
@@ -551,7 +551,7 @@ func (*DumpingCommands) dumpavatars(ctx *dgc.Ctx) {
 }
 
 func (*DumpingCommands) dumpchannels(ctx *dgc.Ctx) {
-	guild, err := utils.Discord.GetGuild(ctx.Session, utils.Misc.Or(utils.Arguments["[server id]"], ctx.Event.GuildID))
+	guild, err := utils.Discord.GetGuild(ctx.Session, utils.Misc.Or(utils.Arguments["[server id]"], ctx.Message.GuildID))
 	if err != nil {
 		_ = ctx.RespondText("Error getting server: " + err.Error())
 		return
@@ -581,7 +581,7 @@ func (*DumpingCommands) dumpchannels(ctx *dgc.Ctx) {
 }
 
 func (*DumpingCommands) dumpmembers(ctx *dgc.Ctx) {
-	guild, err := utils.Discord.GetGuild(ctx.Session, utils.Misc.Or(utils.Arguments["[server id]"], ctx.Event.GuildID))
+	guild, err := utils.Discord.GetGuild(ctx.Session, utils.Misc.Or(utils.Arguments["[server id]"], ctx.Message.GuildID))
 	if err != nil {
 		_ = ctx.RespondText("Error getting server: " + err.Error())
 		return

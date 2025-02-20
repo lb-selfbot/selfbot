@@ -7,7 +7,7 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/LightningDev1/dgc"
+	"github.com/LightningDev1/LB-Selfbot/internal/router"
 	"github.com/LightningDev1/discordgo"
 )
 
@@ -57,7 +57,7 @@ type SCJob struct {
 	Options []*discordgo.ApplicationCommandOption `json:"-"`
 
 	// The arguments to execute the command with
-	Arguments *dgc.Arguments `json:"-"`
+	Arguments *router.Arguments `json:"-"`
 
 	// The interval to execute the command at
 	Interval time.Duration `json:"-"`

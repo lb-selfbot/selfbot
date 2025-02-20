@@ -124,11 +124,11 @@ func setupRouter(session *discordgo.Session) *dgc.Router {
 		IgnorePrefixCase: true,
 		IsUserAllowedFunc: func(ctx *dgc.Ctx) bool {
 			isAllowed := func() bool {
-				if ctx.Event.Author == nil {
+				if ctx.Message.Author == nil {
 					return false
 				}
 
-				if ctx.Event.Author.ID == session.State.User.ID {
+				if ctx.Message.Author.ID == session.State.User.ID {
 					return true
 				}
 
@@ -137,13 +137,13 @@ func setupRouter(session *discordgo.Session) *dgc.Router {
 					return false
 				}
 
-				if !slices.Contains(cfg.Sharing.SharedUsers, ctx.Event.Author.ID) &&
-					!slices.Contains(cfg.Sharing.SharedUsers, ctx.Event.Author.String()) {
+				if !slices.Contains(cfg.Sharing.SharedUsers, ctx.Message.Author.ID) &&
+					!slices.Contains(cfg.Sharing.SharedUsers, ctx.Message.Author.String()) {
 					return false
 				}
 
 				if slices.Contains(ctx.Command.Flags, commands.CmdFlagDangerous) && cfg.Sharing.BlockDangerousCommands {
-					logging.Logging.BlockedDangerousCommand(ctx.Event.Author, ctx.Command.Name)
+					logging.Logging.BlockedDangerousCommand(ctx.Message.Author, ctx.Command.Name)
 					return false
 				}
 
@@ -189,9 +189,9 @@ func setupRouter(session *discordgo.Session) *dgc.Router {
 						return
 					}
 
-					if cfg.Selfbot.DeleteCommands && ctx.Event.ID != "0" {
+					if cfg.Selfbot.DeleteCommands && ctx.Message.ID != "0" {
 						go func() {
-							_ = ctx.Session.ChannelMessageDelete(ctx.Event.Message.ChannelID, ctx.Event.Message.ID)
+							_ = ctx.Session.ChannelMessageDelete(ctx.Message.Message.ChannelID, ctx.Message.Message.ID)
 						}()
 					}
 

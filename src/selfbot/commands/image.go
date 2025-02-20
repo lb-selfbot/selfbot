@@ -1055,7 +1055,7 @@ func (ImageCommands) meme(ctx *dgc.Ctx) {
 func (ImageCommands) ytcomment(ctx *dgc.Ctx) {
 	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
-		user = ctx.Event.Author
+		user = ctx.Message.Author
 	}
 	_ = ctx.RespondText(fmt.Sprintf(
 		"https://some-random-api.com/canvas/youtube-comment?avatar=%s&comment=%s&username=%s",
@@ -1072,7 +1072,7 @@ func (ImageCommands) pokemon(ctx *dgc.Ctx) {
 func (ImageCommands) wasted(ctx *dgc.Ctx) {
 	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
-		user = ctx.Event.Author
+		user = ctx.Message.Author
 	}
 	_ = ctx.RespondText(fmt.Sprintf("https://some-random-api.com/canvas/wasted?avatar=%s", url.QueryEscape(user.AvatarURL(""))))
 }
@@ -1080,7 +1080,7 @@ func (ImageCommands) wasted(ctx *dgc.Ctx) {
 func (ImageCommands) triggered(ctx *dgc.Ctx) {
 	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
-		user = ctx.Event.Author
+		user = ctx.Message.Author
 	}
 	_ = ctx.RespondText(fmt.Sprintf("https://some-random-api.com/canvas/triggered?avatar=%s", url.QueryEscape(user.AvatarURL(""))))
 }
@@ -1088,7 +1088,7 @@ func (ImageCommands) triggered(ctx *dgc.Ctx) {
 func (ImageCommands) glass(ctx *dgc.Ctx) {
 	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
-		user = ctx.Event.Author
+		user = ctx.Message.Author
 	}
 	_ = ctx.RespondText(fmt.Sprintf("https://some-random-api.com/canvas/glass?avatar=%s", url.QueryEscape(user.AvatarURL(""))))
 }
@@ -1096,7 +1096,7 @@ func (ImageCommands) glass(ctx *dgc.Ctx) {
 func (ImageCommands) greyscale(ctx *dgc.Ctx) {
 	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
-		user = ctx.Event.Author
+		user = ctx.Message.Author
 	}
 	_ = ctx.RespondText(fmt.Sprintf("https://some-random-api.com/canvas/greyscale?avatar=%s", url.QueryEscape(user.AvatarURL(""))))
 }
@@ -1104,7 +1104,7 @@ func (ImageCommands) greyscale(ctx *dgc.Ctx) {
 func (ImageCommands) invert(ctx *dgc.Ctx) {
 	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
-		user = ctx.Event.Author
+		user = ctx.Message.Author
 	}
 	_ = ctx.RespondText(fmt.Sprintf("https://some-random-api.com/canvas/invert?avatar=%s", url.QueryEscape(user.AvatarURL(""))))
 }
@@ -1112,7 +1112,7 @@ func (ImageCommands) invert(ctx *dgc.Ctx) {
 func (ImageCommands) invertgreyscale(ctx *dgc.Ctx) {
 	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
-		user = ctx.Event.Author
+		user = ctx.Message.Author
 	}
 	_ = ctx.RespondText(fmt.Sprintf("https://some-random-api.com/canvas/invertgreyscale?avatar=%s", url.QueryEscape(user.AvatarURL(""))))
 }
@@ -1120,7 +1120,7 @@ func (ImageCommands) invertgreyscale(ctx *dgc.Ctx) {
 func (ImageCommands) brightness(ctx *dgc.Ctx) {
 	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
-		user = ctx.Event.Author
+		user = ctx.Message.Author
 	}
 	_ = ctx.RespondText(fmt.Sprintf("https://some-random-api.com/canvas/brightness?avatar=%s", url.QueryEscape(user.AvatarURL(""))))
 }
@@ -1128,7 +1128,7 @@ func (ImageCommands) brightness(ctx *dgc.Ctx) {
 func (ImageCommands) red(ctx *dgc.Ctx) {
 	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
-		user = ctx.Event.Author
+		user = ctx.Message.Author
 	}
 	_ = ctx.RespondText(fmt.Sprintf("https://some-random-api.com/canvas/red?avatar=%s", url.QueryEscape(user.AvatarURL(""))))
 }
@@ -1136,7 +1136,7 @@ func (ImageCommands) red(ctx *dgc.Ctx) {
 func (ImageCommands) green(ctx *dgc.Ctx) {
 	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
-		user = ctx.Event.Author
+		user = ctx.Message.Author
 	}
 	_ = ctx.RespondText(fmt.Sprintf("https://some-random-api.com/canvas/green?avatar=%s", url.QueryEscape(user.AvatarURL(""))))
 }
@@ -1144,7 +1144,7 @@ func (ImageCommands) green(ctx *dgc.Ctx) {
 func (ImageCommands) blue(ctx *dgc.Ctx) {
 	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
-		user = ctx.Event.Author
+		user = ctx.Message.Author
 	}
 	_ = ctx.RespondText(fmt.Sprintf("https://some-random-api.com/canvas/blue?avatar=%s", url.QueryEscape(user.AvatarURL(""))))
 }
@@ -1152,7 +1152,7 @@ func (ImageCommands) blue(ctx *dgc.Ctx) {
 func (ImageCommands) pixelate(ctx *dgc.Ctx) {
 	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
-		user = ctx.Event.Author
+		user = ctx.Message.Author
 	}
 	_ = ctx.RespondText(fmt.Sprintf("https://some-random-api.com/canvas/pixelate?avatar=%s", url.QueryEscape(user.AvatarURL(""))))
 }
@@ -1160,7 +1160,7 @@ func (ImageCommands) pixelate(ctx *dgc.Ctx) {
 func (ImageCommands) comrade(ctx *dgc.Ctx) {
 	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
-		user = ctx.Event.Author
+		user = ctx.Message.Author
 	}
 	_ = ctx.RespondText(fmt.Sprintf("https://some-random-api.com/canvas/comrade?avatar=%s", url.QueryEscape(user.AvatarURL(""))))
 }
@@ -1168,7 +1168,7 @@ func (ImageCommands) comrade(ctx *dgc.Ctx) {
 func (ImageCommands) missionpassed(ctx *dgc.Ctx) {
 	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
-		user = ctx.Event.Author
+		user = ctx.Message.Author
 	}
 	_ = ctx.RespondText(fmt.Sprintf("https://some-random-api.com/canvas/passed?avatar=%s", url.QueryEscape(user.AvatarURL(""))))
 }
@@ -1176,7 +1176,7 @@ func (ImageCommands) missionpassed(ctx *dgc.Ctx) {
 func (ImageCommands) jail(ctx *dgc.Ctx) {
 	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
-		user = ctx.Event.Author
+		user = ctx.Message.Author
 	}
 	_ = ctx.RespondText(fmt.Sprintf("https://some-random-api.com/canvas/jail?avatar=%s", url.QueryEscape(user.AvatarURL(""))))
 }
@@ -1188,7 +1188,7 @@ func (ImageCommands) nobitches(ctx *dgc.Ctx) {
 func (ImageCommands) threshold(ctx *dgc.Ctx) {
 	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
-		user = ctx.Event.Author
+		user = ctx.Message.Author
 	}
 	_ = ctx.RespondText(fmt.Sprintf("https://some-random-api.com/canvas/threshold?avatar=%s", url.QueryEscape(user.AvatarURL(""))))
 }
@@ -1196,7 +1196,7 @@ func (ImageCommands) threshold(ctx *dgc.Ctx) {
 func (ImageCommands) blurple(ctx *dgc.Ctx) {
 	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
-		user = ctx.Event.Author
+		user = ctx.Message.Author
 	}
 	_ = ctx.RespondText(fmt.Sprintf("https://some-random-api.com/canvas/blurple?avatar=%s", url.QueryEscape(user.AvatarURL(""))))
 }
@@ -1204,7 +1204,7 @@ func (ImageCommands) blurple(ctx *dgc.Ctx) {
 func (ImageCommands) blurple2(ctx *dgc.Ctx) {
 	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
-		user = ctx.Event.Author
+		user = ctx.Message.Author
 	}
 	_ = ctx.RespondText(fmt.Sprintf("https://some-random-api.com/canvas/blurple2?avatar=%s", url.QueryEscape(user.AvatarURL(""))))
 }
@@ -1212,7 +1212,7 @@ func (ImageCommands) blurple2(ctx *dgc.Ctx) {
 func (ImageCommands) color(ctx *dgc.Ctx) {
 	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
-		user = ctx.Event.Author
+		user = ctx.Message.Author
 	}
 	_ = ctx.RespondText(fmt.Sprintf("https://some-random-api.com/canvas/color?avatar=%s&color=%s",
 		url.QueryEscape(user.AvatarURL("")),
@@ -1223,7 +1223,7 @@ func (ImageCommands) color(ctx *dgc.Ctx) {
 func (ImageCommands) sostupid(ctx *dgc.Ctx) {
 	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
-		user = ctx.Event.Author
+		user = ctx.Message.Author
 	}
 	_ = ctx.RespondText(fmt.Sprintf("https://some-random-api.com/canvas/its-so-stupid?avatar=%s&dog=%s",
 		url.QueryEscape(user.AvatarURL("")),
@@ -1234,7 +1234,7 @@ func (ImageCommands) sostupid(ctx *dgc.Ctx) {
 func (ImageCommands) simpcard(ctx *dgc.Ctx) {
 	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
-		user = ctx.Event.Author
+		user = ctx.Message.Author
 	}
 	_ = ctx.RespondText(fmt.Sprintf("https://some-random-api.com/canvas/simpcard?avatar=%s", url.QueryEscape(user.AvatarURL(""))))
 }
@@ -1242,7 +1242,7 @@ func (ImageCommands) simpcard(ctx *dgc.Ctx) {
 func (ImageCommands) horny(ctx *dgc.Ctx) {
 	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
-		user = ctx.Event.Author
+		user = ctx.Message.Author
 	}
 	_ = ctx.RespondText(fmt.Sprintf("https://some-random-api.com/canvas/horny?avatar=%s", url.QueryEscape(user.AvatarURL(""))))
 }
@@ -1250,7 +1250,7 @@ func (ImageCommands) horny(ctx *dgc.Ctx) {
 func (ImageCommands) lgbt(ctx *dgc.Ctx) {
 	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
-		user = ctx.Event.Author
+		user = ctx.Message.Author
 	}
 	_ = ctx.RespondText(fmt.Sprintf("https://some-random-api.com/canvas/lgbt?avatar=%s", url.QueryEscape(user.AvatarURL(""))))
 }
@@ -1258,7 +1258,7 @@ func (ImageCommands) lgbt(ctx *dgc.Ctx) {
 func (ImageCommands) pansexual(ctx *dgc.Ctx) {
 	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
-		user = ctx.Event.Author
+		user = ctx.Message.Author
 	}
 	_ = ctx.RespondText(fmt.Sprintf("https://some-random-api.com/canvas/pansexual?avatar=%s", url.QueryEscape(user.AvatarURL(""))))
 }
@@ -1266,7 +1266,7 @@ func (ImageCommands) pansexual(ctx *dgc.Ctx) {
 func (ImageCommands) nonbinary(ctx *dgc.Ctx) {
 	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
-		user = ctx.Event.Author
+		user = ctx.Message.Author
 	}
 	_ = ctx.RespondText(fmt.Sprintf("https://some-random-api.com/canvas/nonbinary?avatar=%s", url.QueryEscape(user.AvatarURL(""))))
 }
@@ -1274,7 +1274,7 @@ func (ImageCommands) nonbinary(ctx *dgc.Ctx) {
 func (ImageCommands) lesbian(ctx *dgc.Ctx) {
 	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
-		user = ctx.Event.Author
+		user = ctx.Message.Author
 	}
 	_ = ctx.RespondText(fmt.Sprintf("https://some-random-api.com/canvas/lesbian?avatar=%s", url.QueryEscape(user.AvatarURL(""))))
 }
@@ -1282,7 +1282,7 @@ func (ImageCommands) lesbian(ctx *dgc.Ctx) {
 func (ImageCommands) bisexual(ctx *dgc.Ctx) {
 	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
-		user = ctx.Event.Author
+		user = ctx.Message.Author
 	}
 	_ = ctx.RespondText(fmt.Sprintf("https://some-random-api.com/canvas/bisexual?avatar=%s", url.QueryEscape(user.AvatarURL(""))))
 }
@@ -1290,7 +1290,7 @@ func (ImageCommands) bisexual(ctx *dgc.Ctx) {
 func (ImageCommands) trans(ctx *dgc.Ctx) {
 	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
-		user = ctx.Event.Author
+		user = ctx.Message.Author
 	}
 	_ = ctx.RespondText(fmt.Sprintf("https://some-random-api.com/canvas/transgender?avatar=%s", url.QueryEscape(user.AvatarURL(""))))
 }
@@ -1306,7 +1306,7 @@ func (ImageCommands) oogway2(ctx *dgc.Ctx) {
 func (ImageCommands) threat(ctx *dgc.Ctx) {
 	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
-		user = ctx.Event.Author
+		user = ctx.Message.Author
 	}
 	jsonResult, err := http.GetJson(fmt.Sprintf("https://nekobot.xyz/api/imagegen?type=threats&url=%s", url.QueryEscape(user.AvatarURL(""))))
 	if err != nil {
@@ -1328,11 +1328,11 @@ func (ImageCommands) clyde(ctx *dgc.Ctx) {
 func (ImageCommands) distractedbf(ctx *dgc.Ctx) {
 	user1, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
-		user1 = ctx.Event.Author
+		user1 = ctx.Message.Author
 	}
 	user2, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(1))
 	if !success {
-		user2 = ctx.Event.Author
+		user2 = ctx.Message.Author
 	}
 	jsonResult, err := http.GetJson(fmt.Sprintf("https://nekobot.xyz/api/imagegen?type=ship&user1=%s&user2=%s", url.QueryEscape(user1.AvatarURL("")), url.QueryEscape(user2.AvatarURL(""))))
 	if err != nil {
@@ -1345,7 +1345,7 @@ func (ImageCommands) distractedbf(ctx *dgc.Ctx) {
 func (ImageCommands) captcha(ctx *dgc.Ctx) {
 	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
-		user = ctx.Event.Author
+		user = ctx.Message.Author
 	}
 	jsonResult, err := http.GetJson(fmt.Sprintf("https://nekobot.xyz/api/imagegen?type=captcha&url=%s&username=%s",
 		url.QueryEscape(user.AvatarURL("")),
@@ -1361,11 +1361,11 @@ func (ImageCommands) captcha(ctx *dgc.Ctx) {
 func (ImageCommands) whowouldwin(ctx *dgc.Ctx) {
 	user1, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
-		user1 = ctx.Event.Author
+		user1 = ctx.Message.Author
 	}
 	user2, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(1))
 	if !success {
-		user2 = ctx.Event.Author
+		user2 = ctx.Message.Author
 	}
 	jsonResult, err := http.GetJson(fmt.Sprintf("https://nekobot.xyz/api/imagegen?type=whowouldwin&user1=%s&user2=%s", url.QueryEscape(user1.AvatarURL("")), url.QueryEscape(user2.AvatarURL(""))))
 	if err != nil {
@@ -1387,7 +1387,7 @@ func (ImageCommands) changemymind(ctx *dgc.Ctx) {
 func (ImageCommands) jpeg(ctx *dgc.Ctx) {
 	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
-		user = ctx.Event.Author
+		user = ctx.Message.Author
 	}
 	jsonResult, err := http.GetJson(fmt.Sprintf("https://nekobot.xyz/api/imagegen?type=jpeg&url=%s", url.QueryEscape(user.AvatarURL(""))))
 	if err != nil {
@@ -1400,7 +1400,7 @@ func (ImageCommands) jpeg(ctx *dgc.Ctx) {
 func (ImageCommands) lolice(ctx *dgc.Ctx) {
 	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
-		user = ctx.Event.Author
+		user = ctx.Message.Author
 	}
 	jsonResult, err := http.GetJson(fmt.Sprintf("https://nekobot.xyz/api/imagegen?type=lolice&url=%s", url.QueryEscape(user.AvatarURL(""))))
 	if err != nil {
@@ -1422,7 +1422,7 @@ func (ImageCommands) kannagen(ctx *dgc.Ctx) {
 func (ImageCommands) iphonex(ctx *dgc.Ctx) {
 	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
-		user = ctx.Event.Author
+		user = ctx.Message.Author
 	}
 	jsonResult, err := http.GetJson(fmt.Sprintf("https://nekobot.xyz/api/imagegen?type=iphonex&url=%s", url.QueryEscape(user.AvatarURL(""))))
 	if err != nil {
@@ -1435,7 +1435,7 @@ func (ImageCommands) iphonex(ctx *dgc.Ctx) {
 func (ImageCommands) awooify(ctx *dgc.Ctx) {
 	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
-		user = ctx.Event.Author
+		user = ctx.Message.Author
 	}
 	jsonResult, err := http.GetJson(fmt.Sprintf("https://nekobot.xyz/api/imagegen?type=awooify&url=%s", url.QueryEscape(user.AvatarURL(""))))
 	if err != nil {
@@ -1448,12 +1448,12 @@ func (ImageCommands) awooify(ctx *dgc.Ctx) {
 func (ImageCommands) trap(ctx *dgc.Ctx) {
 	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
-		user = ctx.Event.Author
+		user = ctx.Message.Author
 	}
 	jsonResult, err := http.GetJson(fmt.Sprintf("https://nekobot.xyz/api/imagegen?type=trap&image=%s&name=%s&author=%s",
 		url.QueryEscape(user.AvatarURL("")),
 		url.QueryEscape(user.String()),
-		url.QueryEscape(ctx.Event.Author.String()),
+		url.QueryEscape(ctx.Message.Author.String()),
 	))
 	if err != nil {
 		_ = ctx.RespondText("An error has occurred: " + err.Error())
@@ -1474,7 +1474,7 @@ func (ImageCommands) trumptweet(ctx *dgc.Ctx) {
 func (ImageCommands) deepfry(ctx *dgc.Ctx) {
 	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
-		user = ctx.Event.Author
+		user = ctx.Message.Author
 	}
 	jsonResult, err := http.GetJson(fmt.Sprintf("https://nekobot.xyz/api/imagegen?type=deepfry&image=%s", url.QueryEscape(user.AvatarURL(""))))
 	if err != nil {
@@ -1487,7 +1487,7 @@ func (ImageCommands) deepfry(ctx *dgc.Ctx) {
 func (ImageCommands) blurpify(ctx *dgc.Ctx) {
 	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
-		user = ctx.Event.Author
+		user = ctx.Message.Author
 	}
 	jsonResult, err := http.GetJson(fmt.Sprintf("https://nekobot.xyz/api/imagegen?type=blurpify&image=%s", url.QueryEscape(user.AvatarURL(""))))
 	if err != nil {
@@ -1500,7 +1500,7 @@ func (ImageCommands) blurpify(ctx *dgc.Ctx) {
 func (ImageCommands) phcomment(ctx *dgc.Ctx) {
 	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
-		user = ctx.Event.Author
+		user = ctx.Message.Author
 	}
 	jsonResult, err := http.GetJson(fmt.Sprintf("https://nekobot.xyz/api/imagegen?type=phcomment&text=%s&username=%s&image=%s",
 		url.QueryEscape(utils.String.RemoveWords(ctx.Arguments.Raw(), 1)),
@@ -1526,7 +1526,7 @@ func (ImageCommands) fact(ctx *dgc.Ctx) {
 func (ImageCommands) trash(ctx *dgc.Ctx) {
 	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
-		user = ctx.Event.Author
+		user = ctx.Message.Author
 	}
 	jsonResult, err := http.GetJson(fmt.Sprintf("https://nekobot.xyz/api/imagegen?type=trash&url=%s", url.QueryEscape(user.AvatarURL(""))))
 	if err != nil {
@@ -1539,7 +1539,7 @@ func (ImageCommands) trash(ctx *dgc.Ctx) {
 func (ImageCommands) stickbug(ctx *dgc.Ctx) {
 	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
-		user = ctx.Event.Author
+		user = ctx.Message.Author
 	}
 	jsonResult, err := http.GetJson(fmt.Sprintf("https://nekobot.xyz/api/imagegen?type=stickbug&url=%s", url.QueryEscape(user.AvatarURL(""))))
 	if err != nil {
@@ -1552,7 +1552,7 @@ func (ImageCommands) stickbug(ctx *dgc.Ctx) {
 func (ImageCommands) magik(ctx *dgc.Ctx) {
 	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
-		user = ctx.Event.Author
+		user = ctx.Message.Author
 	}
 	jsonResult, err := http.GetJson(fmt.Sprintf("https://nekobot.xyz/api/imagegen?type=magik&image=%s&intensity=5", url.QueryEscape(user.AvatarURL(""))))
 	if err != nil {
@@ -1788,11 +1788,11 @@ func (ImageCommands) capybara(ctx *dgc.Ctx) {
 func (ImageCommands) bed(ctx *dgc.Ctx) {
 	user1, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
-		user1 = ctx.Event.Author
+		user1 = ctx.Message.Author
 	}
 	user2, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(1))
 	if !success {
-		user2 = ctx.Event.Author
+		user2 = ctx.Message.Author
 	}
 	err := utils.Discord.SendFileFromURL(
 		ctx,
@@ -1838,7 +1838,7 @@ func (ImageCommands) abandon(ctx *dgc.Ctx) {
 func (ImageCommands) aborted(ctx *dgc.Ctx) {
 	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
-		user = ctx.Event.Author
+		user = ctx.Message.Author
 	}
 	err := utils.Discord.SendFileFromURL(
 		ctx,
@@ -1856,7 +1856,7 @@ func (ImageCommands) aborted(ctx *dgc.Ctx) {
 func (ImageCommands) affect(ctx *dgc.Ctx) {
 	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
-		user = ctx.Event.Author
+		user = ctx.Message.Author
 	}
 	err := utils.Discord.SendFileFromURL(
 		ctx,
@@ -1874,7 +1874,7 @@ func (ImageCommands) affect(ctx *dgc.Ctx) {
 func (ImageCommands) airpods(ctx *dgc.Ctx) {
 	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
-		user = ctx.Event.Author
+		user = ctx.Message.Author
 	}
 	err := utils.Discord.SendFileFromURL(
 		ctx,
@@ -1892,7 +1892,7 @@ func (ImageCommands) airpods(ctx *dgc.Ctx) {
 func (ImageCommands) america(ctx *dgc.Ctx) {
 	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
-		user = ctx.Event.Author
+		user = ctx.Message.Author
 	}
 	err := utils.Discord.SendFileFromURL(
 		ctx,
@@ -1924,7 +1924,7 @@ func (ImageCommands) armor(ctx *dgc.Ctx) {
 func (ImageCommands) bongocat(ctx *dgc.Ctx) {
 	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
-		user = ctx.Event.Author
+		user = ctx.Message.Author
 	}
 	err := utils.Discord.SendFileFromURL(
 		ctx,
@@ -1973,7 +1973,7 @@ func (ImageCommands) bigbrain(ctx *dgc.Ctx) {
 func (ImageCommands) brazzers(ctx *dgc.Ctx) {
 	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
-		user = ctx.Event.Author
+		user = ctx.Message.Author
 	}
 	err := utils.Discord.SendFileFromURL(
 		ctx,
@@ -1992,7 +1992,7 @@ func (ImageCommands) brazzers(ctx *dgc.Ctx) {
 func (ImageCommands) byemom(ctx *dgc.Ctx) {
 	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
-		user = ctx.Event.Author
+		user = ctx.Message.Author
 	}
 	err := utils.Discord.SendFileFromURL(
 		ctx,
@@ -2012,7 +2012,7 @@ func (ImageCommands) byemom(ctx *dgc.Ctx) {
 func (ImageCommands) cancer(ctx *dgc.Ctx) {
 	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
-		user = ctx.Event.Author
+		user = ctx.Message.Author
 	}
 	err := utils.Discord.SendFileFromURL(
 		ctx,
@@ -2058,7 +2058,7 @@ func (ImageCommands) citation(ctx *dgc.Ctx) {
 func (ImageCommands) communism(ctx *dgc.Ctx) {
 	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
-		user = ctx.Event.Author
+		user = ctx.Message.Author
 	}
 	err := utils.Discord.SendFileFromURL(
 		ctx,
@@ -2090,7 +2090,7 @@ func (ImageCommands) confusedcat(ctx *dgc.Ctx) {
 func (ImageCommands) corporate(ctx *dgc.Ctx) {
 	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
-		user = ctx.Event.Author
+		user = ctx.Message.Author
 	}
 	err := utils.Discord.SendFileFromURL(
 		ctx,
@@ -2122,7 +2122,7 @@ func (ImageCommands) cry(ctx *dgc.Ctx) {
 func (ImageCommands) dab(ctx *dgc.Ctx) {
 	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
-		user = ctx.Event.Author
+		user = ctx.Message.Author
 	}
 	err := utils.Discord.SendFileFromURL(
 		ctx,
@@ -2140,7 +2140,7 @@ func (ImageCommands) dab(ctx *dgc.Ctx) {
 func (ImageCommands) dank(ctx *dgc.Ctx) {
 	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
-		user = ctx.Event.Author
+		user = ctx.Message.Author
 	}
 	err := utils.Discord.SendFileFromURL(
 		ctx,
@@ -2158,7 +2158,7 @@ func (ImageCommands) dank(ctx *dgc.Ctx) {
 func (ImageCommands) delete(ctx *dgc.Ctx) {
 	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
-		user = ctx.Event.Author
+		user = ctx.Message.Author
 	}
 	err := utils.Discord.SendFileFromURL(
 		ctx,
@@ -2176,7 +2176,7 @@ func (ImageCommands) delete(ctx *dgc.Ctx) {
 func (ImageCommands) disability(ctx *dgc.Ctx) {
 	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
-		user = ctx.Event.Author
+		user = ctx.Message.Author
 	}
 	err := utils.Discord.SendFileFromURL(
 		ctx,
@@ -2208,7 +2208,7 @@ func (ImageCommands) doglemon(ctx *dgc.Ctx) {
 func (ImageCommands) door(ctx *dgc.Ctx) {
 	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
-		user = ctx.Event.Author
+		user = ctx.Message.Author
 	}
 	err := utils.Discord.SendFileFromURL(
 		ctx,
@@ -2226,7 +2226,7 @@ func (ImageCommands) door(ctx *dgc.Ctx) {
 func (ImageCommands) egg(ctx *dgc.Ctx) {
 	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
-		user = ctx.Event.Author
+		user = ctx.Message.Author
 	}
 	err := utils.Discord.SendFileFromURL(
 		ctx,
@@ -2325,7 +2325,7 @@ func (ImageCommands) achievement(ctx *dgc.Ctx) {
 func (ImageCommands) amiajoke(ctx *dgc.Ctx) {
 	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
-		user = ctx.Event.Author
+		user = ctx.Message.Author
 	}
 	_ = ctx.RespondText(fmt.Sprintf("https://api.lightning-bot.com/api/v3/imagegen/amiajoke?url=%s", url.QueryEscape(user.AvatarURL(""))))
 }
@@ -2333,7 +2333,7 @@ func (ImageCommands) amiajoke(ctx *dgc.Ctx) {
 func (ImageCommands) bad(ctx *dgc.Ctx) {
 	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
-		user = ctx.Event.Author
+		user = ctx.Message.Author
 	}
 	_ = ctx.RespondText(fmt.Sprintf("https://api.lightning-bot.com/api/v3/imagegen/bad?url=%s", url.QueryEscape(user.AvatarURL(""))))
 }
@@ -2373,7 +2373,7 @@ func (ImageCommands) facts(ctx *dgc.Ctx) {
 func (ImageCommands) blur(ctx *dgc.Ctx) {
 	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
-		user = ctx.Event.Author
+		user = ctx.Message.Author
 	}
 	_ = ctx.RespondText(fmt.Sprintf("https://api.lightning-bot.com/api/v3/imagegen/filter?url=%s&filter=blur", url.QueryEscape(user.AvatarURL(""))))
 }
@@ -2381,7 +2381,7 @@ func (ImageCommands) blur(ctx *dgc.Ctx) {
 func (ImageCommands) flipav(ctx *dgc.Ctx) {
 	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
-		user = ctx.Event.Author
+		user = ctx.Message.Author
 	}
 	_ = ctx.RespondText(fmt.Sprintf("https://api.lightning-bot.com/api/v3/imagegen/filter?url=%s&filter=flip", url.QueryEscape(user.AvatarURL(""))))
 }
@@ -2389,7 +2389,7 @@ func (ImageCommands) flipav(ctx *dgc.Ctx) {
 func (ImageCommands) mirror(ctx *dgc.Ctx) {
 	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
-		user = ctx.Event.Author
+		user = ctx.Message.Author
 	}
 	_ = ctx.RespondText(fmt.Sprintf("https://api.lightning-bot.com/api/v3/imagegen/filter?url=%s&filter=mirror", url.QueryEscape(user.AvatarURL(""))))
 }
@@ -2397,7 +2397,7 @@ func (ImageCommands) mirror(ctx *dgc.Ctx) {
 func (ImageCommands) wide(ctx *dgc.Ctx) {
 	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
-		user = ctx.Event.Author
+		user = ctx.Message.Author
 	}
 	_ = ctx.RespondText(fmt.Sprintf("https://api.lightning-bot.com/api/v3/imagegen/filter?url=%s&filter=wide", url.QueryEscape(user.AvatarURL(""))))
 }
@@ -2405,7 +2405,7 @@ func (ImageCommands) wide(ctx *dgc.Ctx) {
 func (ImageCommands) sepia(ctx *dgc.Ctx) {
 	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
-		user = ctx.Event.Author
+		user = ctx.Message.Author
 	}
 	_ = ctx.RespondText(fmt.Sprintf("https://api.lightning-bot.com/api/v3/imagegen/filter?url=%s&filter=sepia", url.QueryEscape(user.AvatarURL(""))))
 }
@@ -2417,7 +2417,7 @@ func (ImageCommands) recaptcha(ctx *dgc.Ctx) {
 func (ImageCommands) gay(ctx *dgc.Ctx) {
 	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
-		user = ctx.Event.Author
+		user = ctx.Message.Author
 	}
 	_ = ctx.RespondText(fmt.Sprintf("https://api.lightning-bot.com/api/v3/imagegen/filter?url=%s&filter=gay", url.QueryEscape(user.AvatarURL(""))))
 }
@@ -2425,7 +2425,7 @@ func (ImageCommands) gay(ctx *dgc.Ctx) {
 func (ImageCommands) communist(ctx *dgc.Ctx) {
 	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
-		user = ctx.Event.Author
+		user = ctx.Message.Author
 	}
 	_ = ctx.RespondText(fmt.Sprintf("https://api.lightning-bot.com/api/v3/imagegen/filter?url=%s&filter=communist", url.QueryEscape(user.AvatarURL(""))))
 }
@@ -2433,7 +2433,7 @@ func (ImageCommands) communist(ctx *dgc.Ctx) {
 func (ImageCommands) snow(ctx *dgc.Ctx) {
 	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
-		user = ctx.Event.Author
+		user = ctx.Message.Author
 	}
 	_ = ctx.RespondText(fmt.Sprintf("https://api.lightning-bot.com/api/v3/imagegen/filter?url=%s&filter=snow", url.QueryEscape(user.AvatarURL(""))))
 }
@@ -2449,7 +2449,7 @@ func (ImageCommands) hub(ctx *dgc.Ctx) {
 func (ImageCommands) floor(ctx *dgc.Ctx) {
 	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
-		user = ctx.Event.Author
+		user = ctx.Message.Author
 	}
 	_ = ctx.RespondText(fmt.Sprintf("https://api.lightning-bot.com/api/v3/imagegen/floor?url=%s&text=%s",
 		url.QueryEscape(user.AvatarURL("")),
@@ -2460,7 +2460,7 @@ func (ImageCommands) floor(ctx *dgc.Ctx) {
 func (ImageCommands) jokeoverhead(ctx *dgc.Ctx) {
 	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
-		user = ctx.Event.Author
+		user = ctx.Message.Author
 	}
 	_ = ctx.RespondText(fmt.Sprintf("https://api.lightning-bot.com/api/v3/imagegen/jokeoverhead?url=%s", url.QueryEscape(user.AvatarURL(""))))
 }
@@ -2468,18 +2468,18 @@ func (ImageCommands) jokeoverhead(ctx *dgc.Ctx) {
 func (ImageCommands) throwaway(ctx *dgc.Ctx) {
 	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
-		user = ctx.Event.Author
+		user = ctx.Message.Author
 	}
 	_ = ctx.RespondText(fmt.Sprintf("https://api.lightning-bot.com/api/v3/imagegen/trash?url=%s&trash_url=%s",
 		url.QueryEscape(user.AvatarURL("")),
-		url.QueryEscape(ctx.Event.Author.AvatarURL("")),
+		url.QueryEscape(ctx.Message.Author.AvatarURL("")),
 	))
 }
 
 func (ImageCommands) salty(ctx *dgc.Ctx) {
 	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
-		user = ctx.Event.Author
+		user = ctx.Message.Author
 	}
 	_ = ctx.RespondText(fmt.Sprintf("https://api.lightning-bot.com/api/v3/imagegen/salty?url=%s", url.QueryEscape(user.AvatarURL(""))))
 }
@@ -2491,7 +2491,7 @@ func (ImageCommands) scroll(ctx *dgc.Ctx) {
 func (ImageCommands) shame(ctx *dgc.Ctx) {
 	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
-		user = ctx.Event.Author
+		user = ctx.Message.Author
 	}
 	_ = ctx.RespondText(fmt.Sprintf("https://api.lightning-bot.com/api/v3/imagegen/shame?url=%s", url.QueryEscape(user.AvatarURL(""))))
 }
@@ -2499,11 +2499,11 @@ func (ImageCommands) shame(ctx *dgc.Ctx) {
 func (ImageCommands) ship(ctx *dgc.Ctx) {
 	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
-		user = ctx.Event.Author
+		user = ctx.Message.Author
 	}
 	user2, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(1))
 	if !success {
-		user2 = ctx.Event.Author
+		user2 = ctx.Message.Author
 	}
 	_ = ctx.RespondText(fmt.Sprintf(
 		"https://api.lightning-bot.com/api/v3/imagegen/ship?url1=%s&url2=%s",
@@ -2515,7 +2515,7 @@ func (ImageCommands) ship(ctx *dgc.Ctx) {
 func (ImageCommands) what(ctx *dgc.Ctx) {
 	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
-		user = ctx.Event.Author
+		user = ctx.Message.Author
 	}
 	_ = ctx.RespondText(fmt.Sprintf("https://api.lightning-bot.com/api/v3/imagegen/what?url=%s", url.QueryEscape(user.AvatarURL(""))))
 }
@@ -2523,7 +2523,7 @@ func (ImageCommands) what(ctx *dgc.Ctx) {
 func (ImageCommands) adios(ctx *dgc.Ctx) {
 	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
-		user = ctx.Event.Author
+		user = ctx.Message.Author
 	}
 	_ = ctx.RespondText(fmt.Sprintf("https://vacefron.nl/api/adios?user=%s", url.QueryEscape(user.AvatarURL(""))))
 }
@@ -2531,11 +2531,11 @@ func (ImageCommands) adios(ctx *dgc.Ctx) {
 func (ImageCommands) batmanslap(ctx *dgc.Ctx) {
 	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
-		user = ctx.Event.Author
+		user = ctx.Message.Author
 	}
 	user2, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(1))
 	if !success {
-		user2 = ctx.Event.Author
+		user2 = ctx.Message.Author
 	}
 	_ = ctx.RespondText(fmt.Sprintf(
 		"https://vacefron.nl/api/batmanslap?text1=%s&text2=%s&batman=%s&robin=%s",
@@ -2553,7 +2553,7 @@ func (ImageCommands) carreverse(ctx *dgc.Ctx) {
 func (ImageCommands) drip(ctx *dgc.Ctx) {
 	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
-		user = ctx.Event.Author
+		user = ctx.Message.Author
 	}
 	_ = ctx.RespondText(fmt.Sprintf("https://vacefron.nl/api/drip?user=%s", url.QueryEscape(user.AvatarURL(""))))
 }
@@ -2575,7 +2575,7 @@ func (ImageCommands) emergencymeeting(ctx *dgc.Ctx) {
 func (ImageCommands) firsttime(ctx *dgc.Ctx) {
 	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
-		user = ctx.Event.Author
+		user = ctx.Message.Author
 	}
 	_ = ctx.RespondText(fmt.Sprintf("https://vacefron.nl/api/firsttime?user=%s", url.QueryEscape(user.AvatarURL(""))))
 }
@@ -2583,7 +2583,7 @@ func (ImageCommands) firsttime(ctx *dgc.Ctx) {
 func (ImageCommands) grave(ctx *dgc.Ctx) {
 	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
-		user = ctx.Event.Author
+		user = ctx.Message.Author
 	}
 	_ = ctx.RespondText(fmt.Sprintf("https://vacefron.nl/api/grave?user=%s", url.QueryEscape(user.AvatarURL(""))))
 }
@@ -2591,7 +2591,7 @@ func (ImageCommands) grave(ctx *dgc.Ctx) {
 func (ImageCommands) iamspeed(ctx *dgc.Ctx) {
 	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
-		user = ctx.Event.Author
+		user = ctx.Message.Author
 	}
 	_ = ctx.RespondText(fmt.Sprintf("https://vacefron.nl/api/iamspeed?user=%s", url.QueryEscape(user.AvatarURL(""))))
 }
@@ -2599,11 +2599,11 @@ func (ImageCommands) iamspeed(ctx *dgc.Ctx) {
 func (ImageCommands) icanmilkyou(ctx *dgc.Ctx) {
 	user1, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
-		user1 = ctx.Event.Author
+		user1 = ctx.Message.Author
 	}
 	user2, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(1))
 	if !success {
-		user2 = ctx.Event.Author
+		user2 = ctx.Message.Author
 	}
 	_ = ctx.RespondText(fmt.Sprintf("https://vacefron.nl/api/icanmilkyou?user1=%s&user2=%s", url.QueryEscape(user1.AvatarURL("")), url.QueryEscape(user2.AvatarURL(""))))
 }
@@ -2611,7 +2611,7 @@ func (ImageCommands) icanmilkyou(ctx *dgc.Ctx) {
 func (ImageCommands) heaven(ctx *dgc.Ctx) {
 	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
-		user = ctx.Event.Author
+		user = ctx.Message.Author
 	}
 	_ = ctx.RespondText(fmt.Sprintf("https://vacefron.nl/api/heaven?user=%s", url.QueryEscape(user.AvatarURL(""))))
 }
@@ -2623,7 +2623,7 @@ func (ImageCommands) npc(ctx *dgc.Ctx) {
 func (ImageCommands) stonks(ctx *dgc.Ctx) {
 	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
-		user = ctx.Event.Author
+		user = ctx.Message.Author
 	}
 	_ = ctx.RespondText(fmt.Sprintf("https://vacefron.nl/api/stonks?user=%s", url.QueryEscape(user.AvatarURL(""))))
 }
@@ -2631,7 +2631,7 @@ func (ImageCommands) stonks(ctx *dgc.Ctx) {
 func (ImageCommands) notstonks(ctx *dgc.Ctx) {
 	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
-		user = ctx.Event.Author
+		user = ctx.Message.Author
 	}
 	_ = ctx.RespondText(fmt.Sprintf("https://vacefron.nl/api/stonks?user=%s&notstonks=true", url.QueryEscape(user.AvatarURL(""))))
 }
@@ -2639,7 +2639,7 @@ func (ImageCommands) notstonks(ctx *dgc.Ctx) {
 func (ImageCommands) fliptable(ctx *dgc.Ctx) {
 	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
-		user = ctx.Event.Author
+		user = ctx.Message.Author
 	}
 	_ = ctx.RespondText(fmt.Sprintf("https://vacefron.nl/api/tableflip?user=%s", url.QueryEscape(user.AvatarURL(""))))
 }
@@ -2651,7 +2651,7 @@ func (ImageCommands) water(ctx *dgc.Ctx) {
 func (ImageCommands) wolverine(ctx *dgc.Ctx) {
 	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
-		user = ctx.Event.Author
+		user = ctx.Message.Author
 	}
 	_ = ctx.RespondText(fmt.Sprintf("https://vacefron.nl/api/wolverine?user=%s", url.QueryEscape(user.AvatarURL(""))))
 }
@@ -2659,11 +2659,11 @@ func (ImageCommands) wolverine(ctx *dgc.Ctx) {
 func (ImageCommands) womanyellingatcat(ctx *dgc.Ctx) {
 	user1, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
-		user1 = ctx.Event.Author
+		user1 = ctx.Message.Author
 	}
 	user2, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(1))
 	if !success {
-		user2 = ctx.Event.Author
+		user2 = ctx.Message.Author
 	}
 	_ = ctx.RespondText(fmt.Sprintf("https://vacefron.nl/api/womanyellingatcat?woman=%s&cat=%s", url.QueryEscape(user1.AvatarURL("")), url.QueryEscape(user2.AvatarURL(""))))
 }
@@ -2680,7 +2680,7 @@ func (ImageCommands) pikachu(ctx *dgc.Ctx) {
 func (ImageCommands) speechbubble(ctx *dgc.Ctx) {
 	link := utils.Arguments["[link/attachment]"]
 
-	attachments := ctx.Event.Message.Attachments
+	attachments := ctx.Message.Message.Attachments
 	if len(attachments) > 0 {
 		link = attachments[0].URL
 	}
@@ -2714,19 +2714,19 @@ func (ImageCommands) speechbubble(ctx *dgc.Ctx) {
 }
 
 func (ImageCommands) quotereply(ctx *dgc.Ctx) {
-	if ctx.Event.ReferencedMessage == nil {
+	if ctx.Message.ReferencedMessage == nil {
 		embed.NewEmbed().
 			SetDescription("You must reply to a message to use quotereply.").
 			Send(ctx)
 		return
 	}
 
-	m := ctx.Event.ReferencedMessage
+	m := ctx.Message.ReferencedMessage
 
 	_ = ctx.RespondText(fmt.Sprintf(
 		"https://api.lightning-bot.com/api/v3/imagegen/quote?author=%s&text=%s&background=%s",
 		url.QueryEscape(utils.Misc.Or(m.Author.DisplayName, m.Author.Username)),
-		url.QueryEscape(ctx.Event.ReferencedMessage.ContentWithMentionsReplaced()),
+		url.QueryEscape(ctx.Message.ReferencedMessage.ContentWithMentionsReplaced()),
 		url.QueryEscape(utils.Arguments["[background url]"]),
 	))
 }
@@ -2735,7 +2735,7 @@ func (ImageCommands) quotemessage(ctx *dgc.Ctx) {
 	channel, success := utils.Discord.TryGetChannelFromMention(ctx, ctx.Arguments.Get(1))
 	if !success {
 		var err error
-		channel, err = ctx.Session.State.Channel(ctx.Event.ChannelID)
+		channel, err = ctx.Session.State.Channel(ctx.Message.ChannelID)
 		if err != nil {
 			embed.NewEmbed().
 				SetDescription("Could not find channel.").
@@ -2787,11 +2787,11 @@ func (ImageCommands) quotetext(ctx *dgc.Ctx) {
 }
 
 func (ImageCommands) getRoleColor(ctx *dgc.Ctx, userID string) string {
-	if ctx.Event.GuildID == "" {
+	if ctx.Message.GuildID == "" {
 		return ""
 	}
 
-	member, ok := utils.Discord.GetMember(ctx.Session, ctx.Event.GuildID, userID)
+	member, ok := utils.Discord.GetMember(ctx.Session, ctx.Message.GuildID, userID)
 	if !ok {
 		return ""
 	}
@@ -2799,7 +2799,7 @@ func (ImageCommands) getRoleColor(ctx *dgc.Ctx, userID string) string {
 	var authorColor string
 
 	for _, roleID := range member.Roles {
-		role, err := ctx.Session.State.Role(ctx.Event.GuildID, roleID)
+		role, err := ctx.Session.State.Role(ctx.Message.GuildID, roleID)
 		if err != nil {
 			continue
 		}
@@ -2816,7 +2816,7 @@ func (i ImageCommands) discordquotemessage(ctx *dgc.Ctx) {
 	channel, success := utils.Discord.TryGetChannelFromMention(ctx, ctx.Arguments.Get(1))
 	if !success {
 		var err error
-		channel, err = ctx.Session.State.Channel(ctx.Event.ChannelID)
+		channel, err = ctx.Session.State.Channel(ctx.Message.ChannelID)
 		if err != nil {
 			embed.NewEmbed().
 				SetDescription("Could not find channel.").
@@ -2846,14 +2846,14 @@ func (i ImageCommands) discordquotemessage(ctx *dgc.Ctx) {
 }
 
 func (i ImageCommands) discordquotereply(ctx *dgc.Ctx) {
-	if ctx.Event.ReferencedMessage == nil {
+	if ctx.Message.ReferencedMessage == nil {
 		embed.NewEmbed().
 			SetDescription("You must reply to a message to use quotereply.").
 			Send(ctx)
 		return
 	}
 
-	m := ctx.Event.ReferencedMessage
+	m := ctx.Message.ReferencedMessage
 
 	authorColor := i.getRoleColor(ctx, m.Author.ID)
 

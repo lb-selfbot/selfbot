@@ -400,13 +400,13 @@ func (EventReactionsCommands) getGuildOrChannel(ctx *dgc.Ctx, arg *dgc.Argument)
 
 	if givenID == "" {
 		// Use the current server/channel
-		if ctx.Event.GuildID != "" {
-			guild, err = utils.Discord.GetGuild(ctx.Session, ctx.Event.GuildID)
+		if ctx.Message.GuildID != "" {
+			guild, err = utils.Discord.GetGuild(ctx.Session, ctx.Message.GuildID)
 			if err != nil {
 				return
 			}
 		} else {
-			channel, err = utils.Discord.GetChannel(ctx.Session, ctx.Event.ChannelID)
+			channel, err = utils.Discord.GetChannel(ctx.Session, ctx.Message.ChannelID)
 			if err != nil {
 				return
 			}
@@ -477,7 +477,7 @@ func (e EventReactionsCommands) ignoreuser(ctx *dgc.Ctx) {
 func (e EventReactionsCommands) ignoreserver(ctx *dgc.Ctx) {
 	switch strings.ToLower(utils.Arguments["<toggle/list/clear>"]) {
 	case "toggle":
-		guildID := utils.Misc.Or(utils.Arguments["[server id]"], ctx.Event.GuildID)
+		guildID := utils.Misc.Or(utils.Arguments["[server id]"], ctx.Message.GuildID)
 
 		guild, err := utils.Discord.GetGuild(ctx.Session, guildID)
 		if err != nil {
@@ -1102,7 +1102,7 @@ func (e EventReactionsCommands) forcenick(ctx *dgc.Ctx) {
 			return
 		}
 
-		guildID := utils.Misc.Or(utils.Arguments["[server id]"], ctx.Event.GuildID)
+		guildID := utils.Misc.Or(utils.Arguments["[server id]"], ctx.Message.GuildID)
 
 		guild, err := utils.Discord.GetGuild(ctx.Session, guildID)
 		if err != nil {
@@ -1114,7 +1114,7 @@ func (e EventReactionsCommands) forcenick(ctx *dgc.Ctx) {
 
 		nickname := utils.Arguments["[nickname]"]
 
-		err = ctx.Session.GuildMemberNickname(ctx.Event.GuildID, user.ID, nickname)
+		err = ctx.Session.GuildMemberNickname(ctx.Message.GuildID, user.ID, nickname)
 		if err != nil {
 			embed.NewEmbed().
 				SetDescription("Could not set nickname: " + err.Error()).
@@ -1151,7 +1151,7 @@ func (e EventReactionsCommands) forcekick(ctx *dgc.Ctx) {
 			return
 		}
 
-		guildID := utils.Misc.Or(utils.Arguments["[server id]"], ctx.Event.GuildID)
+		guildID := utils.Misc.Or(utils.Arguments["[server id]"], ctx.Message.GuildID)
 
 		guild, err := utils.Discord.GetGuild(ctx.Session, guildID)
 		if err != nil {
@@ -1161,7 +1161,7 @@ func (e EventReactionsCommands) forcekick(ctx *dgc.Ctx) {
 			return
 		}
 
-		err = ctx.Session.GuildMemberDelete(ctx.Event.GuildID, user.ID)
+		err = ctx.Session.GuildMemberDelete(ctx.Message.GuildID, user.ID)
 		if err != nil {
 			embed.NewEmbed().
 				SetDescription("Could not kick user: " + err.Error()).
@@ -1212,7 +1212,7 @@ func (e EventReactionsCommands) noleave(ctx *dgc.Ctx) {
 		arg := ctx.Arguments.Get(2)
 		givenID := utils.Misc.Or(arg.AsChannelMentionID(), arg.Raw())
 
-		channel, err := utils.Discord.GetChannel(ctx.Session, utils.Misc.Or(givenID, ctx.Event.ChannelID))
+		channel, err := utils.Discord.GetChannel(ctx.Session, utils.Misc.Or(givenID, ctx.Message.ChannelID))
 		if err != nil {
 			embed.NewEmbed().
 				SetDescription("Could not find channel: " + err.Error()).
@@ -1713,8 +1713,8 @@ func (EventReactionsCommands) afktriggerusers(ctx *dgc.Ctx) {
 	case "get":
 		userString := ""
 		for _, userID := range cfg.AFK.TriggerList.Users {
-			user, ok := utils.Discord.GetUser(ctx.Session, userID)
-			if !ok {
+			user, err := utils.Discord.GetUser(ctx.Session, userID)
+			if err != nil {
 				userString += fmt.Sprintf("%s - %s\n", "Unknown", userID)
 				continue
 			}
@@ -1808,7 +1808,7 @@ func (EventReactionsCommands) afktriggerservers(ctx *dgc.Ctx) {
 			AddField("AFK Triggerlist Servers", strings.Join(servers, ", ")).
 			Send(ctx)
 	case "add":
-		guild, err := utils.Discord.GetGuild(ctx.Session, utils.Misc.Or(utils.Arguments["[server id]"], ctx.Event.GuildID))
+		guild, err := utils.Discord.GetGuild(ctx.Session, utils.Misc.Or(utils.Arguments["[server id]"], ctx.Message.GuildID))
 		if err != nil {
 			embed.NewEmbed().
 				SetDescription("Could not find server.").
@@ -1829,7 +1829,7 @@ func (EventReactionsCommands) afktriggerservers(ctx *dgc.Ctx) {
 			SetDescription(fmt.Sprintf("Added %s to the AFK Triggerlist.", guild.Name)).
 			Send(ctx)
 	case "rm":
-		guild, err := utils.Discord.GetGuild(ctx.Session, utils.Misc.Or(utils.Arguments["[server id]"], ctx.Event.GuildID))
+		guild, err := utils.Discord.GetGuild(ctx.Session, utils.Misc.Or(utils.Arguments["[server id]"], ctx.Message.GuildID))
 		if err != nil {
 			embed.NewEmbed().
 				SetDescription("Could not find server.").

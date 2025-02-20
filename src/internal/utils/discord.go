@@ -8,64 +8,18 @@ import (
 	nethttp "net/http"
 	"os"
 	"path"
-	"regexp"
 	"slices"
 	"strconv"
 	"strings"
-	"sync"
 	"time"
 
 	"github.com/LightningDev1/LB-Selfbot/internal/constants"
 	"github.com/LightningDev1/LB-Selfbot/internal/http"
-	"github.com/LightningDev1/dgc"
+	"github.com/LightningDev1/LB-Selfbot/internal/router"
 	"github.com/LightningDev1/discordgo"
 )
 
-var Arguments = make(map[string]string)
-
-var Users = sync.Map{}
-var nilUser = &discordgo.User{}
-
 type DiscordUtils struct{}
-
-func (DiscordUtils) TryGetUserFromMention(session *discordgo.Session, mention *dgc.Argument) (*discordgo.User, bool) {
-	userID := Misc.Or(mention.AsUserMentionID(), mention.Raw())
-
-	if user, ok := Users.Load(userID); ok {
-		if user == nilUser {
-			return nil, false
-		}
-
-		return user.(*discordgo.User), true
-	}
-
-	user, err := session.State.GetUser(userID)
-	if err != nil {
-		var err error
-
-		user, err = session.User(userID)
-		if err != nil {
-			Users.Store(userID, nilUser)
-			return nil, false
-		}
-	}
-
-	Users.Store(userID, user)
-
-	return user, true
-}
-
-func (DiscordUtils) TryGetMemberFromMention(ctx *dgc.Ctx, mention *dgc.Argument) (*discordgo.Member, bool) {
-	return Discord.GetMember(ctx.Session, ctx.Event.GuildID, Misc.Or(mention.AsUserMentionID(), mention.Raw()))
-}
-
-func (d DiscordUtils) TryGetUsernameFromMention(session *discordgo.Session, mention *dgc.Argument) (string, bool) {
-	user, success := d.TryGetUserFromMention(session, mention)
-	if !success {
-		return "", false
-	}
-	return user.String(), true
-}
 
 func (DiscordUtils) GetChannel(session *discordgo.Session, channelID string) (*discordgo.Channel, error) {
 	channel, err := session.State.Channel(channelID)
@@ -76,40 +30,6 @@ func (DiscordUtils) GetChannel(session *discordgo.Session, channelID string) (*d
 		}
 	}
 	return channel, nil
-}
-
-func (d DiscordUtils) TryGetChannelFromMention(ctx *dgc.Ctx, mention *dgc.Argument) (*discordgo.Channel, bool) {
-	channelID := Misc.Or(mention.AsChannelMentionID(), mention.Raw())
-	channel, err := d.GetChannel(ctx.Session, channelID)
-	if err != nil {
-		return nil, false
-	}
-	return channel, true
-}
-
-func (d DiscordUtils) TryGetChannelFromMentionWithDefault(ctx *dgc.Ctx, mention *dgc.Argument) (*discordgo.Channel, bool) {
-	channelID := Misc.Or(mention.AsChannelMentionID(), mention.Raw())
-	if channelID == "" {
-		channelID = ctx.Event.ChannelID
-	}
-
-	channel, err := d.GetChannel(ctx.Session, channelID)
-	if err != nil {
-		return nil, false
-	}
-	return channel, true
-}
-
-func (DiscordUtils) TryGetRoleFromMention(ctx *dgc.Ctx, mention *dgc.Argument) (*discordgo.Role, bool) {
-	roleID := Misc.Or(mention.AsRoleMentionID(), mention.Raw())
-	role, err := ctx.Session.State.Role(ctx.Event.GuildID, roleID)
-	if err != nil {
-		role, err = ctx.Session.State.Role(ctx.Event.GuildID, roleID)
-		if err != nil {
-			return nil, false
-		}
-	}
-	return role, true
 }
 
 func (DiscordUtils) SnowflakeToTime(snowflake string) time.Time {
@@ -136,38 +56,6 @@ func (DiscordUtils) ParseInvite(invite string) string {
 		return splitInvite[len(splitInvite)-1]
 	}
 	return invite
-}
-
-func (DiscordUtils) CheckIfInServer(ctx *dgc.Ctx) bool {
-	if ctx.Event.GuildID == "" {
-		_ = ctx.RespondText(fmt.Sprintf("Error: The `%s` command is only available in a server.", ctx.Command.Name))
-	}
-	return ctx.Event.GuildID != ""
-}
-
-func (DiscordUtils) GetArguments(ctx *dgc.Ctx) (map[string]string, bool) {
-	rawArguments := strings.Replace(ctx.Command.Usage, fmt.Sprintf("[p]%s", ctx.Command.Name), "", -1)
-	commandArguments := regexp.MustCompile(`(<(.*?)>|\[(.*?)])`).FindAllString(rawArguments, -1)
-	arguments := map[string]string{}
-	content := ctx.Event.Message.Content
-	for index, argName := range commandArguments {
-		raw := ctx.Arguments.Get(index).Raw()
-		isRequired := strings.Contains(argName, "<") && strings.Contains(argName, ">")
-
-		if strings.Contains(argName, "\"") && strings.Count(raw, "\"") >= 2 {
-			arguments[argName] = regexp.MustCompile("\"(.*?)\"").FindString(content)
-			content = strings.Replace(content, arguments[argName], "", -1)
-		} else {
-			arguments[argName] = raw
-			content = String.RemoveWords(content, 1)
-		}
-
-		if arguments[argName] == "" && isRequired {
-			_ = ctx.RespondText("Missing required argument: " + argName)
-			return map[string]string{}, false
-		}
-	}
-	return arguments, true
 }
 
 func (DiscordUtils) GetChannelMessages(session *discordgo.Session, channelID string, limit int) ([]*discordgo.Message, error) {
@@ -295,10 +183,10 @@ func (DiscordUtils) DeleteMessages(session *discordgo.Session, channelID, userID
 	return deleted, nil
 }
 
-func (DiscordUtils) GetRoleNames(ctx *dgc.Ctx, member *discordgo.Member) string {
+func (DiscordUtils) GetRoleNames(session *discordgo.Session, member *discordgo.Member) string {
 	var roleNames []string
 	for _, role := range member.Roles {
-		role, err := ctx.Session.State.Role(member.GuildID, role)
+		role, err := session.State.Role(member.GuildID, role)
 		if err == nil {
 			roleNames = append(roleNames, role.Name)
 		}
@@ -444,14 +332,14 @@ Permission: View Guild Insights      | Value: %s`,
 	return permissionsString
 }
 
-func (DiscordUtils) SendFileFromURL(ctx *dgc.Ctx, url string, fileName string, headers ...map[string]string) error {
+func (DiscordUtils) SendFileFromURL(ctx *router.Ctx, url string, fileName string, headers ...map[string]string) error {
 	httpResponse := http.Get(url, headers...)
 	if httpResponse.Error != nil {
 		return httpResponse.Error
 	}
 
 	_, err := ctx.Session.ChannelFileSend(
-		ctx.Event.ChannelID,
+		ctx.Message.ChannelID,
 		fileName,
 		bytes.NewReader(httpResponse.Body),
 	)
@@ -592,15 +480,12 @@ func (DiscordUtils) GetChannelName(session *discordgo.Session, channelID string)
 	return channelName
 }
 
-func (DiscordUtils) GetUser(session *discordgo.Session, userID string) (*discordgo.User, bool) {
-	arg := &dgc.Argument{}
-	return Discord.TryGetUserFromMention(session, arg.SetRaw(userID))
-}
+func (DiscordUtils) GetUser(session *discordgo.Session, userID string) (*discordgo.User, error) {
+	if user, err := session.State.GetUser(userID); err == nil {
+		return user, nil
+	}
 
-func (DiscordUtils) GetUserName(session *discordgo.Session, userID string) string {
-	arg := &dgc.Argument{}
-	userName, _ := Discord.TryGetUsernameFromMention(session, arg.SetRaw(userID))
-	return Misc.Or(userName, "Unknown")
+	return session.User(userID)
 }
 
 func (DiscordUtils) IsGuildInList(session *discordgo.Session, guildID string, guildsList []string) bool {

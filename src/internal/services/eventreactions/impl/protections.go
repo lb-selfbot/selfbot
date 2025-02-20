@@ -8,10 +8,10 @@ import (
 	"github.com/LightningDev1/LB-Selfbot/internal/api"
 	"github.com/LightningDev1/LB-Selfbot/internal/config"
 	"github.com/LightningDev1/LB-Selfbot/internal/constants"
+	"github.com/LightningDev1/LB-Selfbot/internal/router"
 	"github.com/LightningDev1/LB-Selfbot/internal/services/interfaces"
 
 	"github.com/LightningDev1/LB-Selfbot/internal/utils"
-	"github.com/LightningDev1/dgc"
 	"github.com/LightningDev1/discordgo"
 )
 
@@ -150,9 +150,9 @@ func (p *Protections) MessageCreateHandler(session *discordgo.Session, message *
 			return
 		}
 
-		ctx := &dgc.Ctx{
+		ctx := &router.Ctx{
 			Session: session,
-			Event:   &discordgo.MessageCreate{Message: message.Message},
+			Message: message.Message,
 		}
 
 		if cfg.Protections.ServerProtections.AntiInvite && constants.INVITE_REGEX.MatchString(message.Content) {

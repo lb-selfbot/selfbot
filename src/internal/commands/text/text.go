@@ -339,7 +339,7 @@ func (c *TextCommands) reverse(ctx *dgc.Ctx) {
 }
 
 func (c *TextCommands) alphabet(ctx *dgc.Ctx) {
-	message, _ := ctx.Session.ChannelMessageSend(ctx.Event.ChannelID, "a")
+	message, _ := ctx.Session.ChannelMessageSend(ctx.Message.ChannelID, "a")
 	for i := 1; i < len(constants.ALPHABET); i++ {
 		time.Sleep(1 * time.Second)
 		char := string(constants.ALPHABET[i])
@@ -416,7 +416,7 @@ func (c *TextCommands) devowel(ctx *dgc.Ctx) {
 func (c *TextCommands) edit(ctx *dgc.Ctx) {
 	fullText := ctx.Arguments.Raw()
 	currentText := string(fullText[0])
-	message, err := ctx.Session.ChannelMessageSend(ctx.Event.ChannelID, currentText)
+	message, err := ctx.Session.ChannelMessageSend(ctx.Message.ChannelID, currentText)
 	if err != nil {
 		_ = ctx.RespondText("An error has occurred: " + err.Error())
 		return
@@ -702,14 +702,14 @@ var (
 )
 
 func (c *TextCommands) virus(ctx *dgc.Ctx) {
-	message, err := ctx.Session.ChannelMessageSend(ctx.Event.ChannelID, fmt.Sprintf(virus[0], utils.Arguments["<virus name>"]))
+	message, err := ctx.Session.ChannelMessageSend(ctx.Message.ChannelID, fmt.Sprintf(virus[0], utils.Arguments["<virus name>"]))
 	if err != nil {
 		return
 	}
 
 	for i := 1; i < len(virus); i++ {
 		time.Sleep(time.Second * 1)
-		message, err = ctx.Session.ChannelMessageEdit(ctx.Event.ChannelID, message.ID, fmt.Sprintf(virus[i], utils.Arguments["<virus name>"]))
+		message, err = ctx.Session.ChannelMessageEdit(ctx.Message.ChannelID, message.ID, fmt.Sprintf(virus[i], utils.Arguments["<virus name>"]))
 		if err != nil {
 			return
 		}
@@ -717,14 +717,14 @@ func (c *TextCommands) virus(ctx *dgc.Ctx) {
 }
 
 func (c *TextCommands) _100(ctx *dgc.Ctx) {
-	message, err := ctx.Session.ChannelMessageSend(ctx.Event.ChannelID, "1")
+	message, err := ctx.Session.ChannelMessageSend(ctx.Message.ChannelID, "1")
 	if err != nil {
 		return
 	}
 
 	for i := 2; i <= 100; i++ {
 		time.Sleep(time.Second * 1)
-		message, err = ctx.Session.ChannelMessageEdit(ctx.Event.ChannelID, message.ID, fmt.Sprint(i))
+		message, err = ctx.Session.ChannelMessageEdit(ctx.Message.ChannelID, message.ID, fmt.Sprint(i))
 		if err != nil {
 			return
 		}
@@ -732,14 +732,14 @@ func (c *TextCommands) _100(ctx *dgc.Ctx) {
 }
 
 func (c *TextCommands) bomb(ctx *dgc.Ctx) {
-	message, err := ctx.Session.ChannelMessageSend(ctx.Event.ChannelID, bomb[0])
+	message, err := ctx.Session.ChannelMessageSend(ctx.Message.ChannelID, bomb[0])
 	if err != nil {
 		return
 	}
 
 	for i := 1; i < len(bomb); i++ {
 		time.Sleep(time.Second * 1)
-		message, err = ctx.Session.ChannelMessageEdit(ctx.Event.ChannelID, message.ID, bomb[i])
+		message, err = ctx.Session.ChannelMessageEdit(ctx.Message.ChannelID, message.ID, bomb[i])
 		if err != nil {
 			return
 		}
@@ -747,14 +747,14 @@ func (c *TextCommands) bomb(ctx *dgc.Ctx) {
 }
 
 func (c *TextCommands) fuckyou(ctx *dgc.Ctx) {
-	message, err := ctx.Session.ChannelMessageSend(ctx.Event.ChannelID, fuckYou[0])
+	message, err := ctx.Session.ChannelMessageSend(ctx.Message.ChannelID, fuckYou[0])
 	if err != nil {
 		return
 	}
 
 	for i := 1; i < len(fuckYou); i++ {
 		time.Sleep(time.Second * 1)
-		message, err = ctx.Session.ChannelMessageEdit(ctx.Event.ChannelID, message.ID, fuckYou[i])
+		message, err = ctx.Session.ChannelMessageEdit(ctx.Message.ChannelID, message.ID, fuckYou[i])
 		if err != nil {
 			return
 		}
@@ -762,14 +762,14 @@ func (c *TextCommands) fuckyou(ctx *dgc.Ctx) {
 }
 
 func (c *TextCommands) fap(ctx *dgc.Ctx) {
-	message, err := ctx.Session.ChannelMessageSend(ctx.Event.ChannelID, fap[0])
+	message, err := ctx.Session.ChannelMessageSend(ctx.Message.ChannelID, fap[0])
 	if err != nil {
 		return
 	}
 
 	for i := 1; i < len(fap); i++ {
 		time.Sleep(time.Second * 1)
-		message, err = ctx.Session.ChannelMessageEdit(ctx.Event.ChannelID, message.ID, fap[i])
+		message, err = ctx.Session.ChannelMessageEdit(ctx.Message.ChannelID, message.ID, fap[i])
 		if err != nil {
 			return
 		}
@@ -782,14 +782,14 @@ func (c *TextCommands) countup(ctx *dgc.Ctx) {
 		_ = ctx.RespondText("Argument <number> must be a number.")
 		return
 	}
-	message, err := ctx.Session.ChannelMessageSend(ctx.Event.ChannelID, "1")
+	message, err := ctx.Session.ChannelMessageSend(ctx.Message.ChannelID, "1")
 	if err != nil {
 		return
 	}
 
 	for i := 2; i <= number; i++ {
 		time.Sleep(time.Second * 1)
-		message, err = ctx.Session.ChannelMessageEdit(ctx.Event.ChannelID, message.ID, fmt.Sprint(i))
+		message, err = ctx.Session.ChannelMessageEdit(ctx.Message.ChannelID, message.ID, fmt.Sprint(i))
 		if err != nil {
 			return
 		}
@@ -802,14 +802,14 @@ func (c *TextCommands) countdown(ctx *dgc.Ctx) {
 		_ = ctx.RespondText("Argument <number> must be a number.")
 		return
 	}
-	message, err := ctx.Session.ChannelMessageSend(ctx.Event.ChannelID, fmt.Sprint(number))
+	message, err := ctx.Session.ChannelMessageSend(ctx.Message.ChannelID, fmt.Sprint(number))
 	if err != nil {
 		return
 	}
 
 	for i := number; i > 0; i-- {
 		time.Sleep(time.Second * 1)
-		message, err = ctx.Session.ChannelMessageEdit(ctx.Event.ChannelID, message.ID, fmt.Sprint(i-1))
+		message, err = ctx.Session.ChannelMessageEdit(ctx.Message.ChannelID, message.ID, fmt.Sprint(i-1))
 		if err != nil {
 			return
 		}
@@ -819,7 +819,7 @@ func (c *TextCommands) countdown(ctx *dgc.Ctx) {
 func (c *TextCommands) asciianimation(ctx *dgc.Ctx) {
 	text := utils.Arguments["<text>"]
 	firstCharAscii := figure.NewFigure(string(text[0]), "", false).String()
-	message, err := ctx.Session.ChannelMessageSend(ctx.Event.ChannelID, fmt.Sprintf("```%s```", firstCharAscii))
+	message, err := ctx.Session.ChannelMessageSend(ctx.Message.ChannelID, fmt.Sprintf("```%s```", firstCharAscii))
 	if err != nil {
 		return
 	}
@@ -831,7 +831,7 @@ func (c *TextCommands) asciianimation(ctx *dgc.Ctx) {
 		time.Sleep(time.Second * 1)
 		currentText = currentText + string(char)
 		ascii := figure.NewFigure(currentText, "", false).String()
-		_, err := ctx.Session.ChannelMessageEdit(ctx.Event.ChannelID, message.ID, fmt.Sprintf("```%s```", ascii))
+		_, err := ctx.Session.ChannelMessageEdit(ctx.Message.ChannelID, message.ID, fmt.Sprintf("```%s```", ascii))
 		if err != nil {
 			return
 		}
@@ -892,13 +892,13 @@ func (c *TextCommands) customanimation(ctx *dgc.Ctx) {
 		return
 	}
 	animationFrames := strings.Split(rawAnimation, "\n")
-	message, err := ctx.Session.ChannelMessageSend(ctx.Event.ChannelID, animationFrames[0])
+	message, err := ctx.Session.ChannelMessageSend(ctx.Message.ChannelID, animationFrames[0])
 	if err != nil {
 		return
 	}
 	for i := 1; i < len(animationFrames); i++ {
 		time.Sleep(time.Second * 1)
-		message, err = ctx.Session.ChannelMessageEdit(ctx.Event.ChannelID, message.ID, animationFrames[i])
+		message, err = ctx.Session.ChannelMessageEdit(ctx.Message.ChannelID, message.ID, animationFrames[i])
 		if err != nil {
 			return
 		}

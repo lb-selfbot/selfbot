@@ -109,7 +109,7 @@ func (s SlashCommands) RegisterCommands(router *dgc.Router) {
 func (s SlashCommands) searchslash(ctx *dgc.Ctx) {
 	serverID := utils.Arguments["[server id]"]
 	if serverID == "" {
-		serverID = ctx.Event.GuildID
+		serverID = ctx.Message.GuildID
 	}
 	if serverID == "" {
 		ctx.RespondText("Please provide a server ID or use the command in a server.")

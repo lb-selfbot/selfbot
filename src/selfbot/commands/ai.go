@@ -147,7 +147,7 @@ func (AICommands) imagine(ctx *dgc.Ctx) {
 		return
 	}
 
-	_, _ = ctx.Session.ChannelFileSend(ctx.Event.ChannelID, "image.png", image)
+	_, _ = ctx.Session.ChannelFileSend(ctx.Message.ChannelID, "image.png", image)
 }
 
 func (AICommands) ocrlink(ctx *dgc.Ctx) {
@@ -165,7 +165,7 @@ func (AICommands) ocrlink(ctx *dgc.Ctx) {
 }
 
 func (AICommands) ocrfile(ctx *dgc.Ctx) {
-	attachments := ctx.Event.Message.Attachments
+	attachments := ctx.Message.Message.Attachments
 
 	if len(attachments) == 0 {
 		_ = ctx.RespondText("Error: you must provide an image as an attachment.")

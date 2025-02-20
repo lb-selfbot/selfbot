@@ -3,8 +3,8 @@ package scjobs
 import (
 	"errors"
 
+	"github.com/LightningDev1/LB-Selfbot/internal/router"
 	"github.com/LightningDev1/LB-Selfbot/internal/utils"
-	"github.com/LightningDev1/dgc"
 	"github.com/LightningDev1/discordgo"
 )
 
@@ -14,7 +14,7 @@ func optionError(name string, err error) error {
 	return errors.New("Error in option " + name + ": " + err.Error())
 }
 
-func ArgumentsToCommandOptions(options []*discordgo.ApplicationCommandOption, args *dgc.Arguments, offset int) ([]*discordgo.ApplicationCommandOption, error) {
+func ArgumentsToCommandOptions(options []*discordgo.ApplicationCommandOption, args *router.Arguments, offset int) ([]*discordgo.ApplicationCommandOption, error) {
 	if len(options) == 0 {
 		// No need to do anything because there are no options
 		return options, nil
@@ -57,21 +57,21 @@ func ArgumentsToCommandOptions(options []*discordgo.ApplicationCommandOption, ar
 		case discordgo.ApplicationCommandOptionString:
 			option.Value = arg.Raw()
 		case discordgo.ApplicationCommandOptionInteger, discordgo.ApplicationCommandOptionNumber:
-			asInt, err := arg.AsInt()
+			asInt, err := arg.Int()
 			if err != nil {
 				return nil, optionError(option.Name, err)
 			}
 
 			option.Value = asInt
 		case discordgo.ApplicationCommandOptionBoolean:
-			asBool, err := arg.AsBool()
+			asBool, err := arg.Bool()
 			if err != nil {
 				return nil, optionError(option.Name, err)
 			}
 
 			option.Value = asBool
 		case discordgo.ApplicationCommandOptionUser, discordgo.ApplicationCommandOptionChannel, discordgo.ApplicationCommandOptionRole, discordgo.ApplicationCommandOptionMentionable:
-			option.Value = arg.AsUserMentionID()
+			option.Value = arg.UserMentionID()
 		}
 	}
 

@@ -770,7 +770,7 @@ func (FunCommands) slot(ctx *dgc.Ctx) {
 			ToString("load")[0]
 	}
 
-	message, err := ctx.Session.ChannelMessageSend(ctx.Event.ChannelID, getEmbed(false))
+	message, err := ctx.Session.ChannelMessageSend(ctx.Message.ChannelID, getEmbed(false))
 	if err != nil {
 		return
 	}
@@ -1035,7 +1035,7 @@ func (FunCommands) randomemoji(ctx *dgc.Ctx) {
 	if !utils.Discord.CheckIfInServer(ctx) {
 		return
 	}
-	emojis, err := ctx.Session.GuildEmojis(ctx.Event.GuildID)
+	emojis, err := ctx.Session.GuildEmojis(ctx.Message.GuildID)
 	if err != nil {
 		_ = ctx.RespondText("An error has occurred.")
 		return
@@ -1048,7 +1048,7 @@ func (FunCommands) randomchannel(ctx *dgc.Ctx) {
 	if !utils.Discord.CheckIfInServer(ctx) {
 		return
 	}
-	channels, err := ctx.Session.GuildChannels(ctx.Event.GuildID)
+	channels, err := ctx.Session.GuildChannels(ctx.Message.GuildID)
 	if err != nil {
 		_ = ctx.RespondText("An error has occurred.")
 		return
@@ -1077,8 +1077,8 @@ func (FunCommands) poll(ctx *dgc.Ctx) {
 		Send(ctx)
 
 	if len(messages) > 0 {
-		_ = ctx.Session.MessageReactionAdd(ctx.Event.ChannelID, messages[0].ID, "👍")
-		_ = ctx.Session.MessageReactionAdd(ctx.Event.ChannelID, messages[0].ID, "👎")
+		_ = ctx.Session.MessageReactionAdd(ctx.Message.ChannelID, messages[0].ID, "👍")
+		_ = ctx.Session.MessageReactionAdd(ctx.Message.ChannelID, messages[0].ID, "👎")
 	}
 }
 
@@ -1639,7 +1639,7 @@ func (FunCommands) randomcolor(ctx *dgc.Ctx) {
 
 	preview, err := utils.Misc.PreviewColorImage(500, 100, r, g, b)
 	if err == nil {
-		_, _ = ctx.Session.ChannelFileSend(ctx.Event.ChannelID, "color.png", preview)
+		_, _ = ctx.Session.ChannelFileSend(ctx.Message.ChannelID, "color.png", preview)
 	}
 }
 

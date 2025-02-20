@@ -874,7 +874,7 @@ func (UtilityCommands) copyserver(ctx *dgc.Ctx) {
 		duration = time.Second * 10
 	}
 
-	guild, err := utils.Discord.GetGuild(ctx.Session, utils.Misc.Or(utils.Arguments["[server id]"], ctx.Event.GuildID))
+	guild, err := utils.Discord.GetGuild(ctx.Session, utils.Misc.Or(utils.Arguments["[server id]"], ctx.Message.GuildID))
 	if err != nil {
 		_ = ctx.RespondText("Error getting server: " + err.Error())
 		return
@@ -1191,7 +1191,7 @@ func (UtilityCommands) joinvc(ctx *dgc.Ctx) {
 }
 
 func (UtilityCommands) findserver(ctx *dgc.Ctx) {
-	guild, err := utils.Discord.GetGuild(ctx.Session, utils.Misc.Or(utils.Arguments["<server id>"], ctx.Event.GuildID))
+	guild, err := utils.Discord.GetGuild(ctx.Session, utils.Misc.Or(utils.Arguments["<server id>"], ctx.Message.GuildID))
 	if err != nil {
 		_ = ctx.RespondText("Error getting server: " + err.Error())
 		return
@@ -1217,7 +1217,7 @@ func (UtilityCommands) finduser(ctx *dgc.Ctx) {
 func (UtilityCommands) snipe(ctx *dgc.Ctx) {
 	channel, success := utils.Discord.TryGetChannelFromMention(ctx, ctx.Arguments.Get(0))
 	if !success {
-		channel, _ = ctx.Session.State.Channel(ctx.Event.ChannelID)
+		channel, _ = ctx.Session.State.Channel(ctx.Message.ChannelID)
 		if channel == nil {
 			_ = ctx.RespondText("Could not find channel")
 			return
@@ -1267,7 +1267,7 @@ func (UtilityCommands) snipe(ctx *dgc.Ctx) {
 func (UtilityCommands) editsnipe(ctx *dgc.Ctx) {
 	channel, success := utils.Discord.TryGetChannelFromMention(ctx, ctx.Arguments.Get(0))
 	if !success {
-		channel, _ = ctx.Session.State.Channel(ctx.Event.ChannelID)
+		channel, _ = ctx.Session.State.Channel(ctx.Message.ChannelID)
 		if channel == nil {
 			_ = ctx.RespondText("Could not find channel")
 			return
@@ -1296,7 +1296,7 @@ func (UtilityCommands) editsnipe(ctx *dgc.Ctx) {
 func (UtilityCommands) firstmessage(ctx *dgc.Ctx) {
 	channel, success := utils.Discord.TryGetChannelFromMention(ctx, ctx.Arguments.Get(0))
 	if !success {
-		channel, _ = ctx.Session.State.Channel(ctx.Event.ChannelID)
+		channel, _ = ctx.Session.State.Channel(ctx.Message.ChannelID)
 		if channel == nil {
 			_ = ctx.RespondText("Could not find channel")
 			return
@@ -1463,9 +1463,9 @@ func (UtilityCommands) pronouns(ctx *dgc.Ctx) {
 func (UtilityCommands) nickscan(ctx *dgc.Ctx) {
 	nickText := ""
 	for _, guild := range ctx.Session.State.Guilds {
-		me, err := ctx.Session.State.Member(guild.ID, ctx.Event.Author.ID)
+		me, err := ctx.Session.State.Member(guild.ID, ctx.Message.Author.ID)
 		if err != nil {
-			me, err = ctx.Session.GuildMember(guild.ID, ctx.Event.Author.ID)
+			me, err = ctx.Session.GuildMember(guild.ID, ctx.Message.Author.ID)
 			if err != nil {
 				continue
 			}
@@ -1592,19 +1592,19 @@ func (UtilityCommands) sendinterval(ctx *dgc.Ctx) {
 	delete := strings.Contains(flags, "DELETE")
 
 	for i := 0; i < amount; i++ {
-		msg, err := ctx.Session.ChannelMessageSend(ctx.Event.ChannelID, message)
+		msg, err := ctx.Session.ChannelMessageSend(ctx.Message.ChannelID, message)
 		if err != nil {
 			return
 		}
 
 		if instantDelete {
-			_ = ctx.Session.ChannelMessageDelete(ctx.Event.ChannelID, msg.ID)
+			_ = ctx.Session.ChannelMessageDelete(ctx.Message.ChannelID, msg.ID)
 		}
 
 		time.Sleep(interval)
 
 		if delete {
-			_ = ctx.Session.ChannelMessageDelete(ctx.Event.ChannelID, ctx.Event.Message.ID)
+			_ = ctx.Session.ChannelMessageDelete(ctx.Message.ChannelID, ctx.Message.Message.ID)
 		}
 	}
 }
@@ -1617,8 +1617,8 @@ func (UtilityCommands) optionpoll(ctx *dgc.Ctx) {
 		Send(ctx)
 
 	if len(messages) > 0 {
-		_ = ctx.Session.MessageReactionAdd(ctx.Event.ChannelID, messages[0].ID, "👍")
-		_ = ctx.Session.MessageReactionAdd(ctx.Event.ChannelID, messages[0].ID, "👎")
+		_ = ctx.Session.MessageReactionAdd(ctx.Message.ChannelID, messages[0].ID, "👍")
+		_ = ctx.Session.MessageReactionAdd(ctx.Message.ChannelID, messages[0].ID, "👎")
 	}
 }
 
@@ -1678,7 +1678,7 @@ func (UtilityCommands) discordpoll(ctx *dgc.Ctx) {
 		return
 	}
 
-	_, err = ctx.Session.ChannelMessageSendComplex(ctx.Event.ChannelID, &discordgo.MessageSend{
+	_, err = ctx.Session.ChannelMessageSendComplex(ctx.Message.ChannelID, &discordgo.MessageSend{
 		Poll: &discordgo.Poll{
 			Question:         discordgo.PollQuestion{Text: question},
 			Answers:          pollAnswers,
@@ -1875,7 +1875,7 @@ func (UtilityCommands) remote(ctx *dgc.Ctx) {
 			ChannelID: channel.ID,
 			GuildID:   channel.GuildID,
 			Content:   fmt.Sprintf("%s%s %s", cfg.Selfbot.CommandPrefix, command.Name, args),
-			Author:    ctx.Event.Author,
+			Author:    ctx.Message.Author,
 		},
 	})
 
@@ -1999,7 +1999,7 @@ func (UtilityCommands) screenshot(ctx *dgc.Ctx) {
 		return
 	}
 
-	_, _ = ctx.Session.ChannelFileSend(ctx.Event.ChannelID, "screenshot.png", buf)
+	_, _ = ctx.Session.ChannelFileSend(ctx.Message.ChannelID, "screenshot.png", buf)
 }
 
 func (UtilityCommands) listdestinations(ctx *dgc.Ctx) {
@@ -2062,7 +2062,7 @@ func (UtilityCommands) uploadfile(ctx *dgc.Ctx) {
 		return
 	}
 
-	attachments := ctx.Event.Message.Attachments
+	attachments := ctx.Message.Message.Attachments
 
 	if len(attachments) == 0 {
 		_ = ctx.RespondText("Error: you must provide a file as an attachment.")
@@ -2189,7 +2189,7 @@ func (UtilityCommands) obfuscateFunc(lang, ext string) func(ctx *dgc.Ctx) {
 	return func(ctx *dgc.Ctx) {
 		script := utils.Arguments["[script/attachment]"]
 
-		attachments := ctx.Event.Message.Attachments
+		attachments := ctx.Message.Message.Attachments
 		if script == "" && len(attachments) > 0 {
 			httpResponse := http.Get(attachments[0].URL)
 			if httpResponse.Error != nil {
@@ -2211,7 +2211,7 @@ func (UtilityCommands) obfuscateFunc(lang, ext string) func(ctx *dgc.Ctx) {
 			return
 		}
 
-		_, _ = ctx.Session.ChannelMessageSendComplex(ctx.Event.ChannelID, &discordgo.MessageSend{
+		_, _ = ctx.Session.ChannelMessageSendComplex(ctx.Message.ChannelID, &discordgo.MessageSend{
 			Content: "Obfuscated Script",
 			Files: []*discordgo.File{
 				{
@@ -2638,7 +2638,7 @@ func (UtilityCommands) _interface(ctx *dgc.Ctx) {
 // Poketwo utilities
 
 func (UtilityCommands) getPoketwoMessage(ctx *dgc.Ctx) (*discordgo.Message, error) {
-	channelID := ctx.Event.ChannelID
+	channelID := ctx.Message.ChannelID
 	channel, success := utils.Discord.TryGetChannelFromMention(ctx, ctx.Arguments.Get(0))
 	if success {
 		channelID = channel.ID
@@ -3114,7 +3114,7 @@ func (UtilityCommands) tts(ctx *dgc.Ctx) {
 	}
 
 	_, _ = ctx.Session.ChannelFileSend(
-		ctx.Event.ChannelID,
+		ctx.Message.ChannelID,
 		"tts.mp3",
 		bytes.NewReader(httpResponse.Body),
 	)
@@ -3698,7 +3698,7 @@ func (UtilityCommands) previewcolor(ctx *dgc.Ctx) {
 
 	preview, err := utils.Misc.PreviewColorImage(500, 100, r, g, b)
 	if err == nil {
-		_, _ = ctx.Session.ChannelFileSend(ctx.Event.ChannelID, "color.png", preview)
+		_, _ = ctx.Session.ChannelFileSend(ctx.Message.ChannelID, "color.png", preview)
 	}
 }
 

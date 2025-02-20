@@ -297,7 +297,7 @@ func (HelpCommand) repeat(ctx *dgc.Ctx) {
 	// Invoke the last command
 	go lastCommand.Command.Handler(&dgc.Ctx{
 		Session:       ctx.Session,
-		Event:         ctx.Event,
+		Event:         ctx.Message,
 		Arguments:     lastCommand.Arguments,
 		CustomObjects: lastCommand.CustomObjects,
 		Router:        ctx.Router,

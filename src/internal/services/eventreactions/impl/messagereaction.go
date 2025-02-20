@@ -74,8 +74,8 @@ func NewMessageReactionFromData(session *discordgo.Session, reactionType interfa
 
 	userID, ok := data["User"].(string)
 	if ok {
-		user, ok = utils.Discord.GetUser(session, userID)
-		if !ok {
+		user, err = utils.Discord.GetUser(session, userID)
+		if err != nil {
 			user = &discordgo.User{ID: userID}
 		}
 	}

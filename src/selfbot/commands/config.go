@@ -940,7 +940,7 @@ func (ConfigCommands) forcesubscribedservers(ctx *dgc.Ctx) {
 			AddField("Force Subscribed Servers", strings.Join(servers, ", ")).
 			Send(ctx)
 	case "add":
-		guild, err := utils.Discord.GetGuild(ctx.Session, utils.Misc.Or(utils.Arguments["[server id]"], ctx.Event.GuildID))
+		guild, err := utils.Discord.GetGuild(ctx.Session, utils.Misc.Or(utils.Arguments["[server id]"], ctx.Message.GuildID))
 		if err != nil {
 			_ = ctx.RespondText("Could not find server.")
 			return
@@ -958,7 +958,7 @@ func (ConfigCommands) forcesubscribedservers(ctx *dgc.Ctx) {
 			SetDescription(fmt.Sprintf("Added %s to the force subscribed servers list.", guild.Name)).
 			Send(ctx)
 	case "rm":
-		guild, err := utils.Discord.GetGuild(ctx.Session, utils.Misc.Or(utils.Arguments["[server id]"], ctx.Event.GuildID))
+		guild, err := utils.Discord.GetGuild(ctx.Session, utils.Misc.Or(utils.Arguments["[server id]"], ctx.Message.GuildID))
 		if err != nil {
 			_ = ctx.RespondText("Could not find server.")
 			return
@@ -1230,8 +1230,8 @@ func (ConfigCommands) customgiveawaybots(ctx *dgc.Ctx) {
 	case "get":
 		botString := ""
 		for _, userID := range cfg.Snipers.GiveawaySniper.CustomBots {
-			user, ok := utils.Discord.GetUser(ctx.Session, userID)
-			if !ok {
+			user, err := utils.Discord.GetUser(ctx.Session, userID)
+			if err != nil {
 				botString += fmt.Sprintf("%s - %s\n", "Unknown", userID)
 				continue
 			}
@@ -1373,7 +1373,7 @@ func (ConfigCommands) sniperserverblacklist(ctx *dgc.Ctx) {
 			AddField("Sniper Server Blacklist", strings.Join(servers, ", ")).
 			Send(ctx)
 	case "add":
-		guild, err := utils.Discord.GetGuild(ctx.Session, utils.Misc.Or(utils.Arguments["[server id]"], ctx.Event.GuildID))
+		guild, err := utils.Discord.GetGuild(ctx.Session, utils.Misc.Or(utils.Arguments["[server id]"], ctx.Message.GuildID))
 		if err != nil {
 			_ = ctx.RespondText("Could not find server.")
 			return
@@ -1391,7 +1391,7 @@ func (ConfigCommands) sniperserverblacklist(ctx *dgc.Ctx) {
 			SetDescription(fmt.Sprintf("Added %s to the sniper server blacklist.", guild.Name)).
 			Send(ctx)
 	case "rm":
-		guild, err := utils.Discord.GetGuild(ctx.Session, utils.Misc.Or(utils.Arguments["[server id]"], ctx.Event.GuildID))
+		guild, err := utils.Discord.GetGuild(ctx.Session, utils.Misc.Or(utils.Arguments["[server id]"], ctx.Message.GuildID))
 		if err != nil {
 			_ = ctx.RespondText("Could not find server.")
 			return
@@ -1946,7 +1946,7 @@ func createWebhookChannel(ctx *dgc.Ctx, serverID, categoryID, name string) (stri
 }
 
 func (ConfigCommands) setupwebhooks(ctx *dgc.Ctx) {
-	serverID := ctx.Event.GuildID
+	serverID := ctx.Message.GuildID
 	if utils.Arguments["[server id]"] != "" {
 		serverID = utils.Arguments["[server id]"]
 	}

@@ -235,7 +235,7 @@ func (ProtectionsCommands) protectedservers(ctx *dgc.Ctx) {
 			AddField("Protected Servers List", strings.Join(servers, ", ")).
 			Send(ctx)
 	case "add":
-		guild, err := utils.Discord.GetGuild(ctx.Session, utils.Misc.Or(utils.Arguments["[server id]"], ctx.Event.GuildID))
+		guild, err := utils.Discord.GetGuild(ctx.Session, utils.Misc.Or(utils.Arguments["[server id]"], ctx.Message.GuildID))
 		if err != nil {
 			_ = ctx.RespondText("Could not find server.")
 			return
@@ -253,7 +253,7 @@ func (ProtectionsCommands) protectedservers(ctx *dgc.Ctx) {
 			SetDescription(fmt.Sprintf("Added %s to the Protected Servers List.", guild.Name)).
 			Send(ctx)
 	case "rm":
-		guild, err := utils.Discord.GetGuild(ctx.Session, utils.Misc.Or(utils.Arguments["[server id]"], ctx.Event.GuildID))
+		guild, err := utils.Discord.GetGuild(ctx.Session, utils.Misc.Or(utils.Arguments["[server id]"], ctx.Message.GuildID))
 		if err != nil {
 			_ = ctx.RespondText("Could not find server.")
 			return

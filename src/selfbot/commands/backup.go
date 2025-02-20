@@ -225,7 +225,7 @@ func (b BackupCommands) bservers(ctx *dgc.Ctx) {
 			addServer(guild, "")
 		}
 
-		m, err := ctx.Session.ChannelMessageSend(ctx.Event.ChannelID, progressFunc())
+		m, err := ctx.Session.ChannelMessageSend(ctx.Message.ChannelID, progressFunc())
 		if err != nil {
 			return
 		}
@@ -248,7 +248,7 @@ func (b BackupCommands) bservers(ctx *dgc.Ctx) {
 
 			time.Sleep(time.Second * 5)
 
-			_, _ = ctx.Session.ChannelMessageEdit(ctx.Event.ChannelID, m.ID, progressFunc())
+			_, _ = ctx.Session.ChannelMessageEdit(ctx.Message.ChannelID, m.ID, progressFunc())
 
 			time.Sleep(time.Second * 5)
 		}

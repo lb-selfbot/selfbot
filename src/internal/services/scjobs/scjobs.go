@@ -9,9 +9,9 @@ import (
 	"time"
 
 	"github.com/LightningDev1/LB-Selfbot/internal/config"
+	"github.com/LightningDev1/LB-Selfbot/internal/router"
 	"github.com/LightningDev1/LB-Selfbot/internal/services/interfaces"
 	"github.com/LightningDev1/LB-Selfbot/internal/utils"
-	"github.com/LightningDev1/dgc"
 	"github.com/LightningDev1/discordgo"
 )
 
@@ -156,8 +156,10 @@ func (s *SCJobsServiceImpl) LoadJobs() error {
 		return err
 	}
 
+	session := s.discordSvc.GetSession()
+
 	s.jobs = utils.Filter(s.jobs, func(job *interfaces.SCJob) bool {
-		job.Arguments = dgc.ParseArguments(job.RawArguments)
+		job.Arguments = router.ParseArguments(&router.Ctx{Session: session}, job.RawArguments)
 
 		if job.Command == nil {
 			job.Command, err = s.getCommand(job)

@@ -505,7 +505,7 @@ func (s SpotifyCommands) slistenalong(ctx *dgc.Ctx) {
 		return
 	}
 
-	_, err := ctx.Session.ChannelMessageSendComplex(ctx.Event.ChannelID, &discordgo.MessageSend{
+	_, err := ctx.Session.ChannelMessageSendComplex(ctx.Message.ChannelID, &discordgo.MessageSend{
 		Content: ctx.Arguments.Raw(),
 		Activity: &discordgo.MessageActivity{
 			Type:      discordgo.MessageActivityTypeListen,

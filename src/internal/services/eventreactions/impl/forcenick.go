@@ -34,8 +34,8 @@ func NewForceNickFromData(session *discordgo.Session, data map[string]any) (*For
 
 	userID, ok := data["user"].(string)
 	if ok {
-		user, ok = utils.Discord.GetUser(session, userID)
-		if !ok {
+		user, err = utils.Discord.GetUser(session, userID)
+		if err != nil {
 			user = &discordgo.User{ID: userID}
 		}
 	}
