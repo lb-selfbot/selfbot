@@ -36,13 +36,15 @@ var (
 )
 
 // SetTitle ...
-func (e *Embed) SetTitle(name string) *Embed {
-	e.Title = name
+func (e *Embed) SetTitle(format string, args ...any) *Embed {
+	e.Title = fmt.Sprintf(format, args...)
 	return e
 }
 
 // SetDescription [desc]
-func (e *Embed) SetDescription(description string) *Embed {
+func (e *Embed) SetDescription(format string, args ...any) *Embed {
+	description := fmt.Sprintf(format, args...)
+
 	if len(description) > 2048 {
 		description = description[:2048]
 	}
@@ -51,8 +53,8 @@ func (e *Embed) SetDescription(description string) *Embed {
 }
 
 // SetSubtext ...
-func (e *Embed) SetSubtext(text string) *Embed {
-	e.Subtext = text
+func (e *Embed) SetSubtext(format string, args ...any) *Embed {
+	e.Subtext = fmt.Sprintf(format, args...)
 	return e
 }
 
@@ -69,7 +71,7 @@ func (e *Embed) AddField(name, value string, flags ...bool) *Embed {
 	if len(value) > LimitFieldValue && !bypass {
 		i := LimitFieldValue
 		extended := false
-		for i = LimitFieldValue; i < len(value); {
+		for i := LimitFieldValue; i < len(value); {
 			if i != LimitFieldValue && !extended {
 				name += " (extended)"
 				extended = true

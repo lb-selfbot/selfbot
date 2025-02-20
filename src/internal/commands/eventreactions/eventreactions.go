@@ -1,39 +1,1846 @@
 package eventreactions
 
 import (
+	"fmt"
+	"slices"
+	"strings"
+	"time"
+
+	"github.com/LightningDev1/LB-Selfbot/internal/config"
+	"github.com/LightningDev1/LB-Selfbot/internal/router"
 	"github.com/LightningDev1/LB-Selfbot/internal/services"
+	"github.com/LightningDev1/LB-Selfbot/internal/utils"
+	"github.com/LightningDev1/LB-Selfbot/selfbot/eventreactions"
 	"github.com/LightningDev1/dgc"
+	"github.com/LightningDev1/discordgo"
 )
 
-type EventReactionsCommands struct {
-	services *services.Services
-}
+type EventReactionsCommands struct{ services *services.Services }
 
-func NewEventReactionsCommands(services *services.Services) *EventReactionsCommands {
-	return &EventReactionsCommands{services: services}
+func NewEventReactionsCommands(s *services.Services) *EventReactionsCommands {
+	return &EventReactionsCommands{services: s}
 }
-
 func (c *EventReactionsCommands) Register() {
-	router := c.services.Discord.GetRouter()
-	router.StartCategory("EventReactions", "Event reaction commands")
+	cmdRouter := c.services.Discord.GetRouter()
 
-	router.RegisterCmd(&dgc.Command{
-		Name:        "autoreply",
-		Description: "Configure auto-reply settings",
-		Usage:       "[p]autoreply <add/remove/list/clear>",
-		Handler:     c.autoreply,
+	cmdRouter.RegisterCategory(&router.Category{
+		Name:        "EventReactions",
+		Description: "Event Reaction commands",
+	}, []*router.Command{
+		{
+			Name:        "listreactions",
+			Description: "List all active event reactions",
+			Arguments:   "listreactions",
+			Handler:     e.listreactions,
+		},
+		{
+			Name:        "clearreactions",
+			Description: "Clear all active event reactions",
+			Arguments:   "clearreactions",
+			Handler:     e.clearreactions,
+		},
+		{
+			Name:        "ignoreuser",
+			Description: "Ignore messages from a user",
+			Arguments:   "ignoreuser <toggle/list/clear> [@user]",
+			Flags:       []router.CommandFlag{router.CmdFlagDangerous},
+			Handler:     e.ignoreuser,
+		},
+		{
+			Name:        "ignoreserver",
+			Description: "Ignore messages from a server",
+			Arguments:   "ignoreserver <toggle/list/clear> [server id]",
+			Flags:       []router.CommandFlag{router.CmdFlagDangerous},
+			Handler:     e.ignoreserver,
+		},
+		{
+			Name:        "pingping",
+			Description: "Reply to pings by pinging the user",
+			Arguments:   "pingping <toggle/list/clear> [server/channel id]",
+			Flags:       []router.CommandFlag{router.CmdFlagDangerous},
+			Handler:     e.pingping,
+		},
+		{
+			Name:        "pingkick",
+			Description: "Reply to pings by kicking the user",
+			Arguments:   "pingkick <toggle/list/clear> [server/channel id]",
+			Flags:       []router.CommandFlag{router.CmdFlagDangerous},
+			Handler:     e.pingkick,
+		},
+		{
+			Name:        "pingban",
+			Description: "Reply to pings by banning the user",
+			Arguments:   "pingban <toggle/list/clear> [server/channel id]",
+			Flags:       []router.CommandFlag{router.CmdFlagDangerous},
+			Handler:     e.pingban,
+		},
+		{
+			Name:        "pingmute",
+			Description: "Reply to pings by muting the user",
+			Arguments:   "pingmute <toggle/list/clear> [server/channel id]",
+			Flags:       []router.CommandFlag{router.CmdFlagDangerous},
+			Handler:     e.pingmute,
+		},
+		{
+			Name:        "pingtimeout",
+			Description: "Reply to pings by timing the user out",
+			Arguments:   "pingtimeout <toggle/list/clear> [server/channel id]",
+			Flags:       []router.CommandFlag{router.CmdFlagDangerous},
+			Handler:     e.pingtimeout,
+		},
+		{
+			Name:        "pinginsult",
+			Description: "Reply to pings by insulting the user",
+			Arguments:   "pinginsult <toggle/list/clear> [server/channel id]",
+			Flags:       []router.CommandFlag{router.CmdFlagDangerous},
+			Handler:     e.pinginsult,
+		},
+		{
+			Name:        "pingreact",
+			Description: "Reply to pings by adding a reaction",
+			Arguments:   "pingreact <toggle/list/clear> [reaction] [server/channel id]",
+			Flags:       []router.CommandFlag{router.CmdFlagDangerous},
+			Handler:     e.pingreact,
+		},
+		{
+			Name:        "pingresponse",
+			Description: "Reply to pings with a custom response",
+			Arguments:   "pingresponse <toggle/list/clear> [\"response\"] [server/channel id]",
+			Flags:       []router.CommandFlag{router.CmdFlagDangerous},
+			Handler:     e.pingresponse,
+		},
+		{
+			Name:        "pingairesponse",
+			Description: "Reply to pings with an AI response",
+			Arguments:   "pingairesponse <toggle/list/clear> [\"system\"] [server/channel id]",
+			Flags:       []router.CommandFlag{router.CmdFlagDangerous},
+			Handler:     e.pingairesponse,
+		},
+		{
+			Name:        "mirrorchannel",
+			Description: "Mirror messages from one channel to another",
+			Arguments:   "mirrorchannel <toggle/list/clear> [source channel] [dest channel]",
+			Flags:       []router.CommandFlag{router.CmdFlagDangerous},
+			Handler:     e.mirrorchannel,
+		},
+		{
+			Name:        "mirrorserver",
+			Description: "Mirror messages from one server to another",
+			Arguments:   "mirrorserver <toggle/list/clear> [source server] [dest server]",
+			Flags:       []router.CommandFlag{router.CmdFlagDangerous},
+			Handler:     e.mirrorserver,
+		},
+		{
+			Name:        "responder",
+			Description: "Reply to messages with a custom response",
+			Arguments:   "responder <toggle/list/clear> [\"response\"] [server/channel id]",
+			Flags:       []router.CommandFlag{router.CmdFlagDangerous},
+			Handler:     e.responder,
+		},
+		{
+			Name:        "airesponder",
+			Description: "Reply to messages with an AI response",
+			Arguments:   "airesponder <toggle/list/clear> [\"system\"] [server/channel id]",
+			Flags:       []router.CommandFlag{router.CmdFlagDangerous},
+			Handler:     e.airesponder,
+		},
+		{
+			Name:        "copy",
+			Description: "Copy a user's messages",
+			Arguments:   "copy <toggle/list/clear> [@user] [server/channel id]",
+			Flags:       []router.CommandFlag{router.CmdFlagDangerous},
+			Handler:     e.copy,
+		},
+		{
+			Name:        "replycopy",
+			Description: "Replycopy a user's messages",
+			Arguments:   "replycopy <toggle/list/clear> [@user] [server/channel id]",
+			Flags:       []router.CommandFlag{router.CmdFlagDangerous},
+			Handler:     e.replycopy,
+		},
+		{
+			Name:        "mock",
+			Description: "Mock a user's messages",
+			Arguments:   "mock <toggle/list/clear> <@user> [server/channel id]",
+			Flags:       []router.CommandFlag{router.CmdFlagDangerous},
+			Handler:     e.mock,
+		},
+		{
+			Name:        "pinspam",
+			Description: "Pin all of a user's messages",
+			Arguments:   "pinspam <toggle/list/clear> [@user] [server/channel id]",
+			Flags:       []router.CommandFlag{router.CmdFlagDangerous},
+			Handler:     e.pinspam,
+		},
+		{
+			Name:        "unpinspam",
+			Description: "Unpin messages pinned by pinspam",
+			Arguments:   "unpinspam",
+			Flags:       []router.CommandFlag{router.CmdFlagDangerous},
+			Handler:     e.unpinspam,
+		},
+		{
+			Name:        "reactspam",
+			Description: "React to all of a user's messages",
+			Arguments:   "reactspam <toggle/list/clear> [@user] [reaction] [global/server/channel id]",
+			Flags:       []router.CommandFlag{router.CmdFlagDangerous},
+			Handler:     e.reactspam,
+		},
+		{
+			Name:        "deletemessages",
+			Description: "Delete all of a user's messages",
+			Arguments:   "deletemessages <toggle/list/clear> [@user] [server/channel id]",
+			Flags:       []router.CommandFlag{router.CmdFlagDangerous},
+			Handler:     e.deletemessages,
+		},
+		{
+			Name:        "keywordnotifier",
+			Description: "Get notified when someone mentions a keyword",
+			Arguments:   "keywordnotifier <toggle/list/clear> [\"keyword\"] [global/server/channel id]",
+			Flags:       []router.CommandFlag{router.CmdFlagDangerous},
+			Handler:     e.keywordnotifier,
+		},
+		{
+			Name:        "removereactions",
+			Description: "Delete all of a user's reactions",
+			Arguments:   "removereactions <toggle/list/clear> [@user] [server/channel id]",
+			Flags:       []router.CommandFlag{router.CmdFlagDangerous},
+			Handler:     e.removereactions,
+		},
+		{
+			Name:        "forcedisconnect",
+			Description: "Disconnect a user from voice channels",
+			Arguments:   "forcedisconnect <toggle/list/clear> [@user] [server/channel id]",
+			Flags:       []router.CommandFlag{router.CmdFlagDangerous},
+			Handler:     e.forcedisconnect,
+		},
+		{
+			Name:        "forcenick",
+			Description: "Force change a user's nickname",
+			Arguments:   "forcenick <toggle/list/clear> [@user] [nickname] [server id]",
+			Flags:       []router.CommandFlag{router.CmdFlagDangerous},
+			Handler:     e.forcenick,
+		},
+		{
+			Name:        "forcekick",
+			Description: "Force kick a user",
+			Arguments:   "forcekick <toggle/list/clear> [@user] [server id]",
+			Flags:       []router.CommandFlag{router.CmdFlagDangerous},
+			Handler:     e.forcekick,
+		},
+		{
+			Name:        "noleave",
+			Description: "Prevent a user from leaving a group chat",
+			Arguments:   "noleave <toggle/list/clear> [@user] [channel id]",
+			Flags:       []router.CommandFlag{router.CmdFlagDangerous},
+			Handler:     e.noleave,
+		},
+		{
+			Name:        "antigroupchat",
+			Description: "Prevent users from adding you to group chats",
+			Arguments:   "antigroupchat <on/off> [silent leave: on/off]",
+			Flags:       []router.CommandFlag{router.CmdFlagDangerous},
+			Handler:     e.antigroupchat,
+		},
+		{
+			Name:        "antideletemessages",
+			Description: "Prevent users from deleting your messages",
+			Arguments:   "antideletemessages <toggle/list/clear> [channel]",
+			Flags:       []router.CommandFlag{router.CmdFlagDangerous},
+			Handler:     e.antideletemessages,
+		},
+		{
+			Name:        "afkresponder",
+			Description: "Get, set or toggle the AFK Responder",
+			Arguments:   "afkresponder <get/set/toggle> [on/off]",
+			Flags:       []router.CommandFlag{router.CmdFlagDangerous},
+			Handler:     e.afkresponder,
+		},
+		{
+			Name:        "afkonping",
+			Description: "Get, set or toggle if AFK message should be sent on ping",
+			Arguments:   "afkonping <get/set/toggle> [on/off]",
+			Flags:       []router.CommandFlag{router.CmdFlagDangerous},
+			Handler:     e.afkonping,
+		},
+		{
+			Name:        "afkondm",
+			Description: "Get, set or toggle if AFK message should be sent on DM",
+			Arguments:   "afkondm <get/set/toggle> [on/off]",
+			Flags:       []router.CommandFlag{router.CmdFlagDangerous},
+			Handler:     e.afkondm,
+		},
+		{
+			Name:        "afkdelay",
+			Description: "Get or set the delay before sending AFK message",
+			Arguments:   "afkdelay <get/set> [value]",
+			Flags:       []router.CommandFlag{router.CmdFlagDangerous},
+			Handler:     e.afkdelay,
+		},
+		{
+			Name:        "afkrandomdelay",
+			Description: "Get, set or toggle if AFK delay is random",
+			Arguments:   "afkrandomdelay <get/set/toggle> [on/off]",
+			Flags:       []router.CommandFlag{router.CmdFlagDangerous},
+			Handler:     e.afkrandomdelay,
+		},
+		{
+			Name:        "afkinactive",
+			Description: "Get, set or toggle if AFK messages are only sent when inactive",
+			Arguments:   "afkinactive <get/set/toggle> [on/off]",
+			Flags:       []router.CommandFlag{router.CmdFlagDangerous},
+			Handler:     e.afkinactive,
+		},
+		{
+			Name:        "afkinactivetimeout",
+			Description: "Get or set the timeout before being considered inactive",
+			Arguments:   "afkinactivetimeout <get/set> [value]",
+			Flags:       []router.CommandFlag{router.CmdFlagDangerous},
+			Handler:     e.afkinactivetimeout,
+		},
+		{
+			Name:        "afktyping",
+			Description: "Get, set or toggle if the AFK Responder should show typing",
+			Arguments:   "afktyping <get/set/toggle> [on/off]",
+			Flags:       []router.CommandFlag{router.CmdFlagDangerous},
+			Handler:     e.afktyping,
+		},
+		{
+			Name:        "afkai",
+			Description: "Get, set or toggle if the AFK Responder should use AI",
+			Arguments:   "afkai <get/set/toggle> [on/off]",
+			Flags:       []router.CommandFlag{router.CmdFlagDangerous},
+			Handler:     e.afkai,
+		},
+		{
+			Name:        "afkmessage",
+			Description: "Get or set the AFK message (or instructions for AI if enabled)",
+			Arguments:   "afkmessage <get/set> [value]",
+			Flags:       []router.CommandFlag{router.CmdFlagDangerous},
+			Handler:     e.afkmessage,
+		},
+		{
+			Name:        "afktriggertype",
+			Description: "Get or set the AFK Triggerlist type",
+			Arguments:   "afktriggertype <get/set/values> [type]",
+			Flags:       []router.CommandFlag{router.CmdFlagDangerous},
+			Handler:     e.afktriggertype,
+		},
+		{
+			Name:        "afktriggerusers",
+			Description: "Get, add, remove or clear users that trigger AFK message",
+			Arguments:   "afktriggerusers <get/add/rm/clear> [user]",
+			Flags:       []router.CommandFlag{router.CmdFlagDangerous},
+			Handler:     e.afktriggerusers,
+		},
+		{
+			Name:        "afktriggerservers",
+			Description: "Get, add, remove or clear servers that trigger AFK message",
+			Arguments:   "afktriggerservers <get/add/rm/clear> [server id]",
+			Flags:       []router.CommandFlag{router.CmdFlagDangerous},
+			Handler:     e.afktriggerservers,
+		},
 	})
-
-	router.RegisterCmd(&dgc.Command{
-		Name:        "autoreplyglobal",
-		Description: "Configure global auto-reply settings",
-		Usage:       "[p]autoreplyglobal <get/set/toggle>",
-		Handler:     c.autoreplyglobal,
-	})
-
-	// ... Register remaining event reaction commands ...
 }
 
-func (c *EventReactionsCommands) autoreply(ctx *dgc.Ctx) {
-	// ... Existing implementation ...
+// Utils
+
+func (EventReactionsCommands) toggleReaction(ctx *router.Ctx, reaction eventreactions.EventReaction) {
+	// Delete the raction if it already exists
+	if eventreactions.Exists(reaction) {
+		eventreactions.Remove(reaction)
+		c.services.Embed.NewEmbed().
+			SetDescription("Removed event reaction: " + reaction.Description()).
+			Send(ctx)
+		return
+	}
+
+	eventreactions.Add(reaction)
+
+	c.services.Embed.NewEmbed().
+		SetDescription("Added event reaction: " + reaction.Description()).
+		Send(ctx)
+}
+
+func (EventReactionsCommands) mapReactions(ctx *router.Ctx, reactions []eventreactions.EventReaction, errText, title string) {
+	if len(reactions) == 0 {
+		c.services.Embed.NewEmbed().
+			SetDescription(errText).
+			Send(ctx)
+		return
+	}
+
+	descriptions := utils.Map(reactions, func(reaction eventreactions.EventReaction) string {
+		return reaction.Description()
+	})
+
+	c.services.Embed.NewEmbed().
+		SetDescription(title + ":\n\n" + strings.Join(descriptions, "\n")).
+		Send(ctx)
+}
+
+func (EventReactionsCommands) getGuildOrChannel(ctx *router.Ctx, arg *dgc.Argument) (guild *discordgo.Guild, channel *discordgo.Channel, err error) {
+	givenID := utils.Misc.Or(arg.AsChannelMentionID(), arg.Raw())
+
+	if givenID == "" {
+		// Use the current server/channel
+		if ctx.Message.GuildID != "" {
+			guild, err = utils.Discord.GetGuild(ctx.Session, ctx.Message.GuildID)
+			if err != nil {
+				return
+			}
+		} else {
+			channel, err = utils.Discord.GetChannel(ctx.Session, ctx.Message.ChannelID)
+			if err != nil {
+				return
+			}
+		}
+	} else {
+		// Use the given server/channel
+		guild, err = utils.Discord.GetGuild(ctx.Session, givenID)
+		if err != nil {
+			channel, err = utils.Discord.GetChannel(ctx.Session, givenID)
+			if err != nil {
+				return
+			}
+		}
+	}
+
+	return
+}
+
+// Commands
+
+func (e EventReactionsCommands) listreactions(ctx *router.Ctx) {
+	reactions := eventreactions.ActiveReactions
+
+	e.mapReactions(ctx, reactions, "There are no active event reactions", "Active event reactions")
+}
+
+func (e EventReactionsCommands) clearreactions(ctx *router.Ctx) {
+	eventreactions.Clear()
+
+	c.services.Embed.NewEmbed().
+		SetDescription("Cleared all event reactions").
+		Send(ctx)
+}
+
+// Ignore User
+
+func (e EventReactionsCommands) ignoreuser(ctx *router.Ctx) {
+	switch strings.ToLower(utils.Arguments["<toggle/list/clear>"]) {
+	case "toggle":
+		user, ok := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(1))
+		if !ok {
+			c.services.Embed.NewEmbed().
+				SetDescription("Could not find user").
+				Send(ctx)
+			return
+		}
+
+		e.toggleReaction(ctx, eventreactions.NewIgnoreUser(user))
+	case "list":
+		reactions := eventreactions.GetAll(eventreactions.IGNORE_USER)
+
+		e.mapReactions(ctx, reactions, "There are no ignored users.", "Ignored users")
+	case "clear":
+		eventreactions.RemoveAll(eventreactions.IGNORE_USER)
+
+		c.services.Embed.NewEmbed().
+			SetDescription("Cleared all ignored users.").
+			Send(ctx)
+	default:
+		c.services.Embed.NewEmbed().
+			SetDescription("Invalid toggle/list/clear argument.").
+			Send(ctx)
+	}
+}
+
+// Ignore Server
+
+func (e EventReactionsCommands) ignoreserver(ctx *router.Ctx) {
+	switch strings.ToLower(utils.Arguments["<toggle/list/clear>"]) {
+	case "toggle":
+		guildID := utils.Misc.Or(utils.Arguments["[server id]"], ctx.Message.GuildID)
+
+		guild, err := utils.Discord.GetGuild(ctx.Session, guildID)
+		if err != nil {
+			c.services.Embed.NewEmbed().
+				SetDescription("Could not find server: " + err.Error()).
+				Send(ctx)
+			return
+		}
+
+		e.toggleReaction(ctx, eventreactions.NewIgnoreGuild(guild))
+	case "list":
+		reactions := eventreactions.GetAll(eventreactions.IGNORE_GUILD)
+
+		e.mapReactions(ctx, reactions, "There are no ignored servers.", "Ignored servers")
+	case "clear":
+		eventreactions.RemoveAll(eventreactions.IGNORE_GUILD)
+
+		c.services.Embed.NewEmbed().
+			SetDescription("Cleared all ignored servers.").
+			Send(ctx)
+	default:
+		c.services.Embed.NewEmbed().
+			SetDescription("Invalid toggle/list/clear argument.").
+			Send(ctx)
+	}
+}
+
+// Ping reactions
+
+func (e EventReactionsCommands) pingReaction(ctx *router.Ctx, reactionType eventreactions.EventReactionType, reaction string, i int) {
+	switch strings.ToLower(utils.Arguments["<toggle/list/clear>"]) {
+	case "toggle":
+		guild, channel, err := e.getGuildOrChannel(ctx, ctx.Arguments.Get(i))
+		if err != nil {
+			c.services.Embed.NewEmbed().
+				SetDescription("Could not find server/channel: " + err.Error()).
+				Send(ctx)
+			return
+		}
+
+		eventReaction := eventreactions.NewPingReaction(reactionType, guild, channel)
+
+		eventReaction.System = utils.Arguments["[\"system\"]"]
+		eventReaction.Response = utils.Arguments["[\"response\"]"]
+
+		eventReaction.Reaction = utils.Arguments["[reaction]"]
+		eventReaction.Reaction = strings.ReplaceAll(eventReaction.Reaction, "<", "")
+		eventReaction.Reaction = strings.ReplaceAll(eventReaction.Reaction, ">", "")
+
+		if eventReaction.Reaction == "" && reactionType == eventreactions.PING_REACT {
+			c.services.Embed.NewEmbed().
+				SetDescription("Reaction cannot be empty!").
+				Send(ctx)
+			return
+		}
+
+		e.toggleReaction(ctx, eventReaction)
+	case "list":
+		reactions := eventreactions.GetAll(reactionType)
+
+		e.mapReactions(ctx, reactions, fmt.Sprintf("There are no ping --> %s reactions.", reaction), fmt.Sprintf("Ping --> %s reactions", reaction))
+	case "clear":
+		eventreactions.RemoveAll(reactionType)
+
+		c.services.Embed.NewEmbed().
+			SetDescription(fmt.Sprintf("Cleared all ping --> %s reactions.", reaction)).
+			Send(ctx)
+	default:
+		c.services.Embed.NewEmbed().
+			SetDescription("Invalid toggle/list/clear argument").
+			Send(ctx)
+	}
+}
+
+func (e EventReactionsCommands) pingping(ctx *router.Ctx) {
+	e.pingReaction(ctx, eventreactions.PING_PING, "ping", 1)
+}
+
+func (e EventReactionsCommands) pingkick(ctx *router.Ctx) {
+	e.pingReaction(ctx, eventreactions.PING_KICK, "kick", 1)
+}
+
+func (e EventReactionsCommands) pingban(ctx *router.Ctx) {
+	e.pingReaction(ctx, eventreactions.PING_BAN, "ban", 1)
+}
+
+func (e EventReactionsCommands) pingmute(ctx *router.Ctx) {
+	e.pingReaction(ctx, eventreactions.PING_MUTE, "mute", 1)
+}
+
+func (e EventReactionsCommands) pingtimeout(ctx *router.Ctx) {
+	e.pingReaction(ctx, eventreactions.PING_TIMEOUT, "timeout", 1)
+}
+
+func (e EventReactionsCommands) pinginsult(ctx *router.Ctx) {
+	e.pingReaction(ctx, eventreactions.PING_INSULT, "insult", 1)
+}
+
+func (e EventReactionsCommands) pingreact(ctx *router.Ctx) {
+	e.pingReaction(ctx, eventreactions.PING_REACT, "react", 2)
+}
+
+func (e EventReactionsCommands) pingresponse(ctx *router.Ctx) {
+	e.pingReaction(ctx, eventreactions.PING_RESPONSE, "response", 2)
+}
+
+func (e EventReactionsCommands) pingairesponse(ctx *router.Ctx) {
+	e.pingReaction(ctx, eventreactions.PING_AI_RESPONSE, "AI response", 2)
+}
+
+// Mirror channel/server
+
+func (e EventReactionsCommands) mirrorchannel(ctx *router.Ctx) {
+	switch strings.ToLower(utils.Arguments["<toggle/list/clear>"]) {
+	case "toggle":
+		srcChannel, srcOk := utils.Discord.TryGetChannelFromMention(ctx, ctx.Arguments.Get(1))
+		destChannel, destOk := utils.Discord.TryGetChannelFromMention(ctx, ctx.Arguments.Get(2))
+		if !srcOk || !destOk {
+			c.services.Embed.NewEmbed().
+				SetDescription("Could not find channel").
+				Send(ctx)
+			return
+		}
+
+		e.toggleReaction(ctx, eventreactions.NewMirrorChannel(srcChannel, destChannel))
+	case "list":
+		reactions := eventreactions.GetAll(eventreactions.MIRROR_CHANNEL)
+
+		e.mapReactions(ctx, reactions, "There are no mirrored channels.", "Mirrored channels")
+	case "clear":
+		eventreactions.RemoveAll(eventreactions.MIRROR_CHANNEL)
+
+		c.services.Embed.NewEmbed().
+			SetDescription("Cleared all mirrored channels.").
+			Send(ctx)
+	default:
+		c.services.Embed.NewEmbed().
+			SetDescription("Invalid toggle/list/clear argument").
+			Send(ctx)
+	}
+}
+
+func (e EventReactionsCommands) mirrorserver(ctx *router.Ctx) {
+	switch strings.ToLower(utils.Arguments["<toggle/list/clear>"]) {
+	case "toggle":
+		srcGuild, srcErr := utils.Discord.GetGuild(ctx.Session, utils.Arguments["[source server]"])
+		destGuild, destErr := utils.Discord.GetGuild(ctx.Session, utils.Arguments["[dest server]"])
+
+		if srcErr != nil || destErr != nil {
+			c.services.Embed.NewEmbed().
+				SetDescription("Could not find server").
+				Send(ctx)
+			return
+		}
+
+		e.toggleReaction(ctx, eventreactions.NewMirrorGuild(srcGuild, destGuild))
+	case "list":
+		reactions := eventreactions.GetAll(eventreactions.MIRROR_CHANNEL)
+
+		e.mapReactions(ctx, reactions, "There are no mirrored servers.", "Mirrored servers")
+	case "clear":
+		eventreactions.RemoveAll(eventreactions.MIRROR_CHANNEL)
+
+		c.services.Embed.NewEmbed().
+			SetDescription("Cleared all mirrored servers.").
+			Send(ctx)
+	default:
+		c.services.Embed.NewEmbed().
+			SetDescription("Invalid toggle/list/clear argument").
+			Send(ctx)
+	}
+}
+
+// Message Reactions
+
+func (e EventReactionsCommands) responder(ctx *router.Ctx) {
+	switch strings.ToLower(utils.Arguments["<toggle/list/clear>"]) {
+	case "toggle":
+		guild, channel, err := e.getGuildOrChannel(ctx, ctx.Arguments.Get(2))
+		if err != nil {
+			c.services.Embed.NewEmbed().
+				SetDescription("Could not find server/channel: " + err.Error()).
+				Send(ctx)
+			return
+		}
+
+		reaction := eventreactions.NewMessageReaction(eventreactions.RESPONDER, guild, channel, nil)
+		reaction.Response = utils.Arguments["[\"response\"]"]
+		e.toggleReaction(ctx, reaction)
+	case "list":
+		reactions := eventreactions.GetAll(eventreactions.RESPONDER)
+
+		e.mapReactions(ctx, reactions, "There are no active responders.", "Responders")
+	case "clear":
+		eventreactions.RemoveAll(eventreactions.RESPONDER)
+
+		c.services.Embed.NewEmbed().
+			SetDescription("Cleared all responders.").
+			Send(ctx)
+	default:
+		c.services.Embed.NewEmbed().
+			SetDescription("Invalid toggle/list/clear argument").
+			Send(ctx)
+	}
+}
+
+func (e EventReactionsCommands) airesponder(ctx *router.Ctx) {
+	switch strings.ToLower(utils.Arguments["<toggle/list/clear>"]) {
+	case "toggle":
+		guild, channel, err := e.getGuildOrChannel(ctx, ctx.Arguments.Get(2))
+		if err != nil {
+			c.services.Embed.NewEmbed().
+				SetDescription("Could not find server/channel: " + err.Error()).
+				Send(ctx)
+			return
+		}
+
+		reaction := eventreactions.NewMessageReaction(eventreactions.AI_RESPONDER, guild, channel, nil)
+		reaction.System = utils.Arguments["[\"system\"]"]
+		e.toggleReaction(ctx, reaction)
+	case "list":
+		reactions := eventreactions.GetAll(eventreactions.AI_RESPONDER)
+
+		e.mapReactions(ctx, reactions, "There are no active AI responders.", "AI Responders")
+	case "clear":
+		eventreactions.RemoveAll(eventreactions.AI_RESPONDER)
+
+		c.services.Embed.NewEmbed().
+			SetDescription("Cleared all AI responders.").
+			Send(ctx)
+	default:
+		c.services.Embed.NewEmbed().
+			SetDescription("Invalid toggle/list/clear argument").
+			Send(ctx)
+	}
+}
+
+func (e EventReactionsCommands) copy(ctx *router.Ctx) {
+	switch strings.ToLower(utils.Arguments["<toggle/list/clear>"]) {
+	case "toggle":
+		user, ok := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(1))
+		if !ok {
+			c.services.Embed.NewEmbed().
+				SetDescription("Could not find user").
+				Send(ctx)
+			return
+		}
+
+		guild, channel, err := e.getGuildOrChannel(ctx, ctx.Arguments.Get(2))
+		if err != nil {
+			c.services.Embed.NewEmbed().
+				SetDescription("Could not find server/channel: " + err.Error()).
+				Send(ctx)
+			return
+		}
+
+		e.toggleReaction(ctx, eventreactions.NewMessageReaction(eventreactions.COPY, guild, channel, user))
+	case "list":
+		reactions := eventreactions.GetAll(eventreactions.COPY)
+
+		e.mapReactions(ctx, reactions, "There are no copied users.", "Copied users")
+	case "clear":
+		eventreactions.RemoveAll(eventreactions.COPY)
+
+		c.services.Embed.NewEmbed().
+			SetDescription("Cleared all copied users.").
+			Send(ctx)
+	default:
+		c.services.Embed.NewEmbed().
+			SetDescription("Invalid toggle/list/clear argument").
+			Send(ctx)
+	}
+}
+
+func (e EventReactionsCommands) replycopy(ctx *router.Ctx) {
+	switch strings.ToLower(utils.Arguments["<toggle/list/clear>"]) {
+	case "toggle":
+		user, ok := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(1))
+		if !ok {
+			c.services.Embed.NewEmbed().
+				SetDescription("Could not find user").
+				Send(ctx)
+			return
+		}
+
+		guild, channel, err := e.getGuildOrChannel(ctx, ctx.Arguments.Get(2))
+		if err != nil {
+			c.services.Embed.NewEmbed().
+				SetDescription("Could not find server/channel: " + err.Error()).
+				Send(ctx)
+			return
+		}
+
+		e.toggleReaction(ctx, eventreactions.NewMessageReaction(eventreactions.REPLY_COPY, guild, channel, user))
+	case "list":
+		reactions := eventreactions.GetAll(eventreactions.REPLY_COPY)
+
+		e.mapReactions(ctx, reactions, "There are no replycopied users.", "Replycopied users")
+	case "clear":
+		eventreactions.RemoveAll(eventreactions.REPLY_COPY)
+
+		c.services.Embed.NewEmbed().
+			SetDescription("Cleared all replycopied users.").
+			Send(ctx)
+	default:
+		c.services.Embed.NewEmbed().
+			SetDescription("Invalid toggle/list/clear argument").
+			Send(ctx)
+	}
+}
+
+func (e EventReactionsCommands) mock(ctx *router.Ctx) {
+	switch strings.ToLower(utils.Arguments["<toggle/list/clear>"]) {
+	case "toggle":
+		user, ok := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(1))
+		if !ok {
+			c.services.Embed.NewEmbed().
+				SetDescription("Could not find user").
+				Send(ctx)
+			return
+		}
+
+		guild, channel, err := e.getGuildOrChannel(ctx, ctx.Arguments.Get(2))
+		if err != nil {
+			c.services.Embed.NewEmbed().
+				SetDescription("Could not find server/channel: " + err.Error()).
+				Send(ctx)
+			return
+		}
+
+		e.toggleReaction(ctx, eventreactions.NewMessageReaction(eventreactions.MOCK, guild, channel, user))
+	case "list":
+		reactions := eventreactions.GetAll(eventreactions.MOCK)
+
+		e.mapReactions(ctx, reactions, "There are no mocked users.", "Mocked users")
+	case "clear":
+		eventreactions.RemoveAll(eventreactions.MOCK)
+
+		c.services.Embed.NewEmbed().
+			SetDescription("Cleared all mocked users.").
+			Send(ctx)
+	default:
+		c.services.Embed.NewEmbed().
+			SetDescription("Invalid toggle/list/clear argument").
+			Send(ctx)
+	}
+}
+
+func (e EventReactionsCommands) pinspam(ctx *router.Ctx) {
+	switch strings.ToLower(utils.Arguments["<toggle/list/clear>"]) {
+	case "toggle":
+		user, ok := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(1))
+		if !ok {
+			c.services.Embed.NewEmbed().
+				SetDescription("Could not find user").
+				Send(ctx)
+			return
+		}
+
+		guild, channel, err := e.getGuildOrChannel(ctx, ctx.Arguments.Get(2))
+		if err != nil {
+			c.services.Embed.NewEmbed().
+				SetDescription("Could not find server/channel: " + err.Error()).
+				Send(ctx)
+			return
+		}
+
+		e.toggleReaction(ctx, eventreactions.NewMessageReaction(eventreactions.PIN_SPAM, guild, channel, user))
+	case "list":
+		reactions := eventreactions.GetAll(eventreactions.PIN_SPAM)
+
+		e.mapReactions(ctx, reactions, "There are no pinspammed users.", "Pinspammed users")
+	case "clear":
+		eventreactions.RemoveAll(eventreactions.PIN_SPAM)
+
+		c.services.Embed.NewEmbed().
+			SetDescription("Cleared all pinspammed users.").
+			Send(ctx)
+	default:
+		c.services.Embed.NewEmbed().
+			SetDescription("Invalid toggle/list/clear argument").
+			Send(ctx)
+	}
+}
+
+func (e EventReactionsCommands) unpinspam(ctx *router.Ctx) {
+	eventreactions.PinSpamMessages.ForEach(func(message *discordgo.Message) {
+		err := ctx.Session.ChannelMessageUnpin(message.ChannelID, message.ID)
+		if err != nil {
+			c.services.Embed.NewEmbed().
+				SetDescription("Could not unpin message: " + err.Error()).
+				Send(ctx)
+			return
+		}
+	})
+
+	eventreactions.PinSpamMessages.Clear()
+
+	c.services.Embed.NewEmbed().
+		SetDescription("Unpinned all messages.").
+		Send(ctx)
+}
+
+func (e EventReactionsCommands) reactspam(ctx *router.Ctx) {
+	switch strings.ToLower(utils.Arguments["<toggle/list/clear>"]) {
+	case "toggle":
+		user, ok := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(1))
+		if !ok {
+			c.services.Embed.NewEmbed().
+				SetDescription("Could not find user").
+				Send(ctx)
+			return
+		}
+
+		arg := strings.ToLower(utils.Arguments["[global/server/channel id]"])
+		global := arg == "global" || arg == ""
+
+		var guild *discordgo.Guild
+		var channel *discordgo.Channel
+		var err error
+
+		if !global {
+			guild, channel, err = e.getGuildOrChannel(ctx, ctx.Arguments.Get(3))
+			if err != nil {
+				c.services.Embed.NewEmbed().
+					SetDescription("Could not find server/channel: " + err.Error()).
+					Send(ctx)
+				return
+			}
+		}
+
+		reaction := eventreactions.NewMessageReaction(eventreactions.REACT_SPAM, guild, channel, user)
+		reaction.Global = global
+		reaction.Reaction = utils.Arguments["[reaction]"]
+		reaction.Reaction = strings.ReplaceAll(reaction.Reaction, "<", "")
+		reaction.Reaction = strings.ReplaceAll(reaction.Reaction, ">", "")
+
+		if reaction.Reaction == "" {
+			_ = ctx.RespondText("Reaction cannot be empty!")
+			return
+		}
+
+		e.toggleReaction(ctx, reaction)
+	case "list":
+		reactions := eventreactions.GetAll(eventreactions.REACT_SPAM)
+
+		e.mapReactions(ctx, reactions, "There are no reactspammed users.", "Reactspammed users")
+	case "clear":
+		eventreactions.RemoveAll(eventreactions.REACT_SPAM)
+
+		c.services.Embed.NewEmbed().
+			SetDescription("Cleared all reactspammed users.").
+			Send(ctx)
+	default:
+		c.services.Embed.NewEmbed().
+			SetDescription("Invalid toggle/list/clear argument").
+			Send(ctx)
+	}
+}
+
+func (e EventReactionsCommands) deletemessages(ctx *router.Ctx) {
+	switch strings.ToLower(utils.Arguments["<toggle/list/clear>"]) {
+	case "toggle":
+		user, ok := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(1))
+		if !ok {
+			c.services.Embed.NewEmbed().
+				SetDescription("Could not find user").
+				Send(ctx)
+			return
+		}
+
+		guild, channel, err := e.getGuildOrChannel(ctx, ctx.Arguments.Get(2))
+		if err != nil {
+			c.services.Embed.NewEmbed().
+				SetDescription("Could not find server/channel: " + err.Error()).
+				Send(ctx)
+			return
+		}
+
+		e.toggleReaction(ctx, eventreactions.NewMessageReaction(eventreactions.DELETE_MESSAGES, guild, channel, user))
+	case "list":
+		reactions := eventreactions.GetAll(eventreactions.DELETE_MESSAGES)
+
+		e.mapReactions(ctx, reactions, "There are no deletemessage reactions.", "Deletemessage reactions")
+	case "clear":
+		eventreactions.RemoveAll(eventreactions.DELETE_MESSAGES)
+
+		c.services.Embed.NewEmbed().
+			SetDescription("Cleared all deletemessage reactions.").
+			Send(ctx)
+	default:
+		c.services.Embed.NewEmbed().
+			SetDescription("Invalid toggle/list/clear argument").
+			Send(ctx)
+	}
+}
+
+func (e EventReactionsCommands) keywordnotifier(ctx *router.Ctx) {
+	switch strings.ToLower(utils.Arguments["<toggle/list/clear>"]) {
+	case "toggle":
+		arg := strings.ToLower(utils.Arguments["[global/server/channel id]"])
+		global := arg == "global" || arg == ""
+
+		var guild *discordgo.Guild
+		var channel *discordgo.Channel
+		var err error
+
+		if !global {
+			guild, channel, err = e.getGuildOrChannel(ctx, ctx.Arguments.Get(2))
+			if err != nil {
+				c.services.Embed.NewEmbed().
+					SetDescription("Could not find server/channel: " + err.Error()).
+					Send(ctx)
+				return
+			}
+		}
+
+		reaction := eventreactions.NewMessageReaction(eventreactions.KEYWORD_NOTIFIER, guild, channel, nil)
+		reaction.Keyword = utils.Arguments["[\"keyword\"]"]
+		reaction.Global = global
+
+		e.toggleReaction(ctx, reaction)
+	case "list":
+		reactions := eventreactions.GetAll(eventreactions.KEYWORD_NOTIFIER)
+
+		e.mapReactions(ctx, reactions, "There are no keyword notifiers.", "Keyword notifiers")
+	case "clear":
+		eventreactions.RemoveAll(eventreactions.KEYWORD_NOTIFIER)
+
+		c.services.Embed.NewEmbed().
+			SetDescription("Cleared all keyword notifiers.").
+			Send(ctx)
+	default:
+		c.services.Embed.NewEmbed().
+			SetDescription("Invalid toggle/list/clear argument").
+			Send(ctx)
+	}
+}
+
+func (e EventReactionsCommands) removereactions(ctx *router.Ctx) {
+	switch strings.ToLower(utils.Arguments["<toggle/list/clear>"]) {
+	case "toggle":
+		user, ok := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(1))
+		if !ok {
+			c.services.Embed.NewEmbed().
+				SetDescription("Could not find user").
+				Send(ctx)
+			return
+		}
+
+		guild, channel, err := e.getGuildOrChannel(ctx, ctx.Arguments.Get(2))
+		if err != nil {
+			c.services.Embed.NewEmbed().
+				SetDescription("Could not find server/channel: " + err.Error()).
+				Send(ctx)
+			return
+		}
+
+		e.toggleReaction(ctx, eventreactions.NewRemoveReactions(guild, channel, user))
+	case "list":
+		reactions := eventreactions.GetAll(eventreactions.REMOVE_REACTIONS)
+
+		e.mapReactions(ctx, reactions, "There are no users with removed reactions.", "Users with removed reactions")
+	case "clear":
+		eventreactions.RemoveAll(eventreactions.REMOVE_REACTIONS)
+
+		c.services.Embed.NewEmbed().
+			SetDescription("Cleared all users with removed reactions.").
+			Send(ctx)
+	default:
+		c.services.Embed.NewEmbed().
+			SetDescription("Invalid toggle/list/clear argument").
+			Send(ctx)
+	}
+}
+
+func (e EventReactionsCommands) forcedisconnect(ctx *router.Ctx) {
+	switch strings.ToLower(utils.Arguments["<toggle/list/clear>"]) {
+	case "toggle":
+		user, ok := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(1))
+		if !ok {
+			c.services.Embed.NewEmbed().
+				SetDescription("Could not find user").
+				Send(ctx)
+			return
+		}
+
+		guild, channel, err := e.getGuildOrChannel(ctx, ctx.Arguments.Get(2))
+		if err != nil {
+			c.services.Embed.NewEmbed().
+				SetDescription("Could not find server/channel: " + err.Error()).
+				Send(ctx)
+			return
+		}
+
+		e.toggleReaction(ctx, eventreactions.NewForceDisconnect(guild, channel, user))
+	case "list":
+		reactions := eventreactions.GetAll(eventreactions.FORCE_DISCONNECT)
+
+		e.mapReactions(ctx, reactions, "There are no force disconnected users.", "Force disconnected users")
+	case "clear":
+		eventreactions.RemoveAll(eventreactions.FORCE_DISCONNECT)
+
+		c.services.Embed.NewEmbed().
+			SetDescription("Cleared all force disconnected users").
+			Send(ctx)
+	default:
+		c.services.Embed.NewEmbed().
+			SetDescription("Invalid toggle/list/clear argument").
+			Send(ctx)
+	}
+}
+
+func (e EventReactionsCommands) forcenick(ctx *router.Ctx) {
+	switch strings.ToLower(utils.Arguments["<toggle/list/clear>"]) {
+	case "toggle":
+		user, ok := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(1))
+		if !ok {
+			c.services.Embed.NewEmbed().
+				SetDescription("Could not find user").
+				Send(ctx)
+			return
+		}
+
+		guildID := utils.Misc.Or(utils.Arguments["[server id]"], ctx.Message.GuildID)
+
+		guild, err := utils.Discord.GetGuild(ctx.Session, guildID)
+		if err != nil {
+			c.services.Embed.NewEmbed().
+				SetDescription("Could not find server: " + err.Error()).
+				Send(ctx)
+			return
+		}
+
+		nickname := utils.Arguments["[nickname]"]
+
+		err = ctx.Session.GuildMemberNickname(ctx.Message.GuildID, user.ID, nickname)
+		if err != nil {
+			c.services.Embed.NewEmbed().
+				SetDescription("Could not set nickname: " + err.Error()).
+				Send(ctx)
+			return
+		}
+
+		e.toggleReaction(ctx, eventreactions.NewForceNick(guild, user, nickname))
+	case "list":
+		reactions := eventreactions.GetAll(eventreactions.FORCE_NICK)
+
+		e.mapReactions(ctx, reactions, "There are no force nicked users.", "Force nicked users")
+	case "clear":
+		eventreactions.RemoveAll(eventreactions.FORCE_NICK)
+
+		c.services.Embed.NewEmbed().
+			SetDescription("Cleared all force nicked users.").
+			Send(ctx)
+	default:
+		c.services.Embed.NewEmbed().
+			SetDescription("Invalid toggle/list/clear argument.").
+			Send(ctx)
+	}
+}
+
+func (e EventReactionsCommands) forcekick(ctx *router.Ctx) {
+	switch strings.ToLower(utils.Arguments["<toggle/list/clear>"]) {
+	case "toggle":
+		user, ok := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(1))
+		if !ok {
+			c.services.Embed.NewEmbed().
+				SetDescription("Could not find user").
+				Send(ctx)
+			return
+		}
+
+		guildID := utils.Misc.Or(utils.Arguments["[server id]"], ctx.Message.GuildID)
+
+		guild, err := utils.Discord.GetGuild(ctx.Session, guildID)
+		if err != nil {
+			c.services.Embed.NewEmbed().
+				SetDescription("Could not find server: " + err.Error()).
+				Send(ctx)
+			return
+		}
+
+		err = ctx.Session.GuildMemberDelete(ctx.Message.GuildID, user.ID)
+		if err != nil {
+			c.services.Embed.NewEmbed().
+				SetDescription("Could not kick user: " + err.Error()).
+				Send(ctx)
+			return
+		}
+
+		e.toggleReaction(ctx, eventreactions.NewForceKick(guild, user))
+	case "list":
+		reactions := eventreactions.GetAll(eventreactions.FORCE_KICK)
+
+		e.mapReactions(ctx, reactions, "There are no force kicked users.", "Force kicked users")
+	case "clear":
+		eventreactions.RemoveAll(eventreactions.FORCE_KICK)
+
+		c.services.Embed.NewEmbed().
+			SetDescription("Cleared all force kicked users.").
+			Send(ctx)
+	default:
+		c.services.Embed.NewEmbed().
+			SetDescription("Invalid toggle/list/clear argument.").
+			Send(ctx)
+	}
+}
+
+func (e EventReactionsCommands) noleave(ctx *router.Ctx) {
+	switch strings.ToLower(utils.Arguments["<toggle/list/clear>"]) {
+	case "toggle":
+		user, ok := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(1))
+		if !ok {
+			c.services.Embed.NewEmbed().
+				SetDescription("Could not find user").
+				Send(ctx)
+			return
+		}
+
+		relationships := utils.Filter(ctx.Session.State.Relationships, func(r *discordgo.Relationship) bool {
+			return r.Type == 1 && r.ID == user.ID
+		})
+
+		if len(relationships) == 0 {
+			c.services.Embed.NewEmbed().
+				SetDescription("The user must be a friend.").
+				Send(ctx)
+			return
+		}
+
+		arg := ctx.Arguments.Get(2)
+		givenID := utils.Misc.Or(arg.AsChannelMentionID(), arg.Raw())
+
+		channel, err := utils.Discord.GetChannel(ctx.Session, utils.Misc.Or(givenID, ctx.Message.ChannelID))
+		if err != nil {
+			c.services.Embed.NewEmbed().
+				SetDescription("Could not find channel: " + err.Error()).
+				Send(ctx)
+			return
+		}
+
+		if channel.Type != discordgo.ChannelTypeGroupDM {
+			c.services.Embed.NewEmbed().
+				SetDescription("The channel must be a group DM.").
+				Send(ctx)
+			return
+		}
+
+		e.toggleReaction(ctx, eventreactions.NewNoLeave(channel, user))
+	case "list":
+		reactions := eventreactions.GetAll(eventreactions.NO_LEAVE)
+
+		e.mapReactions(ctx, reactions, "There are no noleave users.", "Noleave users")
+	case "clear":
+		eventreactions.RemoveAll(eventreactions.NO_LEAVE)
+
+		c.services.Embed.NewEmbed().
+			SetDescription("Cleared all noleave users.").
+			Send(ctx)
+	default:
+		c.services.Embed.NewEmbed().
+			SetDescription("Invalid toggle/list/clear argument.").
+			Send(ctx)
+	}
+}
+
+func (e EventReactionsCommands) antigroupchat(ctx *router.Ctx) {
+	var toggle bool
+	var silentToggle bool
+
+	rawToggle := strings.ToLower(utils.Arguments["<on/off>"])
+	if rawToggle != "on" && rawToggle != "off" {
+		_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
+		return
+	}
+	toggle = rawToggle == "on"
+
+	rawSilentToggle := strings.ToLower(utils.Arguments["[silent leave: on/off]"])
+	silentToggle = rawSilentToggle == "on"
+
+	reaction := eventreactions.NewAntiGroupChat(silentToggle)
+
+	if toggle {
+		// Turn on (first remove to reset silent argument)
+		eventreactions.Remove(reaction)
+		eventreactions.Add(reaction)
+
+		c.services.Embed.NewEmbed().
+			SetDescription("Turned on the anti group chat reaction!").
+			Send(ctx)
+	} else {
+		// Turn off
+		eventreactions.Remove(reaction)
+
+		c.services.Embed.NewEmbed().
+			SetDescription("Turned off the anti group chat reaction!").
+			Send(ctx)
+	}
+}
+
+func (e EventReactionsCommands) antideletemessages(ctx *router.Ctx) {
+	switch strings.ToLower(utils.Arguments["<toggle/list/clear>"]) {
+	case "toggle":
+		channel, success := utils.Discord.TryGetChannelFromMentionWithDefault(ctx, ctx.Arguments.Get(1))
+		if !success {
+			_ = ctx.RespondText("Could not find channel")
+			return
+		}
+
+		e.toggleReaction(ctx, eventreactions.NewAntiDeleteMessages(channel))
+	case "list":
+		reactions := eventreactions.GetAll(eventreactions.ANTI_DELETE_MESSAGES)
+
+		e.mapReactions(ctx, reactions, "There are no anti delete messages.", "Anti Delete Messages")
+	case "clear":
+		eventreactions.RemoveAll(eventreactions.ANTI_DELETE_MESSAGES)
+
+		c.services.Embed.NewEmbed().
+			SetDescription("Cleared all anti delete messages.").
+			Send(ctx)
+	default:
+		c.services.Embed.NewEmbed().
+			SetDescription("Invalid toggle/list/clear argument").
+			Send(ctx)
+	}
+}
+
+// AFK
+
+func (EventReactionsCommands) afkresponder(ctx *router.Ctx) {
+	cfg, err := config.GetConfig()
+	if err != nil {
+		_ = ctx.RespondText("Error getting config")
+		return
+	}
+
+	switch utils.Arguments["<get/set/toggle>"] {
+	case "get":
+		c.services.Embed.NewEmbed().
+			AddField("AFK Responder", utils.Misc.FormatBoolOnOff(cfg.AFK.Enabled)).
+			Send(ctx)
+	case "set":
+		toggle := strings.ToLower(utils.Arguments["[on/off]"])
+		if toggle != "on" && toggle != "off" {
+			_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
+			return
+		}
+
+		cfg.AFK.Enabled = toggle == "on"
+		_ = cfg.Save()
+
+		c.services.Embed.NewEmbed().
+			SetDescription("Turned " + toggle + " AFK Responder").
+			Send(ctx)
+	case "toggle":
+		cfg.AFK.Enabled = !cfg.AFK.Enabled
+		_ = cfg.Save()
+
+		c.services.Embed.NewEmbed().
+			SetDescription("Turned " + utils.Misc.FormatBoolOnOff(cfg.AFK.Enabled) + " AFK Responder").
+			Send(ctx)
+	default:
+		_ = ctx.RespondText("Invalid <get/set/toggle> argument. Use `get`, `set` or `toggle`.")
+	}
+}
+
+func (EventReactionsCommands) afkonping(ctx *router.Ctx) {
+	cfg, err := config.GetConfig()
+	if err != nil {
+		_ = ctx.RespondText("Error getting config")
+		return
+	}
+
+	switch utils.Arguments["<get/set/toggle>"] {
+	case "get":
+		c.services.Embed.NewEmbed().
+			AddField("AFK On Ping", utils.Misc.FormatBoolOnOff(cfg.AFK.OnPing)).
+			Send(ctx)
+	case "set":
+		toggle := strings.ToLower(utils.Arguments["[on/off]"])
+		if toggle != "on" && toggle != "off" {
+			_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
+			return
+		}
+
+		cfg.AFK.OnPing = toggle == "on"
+		_ = cfg.Save()
+
+		c.services.Embed.NewEmbed().
+			SetDescription("Turned " + toggle + " AFK On Ping").
+			Send(ctx)
+	case "toggle":
+		cfg.AFK.OnPing = !cfg.AFK.OnPing
+		_ = cfg.Save()
+
+		c.services.Embed.NewEmbed().
+			SetDescription("Turned " + utils.Misc.FormatBoolOnOff(cfg.AFK.OnPing) + " AFK On Ping").
+			Send(ctx)
+	default:
+		_ = ctx.RespondText("Invalid <get/set/toggle> argument. Use `get`, `set` or `toggle`.")
+	}
+}
+
+func (EventReactionsCommands) afkondm(ctx *router.Ctx) {
+	cfg, err := config.GetConfig()
+	if err != nil {
+		_ = ctx.RespondText("Error getting config")
+		return
+	}
+
+	switch utils.Arguments["<get/set/toggle>"] {
+	case "get":
+		c.services.Embed.NewEmbed().
+			AddField("AFK On DM", utils.Misc.FormatBoolOnOff(cfg.AFK.OnDM)).
+			Send(ctx)
+	case "set":
+		toggle := strings.ToLower(utils.Arguments["[on/off]"])
+		if toggle != "on" && toggle != "off" {
+			_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
+			return
+		}
+
+		cfg.AFK.OnDM = toggle == "on"
+		_ = cfg.Save()
+
+		c.services.Embed.NewEmbed().
+			SetDescription("Turned " + toggle + " AFK On DM").
+			Send(ctx)
+	case "toggle":
+		cfg.AFK.OnDM = !cfg.AFK.OnDM
+		_ = cfg.Save()
+
+		c.services.Embed.NewEmbed().
+			SetDescription("Turned " + utils.Misc.FormatBoolOnOff(cfg.AFK.OnDM) + " AFK On DM").
+			Send(ctx)
+	default:
+		_ = ctx.RespondText("Invalid <get/set/toggle> argument. Use `get`, `set` or `toggle`.")
+	}
+}
+
+func (EventReactionsCommands) afkdelay(ctx *router.Ctx) {
+	cfg, err := config.GetConfig()
+	if err != nil {
+		_ = ctx.RespondText("Error getting config")
+		return
+	}
+
+	switch utils.Arguments["<get/set>"] {
+	case "get":
+		formatted := utils.Misc.FormatDuration(time.Duration(cfg.AFK.Delay) * time.Second)
+
+		c.services.Embed.NewEmbed().
+			AddField("AFK Delay", formatted).
+			Send(ctx)
+	case "set":
+		delay, err := utils.Misc.ParseDuration(utils.Arguments["[value]"])
+		if err != nil {
+			_ = ctx.RespondText("Invalid duration: " + err.Error())
+			return
+		}
+
+		cfg.AFK.Delay = int(delay.Seconds())
+		_ = cfg.Save()
+
+		formatted := utils.Misc.FormatDuration(time.Duration(cfg.AFK.Delay) * time.Second)
+
+		c.services.Embed.NewEmbed().
+			SetDescription(fmt.Sprintf("AFK Delay set to %s.", formatted)).
+			Send(ctx)
+	default:
+		_ = ctx.RespondText("Invalid <get/set> argument. Use `get` or `set`.")
+	}
+}
+
+func (EventReactionsCommands) afkrandomdelay(ctx *router.Ctx) {
+	cfg, err := config.GetConfig()
+	if err != nil {
+		_ = ctx.RespondText("Error getting config")
+		return
+	}
+
+	switch utils.Arguments["<get/set/toggle>"] {
+	case "get":
+		c.services.Embed.NewEmbed().
+			AddField("AFK Random Delay", utils.Misc.FormatBoolOnOff(cfg.AFK.RandomDelay)).
+			Send(ctx)
+	case "set":
+		toggle := strings.ToLower(utils.Arguments["[on/off]"])
+		if toggle != "on" && toggle != "off" {
+			_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
+			return
+		}
+
+		cfg.AFK.RandomDelay = toggle == "on"
+		_ = cfg.Save()
+
+		c.services.Embed.NewEmbed().
+			SetDescription("Turned " + toggle + " AFK Random Delay").
+			Send(ctx)
+	case "toggle":
+		cfg.AFK.RandomDelay = !cfg.AFK.RandomDelay
+		_ = cfg.Save()
+
+		c.services.Embed.NewEmbed().
+			SetDescription("Turned " + utils.Misc.FormatBoolOnOff(cfg.AFK.RandomDelay) + " AFK Random Delay").
+			Send(ctx)
+	default:
+		_ = ctx.RespondText("Invalid <get/set/toggle> argument. Use `get`, `set` or `toggle`.")
+	}
+}
+
+func (EventReactionsCommands) afkinactive(ctx *router.Ctx) {
+	cfg, err := config.GetConfig()
+	if err != nil {
+		_ = ctx.RespondText("Error getting config")
+		return
+	}
+
+	switch utils.Arguments["<get/set/toggle>"] {
+	case "get":
+		c.services.Embed.NewEmbed().
+			AddField("AFK Must Be Inactive", utils.Misc.FormatBoolOnOff(cfg.AFK.MustBeInactive)).
+			Send(ctx)
+	case "set":
+		toggle := strings.ToLower(utils.Arguments["[on/off]"])
+		if toggle != "on" && toggle != "off" {
+			_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
+			return
+		}
+
+		cfg.AFK.MustBeInactive = toggle == "on"
+		_ = cfg.Save()
+
+		c.services.Embed.NewEmbed().
+			SetDescription("Turned " + toggle + " AFK Must Be Inactive").
+			Send(ctx)
+	case "toggle":
+		cfg.AFK.MustBeInactive = !cfg.AFK.MustBeInactive
+		_ = cfg.Save()
+
+		c.services.Embed.NewEmbed().
+			SetDescription("Turned " + utils.Misc.FormatBoolOnOff(cfg.AFK.MustBeInactive) + " AFK Must Be Inactive").
+			Send(ctx)
+	default:
+		_ = ctx.RespondText("Invalid <get/set/toggle> argument. Use `get`, `set` or `toggle`.")
+	}
+}
+
+func (EventReactionsCommands) afkinactivetimeout(ctx *router.Ctx) {
+	cfg, err := config.GetConfig()
+	if err != nil {
+		_ = ctx.RespondText("Error getting config")
+		return
+	}
+
+	switch utils.Arguments["<get/set>"] {
+	case "get":
+		formatted := utils.Misc.FormatDuration(time.Duration(cfg.AFK.InactiveTimeout) * time.Second)
+
+		c.services.Embed.NewEmbed().
+			AddField("AFK Inactive Timeout", formatted).
+			Send(ctx)
+	case "set":
+		delay, err := utils.Misc.ParseDuration(utils.Arguments["[value]"])
+		if err != nil {
+			_ = ctx.RespondText("Invalid duration: " + err.Error())
+			return
+		}
+
+		cfg.AFK.InactiveTimeout = int(delay.Seconds())
+		_ = cfg.Save()
+
+		formatted := utils.Misc.FormatDuration(time.Duration(cfg.AFK.InactiveTimeout) * time.Second)
+
+		c.services.Embed.NewEmbed().
+			SetDescription(fmt.Sprintf("AFK Inactive Timeout set to %s.", formatted)).
+			Send(ctx)
+	default:
+		_ = ctx.RespondText("Invalid <get/set> argument. Use `get` or `set`.")
+	}
+}
+
+func (EventReactionsCommands) afktyping(ctx *router.Ctx) {
+	cfg, err := config.GetConfig()
+	if err != nil {
+		_ = ctx.RespondText("Error getting config")
+		return
+	}
+
+	switch utils.Arguments["<get/set/toggle>"] {
+	case "get":
+		c.services.Embed.NewEmbed().
+			AddField("AFK Typing", utils.Misc.FormatBoolOnOff(cfg.AFK.Typing)).
+			Send(ctx)
+	case "set":
+		toggle := strings.ToLower(utils.Arguments["[on/off]"])
+		if toggle != "on" && toggle != "off" {
+			_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
+			return
+		}
+
+		cfg.AFK.Typing = toggle == "on"
+		_ = cfg.Save()
+
+		c.services.Embed.NewEmbed().
+			SetDescription("Turned " + toggle + " AFK Typing").
+			Send(ctx)
+	case "toggle":
+		cfg.AFK.Typing = !cfg.AFK.Typing
+		_ = cfg.Save()
+
+		c.services.Embed.NewEmbed().
+			SetDescription("Turned " + utils.Misc.FormatBoolOnOff(cfg.AFK.Typing) + " AFK Typing").
+			Send(ctx)
+	default:
+		_ = ctx.RespondText("Invalid <get/set/toggle> argument. Use `get`, `set` or `toggle`.")
+	}
+}
+
+func (EventReactionsCommands) afkai(ctx *router.Ctx) {
+	cfg, err := config.GetConfig()
+	if err != nil {
+		_ = ctx.RespondText("Error getting config")
+		return
+	}
+
+	switch utils.Arguments["<get/set/toggle>"] {
+	case "get":
+		c.services.Embed.NewEmbed().
+			AddField("AFK AI Response", utils.Misc.FormatBoolOnOff(cfg.AFK.AI)).
+			Send(ctx)
+	case "set":
+		toggle := strings.ToLower(utils.Arguments["[on/off]"])
+		if toggle != "on" && toggle != "off" {
+			_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
+			return
+		}
+
+		cfg.AFK.AI = toggle == "on"
+		_ = cfg.Save()
+
+		c.services.Embed.NewEmbed().
+			SetDescription("Turned " + toggle + " AFK AI Response").
+			Send(ctx)
+	case "toggle":
+		cfg.AFK.AI = !cfg.AFK.AI
+		_ = cfg.Save()
+
+		c.services.Embed.NewEmbed().
+			SetDescription("Turned " + utils.Misc.FormatBoolOnOff(cfg.AFK.AI) + " AFK AI Response").
+			Send(ctx)
+	default:
+		_ = ctx.RespondText("Invalid <get/set/toggle> argument. Use `get`, `set` or `toggle`.")
+	}
+}
+
+func (EventReactionsCommands) afkmessage(ctx *router.Ctx) {
+	cfg, err := config.GetConfig()
+	if err != nil {
+		_ = ctx.RespondText("Error getting config")
+		return
+	}
+
+	switch utils.Arguments["<get/set>"] {
+	case "get":
+		c.services.Embed.NewEmbed().
+			AddField("AFK Message", cfg.AFK.Message).
+			Send(ctx)
+	case "set":
+		value := ctx.Arguments.RawFrom(1)
+
+		cfg.AFK.Message = value
+		_ = cfg.Save()
+
+		c.services.Embed.NewEmbed().
+			SetDescription("AFK Message set to " + value).
+			Send(ctx)
+	default:
+		_ = ctx.RespondText("Invalid <get/set> argument. Use `get` or `set`.")
+	}
+}
+
+func (EventReactionsCommands) afktriggertype(ctx *router.Ctx) {
+	cfg, err := config.GetConfig()
+	if err != nil {
+		_ = ctx.RespondText("Error getting config")
+		return
+	}
+
+	switch utils.Arguments["<get/set/values>"] {
+	case "get":
+		c.services.Embed.NewEmbed().
+			AddField("AFK Trigger Type", cfg.AFK.TriggerList.Type).
+			Send(ctx)
+	case "set":
+		value := strings.ToLower(utils.Arguments["[type]"])
+
+		switch value {
+		case "global":
+			cfg.AFK.TriggerList.Type = "Global"
+		case "whitelist":
+			cfg.AFK.TriggerList.Type = "Whitelist"
+		case "blacklist":
+			cfg.AFK.TriggerList.Type = "Blacklist"
+		default:
+			_ = ctx.RespondText("Invalid trigger type. Use `[p]afktriggertype values` to get a list of available types.")
+			return
+		}
+
+		_ = cfg.Save()
+
+		c.services.Embed.NewEmbed().
+			SetDescription("AFK Trigger Type set to " + cfg.Selfbot.Client).
+			Send(ctx)
+	case "values":
+		c.services.Embed.NewEmbed().
+			SetDescription("Available AFK Trigger Type values: `Global`, `Whitelist`, `Blacklist`.").
+			Send(ctx)
+	default:
+		_ = ctx.RespondText("Invalid <get/set/values> argument. Use `get` or `set` or `values`.")
+	}
+}
+
+func (EventReactionsCommands) afktriggerusers(ctx *router.Ctx) {
+	cfg, err := config.GetConfig()
+	if err != nil {
+		_ = ctx.RespondText("Error getting config")
+		return
+	}
+
+	switch strings.ToLower(utils.Arguments["<get/add/rm/clear>"]) {
+	case "get":
+		userString := ""
+		for _, userID := range cfg.AFK.TriggerList.Users {
+			user, err := utils.Discord.GetUser(ctx.Session, userID)
+			if err != nil {
+				userString += fmt.Sprintf("%s - %s\n", "Unknown", userID)
+				continue
+			}
+
+			userString += fmt.Sprintf("%s - %s\n", user.Username, userID)
+		}
+
+		if userString == "" {
+			userString = "No users set."
+		}
+
+		c.services.Embed.NewEmbed().
+			AddField("AFK Triggerlist Users", userString).
+			Send(ctx)
+	case "add":
+		user, ok := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(1))
+		if !ok {
+			c.services.Embed.NewEmbed().
+				SetDescription("Could not find user.").
+				Send(ctx)
+			return
+		}
+
+		if slices.Contains(cfg.AFK.TriggerList.Users, user.ID) {
+			_ = ctx.RespondText("User is already in the AFK Triggerlist.")
+			return
+		}
+
+		cfg.AFK.TriggerList.Users = append(cfg.AFK.TriggerList.Users, user.ID)
+
+		_ = cfg.Save()
+
+		c.services.Embed.NewEmbed().
+			SetDescription(fmt.Sprintf("Added %s to the AFK Triggerlist.", user.Mention())).
+			Send(ctx)
+	case "rm":
+		user, ok := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(1))
+		if !ok {
+			c.services.Embed.NewEmbed().
+				SetDescription("Could not find user.").
+				Send(ctx)
+			return
+		}
+
+		if !slices.Contains(cfg.AFK.TriggerList.Users, user.ID) {
+			_ = ctx.RespondText("User already isn't in the AFK Triggerlist.")
+			return
+		}
+
+		cfg.AFK.TriggerList.Users = utils.RemoveSliceItem(cfg.AFK.TriggerList.Users, user.ID)
+
+		_ = cfg.Save()
+
+		c.services.Embed.NewEmbed().
+			SetDescription(fmt.Sprintf("Removed %s from the AFK Triggerlist.", user.Mention())).
+			Send(ctx)
+	case "clear":
+		cfg.AFK.TriggerList.Users = []string{}
+		_ = cfg.Save()
+
+		c.services.Embed.NewEmbed().
+			SetDescription("Cleared all users from the AFK Triggerlist.").
+			Send(ctx)
+	default:
+		_ = ctx.RespondText("Invalid <get/add/rm/clear> argument. Use `get`, `add`, `rm`, or `clear`.")
+	}
+}
+
+func (EventReactionsCommands) afktriggerservers(ctx *router.Ctx) {
+	cfg, err := config.GetConfig()
+	if err != nil {
+		_ = ctx.RespondText("Error getting config")
+		return
+	}
+
+	switch strings.ToLower(utils.Arguments["<get/add/rm/clear>"]) {
+	case "get":
+		var servers []string
+
+		for _, serverID := range cfg.AFK.TriggerList.Servers {
+			guild, err := utils.Discord.GetGuild(ctx.Session, serverID)
+			if err != nil {
+				servers = append(servers, serverID)
+				continue
+			}
+
+			servers = append(servers, guild.Name+" ("+guild.ID+")")
+		}
+
+		c.services.Embed.NewEmbed().
+			AddField("AFK Triggerlist Servers", strings.Join(servers, ", ")).
+			Send(ctx)
+	case "add":
+		guild, err := utils.Discord.GetGuild(ctx.Session, utils.Misc.Or(utils.Arguments["[server id]"], ctx.Message.GuildID))
+		if err != nil {
+			c.services.Embed.NewEmbed().
+				SetDescription("Could not find server.").
+				Send(ctx)
+			return
+		}
+
+		if slices.Contains(cfg.AFK.TriggerList.Servers, guild.ID) {
+			_ = ctx.RespondText(fmt.Sprintf("Server %s is already in the AFK Triggerlist!", guild.Name))
+			return
+		}
+
+		cfg.AFK.TriggerList.Servers = append(cfg.AFK.TriggerList.Servers, guild.ID)
+
+		_ = cfg.Save()
+
+		c.services.Embed.NewEmbed().
+			SetDescription(fmt.Sprintf("Added %s to the AFK Triggerlist.", guild.Name)).
+			Send(ctx)
+	case "rm":
+		guild, err := utils.Discord.GetGuild(ctx.Session, utils.Misc.Or(utils.Arguments["[server id]"], ctx.Message.GuildID))
+		if err != nil {
+			c.services.Embed.NewEmbed().
+				SetDescription("Could not find server.").
+				Send(ctx)
+			return
+		}
+
+		if !slices.Contains(cfg.AFK.TriggerList.Servers, guild.ID) {
+			_ = ctx.RespondText(fmt.Sprintf("Server %s already isn't in the AFK Triggerlist!", guild.Name))
+			return
+		}
+
+		cfg.AFK.TriggerList.Servers = utils.RemoveSliceItem(cfg.AFK.TriggerList.Servers, guild.ID)
+
+		_ = cfg.Save()
+
+		c.services.Embed.NewEmbed().
+			SetDescription(fmt.Sprintf("Removed %s from the AFK Triggerlist.", guild.Name)).
+			Send(ctx)
+	case "clear":
+		cfg.AFK.TriggerList.Servers = []string{}
+		_ = cfg.Save()
+
+		c.services.Embed.NewEmbed().
+			SetDescription("Cleared all servers from the AFK Triggerlist.").
+			Send(ctx)
+	default:
+		_ = ctx.RespondText("Invalid <get/add/rm/clear> argument. Use `get`, `add`, `rm`, or `clear`.")
+	}
 }

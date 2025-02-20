@@ -603,7 +603,7 @@ func (c *TextCommands) zwc(ctx *router.Ctx) {
 func (c *TextCommands) distance(ctx *router.Ctx) {
 	text1, text2 := ctx.Arguments.Get(0).Raw(), ctx.Arguments.Get(1).Raw()
 
-	c.services.Embed.NewEmbed().
+	c.services.c.services.Embed.NewEmbed().
 		AddField("Text 1", text1).
 		AddField("Text 2", text2).
 		AddField("Distance", strconv.Itoa(utils.Misc.GetDistance(text1, text2))).
@@ -831,14 +831,14 @@ func (c *TextCommands) asciianimation(ctx *router.Ctx) {
 }
 
 func (c *TextCommands) customanimationhelp(ctx *router.Ctx) {
-	c.services.Embed.NewEmbed().
+	c.services.c.services.Embed.NewEmbed().
 		AddField("Creating an animation", fmt.Sprintf(
 			"To create an animation, create a text file in %s. Every line in the file will be a frame of the animation.\n",
 			filepath.Join(utils.IO.GetMainFolder(), "Animations"),
 		)).
 		AddField("Using an animation", fmt.Sprintf(
 			"To use an animation, use the command `%scustomanimation <filename without .txt>`.\n",
-			ctx.Router.GetPrefixes()[0],
+			ctx.Router.GetConfig().PrefixFunc()[0],
 		)).
 		Send(ctx)
 }
@@ -866,11 +866,11 @@ func (c *TextCommands) customanimations(ctx *router.Ctx) {
 		return nil
 	})
 
-	c.services.Embed.NewEmbed().AddField("Custom Animations", customAnimString).Send(ctx)
+	c.services.c.services.Embed.NewEmbed().AddField("Custom Animations", customAnimString).Send(ctx)
 }
 
 func (c *TextCommands) customanimation(ctx *router.Ctx) {
-	name := utils.Arguments["<name>"]
+	name := ctx.Arguments.Get(0).Raw()
 	folder := filepath.Join(utils.IO.GetMainFolder(), "Animations")
 	_ = os.MkdirAll(folder, os.ModePerm)
 	path := filepath.Join(folder, utils.IO.SanitizeFilename(name+".txt"))
@@ -903,7 +903,7 @@ func (c *TextCommands) encodings(ctx *router.Ctx) {
 		encodingNames = append(encodingNames, name)
 	}
 
-	c.services.Embed.NewEmbed().
+	c.services.c.services.Embed.NewEmbed().
 		AddField("Available Encodings", strings.Join(encodingNames, ", ")).
 		Send(ctx)
 }
@@ -924,7 +924,7 @@ func (c *TextCommands) encode(ctx *router.Ctx) {
 		return
 	}
 
-	c.services.Embed.NewEmbed().
+	c.services.c.services.Embed.NewEmbed().
 		AddField("Text", text).
 		AddField("Encoded", encoded).
 		Send(ctx)
@@ -950,7 +950,7 @@ func (c *TextCommands) decode(ctx *router.Ctx) {
 		return
 	}
 
-	c.services.Embed.NewEmbed().
+	c.services.c.services.Embed.NewEmbed().
 		AddField("Text", text).
 		AddField("Decoded", decoded).
 		Send(ctx)
@@ -962,7 +962,7 @@ func (c *TextCommands) hashes(ctx *router.Ctx) {
 		hashNames = append(hashNames, name)
 	}
 
-	c.services.Embed.NewEmbed().
+	c.services.c.services.Embed.NewEmbed().
 		AddField("Available Hashes", strings.Join(hashNames, ", ")).
 		Send(ctx)
 }
@@ -979,7 +979,7 @@ func (c *TextCommands) hash(ctx *router.Ctx) {
 
 	hashed := hashFunc(text)
 
-	c.services.Embed.NewEmbed().
+	c.services.c.services.Embed.NewEmbed().
 		AddField("Text", text).
 		AddField("Hashed", hashed).
 		Send(ctx)
@@ -991,15 +991,13 @@ func (c *TextCommands) encryptions(ctx *router.Ctx) {
 		encryptionNames = append(encryptionNames, name)
 	}
 
-	c.services.Embed.NewEmbed().
+	c.services.c.services.Embed.NewEmbed().
 		AddField("Available Encryptions", strings.Join(encryptionNames, ", ")).
 		Send(ctx)
 }
 
 func (c *TextCommands) encrypt(ctx *router.Ctx) {
-	encryptionName := ctx.Arguments.Get(0).Raw()
-	key := utils.Arguments["<\"key\">"]
-	text := utils.Arguments["<\"text\">"]
+	encryptionName, key, text := ctx.Arguments.Get(0).Raw(), ctx.Arguments.Get(1).Raw(), ctx.Arguments.RawFrom(2)
 
 	encryption, ok := encodings.Encryptions[encryptionName]
 	if !ok {
@@ -1013,16 +1011,14 @@ func (c *TextCommands) encrypt(ctx *router.Ctx) {
 		return
 	}
 
-	c.services.Embed.NewEmbed().
+	c.services.c.services.Embed.NewEmbed().
 		AddField("Text", text).
 		AddField("Encrypted", encrypted).
 		Send(ctx)
 }
 
 func (c *TextCommands) decrypt(ctx *router.Ctx) {
-	encryptionName := ctx.Arguments.Get(0).Raw()
-	key := utils.Arguments["<\"key\">"]
-	text := utils.Arguments["<\"text\">"]
+	encryptionName, key, text := ctx.Arguments.Get(0).Raw(), ctx.Arguments.Get(1).Raw(), ctx.Arguments.RawFrom(2)
 
 	encryption, ok := encodings.Encryptions[encryptionName]
 	if !ok {
@@ -1036,7 +1032,7 @@ func (c *TextCommands) decrypt(ctx *router.Ctx) {
 		return
 	}
 
-	c.services.Embed.NewEmbed().
+	c.services.c.services.Embed.NewEmbed().
 		AddField("Text", text).
 		AddField("Decrypted", encrypted).
 		Send(ctx)

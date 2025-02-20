@@ -404,7 +404,7 @@ func (a *Argument) MustChannel(flags ...ArgumentFlag) *discordgo.Channel {
 func (a *Argument) Guild(flags ...ArgumentFlag) (*discordgo.Guild, error) {
 	guildID := a.raw
 	if guildID == "" {
-		if slices.Contains(flags, ArgumentFlagFallbackDefault) {
+		if slices.Contains(flags, ArgumentFlagFallbackDefault) && a.ctx.Message.GuildID != "" {
 			guildID = a.ctx.Message.GuildID
 		} else {
 			return nil, ErrArgumentEmpty

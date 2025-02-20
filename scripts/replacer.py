@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# filepath: /Users/kaan/Code/LightningBot/LB-Selfbot/scripts/replacer.py
+# filepath: replacer.py
 
 import sys
 import os
@@ -7,19 +7,25 @@ import re
 
 def transform_file_contents(lines, package_name):
     """
-    Transform the file contents according to the old replacer logic.
-    We treat 'package <something>' as 'package package_name'.
-    We detect an old RegisterCommands function to replace with a new one.
-    We also do string replacements for flags, usage -> arguments, etc.
+    Transform the old file contents.
+    Captures the command category via the RegisterCommands function.
+    Performs string replacements on commands:
+     - Replaces dgc with router.
+     - Changes Usage to Arguments and strips "[p]".
+     - Converts []string{...} to []router.CommandFlag{...} and
+       CmdFlagDangerous to router.CmdFlagDangerous.
+     - Changes handler references from a. (old) to c. (new).
     """
-    func_pattern = r'^func\s+\(\w+\s+\*ActivityCommands\)\s+RegisterCommands'
+    # Captures the struct name (category) from the RegisterCommands method.
+    func_pattern = r'^func\s+\(\w+\s+\*(\w+)Commands\)\s+RegisterCommands'
     category_pattern = r'^\s*router\.StartCategory\("([^"]+)",\s*"([^"]+)"\)'
     cmd_start_pattern = r'^\s*router\.RegisterCmd\(&dgc\.Command\{\s*$'
     cmd_end_pattern = r'^\s*\}\)\s*$'
-    old_struct_pattern = r'^type\s+ActivityCommands\s+struct\s*\{\s*\}'
+    old_struct_pattern = r'^type\s+\w+Commands\s+struct\s*\{\s*\}'
 
     top_section = []
     bottom_section = []
+    struct_name = None
 
     found_register_func = False
     finished_register_func = False
@@ -33,27 +39,29 @@ def transform_file_contents(lines, package_name):
     for line in lines:
         stripped = line.rstrip('\n')
 
-        # Replace the package line
+        # Replace the package declaration with the given package name
         if stripped.startswith('package '):
             top_section.append(f'package {package_name}\n')
             continue
 
-        # Skip empty struct
+        # Skip empty struct definitions
         if re.match(old_struct_pattern, stripped):
             continue
 
-        # Detect the old RegisterCommands function start
-        if re.match(func_pattern, stripped):
+        # Detect the start of the old RegisterCommands function and capture struct name
+        m = re.match(func_pattern, stripped)
+        if m:
+            struct_name = m.group(1)
             found_register_func = True
             continue
 
-        # Detect the end of old RegisterCommands function
+        # End of the RegisterCommands function block
         if found_register_func and stripped.startswith('}'):
             finished_register_func = True
             found_register_func = False
             continue
 
-        # Inside old RegisterCommands block: detect category and commands
+        # Inside the RegisterCommands function block
         if found_register_func and not finished_register_func:
             if re.match(category_pattern, stripped):
                 m = re.match(category_pattern, stripped)
@@ -69,19 +77,23 @@ def transform_file_contents(lines, package_name):
                 cur_cmd_block.append(stripped)
             continue
 
-        # Lines outside old RegisterCommands
+        # Lines outside of the RegisterCommands block
         if not finished_register_func:
             top_section.append(line)
         else:
             bottom_section.append(line)
 
-    # Build new struct + constructor + Register method
+    # If we didn't capture a struct name, use package_name capitalized as fallback.
+    if not struct_name:
+        struct_name = package_name.capitalize()
+
+    # Build the new struct, constructor, and Register method
     new_code = []
-    new_code.append('type ActivityCommands struct { services *services.Services }\n')
-    new_code.append('func NewActivityCommands(s *services.Services) *ActivityCommands {\n')
-    new_code.append('\treturn &ActivityCommands{services: s}\n')
+    new_code.append(f'type {struct_name}Commands struct {{ services *services.Services }}\n')
+    new_code.append(f'func New{struct_name}Commands(s *services.Services) *{struct_name}Commands {{\n')
+    new_code.append(f'\treturn &{struct_name}Commands{{services: s}}\n')
     new_code.append('}\n')
-    new_code.append('func (c *ActivityCommands) Register() {\n')
+    new_code.append(f'func (c *{struct_name}Commands) Register() {{\n')
     new_code.append('\tcmdRouter := c.services.Discord.GetRouter()\n\n')
 
     if cat_name and cat_desc and commands:
@@ -92,28 +104,27 @@ def transform_file_contents(lines, package_name):
         for cmd_block in commands:
             new_code.append('\t\t{\n')
             for line_cmd in cmd_block:
-                # Replace library references from dgc => router
+                # Replace occurrences of "dgc" with "router"
                 line_cmd = line_cmd.replace('dgc', 'router')
-                # Convert Usage => Arguments and remove [p]
+                # Change "Usage:" to "Arguments:" and remove "[p]"
                 if 'Usage:' in line_cmd:
                     line_cmd = line_cmd.replace('Usage:', 'Arguments:')
                     line_cmd = line_cmd.replace('[p]', '')
-                # Convert []string => []router.CommandFlag
+                # Convert flag declarations from []string{...} to []router.CommandFlag{...}
                 if 'Flags:' in line_cmd and '[]string{' in line_cmd:
                     line_cmd = line_cmd.replace('[]string{', '[]router.CommandFlag{')
-                # Convert CmdFlagDangerous => router.CmdFlagDangerous
+                # Change "CmdFlagDangerous" to "router.CmdFlagDangerous"
                 line_cmd = line_cmd.replace('CmdFlagDangerous', 'router.CmdFlagDangerous')
-                # Convert a. handler => c. handler
+                # Update handler references from a. to c.
                 if 'Handler:' in line_cmd and 'a.' in line_cmd:
                     line_cmd = line_cmd.replace('Handler:     a.', 'Handler:     c.')
-
                 new_code.append(f'\t\t\t{line_cmd}\n')
             new_code.append('\t\t},\n')
         new_code.append('\t})\n')
 
     new_code.append('}\n\n')
 
-    # Merge everything
+    # Merge all sections; ensure a single package line remains
     final_lines = []
     found_package_line = False
     for ln in top_section:
@@ -123,10 +134,8 @@ def transform_file_contents(lines, package_name):
                 final_lines.append(f'package {package_name}\n')
             continue
         final_lines.append(ln)
-
     final_lines.append(''.join(new_code))
     final_lines.extend(bottom_section)
-
     return final_lines
 
 def main():
@@ -138,16 +147,15 @@ def main():
 
     # Walk through subdirectories in base_dir
     for root, dirs, files in os.walk(base_dir):
-        # We're only interested in directories that contain "xxx.go" and "xxx-old.go"
-        # For each file ending in "-old.go", do the transformation & renaming
+        # Process each file ending in "-old.go"
         for filename in files:
             if filename.endswith("-old.go"):
                 old_path = os.path.join(root, filename)
-                # The new file name is the same minus "-old"
-                new_filename = filename.replace("-old.go", ".go")
+                # New filename is the same but without "-old"
+                new_filename = filename.replace("-old.go", ".go").lower()
                 new_path = os.path.join(root, new_filename)
 
-                # If there's an existing .go file, delete it
+                # Delete the existing .go file if it exists
                 if os.path.exists(new_path):
                     os.remove(new_path)
 
@@ -155,20 +163,21 @@ def main():
                 with open(old_path, 'r') as f:
                     old_lines = f.readlines()
 
-                # The package name is the directory's name
-                folder_name = os.path.basename(root)
+                # Use the directory's name as the package name
+                package_name = os.path.basename(root).lower()
 
-                # Transform
-                new_contents = transform_file_contents(old_lines, folder_name)
+                # Transform file contents
+                new_contents = transform_file_contents(old_lines, package_name)
 
-                # Write back to the old file
+                # Write the transformed contents back to the old file
                 with open(old_path, 'w') as f:
                     f.writelines(new_contents)
 
-                # Rename old -> new
+                # Rename the file from old to new
                 os.rename(old_path, new_path)
-
                 print(f"Processed: {old_path} -> {new_path}")
+
+    os.system('gofmt -w .')
 
 if __name__ == "__main__":
     main()
