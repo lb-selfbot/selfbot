@@ -1,7 +1,7 @@
 package interfaces
 
 import (
-	"github.com/LightningDev1/dgc"
+	"github.com/LightningDev1/LB-Selfbot/internal/router"
 	"github.com/LightningDev1/discordgo"
 )
 
@@ -11,7 +11,7 @@ type DiscordService interface {
 	Init(token string, verbose bool) error
 
 	GetSession() *discordgo.Session
-	GetRouter() *dgc.Router
+	GetRouter() router.Router
 
 	Open() error
 }

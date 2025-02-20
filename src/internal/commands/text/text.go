@@ -1,4 +1,4 @@
-package commands
+package text
 
 import (
 	"fmt"
@@ -10,189 +10,197 @@ import (
 
 	"github.com/LightningDev1/LB-Selfbot/internal/constants"
 	"github.com/LightningDev1/LB-Selfbot/internal/encodings"
+	"github.com/LightningDev1/LB-Selfbot/internal/services"
 	"github.com/LightningDev1/LB-Selfbot/internal/utils"
-	"github.com/LightningDev1/LB-Selfbot/selfbot/embed"
 	"github.com/LightningDev1/dgc"
 	"github.com/common-nighthawk/go-figure"
 )
 
-type TextCommands struct{}
+type TextCommands struct {
+	services *services.Services
+}
 
-func (t TextCommands) RegisterCommands(router *dgc.Router) {
-	router.StartCategory("Text", "Text commands")
+func NewTextCommands(services *services.Services) *TextCommands {
+	return &TextCommands{services: services}
+}
+
+func (c *TextCommands) Register() {
+	router := c.services.Discord.GetRouter()
+	router.StartCategory("Text", "Text manipulation commands")
+
 	router.RegisterCmd(&dgc.Command{
 		Name:        "empty",
 		Description: "Sends an empty message",
 		Usage:       "[p]empty",
-		Handler:     t.empty,
+		Handler:     c.empty,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "reverse",
 		Description: "Reverses the text and sends it",
 		Usage:       "[p]reverse <text>",
-		Handler:     t.reverse,
+		Handler:     c.reverse,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "alphabet",
 		Description: "Edits the message with every letter in the alphabet",
 		Usage:       "[p]alphabet",
-		Handler:     t.alphabet,
+		Handler:     c.alphabet,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "ascii",
 		Description: "Sends the text as ASCII art",
 		Usage:       "[p]ascii <text>",
-		Handler:     t.ascii,
+		Handler:     c.ascii,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "bold",
 		Description: "Sends the text in bold",
 		Usage:       "[p]bold <text>",
-		Handler:     t.bold,
+		Handler:     c.bold,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "strike",
 		Description: "Add strikethrough effect to text",
 		Usage:       "[p]strike <text>",
-		Handler:     t.strike,
+		Handler:     c.strike,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "italic",
 		Description: "Sends the text in italicized font",
 		Usage:       "[p]italic <text>",
-		Handler:     t.italic,
+		Handler:     c.italic,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "spoiler",
 		Description: "Sends the text as a spoiler",
 		Usage:       "[p]spoiler <text>",
-		Handler:     t.spoiler,
+		Handler:     c.spoiler,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "lspoiler",
 		Description: "Same as spoiler but spoilers ever letter seperately",
 		Usage:       "[p]lspoiler <text>",
-		Handler:     t.lspoiler,
+		Handler:     c.lspoiler,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "leet",
 		Description: "Sends the text in a language only leet hackers can understand",
 		Usage:       "[p]leet <text>",
-		Handler:     t.leet,
+		Handler:     c.leet,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "devowel",
 		Description: "Sends the text without the vowels",
 		Usage:       "[p]devowel <text>",
-		Handler:     t.devowel,
+		Handler:     c.devowel,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "edit",
 		Description: "Makes an edit animation with the text",
 		Usage:       "[p]edit <text>",
-		Handler:     t.edit,
+		Handler:     c.edit,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "emojify",
 		Description: "Sends the text as Discord emojis",
 		Usage:       "[p]emojify <text>",
-		Handler:     t.emojify,
+		Handler:     c.emojify,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "shrug",
 		Description: "Sends a shrug",
 		Usage:       "[p]shrug <text>",
-		Handler:     t.shrug,
+		Handler:     c.shrug,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "lenny",
 		Description: "Sends a lenny",
 		Usage:       "[p]lenny",
-		Handler:     t.lenny,
+		Handler:     c.lenny,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "tableflip",
 		Description: "Sends a tableflip",
 		Usage:       "[p]tableflip",
-		Handler:     t.tableflip,
+		Handler:     c.tableflip,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "unflip",
 		Description: "Sends an unflip",
 		Usage:       "[p]unflip",
-		Handler:     t.unflip,
+		Handler:     c.unflip,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "clap",
 		Description: "Replaces spaces in the text into clap emojis",
 		Usage:       "[p]clap <text>",
-		Handler:     t.clap,
+		Handler:     c.clap,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "zalgo",
 		Description: "Sends the text in an almost unreadable font",
 		Usage:       "[p]zalgo <text>",
-		Handler:     t.zalgo,
+		Handler:     c.zalgo,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "unzalgo",
 		Description: "Makes zalgo text readable again",
 		Usage:       "[p]unzalgo <text>",
-		Handler:     t.unzalgo,
+		Handler:     c.unzalgo,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "upper",
 		Description: "Sends the text in uppercase",
 		Usage:       "[p]upper <text>",
-		Handler:     t.upper,
+		Handler:     c.upper,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "lower",
 		Description: "Sends the text in lowercase",
 		Usage:       "[p]lower <text>",
-		Handler:     t.lower,
+		Handler:     c.lower,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "fliptext",
 		Description: "Sends the text upside down",
 		Usage:       "[p]fliptext <text>",
-		Handler:     t.fliptext,
+		Handler:     c.fliptext,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "unfliptext",
 		Description: "Sends flipped text back to normal",
 		Usage:       "[p]unfliptext <text>",
-		Handler:     t.unfliptext,
+		Handler:     c.unfliptext,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "wave",
 		Description: "Sends text in a wave",
 		Usage:       "[p]wave <text>",
-		Handler:     t.wave,
+		Handler:     c.wave,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "customwave",
 		Description: "Sends text in a wave with custom parameters",
 		Usage:       "[p]customwave <width> <iterations> <text>",
-		Handler:     t.customwave,
+		Handler:     c.customwave,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "zwc",
 		Description: "Sends text with zero width characters",
 		Usage:       "[p]zwc <text>",
-		Handler:     t.zwc,
+		Handler:     c.zwc,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "distance",
 		Description: "Calculate the Levenshtein distance between two strings",
 		Usage:       "[p]distance <\"text1\"> <\"text2\">",
-		Handler:     t.distance,
+		Handler:     c.distance,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "codeblock",
 		Description: "Send a codeblock with syntax highlighting",
 		Usage:       "[p]codeblock <language> <code>",
-		Handler:     t.codeblock,
+		Handler:     c.codeblock,
 	})
 
 	// Animation commands
@@ -201,67 +209,67 @@ func (t TextCommands) RegisterCommands(router *dgc.Router) {
 		Name:        "virus",
 		Description: "Send an animated virus message",
 		Usage:       "[p]virus <virus name>",
-		Handler:     t.virus,
+		Handler:     c.virus,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "100",
 		Description: "Count to 100",
 		Usage:       "[p]100",
-		Handler:     t._100,
+		Handler:     c._100,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "bomb",
 		Description: "Send an animated bomb message",
 		Usage:       "[p]bomb",
-		Handler:     t.bomb,
+		Handler:     c.bomb,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "fuckyou",
 		Description: "Send an animated fuck you message",
 		Usage:       "[p]fuckyou",
-		Handler:     t.fuckyou,
+		Handler:     c.fuckyou,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "fap",
 		Description: "Send a fap animation",
 		Usage:       "[p]fap",
-		Handler:     t.fap,
+		Handler:     c.fap,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "countup",
 		Description: "Count up to a number",
 		Usage:       "[p]countup <number>",
-		Handler:     t.countup,
+		Handler:     c.countup,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "countdown",
 		Description: "Count down to a number",
 		Usage:       "[p]countdown <number>",
-		Handler:     t.countdown,
+		Handler:     c.countdown,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "asciianimation",
 		Description: "Send an animated ascii message",
 		Usage:       "[p]asciianimation <text>",
-		Handler:     t.asciianimation,
+		Handler:     c.asciianimation,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "customanimationhelp",
 		Description: "View custom animation help",
 		Usage:       "[p]customanimationhelp",
-		Handler:     t.customanimationhelp,
+		Handler:     c.customanimationhelp,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "customanimations",
 		Description: "View all custom animations",
 		Usage:       "[p]customanimations",
-		Handler:     t.customanimations,
+		Handler:     c.customanimations,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "customanimation",
 		Description: "Invoke a custom animation",
 		Usage:       "[p]customanimation <name>",
-		Handler:     t.customanimation,
+		Handler:     c.customanimation,
 	})
 
 	// Encoding commands
@@ -270,19 +278,19 @@ func (t TextCommands) RegisterCommands(router *dgc.Router) {
 		Name:        "encodings",
 		Description: "Get a list of all available encodings",
 		Usage:       "[p]encodings",
-		Handler:     t.encodings,
+		Handler:     c.encodings,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "encode",
 		Description: "Encode text using a specified encoding",
 		Usage:       "[p]encode <encoding> <text>",
-		Handler:     t.encode,
+		Handler:     c.encode,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "decode",
 		Description: "Decode text using a specified encoding",
 		Usage:       "[p]decode <encoding> <text>",
-		Handler:     t.decode,
+		Handler:     c.decode,
 	})
 
 	// Hashing commands
@@ -291,13 +299,13 @@ func (t TextCommands) RegisterCommands(router *dgc.Router) {
 		Name:        "hashes",
 		Description: "Get a list of all available hashes",
 		Usage:       "[p]hashes",
-		Handler:     t.hashes,
+		Handler:     c.hashes,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "hash",
 		Description: "Hash text using a specified hash",
 		Usage:       "[p]hash <hash> <text>",
-		Handler:     t.hash,
+		Handler:     c.hash,
 	})
 
 	// Encryption commands
@@ -306,32 +314,31 @@ func (t TextCommands) RegisterCommands(router *dgc.Router) {
 		Name:        "encryptions",
 		Description: "Get a list of all available encryptions",
 		Usage:       "[p]encryptions",
-		Handler:     t.encryptions,
+		Handler:     c.encryptions,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "encrypt",
 		Description: "Encrypt text using a specified encryption",
 		Usage:       "[p]encrypt <encryption> <\"key\"> <\"text\">",
-		Handler:     t.encrypt,
+		Handler:     c.encrypt,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "decrypt",
 		Description: "Decrypt text using a specified encryption",
 		Usage:       "[p]decrypt <encryption> <\"key\"> <\"text\">",
-		Handler:     t.decrypt,
+		Handler:     c.decrypt,
 	})
-
 }
 
-func (TextCommands) empty(ctx *dgc.Ctx) {
+func (c *TextCommands) empty(ctx *dgc.Ctx) {
 	_ = ctx.RespondText("_ _")
 }
 
-func (TextCommands) reverse(ctx *dgc.Ctx) {
+func (c *TextCommands) reverse(ctx *dgc.Ctx) {
 	_ = ctx.RespondText(utils.String.Reverse(ctx.Arguments.Raw()))
 }
 
-func (TextCommands) alphabet(ctx *dgc.Ctx) {
+func (c *TextCommands) alphabet(ctx *dgc.Ctx) {
 	message, _ := ctx.Session.ChannelMessageSend(ctx.Event.ChannelID, "a")
 	for i := 1; i < len(constants.ALPHABET); i++ {
 		time.Sleep(1 * time.Second)
@@ -340,28 +347,28 @@ func (TextCommands) alphabet(ctx *dgc.Ctx) {
 	}
 }
 
-func (TextCommands) ascii(ctx *dgc.Ctx) {
+func (c *TextCommands) ascii(ctx *dgc.Ctx) {
 	ascii := figure.NewFigure(ctx.Arguments.Raw(), "", false).String()
 	_ = ctx.RespondText("```" + ascii + "```")
 }
 
-func (TextCommands) bold(ctx *dgc.Ctx) {
+func (c *TextCommands) bold(ctx *dgc.Ctx) {
 	_ = ctx.RespondText("**" + ctx.Arguments.Raw() + "**")
 }
 
-func (TextCommands) strike(ctx *dgc.Ctx) {
+func (c *TextCommands) strike(ctx *dgc.Ctx) {
 	_ = ctx.RespondText("~~" + ctx.Arguments.Raw() + "~~")
 }
 
-func (TextCommands) italic(ctx *dgc.Ctx) {
+func (c *TextCommands) italic(ctx *dgc.Ctx) {
 	_ = ctx.RespondText("*" + ctx.Arguments.Raw() + "*")
 }
 
-func (TextCommands) spoiler(ctx *dgc.Ctx) {
+func (c *TextCommands) spoiler(ctx *dgc.Ctx) {
 	_ = ctx.RespondText("||" + ctx.Arguments.Raw() + "||")
 }
 
-func (TextCommands) lspoiler(ctx *dgc.Ctx) {
+func (c *TextCommands) lspoiler(ctx *dgc.Ctx) {
 	finalString := ""
 	chars := []rune(ctx.Arguments.Raw())
 	for i := 0; i < len(chars); i++ {
@@ -371,7 +378,7 @@ func (TextCommands) lspoiler(ctx *dgc.Ctx) {
 	_ = ctx.RespondText(finalString)
 }
 
-func (TextCommands) leet(ctx *dgc.Ctx) {
+func (c *TextCommands) leet(ctx *dgc.Ctx) {
 	text := ctx.Arguments.Raw()
 	leetChars := [][]string{
 		{"a", "4"},
@@ -397,7 +404,7 @@ func (TextCommands) leet(ctx *dgc.Ctx) {
 	_ = ctx.RespondText(text)
 }
 
-func (TextCommands) devowel(ctx *dgc.Ctx) {
+func (c *TextCommands) devowel(ctx *dgc.Ctx) {
 	text := ctx.Arguments.Raw()
 	vowels := []string{"a", "A", "e", "E", "i", "I", "o", "O", "u", "U"}
 	for _, element := range vowels {
@@ -406,7 +413,7 @@ func (TextCommands) devowel(ctx *dgc.Ctx) {
 	_ = ctx.RespondText(text)
 }
 
-func (TextCommands) edit(ctx *dgc.Ctx) {
+func (c *TextCommands) edit(ctx *dgc.Ctx) {
 	fullText := ctx.Arguments.Raw()
 	currentText := string(fullText[0])
 	message, err := ctx.Session.ChannelMessageSend(ctx.Event.ChannelID, currentText)
@@ -421,7 +428,7 @@ func (TextCommands) edit(ctx *dgc.Ctx) {
 	}
 }
 
-func (TextCommands) emojify(ctx *dgc.Ctx) {
+func (c *TextCommands) emojify(ctx *dgc.Ctx) {
 	text := strings.ToLower(ctx.Arguments.Raw())
 	emojiChars := [][]string{
 		{"a", "🇦"},
@@ -458,23 +465,23 @@ func (TextCommands) emojify(ctx *dgc.Ctx) {
 	_ = ctx.RespondText(text)
 }
 
-func (TextCommands) shrug(ctx *dgc.Ctx) {
+func (c *TextCommands) shrug(ctx *dgc.Ctx) {
 	_ = ctx.RespondText("¯\\_(ツ)_/¯")
 }
 
-func (TextCommands) lenny(ctx *dgc.Ctx) {
+func (c *TextCommands) lenny(ctx *dgc.Ctx) {
 	_ = ctx.RespondText("( ͡° ͜ʖ ͡°)")
 }
 
-func (TextCommands) tableflip(ctx *dgc.Ctx) {
+func (c *TextCommands) tableflip(ctx *dgc.Ctx) {
 	_ = ctx.RespondText("(╯°□°）╯︵ ┻━┻")
 }
 
-func (TextCommands) unflip(ctx *dgc.Ctx) {
+func (c *TextCommands) unflip(ctx *dgc.Ctx) {
 	_ = ctx.RespondText("┬─┬ ノ( ゜-゜ノ)")
 }
 
-func (TextCommands) clap(ctx *dgc.Ctx) {
+func (c *TextCommands) clap(ctx *dgc.Ctx) {
 	text := ctx.Arguments.Raw()
 	clapChars := [][]string{
 		{" ", "👏"},
@@ -486,7 +493,7 @@ func (TextCommands) clap(ctx *dgc.Ctx) {
 	_ = ctx.RespondText(text)
 }
 
-func (TextCommands) zalgo(ctx *dgc.Ctx) {
+func (c *TextCommands) zalgo(ctx *dgc.Ctx) {
 	text := strings.ToLower(ctx.Arguments.Raw())
 	zalgoChars := [][]string{
 		{"a", "a̷̧̡̡̨͉͍̫͖͊̆̂"},
@@ -523,32 +530,32 @@ func (TextCommands) zalgo(ctx *dgc.Ctx) {
 	_ = ctx.RespondText(text)
 }
 
-func (TextCommands) unzalgo(ctx *dgc.Ctx) {
+func (c *TextCommands) unzalgo(ctx *dgc.Ctx) {
 	text := utils.String.FilterAlphaNumeric(ctx.Arguments.Raw())
 	_ = ctx.RespondText(text)
 }
 
-func (TextCommands) upper(ctx *dgc.Ctx) {
+func (c *TextCommands) upper(ctx *dgc.Ctx) {
 	text := strings.ToUpper(ctx.Arguments.Raw())
 	_ = ctx.RespondText(text)
 }
 
-func (TextCommands) lower(ctx *dgc.Ctx) {
+func (c *TextCommands) lower(ctx *dgc.Ctx) {
 	text := strings.ToLower(ctx.Arguments.Raw())
 	_ = ctx.RespondText(text)
 }
 
-func (TextCommands) fliptext(ctx *dgc.Ctx) {
+func (c *TextCommands) fliptext(ctx *dgc.Ctx) {
 	text := utils.String.Flip(ctx.Arguments.Raw(), false)
 	_ = ctx.RespondText(text)
 }
 
-func (TextCommands) unfliptext(ctx *dgc.Ctx) {
+func (c *TextCommands) unfliptext(ctx *dgc.Ctx) {
 	text := utils.String.Flip(ctx.Arguments.Raw(), true)
 	_ = ctx.RespondText(text)
 }
 
-func (TextCommands) wave(ctx *dgc.Ctx) {
+func (c *TextCommands) wave(ctx *dgc.Ctx) {
 	sawtoothWave := utils.Misc.CreateSawtoothWave(8, 6)
 
 	wave := ""
@@ -560,7 +567,7 @@ func (TextCommands) wave(ctx *dgc.Ctx) {
 	_ = ctx.RespondText(wave)
 }
 
-func (TextCommands) customwave(ctx *dgc.Ctx) {
+func (c *TextCommands) customwave(ctx *dgc.Ctx) {
 	width, err := ctx.Arguments.Get(0).AsInt()
 	if err != nil {
 		_ = ctx.RespondText("Width must be a number!")
@@ -595,26 +602,26 @@ func (TextCommands) customwave(ctx *dgc.Ctx) {
 	_ = ctx.RespondText(wave)
 }
 
-func (TextCommands) zwc(ctx *dgc.Ctx) {
+func (c *TextCommands) zwc(ctx *dgc.Ctx) {
 	text := ctx.Arguments.Raw()
 	text = strings.Join(strings.Split(text, ""), "\u200B")
 	_ = ctx.RespondText(text)
 }
 
-func (TextCommands) distance(ctx *dgc.Ctx) {
+func (c *TextCommands) distance(ctx *dgc.Ctx) {
 	distance := utils.Misc.GetDistance(
 		utils.Arguments["<\"text1\">"],
 		utils.Arguments["<\"text2\">"],
 	)
 
-	embed.NewEmbed().
+	c.services.Embed.NewEmbed().
 		AddField("Text 1", utils.Arguments["<\"text1\">"]).
 		AddField("Text 2", utils.Arguments["<\"text2\">"]).
 		AddField("Distance", fmt.Sprint(distance)).
 		Send(ctx)
 }
 
-func (TextCommands) codeblock(ctx *dgc.Ctx) {
+func (c *TextCommands) codeblock(ctx *dgc.Ctx) {
 	language := utils.Arguments["<language>"]
 	code := utils.String.RemoveWords(ctx.Arguments.Raw(), 1)
 
@@ -694,7 +701,7 @@ var (
 	}
 )
 
-func (TextCommands) virus(ctx *dgc.Ctx) {
+func (c *TextCommands) virus(ctx *dgc.Ctx) {
 	message, err := ctx.Session.ChannelMessageSend(ctx.Event.ChannelID, fmt.Sprintf(virus[0], utils.Arguments["<virus name>"]))
 	if err != nil {
 		return
@@ -709,7 +716,7 @@ func (TextCommands) virus(ctx *dgc.Ctx) {
 	}
 }
 
-func (TextCommands) _100(ctx *dgc.Ctx) {
+func (c *TextCommands) _100(ctx *dgc.Ctx) {
 	message, err := ctx.Session.ChannelMessageSend(ctx.Event.ChannelID, "1")
 	if err != nil {
 		return
@@ -724,7 +731,7 @@ func (TextCommands) _100(ctx *dgc.Ctx) {
 	}
 }
 
-func (TextCommands) bomb(ctx *dgc.Ctx) {
+func (c *TextCommands) bomb(ctx *dgc.Ctx) {
 	message, err := ctx.Session.ChannelMessageSend(ctx.Event.ChannelID, bomb[0])
 	if err != nil {
 		return
@@ -739,7 +746,7 @@ func (TextCommands) bomb(ctx *dgc.Ctx) {
 	}
 }
 
-func (TextCommands) fuckyou(ctx *dgc.Ctx) {
+func (c *TextCommands) fuckyou(ctx *dgc.Ctx) {
 	message, err := ctx.Session.ChannelMessageSend(ctx.Event.ChannelID, fuckYou[0])
 	if err != nil {
 		return
@@ -754,7 +761,7 @@ func (TextCommands) fuckyou(ctx *dgc.Ctx) {
 	}
 }
 
-func (TextCommands) fap(ctx *dgc.Ctx) {
+func (c *TextCommands) fap(ctx *dgc.Ctx) {
 	message, err := ctx.Session.ChannelMessageSend(ctx.Event.ChannelID, fap[0])
 	if err != nil {
 		return
@@ -769,7 +776,7 @@ func (TextCommands) fap(ctx *dgc.Ctx) {
 	}
 }
 
-func (TextCommands) countup(ctx *dgc.Ctx) {
+func (c *TextCommands) countup(ctx *dgc.Ctx) {
 	number, err := strconv.Atoi(utils.Arguments["<number>"])
 	if err != nil && utils.Arguments["<number>"] != "" {
 		_ = ctx.RespondText("Argument <number> must be a number.")
@@ -789,7 +796,7 @@ func (TextCommands) countup(ctx *dgc.Ctx) {
 	}
 }
 
-func (TextCommands) countdown(ctx *dgc.Ctx) {
+func (c *TextCommands) countdown(ctx *dgc.Ctx) {
 	number, err := strconv.Atoi(utils.Arguments["<number>"])
 	if err != nil && utils.Arguments["<number>"] != "" {
 		_ = ctx.RespondText("Argument <number> must be a number.")
@@ -809,7 +816,7 @@ func (TextCommands) countdown(ctx *dgc.Ctx) {
 	}
 }
 
-func (TextCommands) asciianimation(ctx *dgc.Ctx) {
+func (c *TextCommands) asciianimation(ctx *dgc.Ctx) {
 	text := utils.Arguments["<text>"]
 	firstCharAscii := figure.NewFigure(string(text[0]), "", false).String()
 	message, err := ctx.Session.ChannelMessageSend(ctx.Event.ChannelID, fmt.Sprintf("```%s```", firstCharAscii))
@@ -831,8 +838,8 @@ func (TextCommands) asciianimation(ctx *dgc.Ctx) {
 	}
 }
 
-func (TextCommands) customanimationhelp(ctx *dgc.Ctx) {
-	embed.NewEmbed().
+func (c *TextCommands) customanimationhelp(ctx *dgc.Ctx) {
+	c.services.Embed.NewEmbed().
 		AddField("Creating an animation", fmt.Sprintf(
 			"To create an animation, create a text file in %s. Every line in the file will be a frame of the animation.\n",
 			filepath.Join(utils.IO.GetMainFolder(), "Animations"),
@@ -844,7 +851,7 @@ func (TextCommands) customanimationhelp(ctx *dgc.Ctx) {
 		Send(ctx)
 }
 
-func (TextCommands) customanimations(ctx *dgc.Ctx) {
+func (c *TextCommands) customanimations(ctx *dgc.Ctx) {
 	folder := filepath.Join(utils.IO.GetMainFolder(), "Animations")
 	_ = os.MkdirAll(folder, os.ModePerm)
 
@@ -867,10 +874,10 @@ func (TextCommands) customanimations(ctx *dgc.Ctx) {
 		return nil
 	})
 
-	embed.NewEmbed().AddField("Custom Animations", customAnimString).Send(ctx)
+	c.services.Embed.NewEmbed().AddField("Custom Animations", customAnimString).Send(ctx)
 }
 
-func (TextCommands) customanimation(ctx *dgc.Ctx) {
+func (c *TextCommands) customanimation(ctx *dgc.Ctx) {
 	name := utils.Arguments["<name>"]
 	folder := filepath.Join(utils.IO.GetMainFolder(), "Animations")
 	_ = os.MkdirAll(folder, os.ModePerm)
@@ -898,18 +905,18 @@ func (TextCommands) customanimation(ctx *dgc.Ctx) {
 	}
 }
 
-func (TextCommands) encodings(ctx *dgc.Ctx) {
+func (c *TextCommands) encodings(ctx *dgc.Ctx) {
 	var encodingNames []string
 	for name := range encodings.Encodings {
 		encodingNames = append(encodingNames, name)
 	}
 
-	embed.NewEmbed().
+	c.services.Embed.NewEmbed().
 		AddField("Available Encodings", strings.Join(encodingNames, ", ")).
 		Send(ctx)
 }
 
-func (TextCommands) encode(ctx *dgc.Ctx) {
+func (c *TextCommands) encode(ctx *dgc.Ctx) {
 	encodingName := ctx.Arguments.Get(0).Raw()
 	text := utils.String.RemoveWords(ctx.Arguments.Raw(), 1)
 
@@ -925,13 +932,13 @@ func (TextCommands) encode(ctx *dgc.Ctx) {
 		return
 	}
 
-	embed.NewEmbed().
+	c.services.Embed.NewEmbed().
 		AddField("Text", text).
 		AddField("Encoded", encoded).
 		Send(ctx)
 }
 
-func (TextCommands) decode(ctx *dgc.Ctx) {
+func (c *TextCommands) decode(ctx *dgc.Ctx) {
 	encodingName := ctx.Arguments.Get(0).Raw()
 	text := utils.String.RemoveWords(ctx.Arguments.Raw(), 1)
 
@@ -951,24 +958,24 @@ func (TextCommands) decode(ctx *dgc.Ctx) {
 		return
 	}
 
-	embed.NewEmbed().
+	c.services.Embed.NewEmbed().
 		AddField("Text", text).
 		AddField("Decoded", decoded).
 		Send(ctx)
 }
 
-func (TextCommands) hashes(ctx *dgc.Ctx) {
+func (c *TextCommands) hashes(ctx *dgc.Ctx) {
 	var hashNames []string
 	for name := range encodings.Hashes {
 		hashNames = append(hashNames, name)
 	}
 
-	embed.NewEmbed().
+	c.services.Embed.NewEmbed().
 		AddField("Available Hashes", strings.Join(hashNames, ", ")).
 		Send(ctx)
 }
 
-func (TextCommands) hash(ctx *dgc.Ctx) {
+func (c *TextCommands) hash(ctx *dgc.Ctx) {
 	hashName := ctx.Arguments.Get(0).Raw()
 	text := utils.String.RemoveWords(ctx.Arguments.Raw(), 1)
 
@@ -980,24 +987,24 @@ func (TextCommands) hash(ctx *dgc.Ctx) {
 
 	hashed := hashFunc(text)
 
-	embed.NewEmbed().
+	c.services.Embed.NewEmbed().
 		AddField("Text", text).
 		AddField("Hashed", hashed).
 		Send(ctx)
 }
 
-func (TextCommands) encryptions(ctx *dgc.Ctx) {
+func (c *TextCommands) encryptions(ctx *dgc.Ctx) {
 	var encryptionNames []string
 	for name := range encodings.Encryptions {
 		encryptionNames = append(encryptionNames, name)
 	}
 
-	embed.NewEmbed().
+	c.services.Embed.NewEmbed().
 		AddField("Available Encryptions", strings.Join(encryptionNames, ", ")).
 		Send(ctx)
 }
 
-func (TextCommands) encrypt(ctx *dgc.Ctx) {
+func (c *TextCommands) encrypt(ctx *dgc.Ctx) {
 	encryptionName := ctx.Arguments.Get(0).Raw()
 	key := utils.Arguments["<\"key\">"]
 	text := utils.Arguments["<\"text\">"]
@@ -1014,13 +1021,13 @@ func (TextCommands) encrypt(ctx *dgc.Ctx) {
 		return
 	}
 
-	embed.NewEmbed().
+	c.services.Embed.NewEmbed().
 		AddField("Text", text).
 		AddField("Encrypted", encrypted).
 		Send(ctx)
 }
 
-func (TextCommands) decrypt(ctx *dgc.Ctx) {
+func (c *TextCommands) decrypt(ctx *dgc.Ctx) {
 	encryptionName := ctx.Arguments.Get(0).Raw()
 	key := utils.Arguments["<\"key\">"]
 	text := utils.Arguments["<\"text\">"]
@@ -1037,7 +1044,7 @@ func (TextCommands) decrypt(ctx *dgc.Ctx) {
 		return
 	}
 
-	embed.NewEmbed().
+	c.services.Embed.NewEmbed().
 		AddField("Text", text).
 		AddField("Decrypted", encrypted).
 		Send(ctx)

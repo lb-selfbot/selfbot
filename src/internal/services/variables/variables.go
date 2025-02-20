@@ -91,7 +91,7 @@ func (v *VariablesServiceImpl) Init() {
 		{
 			regex: regexp.MustCompile(`\$TOTALCOMMANDS`),
 			valueFunc: func(arg string) string {
-				return strconv.Itoa(len(v.discordSvc.GetRouter().Commands))
+				return strconv.Itoa(len(v.discordSvc.GetRouter().GetCmds()))
 			},
 		},
 		{

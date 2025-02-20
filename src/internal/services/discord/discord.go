@@ -9,13 +9,12 @@ import (
 	"strings"
 
 	"github.com/LightningDev1/LB-Selfbot/internal/constants"
+	"github.com/LightningDev1/LB-Selfbot/internal/router"
 
 	"github.com/LightningDev1/LB-Selfbot/internal/config"
 	"github.com/LightningDev1/LB-Selfbot/internal/services/interfaces"
 	"github.com/LightningDev1/LB-Selfbot/internal/tui"
 	"github.com/LightningDev1/LB-Selfbot/internal/utils"
-	"github.com/LightningDev1/LB-Selfbot/selfbot/commands"
-	"github.com/LightningDev1/dgc"
 	"github.com/LightningDev1/discordgo"
 )
 
@@ -27,7 +26,7 @@ type DiscordServiceImpl struct {
 	extensionsSvc     interfaces.ExtensionsService
 
 	session *discordgo.Session
-	router  *dgc.Router
+	router  router.Router
 
 	verbose bool
 }
@@ -103,106 +102,103 @@ func (d *DiscordServiceImpl) Init(token string, verbose bool) error {
 		d.session.LogLevel = discordgo.LogWarning
 	}
 
-	d.router = dgc.Create(&dgc.Router{
+	d.router = router.NewRouter(&router.RouterConfig{
 		PrefixFunc: func() []string {
 			cfg, err := config.GetConfig()
 			if err != nil {
-				return []string{"!"}
+				d.uiSvc.LogError("Failed to get config")
+				return nil
 			}
+
 			return []string{cfg.Selfbot.CommandPrefix}
 		},
 		IgnorePrefixCase: true,
-		IsUserAllowedFunc: func(ctx *dgc.Ctx) bool {
-			if ctx.Event.Author == nil {
+		IsUserAllowedFunc: func(ctx *router.Ctx) bool {
+			isAllowed := d.isUserAllowed(ctx)
+			if !isAllowed {
 				return false
 			}
 
-			if ctx.Event.Author.ID == d.session.State.User.ID {
-				return true
-			}
-
-			cfg, err := config.GetConfig()
-			if err != nil {
+			if slices.Contains(ctx.Command.Flags, router.CmdFlagHostingDangerous) && constants.HOSTING {
+				d.uiSvc.LogDangerousHostingCmdBlocked(ctx.Command.Name)
 				return false
 			}
 
-			if !slices.Contains(cfg.Sharing.SharedUsers, ctx.Event.Author.ID) &&
-				!slices.Contains(cfg.Sharing.SharedUsers, ctx.Event.Author.String()) {
-				return false
-			}
-
-			if slices.Contains(ctx.Command.Flags, commands.CmdFlagDangerous) && cfg.Sharing.BlockDangerousCommands {
-				d.uiSvc.LogDangerousCmdBlocked(ctx.Event.Author, ctx.Command.Name)
-				return false
-			}
-
-			if cfg.Sharing.ShareAll || slices.Contains([]string{"help", "search", "repeat"}, ctx.Command.Name) {
-				return true
-			}
-
-			categoryName := ""
-			if ctx.Command.Category != nil {
-				categoryName = ctx.Command.Category.Name
-			}
-			for _, category := range cfg.Sharing.SharedCategories {
-				if strings.EqualFold(category, categoryName) {
-					return true
-				}
-			}
-			return slices.Contains(cfg.Sharing.SharedCommands, ctx.Command.Name)
-		},
-		Commands: []*dgc.Command{},
-		Middlewares: []dgc.Middleware{
-			func(following dgc.ExecutionHandler) dgc.ExecutionHandler {
-				return func(ctx *dgc.Ctx) {
-					arguments, success := utils.Discord.GetArguments(ctx)
-					if !success {
-						return
-					}
-
-					cfg, err := config.GetConfig()
-					if err != nil {
-						d.uiSvc.LogError("Failed to get config")
-						return
-					}
-
-					if cfg.Selfbot.DeleteCommands && ctx.Event.ID != "0" {
-						go func() {
-							_ = ctx.Session.ChannelMessageDelete(ctx.Event.Message.ChannelID, ctx.Event.Message.ID)
-						}()
-					}
-
-					utils.Arguments = arguments
-
-					if ctx.Command.Name != "repeat" {
-						d.eventReactionsSvc.AddUsedCommand(ctx)
-					}
-
-					d.uiSvc.LogCmdUsed(ctx.Command.Name)
-
-					d.authSvc.CheckNonce()
-
-					following(ctx)
-				}
-			},
+			return true
 		},
 	})
 
+	d.router.RegisterMiddleware(func(following router.ExecutionHandler) router.ExecutionHandler {
+		return func(ctx *router.Ctx) {
+			cfg, err := config.GetConfig()
+			if err != nil {
+				d.uiSvc.LogError("Failed to get config")
+				return
+			}
+
+			if cfg.Selfbot.DeleteCommands && ctx.Message.ID != "0" {
+				go ctx.Session.ChannelMessageDelete(ctx.Message.ChannelID, ctx.Message.ID)
+			}
+
+			if ctx.Command.Name != "repeat" {
+				d.eventReactionsSvc.AddUsedCommand(ctx)
+			}
+
+			d.uiSvc.LogCmdUsed(ctx.Command.Name)
+
+			d.authSvc.CheckNonce()
+
+			following(ctx)
+		}
+	})
+
 	d.eventReactionsSvc.Register()
-
-	commands.Commands.RegisterCommands(d.session, d.router, false)
-
-	d.extensionsSvc.Register()
-
-	commands.Commands.HelpCommand.RegisterHelpCommand(d.router, d.session)
-
-	d.router.Initialize(d.session)
+	d.router.RegisterHandler(d.session)
 
 	return nil
 }
 
+func (d *DiscordServiceImpl) isUserAllowed(ctx *router.Ctx) bool {
+	if ctx.Message.Author.ID == ctx.Session.State.User.ID {
+		return true
+	}
+
+	cfg, err := config.GetConfig()
+	if err != nil {
+		d.uiSvc.LogError("Failed to get config")
+		return false
+	}
+
+	isSharedUser := slices.Contains(cfg.Sharing.SharedUsers, ctx.Message.Author.ID) ||
+		slices.Contains(cfg.Sharing.SharedUsers, ctx.Message.Author.String())
+	if !isSharedUser {
+		return false
+	}
+
+	if slices.Contains(ctx.Command.Flags, router.CmdFlagDangerous) && cfg.Sharing.BlockDangerousCommands {
+		d.uiSvc.LogDangerousCmdBlocked(ctx.Message.Author, ctx.Command.Name)
+		return false
+	}
+
+	if cfg.Sharing.ShareAll || slices.Contains([]string{"help", "search", "repeat"}, ctx.Command.Name) {
+		return true
+	}
+
+	categoryName := ""
+	if ctx.Command.Category != nil {
+		categoryName = ctx.Command.Category.Name
+	}
+
+	for _, category := range cfg.Sharing.SharedCategories {
+		if strings.EqualFold(category, categoryName) {
+			return true
+		}
+	}
+	return slices.Contains(cfg.Sharing.SharedCommands, ctx.Command.Name)
+}
+
 func (d *DiscordServiceImpl) GetSession() *discordgo.Session { return d.session }
-func (d *DiscordServiceImpl) GetRouter() *dgc.Router         { return d.router }
+func (d *DiscordServiceImpl) GetRouter() router.Router       { return d.router }
 
 func (d *DiscordServiceImpl) Open() error {
 	err := d.session.Open()

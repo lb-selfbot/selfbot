@@ -3,7 +3,7 @@ package interfaces
 import (
 	"time"
 
-	"github.com/LightningDev1/dgc"
+	"github.com/LightningDev1/LB-Selfbot/internal/router"
 	"github.com/LightningDev1/discordgo"
 )
 
@@ -118,8 +118,8 @@ type EventReactionsService interface {
 	GetEditedMessages(channelID string) []*discordgo.MessageUpdate
 	GetDeletedMessages(channelID string) []*discordgo.Message
 
-	GetUsedCommands() []*dgc.Ctx
-	AddUsedCommand(ctx *dgc.Ctx)
+	GetUsedCommands() []*router.Ctx
+	AddUsedCommand(ctx *router.Ctx)
 
 	GetLastActivity() time.Time
 	SetLastActivity()

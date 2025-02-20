@@ -368,12 +368,10 @@ func SaveConfigFromUI(config *Config) {
 func GetDefaultConfig() Config {
 	var defaultConfig Config
 
-	defaultConfigBytes, err := assets.Assets.ReadFile("defaultConfig.json")
-	if err != nil {
-		return defaultConfig
+	data, err := assets.ReadFile(assets.AssetDefaultConfig)
+	if err == nil {
+		_ = json.Unmarshal(data, &defaultConfig)
 	}
-
-	_ = json.Unmarshal(defaultConfigBytes, &defaultConfig)
 
 	return defaultConfig
 }

@@ -16,6 +16,7 @@ import (
 
 	"github.com/LightningDev1/LB-Selfbot/internal/assets"
 	"github.com/LightningDev1/LB-Selfbot/internal/browser"
+	"github.com/LightningDev1/LB-Selfbot/internal/commands"
 	"github.com/LightningDev1/LB-Selfbot/internal/config"
 	"github.com/LightningDev1/LB-Selfbot/internal/constants"
 	"github.com/LightningDev1/LB-Selfbot/internal/http"
@@ -26,8 +27,6 @@ import (
 	"github.com/LightningDev1/LB-Selfbot/internal/services/ui"
 	"github.com/LightningDev1/LB-Selfbot/internal/setup"
 	"github.com/LightningDev1/LB-Selfbot/internal/utils"
-	"github.com/LightningDev1/LB-Selfbot/selfbot/commands"
-	"github.com/LightningDev1/dgc"
 	"github.com/LightningDev1/discordgo"
 )
 
@@ -140,6 +139,8 @@ func main() {
 		os.Exit(1)
 	}
 
+	cmdRegistry := commands.NewCmdRegistry()
+
 	// Handle CLI flags
 	constants.CONSOLE = !*isLaunched
 	constants.PORTABLE = *isPortable
@@ -151,20 +152,34 @@ func main() {
 		return
 
 	case *showFeatureList:
-		router := dgc.Create(&dgc.Router{})
-		commands.Commands.RegisterCommands(nil, router, true)
+		err := services.Discord.Init("", false)
+		if err != nil {
+			return
+		}
+
+		cmdRegistry.Register(services)
+
+		router := services.Discord.GetRouter()
+
 		_ = json.NewEncoder(os.Stdout).Encode(map[string]any{
-			"commands":   router.Commands,
-			"categories": router.Categories,
+			"commands":   router.GetCmds(),
+			"categories": router.GetCategories(),
 		})
 		return
 
 	case *generateDocs:
-		router := dgc.Create(&dgc.Router{})
-		commands.Commands.RegisterCommands(nil, router, true)
+		err := services.Discord.Init("", false)
+		if err != nil {
+			return
+		}
 
-		data := make(map[string]any, len(router.Categories))
-		for _, category := range router.Categories {
+		cmdRegistry.Register(services)
+
+		router := services.Discord.GetRouter()
+		categories := router.GetCategories()
+
+		data := make(map[string]any, len(categories))
+		for _, category := range categories {
 			data[category.Name] = category.Description
 		}
 
@@ -271,6 +286,8 @@ func main() {
 		logging.Error("Discord init error:", err)
 		os.Exit(1)
 	}
+
+	cmdRegistry.Register(services)
 
 	if !constants.CONSOLE {
 		<-services.IPC.OnConnect()

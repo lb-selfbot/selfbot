@@ -10,6 +10,7 @@ import (
 
 	"github.com/LightningDev1/LB-Selfbot/internal/config"
 	"github.com/LightningDev1/LB-Selfbot/internal/constants"
+	"github.com/LightningDev1/LB-Selfbot/internal/router"
 	"github.com/LightningDev1/LB-Selfbot/internal/services/interfaces"
 	"github.com/LightningDev1/LB-Selfbot/internal/services/ui"
 	"github.com/LightningDev1/LB-Selfbot/internal/utils"
@@ -47,7 +48,7 @@ func (e *ExtensionsServiceImpl) logError(message string) {
 }
 
 func (e *ExtensionsServiceImpl) Register() {
-	session, router := e.discordSvc.GetSession(), e.discordSvc.GetRouter()
+	session, cmdRouter := e.discordSvc.GetSession(), e.discordSvc.GetRouter()
 
 	exports := interp.Exports{
 		"github.com/LightningDev1/LB-Extensions/lightningbot": map[string]reflect.Value{
@@ -109,13 +110,13 @@ func (e *ExtensionsServiceImpl) Register() {
 			return nil
 		}
 
-		registerFunc, ok := register.Interface().(func(*discordgo.Session, *dgc.Router))
+		registerFunc, ok := register.Interface().(func(*discordgo.Session, router.Router))
 		if !ok {
 			handleError(fmt.Errorf("Register is not a function, but %T", register.Interface()))
 			return nil
 		}
 
-		registerFunc(session, router)
+		registerFunc(session, cmdRouter)
 
 		e.loadedExtensions++
 

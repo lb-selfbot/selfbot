@@ -4,9 +4,9 @@ import (
 	"sync"
 	"time"
 
+	"github.com/LightningDev1/LB-Selfbot/internal/router"
 	"github.com/LightningDev1/LB-Selfbot/internal/services/interfaces"
 	"github.com/LightningDev1/LB-Selfbot/internal/utils"
-	"github.com/LightningDev1/dgc"
 	"github.com/LightningDev1/discordgo"
 )
 
@@ -33,7 +33,7 @@ type EventReactionsServiceImpl struct {
 	deletedMsgs   map[string][]*discordgo.Message
 	deletedMsgsMu sync.Mutex
 
-	usedCmds   []*dgc.Ctx
+	usedCmds   []*router.Ctx
 	usedCmdsMu sync.Mutex
 
 	lastActivity time.Time
@@ -52,7 +52,7 @@ func NewEventReactionsServiceImpl() *EventReactionsServiceImpl {
 		eventReactionsMsgs: make([]*discordgo.Message, 0),
 		editedMsgs:         make(map[string][]*discordgo.MessageUpdate),
 		deletedMsgs:        make(map[string][]*discordgo.Message),
-		usedCmds:           make([]*dgc.Ctx, 0),
+		usedCmds:           make([]*router.Ctx, 0),
 		lastActivity:       time.Now(),
 		lastAFKMsg:         time.Now(),
 	}
@@ -201,11 +201,11 @@ func (e *EventReactionsServiceImpl) GetDeletedMessages(channelID string) []*disc
 	return e.deletedMsgs[channelID]
 }
 
-func (e *EventReactionsServiceImpl) GetUsedCommands() []*dgc.Ctx {
+func (e *EventReactionsServiceImpl) GetUsedCommands() []*router.Ctx {
 	return e.usedCmds
 }
 
-func (e *EventReactionsServiceImpl) AddUsedCommand(ctx *dgc.Ctx) {
+func (e *EventReactionsServiceImpl) AddUsedCommand(ctx *router.Ctx) {
 	e.usedCmdsMu.Lock()
 	defer e.usedCmdsMu.Unlock()
 
