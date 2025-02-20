@@ -129,13 +129,14 @@ func (ui *UIServiceImpl) LogPrivnoteSniper(msg *discordgo.Message, elapsed time.
 		Show()
 }
 
-func (ui *UIServiceImpl) LogGiveawaySniperFound(msg *discordgo.Message, prize, host, endsIn, account string) {
+func (ui *UIServiceImpl) LogGiveawaySniperFound(msg *discordgo.Message, prize, hostID, endsIn, account string) {
 	session := ui.discordSvc.GetSession()
 	guildName := utils.Discord.GetGuildName(session, msg.GuildID)
 	channelName := utils.Discord.GetChannelName(session, msg.ChannelID)
-	hostName := utils.Discord.GetUserName(session, host)
-	if hostName == "Unknown" {
-		hostName = host
+	var hostName string
+	host, err := utils.Discord.GetUser(session, hostID)
+	if err == nil {
+		hostName = host.DisplayName
 	}
 
 	cfg, err := config.GetConfig()

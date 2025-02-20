@@ -92,6 +92,23 @@ func (a *Arguments) Raw() string {
 	return a.raw
 }
 
+// RawFrom returns the raw arguments from the given index.
+func (a *Arguments) RawFrom(index int) string {
+	if a.Amount() <= index {
+		return ""
+	}
+
+	args := a.arguments[index:]
+
+	var sb strings.Builder
+	for _, arg := range args {
+		sb.WriteString(arg.raw)
+		sb.WriteString(" ")
+	}
+
+	return strings.TrimSpace(sb.String())
+}
+
 // Amount returns the amount of arguments.
 func (a *Arguments) Amount() int {
 	return len(a.arguments)

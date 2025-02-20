@@ -57,12 +57,12 @@ func ArgumentsToCommandOptions(options []*discordgo.ApplicationCommandOption, ar
 		case discordgo.ApplicationCommandOptionString:
 			option.Value = arg.Raw()
 		case discordgo.ApplicationCommandOptionInteger, discordgo.ApplicationCommandOptionNumber:
-			asInt, err := arg.Int()
+			Int, err := arg.Int()
 			if err != nil {
 				return nil, optionError(option.Name, err)
 			}
 
-			option.Value = asInt
+			option.Value = Int
 		case discordgo.ApplicationCommandOptionBoolean:
 			asBool, err := arg.Bool()
 			if err != nil {

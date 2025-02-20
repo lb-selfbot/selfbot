@@ -1026,7 +1026,7 @@ func (i ImageCommands) RegisterCommands(router *dgc.Router) {
 func (ImageCommands) tweet(ctx *dgc.Ctx) {
 	jsonResult, err := http.GetJson(fmt.Sprintf(
 		"https://nekobot.xyz/api/imagegen?type=tweet&text=%s&username=%s",
-		url.QueryEscape(utils.String.RemoveWords(ctx.Arguments.Raw(), 1)),
+		url.QueryEscape(ctx.Arguments.RawFrom(1)),
 		url.QueryEscape(utils.Arguments["<username>"]),
 	))
 	if err != nil {
@@ -1060,7 +1060,7 @@ func (ImageCommands) ytcomment(ctx *dgc.Ctx) {
 	_ = ctx.RespondText(fmt.Sprintf(
 		"https://some-random-api.com/canvas/youtube-comment?avatar=%s&comment=%s&username=%s",
 		url.QueryEscape(user.AvatarURL("")),
-		url.QueryEscape(utils.String.RemoveWords(ctx.Arguments.Raw(), 1)),
+		url.QueryEscape(ctx.Arguments.RawFrom(1)),
 		url.QueryEscape(user.Username),
 	))
 }
@@ -1227,7 +1227,7 @@ func (ImageCommands) sostupid(ctx *dgc.Ctx) {
 	}
 	_ = ctx.RespondText(fmt.Sprintf("https://some-random-api.com/canvas/its-so-stupid?avatar=%s&dog=%s",
 		url.QueryEscape(user.AvatarURL("")),
-		url.QueryEscape(utils.String.RemoveWords(ctx.Arguments.Raw(), 1)),
+		url.QueryEscape(ctx.Arguments.RawFrom(1)),
 	))
 }
 
@@ -1349,7 +1349,7 @@ func (ImageCommands) captcha(ctx *dgc.Ctx) {
 	}
 	jsonResult, err := http.GetJson(fmt.Sprintf("https://nekobot.xyz/api/imagegen?type=captcha&url=%s&username=%s",
 		url.QueryEscape(user.AvatarURL("")),
-		url.QueryEscape(utils.String.RemoveWords(ctx.Arguments.Raw(), 1)),
+		url.QueryEscape(ctx.Arguments.RawFrom(1)),
 	))
 	if err != nil {
 		_ = ctx.RespondText("An error has occurred: " + err.Error())
@@ -1503,7 +1503,7 @@ func (ImageCommands) phcomment(ctx *dgc.Ctx) {
 		user = ctx.Message.Author
 	}
 	jsonResult, err := http.GetJson(fmt.Sprintf("https://nekobot.xyz/api/imagegen?type=phcomment&text=%s&username=%s&image=%s",
-		url.QueryEscape(utils.String.RemoveWords(ctx.Arguments.Raw(), 1)),
+		url.QueryEscape(ctx.Arguments.RawFrom(1)),
 		url.QueryEscape(user.Username),
 		url.QueryEscape(user.AvatarURL("")),
 	))
@@ -2001,7 +2001,7 @@ func (ImageCommands) byemom(ctx *dgc.Ctx) {
 		map[string]string{
 			"avatars":   user.AvatarURL(""),
 			"usernames": user.String(),
-			"text":      utils.String.RemoveWords(ctx.Arguments.Raw(), 1),
+			"text":      ctx.Arguments.RawFrom(1),
 		},
 	)
 	if err != nil {
@@ -2453,7 +2453,7 @@ func (ImageCommands) floor(ctx *dgc.Ctx) {
 	}
 	_ = ctx.RespondText(fmt.Sprintf("https://api.lightning-bot.com/api/v3/imagegen/floor?url=%s&text=%s",
 		url.QueryEscape(user.AvatarURL("")),
-		url.QueryEscape(utils.String.RemoveWords(ctx.Arguments.Raw(), 1)),
+		url.QueryEscape(ctx.Arguments.RawFrom(1)),
 	))
 }
 
@@ -2880,7 +2880,7 @@ func (ImageCommands) discordquoteuser(ctx *dgc.Ctx) {
 		"https://api.lightning-bot.com/api/v3/imagegen/discordquote?author=%s&author_url=%s&text=%s",
 		url.QueryEscape(utils.Misc.Or(user.DisplayName, user.Username)),
 		url.QueryEscape(user.AvatarURL("")),
-		url.QueryEscape(utils.String.RemoveWords(ctx.Arguments.Raw(), 1)),
+		url.QueryEscape(ctx.Arguments.RawFrom(1)),
 	))
 }
 

@@ -89,7 +89,7 @@ func (n *Notifiers) MessageUpdateHandler(session *discordgo.Session, message *di
 	}
 
 	isDM := utils.Discord.IsDM(session, message.Message)
-	embedded := message.Embeds != nil && len(message.Embeds) > 0
+	embedded := len(message.Embeds) > 0
 
 	//  DM Edit Notifier
 	if isDM && !embedded && cfg.Events.DMEditNotifier {
@@ -186,11 +186,11 @@ func (n *Notifiers) TypingStartHandler(session *discordgo.Session, event *discor
 
 	// DM Typing Notifier
 	if cfg.Events.DMTypingNotifier && isDM {
-		username := utils.Discord.GetUserName(session, event.UserID)
-		if username == "Unknown" {
+		user, err := utils.Discord.GetUser(session, event.UserID)
+		if err != nil {
 			return
 		}
 
-		n.uiSvc.LogDMTypingNotifier(username)
+		n.uiSvc.LogDMTypingNotifier(user.DisplayName)
 	}
 }

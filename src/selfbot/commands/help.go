@@ -57,7 +57,7 @@ func (h *HelpCommand) RegisterHelpCommand(router *dgc.Router, session *discordgo
 
 func generateCategoryHelpFunc(category *dgc.Category, name string) dgc.ExecutionHandler {
 	return func(ctx *dgc.Ctx) {
-		page, _ := ctx.Arguments.Get(0).AsInt()
+		page, _ := ctx.Arguments.Get(0).Int()
 
 		renderCategoryHelp(ctx.Router, category, name, page).Send(ctx)
 	}
@@ -101,7 +101,7 @@ func getNameFromArgument(arg string) string {
 func specificHelpCommand(ctx *dgc.Ctx) {
 	oldName := strings.ToLower(ctx.Arguments.Get(0).Raw())
 	name := getNameFromArgument(oldName)
-	page, _ := ctx.Arguments.Get(1).AsInt()
+	page, _ := ctx.Arguments.Get(1).Int()
 	prefix := ctx.Router.GetPrefixes()[0]
 
 	if category := ctx.Router.GetCategory(utils.String.Capitalize(name)); category != nil {

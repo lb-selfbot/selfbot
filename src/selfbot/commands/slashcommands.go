@@ -403,7 +403,7 @@ func (s SlashCommands) createscjob(ctx *dgc.Ctx) {
 			Name: guild.Name,
 			ID:   guild.ID,
 		},
-		RawArguments: utils.String.RemoveWords(ctx.Arguments.Raw(), 5),
+		RawArguments: ctx.Arguments.RawFrom(5),
 		IntervalSec:  int(interval.Seconds()),
 
 		// Set command so the job handler won't have to fetch it again
@@ -504,7 +504,7 @@ func (s SlashCommands) setscjobcommand(ctx *dgc.Ctx) {
 		ID:   command.ApplicationID,
 	}
 
-	job.RawArguments = utils.String.RemoveWords(ctx.Arguments.Raw(), 3)
+	job.RawArguments = ctx.Arguments.RawFrom(3)
 
 	job.Command = command
 

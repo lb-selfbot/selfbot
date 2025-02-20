@@ -1648,7 +1648,7 @@ func (EventReactionsCommands) afkmessage(ctx *dgc.Ctx) {
 			AddField("AFK Message", cfg.AFK.Message).
 			Send(ctx)
 	case "set":
-		value := utils.String.RemoveWords(ctx.Arguments.Raw(), 1)
+		value := ctx.Arguments.RawFrom(1)
 
 		cfg.AFK.Message = value
 		_ = cfg.Save()

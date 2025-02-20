@@ -490,7 +490,7 @@ func (a *ActivityCommands) getactivityjson(ctx *dgc.Ctx) {
 }
 
 func (a *ActivityCommands) setactivityjson(ctx *dgc.Ctx) {
-	rawJson := utils.String.RemoveWords(ctx.Arguments.Raw(), 1)
+	rawJson := ctx.Arguments.RawFrom(1)
 
 	var activity *discordgo.Activity
 	err := json.Unmarshal([]byte(rawJson), &activity)
@@ -778,7 +778,7 @@ func (*ActivityCommands) caname(ctx *dgc.Ctx) {
 			AddField("Custom Activity Name", cfg.Activity.Name).
 			Send(ctx)
 	case "set":
-		value := utils.String.RemoveWords(ctx.Arguments.Raw(), 1)
+		value := ctx.Arguments.RawFrom(1)
 
 		cfg.Activity.Name = value
 		_ = cfg.Save()
@@ -804,7 +804,7 @@ func (*ActivityCommands) castate(ctx *dgc.Ctx) {
 			AddField("Custom Activity State", cfg.Activity.State).
 			Send(ctx)
 	case "set":
-		value := utils.String.RemoveWords(ctx.Arguments.Raw(), 1)
+		value := ctx.Arguments.RawFrom(1)
 
 		cfg.Activity.State = value
 		_ = cfg.Save()
@@ -830,7 +830,7 @@ func (*ActivityCommands) cadetails(ctx *dgc.Ctx) {
 			AddField("Custom Activity Details", cfg.Activity.Details).
 			Send(ctx)
 	case "set":
-		value := utils.String.RemoveWords(ctx.Arguments.Raw(), 1)
+		value := ctx.Arguments.RawFrom(1)
 
 		cfg.Activity.Details = value
 		_ = cfg.Save()
@@ -982,7 +982,7 @@ func (*ActivityCommands) calargetext(ctx *dgc.Ctx) {
 			AddField("Custom Activity Large Image Text", cfg.Activity.LargeImageText).
 			Send(ctx)
 	case "set":
-		value := utils.String.RemoveWords(ctx.Arguments.Raw(), 1)
+		value := ctx.Arguments.RawFrom(1)
 
 		cfg.Activity.LargeImageText = value
 		_ = cfg.Save()
@@ -1034,7 +1034,7 @@ func (*ActivityCommands) casmalltext(ctx *dgc.Ctx) {
 			AddField("Custom Activity Small Image Text", cfg.Activity.SmallImageText).
 			Send(ctx)
 	case "set":
-		value := utils.String.RemoveWords(ctx.Arguments.Raw(), 1)
+		value := ctx.Arguments.RawFrom(1)
 
 		cfg.Activity.SmallImageText = value
 		_ = cfg.Save()
@@ -1287,7 +1287,7 @@ func (ActivityCommands) activitypresets(ctx *dgc.Ctx) {
 	switch strings.ToLower(utils.Arguments["<set/values>"]) {
 	case "set":
 		name := strings.ToLower(utils.Arguments["[name]"])
-		text := utils.String.RemoveWords(ctx.Arguments.Raw(), 2)
+		text := ctx.Arguments.RawFrom(2)
 
 		cfg, err := config.GetConfig()
 		if err != nil {

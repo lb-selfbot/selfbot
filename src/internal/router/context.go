@@ -12,5 +12,10 @@ type Ctx struct {
 	Message *discordgo.Message
 }
 
+func (c *Ctx) RespondText(text string) error {
+	_, err := c.Session.ChannelMessageSend(c.Message.ChannelID, text)
+	return err
+}
+
 // ExecutionHandler represents a handler for executing commands.
 type ExecutionHandler func(*Ctx)

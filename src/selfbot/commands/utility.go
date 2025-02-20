@@ -1035,7 +1035,7 @@ func (UtilityCommands) copychannel(ctx *dgc.Ctx) {
 		return
 	}
 
-	limit, err := ctx.Arguments.Get(2).AsInt()
+	limit, err := ctx.Arguments.Get(2).Int()
 	if err != nil {
 		limit = 100
 	}
@@ -1551,7 +1551,7 @@ func (UtilityCommands) sendmessagejson(ctx *dgc.Ctx) {
 		return
 	}
 
-	rawData := utils.String.RemoveWords(ctx.Arguments.Raw(), 1)
+	rawData := ctx.Arguments.RawFrom(1)
 
 	var data *discordgo.MessageSend
 	err := json.Unmarshal([]byte(rawData), &data)
@@ -1847,7 +1847,7 @@ func (UtilityCommands) remote(ctx *dgc.Ctx) {
 	}
 
 	commandName := strings.ToLower(utils.Arguments["<command>"])
-	args := utils.String.RemoveWords(ctx.Arguments.Raw(), 2)
+	args := ctx.Arguments.RawFrom(2)
 
 	var command *dgc.Command
 
@@ -2277,7 +2277,7 @@ func (UtilityCommands) addreview(ctx *dgc.Ctx) {
 		return
 	}
 
-	err := api.AddReviewDBReview(ctx.Session, user.ID, utils.String.RemoveWords(ctx.Arguments.Raw(), 1))
+	err := api.AddReviewDBReview(ctx.Session, user.ID, ctx.Arguments.RawFrom(1))
 	if err != nil {
 		embed.NewEmbed().
 			SetDescription("Error adding review: " + err.Error()).
@@ -2322,7 +2322,7 @@ func (UtilityCommands) tags(ctx *dgc.Ctx) {
 			Send(ctx)
 	case "add":
 		name := ctx.Arguments.Get(1).Raw()
-		content := utils.String.RemoveWords(ctx.Arguments.Raw(), 2)
+		content := ctx.Arguments.RawFrom(2)
 
 		cfg.Tags[name] = content
 
@@ -2859,7 +2859,7 @@ func (UtilityCommands) reminders(ctx *dgc.Ctx) {
 			return
 		}
 
-		message := utils.String.RemoveWords(ctx.Arguments.Raw(), 3)
+		message := ctx.Arguments.RawFrom(3)
 
 		cfg.Reminders = append(cfg.Reminders, config.Reminder{
 			Name:    ctx.Arguments.Get(1).Raw(),
@@ -3102,7 +3102,7 @@ func (c UtilityCommands) convertmass(ctx *dgc.Ctx) {
 // Misc utilities
 
 func (UtilityCommands) tts(ctx *dgc.Ctx) {
-	httpResponse := api.TTS(utils.String.RemoveWords(ctx.Arguments.Raw(), 1), utils.Arguments["<language>"])
+	httpResponse := api.TTS(ctx.Arguments.RawFrom(1), utils.Arguments["<language>"])
 	if httpResponse.Error != nil {
 		_ = ctx.RespondText("An error has occurred.")
 		return
@@ -3121,7 +3121,7 @@ func (UtilityCommands) tts(ctx *dgc.Ctx) {
 }
 
 func (UtilityCommands) translate(ctx *dgc.Ctx) {
-	translateResult := api.Translate(utils.String.RemoveWords(ctx.Arguments.Raw(), 1), utils.Arguments["<language>"])
+	translateResult := api.Translate(ctx.Arguments.RawFrom(1), utils.Arguments["<language>"])
 	if translateResult.Error != nil {
 		_ = ctx.RespondText("An error has occurred: " + translateResult.Error.Error())
 		return
@@ -3627,7 +3627,7 @@ func (UtilityCommands) randomcountry(ctx *dgc.Ctx) {
 }
 
 func (UtilityCommands) loremipsum(ctx *dgc.Ctx) {
-	paragrahps, err := ctx.Arguments.Get(0).AsInt()
+	paragrahps, err := ctx.Arguments.Get(0).Int()
 	if err != nil {
 		paragrahps = 1
 	}
@@ -3644,7 +3644,7 @@ func (UtilityCommands) loremipsum(ctx *dgc.Ctx) {
 }
 
 func (UtilityCommands) baconipsum(ctx *dgc.Ctx) {
-	paragrahps, err := ctx.Arguments.Get(0).AsInt()
+	paragrahps, err := ctx.Arguments.Get(0).Int()
 	if err != nil {
 		paragrahps = 1
 	}

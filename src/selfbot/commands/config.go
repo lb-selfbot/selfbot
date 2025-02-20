@@ -599,7 +599,7 @@ func (ConfigCommands) title(ctx *dgc.Ctx) {
 			AddField("Title", cfg.Selfbot.Title).
 			Send(ctx)
 	case "set":
-		value := utils.String.RemoveWords(ctx.Arguments.Raw(), 1)
+		value := ctx.Arguments.RawFrom(1)
 
 		cfg.Selfbot.Title = value
 		_ = cfg.Save()
@@ -625,7 +625,7 @@ func (ConfigCommands) footer(ctx *dgc.Ctx) {
 			AddField("Footer", cfg.Selfbot.Footer).
 			Send(ctx)
 	case "set":
-		value := utils.String.RemoveWords(ctx.Arguments.Raw(), 1)
+		value := ctx.Arguments.RawFrom(1)
 
 		cfg.Selfbot.Footer = value
 		_ = cfg.Save()
@@ -1309,7 +1309,7 @@ func (ConfigCommands) sniperblacklist(ctx *dgc.Ctx) {
 			AddField("Giveaway Sniper Blacklist", strings.Join(cfg.Snipers.Blacklist, ", ")).
 			Send(ctx)
 	case "add":
-		entry := utils.String.RemoveWords(ctx.Arguments.Raw(), 1)
+		entry := ctx.Arguments.RawFrom(1)
 
 		if slices.Contains(cfg.Snipers.Blacklist, entry) {
 			_ = ctx.RespondText("Value is already in the blacklist!")
@@ -1323,7 +1323,7 @@ func (ConfigCommands) sniperblacklist(ctx *dgc.Ctx) {
 			SetDescription("Added " + entry + " to the sniper blacklist.").
 			Send(ctx)
 	case "rm":
-		entry := utils.String.RemoveWords(ctx.Arguments.Raw(), 1)
+		entry := ctx.Arguments.RawFrom(1)
 
 		if !slices.Contains(cfg.Snipers.Blacklist, entry) {
 			_ = ctx.RespondText("Value already isn't in the blacklist!")

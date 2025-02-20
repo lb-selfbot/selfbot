@@ -167,7 +167,7 @@ func (TrollingCommands) trollnitro(ctx *dgc.Ctx) {
 }
 
 func (TrollingCommands) fakenitro(ctx *dgc.Ctx) {
-	amount, err := ctx.Arguments.Get(0).AsInt()
+	amount, err := ctx.Arguments.Get(0).Int()
 	if err != nil {
 		_ = ctx.RespondText("Argument <amount> must be a number.")
 		return
@@ -187,17 +187,17 @@ func (TrollingCommands) hiddentext(ctx *dgc.Ctx) {
 }
 
 func (TrollingCommands) hiddeninvite(ctx *dgc.Ctx) {
-	text := utils.String.RemoveWords(ctx.Arguments.Raw(), 1)
+	text := ctx.Arguments.RawFrom(1)
 	_ = ctx.RespondText(fmt.Sprintf("%s %s %s", text, constants.INVISIBLE_TEXT, utils.Arguments["<invite>"]))
 }
 
 func (TrollingCommands) hiddenping(ctx *dgc.Ctx) {
-	text := utils.String.RemoveWords(ctx.Arguments.Raw(), 1)
+	text := ctx.Arguments.RawFrom(1)
 	_ = ctx.RespondText(fmt.Sprintf("%s %s <@%s>", text, constants.INVISIBLE_TEXT, utils.Arguments["<userid>"]))
 }
 
 func (TrollingCommands) hiddenroleping(ctx *dgc.Ctx) {
-	text := utils.String.RemoveWords(ctx.Arguments.Raw(), 1)
+	text := ctx.Arguments.RawFrom(1)
 	_ = ctx.RespondText(fmt.Sprintf("%s %s <@&%s>", text, constants.INVISIBLE_TEXT, utils.Arguments["<roleid>"]))
 }
 
@@ -301,7 +301,7 @@ func (TrollingCommands) impersonate(ctx *dgc.Ctx) {
 		_ = ctx.RespondText("Could not find user.")
 		return
 	}
-	text := utils.String.RemoveWords(ctx.Arguments.Raw(), 1)
+	text := ctx.Arguments.RawFrom(1)
 
 	_, err := utils.Discord.Impersonate(ctx.Session, user, text, ctx.Message.ChannelID)
 	if err != nil {

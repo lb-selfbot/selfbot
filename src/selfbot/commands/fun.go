@@ -1473,7 +1473,7 @@ func (FunCommands) ermahgerd(ctx *dgc.Ctx) {
 }
 
 func (FunCommands) iseven(ctx *dgc.Ctx) {
-	number, err := ctx.Arguments.Get(0).AsInt()
+	number, err := ctx.Arguments.Get(0).Int()
 	if err != nil {
 		_ = ctx.RespondText("Argument <number> must be a number.")
 		return

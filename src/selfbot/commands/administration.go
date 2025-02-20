@@ -701,7 +701,7 @@ func (*AdministrationCommands) renamechannel(ctx *dgc.Ctx) {
 	}
 
 	_, err := ctx.Session.ChannelEdit(channel.ID, &discordgo.ChannelEdit{
-		Name: utils.String.RemoveWords(ctx.Arguments.Raw(), 1),
+		Name: ctx.Arguments.RawFrom(1),
 	})
 	if err != nil {
 		_ = ctx.RespondText("Error renaming channel: " + err.Error())
@@ -1643,7 +1643,7 @@ func (*AdministrationCommands) nickuser(ctx *dgc.Ctx) {
 		return
 	}
 
-	err := ctx.Session.GuildMemberNickname(ctx.Message.GuildID, strings.ReplaceAll(member.User.ID, ctx.Message.Author.ID, "@me"), utils.String.RemoveWords(ctx.Arguments.Raw(), 1))
+	err := ctx.Session.GuildMemberNickname(ctx.Message.GuildID, strings.ReplaceAll(member.User.ID, ctx.Message.Author.ID, "@me"), ctx.Arguments.RawFrom(1))
 	if err != nil {
 		_ = ctx.RespondText("Error changing nickname: " + err.Error())
 		return
