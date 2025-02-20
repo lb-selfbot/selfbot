@@ -39,6 +39,7 @@ func (c *TextCommands) Register() {
 		{
 			Name:        "empty",
 			Description: "Sends an empty message",
+			Flags:       []router.CommandFlag{router.CmdFlagDangerous},
 			Handler:     c.empty,
 		},
 		{
