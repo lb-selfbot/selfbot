@@ -66,175 +66,146 @@ func (f FunCommands) RegisterCommands(router *dgc.Router) {
 	router.RegisterCmd(&dgc.Command{
 		Name:        "insult",
 		Description: "Insult a person",
-		Usage:       "[p]insult",
 		Handler:     f.insult,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "dadjoke",
 		Description: "Send a random dad joke",
-		Usage:       "[p]dadjoke",
 		Handler:     f.dadjoke,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "yomomma",
 		Description: "Send a random yo momma joke",
-		Usage:       "[p]yomomma",
 		Handler:     f.yomomma,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "wouldyourather",
 		Description: "Send a random would you rather question",
-		Usage:       "[p]wouldyourather",
 		Handler:     f.wouldyourather,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "topic",
 		Description: "Send a conversation topic",
-		Usage:       "[p]topic",
 		Handler:     f.topic,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "slot",
 		Description: "Play the slot machine",
-		Usage:       "[p]slot",
 		Handler:     f.slot,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "advice",
 		Description: "Send random advice",
-		Usage:       "[p]advice",
 		Handler:     f.advice,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "catfact",
 		Description: "Send a random cat fact",
-		Usage:       "[p]catfact",
 		Handler:     f.catfact,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "dogfact",
 		Description: "Send a random dog fact",
-		Usage:       "[p]dogfact",
 		Handler:     f.dogfact,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "pandafact",
 		Description: "Send a random panda fact",
-		Usage:       "[p]pandafact",
 		Handler:     f.pandafact,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "foxfact",
 		Description: "Send a random fox fact",
-		Usage:       "[p]foxfact",
 		Handler:     f.foxfact,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "koalafact",
 		Description: "Send a random koala fact",
-		Usage:       "[p]koalafact",
 		Handler:     f.koalafact,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "birdfact",
 		Description: "Send a random bird fact",
-		Usage:       "[p]birdfact",
 		Handler:     f.birdfact,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "redpandafact",
 		Description: "Send a random red panda fact",
-		Usage:       "[p]redpandafact",
 		Handler:     f.redpandafact,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "whalefact",
 		Description: "Send a random whale fact",
-		Usage:       "[p]whalefact",
 		Handler:     f.whalefact,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "kangaroofact",
 		Description: "Send a random whale fact",
-		Usage:       "[p]kangaroofact",
 		Handler:     f.kangaroofact,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "bunnyfact",
 		Description: "Send a random bunny fact",
-		Usage:       "[p]bunnyfact",
 		Handler:     f.bunnyfact,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "lionfact",
 		Description: "Send a random lion fact",
-		Usage:       "[p]lionfact",
 		Handler:     f.lionfact,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "frogfact",
 		Description: "Send a random frog fact",
-		Usage:       "[p]frogfact",
 		Handler:     f.frogfact,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "duckfact",
 		Description: "Send a random duck fact",
-		Usage:       "[p]duckfact",
 		Handler:     f.duckfact,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "penguinfact",
 		Description: "Send a random penguin fact",
-		Usage:       "[p]penguinfact",
 		Handler:     f.penguinfact,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "dolphinfact",
 		Description: "Send a random dolphin fact",
-		Usage:       "[p]dolphinfact",
 		Handler:     f.dolphinfact,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "bearfact",
 		Description: "Send a random bear fact",
-		Usage:       "[p]bearfact",
 		Handler:     f.bearfact,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "axolotlfact",
 		Description: "Send a random axolotl fact",
-		Usage:       "[p]axolotlfact",
 		Handler:     f.axolotlfact,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "capybarafact",
 		Description: "Send a random capybara fact",
-		Usage:       "[p]capybarafact",
 		Handler:     f.capybarafact,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "trivia",
 		Description: "Send a random trivia question",
-		Usage:       "[p]trivia",
 		Handler:     f.trivia,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "dice",
 		Description: "Roll a dice",
-		Usage:       "[p]dice",
 		Handler:     f.dice,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "randomemoji",
 		Description: "Send a random emoji from ther current server [server only]",
-		Usage:       "[p]randomemoji",
 		Handler:     f.randomemoji,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "randomchannel",
 		Description: "Send a random channel from ther current server [server only]",
-		Usage:       "[p]randomchannel",
 		Handler:     f.randomchannel,
 	})
 	router.RegisterCmd(&dgc.Command{
@@ -258,25 +229,21 @@ func (f FunCommands) RegisterCommands(router *dgc.Router) {
 	router.RegisterCmd(&dgc.Command{
 		Name:        "joke",
 		Description: "Send a random joke",
-		Usage:       "[p]joke",
 		Handler:     f.joke,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "fml",
 		Description: "Send a random fuck my life quote",
-		Usage:       "[p]fml",
 		Handler:     f.fml,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "tronald",
 		Description: "Send a random Donald Trump quote",
-		Usage:       "[p]tronald",
 		Handler:     f.tronald,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "kanyewest",
 		Description: "Send a random Kanye West quote",
-		Usage:       "[p]kanyewest",
 		Handler:     f.kanyewest,
 	})
 	router.RegisterCmd(&dgc.Command{
@@ -294,61 +261,51 @@ func (f FunCommands) RegisterCommands(router *dgc.Router) {
 	router.RegisterCmd(&dgc.Command{
 		Name:        "hug",
 		Description: "Send someone",
-		Usage:       "[p]hug",
 		Handler:     f.hug,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "kiss",
 		Description: "Kiss someone",
-		Usage:       "[p]kiss",
 		Handler:     f.kiss,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "slap",
 		Description: "Slap someone",
-		Usage:       "[p]slap",
 		Handler:     f.slap,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "cuddle",
 		Description: "Cuddle someone",
-		Usage:       "[p]cuddle",
 		Handler:     f.cuddle,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "pat",
 		Description: "Pat someone",
-		Usage:       "[p]pat",
 		Handler:     f.pat,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "feed",
 		Description: "Feed someone",
-		Usage:       "[p]feed",
 		Handler:     f.feed,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "wink",
 		Description: "Wink to someone",
-		Usage:       "[p]wink",
 		Handler:     f.wink,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "chucknorris",
 		Description: "Send a random Chuck Norris joke",
-		Usage:       "[p]chucknorris",
 		Handler:     f.chucknorris,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "iss",
 		Description: "Send the current ISS coordinates",
-		Usage:       "[p]iss",
 		Handler:     f.iss,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "apod",
 		Description: "Send NASA's Astronomy Picture Of The Day",
-		Usage:       "[p]apod",
 		Handler:     f.apod,
 	})
 	router.RegisterCmd(&dgc.Command{
@@ -360,19 +317,16 @@ func (f FunCommands) RegisterCommands(router *dgc.Router) {
 	router.RegisterCmd(&dgc.Command{
 		Name:        "riddle",
 		Description: "Send a random riddle",
-		Usage:       "[p]riddle",
 		Handler:     f.riddle,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "quote",
 		Description: "Send a random quote",
-		Usage:       "[p]quote",
 		Handler:     f.quote,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "evilinsult",
 		Description: "Send a random evil insult",
-		Usage:       "[p]evilinsult",
 		Handler:     f.evilinsult,
 	})
 	router.RegisterCmd(&dgc.Command{
@@ -396,31 +350,26 @@ func (f FunCommands) RegisterCommands(router *dgc.Router) {
 	router.RegisterCmd(&dgc.Command{
 		Name:        "rickrollurl",
 		Description: "Send the rick roll url",
-		Usage:       "[p]rickrollurl",
 		Handler:     f.rickrollurl,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "rickroll",
 		Description: "Send the rick roll lyrics",
-		Usage:       "[p]rickroll",
 		Handler:     f.rickroll,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "coinflip",
 		Description: "Flip a coin",
-		Usage:       "[p]coinflip",
 		Handler:     f.coinflip,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "notfunny",
 		Description: "Send a not funny copypasta",
-		Usage:       "[p]notfunny",
 		Handler:     f.notfunny,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "randomquestion",
 		Description: "Send a random question",
-		Usage:       "[p]randomquestion",
 		Handler:     f.randomquestion,
 	})
 	router.RegisterCmd(&dgc.Command{
@@ -432,37 +381,31 @@ func (f FunCommands) RegisterCommands(router *dgc.Router) {
 	router.RegisterCmd(&dgc.Command{
 		Name:        "breakingbadquote",
 		Description: "Send a random Breaking Badquote",
-		Usage:       "[p]breakingbadquote",
 		Handler:     f.breakingbadquote,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "gameofthronesquote",
 		Description: "Send a random Game of Thrones quote",
-		Usage:       "[p]gameofthronesquote",
 		Handler:     f.gameofthronesquote,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "luciferquote",
 		Description: "Send a random Lucifer quote",
-		Usage:       "[p]luciferquote",
 		Handler:     f.luciferquote,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "strangerthingsquote",
 		Description: "Send a random Stranger Things quote",
-		Usage:       "[p]strangerthingsquote",
 		Handler:     f.strangerthingsquote,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "xkcd",
 		Description: "Send the current XKCD comic",
-		Usage:       "[p]xkcd",
 		Handler:     f.xkcd,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "boredactivity",
 		Description: "Send a random activity to do when bored",
-		Usage:       "[p]boredactivity",
 		Handler:     f.boredactivity,
 	})
 	router.RegisterCmd(&dgc.Command{
@@ -486,73 +429,61 @@ func (f FunCommands) RegisterCommands(router *dgc.Router) {
 	router.RegisterCmd(&dgc.Command{
 		Name:        "randomword",
 		Description: "Get a random word",
-		Usage:       "[p]randomword",
 		Handler:     f.randomword,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "randomweirdword",
 		Description: "Get a random weird word",
-		Usage:       "[p]randomweirdword",
 		Handler:     f.randomweirdword,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "startupidea",
 		Description: "Get a random startup idea",
-		Usage:       "[p]startupidea",
 		Handler:     f.startupidea,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "fakeperson",
 		Description: "Generate an image of a fake person",
-		Usage:       "[p]fakeperson",
 		Handler:     f.fakeperson,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "commitmessage",
 		Description: "Generate a random commit message",
-		Usage:       "[p]commitmessage",
 		Handler:     f.commitmessage,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "showerthought",
 		Description: "Send a random shower thought",
-		Usage:       "[p]showerthought",
 		Handler:     f.showerthought,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "truth",
 		Description: "Play Truth or Dare",
-		Usage:       "[p]truth",
 		Handler:     f.truth,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "dare",
 		Description: "Play Truth or Dare",
-		Usage:       "[p]dare",
 		Handler:     f.dare,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "neverhaveiever",
 		Description: "Play Never have I ever...",
-		Usage:       "[p]neverhaveiever",
 		Handler:     f.neverhaveiever,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "paranoia",
 		Description: "Send a random paranoia question",
-		Usage:       "[p]paranoia",
 		Handler:     f.paranoia,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "randomcolor",
 		Description: "Generate a random color",
-		Usage:       "[p]randomcolor",
 		Handler:     f.randomcolor,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "pickupline",
 		Description: "Generate a pickup line",
-		Usage:       "[p]pickupline",
 		Handler:     f.pickupline,
 	})
 	router.RegisterCmd(&dgc.Command{
@@ -564,7 +495,6 @@ func (f FunCommands) RegisterCommands(router *dgc.Router) {
 	router.RegisterCmd(&dgc.Command{
 		Name:        "randomelement",
 		Description: "Get info about a random periodic table element",
-		Usage:       "[p]randomelement",
 		Handler:     f.randomelement,
 	})
 }

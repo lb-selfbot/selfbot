@@ -40,7 +40,6 @@ func (h *HelpCommand) RegisterHelpCommand(router *dgc.Router, session *discordgo
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "repeat",
-		Usage:       "[p]repeat",
 		Description: "Repeat the last used command",
 		Handler:     h.repeat,
 	})

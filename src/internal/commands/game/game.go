@@ -43,25 +43,21 @@ func (g *GameCommands) RegisterCommands(router *dgc.Router) {
 	router.RegisterCmd(&dgc.Command{
 		Name:        "fnmap",
 		Description: "Get the current Fortnite map",
-		Usage:       "[p]fnmap",
 		Handler:     g.fnmap,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "fnmappois",
 		Description: "Get the current Fortnite map with POIs",
-		Usage:       "[p]fnmappois",
 		Handler:     g.fnmappois,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "fnrandomplaylist",
 		Description: "Get a random Fortnite playlist",
-		Usage:       "[p]fnrandomplaylist",
 		Handler:     g.fnrandomplaylist,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "fnrandombanner",
 		Description: "Get a random Fortnite banner",
-		Usage:       "[p]fnrandombanner",
 		Handler:     g.fnrandombanner,
 	})
 	router.RegisterCmd(&dgc.Command{
@@ -79,25 +75,21 @@ func (g *GameCommands) RegisterCommands(router *dgc.Router) {
 	router.RegisterCmd(&dgc.Command{
 		Name:        "fnrandomcosmetic",
 		Description: "Get a random Fortnite cosmetic",
-		Usage:       "[p]fnrandomcosmetic",
 		Handler:     g.fnrandomcosmetic,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "fnstatus",
 		Description: "Get the current Fortnite status",
-		Usage:       "[p]fnstatus",
 		Handler:     g.fnstatus,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "alstatus",
 		Description: "Get the Apex legends status",
-		Usage:       "[p]alstatus",
 		Handler:     g.alstatus,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "alnews",
 		Description: "Get the latest Apex legends news",
-		Usage:       "[p]alnews",
 		Handler:     g.alnews,
 	})
 	router.RegisterCmd(&dgc.Command{
@@ -109,7 +101,6 @@ func (g *GameCommands) RegisterCommands(router *dgc.Router) {
 	router.RegisterCmd(&dgc.Command{
 		Name:        "gtastatus",
 		Description: "Get the current GTA status",
-		Usage:       "[p]gtastatus",
 		Handler:     g.gtastatus,
 	})
 	router.RegisterCmd(&dgc.Command{

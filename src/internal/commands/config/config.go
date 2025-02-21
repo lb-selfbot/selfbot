@@ -25,7 +25,7 @@ func (c ConfigCommands) RegisterCommands(router *dgc.Router) {
 		Name:        "commandprefix",
 		Description: "Get or set the command prefix",
 		Arguments:   "<get/set> [value]",
-		Flags:       []string{CmdFlagDangerous},
+		Flags:       []router.CommandFlag{router.CmdFlagDangerous},
 		Handler:     c.commandprefix,
 	})
 
@@ -33,7 +33,7 @@ func (c ConfigCommands) RegisterCommands(router *dgc.Router) {
 		Name:        "commandmode",
 		Description: "Get or set the command mode",
 		Arguments:   "<get/set/values> [value]",
-		Flags:       []string{CmdFlagDangerous},
+		Flags:       []router.CommandFlag{router.CmdFlagDangerous},
 		Handler:     c.commandmode,
 	})
 
@@ -41,7 +41,7 @@ func (c ConfigCommands) RegisterCommands(router *dgc.Router) {
 		Name:        "title",
 		Description: "Get or set the title",
 		Arguments:   "<get/set> [value]",
-		Flags:       []string{CmdFlagDangerous},
+		Flags:       []router.CommandFlag{router.CmdFlagDangerous},
 		Handler:     c.title,
 	})
 
@@ -49,7 +49,7 @@ func (c ConfigCommands) RegisterCommands(router *dgc.Router) {
 		Name:        "footer",
 		Description: "Get or set the footer",
 		Arguments:   "<get/set> [value]",
-		Flags:       []string{CmdFlagDangerous},
+		Flags:       []router.CommandFlag{router.CmdFlagDangerous},
 		Handler:     c.footer,
 	})
 
@@ -57,7 +57,7 @@ func (c ConfigCommands) RegisterCommands(router *dgc.Router) {
 		Name:        "delresponses",
 		Description: "Get, set or toggle if the bot should delete responses to commands",
 		Arguments:   "<get/set/toggle> [on/off]",
-		Flags:       []string{CmdFlagDangerous},
+		Flags:       []router.CommandFlag{router.CmdFlagDangerous},
 		Handler:     c.delresponses,
 	})
 
@@ -65,7 +65,7 @@ func (c ConfigCommands) RegisterCommands(router *dgc.Router) {
 		Name:        "delresponsesdelay",
 		Description: "Get or set the delay before deleting responses",
 		Arguments:   "<get/set> [value]",
-		Flags:       []string{CmdFlagDangerous},
+		Flags:       []router.CommandFlag{router.CmdFlagDangerous},
 		Handler:     c.delresponsesdelay,
 	})
 
@@ -73,7 +73,7 @@ func (c ConfigCommands) RegisterCommands(router *dgc.Router) {
 		Name:        "delcommands",
 		Description: "Get, set or toggle if the bot should delete commands",
 		Arguments:   "<get/set/toggle> [on/off]",
-		Flags:       []string{CmdFlagDangerous},
+		Flags:       []router.CommandFlag{router.CmdFlagDangerous},
 		Handler:     c.delcommands,
 	})
 
@@ -81,7 +81,7 @@ func (c ConfigCommands) RegisterCommands(router *dgc.Router) {
 		Name:        "clientspoof",
 		Description: "Get or set the bot's client spoof",
 		Arguments:   "<get/set/values> [value]",
-		Flags:       []string{CmdFlagDangerous},
+		Flags:       []router.CommandFlag{router.CmdFlagDangerous},
 		Handler:     c.clientspoof,
 	})
 
@@ -89,7 +89,7 @@ func (c ConfigCommands) RegisterCommands(router *dgc.Router) {
 		Name:        "timezone",
 		Description: "Get or set the timezone",
 		Arguments:   "<get/set> [value]",
-		Flags:       []string{CmdFlagDangerous},
+		Flags:       []router.CommandFlag{router.CmdFlagDangerous},
 		Handler:     c.timezone,
 	})
 
@@ -97,7 +97,7 @@ func (c ConfigCommands) RegisterCommands(router *dgc.Router) {
 		Name:        "embedcolor",
 		Description: "Get or set the Embed Color (for URL Embeds)",
 		Arguments:   "<get/set> [hex color]",
-		Flags:       []string{CmdFlagDangerous},
+		Flags:       []router.CommandFlag{router.CmdFlagDangerous},
 		Handler:     c.embedcolor,
 	})
 
@@ -105,7 +105,7 @@ func (c ConfigCommands) RegisterCommands(router *dgc.Router) {
 		Name:        "embedimage",
 		Description: "Get or set the Embed Image (for URL Embeds)",
 		Arguments:   "<get/set> [url]",
-		Flags:       []string{CmdFlagDangerous},
+		Flags:       []router.CommandFlag{router.CmdFlagDangerous},
 		Handler:     c.embedimage,
 	})
 
@@ -113,7 +113,7 @@ func (c ConfigCommands) RegisterCommands(router *dgc.Router) {
 		Name:        "embedurl",
 		Description: "Get or set the Embed URL (for URL Embeds)",
 		Arguments:   "<get/set> [url]",
-		Flags:       []string{CmdFlagDangerous},
+		Flags:       []router.CommandFlag{router.CmdFlagDangerous},
 		Handler:     c.embedurl,
 	})
 
@@ -121,7 +121,7 @@ func (c ConfigCommands) RegisterCommands(router *dgc.Router) {
 		Name:        "forcesubscribedservers",
 		Description: "Get, add, remove or clear force subscribed servers",
 		Arguments:   "<get/add/rm/clear> [server id]",
-		Flags:       []string{CmdFlagDangerous},
+		Flags:       []router.CommandFlag{router.CmdFlagDangerous},
 		Handler:     c.forcesubscribedservers,
 	})
 
@@ -129,7 +129,7 @@ func (c ConfigCommands) RegisterCommands(router *dgc.Router) {
 		Name:        "aliases",
 		Description: "Get, add, remove or clear command aliases",
 		Arguments:   "<get/add/rm/clear> [alias] [command]",
-		Flags:       []string{CmdFlagDangerous},
+		Flags:       []router.CommandFlag{router.CmdFlagDangerous},
 		Handler:     c.aliases,
 	})
 
@@ -137,7 +137,7 @@ func (c ConfigCommands) RegisterCommands(router *dgc.Router) {
 		Name:        "notifications",
 		Description: "Get, set, toggle, or get an example of toast notifications",
 		Arguments:   "<get/set/toggle/example> [on/off]",
-		Flags:       []string{CmdFlagDangerous},
+		Flags:       []router.CommandFlag{router.CmdFlagDangerous},
 		Handler:     c.notifications,
 	})
 
@@ -145,7 +145,7 @@ func (c ConfigCommands) RegisterCommands(router *dgc.Router) {
 		Name:        "nitrosniper",
 		Description: "Get, set or toggle the Nitro Sniper",
 		Arguments:   "<get/set/toggle> [on/off]",
-		Flags:       []string{CmdFlagDangerous},
+		Flags:       []router.CommandFlag{router.CmdFlagDangerous},
 		Handler:     c.nitrosniper,
 	})
 
@@ -153,7 +153,7 @@ func (c ConfigCommands) RegisterCommands(router *dgc.Router) {
 		Name:        "giveawaysniper",
 		Description: "Get, set or toggle the Giveaway Sniper",
 		Arguments:   "<get/set/toggle> [on/off]",
-		Flags:       []string{CmdFlagDangerous},
+		Flags:       []router.CommandFlag{router.CmdFlagDangerous},
 		Handler:     c.giveawaysniper,
 	})
 
@@ -161,7 +161,7 @@ func (c ConfigCommands) RegisterCommands(router *dgc.Router) {
 		Name:        "giveawaysnipersleep",
 		Description: "Get or set the Giveaway Sniper sleep delay",
 		Arguments:   "<get/set> [value]",
-		Flags:       []string{CmdFlagDangerous},
+		Flags:       []router.CommandFlag{router.CmdFlagDangerous},
 		Handler:     c.giveawaysnipersleep,
 	})
 
@@ -169,7 +169,7 @@ func (c ConfigCommands) RegisterCommands(router *dgc.Router) {
 		Name:        "customgiveawaybots",
 		Description: "Get, add, remove or clear custom giveaway bots",
 		Arguments:   "<get/add/rm/clear> [bot]",
-		Flags:       []string{CmdFlagDangerous},
+		Flags:       []router.CommandFlag{router.CmdFlagDangerous},
 		Handler:     c.customgiveawaybots,
 	})
 
@@ -177,7 +177,7 @@ func (c ConfigCommands) RegisterCommands(router *dgc.Router) {
 		Name:        "sniperblacklist",
 		Description: "Get, add, remove or clear the sniper blacklist",
 		Arguments:   "<get/add/rm/clear> [value]",
-		Flags:       []string{CmdFlagDangerous},
+		Flags:       []router.CommandFlag{router.CmdFlagDangerous},
 		Handler:     c.sniperblacklist,
 	})
 
@@ -185,7 +185,7 @@ func (c ConfigCommands) RegisterCommands(router *dgc.Router) {
 		Name:        "sniperserverblacklist",
 		Description: "Get, add, remove or clear the sniper server blacklist",
 		Arguments:   "<get/add/rm/clear> [server id]",
-		Flags:       []string{CmdFlagDangerous},
+		Flags:       []router.CommandFlag{router.CmdFlagDangerous},
 		Handler:     c.sniperserverblacklist,
 	})
 
@@ -193,7 +193,7 @@ func (c ConfigCommands) RegisterCommands(router *dgc.Router) {
 		Name:        "multitokensniper",
 		Description: "Get, set or toggle the Multi Token Sniper",
 		Arguments:   "<get/set/toggle> [on/off]",
-		Flags:       []string{CmdFlagDangerous},
+		Flags:       []router.CommandFlag{router.CmdFlagDangerous},
 		Handler:     c.multitokensniper,
 	})
 
@@ -201,7 +201,7 @@ func (c ConfigCommands) RegisterCommands(router *dgc.Router) {
 		Name:        "snipertokens",
 		Description: "Get, add, remove or clear Multi Token Sniper tokens",
 		Arguments:   "<get/add/rm/clear> [value]",
-		Flags:       []string{CmdFlagDangerous},
+		Flags:       []router.CommandFlag{router.CmdFlagDangerous},
 		Handler:     c.snipertokens,
 	})
 
@@ -209,7 +209,7 @@ func (c ConfigCommands) RegisterCommands(router *dgc.Router) {
 		Name:        "privnotesniper",
 		Description: "Get, set or toggle the Privnote Sniper",
 		Arguments:   "<get/set/toggle> [on/off]",
-		Flags:       []string{CmdFlagDangerous},
+		Flags:       []router.CommandFlag{router.CmdFlagDangerous},
 		Handler:     c.privnotesniper,
 	})
 
@@ -217,7 +217,7 @@ func (c ConfigCommands) RegisterCommands(router *dgc.Router) {
 		Name:        "poketwosniper",
 		Description: "Get, set or toggle the PokéTwo Sniper",
 		Arguments:   "<get/set/toggle> [on/off]",
-		Flags:       []string{CmdFlagDangerous},
+		Flags:       []router.CommandFlag{router.CmdFlagDangerous},
 		Handler:     c.poketwosniper,
 	})
 
@@ -225,7 +225,7 @@ func (c ConfigCommands) RegisterCommands(router *dgc.Router) {
 		Name:        "poketwosleep",
 		Description: "Get or set the PokéTwo Sniper catch delay",
 		Arguments:   "<get/set> [value]",
-		Flags:       []string{CmdFlagDangerous},
+		Flags:       []router.CommandFlag{router.CmdFlagDangerous},
 		Handler:     c.poketwosleep,
 	})
 
@@ -233,7 +233,7 @@ func (c ConfigCommands) RegisterCommands(router *dgc.Router) {
 		Name:        "poketworandomsleep",
 		Description: "Get, set or toggle the PokéTwo Sniper random sleep",
 		Arguments:   "<get/set/toggle> [on/off]",
-		Flags:       []string{CmdFlagDangerous},
+		Flags:       []router.CommandFlag{router.CmdFlagDangerous},
 		Handler:     c.poketworandomsleep,
 	})
 
@@ -241,7 +241,7 @@ func (c ConfigCommands) RegisterCommands(router *dgc.Router) {
 		Name:        "poketwotimeout",
 		Description: "Get or set the PokéTwo Sniper timeout",
 		Arguments:   "<get/set> [value]",
-		Flags:       []string{CmdFlagDangerous},
+		Flags:       []router.CommandFlag{router.CmdFlagDangerous},
 		Handler:     c.poketwotimeout,
 	})
 
@@ -249,7 +249,7 @@ func (c ConfigCommands) RegisterCommands(router *dgc.Router) {
 		Name:        "poketwotyping",
 		Description: "Get, set or toggle the PokéTwo typing",
 		Arguments:   "<get/set/toggle> [on/off]",
-		Flags:       []string{CmdFlagDangerous},
+		Flags:       []router.CommandFlag{router.CmdFlagDangerous},
 		Handler:     c.poketwotyping,
 	})
 
@@ -257,7 +257,7 @@ func (c ConfigCommands) RegisterCommands(router *dgc.Router) {
 		Name:        "poketwocatchrate",
 		Description: "Get or set the PokéTwo catch rate",
 		Arguments:   "<get/set> [percentage]",
-		Flags:       []string{CmdFlagDangerous},
+		Flags:       []router.CommandFlag{router.CmdFlagDangerous},
 		Handler:     c.poketwocatchrate,
 	})
 
@@ -265,7 +265,7 @@ func (c ConfigCommands) RegisterCommands(router *dgc.Router) {
 		Name:        "poketwofakeactivity",
 		Description: "Get, set or toggle the PokéTwo fake activity",
 		Arguments:   "<get/set/toggle> [on/off]",
-		Flags:       []string{CmdFlagDangerous},
+		Flags:       []router.CommandFlag{router.CmdFlagDangerous},
 		Handler:     c.poketwofakeactivity,
 	})
 
@@ -273,7 +273,7 @@ func (c ConfigCommands) RegisterCommands(router *dgc.Router) {
 		Name:        "poketwochannels",
 		Description: "Get, add, remove or clear PokéTwo channels",
 		Arguments:   "<get/add/rm/clear> [channel]",
-		Flags:       []string{CmdFlagDangerous},
+		Flags:       []router.CommandFlag{router.CmdFlagDangerous},
 		Handler:     c.poketwochannels,
 	})
 
@@ -281,7 +281,7 @@ func (c ConfigCommands) RegisterCommands(router *dgc.Router) {
 		Name:        "poketwolanguage",
 		Description: "Get or set the PokéTwo Sniper catch language",
 		Arguments:   "<get/set/values> [language]",
-		Flags:       []string{CmdFlagDangerous},
+		Flags:       []router.CommandFlag{router.CmdFlagDangerous},
 		Handler:     c.poketwolanguage,
 	})
 
@@ -289,7 +289,7 @@ func (c ConfigCommands) RegisterCommands(router *dgc.Router) {
 		Name:        "setupwebhooks",
 		Description: "Automatically set up all webhooks",
 		Arguments:   "[server id]",
-		Flags:       []string{CmdFlagDangerous},
+		Flags:       []router.CommandFlag{router.CmdFlagDangerous},
 		Handler:     c.setupwebhooks,
 	})
 
@@ -297,7 +297,7 @@ func (c ConfigCommands) RegisterCommands(router *dgc.Router) {
 		Name:        "wall",
 		Description: "Set all webhooks at once",
 		Arguments:   "[webhook url]",
-		Flags:       []string{CmdFlagDangerous},
+		Flags:       []router.CommandFlag{router.CmdFlagDangerous},
 		Handler:     c.wall,
 	})
 
@@ -305,7 +305,7 @@ func (c ConfigCommands) RegisterCommands(router *dgc.Router) {
 		Name:        "wnitrosniper",
 		Description: "Get or set the Nitro Sniper webhook",
 		Arguments:   "<get/set> [webhook url]",
-		Flags:       []string{CmdFlagDangerous},
+		Flags:       []router.CommandFlag{router.CmdFlagDangerous},
 		Handler:     c.wnitrosniper,
 	})
 
@@ -313,7 +313,7 @@ func (c ConfigCommands) RegisterCommands(router *dgc.Router) {
 		Name:        "wgiveawaysniper",
 		Description: "Get or set the Giveaway Sniper webhook",
 		Arguments:   "<get/set> [webhook url]",
-		Flags:       []string{CmdFlagDangerous},
+		Flags:       []router.CommandFlag{router.CmdFlagDangerous},
 		Handler:     c.wgiveawaysniper,
 	})
 
@@ -321,7 +321,7 @@ func (c ConfigCommands) RegisterCommands(router *dgc.Router) {
 		Name:        "wselfbotdetection",
 		Description: "Get or set the Selfbot Detection webhook",
 		Arguments:   "<get/set> [webhook url]",
-		Flags:       []string{CmdFlagDangerous},
+		Flags:       []router.CommandFlag{router.CmdFlagDangerous},
 		Handler:     c.wselfbotdetection,
 	})
 
@@ -329,7 +329,7 @@ func (c ConfigCommands) RegisterCommands(router *dgc.Router) {
 		Name:        "wstaffdetection",
 		Description: "Get or set the Staff Detection webhook",
 		Arguments:   "<get/set> [webhook url]",
-		Flags:       []string{CmdFlagDangerous},
+		Flags:       []router.CommandFlag{router.CmdFlagDangerous},
 		Handler:     c.wstaffdetection,
 	})
 
@@ -337,7 +337,7 @@ func (c ConfigCommands) RegisterCommands(router *dgc.Router) {
 		Name:        "wnotifiers",
 		Description: "Get or set the Notifiers webhook",
 		Arguments:   "<get/set> [webhook url]",
-		Flags:       []string{CmdFlagDangerous},
+		Flags:       []router.CommandFlag{router.CmdFlagDangerous},
 		Handler:     c.wnotifiers,
 	})
 
@@ -345,7 +345,7 @@ func (c ConfigCommands) RegisterCommands(router *dgc.Router) {
 		Name:        "wpingdetection",
 		Description: "Get or set the Ping Detection webhook",
 		Arguments:   "<get/set> [webhook url]",
-		Flags:       []string{CmdFlagDangerous},
+		Flags:       []router.CommandFlag{router.CmdFlagDangerous},
 		Handler:     c.wpingdetection,
 	})
 
@@ -353,7 +353,7 @@ func (c ConfigCommands) RegisterCommands(router *dgc.Router) {
 		Name:        "wmisc",
 		Description: "Get or set the Miscellaneous webhook",
 		Arguments:   "<get/set> [webhook url]",
-		Flags:       []string{CmdFlagDangerous},
+		Flags:       []router.CommandFlag{router.CmdFlagDangerous},
 		Handler:     c.wmisc,
 	})
 
@@ -361,7 +361,7 @@ func (c ConfigCommands) RegisterCommands(router *dgc.Router) {
 		Name:        "wsessions",
 		Description: "Get or set the Sessions webhook",
 		Arguments:   "<get/set> [webhook url]",
-		Flags:       []string{CmdFlagDangerous},
+		Flags:       []router.CommandFlag{router.CmdFlagDangerous},
 		Handler:     c.wsessions,
 	})
 
@@ -369,7 +369,7 @@ func (c ConfigCommands) RegisterCommands(router *dgc.Router) {
 		Name:        "wpingself",
 		Description: "Get, set or toggle Ping Self for webhooks",
 		Arguments:   "<get/set/values> [value]",
-		Flags:       []string{CmdFlagDangerous},
+		Flags:       []router.CommandFlag{router.CmdFlagDangerous},
 		Handler:     c.wpingself,
 	})
 
@@ -377,7 +377,7 @@ func (c ConfigCommands) RegisterCommands(router *dgc.Router) {
 		Name:        "wpingeveryone",
 		Description: "Get, set or toggle Ping Everyone for webhooks",
 		Arguments:   "<get/set/values> [value]",
-		Flags:       []string{CmdFlagDangerous},
+		Flags:       []router.CommandFlag{router.CmdFlagDangerous},
 		Handler:     c.wpingeveryone,
 	})
 
@@ -385,7 +385,7 @@ func (c ConfigCommands) RegisterCommands(router *dgc.Router) {
 		Name:        "bannotifier",
 		Description: "Get, set or toggle the Ban Notifier",
 		Arguments:   "<get/set/toggle> [on/off]",
-		Flags:       []string{CmdFlagDangerous},
+		Flags:       []router.CommandFlag{router.CmdFlagDangerous},
 		Handler:     c.bannotifier,
 	})
 
@@ -393,7 +393,7 @@ func (c ConfigCommands) RegisterCommands(router *dgc.Router) {
 		Name:        "staffdetection",
 		Description: "Get, set or toggle the Staff Detection",
 		Arguments:   "<get/set/toggle> [on/off]",
-		Flags:       []string{CmdFlagDangerous},
+		Flags:       []router.CommandFlag{router.CmdFlagDangerous},
 		Handler:     c.staffdetection,
 	})
 
@@ -401,7 +401,7 @@ func (c ConfigCommands) RegisterCommands(router *dgc.Router) {
 		Name:        "pingdetection",
 		Description: "Get, set or toggle the Ping Detection",
 		Arguments:   "<get/set/toggle> [on/off]",
-		Flags:       []string{CmdFlagDangerous},
+		Flags:       []router.CommandFlag{router.CmdFlagDangerous},
 		Handler:     c.pingdetection,
 	})
 
@@ -409,7 +409,7 @@ func (c ConfigCommands) RegisterCommands(router *dgc.Router) {
 		Name:        "ticketnotifier",
 		Description: "Get, set or toggle the Ticket Notifier",
 		Arguments:   "<get/set/toggle> [on/off]",
-		Flags:       []string{CmdFlagDangerous},
+		Flags:       []router.CommandFlag{router.CmdFlagDangerous},
 		Handler:     c.ticketnotifier,
 	})
 
@@ -417,7 +417,7 @@ func (c ConfigCommands) RegisterCommands(router *dgc.Router) {
 		Name:        "sessionconnected",
 		Description: "Get, set or toggle the Session Connected Notifier",
 		Arguments:   "<get/set/toggle> [on/off]",
-		Flags:       []string{CmdFlagDangerous},
+		Flags:       []router.CommandFlag{router.CmdFlagDangerous},
 		Handler:     c.sessionconnected,
 	})
 
@@ -425,7 +425,7 @@ func (c ConfigCommands) RegisterCommands(router *dgc.Router) {
 		Name:        "sessiondisconnected",
 		Description: "Get, set or toggle the Session Disconnected Notifier",
 		Arguments:   "<get/set/toggle> [on/off]",
-		Flags:       []string{CmdFlagDangerous},
+		Flags:       []router.CommandFlag{router.CmdFlagDangerous},
 		Handler:     c.sessiondisconnected,
 	})
 
@@ -433,7 +433,7 @@ func (c ConfigCommands) RegisterCommands(router *dgc.Router) {
 		Name:        "selfbotdetection",
 		Description: "Get, set or toggle the Selfbot Detection",
 		Arguments:   "<get/set/toggle> [on/off]",
-		Flags:       []string{CmdFlagDangerous},
+		Flags:       []router.CommandFlag{router.CmdFlagDangerous},
 		Handler:     c.selfbotdetection,
 	})
 
@@ -441,7 +441,7 @@ func (c ConfigCommands) RegisterCommands(router *dgc.Router) {
 		Name:        "dmtypingnotifier",
 		Description: "Get, set or toggle the DM Typing Notifier",
 		Arguments:   "<get/set/toggle> [on/off]",
-		Flags:       []string{CmdFlagDangerous},
+		Flags:       []router.CommandFlag{router.CmdFlagDangerous},
 		Handler:     c.dmtypingnotifier,
 	})
 
@@ -449,7 +449,7 @@ func (c ConfigCommands) RegisterCommands(router *dgc.Router) {
 		Name:        "dmnotifier",
 		Description: "Get, set or toggle the DM Notifier",
 		Arguments:   "<get/set/toggle> [on/off]",
-		Flags:       []string{CmdFlagDangerous},
+		Flags:       []router.CommandFlag{router.CmdFlagDangerous},
 		Handler:     c.dmnotifier,
 	})
 
@@ -457,7 +457,7 @@ func (c ConfigCommands) RegisterCommands(router *dgc.Router) {
 		Name:        "dmeditnotifier",
 		Description: "Get, set or toggle the DM Edit Notifier",
 		Arguments:   "<get/set/toggle> [on/off]",
-		Flags:       []string{CmdFlagDangerous},
+		Flags:       []router.CommandFlag{router.CmdFlagDangerous},
 		Handler:     c.dmeditnotifier,
 	})
 
@@ -465,7 +465,7 @@ func (c ConfigCommands) RegisterCommands(router *dgc.Router) {
 		Name:        "dmdeletenotifier",
 		Description: "Get, set or toggle the DM Delete Notifier",
 		Arguments:   "<get/set/toggle> [on/off]",
-		Flags:       []string{CmdFlagDangerous},
+		Flags:       []router.CommandFlag{router.CmdFlagDangerous},
 		Handler:     c.dmdeletenotifier,
 	})
 
@@ -473,7 +473,7 @@ func (c ConfigCommands) RegisterCommands(router *dgc.Router) {
 		Name:        "messagedeletenotifier",
 		Description: "Get, set or toggle the Message Delete Notifier",
 		Arguments:   "<get/set/toggle> [on/off]",
-		Flags:       []string{CmdFlagDangerous},
+		Flags:       []router.CommandFlag{router.CmdFlagDangerous},
 		Handler:     c.messagedeletenotifier,
 	})
 
@@ -481,7 +481,7 @@ func (c ConfigCommands) RegisterCommands(router *dgc.Router) {
 		Name:        "uitheme",
 		Description: "Get or set the UI theme",
 		Arguments:   "<get/set/values> [value]",
-		Flags:       []string{CmdFlagDangerous},
+		Flags:       []router.CommandFlag{router.CmdFlagDangerous},
 		Handler:     c.uitheme,
 	})
 
@@ -489,7 +489,7 @@ func (c ConfigCommands) RegisterCommands(router *dgc.Router) {
 		Name:        "hidetosystray",
 		Description: "Get, set or toggle Hide UI To Systray",
 		Arguments:   "<get/set/toggle> [on/off]",
-		Flags:       []string{CmdFlagDangerous},
+		Flags:       []router.CommandFlag{router.CmdFlagDangerous},
 		Handler:     c.hidetosystray,
 	})
 
@@ -497,7 +497,7 @@ func (c ConfigCommands) RegisterCommands(router *dgc.Router) {
 		Name:        "runuionstartup",
 		Description: "Get, set or toggle Run UI on Startup",
 		Arguments:   "<get/set/toggle> [on/off]",
-		Flags:       []string{CmdFlagDangerous},
+		Flags:       []router.CommandFlag{router.CmdFlagDangerous},
 		Handler:     c.runuionstartup,
 	})
 
@@ -505,7 +505,7 @@ func (c ConfigCommands) RegisterCommands(router *dgc.Router) {
 		Name:        "runbotonstartup",
 		Description: "Get, set or toggle Run Selfbot on Startup",
 		Arguments:   "<get/set/toggle> [on/off]",
-		Flags:       []string{CmdFlagDangerous},
+		Flags:       []router.CommandFlag{router.CmdFlagDangerous},
 		Handler:     c.runbotonstartup,
 	})
 }

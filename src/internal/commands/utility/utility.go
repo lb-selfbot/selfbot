@@ -80,13 +80,11 @@ func (u UtilityCommands) RegisterCommands(router *dgc.Router) {
 	router.RegisterCmd(&dgc.Command{
 		Name:        "adminservers",
 		Description: "See all servers you have administator in",
-		Usage:       "[p]adminservers",
 		Handler:     u.adminservers,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "admingroups",
 		Description: "See all groups you are the owner of",
-		Usage:       "[p]admingroups",
 		Handler:     u.admingroups,
 	})
 	router.RegisterCmd(&dgc.Command{
@@ -134,7 +132,6 @@ func (u UtilityCommands) RegisterCommands(router *dgc.Router) {
 	router.RegisterCmd(&dgc.Command{
 		Name:        "leavehypesquad",
 		Description: "Leave Hypesquad",
-		Usage:       "[p]leavehypesquad",
 		Handler:     u.leavehypesquad,
 	})
 	router.RegisterCmd(&dgc.Command{
@@ -158,7 +155,6 @@ func (u UtilityCommands) RegisterCommands(router *dgc.Router) {
 	router.RegisterCmd(&dgc.Command{
 		Name:        "sessionid",
 		Description: "See LightningBot's Discord session ID",
-		Usage:       "[p]sessionid",
 		Handler:     u.sessionid,
 	})
 	router.RegisterCmd(&dgc.Command{
@@ -182,7 +178,6 @@ func (u UtilityCommands) RegisterCommands(router *dgc.Router) {
 	router.RegisterCmd(&dgc.Command{
 		Name:        "nickscan",
 		Description: "Search for servers with a nickname",
-		Usage:       "[p]nickscan",
 		Handler:     u.nickscan,
 	})
 	router.RegisterCmd(&dgc.Command{
@@ -230,7 +225,6 @@ func (u UtilityCommands) RegisterCommands(router *dgc.Router) {
 	router.RegisterCmd(&dgc.Command{
 		Name:        "discordstatus",
 		Description: "Check the Discord status",
-		Usage:       "[p]discordstatus",
 		Handler:     u.discordstatus,
 	})
 
@@ -239,74 +233,64 @@ func (u UtilityCommands) RegisterCommands(router *dgc.Router) {
 	router.RegisterCmd(&dgc.Command{
 		Name:        "website",
 		Description: "Open the LightningBot website",
-		Usage:       "[p]website",
-		Flags:       []string{CmdFlagHostingDangerous},
+		Flags:       []router.CommandFlag{router.CmdFlagHostingDangerous},
 		Handler:     u.website,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "dashboard",
 		Description: "Open the LightningBot dashboard",
-		Usage:       "[p]dashboard",
-		Flags:       []string{CmdFlagHostingDangerous},
+		Flags:       []router.CommandFlag{router.CmdFlagHostingDangerous},
 		Handler:     u.dashboard,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "changelog",
 		Description: "See the latest changelog",
-		Usage:       "[p]changelog",
 		Handler:     u.changelog,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "version",
 		Description: "See the current LightningBot version",
-		Usage:       "[p]version",
 		Handler:     u.version,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "uptime",
 		Description: "See how long the bot has been running for",
-		Usage:       "[p]uptime",
 		Handler:     u.uptime,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "history",
 		Description: "See used command history",
-		Usage:       "[p]history",
 		Handler:     u.history,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "restartbot",
 		Description: "Restart LightningBot",
-		Usage:       "[p]restartbot",
-		Flags:       []string{CmdFlagDangerous},
+		Flags:       []router.CommandFlag{router.CmdFlagDangerous},
 		Handler:     u.restartbot,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "stopbot",
 		Description: "Stop LightningBot",
-		Usage:       "[p]stopbot",
-		Flags:       []string{CmdFlagDangerous},
+		Flags:       []router.CommandFlag{router.CmdFlagDangerous},
 		Handler:     u.stopbot,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "cls",
 		Description: "Clear UI console",
-		Usage:       "[p]cls",
-		Flags:       []string{CmdFlagDangerous},
+		Flags:       []router.CommandFlag{router.CmdFlagDangerous},
 		Handler:     u.cls,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "openfolder",
 		Description: "Open the LightningBot folder",
-		Usage:       "[p]openfolder",
-		Flags:       []string{CmdFlagDangerous, CmdFlagHostingDangerous},
+		Flags:       []router.CommandFlag{router.CmdFlagDangerous, router.CmdFlagHostingDangerous},
 		Handler:     u.openfolder,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "remote",
 		Description: "Run a command remotely",
 		Arguments:   "<channel> <command> [args...]",
-		Flags:       []string{CmdFlagDangerous},
+		Flags:       []router.CommandFlag{router.CmdFlagDangerous},
 		Handler:     u.remote,
 	})
 
@@ -315,70 +299,61 @@ func (u UtilityCommands) RegisterCommands(router *dgc.Router) {
 	router.RegisterCmd(&dgc.Command{
 		Name:        "systeminfo",
 		Description: "See info about your system",
-		Usage:       "[p]systeminfo",
 		Handler:     u.systeminfo,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "shutdownpc",
 		Description: "Shut your PC down",
-		Usage:       "[p]shutdownpc",
-		Flags:       []string{CmdFlagDangerous, CmdFlagHostingDangerous},
+		Flags:       []router.CommandFlag{router.CmdFlagDangerous, router.CmdFlagHostingDangerous},
 		Handler:     u.shutdownpc,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "restartpc",
 		Description: "Restart your PC",
-		Usage:       "[p]restartpc",
-		Flags:       []string{CmdFlagDangerous, CmdFlagHostingDangerous},
+		Flags:       []router.CommandFlag{router.CmdFlagDangerous, router.CmdFlagHostingDangerous},
 		Handler:     u.restartpc,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "sleeppc",
 		Description: "Put your PC to sleep",
-		Usage:       "[p]sleeppc",
-		Flags:       []string{CmdFlagDangerous, CmdFlagHostingDangerous},
+		Flags:       []router.CommandFlag{router.CmdFlagDangerous, router.CmdFlagHostingDangerous},
 		Handler:     u.sleeppc,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "hibernatepc",
 		Description: "Hibernate your PC",
-		Usage:       "[p]hibernatepc",
-		Flags:       []string{CmdFlagDangerous, CmdFlagHostingDangerous},
+		Flags:       []router.CommandFlag{router.CmdFlagDangerous, router.CmdFlagHostingDangerous},
 		Handler:     u.hibernatepc,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "lockpc",
 		Description: "Lock your PC",
-		Usage:       "[p]lockpc",
-		Flags:       []string{CmdFlagDangerous, CmdFlagHostingDangerous},
+		Flags:       []router.CommandFlag{router.CmdFlagDangerous, router.CmdFlagHostingDangerous},
 		Handler:     u.lockpc,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "activewindow",
 		Description: "View the active window on your PC",
-		Usage:       "[p]activewindow",
-		Flags:       []string{CmdFlagDangerous, CmdFlagHostingDangerous},
+		Flags:       []router.CommandFlag{router.CmdFlagDangerous, router.CmdFlagHostingDangerous},
 		Handler:     u.activewindow,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "calc",
 		Description: "Open the calculator",
-		Usage:       "[p]calc",
-		Flags:       []string{CmdFlagDangerous, CmdFlagHostingDangerous},
+		Flags:       []router.CommandFlag{router.CmdFlagDangerous, router.CmdFlagHostingDangerous},
 		Handler:     u.calc,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "notepad",
 		Description: "Open notepad",
-		Usage:       "[p]notepad",
-		Flags:       []string{CmdFlagDangerous, CmdFlagHostingDangerous},
+		Flags:       []router.CommandFlag{router.CmdFlagDangerous, router.CmdFlagHostingDangerous},
 		Handler:     u.notepad,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "open",
 		Description: "Open a URL in the browser",
 		Arguments:   "<url>",
-		Flags:       []string{CmdFlagDangerous, CmdFlagHostingDangerous},
+		Flags:       []router.CommandFlag{router.CmdFlagDangerous, router.CmdFlagHostingDangerous},
 		Handler:     u.open,
 	})
 
@@ -388,20 +363,19 @@ func (u UtilityCommands) RegisterCommands(router *dgc.Router) {
 		Name:        "screenshot",
 		Description: "Take a screenshot",
 		Arguments:   "[delay]",
-		Flags:       []string{CmdFlagDangerous, CmdFlagHostingDangerous},
+		Flags:       []router.CommandFlag{router.CmdFlagDangerous, router.CmdFlagHostingDangerous},
 		Handler:     u.screenshot,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "listdestinations",
 		Description: "List all upload destinations",
-		Usage:       "[p]listdestinations",
 		Handler:     u.listdestinations,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "uploadss",
 		Description: "Upload a screenshot",
 		Arguments:   "<destination> [delay]",
-		Flags:       []string{CmdFlagDangerous, CmdFlagHostingDangerous},
+		Flags:       []router.CommandFlag{router.CmdFlagDangerous, router.CmdFlagHostingDangerous},
 		Handler:     u.uploadss,
 	})
 	router.RegisterCmd(&dgc.Command{
@@ -464,7 +438,6 @@ func (u UtilityCommands) RegisterCommands(router *dgc.Router) {
 	router.RegisterCmd(&dgc.Command{
 		Name:        "reviewdbtoken",
 		Description: "Get your ReviewDB token",
-		Usage:       "[p]reviewdbtoken",
 		Handler:     u.reviewdbtoken,
 	})
 	router.RegisterCmd(&dgc.Command{
@@ -539,7 +512,6 @@ func (u UtilityCommands) RegisterCommands(router *dgc.Router) {
 	router.RegisterCmd(&dgc.Command{
 		Name:        "ping",
 		Description: "Check the latency of the bot",
-		Usage:       "[p]ping",
 		Handler:     u.ping,
 	})
 	router.RegisterCmd(&dgc.Command{
@@ -587,8 +559,7 @@ func (u UtilityCommands) RegisterCommands(router *dgc.Router) {
 	router.RegisterCmd(&dgc.Command{
 		Name:        "interface",
 		Description: "See your public/local ip and MAC address",
-		Usage:       "[p]interface",
-		Flags:       []string{CmdFlagDangerous, CmdFlagHostingDangerous},
+		Flags:       []router.CommandFlag{router.CmdFlagDangerous, router.CmdFlagHostingDangerous},
 		Handler:     u._interface,
 	})
 
@@ -732,7 +703,6 @@ func (u UtilityCommands) RegisterCommands(router *dgc.Router) {
 	router.RegisterCmd(&dgc.Command{
 		Name:        "tokengen",
 		Description: "Generate a Discord token",
-		Usage:       "[p]tokengen",
 		Handler:     u.tokengen,
 	})
 	router.RegisterCmd(&dgc.Command{
@@ -1603,7 +1573,7 @@ func (UtilityCommands) sendinterval(ctx *router.Ctx) {
 		time.Sleep(interval)
 
 		if delete {
-			_ = ctx.Session.ChannelMessageDelete(ctx.Message.ChannelID, ctx.Message.Message.ID)
+			_ = ctx.Session.ChannelMessageDelete(ctx.Message.ChannelID, ctx.Message.ID)
 		}
 	}
 }
@@ -2061,7 +2031,7 @@ func (UtilityCommands) uploadfile(ctx *router.Ctx) {
 		return
 	}
 
-	attachments := ctx.Message.Message.Attachments
+	attachments := ctx.Message.Attachments
 
 	if len(attachments) == 0 {
 		_ = ctx.RespondText("Error: you must provide a file as an attachment.")
@@ -2188,7 +2158,7 @@ func (UtilityCommands) obfuscateFunc(lang, ext string) func(ctx *router.Ctx) {
 	return func(ctx *router.Ctx) {
 		script := utils.Arguments["[script/attachment]"]
 
-		attachments := ctx.Message.Message.Attachments
+		attachments := ctx.Message.Attachments
 		if script == "" && len(attachments) > 0 {
 			httpResponse := http.Get(attachments[0].URL)
 			if httpResponse.Error != nil {

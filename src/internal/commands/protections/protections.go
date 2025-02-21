@@ -21,7 +21,7 @@ func (p ProtectionsCommands) RegisterCommands(router *dgc.Router) {
 		Name:        "antiphishing",
 		Description: "Get, set or toggle Anti Phishing",
 		Arguments:   "<get/set/toggle> [on/off]",
-		Flags:       []string{CmdFlagDangerous},
+		Flags:       []router.CommandFlag{router.CmdFlagDangerous},
 		Handler:     p.antiphishing,
 	})
 
@@ -29,7 +29,7 @@ func (p ProtectionsCommands) RegisterCommands(router *dgc.Router) {
 		Name:        "antifriendrequest",
 		Description: "Get, set or toggle Anti Friend Request Spam",
 		Arguments:   "<get/set/toggle> [on/off]",
-		Flags:       []string{CmdFlagDangerous},
+		Flags:       []router.CommandFlag{router.CmdFlagDangerous},
 		Handler:     p.antifriendrequest,
 	})
 
@@ -37,7 +37,7 @@ func (p ProtectionsCommands) RegisterCommands(router *dgc.Router) {
 		Name:        "antimassdm",
 		Description: "Get, set or toggle Anti Mass DM / DM Spam",
 		Arguments:   "<get/set/toggle> [on/off]",
-		Flags:       []string{CmdFlagDangerous},
+		Flags:       []router.CommandFlag{router.CmdFlagDangerous},
 		Handler:     p.antimassdm,
 	})
 
@@ -45,7 +45,7 @@ func (p ProtectionsCommands) RegisterCommands(router *dgc.Router) {
 		Name:        "protectedservers",
 		Description: "Get, add, remove or clear the protected servers list",
 		Arguments:   "<get/add/rm/clear> [server id]",
-		Flags:       []string{CmdFlagDangerous},
+		Flags:       []router.CommandFlag{router.CmdFlagDangerous},
 		Handler:     p.protectedservers,
 	})
 
@@ -53,7 +53,7 @@ func (p ProtectionsCommands) RegisterCommands(router *dgc.Router) {
 		Name:        "antiinvite",
 		Description: "Get, set or toggle Anti Invite (Server Protections)",
 		Arguments:   "<get/set/toggle> [on/off]",
-		Flags:       []string{CmdFlagDangerous},
+		Flags:       []router.CommandFlag{router.CmdFlagDangerous},
 		Handler:     p.antiinvite,
 	})
 
@@ -61,7 +61,7 @@ func (p ProtectionsCommands) RegisterCommands(router *dgc.Router) {
 		Name:        "antispam",
 		Description: "Get, set or toggle Anti Spam (Server Protections)",
 		Arguments:   "<get/set/toggle> [on/off]",
-		Flags:       []string{CmdFlagDangerous},
+		Flags:       []router.CommandFlag{router.CmdFlagDangerous},
 		Handler:     p.antispam,
 	})
 
@@ -69,7 +69,7 @@ func (p ProtectionsCommands) RegisterCommands(router *dgc.Router) {
 		Name:        "antiupper",
 		Description: "Get, set or toggle Anti Upper (Server Protections)",
 		Arguments:   "<get/set/toggle> [on/off]",
-		Flags:       []string{CmdFlagDangerous},
+		Flags:       []router.CommandFlag{router.CmdFlagDangerous},
 		Handler:     p.antiupper,
 	})
 
@@ -77,7 +77,7 @@ func (p ProtectionsCommands) RegisterCommands(router *dgc.Router) {
 		Name:        "antidelete",
 		Description: "Get, set or toggle Anti Delete (Server Protections)",
 		Arguments:   "<get/set/toggle> [on/off]",
-		Flags:       []string{CmdFlagDangerous},
+		Flags:       []router.CommandFlag{router.CmdFlagDangerous},
 		Handler:     p.antidelete,
 	})
 
@@ -85,7 +85,7 @@ func (p ProtectionsCommands) RegisterCommands(router *dgc.Router) {
 		Name:        "dm",
 		Description: "Open or close DM's from everyone",
 		Arguments:   "<open/close>",
-		Flags:       []string{CmdFlagDangerous},
+		Flags:       []router.CommandFlag{router.CmdFlagDangerous},
 		Handler:     p.dm,
 	})
 
@@ -93,7 +93,7 @@ func (p ProtectionsCommands) RegisterCommands(router *dgc.Router) {
 		Name:        "friendrequests",
 		Description: "Allow or deny new friend requests",
 		Arguments:   "<allow/deny>",
-		Flags:       []string{CmdFlagDangerous},
+		Flags:       []router.CommandFlag{router.CmdFlagDangerous},
 		Handler:     p.friendrequests,
 	})
 }

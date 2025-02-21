@@ -7,7 +7,6 @@ import (
 	"github.com/LightningDev1/LB-Selfbot/internal/api"
 	"github.com/LightningDev1/LB-Selfbot/internal/router"
 	"github.com/LightningDev1/LB-Selfbot/internal/services"
-	"github.com/LightningDev1/LB-Selfbot/internal/utils"
 )
 
 type AICommands struct{ services *services.Services }
@@ -25,50 +24,50 @@ func (c *AICommands) Register() {
 		{
 			Name:        "chatgpt",
 			Description: "Talk to OpenAI GPT-3.5",
-			Arguments:   "chatgpt <\"message\"> [\"system\"]",
+			Arguments:   "<\"message\"> [\"system\"]",
 			Handler:     c.chatgpt,
 		},
 		{
 			Name:        "gpt4",
 			Description: "Talk to OpenAI GPT-4",
-			Arguments:   "gpt4 <\"message\"> [\"system\"]",
+			Arguments:   "<\"message\"> [\"system\"]",
 			Handler:     c.gpt4,
 		},
 		{
 			Name:        "imaginestyles",
 			Description: "List of available styles for [p]imagine",
-			Arguments:   "imaginestyles",
 			Handler:     c.imaginestyles,
 		},
 		{
 			Name:        "imaginemodels",
 			Description: "List of available models for [p]imagine",
-			Arguments:   "imaginemodels",
 			Handler:     c.imaginemodels,
 		},
 		{
 			Name:        "imagine",
 			Description: "Generate an image from text",
-			Arguments:   "imagine <\"prompt\"> [\"negative prompt\"] [\"model\"] [\"style\"]",
+			Arguments:   "<\"prompt\"> [\"negative prompt\"] [\"model\"] [\"style\"]",
 			Handler:     c.imagine,
 		},
 		{
 			Name:        "ocrlink",
 			Description: "Extract text from an image URL",
-			Arguments:   "ocrlink <link>",
+			Arguments:   "<link>",
 			Handler:     c.ocrlink,
 		},
 		{
 			Name:        "ocrfile",
 			Description: "Extract text from an image file",
-			Arguments:   "ocrfile [attachment]",
+			Arguments:   "[attachment]",
 			Handler:     c.ocrfile,
 		},
 	})
 }
 
-func (AICommands) chatgpt(ctx *router.Ctx) {
-	response, err := api.GPT(utils.Arguments["[\"system\"]"], utils.Arguments["<\"message\">"])
+func (c *AICommands) chatgpt(ctx *router.Ctx) {
+	message, system := ctx.Arguments.Get(0).Raw(), ctx.Arguments.Get(1).Raw()
+
+	response, err := api.GPT(system, message)
 	if err != nil {
 		_ = ctx.RespondText("Error getting response: " + err.Error())
 		return
@@ -76,14 +75,16 @@ func (AICommands) chatgpt(ctx *router.Ctx) {
 
 	c.services.Embed.NewEmbed().
 		SetTitle("ChatGPT (GPT-3.5)").
-		AddField("System", utils.Arguments["[\"system\"]"]).
-		AddField("Message", utils.Arguments["<\"message\">"]).
+		AddField("System", system).
+		AddField("Message", message).
 		AddField("Response", response).
 		Send(ctx)
 }
 
-func (AICommands) gpt4(ctx *router.Ctx) {
-	response, err := api.GPT(utils.Arguments["[\"system\"]"], utils.Arguments["<\"message\">"], "gpt-4")
+func (c *AICommands) gpt4(ctx *router.Ctx) {
+	message, system := ctx.Arguments.Get(0).Raw(), ctx.Arguments.Get(1).Raw()
+
+	response, err := api.GPT(system, message, "gpt-4")
 	if err != nil {
 		_ = ctx.RespondText("Error getting response: " + err.Error())
 		return
@@ -91,13 +92,13 @@ func (AICommands) gpt4(ctx *router.Ctx) {
 
 	c.services.Embed.NewEmbed().
 		SetTitle("ChatGPT (GPT-4)").
-		AddField("System", utils.Arguments["[\"system\"]"]).
-		AddField("Message", utils.Arguments["<\"message\">"]).
+		AddField("System", system).
+		AddField("Message", message).
 		AddField("Response", response).
 		Send(ctx)
 }
 
-func (AICommands) imaginestyles(ctx *router.Ctx) {
+func (c *AICommands) imaginestyles(ctx *router.Ctx) {
 	stylesString := []string{}
 
 	for k := range api.DefaultStyles {
@@ -112,7 +113,7 @@ func (AICommands) imaginestyles(ctx *router.Ctx) {
 		Send(ctx)
 }
 
-func (AICommands) imaginemodels(ctx *router.Ctx) {
+func (c *AICommands) imaginemodels(ctx *router.Ctx) {
 	models := api.GetImageModels()
 
 	modelsString := []string{}
@@ -129,21 +130,17 @@ func (AICommands) imaginemodels(ctx *router.Ctx) {
 		Send(ctx)
 }
 
-func (AICommands) imagine(ctx *router.Ctx) {
-	prompt := utils.Arguments["<\"prompt\">"]
+func (c *AICommands) imagine(ctx *router.Ctx) {
+	prompt, negPrompt, model, style := ctx.Arguments.Get(0).Raw(), ctx.Arguments.Get(1).Raw(),
+		ctx.Arguments.Get(2).Raw(), ctx.Arguments.Get(3).Raw()
 
-	style := strings.ToLower(utils.Arguments["[\"style\"]"])
 	if styleValue, ok := api.DefaultStyles[style]; ok {
 		prompt += ", " + styleValue
 	}
 
-	var model string
+	modelValue, _ := api.DefaultModels[model]
 
-	if modelValue, ok := api.DefaultModels[utils.Arguments["[\"model\"]"]]; ok {
-		model = modelValue
-	}
-
-	image, err := api.GenerateImage(prompt, utils.Arguments["[\"negative prompt\"]"], model)
+	image, err := api.GenerateImage(prompt, negPrompt, modelValue)
 	if err != nil {
 		_ = ctx.RespondText("Error getting response: " + err.Error())
 		return
@@ -152,7 +149,7 @@ func (AICommands) imagine(ctx *router.Ctx) {
 	_, _ = ctx.Session.ChannelFileSend(ctx.Message.ChannelID, "image.png", image)
 }
 
-func (AICommands) ocrlink(ctx *router.Ctx) {
+func (c *AICommands) ocrlink(ctx *router.Ctx) {
 	text, err := api.OCR(ctx.Arguments.Raw())
 	if err != nil {
 		_ = ctx.RespondText("Error getting response: " + err.Error())
@@ -166,8 +163,8 @@ func (AICommands) ocrlink(ctx *router.Ctx) {
 		Send(ctx)
 }
 
-func (AICommands) ocrfile(ctx *router.Ctx) {
-	attachments := ctx.Message.Message.Attachments
+func (c *AICommands) ocrfile(ctx *router.Ctx) {
+	attachments := ctx.Message.Attachments
 
 	if len(attachments) == 0 {
 		_ = ctx.RespondText("Error: you must provide an image as an attachment.")

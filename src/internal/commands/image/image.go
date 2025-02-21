@@ -25,7 +25,6 @@ func (i ImageCommands) RegisterCommands(router *dgc.Router) {
 	router.RegisterCmd(&dgc.Command{
 		Name:        "meme",
 		Description: "Send a random meme",
-		Usage:       "[p]meme",
 		Handler:     i.meme,
 	})
 	router.RegisterCmd(&dgc.Command{
@@ -37,7 +36,6 @@ func (i ImageCommands) RegisterCommands(router *dgc.Router) {
 	router.RegisterCmd(&dgc.Command{
 		Name:        "pokemon",
 		Description: "Send a random Pokémon image",
-		Usage:       "[p]pokemon",
 		Handler:     i.pokemon,
 	})
 	router.RegisterCmd(&dgc.Command{
@@ -145,13 +143,11 @@ func (i ImageCommands) RegisterCommands(router *dgc.Router) {
 	router.RegisterCmd(&dgc.Command{
 		Name:        "blurple",
 		Description: "Make the users avatar blurple",
-		Usage:       "[p]blurple",
 		Handler:     i.blurple,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "blurple2",
 		Description: "Make the users avatar new blurple",
-		Usage:       "[p]blurple2",
 		Handler:     i.blurple2,
 	})
 	router.RegisterCmd(&dgc.Command{
@@ -343,7 +339,6 @@ func (i ImageCommands) RegisterCommands(router *dgc.Router) {
 	router.RegisterCmd(&dgc.Command{
 		Name:        "randomgif",
 		Description: "Send a random GIF from Giphy",
-		Usage:       "[p]randomgif",
 		Handler:     i.randomgif,
 	})
 	router.RegisterCmd(&dgc.Command{
@@ -421,25 +416,21 @@ func (i ImageCommands) RegisterCommands(router *dgc.Router) {
 	router.RegisterCmd(&dgc.Command{
 		Name:        "sadcat",
 		Description: "Send an image of a sad cat",
-		Usage:       "[p]sadcat",
 		Handler:     i.sadcat,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "bird",
 		Description: "Send an image of a bird",
-		Usage:       "[p]bird",
 		Handler:     i.bird,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "cat",
 		Description: "Send an image of a cat",
-		Usage:       "[p]cat",
 		Handler:     i.cat,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "catgif",
 		Description: "Send a GIF of a cat",
-		Usage:       "[p]catgif",
 		Handler:     i.catgif,
 	})
 	router.RegisterCmd(&dgc.Command{
@@ -451,109 +442,91 @@ func (i ImageCommands) RegisterCommands(router *dgc.Router) {
 	router.RegisterCmd(&dgc.Command{
 		Name:        "dog",
 		Description: "Send an image of a dog",
-		Usage:       "[p]dog",
 		Handler:     i.dog,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "panda",
 		Description: "Send an image of a panda",
-		Usage:       "[p]panda",
 		Handler:     i.panda,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "redpanda",
 		Description: "Send an image of a red panda",
-		Usage:       "[p]redpanda",
 		Handler:     i.redpanda,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "koala",
 		Description: "Send an image of a koala",
-		Usage:       "[p]koala",
 		Handler:     i.koala,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "raccoon",
 		Description: "Send an image of a raccoon",
-		Usage:       "[p]raccoon",
 		Handler:     i.raccoon,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "fox",
 		Description: "Send an image of a fox",
-		Usage:       "[p]fox",
 		Handler:     i.fox,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "shibe",
 		Description: "Send an image of a shiba inu/shibe/doge",
-		Usage:       "[p]shibe",
 		Handler:     i.shibe,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "whale",
 		Description: "Send an image of a whale",
-		Usage:       "[p]whale",
 		Handler:     i.whale,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "kangaroo",
 		Description: "Send an image of a kangaroo",
-		Usage:       "[p]kangaroo",
 		Handler:     i.kangaroo,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "bunny",
 		Description: "Send an image of a bunny",
-		Usage:       "[p]bunny",
 		Handler:     i.bunny,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "lion",
 		Description: "Send an image of a lion",
-		Usage:       "[p]lion",
 		Handler:     i.lion,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "frog",
 		Description: "Send an image of a frog",
-		Usage:       "[p]frog",
 		Handler:     i.frog,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "duck",
 		Description: "Send an image of a duck",
-		Usage:       "[p]duck",
 		Handler:     i.duck,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "penguin",
 		Description: "Send an image of a penguin",
-		Usage:       "[p]penguin",
 		Handler:     i.penguin,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "dolphin",
 		Description: "Send an image of a dolphin",
-		Usage:       "[p]dolphin",
 		Handler:     i.dolphin,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "bear",
 		Description: "Send an image of a bear",
-		Usage:       "[p]bear",
 		Handler:     i.bear,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "axolotl",
 		Description: "Send an image of an axolotl",
-		Usage:       "[p]axolotl",
 		Handler:     i.axolotl,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "capybara",
 		Description: "Send an image of a capybara",
-		Usage:       "[p]capybara",
 		Handler:     i.capybara,
 	})
 	router.RegisterCmd(&dgc.Command{
@@ -763,7 +736,6 @@ func (i ImageCommands) RegisterCommands(router *dgc.Router) {
 	router.RegisterCmd(&dgc.Command{
 		Name:        "rule34",
 		Description: "Random rule 34 image",
-		Usage:       "[p]rule34",
 		Handler:     i.rule34,
 	})
 	router.RegisterCmd(&dgc.Command{
@@ -961,7 +933,6 @@ func (i ImageCommands) RegisterCommands(router *dgc.Router) {
 	router.RegisterCmd(&dgc.Command{
 		Name:        "pikachu",
 		Description: "Send a random Pikachu image",
-		Usage:       "[p]pikachu",
 		Handler:     i.pikachu,
 	})
 	router.RegisterCmd(&dgc.Command{
@@ -999,7 +970,6 @@ func (i ImageCommands) RegisterCommands(router *dgc.Router) {
 	router.RegisterCmd(&dgc.Command{
 		Name:        "discordquotereply",
 		Description: "Quote the Discord message you replied to",
-		Usage:       "[p]discordquotereply",
 		Handler:     i.discordquotereply,
 	})
 	router.RegisterCmd(&dgc.Command{
@@ -2679,7 +2649,7 @@ func (ImageCommands) pikachu(ctx *router.Ctx) {
 func (ImageCommands) speechbubble(ctx *router.Ctx) {
 	link := utils.Arguments["[link/attachment]"]
 
-	attachments := ctx.Message.Message.Attachments
+	attachments := ctx.Message.Attachments
 	if len(attachments) > 0 {
 		link = attachments[0].URL
 	}
