@@ -13,7 +13,7 @@ func (r RedditCommands) RegisterCommands(router *dgc.Router) {
 	router.RegisterCmd(&dgc.Command{
 		Name:        "subreddit",
 		Description: "Get a random post from a subreddit",
-		Usage:       "[p]subreddit <subreddit>",
+		Arguments:   "<subreddit>",
 		Handler:     r.subreddit,
 	})
 	subreddits := []string{

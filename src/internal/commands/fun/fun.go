@@ -24,43 +24,43 @@ func (f FunCommands) RegisterCommands(router *dgc.Router) {
 	router.RegisterCmd(&dgc.Command{
 		Name:        "eightball",
 		Description: "Asks the 8-Ball a question",
-		Usage:       "[p]eightball <question>",
+		Arguments:   "<question>",
 		Handler:     f.eightball,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "howgay",
 		Description: "See how gay a person is",
-		Usage:       "[p]howgay <user>",
+		Arguments:   "<user>",
 		Handler:     f.howgay,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "howsimp",
 		Description: "See how simp a person is",
-		Usage:       "[p]howsimp <user>",
+		Arguments:   "<user>",
 		Handler:     f.howsimp,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "penis",
 		Description: "See how big a person's penis is",
-		Usage:       "[p]penis <user>",
+		Arguments:   "<user>",
 		Handler:     f.penis,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "ego",
 		Description: "See how big a person's ego is",
-		Usage:       "[p]ego <user>",
+		Arguments:   "<user>",
 		Handler:     f.ego,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "iqtest",
 		Description: "Test a person's IQ",
-		Usage:       "[p]iqtest <user>",
+		Arguments:   "<user>",
 		Handler:     f.iqtest,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "hack",
 		Description: "Fake hack a person",
-		Usage:       "[p]hack <user>",
+		Arguments:   "<user>",
 		Handler:     f.hack,
 	})
 	router.RegisterCmd(&dgc.Command{
@@ -240,19 +240,19 @@ func (f FunCommands) RegisterCommands(router *dgc.Router) {
 	router.RegisterCmd(&dgc.Command{
 		Name:        "choose",
 		Description: "Choose a random item from the list of items",
-		Usage:       "[p]choose <option1> <option2> ...",
+		Arguments:   "<option1> <option2> ...",
 		Handler:     f.choose,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "poll",
 		Description: "Create a poll",
-		Usage:       "[p]poll <question>",
+		Arguments:   "<question>",
 		Handler:     f.poll,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "numberfact",
 		Description: "Send a random fact about a number",
-		Usage:       "[p]numberfact <number>",
+		Arguments:   "<number>",
 		Handler:     f.numberfact,
 	})
 	router.RegisterCmd(&dgc.Command{
@@ -282,13 +282,13 @@ func (f FunCommands) RegisterCommands(router *dgc.Router) {
 	router.RegisterCmd(&dgc.Command{
 		Name:        "rps",
 		Description: "Play rock paper scissors",
-		Usage:       "[p]rps <rock/paper/scissors>",
+		Arguments:   "<rock/paper/scissors>",
 		Handler:     f.rps,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "covidtest",
 		Description: "Test someone for Covid-19",
-		Usage:       "[p]covidtest <user>",
+		Arguments:   "<user>",
 		Handler:     f.covidtest,
 	})
 	router.RegisterCmd(&dgc.Command{
@@ -354,7 +354,7 @@ func (f FunCommands) RegisterCommands(router *dgc.Router) {
 	router.RegisterCmd(&dgc.Command{
 		Name:        "httpcat",
 		Description: "Send a HTTP Cat image",
-		Usage:       "[p]httpcat <statuscode>",
+		Arguments:   "<statuscode>",
 		Handler:     f.httpcat,
 	})
 	router.RegisterCmd(&dgc.Command{
@@ -378,19 +378,19 @@ func (f FunCommands) RegisterCommands(router *dgc.Router) {
 	router.RegisterCmd(&dgc.Command{
 		Name:        "owoify",
 		Description: "Owoify text",
-		Usage:       "[p]owoify <text>",
+		Arguments:   "<text>",
 		Handler:     f.owoify,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "uwuify",
 		Description: "Uwuify text",
-		Usage:       "[p]uwuify <text>",
+		Arguments:   "<text>",
 		Handler:     f.uwuify,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "uvuify",
 		Description: "Uvuify text",
-		Usage:       "[p]uvuify <text>",
+		Arguments:   "<text>",
 		Handler:     f.uvuify,
 	})
 	router.RegisterCmd(&dgc.Command{
@@ -426,7 +426,7 @@ func (f FunCommands) RegisterCommands(router *dgc.Router) {
 	router.RegisterCmd(&dgc.Command{
 		Name:        "lyrics",
 		Description: "Get the lyrics of a song",
-		Usage:       "[p]lyrics <song name>",
+		Arguments:   "<song name>",
 		Handler:     f.lyrics,
 	})
 	router.RegisterCmd(&dgc.Command{
@@ -468,19 +468,19 @@ func (f FunCommands) RegisterCommands(router *dgc.Router) {
 	router.RegisterCmd(&dgc.Command{
 		Name:        "ermahgerd",
 		Description: "Translate text to ERMAHGERD",
-		Usage:       "[p]ermahgerd <text>",
+		Arguments:   "<text>",
 		Handler:     f.ermahgerd,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "iseven",
 		Description: "Check if a number is even",
-		Usage:       "[p]iseven <number>",
+		Arguments:   "<number>",
 		Handler:     f.iseven,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "agify",
 		Description: "Determine the age of a first name",
-		Usage:       "[p]agify <name>",
+		Arguments:   "<name>",
 		Handler:     f.agify,
 	})
 	router.RegisterCmd(&dgc.Command{
@@ -558,7 +558,7 @@ func (f FunCommands) RegisterCommands(router *dgc.Router) {
 	router.RegisterCmd(&dgc.Command{
 		Name:        "elementinfo",
 		Description: "Get info about a periodic table element",
-		Usage:       "[p]elementinfo <element>",
+		Arguments:   "<element>",
 		Handler:     f.elementinfo,
 	})
 	router.RegisterCmd(&dgc.Command{

@@ -62,19 +62,19 @@ func (u UtilityCommands) RegisterCommands(router *dgc.Router) {
 	router.RegisterCmd(&dgc.Command{
 		Name:        "copyserver",
 		Description: "Make an exact copy of a server",
-		Usage:       "[p]copyserver [server id] [delay]",
+		Arguments:   "[server id] [delay]",
 		Handler:     u.copyserver,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "copychannel",
 		Description: "Make an exact copy of a channel",
-		Usage:       "[p]copychannel <source channel> <dest channel> [limit]",
+		Arguments:   "<source channel> <dest channel> [limit]",
 		Handler:     u.copychannel,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "leavegroups",
 		Description: "Leave all of your groups",
-		Usage:       "[p]leavegroups [silent: on/off]",
+		Arguments:   "[silent: on/off]",
 		Handler:     u.leavegroups,
 	})
 	router.RegisterCmd(&dgc.Command{
@@ -92,43 +92,43 @@ func (u UtilityCommands) RegisterCommands(router *dgc.Router) {
 	router.RegisterCmd(&dgc.Command{
 		Name:        "joinvc",
 		Description: "Join a voice channel",
-		Usage:       "[p]joinvc <channel id>",
+		Arguments:   "<channel id>",
 		Handler:     u.joinvc,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "findserver",
 		Description: "Find a server by ID",
-		Usage:       "[p]findserver <server id>",
+		Arguments:   "<server id>",
 		Handler:     u.findserver,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "finduser",
 		Description: "Find a user by ID",
-		Usage:       "[p]finduser <server id>",
+		Arguments:   "<server id>",
 		Handler:     u.finduser,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "snipe",
 		Description: "See the last deleted message in a channel",
-		Usage:       "[p]snipe [channel]",
+		Arguments:   "[channel]",
 		Handler:     u.snipe,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "editsnipe",
 		Description: "See the last edited message in a channel",
-		Usage:       "[p]editsnipe [channel]",
+		Arguments:   "[channel]",
 		Handler:     u.editsnipe,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "firstmessage",
 		Description: "See the first message in the channel",
-		Usage:       "[p]firstmessage [channel]",
+		Arguments:   "[channel]",
 		Handler:     u.firstmessage,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "hypesquad",
 		Description: "Change your Hypesquad House",
-		Usage:       "[p]hypesquad <bravery/brilliance/balance>",
+		Arguments:   "<bravery/brilliance/balance>",
 		Handler:     u.hypesquad,
 	})
 	router.RegisterCmd(&dgc.Command{
@@ -140,19 +140,19 @@ func (u UtilityCommands) RegisterCommands(router *dgc.Router) {
 	router.RegisterCmd(&dgc.Command{
 		Name:        "theme",
 		Description: "Change your Discord theme",
-		Usage:       "[p]theme <light/dark>",
+		Arguments:   "<light/dark>",
 		Handler:     u.theme,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "compact",
 		Description: "Toggle Discord compact mode",
-		Usage:       "[p]compact <on/off>",
+		Arguments:   "<on/off>",
 		Handler:     u.compact,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "devmode",
 		Description: "Toggle Discord developer mode",
-		Usage:       "[p]devmode <on/off>",
+		Arguments:   "<on/off>",
 		Handler:     u.devmode,
 	})
 	router.RegisterCmd(&dgc.Command{
@@ -164,19 +164,19 @@ func (u UtilityCommands) RegisterCommands(router *dgc.Router) {
 	router.RegisterCmd(&dgc.Command{
 		Name:        "aboutme",
 		Description: "Change your About Me text",
-		Usage:       "[p]aboutme [text]",
+		Arguments:   "[text]",
 		Handler:     u.aboutme,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "displayname",
 		Description: "Change your display name",
-		Usage:       "[p]displayname <text>",
+		Arguments:   "<text>",
 		Handler:     u.displayname,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "pronouns",
 		Description: "Change your pronouns",
-		Usage:       "[p]pronouns <text>",
+		Arguments:   "<text>",
 		Handler:     u.pronouns,
 	})
 	router.RegisterCmd(&dgc.Command{
@@ -188,43 +188,43 @@ func (u UtilityCommands) RegisterCommands(router *dgc.Router) {
 	router.RegisterCmd(&dgc.Command{
 		Name:        "getmessagejson",
 		Description: "Get a message's JSON data",
-		Usage:       "[p]getmessagejson <#channel> <message id>",
+		Arguments:   "<#channel> <message id>",
 		Handler:     u.getmessagejson,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "getembedjson",
 		Description: "Get an embed's JSON data",
-		Usage:       "[p]getembedjson <#channel> <message id>",
+		Arguments:   "<#channel> <message id>",
 		Handler:     u.getembedjson,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "sendmessagejson",
 		Description: "Send a message using raw JSON data",
-		Usage:       "[p]getmessagejson <#channel> <json>",
+		Arguments:   "<#channel> <json>",
 		Handler:     u.sendmessagejson,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "sendinterval",
 		Description: "Send a message every x seconds (flags: DELETE, INSTANT_DEL)",
-		Usage:       "[p]sendinterval <interval> <amount> <\"message\"> [flags]",
+		Arguments:   "<interval> <amount> <\"message\"> [flags]",
 		Handler:     u.sendinterval,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "optionpoll",
 		Description: "Create a poll with options",
-		Usage:       "[p]optionpoll <\"question\"> <\"option1\"> <\"option2\">",
+		Arguments:   "<\"question\"> <\"option1\"> <\"option2\">",
 		Handler:     u.optionpoll,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "discordpoll",
 		Description: "Create a native Discord poll (options/emojis split by comma)",
-		Usage:       "[p]discordpoll <duration> <\"question\"> <\"options\"> [\"emojis\"]",
+		Arguments:   "<duration> <\"question\"> <\"options\"> [\"emojis\"]",
 		Handler:     u.discordpoll,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "checktoken",
 		Description: "Check if a Discord token is valid",
-		Usage:       "[p]checktoken <token>",
+		Arguments:   "<token>",
 		Handler:     u.checktoken,
 	})
 	router.RegisterCmd(&dgc.Command{
@@ -305,7 +305,7 @@ func (u UtilityCommands) RegisterCommands(router *dgc.Router) {
 	router.RegisterCmd(&dgc.Command{
 		Name:        "remote",
 		Description: "Run a command remotely",
-		Usage:       "[p]remote <channel> <command> [args...]",
+		Arguments:   "<channel> <command> [args...]",
 		Flags:       []string{CmdFlagDangerous},
 		Handler:     u.remote,
 	})
@@ -377,7 +377,7 @@ func (u UtilityCommands) RegisterCommands(router *dgc.Router) {
 	router.RegisterCmd(&dgc.Command{
 		Name:        "open",
 		Description: "Open a URL in the browser",
-		Usage:       "[p]open <url>",
+		Arguments:   "<url>",
 		Flags:       []string{CmdFlagDangerous, CmdFlagHostingDangerous},
 		Handler:     u.open,
 	})
@@ -387,7 +387,7 @@ func (u UtilityCommands) RegisterCommands(router *dgc.Router) {
 	router.RegisterCmd(&dgc.Command{
 		Name:        "screenshot",
 		Description: "Take a screenshot",
-		Usage:       "[p]screenshot [delay]",
+		Arguments:   "[delay]",
 		Flags:       []string{CmdFlagDangerous, CmdFlagHostingDangerous},
 		Handler:     u.screenshot,
 	})
@@ -400,20 +400,20 @@ func (u UtilityCommands) RegisterCommands(router *dgc.Router) {
 	router.RegisterCmd(&dgc.Command{
 		Name:        "uploadss",
 		Description: "Upload a screenshot",
-		Usage:       "[p]uploadss <destination> [delay]",
+		Arguments:   "<destination> [delay]",
 		Flags:       []string{CmdFlagDangerous, CmdFlagHostingDangerous},
 		Handler:     u.uploadss,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "uploadfile",
 		Description: "Upload a file",
-		Usage:       "[p]uploadfile <destination> [attachment]",
+		Arguments:   "<destination> [attachment]",
 		Handler:     u.uploadfile,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "uploadlink",
 		Description: "Upload a link",
-		Usage:       "[p]uploadlink <destination> <link>",
+		Arguments:   "<destination> <link>",
 		Handler:     u.uploadlink,
 	})
 
@@ -422,19 +422,19 @@ func (u UtilityCommands) RegisterCommands(router *dgc.Router) {
 	router.RegisterCmd(&dgc.Command{
 		Name:        "paste",
 		Description: "Create a paste",
-		Usage:       "[p]pastebin <text>",
+		Arguments:   "<text>",
 		Handler:     u.pastebin,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "pastefile",
 		Description: "Create a paste from a file",
-		Usage:       "[p]pastefile <filepath>",
+		Arguments:   "<filepath>",
 		Handler:     u.pastefile,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "tinyurl",
 		Description: "Shorten a URL with TinyURL",
-		Usage:       "[p]tinyurl <url>",
+		Arguments:   "<url>",
 		Handler:     u.tinyurl,
 	})
 
@@ -443,19 +443,19 @@ func (u UtilityCommands) RegisterCommands(router *dgc.Router) {
 	router.RegisterCmd(&dgc.Command{
 		Name:        "obfuscatepython",
 		Description: "Obfuscate a Python script",
-		Usage:       "[p]obfuscatepython [script/attachment]",
+		Arguments:   "[script/attachment]",
 		Handler:     u.obfuscateFunc("python", "py"),
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "obfuscatelua",
 		Description: "Obfuscate a Lua script",
-		Usage:       "[p]obfuscatelua [script/attachment]",
+		Arguments:   "[script/attachment]",
 		Handler:     u.obfuscateFunc("lua", "lua"),
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "obfuscatejs",
 		Description: "Obfuscate a JS script",
-		Usage:       "[p]obfuscatejs [script/attachment]",
+		Arguments:   "[script/attachment]",
 		Handler:     u.obfuscateFunc("javascript", "js"),
 	})
 
@@ -470,13 +470,13 @@ func (u UtilityCommands) RegisterCommands(router *dgc.Router) {
 	router.RegisterCmd(&dgc.Command{
 		Name:        "getreviews",
 		Description: "Get a users ReviewDB reviews",
-		Usage:       "[p]getreviews <user>",
+		Arguments:   "<user>",
 		Handler:     u.getreviews,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "addreview",
 		Description: "Add a ReviewDB review to a user",
-		Usage:       "[p]addreview <user> <review>",
+		Arguments:   "<user> <review>",
 		Handler:     u.addreview,
 	})
 
@@ -485,7 +485,7 @@ func (u UtilityCommands) RegisterCommands(router *dgc.Router) {
 	router.RegisterCmd(&dgc.Command{
 		Name:        "tags",
 		Description: "Manage tags",
-		Usage:       "[p]tags <get/add/rm/clear/send> [name] [content]",
+		Arguments:   "<get/add/rm/clear/send> [name] [content]",
 		Handler:     u.tags,
 	})
 
@@ -494,43 +494,43 @@ func (u UtilityCommands) RegisterCommands(router *dgc.Router) {
 	router.RegisterCmd(&dgc.Command{
 		Name:        "mastercard",
 		Description: "Generate a mastercard credit card",
-		Usage:       "[p]mastercard [name]",
+		Arguments:   "[name]",
 		Handler:     u.mastercard,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "visa16",
 		Description: "Generate a visa credit card (16 characters)",
-		Usage:       "[p]visa16 [name]",
+		Arguments:   "[name]",
 		Handler:     u.visa16,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "visa13",
 		Description: "Generate a visa credit card (13 characters)",
-		Usage:       "[p]visa13 [name]",
+		Arguments:   "[name]",
 		Handler:     u.visa13,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "amex",
 		Description: "Generate an amex credit card",
-		Usage:       "[p]amex [name]",
+		Arguments:   "[name]",
 		Handler:     u.amex,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "discover",
 		Description: "Generate a discover credit card",
-		Usage:       "[p]discover [name]",
+		Arguments:   "[name]",
 		Handler:     u.discover,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "diners",
 		Description: "Generate a diners credit card",
-		Usage:       "[p]diners [name]",
+		Arguments:   "[name]",
 		Handler:     u.diners,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "jcb",
 		Description: "Generate a JCB credit card",
-		Usage:       "[p]jcb [name]",
+		Arguments:   "[name]",
 		Handler:     u.jcb,
 	})
 
@@ -545,43 +545,43 @@ func (u UtilityCommands) RegisterCommands(router *dgc.Router) {
 	router.RegisterCmd(&dgc.Command{
 		Name:        "pingweb",
 		Description: "Check the latency to a website",
-		Usage:       "[p]pingweb <host>",
+		Arguments:   "<host>",
 		Handler:     u.pingweb,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "ipinfo",
 		Description: "Get info about an IP Address",
-		Usage:       "[p]ipinfo <ip>",
+		Arguments:   "<ip>",
 		Handler:     u.ipinfo,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "portscan",
 		Description: "Scan a host for open ports",
-		Usage:       "[p]portscan <host>",
+		Arguments:   "<host>",
 		Handler:     u.portscan,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "resolve",
 		Description: "Get a domain's IP address",
-		Usage:       "[p]resolve <domain>",
+		Arguments:   "<domain>",
 		Handler:     u.resolve,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "reversedns",
 		Description: "Find all domains hosted on an IP address",
-		Usage:       "[p]reversedns <ip>",
+		Arguments:   "<ip>",
 		Handler:     u.reversedns,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "reversemac",
 		Description: "Find the vender of a MAC address",
-		Usage:       "[p]reversemac <mac>",
+		Arguments:   "<mac>",
 		Handler:     u.reversemac,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "headers",
 		Description: "Get URL response headers",
-		Usage:       "[p]headers <url>",
+		Arguments:   "<url>",
 		Handler:     u.headers,
 	})
 	router.RegisterCmd(&dgc.Command{
@@ -597,13 +597,13 @@ func (u UtilityCommands) RegisterCommands(router *dgc.Router) {
 	router.RegisterCmd(&dgc.Command{
 		Name:        "snipepokemon",
 		Description: "Snipe a PokéTwo Pokemon",
-		Usage:       "[p]snipepokemon [#channel]",
+		Arguments:   "[#channel]",
 		Handler:     u.snipepokemon,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "detectpokemon",
 		Description: "Detect a PokéTwo Pokemon",
-		Usage:       "[p]detectpokemon [#channel]",
+		Arguments:   "[#channel]",
 		Handler:     u.detectpokemon,
 	})
 
@@ -612,7 +612,7 @@ func (u UtilityCommands) RegisterCommands(router *dgc.Router) {
 	router.RegisterCmd(&dgc.Command{
 		Name:        "reminders",
 		Description: "Manage your reminders",
-		Usage:       "[p]reminders <get/add/rm/clear> [name] [duration] [message]",
+		Arguments:   "<get/add/rm/clear> [name] [duration] [message]",
 		Handler:     u.reminders,
 	})
 
@@ -621,43 +621,43 @@ func (u UtilityCommands) RegisterCommands(router *dgc.Router) {
 	router.RegisterCmd(&dgc.Command{
 		Name:        "convertvelocity",
 		Description: "Convert velocity from one unit to another",
-		Usage:       "[p]convertvelocity <value> <source unit> <destination unit>",
+		Arguments:   "<value> <source unit> <destination unit>",
 		Handler:     u.convertvelocity,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "convertarea",
 		Description: "Convert area from one unit to another",
-		Usage:       "[p]convertarea <value> <source unit> <destination unit>",
+		Arguments:   "<value> <source unit> <destination unit>",
 		Handler:     u.convertarea,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "convertlength",
 		Description: "Convert length from one unit to another",
-		Usage:       "[p]convertlength <value> <source unit> <destination unit>",
+		Arguments:   "<value> <source unit> <destination unit>",
 		Handler:     u.convertlength,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "converttemperature",
 		Description: "Convert temperature from one unit to another",
-		Usage:       "[p]converttemperature <value> <source unit> <destination unit>",
+		Arguments:   "<value> <source unit> <destination unit>",
 		Handler:     u.converttemperature,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "converttime",
 		Description: "Convert time from one unit to another",
-		Usage:       "[p]converttime <value> <source unit> <destination unit>",
+		Arguments:   "<value> <source unit> <destination unit>",
 		Handler:     u.converttime,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "convertvolume",
 		Description: "Convert volume from one unit to another",
-		Usage:       "[p]convertvolume <value> <source unit> <destination unit>",
+		Arguments:   "<value> <source unit> <destination unit>",
 		Handler:     u.convertvolume,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "convertmass",
 		Description: "Convert mass from one unit to another",
-		Usage:       "[p]convertmass <value> <source unit> <destination unit>",
+		Arguments:   "<value> <source unit> <destination unit>",
 		Handler:     u.convertmass,
 	})
 
@@ -666,67 +666,67 @@ func (u UtilityCommands) RegisterCommands(router *dgc.Router) {
 	router.RegisterCmd(&dgc.Command{
 		Name:        "tts",
 		Description: "Send a Text-To-Speech message",
-		Usage:       "[p]tts <language> <text>",
+		Arguments:   "<language> <text>",
 		Handler:     u.tts,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "translate",
 		Description: "Translate text to a language",
-		Usage:       "[p]translate <language> <text>",
+		Arguments:   "<language> <text>",
 		Handler:     u.translate,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "detectlang",
 		Description: "Detect a texts language",
-		Usage:       "[p]detectlang <text>",
+		Arguments:   "<text>",
 		Handler:     u.detectlang,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "english",
 		Description: "Translate text to English",
-		Usage:       "[p]english <text>",
+		Arguments:   "<text>",
 		Handler:     u.english,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "define",
 		Description: "Define a word",
-		Usage:       "[p]define <word>",
+		Arguments:   "<word>",
 		Handler:     u.define,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "urbandictionary",
 		Description: "Search someting on the Urban Dictionary",
-		Usage:       "[p]urbandictionary <word>",
+		Arguments:   "<word>",
 		Handler:     u.urbandictionary,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "wikipedia",
 		Description: "Search someting on Wikipedia",
-		Usage:       "[p]wikipedia <query>",
+		Arguments:   "<query>",
 		Handler:     u.wikipedia,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "weather",
 		Description: "Check the weather in a city",
-		Usage:       "[p]weather <city>",
+		Arguments:   "<city>",
 		Handler:     u.weather,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "lvbypass",
 		Description: "Bypass a Linkvertise link",
-		Usage:       "[p]lvbypass <url>",
+		Arguments:   "<url>",
 		Handler:     u.lvbypass,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "flightinfo",
 		Description: "Get info about a flight",
-		Usage:       "[p]flightinfo <flight number>",
+		Arguments:   "<flight number>",
 		Handler:     u.flightinfo,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "passgen",
 		Description: "Generate a password",
-		Usage:       "[p]passgen <character amount>",
+		Arguments:   "<character amount>",
 		Handler:     u.passgen,
 	})
 	router.RegisterCmd(&dgc.Command{
@@ -738,121 +738,121 @@ func (u UtilityCommands) RegisterCommands(router *dgc.Router) {
 	router.RegisterCmd(&dgc.Command{
 		Name:        "revimage",
 		Description: "Reverse image search",
-		Usage:       "[p]revimage <image url>",
+		Arguments:   "<image url>",
 		Handler:     u.revimage,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "revavatar",
 		Description: "Reverse image search a users avatar",
-		Usage:       "[p]revavatar <user>",
+		Arguments:   "<user>",
 		Handler:     u.revavatar,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "timezones",
 		Description: "Get a list of timezones for a continent",
-		Usage:       "[p]timezones <continent>",
+		Arguments:   "<continent>",
 		Handler:     u.timezones,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "timezone",
 		Description: "Get information about a timezone",
-		Usage:       "[p]timezoneinfo <timezone>",
+		Arguments:   "<timezone>",
 		Handler:     u.timezoneinfo,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "calculate",
 		Description: "Calculate something",
-		Usage:       "[p]calculate <expression>",
+		Arguments:   "<expression>",
 		Handler:     u.calculate,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "googlesearch",
 		Description: "Search someting on Google",
-		Usage:       "[p]googlesearch <query>",
+		Arguments:   "<query>",
 		Handler:     u.googlesearch,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "youtubesearch",
 		Description: "Search someting on Youtube",
-		Usage:       "[p]youtubesearch <query>",
+		Arguments:   "<query>",
 		Handler:     u.youtubesearch,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "youtubedl",
 		Description: "Download a YouTube video to the desktop",
-		Usage:       "[p]youtubedl <query>",
+		Arguments:   "<query>",
 		Handler:     u.youtubedl,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "amazon",
 		Description: "Search products on Amazon",
-		Usage:       "[p]amazon <query>",
+		Arguments:   "<query>",
 		Handler:     u.amazon,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "steam",
 		Description: "Search games on Steam",
-		Usage:       "[p]steam <query>",
+		Arguments:   "<query>",
 		Handler:     u.steam,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "github",
 		Description: "Search repos on GitHub",
-		Usage:       "[p]github <query>",
+		Arguments:   "<query>",
 		Handler:     u.github,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "stackoverflow",
 		Description: "Search answers on Stack Overflow",
-		Usage:       "[p]stackoverflow <query>",
+		Arguments:   "<query>",
 		Handler:     u.stackoverflow,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "searchcountry",
 		Description: "Get info about a country",
-		Usage:       "[p]searchcountry <country>",
+		Arguments:   "<country>",
 		Handler:     u.searchcountry,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "randomcountry",
 		Description: "Get info about a random country",
-		Usage:       "[p]randomcountry <country>",
+		Arguments:   "<country>",
 		Handler:     u.randomcountry,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "loremipsum",
 		Description: "Generate a random placeholder text",
-		Usage:       "[p]loremipsum [paragraphs]",
+		Arguments:   "[paragraphs]",
 		Handler:     u.loremipsum,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "baconipsum",
 		Description: "Generate a meaty placeholder text",
-		Usage:       "[p]baconipsum [paragraphs]",
+		Arguments:   "[paragraphs]",
 		Handler:     u.baconipsum,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "previewcolor",
 		Description: "Preview a color",
-		Usage:       "[p]previewcolor <rgb/hex>",
+		Arguments:   "<rgb/hex>",
 		Handler:     u.previewcolor,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "generatekey",
 		Description: "Generate a random license key (X or x for letters, 9 for numbers)",
-		Usage:       "[p]generatekey <format> [amount]",
+		Arguments:   "<format> [amount]",
 		Handler:     u.generatekey,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "timestamp",
 		Description: "Create a Discord timestamp",
-		Usage:       "[p]timestamp <time>",
+		Arguments:   "<time>",
 		Handler:     u.timestampCommand(""),
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "reltimestamp",
 		Description: "Create a relative Discord timestamp",
-		Usage:       "[p]reltimestamp <time>",
+		Arguments:   "<time>",
 		Handler:     u.timestampCommand(":R"),
 	})
 }

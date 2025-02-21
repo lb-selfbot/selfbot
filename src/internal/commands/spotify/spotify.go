@@ -48,14 +48,14 @@ func (s SpotifyCommands) RegisterCommands(router *dgc.Router) {
 	router.RegisterCmd(&dgc.Command{
 		Name:        "splay",
 		Description: "Play a song on Spotify",
-		Usage:       "[p]splay <song name>",
+		Arguments:   "<song name>",
 		Flags:       []string{CmdFlagDangerous},
 		Handler:     s.splay,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "squeue",
 		Description: "Queue a song to play after the current one",
-		Usage:       "[p]squeue <song name>",
+		Arguments:   "<song name>",
 		Flags:       []string{CmdFlagDangerous},
 		Handler:     s.squeue,
 	})
@@ -69,28 +69,28 @@ func (s SpotifyCommands) RegisterCommands(router *dgc.Router) {
 	router.RegisterCmd(&dgc.Command{
 		Name:        "svolume",
 		Description: "Change Spotify volume",
-		Usage:       "[p]svolume <volume>",
+		Arguments:   "<volume>",
 		Flags:       []string{CmdFlagDangerous},
 		Handler:     s.svolume,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "sshuffle",
 		Description: "Turn shuffle on or off",
-		Usage:       "[p]sshuffle <on/off>",
+		Arguments:   "<on/off>",
 		Flags:       []string{CmdFlagDangerous},
 		Handler:     s.sshuffle,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "srepeat",
 		Description: "Change the Spotify repeat mode",
-		Usage:       "[p]srepeat <track/context/off>",
+		Arguments:   "<track/context/off>",
 		Flags:       []string{CmdFlagDangerous},
 		Handler:     s.srepeat,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "sseek",
 		Description: "Seek to a specific time in the song",
-		Usage:       "[p]sseek <seconds>",
+		Arguments:   "<seconds>",
 		Flags:       []string{CmdFlagDangerous},
 		Handler:     s.sseek,
 	})
@@ -118,7 +118,7 @@ func (s SpotifyCommands) RegisterCommands(router *dgc.Router) {
 	router.RegisterCmd(&dgc.Command{
 		Name:        "slistenalong",
 		Description: "Send a Spotify listen along invite",
-		Usage:       "[p]slistenalong [content]",
+		Arguments:   "[content]",
 		Flags:       []string{CmdFlagDangerous},
 		Handler:     s.slistenalong,
 	})

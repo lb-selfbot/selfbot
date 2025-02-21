@@ -34,7 +34,7 @@ func (h *HelpCommand) RegisterHelpCommand(router *dgc.Router, session *discordgo
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "search",
-		Usage:       "[p]search <query>",
+		Arguments:   "<query>",
 		Description: "Search for a command",
 		Handler:     h.search,
 	})

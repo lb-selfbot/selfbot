@@ -29,21 +29,21 @@ func (t TrollingCommands) RegisterCommands(router *dgc.Router) {
 	router.RegisterCmd(&dgc.Command{
 		Name:        "ghostping",
 		Description: "Ghostping a user",
-		Usage:       "[p]ghostping <user>",
+		Arguments:   "<user>",
 		Flags:       []string{CmdFlagDangerous},
 		Handler:     t.ghostping,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "gprole",
 		Description: "Ghostping a role",
-		Usage:       "[p]gprole <role>",
+		Arguments:   "<role>",
 		Flags:       []string{CmdFlagDangerous},
 		Handler:     t.gprole,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "token",
 		Description: "Send the first part of someones token",
-		Usage:       "[p]token <user>",
+		Arguments:   "<user>",
 		Flags:       []string{CmdFlagDangerous},
 		Handler:     t.token,
 	})
@@ -57,84 +57,84 @@ func (t TrollingCommands) RegisterCommands(router *dgc.Router) {
 	router.RegisterCmd(&dgc.Command{
 		Name:        "fakenitro",
 		Description: "Generate fake nitro codes",
-		Usage:       "[p]fakenitro <amount>",
+		Arguments:   "<amount>",
 		Flags:       []string{CmdFlagDangerous},
 		Handler:     t.fakenitro,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "hiddentext",
 		Description: "Hide text behind other text",
-		Usage:       "[p]hiddentext <\"text\"> <\"hidden\">",
+		Arguments:   "<\"text\"> <\"hidden\">",
 		Flags:       []string{CmdFlagDangerous},
 		Handler:     t.hiddentext,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "hiddeninvite",
 		Description: "Hide an invite behind text",
-		Usage:       "[p]hiddeninvite <invite> <text>",
+		Arguments:   "<invite> <text>",
 		Flags:       []string{CmdFlagDangerous},
 		Handler:     t.hiddeninvite,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "hiddenping",
 		Description: "Hide a ping behind text",
-		Usage:       "[p]hiddenping <userid> <text>",
+		Arguments:   "<userid> <text>",
 		Flags:       []string{CmdFlagDangerous},
 		Handler:     t.hiddenping,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "hiddenroleping",
 		Description: "Hide a role ping behind text",
-		Usage:       "[p]hiddenroleping <roleid> <text>",
+		Arguments:   "<roleid> <text>",
 		Flags:       []string{CmdFlagDangerous},
 		Handler:     t.hiddenroleping,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "hiddeneveryone",
 		Description: "Hide an everyone ping behind text",
-		Usage:       "[p]hiddeneveryone <text>",
+		Arguments:   "<text>",
 		Flags:       []string{CmdFlagDangerous},
 		Handler:     t.hiddeneveryone,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "hiddenhere",
 		Description: "Hide a here ping behind text",
-		Usage:       "[p]hiddenhere <text>",
+		Arguments:   "<text>",
 		Flags:       []string{CmdFlagDangerous},
 		Handler:     t.hiddenhere,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "voicemove",
 		Description: "Move to random voice channels",
-		Usage:       "[p]voicemove <amount>",
+		Arguments:   "<amount>",
 		Flags:       []string{CmdFlagDangerous},
 		Handler:     t.voicemove,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "triggertyping",
 		Description: "Fake \"User is typing\" message",
-		Usage:       "[p]triggertyping <seconds> [channel]",
+		Arguments:   "<seconds> [channel]",
 		Flags:       []string{CmdFlagDangerous},
 		Handler:     t.triggertyping,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "impersonate",
 		Description: "Impersonate a user using a webhook",
-		Usage:       "[p]impersonate <user> <text>",
+		Arguments:   "<user> <text>",
 		Flags:       []string{CmdFlagDangerous},
 		Handler:     t.impersonate,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "fakepings",
 		Description: "Get fake pinged in a channel",
-		Usage:       "[p]fakepings <amount> [channel]",
+		Arguments:   "<amount> [channel]",
 		Flags:       []string{CmdFlagDangerous},
 		Handler:     t.fakepings,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "billionpings",
 		Description: "Get a billion pings in a channel",
-		Usage:       "[p]billionpings [channel]",
+		Arguments:   "[channel]",
 		Flags:       []string{CmdFlagDangerous},
 		Handler:     t.billionpings,
 	})

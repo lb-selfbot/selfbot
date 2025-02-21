@@ -145,8 +145,8 @@ func (c *SlashCommands) searchslash(ctx *router.Ctx) {
 		desc += fmt.Sprintf("`/%s` - %s - %s\n", cmd.Name, botName, cmd.Description)
 	}
 
-	c.services.c.services.Embed.NewEmbed().
-		SetTitle("Slash Commands: " + query).
+	c.services.Embed.NewEmbed()
+	SetTitle("Slash Commands: " + query).
 		SetDescription(desc).
 		Send(ctx)
 }
@@ -221,12 +221,12 @@ func (c *SlashCommands) executeslash(ctx *router.Ctx) {
 }
 
 func (c *SlashCommands) slashcommandjobhelp(ctx *router.Ctx) {
-	c.services.c.services.Embed.NewEmbed().
-		SetDescription(
-			"Slash command jobs are jobs that run slash commands on a set interval. " +
-				"To get more information and examples, read the documentation at " +
-				"https://docs.lightning-bot.com/commands/slash-commands",
-		).
+	c.services.Embed.NewEmbed()
+	SetDescription(
+		"Slash command jobs are jobs that run slash commands on a set interval. " +
+			"To get more information and examples, read the documentation at " +
+			"https://docs.lightning-bot.com/commands/slash-commands",
+	).
 		Send(ctx)
 }
 
@@ -238,8 +238,8 @@ func (c *SlashCommands) listscjobs(ctx *router.Ctx) {
 		false: "s",
 	}[len(jobs) == 1]
 
-	emb := c.services.c.services.Embed.NewEmbed().
-		SetTitle("Slash Command Jobs").
+	emb := c.services.Embed.NewEmbed()
+	SetTitle("Slash Command Jobs").
 		SetDescription("Found %d job%s", len(jobs), suffix)
 
 	for _, job := range slashcommands.Jobs {
@@ -293,8 +293,8 @@ func (c *SlashCommands) getscjob(ctx *router.Ctx) {
 		args = " " + args
 	}
 
-	c.services.c.services.Embed.NewEmbed().
-		SetTitle("Slash command job information").
+	c.services.Embed.NewEmbed()
+	SetTitle("Slash command job information").
 		AddField("Name", job.Name).
 		AddField("Command", fmt.Sprintf("`/%s%s` (%s)", cmd.Name, args, cmd.ID)).
 		AddField("Channel", fmt.Sprintf("#%s (%s)", channel.Name, channel.ID)).
@@ -418,8 +418,8 @@ func (c *SlashCommands) createscjob(ctx *router.Ctx) {
 		return
 	}
 
-	c.services.c.services.Embed.NewEmbed().
-		SetDescription("Successfully created slash command job!").
+	c.services.Embed.NewEmbed()
+	SetDescription("Successfully created slash command job!").
 		AddField("Job Name", job.Name).
 		Send(ctx)
 }
@@ -439,8 +439,8 @@ func (c *SlashCommands) deletescjob(ctx *router.Ctx) {
 		return
 	}
 
-	c.services.c.services.Embed.NewEmbed().
-		SetDescription("Successfully deleted slash command job!").
+	c.services.Embed.NewEmbed()
+	SetDescription("Successfully deleted slash command job!").
 		AddField("Job Name", job.Name).
 		Send(ctx)
 }
@@ -516,8 +516,8 @@ func (c *SlashCommands) setscjobcommand(ctx *router.Ctx) {
 		return
 	}
 
-	c.services.c.services.Embed.NewEmbed().
-		SetDescription("Successfully updated slash command job").
+	c.services.Embed.NewEmbed()
+	SetDescription("Successfully updated slash command job").
 		AddField("Job Name", job.Name).
 		AddField("Command", fmt.Sprintf("`/%s%s` (%s)", command.Name, job.RawArguments, command.ID)).
 		Send(ctx)
@@ -571,8 +571,8 @@ func (c *SlashCommands) setscjobchannel(ctx *router.Ctx) {
 		return
 	}
 
-	c.services.c.services.Embed.NewEmbed().
-		SetDescription("Successfully updated slash command job").
+	c.services.Embed.NewEmbed()
+	SetDescription("Successfully updated slash command job").
 		AddField("Job Name", job.Name).
 		AddField("Channel", channel.Mention()).
 		Send(ctx)
@@ -607,8 +607,8 @@ func (c *SlashCommands) setscjobinterval(ctx *router.Ctx) {
 		return
 	}
 
-	c.services.c.services.Embed.NewEmbed().
-		SetDescription("Successfully updated slash command job").
+	c.services.Embed.NewEmbed()
+	SetDescription("Successfully updated slash command job").
 		AddField("Job Name", job.Name).
 		AddField("Interval", utils.Misc.FormatDuration(job.Interval)).
 		Send(ctx)
@@ -643,8 +643,8 @@ func (c *SlashCommands) setscjobpaused(ctx *router.Ctx) {
 		return
 	}
 
-	c.services.c.services.Embed.NewEmbed().
-		SetDescription("Successfully updated slash command job").
+	c.services.Embed.NewEmbed()
+	SetDescription("Successfully updated slash command job").
 		AddField("Job Name", job.Name).
 		AddField("Paused", toggle).
 		Send(ctx)

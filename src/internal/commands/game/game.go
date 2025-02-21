@@ -16,18 +16,28 @@ import (
 	"github.com/bitly/go-simplejson"
 )
 
-func (g GameCommands) RegisterCommands(router *dgc.Router) {
+type GameCommands struct{ services *services.Services }
+
+func NewGameCommands(s *services.Services) *GameCommands {
+	return &GameCommands{services: s}
+}
+func (c *GameCommands) Register() {
+	cmdRouter := c.services.Discord.GetRouter()
+
+}
+
+func (g *GameCommands) RegisterCommands(router *dgc.Router) {
 	router.StartCategory("Game", "Game commands")
 	router.RegisterCmd(&dgc.Command{
 		Name:        "mcuuid",
 		Description: "Get the minecraft uuid of a player",
-		Usage:       "[p]mcuuid <username>",
+		Arguments:   "<username>",
 		Handler:     g.mcuuid,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "mcnamehistory",
 		Description: "Get the minecraft name history of a player",
-		Usage:       "[p]mcnamehistory <uuid>",
+		Arguments:   "<uuid>",
 		Handler:     g.mcnamehistory,
 	})
 	router.RegisterCmd(&dgc.Command{
@@ -57,13 +67,13 @@ func (g GameCommands) RegisterCommands(router *dgc.Router) {
 	router.RegisterCmd(&dgc.Command{
 		Name:        "fnstats",
 		Description: "Get a player's Fortnite stats",
-		Usage:       "[p]fnstats <username>",
+		Arguments:   "<username>",
 		Handler:     g.fnstats,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "fncreatorcode",
 		Description: "Get info about a Fortnite creator code",
-		Usage:       "[p]fncreatorcode <code>",
+		Arguments:   "<code>",
 		Handler:     g.fncreatorcode,
 	})
 	router.RegisterCmd(&dgc.Command{
@@ -93,7 +103,7 @@ func (g GameCommands) RegisterCommands(router *dgc.Router) {
 	router.RegisterCmd(&dgc.Command{
 		Name:        "alstats",
 		Description: "Get a player's Apex legends stats",
-		Usage:       "[p]alstats <platform> <username>",
+		Arguments:   "<platform> <username>",
 		Handler:     g.alstats,
 	})
 	router.RegisterCmd(&dgc.Command{
@@ -105,26 +115,26 @@ func (g GameCommands) RegisterCommands(router *dgc.Router) {
 	router.RegisterCmd(&dgc.Command{
 		Name:        "fivemplayers",
 		Description: "Get the amount of players on a FiveM server",
-		Usage:       "[p]fivemplayers <ip:port>",
+		Arguments:   "<ip:port>",
 		Handler:     g.fivemplayers,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "fiveminfo",
 		Description: "Get info about a FiveM server",
-		Usage:       "[p]fiveminfo <ip:port>",
+		Arguments:   "<ip:port>",
 		Handler:     g.fiveminfo,
 	})
 
 	router.RegisterCmd(&dgc.Command{
 		Name:        "hltbsearch",
 		Description: "Search for a game on HowLongToBeat",
-		Usage:       "[p]hltbsearch <game>",
+		Arguments:   "<game>",
 		Handler:     g.hltbsearch,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "hltbinfo",
 		Description: "Get info about a game on HowLongToBeat",
-		Usage:       "[p]hltbinfo <game id>",
+		Arguments:   "<game id>",
 		Handler:     g.hltbinfo,
 	})
 }
@@ -574,14 +584,4 @@ func (GameCommands) hltbinfo(ctx *router.Ctx) {
 		AddField("Developer", game.Get("profile_dev").MustString("None")).
 		AddField("Platforms", game.Get("profile_platform").MustString("None")).
 		Send(ctx)
-}
-
-type GameCommands struct{ services *services.Services }
-
-func NewGameCommands(s *services.Services) *GameCommands {
-	return &GameCommands{services: s}
-}
-func (c *GameCommands) Register() {
-	cmdRouter := c.services.Discord.GetRouter()
-
 }

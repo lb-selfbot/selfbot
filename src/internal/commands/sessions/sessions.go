@@ -6,7 +6,6 @@ import (
 	"github.com/LightningDev1/LB-Selfbot/internal/router"
 	"github.com/LightningDev1/LB-Selfbot/internal/services"
 	"github.com/LightningDev1/LB-Selfbot/internal/utils"
-	"github.com/LightningDev1/LB-Selfbot/selfbot/sessions"
 )
 
 type SessionsCommands struct{ services *services.Services }
@@ -26,21 +25,23 @@ func (c *SessionsCommands) Register() {
 			Description: "View all your gateway sessions (active devices)",
 			Arguments:   "viewgatewaysessions",
 			Flags:       []router.CommandFlag{router.CmdFlagDangerous},
-			Handler:     s.viewgatewaysessions,
+			Handler:     c.viewgatewaysessions,
 		},
 		{
 			Name:        "viewloginsessions",
 			Description: "View all your login sessions (tokens)",
 			Arguments:   "viewloginsessions",
 			Flags:       []router.CommandFlag{router.CmdFlagDangerous},
-			Handler:     s.viewloginsessions,
+			Handler:     c.viewloginsessions,
 		},
 	})
 }
 
-func (s *SessionsCommands) viewgatewaysessions(ctx *router.Ctx) {
-	emb := c.services.Embed.NewEmbed().SetDescription("Sessions")
-	for index, session := range sessions.GatewaySessions {
+func (c *SessionsCommands) viewgatewaysessions(ctx *router.Ctx) {
+	emb := c.services.Embed.NewEmbed().
+		SetDescription("Sessions")
+
+	for index, session := range c.services.Sessions.GetGatewaySessions() {
 		var activity string
 		if len(session.Activities) > 0 {
 			activity = session.Activities[0].Name
@@ -59,12 +60,15 @@ func (s *SessionsCommands) viewgatewaysessions(ctx *router.Ctx) {
 			),
 		)
 	}
+
 	emb.Send(ctx)
 }
 
-func (s *SessionsCommands) viewloginsessions(ctx *router.Ctx) {
-	emb := c.services.Embed.NewEmbed().SetDescription("Sessions")
-	for index, session := range sessions.LoginSessions {
+func (c *SessionsCommands) viewloginsessions(ctx *router.Ctx) {
+	emb := c.services.Embed.NewEmbed().
+		SetDescription("Sessions")
+
+	for index, session := range c.services.Sessions.GetLoginSessions() {
 		emb.AddField(
 			fmt.Sprintf("Session %d", index+1),
 			fmt.Sprintf(
@@ -76,5 +80,6 @@ func (s *SessionsCommands) viewloginsessions(ctx *router.Ctx) {
 			),
 		)
 	}
+
 	emb.Send(ctx)
 }

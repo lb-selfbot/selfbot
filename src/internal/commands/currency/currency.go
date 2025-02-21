@@ -20,85 +20,85 @@ func (c CurrencyCommands) RegisterCommands(router *dgc.Router) {
 	router.RegisterCmd(&dgc.Command{
 		Name:        "btcaddress",
 		Description: "Get information about a Bitcoin address",
-		Usage:       "[p]btcaddress <address>",
+		Arguments:   "<address>",
 		Handler:     c.generateAddressFunc("Bitcoin", "BTC", 8),
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "btctransaction",
 		Description: "Get information about a Bitcoin transaction",
-		Usage:       "[p]btctransaction <hash>",
+		Arguments:   "<hash>",
 		Handler:     c.generateTransactionFunc("Bitcoin", "BTC", 8),
 	})
 
 	router.RegisterCmd(&dgc.Command{
 		Name:        "ethaddress",
 		Description: "Get information about an Ethereum address",
-		Usage:       "[p]ethaddress <address>",
+		Arguments:   "<address>",
 		Handler:     c.generateAddressFunc("Ethereum", "ETH", 18),
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "ethtransaction",
 		Description: "Get information about an Ethereum transaction",
-		Usage:       "[p]ethtransaction <hash>",
+		Arguments:   "<hash>",
 		Handler:     c.generateTransactionFunc("Ethereum", "ETH", 18),
 	})
 
 	router.RegisterCmd(&dgc.Command{
 		Name:        "ltcaddress",
 		Description: "Get information about a Litecoin address",
-		Usage:       "[p]ltcaddress <address>",
+		Arguments:   "<address>",
 		Handler:     c.generateAddressFunc("Litecoin", "LTC", 8),
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "ltctransaction",
 		Description: "Get information about a Litecoin transaction",
-		Usage:       "[p]ltctransaction <address>",
+		Arguments:   "<address>",
 		Handler:     c.generateTransactionFunc("Litecoin", "LTC", 8),
 	})
 
 	router.RegisterCmd(&dgc.Command{
 		Name:        "dashaddress",
 		Description: "Get information about a Dash address",
-		Usage:       "[p]dashaddress <address>",
+		Arguments:   "<address>",
 		Handler:     c.generateAddressFunc("Dash", "DASH", 8),
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "dashtransaction",
 		Description: "Get information about a Dash transaction",
-		Usage:       "[p]dashtransaction <address>",
+		Arguments:   "<address>",
 		Handler:     c.generateTransactionFunc("Dash", "DASH", 8),
 	})
 
 	router.RegisterCmd(&dgc.Command{
 		Name:        "dogeaddress",
 		Description: "Get information about a Dogecoin address",
-		Usage:       "[p]dogeaddress <address>",
+		Arguments:   "<address>",
 		Handler:     c.generateAddressFunc("Dogecoin", "DOGE", 8),
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "dogetransaction",
 		Description: "Get information about a Dogecoin transaction",
-		Usage:       "[p]dogetransaction <address>",
+		Arguments:   "<address>",
 		Handler:     c.generateTransactionFunc("Dogecoin", "DOGE", 8),
 	})
 
 	router.RegisterCmd(&dgc.Command{
 		Name:        "priceinfo",
 		Description: "Get price information from a (crypto)currency",
-		Usage:       "[p]priceinfo <from symbol> [to symbol]",
+		Arguments:   "<from symbol> [to symbol]",
 		Handler:     c.priceinfo,
 	})
 
 	router.RegisterCmd(&dgc.Command{
 		Name:        "searchsymbol",
 		Description: "Search for a stock market symbol",
-		Usage:       "[p]searchsymbol <query>",
+		Arguments:   "<query>",
 		Handler:     c.searchsymbol,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "symbolinfo",
 		Description: "Get information about a stock market symbol",
-		Usage:       "[p]symbolinfo <symbol>",
+		Arguments:   "<symbol>",
 		Handler:     c.symbolinfo,
 	})
 }

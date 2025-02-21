@@ -19,7 +19,7 @@ func (i ImageCommands) RegisterCommands(router *dgc.Router) {
 	router.RegisterCmd(&dgc.Command{
 		Name:        "tweet",
 		Description: "Tweet a message",
-		Usage:       "[p]tweet <username> <text>",
+		Arguments:   "<username> <text>",
 		Handler:     i.tweet,
 	})
 	router.RegisterCmd(&dgc.Command{
@@ -31,7 +31,7 @@ func (i ImageCommands) RegisterCommands(router *dgc.Router) {
 	router.RegisterCmd(&dgc.Command{
 		Name:        "ytcomment",
 		Description: "Make a fake YouTube comment",
-		Usage:       "[p]ytcomment <user> <text>",
+		Arguments:   "<user> <text>",
 		Handler:     i.ytcomment,
 	})
 	router.RegisterCmd(&dgc.Command{
@@ -43,103 +43,103 @@ func (i ImageCommands) RegisterCommands(router *dgc.Router) {
 	router.RegisterCmd(&dgc.Command{
 		Name:        "wasted",
 		Description: "Add a wasted overlay on the users avatar",
-		Usage:       "[p]wasted [user]",
+		Arguments:   "[user]",
 		Handler:     i.wasted,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "triggered",
 		Description: "Add a triggered overlay on the users avatar",
-		Usage:       "[p]triggered [user]",
+		Arguments:   "[user]",
 		Handler:     i.triggered,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "glass",
 		Description: "Add a glass overlay on the users avatar",
-		Usage:       "[p]glass [user]",
+		Arguments:   "[user]",
 		Handler:     i.glass,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "greyscale",
 		Description: "Add a greyscale overlay on the users avatar",
-		Usage:       "[p]greyscale [user]",
+		Arguments:   "[user]",
 		Handler:     i.greyscale,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "invert",
 		Description: "Invert the users avatar",
-		Usage:       "[p]invert [user]",
+		Arguments:   "[user]",
 		Handler:     i.invert,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "invertgreyscale",
 		Description: "Invert and greyscale the users avatar",
-		Usage:       "[p]invertgreyscale [user]",
+		Arguments:   "[user]",
 		Handler:     i.invertgreyscale,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "brightness",
 		Description: "Make the users avatar brighter",
-		Usage:       "[p]brightness [user]",
+		Arguments:   "[user]",
 		Handler:     i.brightness,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "red",
 		Description: "Make the users avatar red",
-		Usage:       "[p]red [user]",
+		Arguments:   "[user]",
 		Handler:     i.red,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "green",
 		Description: "Make the users avatar green",
-		Usage:       "[p]green [user]",
+		Arguments:   "[user]",
 		Handler:     i.green,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "blue",
 		Description: "Make the users avatar blue",
-		Usage:       "[p]blue [user]",
+		Arguments:   "[user]",
 		Handler:     i.blue,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "pixelate",
 		Description: "Pixelate the users avatar",
-		Usage:       "[p]pixelate [user]",
+		Arguments:   "[user]",
 		Handler:     i.pixelate,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "comrade",
 		Description: "Add comrade overlay on users avatar",
-		Usage:       "[p]comrade [user]",
+		Arguments:   "[user]",
 		Handler:     i.comrade,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "missionpassed",
 		Description: "Add Mission Passed overlay on users avatar",
-		Usage:       "[p]missionpassed [user]",
+		Arguments:   "[user]",
 		Handler:     i.missionpassed,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "jail",
 		Description: "Add jail overlay on users avatar",
-		Usage:       "[p]jail [user]",
+		Arguments:   "[user]",
 		Handler:     i.jail,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "nobitches",
 		Description: "Make a no bitches meme",
-		Usage:       "[p]nobitches <text>",
+		Arguments:   "<text>",
 		Handler:     i.nobitches,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "threat",
 		Description: "Make biggest threats meme",
-		Usage:       "[p]threat [user]",
+		Arguments:   "[user]",
 		Handler:     i.threat,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "threshold",
 		Description: "Add a threshold filter to a users avatar",
-		Usage:       "[p]threshold <user>",
+		Arguments:   "<user>",
 		Handler:     i.threshold,
 	})
 	router.RegisterCmd(&dgc.Command{
@@ -157,187 +157,187 @@ func (i ImageCommands) RegisterCommands(router *dgc.Router) {
 	router.RegisterCmd(&dgc.Command{
 		Name:        "color",
 		Description: "Make the users avatar a custom color",
-		Usage:       "[p]color <user> <color>",
+		Arguments:   "<user> <color>",
 		Handler:     i.color,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "sostupid",
 		Description: "Make an it's so stupid meme",
-		Usage:       "[p]sostupid <user> <text>",
+		Arguments:   "<user> <text>",
 		Handler:     i.sostupid,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "simpcard",
 		Description: "Make a simp card for a user",
-		Usage:       "[p]simpcard <user>",
+		Arguments:   "<user>",
 		Handler:     i.simpcard,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "horny",
 		Description: "Make a horny card for a user",
-		Usage:       "[p]horny <user>",
+		Arguments:   "<user>",
 		Handler:     i.horny,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "lgbt",
 		Description: "Add an lgbt border to the user",
-		Usage:       "[p]lgbt <user>",
+		Arguments:   "<user>",
 		Handler:     i.lgbt,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "pansexual",
 		Description: "Add a pansexual border to the user",
-		Usage:       "[p]pansexual <user>",
+		Arguments:   "<user>",
 		Handler:     i.pansexual,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "nonbinary",
 		Description: "Add a nonbinary border to the user",
-		Usage:       "[p]nonbinary <user>",
+		Arguments:   "<user>",
 		Handler:     i.nonbinary,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "lesbian2",
 		Description: "Add a lesbian border to the user",
-		Usage:       "[p]lesbian2 <user>",
+		Arguments:   "<user>",
 		Handler:     i.lesbian,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "bisexual",
 		Description: "Add a bisexual border to the user",
-		Usage:       "[p]bisexual <user>",
+		Arguments:   "<user>",
 		Handler:     i.bisexual,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "trans",
 		Description: "Add a trans border to the user",
-		Usage:       "[p]trans <user>",
+		Arguments:   "<user>",
 		Handler:     i.trans,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "oogway",
 		Description: "Make a master oogway meme",
-		Usage:       "[p]oogway <text>",
+		Arguments:   "<text>",
 		Handler:     i.oogway,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "oogway2",
 		Description: "Make a master oogway meme",
-		Usage:       "[p]oogway2 <text>",
+		Arguments:   "<text>",
 		Handler:     i.oogway2,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "clyde",
 		Description: "Make Clyde say something",
-		Usage:       "[p]clyde <text>",
+		Arguments:   "<text>",
 		Handler:     i.clyde,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "gay",
 		Description: "Add a rainbow overlay on the users avatar",
-		Usage:       "[p]gay <user>",
+		Arguments:   "<user>",
 		Handler:     i.gay,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "distractedbf",
 		Description: "Make a distracted boyfriend meme with the users",
-		Usage:       "[p]distractedbf <user1> <user2>",
+		Arguments:   "<user1> <user2>",
 		Handler:     i.distractedbf,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "captcha",
 		Description: "Make a captcha meme",
-		Usage:       "[p]captcha <user> <text>",
+		Arguments:   "<user> <text>",
 		Handler:     i.captcha,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "whowouldwin",
 		Description: "Make a who would win meme",
-		Usage:       "[p]whowouldwin <user1> <user2>",
+		Arguments:   "<user1> <user2>",
 		Handler:     i.whowouldwin,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "jpeg",
 		Description: "JPEG a users avatar",
-		Usage:       "[p]jpeg <user>",
+		Arguments:   "<user>",
 		Handler:     i.jpeg,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "lolice",
 		Description: "Make a lolice meme",
-		Usage:       "[p]lolice <user>",
+		Arguments:   "<user>",
 		Handler:     i.lolice,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "kannagen",
 		Description: "Make a kannagen meme",
-		Usage:       "[p]kannagen <user1> <user2>",
+		Arguments:   "<user1> <user2>",
 		Handler:     i.kannagen,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "iphonex",
 		Description: "Put users profile picture on an iPhone X",
-		Usage:       "[p]iphonex <user1> <user2>",
+		Arguments:   "<user1> <user2>",
 		Handler:     i.iphonex,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "awooify",
 		Description: "Awooify the user",
-		Usage:       "[p]awooify <user1> <user2>",
+		Arguments:   "<user1> <user2>",
 		Handler:     i.awooify,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "trap",
 		Description: "Make a trap card",
-		Usage:       "[p]trap <user>",
+		Arguments:   "<user>",
 		Handler:     i.trap,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "trumptweet",
 		Description: "Make a fake Trump tweet",
-		Usage:       "[p]trumptweet <text>",
+		Arguments:   "<text>",
 		Handler:     i.trumptweet,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "deepfry",
 		Description: "Deepfry the users avatar",
-		Usage:       "[p]deepfry <text>",
+		Arguments:   "<text>",
 		Handler:     i.deepfry,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "blurpify",
 		Description: "Blurpify the users avatar",
-		Usage:       "[p]blurpify <text>",
+		Arguments:   "<text>",
 		Handler:     i.blurpify,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "phcomment",
 		Description: "Make the user comment something on PornHub",
-		Usage:       "[p]phcomment <user> <text>",
+		Arguments:   "<user> <text>",
 		Handler:     i.phcomment,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "fact",
 		Description: "Make a fact meme",
-		Usage:       "[p]fact <user>",
+		Arguments:   "<user>",
 		Handler:     i.fact,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "trash",
 		Description: "Make a trash meme",
-		Usage:       "[p]trash <user>",
+		Arguments:   "<user>",
 		Handler:     i.trash,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "stickbug",
 		Description: "Make a stickbug meme",
-		Usage:       "[p]stickbug <user>",
+		Arguments:   "<user>",
 		Handler:     i.stickbug,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "magik",
 		Description: "Make a users avatar magik",
-		Usage:       "[p]magik <user>",
+		Arguments:   "<user>",
 		Handler:     i.magik,
 	})
 	router.RegisterCmd(&dgc.Command{
@@ -349,73 +349,73 @@ func (i ImageCommands) RegisterCommands(router *dgc.Router) {
 	router.RegisterCmd(&dgc.Command{
 		Name:        "searchgif",
 		Description: "Search GIFs on Giphy",
-		Usage:       "[p]searchgif <query>",
+		Arguments:   "<query>",
 		Handler:     i.searchgif,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "communist",
 		Description: "Make the user a communist",
-		Usage:       "[p]communist <user>",
+		Arguments:   "<user>",
 		Handler:     i.communist,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "snow",
 		Description: "Add a snow overlay the the users avatar",
-		Usage:       "[p]snow <user>",
+		Arguments:   "<user>",
 		Handler:     i.snow,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "hub",
 		Description: "Make a PornHub logo with custom text",
-		Usage:       "[p]hub <\"text1\"> <\"text2\">",
+		Arguments:   "<\"text1\"> <\"text2\">",
 		Handler:     i.hub,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "floor",
 		Description: "Make a floor meme",
-		Usage:       "[p]floor <user> <text>",
+		Arguments:   "<user> <text>",
 		Handler:     i.floor,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "jokeoverhead",
 		Description: "When someone doesn't understand a joke",
-		Usage:       "[p]jokeoverhead <user>",
+		Arguments:   "<user>",
 		Handler:     i.jokeoverhead,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "throwaway",
 		Description: "Throw a user away",
-		Usage:       "[p]throwaway <user>",
+		Arguments:   "<user>",
 		Handler:     i.throwaway,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "salty",
 		Description: "Make a user salty",
-		Usage:       "[p]salty <user>",
+		Arguments:   "<user>",
 		Handler:     i.salty,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "scroll",
 		Description: "Make a scroll meme",
-		Usage:       "[p]scroll <text>",
+		Arguments:   "<text>",
 		Handler:     i.scroll,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "shame",
 		Description: "Shame a user",
-		Usage:       "[p]shame <user>",
+		Arguments:   "<user>",
 		Handler:     i.shame,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "ship",
 		Description: "Ship users",
-		Usage:       "[p]ship <user1> <user2>",
+		Arguments:   "<user1> <user2>",
 		Handler:     i.ship,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "what",
 		Description: "Make a what meme",
-		Usage:       "[p]what <user>",
+		Arguments:   "<user>",
 		Handler:     i.what,
 	})
 	router.RegisterCmd(&dgc.Command{
@@ -445,7 +445,7 @@ func (i ImageCommands) RegisterCommands(router *dgc.Router) {
 	router.RegisterCmd(&dgc.Command{
 		Name:        "catsays",
 		Description: "Make a cat say something",
-		Usage:       "[p]catsays <text>",
+		Arguments:   "<text>",
 		Handler:     i.catsays,
 	})
 	router.RegisterCmd(&dgc.Command{
@@ -559,205 +559,205 @@ func (i ImageCommands) RegisterCommands(router *dgc.Router) {
 	router.RegisterCmd(&dgc.Command{
 		Name:        "balloon",
 		Description: "Make a balloon meme",
-		Usage:       "[p]balloon <\"text1\"> <\"text2\">",
+		Arguments:   "<\"text1\"> <\"text2\">",
 		Handler:     i.balloon,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "abandon",
 		Description: "Make an abandon meme",
-		Usage:       "[p]abandon <text>",
+		Arguments:   "<text>",
 		Handler:     i.abandon,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "aborted",
 		Description: "Make an aborted meme",
-		Usage:       "[p]aborted <user>",
+		Arguments:   "<user>",
 		Handler:     i.aborted,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "affect",
 		Description: "Make an affect meme",
-		Usage:       "[p]affect <user>",
+		Arguments:   "<user>",
 		Handler:     i.affect,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "airpods",
 		Description: "Add AirPods to the users avatar",
-		Usage:       "[p]airpods <user>",
+		Arguments:   "<user>",
 		Handler:     i.airpods,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "america",
 		Description: "Patriotize the user",
-		Usage:       "[p]america <user>",
+		Arguments:   "<user>",
 		Handler:     i.america,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "armor",
 		Description: "Make an armor meme",
-		Usage:       "[p]armor <text>",
+		Arguments:   "<text>",
 		Handler:     i.armor,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "bed",
 		Description: "Make a bed meme",
-		Usage:       "[p]bed <user1> <user2>",
+		Arguments:   "<user1> <user2>",
 		Handler:     i.bed,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "bongocat",
 		Description: "Make a bongocat meme",
-		Usage:       "[p]bongocat <user>",
+		Arguments:   "<user>",
 		Handler:     i.bongocat,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "boo",
 		Description: "Make a boo meme",
-		Usage:       "[p]boo <\"text1\"> <\"text2\">",
+		Arguments:   "<\"text1\"> <\"text2\">",
 		Handler:     i.boo,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "bigbrain",
 		Description: "Make a big brain meme",
-		Usage:       "[p]bigbrain <\"item 1\"> <\"item 2\"> <\"item 3\"> <\"item 4\">",
+		Arguments:   "<\"item 1\"> <\"item 2\"> <\"item 3\"> <\"item 4\">",
 		Handler:     i.bigbrain,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "brazzers",
 		Description: "Make a brazzers meme",
-		Usage:       "[p]brazzers <user>",
+		Arguments:   "<user>",
 		Handler:     i.brazzers,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "byemom",
 		Description: "Make a byemom meme",
-		Usage:       "[p]byemom <user> <text>",
+		Arguments:   "<user> <text>",
 		Handler:     i.byemom,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "cancer",
 		Description: "Make a Squidward cancer meme",
-		Usage:       "[p]cancer <user>",
+		Arguments:   "<user>",
 		Handler:     i.cancer,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "changemymind",
 		Description: "Make a change my mind meme",
-		Usage:       "[p]changemymind <text>",
+		Arguments:   "<text>",
 		Handler:     i.changemymind,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "cheating",
 		Description: "Make a cheating meme",
-		Usage:       "[p]cheating <\"text1\"> <\"text2\">",
+		Arguments:   "<\"text1\"> <\"text2\">",
 		Handler:     i.cheating,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "citation",
 		Description: "Make a citation meme",
-		Usage:       "[p]citation <\"text1\"> <\"text2\"> <\"text3\">",
+		Arguments:   "<\"text1\"> <\"text2\"> <\"text3\">",
 		Handler:     i.citation,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "communism",
 		Description: "Make the user a communist",
-		Usage:       "[p]communism <user>",
+		Arguments:   "<user>",
 		Handler:     i.communism,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "confusedcat",
 		Description: "Make a confused cat meme",
-		Usage:       "[p]confusedcat <\"text1\"> <\"text2\">",
+		Arguments:   "<\"text1\"> <\"text2\">",
 		Handler:     i.confusedcat,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "corporate",
 		Description: "Make a corporate meme",
-		Usage:       "[p]corporate <user>",
+		Arguments:   "<user>",
 		Handler:     i.corporate,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "cry",
 		Description: "Make a cry meme",
-		Usage:       "[p]cry <text>",
+		Arguments:   "<text>",
 		Handler:     i.cry,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "dab",
 		Description: "Make a dab meme",
-		Usage:       "[p]dab <user>",
+		Arguments:   "<user>",
 		Handler:     i.dab,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "dank",
 		Description: "Make a dank meme",
-		Usage:       "[p]dank <user>",
+		Arguments:   "<user>",
 		Handler:     i.dank,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "delete",
 		Description: "Make a delete meme",
-		Usage:       "[p]delete <user>",
+		Arguments:   "<user>",
 		Handler:     i.delete,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "disability",
 		Description: "Make a disability meme",
-		Usage:       "[p]disability <user>",
+		Arguments:   "<user>",
 		Handler:     i.disability,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "doglemon",
 		Description: "Make a dog lemon meme",
-		Usage:       "[p]doglemon <\"text1\"> <\"text2\">",
+		Arguments:   "<\"text1\"> <\"text2\">",
 		Handler:     i.doglemon,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "door",
 		Description: "Make a door meme",
-		Usage:       "[p]door <user>",
+		Arguments:   "<user>",
 		Handler:     i.door,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "egg",
 		Description: "Make a egg meme",
-		Usage:       "[p]egg <user>",
+		Arguments:   "<user>",
 		Handler:     i.egg,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "excuseme",
 		Description: "Make an excuse me meme",
-		Usage:       "[p]excuseme <text>",
+		Arguments:   "<text>",
 		Handler:     i.excuseme,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "expanddong",
 		Description: "Make an expand dong meme",
-		Usage:       "[p]expanddong <text>",
+		Arguments:   "<text>",
 		Handler:     i.expanddong,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "expandingwwe",
 		Description: "Make an expanding WWE meme",
-		Usage:       "[p]expandingwwe <\"item 1\"> <\"item 2\"> <\"item 3\"> <\"item 4\"> <\"item 5\">",
+		Arguments:   "<\"item 1\"> <\"item 2\"> <\"item 3\"> <\"item 4\"> <\"item 5\">",
 		Handler:     i.expandingwwe,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "recaptcha",
 		Description: "Make a recaptcha",
-		Usage:       "[p]recaptcha <text>",
+		Arguments:   "<text>",
 		Handler:     i.recaptcha,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "qrcode",
 		Description: "Make a QR Code",
-		Usage:       "[p]qrcode <text>",
+		Arguments:   "<text>",
 		Handler:     i.qrcode,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "darkqrcode",
 		Description: "Make a dark QR Code",
-		Usage:       "[p]darkqrcode <text>",
+		Arguments:   "<text>",
 		Handler:     i.darkqrcode,
 	})
 	router.RegisterCmd(&dgc.Command{
@@ -769,193 +769,193 @@ func (i ImageCommands) RegisterCommands(router *dgc.Router) {
 	router.RegisterCmd(&dgc.Command{
 		Name:        "achievement",
 		Description: "Make a minecraft achievement",
-		Usage:       "[p]achievement <text>",
+		Arguments:   "<text>",
 		Handler:     i.achievement,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "amiajoke",
 		Description: "Make an am I a joke meme",
-		Usage:       "[p]amiajoke <user>",
+		Arguments:   "<user>",
 		Handler:     i.amiajoke,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "bad",
 		Description: "Make a bad meme",
-		Usage:       "[p]bad <user>",
+		Arguments:   "<user>",
 		Handler:     i.bad,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "calling",
 		Description: "Make a calling meme",
-		Usage:       "[p]calling <text>",
+		Arguments:   "<text>",
 		Handler:     i.calling,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "didyoumean",
 		Description: "Make a did you mean meme",
-		Usage:       "[p]didyoumean <\"top\"> <\"bottom\">",
+		Arguments:   "<\"top\"> <\"bottom\">",
 		Handler:     i.didyoumean,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "drake",
 		Description: "Make a drake meme",
-		Usage:       "[p]drake <\"top\"> <\"bottom\">",
+		Arguments:   "<\"top\"> <\"bottom\">",
 		Handler:     i.drake,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "ayano",
 		Description: "Make an ayano meme",
-		Usage:       "[p]ayano <\"top\"> <\"bottom\">",
+		Arguments:   "<\"top\"> <\"bottom\">",
 		Handler:     i.ayano,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "facts",
 		Description: "Make a facts meme",
-		Usage:       "[p]facts <text>",
+		Arguments:   "<text>",
 		Handler:     i.facts,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "blur",
 		Description: "Blur the user's avatar",
-		Usage:       "[p]blur <user>",
+		Arguments:   "<user>",
 		Handler:     i.blur,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "flipav",
 		Description: "Flip the user's avatar",
-		Usage:       "[p]flipav <user>",
+		Arguments:   "<user>",
 		Handler:     i.flipav,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "mirror",
 		Description: "Mirror the user's avatar",
-		Usage:       "[p]mirror <user>",
+		Arguments:   "<user>",
 		Handler:     i.mirror,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "wide",
 		Description: "Make the user's avatar wide",
-		Usage:       "[p]wide <user>",
+		Arguments:   "<user>",
 		Handler:     i.wide,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "sepia",
 		Description: "Make the user's avatar sepia",
-		Usage:       "[p]sepia <user>",
+		Arguments:   "<user>",
 		Handler:     i.sepia,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "adios",
 		Description: "Make an adios meme",
-		Usage:       "[p]adios <user>",
+		Arguments:   "<user>",
 		Handler:     i.adios,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "batmanslap",
 		Description: "Make a batmanslap meme",
-		Usage:       "[p]batmanslap <user1> <user2> <\"text1\"> <\"text2\">",
+		Arguments:   "<user1> <user2> <\"text1\"> <\"text2\">",
 		Handler:     i.batmanslap,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "carreverse",
 		Description: "Make a car reverse meme",
-		Usage:       "[p]carreverse <text>",
+		Arguments:   "<text>",
 		Handler:     i.carreverse,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "drip",
 		Description: "Give the user some drip",
-		Usage:       "[p]drip <user>",
+		Arguments:   "<user>",
 		Handler:     i.drip,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "impostor",
 		Description: "Make an Among Us impostor meme",
-		Usage:       "[p]impostor <text>",
+		Arguments:   "<text>",
 		Handler:     i.impostor,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "notimpostor",
 		Description: "Make an Among Us not impostor meme",
-		Usage:       "[p]notimpostor <text>",
+		Arguments:   "<text>",
 		Handler:     i.notimpostor,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "emergencymeeting",
 		Description: "Make an Among Us emergency meeting meme",
-		Usage:       "[p]emergencymeeting <text>",
+		Arguments:   "<text>",
 		Handler:     i.emergencymeeting,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "firsttime",
 		Description: "Make a first time meme",
-		Usage:       "[p]firsttime <user>",
+		Arguments:   "<user>",
 		Handler:     i.firsttime,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "grave",
 		Description: "Make a grave meme",
-		Usage:       "[p]grave <user>",
+		Arguments:   "<user>",
 		Handler:     i.grave,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "iamspeed",
 		Description: "Make an i am speed meme",
-		Usage:       "[p]iamspeed <user>",
+		Arguments:   "<user>",
 		Handler:     i.iamspeed,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "icanmilkyou",
 		Description: "Make an i can milk you meme",
-		Usage:       "[p]icanmilkyou <user1> <user2>",
+		Arguments:   "<user1> <user2>",
 		Handler:     i.icanmilkyou,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "heaven",
 		Description: "Make a heaven meme",
-		Usage:       "[p]heaven <user>",
+		Arguments:   "<user>",
 		Handler:     i.heaven,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "npc",
 		Description: "Make an npc meme",
-		Usage:       "[p]npc <\"text1\"> <\"text2\">",
+		Arguments:   "<\"text1\"> <\"text2\">",
 		Handler:     i.npc,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "stonks",
 		Description: "Make a stonks meme",
-		Usage:       "[p]stonks <user>",
+		Arguments:   "<user>",
 		Handler:     i.stonks,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "notstonks",
 		Description: "Make a not stonks meme",
-		Usage:       "[p]notstonks <user>",
+		Arguments:   "<user>",
 		Handler:     i.notstonks,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "fliptable",
 		Description: "Make the user flip a table",
-		Usage:       "[p]fliptable <user>",
+		Arguments:   "<user>",
 		Handler:     i.fliptable,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "water",
 		Description: "Make a water meme",
-		Usage:       "[p]water <text>",
+		Arguments:   "<text>",
 		Handler:     i.water,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "wolverine",
 		Description: "Make a wolverine meme",
-		Usage:       "[p]wolverine <user>",
+		Arguments:   "<user>",
 		Handler:     i.wolverine,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "womanyellingatcat",
 		Description: "Make a woman yelling at cat meme",
-		Usage:       "[p]womanyellingatcat <user1> <user2>",
+		Arguments:   "<user1> <user2>",
 		Handler:     i.womanyellingatcat,
 	})
 	router.RegisterCmd(&dgc.Command{
@@ -967,32 +967,32 @@ func (i ImageCommands) RegisterCommands(router *dgc.Router) {
 	router.RegisterCmd(&dgc.Command{
 		Name:        "speechbubble",
 		Description: "Add a speech bubble to an image",
-		Usage:       "[p]speechbubble [force GIF: on/off] [link/attachment]",
+		Arguments:   "[force GIF: on/off] [link/attachment]",
 		Handler:     i.speechbubble,
 	})
 
 	router.RegisterCmd(&dgc.Command{
 		Name:        "quotereply",
 		Description: "Quote the message you replied to",
-		Usage:       "[p]quotereply [background url]",
+		Arguments:   "[background url]",
 		Handler:     i.quotereply,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "quotemessage",
 		Description: "Quote a message",
-		Usage:       "[p]quotemessage <message id> [channel id]",
+		Arguments:   "<message id> [channel id]",
 		Handler:     i.quotemessage,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "quoteuser",
 		Description: "Quote a user",
-		Usage:       "[p]quoteuser <@user> <\"text\"> [background url]",
+		Arguments:   "<@user> <\"text\"> [background url]",
 		Handler:     i.quoteuser,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "quotetext",
 		Description: "Quote using text",
-		Usage:       "[p]quotetext <\"author\"> <\"text\"> [background url]",
+		Arguments:   "<\"author\"> <\"text\"> [background url]",
 		Handler:     i.quotetext,
 	})
 
@@ -1005,19 +1005,19 @@ func (i ImageCommands) RegisterCommands(router *dgc.Router) {
 	router.RegisterCmd(&dgc.Command{
 		Name:        "discordquotemessage",
 		Description: "Quote a Discord message",
-		Usage:       "[p]discordquotemessage <message id> [channel id]",
+		Arguments:   "<message id> [channel id]",
 		Handler:     i.discordquotemessage,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "discordquoteuser",
 		Description: "Quote a user",
-		Usage:       "[p]discordquoteuser <@user> <\"text\">",
+		Arguments:   "<@user> <\"text\">",
 		Handler:     i.discordquoteuser,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "discordquotetext",
 		Description: "Quote a Discord message",
-		Usage:       "[p]discordquotetext <\"author\"> <\"text\"> <avatar url>",
+		Arguments:   "<\"author\"> <\"text\"> <avatar url>",
 		Handler:     i.discordquotetext,
 	})
 }
