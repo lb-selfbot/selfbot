@@ -4,18 +4,16 @@ import (
 	"github.com/LightningDev1/LB-Selfbot/internal/api"
 	"github.com/LightningDev1/LB-Selfbot/internal/router"
 	"github.com/LightningDev1/LB-Selfbot/internal/services"
-	"github.com/LightningDev1/LB-Selfbot/internal/utils"
-	"github.com/LightningDev1/dgc"
 )
 
-func (r RedditCommands) RegisterCommands(router *dgc.Router) {
-	router.StartCategory("Reddit", "Reddit commands")
-	router.RegisterCmd(&dgc.Command{
-		Name:        "subreddit",
-		Description: "Get a random post from a subreddit",
-		Arguments:   "<subreddit>",
-		Handler:     r.subreddit,
-	})
+type RedditCommands struct{ services *services.Services }
+
+func NewRedditCommands(s *services.Services) *RedditCommands {
+	return &RedditCommands{services: s}
+}
+func (c *RedditCommands) Register() {
+	cmdRouter := c.services.Discord.GetRouter()
+
 	subreddits := []string{
 		"mildlyinteresting",
 		"thatsinsane",
@@ -63,17 +61,31 @@ func (r RedditCommands) RegisterCommands(router *dgc.Router) {
 		"oldschoolcool",
 		"pcmasterrace",
 	}
+
+	commands := make([]*router.Command, 0, len(subreddits)+1)
+
+	commands = append(commands, &router.Command{
+		Name:        "subreddit",
+		Description: "Get a random post from a subreddit",
+		Arguments:   "<name>",
+		Handler:     c.subreddit,
+	})
+
 	for _, subreddit := range subreddits {
-		router.RegisterCmd(&dgc.Command{
+		commands = append(commands, &router.Command{
 			Name:        subreddit,
 			Description: "Get a random post from r/" + subreddit,
-			Usage:       "[p]" + subreddit,
-			Handler:     r.generateFunc(subreddit),
+			Handler:     c.generateFunc(subreddit),
 		})
 	}
+
+	cmdRouter.RegisterCategory(&router.Category{
+		Name:        "Reddit",
+		Description: "Reddit commands",
+	}, commands)
 }
 
-func (RedditCommands) generateFunc(subreddit string) func(ctx *router.Ctx) {
+func (c *RedditCommands) generateFunc(subreddit string) func(ctx *router.Ctx) {
 	// This makes sure that the function is not overwritten by the next command.
 	// If you put the function in the RegisterCommands function, the element
 	// variable will always be the last element in the command array.
@@ -92,26 +104,18 @@ func (RedditCommands) generateFunc(subreddit string) func(ctx *router.Ctx) {
 	}
 }
 
-func (RedditCommands) subreddit(ctx *router.Ctx) {
-	subreddit := utils.Arguments["<subreddit>"]
+func (c *RedditCommands) subreddit(ctx *router.Ctx) {
+	subreddit := ctx.Arguments.Get(0).Raw()
+
 	post, success := api.GetImageFromSubreddit(subreddit)
 	if !success || post == nil {
 		_ = ctx.RespondText("That subreddit is invalid.")
 		return
 	}
+
 	c.services.Embed.NewEmbed().
 		AddField("Subreddit", subreddit).
 		AddField("Title", post.Title).
 		AddField("URL", post.ImageURL).
 		Send(ctx)
-}
-
-type RedditCommands struct{ services *services.Services }
-
-func NewRedditCommands(s *services.Services) *RedditCommands {
-	return &RedditCommands{services: s}
-}
-func (c *RedditCommands) Register() {
-	cmdRouter := c.services.Discord.GetRouter()
-
 }
