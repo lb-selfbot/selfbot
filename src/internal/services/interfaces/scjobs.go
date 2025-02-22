@@ -69,6 +69,11 @@ type SCJob struct {
 	StopChannel chan struct{} `json:"-"`
 }
 
+// IsRunning returns true if the job is running.
+func (j *SCJob) IsRunning() bool {
+	return j.Lock.Load() == 1
+}
+
 // Stop stops the job handler.
 func (j *SCJob) Stop() {
 	close(j.StopChannel)

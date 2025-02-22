@@ -57,7 +57,7 @@ func (s *SCJobsServiceImpl) start() {
 
 		// First start all job handlers
 		for _, job := range s.jobs {
-			if job.Lock.Load() == 1 {
+			if job.IsRunning() {
 				continue
 			}
 

@@ -1244,10 +1244,11 @@ func (ConfigCommands) customgiveawaybots(ctx *router.Ctx) {
 			AddField("Custom Giveaway Bots", botString).
 			Send(ctx)
 	case "add":
-		bot, ok := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(1))
-		if !ok {
+		bot, err := ctx.Arguments.Get(1).User(router.ArgumentFlagFallbackDefault)
+		if err != nil {
 			_ = ctx.RespondText("Could not find bot.")
 			return
+
 		}
 
 		if slices.Contains(cfg.Snipers.GiveawaySniper.CustomBots, bot.ID) {
@@ -1263,10 +1264,11 @@ func (ConfigCommands) customgiveawaybots(ctx *router.Ctx) {
 			SetDescription(fmt.Sprintf("Added %s to the custom giveaway bots list.", bot.Mention())).
 			Send(ctx)
 	case "rm":
-		bot, ok := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(1))
-		if !ok {
+		bot, err := ctx.Arguments.Get(1).User(router.ArgumentFlagFallbackDefault)
+		if err != nil {
 			_ = ctx.RespondText("Could not find bot.")
 			return
+
 		}
 
 		if !slices.Contains(cfg.Snipers.GiveawaySniper.CustomBots, bot.ID) {

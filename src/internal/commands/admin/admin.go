@@ -106,42 +106,42 @@ func (c *AdminCommands) Register() {
 		{
 			Name:        "renamechannel",
 			Description: "Rename a channel",
-			Arguments:   "renamechannel <channel> <name>",
+			Arguments:   "renamechannel <#channel> <name>",
 			Flags:       []router.CommandFlag{router.CmdFlagDangerous},
 			Handler:     c.renamechannel,
 		},
 		{
 			Name:        "deletechannel",
 			Description: "Delete a channel",
-			Arguments:   "deletechannel <channel>",
+			Arguments:   "deletechannel <#channel>",
 			Flags:       []router.CommandFlag{router.CmdFlagDangerous},
 			Handler:     c.deletechannel,
 		},
 		{
 			Name:        "slowmode",
 			Description: "Change slowmode amount",
-			Arguments:   "slowmode <channel> <seconds>",
+			Arguments:   "slowmode <#channel> <seconds>",
 			Flags:       []router.CommandFlag{router.CmdFlagDangerous},
 			Handler:     c.slowmode,
 		},
 		{
 			Name:        "removeslowmode",
 			Description: "Remove slowmode",
-			Arguments:   "removeslowmode <channel>",
+			Arguments:   "removeslowmode <#channel>",
 			Flags:       []router.CommandFlag{router.CmdFlagDangerous},
 			Handler:     c.removeslowmode,
 		},
 		{
 			Name:        "lockchannel",
 			Description: "Lock a channel",
-			Arguments:   "lockchannel <channel>",
+			Arguments:   "lockchannel <#channel>",
 			Flags:       []router.CommandFlag{router.CmdFlagDangerous},
 			Handler:     c.lockchannel,
 		},
 		{
 			Name:        "unlockchannel",
 			Description: "Unlock a channel",
-			Arguments:   "unlockchannel <channel>",
+			Arguments:   "unlockchannel <#channel>",
 			Flags:       []router.CommandFlag{router.CmdFlagDangerous},
 			Handler:     c.unlockchannel,
 		},
@@ -189,7 +189,7 @@ func (c *AdminCommands) Register() {
 		{
 			Name:        "ackmessage",
 			Description: "Ack a message",
-			Arguments:   "ackmessage <channel> <message id>",
+			Arguments:   "ackmessage <#channel> <message id>",
 			Handler:     c.ackmessage,
 		},
 		{
@@ -1196,9 +1196,10 @@ func (*AdminCommands) webhookdelete(ctx *router.Ctx) {
 // Member Control
 
 func (*AdminCommands) userinfo(ctx *router.Ctx) {
-	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
-	if !success {
-		user = ctx.Message.Author
+	user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
+	if err != nil {
+		ctx.RespondText("Cannot find user")
+		return
 	}
 
 	var member *discordgo.Member

@@ -89,8 +89,8 @@ func (*SharingCommands) sharedusers(ctx *router.Ctx) {
 			AddField("Shared Users", userString).
 			Send(ctx)
 	case "add":
-		user, ok := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(1))
-		if !ok {
+		user, err := ctx.Arguments.Get(1).User(router.ArgumentFlagFallbackDefault)
+		if err != nil {
 			c.services.Embed.NewEmbed().
 				SetDescription("Could not find user.").
 				Send(ctx)
@@ -110,8 +110,8 @@ func (*SharingCommands) sharedusers(ctx *router.Ctx) {
 			SetDescription(fmt.Sprintf("Added %s to the Shared Users list.", user.Mention())).
 			Send(ctx)
 	case "rm":
-		user, ok := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(1))
-		if !ok {
+		user, err := ctx.Arguments.Get(1).User(router.ArgumentFlagFallbackDefault)
+		if err != nil {
 			c.services.Embed.NewEmbed().
 				SetDescription("Could not find user.").
 				Send(ctx)

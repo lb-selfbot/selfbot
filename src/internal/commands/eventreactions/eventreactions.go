@@ -430,8 +430,8 @@ func (e EventReactionsCommands) clearreactions(ctx *router.Ctx) {
 func (e EventReactionsCommands) ignoreuser(ctx *router.Ctx) {
 	switch strings.ToLower(utils.Arguments["<toggle/list/clear>"]) {
 	case "toggle":
-		user, ok := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(1))
-		if !ok {
+		user, err := ctx.Arguments.Get(1).User(router.ArgumentFlagFallbackDefault)
+		if err != nil {
 			c.services.Embed.NewEmbed().
 				SetDescription("Could not find user").
 				Send(ctx)
@@ -702,12 +702,13 @@ func (e EventReactionsCommands) airesponder(ctx *router.Ctx) {
 func (e EventReactionsCommands) copy(ctx *router.Ctx) {
 	switch strings.ToLower(utils.Arguments["<toggle/list/clear>"]) {
 	case "toggle":
-		user, ok := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(1))
-		if !ok {
+		user, err := ctx.Arguments.Get(1).User(router.ArgumentFlagFallbackDefault)
+		if err != nil {
 			c.services.Embed.NewEmbed().
 				SetDescription("Could not find user").
 				Send(ctx)
 			return
+
 		}
 
 		guild, channel, err := e.getGuildOrChannel(ctx, ctx.Arguments.Get(2))
@@ -739,12 +740,13 @@ func (e EventReactionsCommands) copy(ctx *router.Ctx) {
 func (e EventReactionsCommands) replycopy(ctx *router.Ctx) {
 	switch strings.ToLower(utils.Arguments["<toggle/list/clear>"]) {
 	case "toggle":
-		user, ok := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(1))
-		if !ok {
+		user, err := ctx.Arguments.Get(1).User(router.ArgumentFlagFallbackDefault)
+		if err != nil {
 			c.services.Embed.NewEmbed().
 				SetDescription("Could not find user").
 				Send(ctx)
 			return
+
 		}
 
 		guild, channel, err := e.getGuildOrChannel(ctx, ctx.Arguments.Get(2))
@@ -776,12 +778,13 @@ func (e EventReactionsCommands) replycopy(ctx *router.Ctx) {
 func (e EventReactionsCommands) mock(ctx *router.Ctx) {
 	switch strings.ToLower(utils.Arguments["<toggle/list/clear>"]) {
 	case "toggle":
-		user, ok := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(1))
-		if !ok {
+		user, err := ctx.Arguments.Get(1).User(router.ArgumentFlagFallbackDefault)
+		if err != nil {
 			c.services.Embed.NewEmbed().
 				SetDescription("Could not find user").
 				Send(ctx)
 			return
+
 		}
 
 		guild, channel, err := e.getGuildOrChannel(ctx, ctx.Arguments.Get(2))
@@ -813,12 +816,13 @@ func (e EventReactionsCommands) mock(ctx *router.Ctx) {
 func (e EventReactionsCommands) pinspam(ctx *router.Ctx) {
 	switch strings.ToLower(utils.Arguments["<toggle/list/clear>"]) {
 	case "toggle":
-		user, ok := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(1))
-		if !ok {
+		user, err := ctx.Arguments.Get(1).User(router.ArgumentFlagFallbackDefault)
+		if err != nil {
 			c.services.Embed.NewEmbed().
 				SetDescription("Could not find user").
 				Send(ctx)
 			return
+
 		}
 
 		guild, channel, err := e.getGuildOrChannel(ctx, ctx.Arguments.Get(2))
@@ -868,12 +872,13 @@ func (e EventReactionsCommands) unpinspam(ctx *router.Ctx) {
 func (e EventReactionsCommands) reactspam(ctx *router.Ctx) {
 	switch strings.ToLower(utils.Arguments["<toggle/list/clear>"]) {
 	case "toggle":
-		user, ok := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(1))
-		if !ok {
+		user, err := ctx.Arguments.Get(1).User(router.ArgumentFlagFallbackDefault)
+		if err != nil {
 			c.services.Embed.NewEmbed().
 				SetDescription("Could not find user").
 				Send(ctx)
 			return
+
 		}
 
 		arg := strings.ToLower(utils.Arguments["[global/server/channel id]"])
@@ -925,12 +930,13 @@ func (e EventReactionsCommands) reactspam(ctx *router.Ctx) {
 func (e EventReactionsCommands) deletemessages(ctx *router.Ctx) {
 	switch strings.ToLower(utils.Arguments["<toggle/list/clear>"]) {
 	case "toggle":
-		user, ok := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(1))
-		if !ok {
+		user, err := ctx.Arguments.Get(1).User(router.ArgumentFlagFallbackDefault)
+		if err != nil {
 			c.services.Embed.NewEmbed().
 				SetDescription("Could not find user").
 				Send(ctx)
 			return
+
 		}
 
 		guild, channel, err := e.getGuildOrChannel(ctx, ctx.Arguments.Get(2))
@@ -1004,12 +1010,13 @@ func (e EventReactionsCommands) keywordnotifier(ctx *router.Ctx) {
 func (e EventReactionsCommands) removereactions(ctx *router.Ctx) {
 	switch strings.ToLower(utils.Arguments["<toggle/list/clear>"]) {
 	case "toggle":
-		user, ok := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(1))
-		if !ok {
+		user, err := ctx.Arguments.Get(1).User(router.ArgumentFlagFallbackDefault)
+		if err != nil {
 			c.services.Embed.NewEmbed().
 				SetDescription("Could not find user").
 				Send(ctx)
 			return
+
 		}
 
 		guild, channel, err := e.getGuildOrChannel(ctx, ctx.Arguments.Get(2))
@@ -1041,12 +1048,13 @@ func (e EventReactionsCommands) removereactions(ctx *router.Ctx) {
 func (e EventReactionsCommands) forcedisconnect(ctx *router.Ctx) {
 	switch strings.ToLower(utils.Arguments["<toggle/list/clear>"]) {
 	case "toggle":
-		user, ok := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(1))
-		if !ok {
+		user, err := ctx.Arguments.Get(1).User(router.ArgumentFlagFallbackDefault)
+		if err != nil {
 			c.services.Embed.NewEmbed().
 				SetDescription("Could not find user").
 				Send(ctx)
 			return
+
 		}
 
 		guild, channel, err := e.getGuildOrChannel(ctx, ctx.Arguments.Get(2))
@@ -1078,12 +1086,13 @@ func (e EventReactionsCommands) forcedisconnect(ctx *router.Ctx) {
 func (e EventReactionsCommands) forcenick(ctx *router.Ctx) {
 	switch strings.ToLower(utils.Arguments["<toggle/list/clear>"]) {
 	case "toggle":
-		user, ok := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(1))
-		if !ok {
+		user, err := ctx.Arguments.Get(1).User(router.ArgumentFlagFallbackDefault)
+		if err != nil {
 			c.services.Embed.NewEmbed().
 				SetDescription("Could not find user").
 				Send(ctx)
 			return
+
 		}
 
 		guildID := utils.Misc.Or(utils.Arguments["[server id]"], ctx.Message.GuildID)
@@ -1127,12 +1136,13 @@ func (e EventReactionsCommands) forcenick(ctx *router.Ctx) {
 func (e EventReactionsCommands) forcekick(ctx *router.Ctx) {
 	switch strings.ToLower(utils.Arguments["<toggle/list/clear>"]) {
 	case "toggle":
-		user, ok := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(1))
-		if !ok {
+		user, err := ctx.Arguments.Get(1).User(router.ArgumentFlagFallbackDefault)
+		if err != nil {
 			c.services.Embed.NewEmbed().
 				SetDescription("Could not find user").
 				Send(ctx)
 			return
+
 		}
 
 		guildID := utils.Misc.Or(utils.Arguments["[server id]"], ctx.Message.GuildID)
@@ -1174,12 +1184,13 @@ func (e EventReactionsCommands) forcekick(ctx *router.Ctx) {
 func (e EventReactionsCommands) noleave(ctx *router.Ctx) {
 	switch strings.ToLower(utils.Arguments["<toggle/list/clear>"]) {
 	case "toggle":
-		user, ok := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(1))
-		if !ok {
+		user, err := ctx.Arguments.Get(1).User(router.ArgumentFlagFallbackDefault)
+		if err != nil {
 			c.services.Embed.NewEmbed().
 				SetDescription("Could not find user").
 				Send(ctx)
 			return
+
 		}
 
 		relationships := utils.Filter(ctx.Session.State.Relationships, func(r *discordgo.Relationship) bool {
@@ -1714,12 +1725,13 @@ func (EventReactionsCommands) afktriggerusers(ctx *router.Ctx) {
 			AddField("AFK Triggerlist Users", userString).
 			Send(ctx)
 	case "add":
-		user, ok := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(1))
-		if !ok {
+		user, err := ctx.Arguments.Get(1).User(router.ArgumentFlagFallbackDefault)
+		if err != nil {
 			c.services.Embed.NewEmbed().
 				SetDescription("Could not find user.").
 				Send(ctx)
 			return
+
 		}
 
 		if slices.Contains(cfg.AFK.TriggerList.Users, user.ID) {
@@ -1735,12 +1747,13 @@ func (EventReactionsCommands) afktriggerusers(ctx *router.Ctx) {
 			SetDescription(fmt.Sprintf("Added %s to the AFK Triggerlist.", user.Mention())).
 			Send(ctx)
 	case "rm":
-		user, ok := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(1))
-		if !ok {
+		user, err := ctx.Arguments.Get(1).User(router.ArgumentFlagFallbackDefault)
+		if err != nil {
 			c.services.Embed.NewEmbed().
 				SetDescription("Could not find user.").
 				Send(ctx)
 			return
+
 		}
 
 		if !slices.Contains(cfg.AFK.TriggerList.Users, user.ID) {

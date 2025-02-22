@@ -1022,9 +1022,10 @@ func (c *ImageCommands) meme(ctx *router.Ctx) {
 }
 
 func (c *ImageCommands) ytcomment(ctx *router.Ctx) {
-	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
-	if !success {
-		user = ctx.Message.Author
+	user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
+	if err != nil {
+		ctx.RespondText("Cannot find user")
+		return
 	}
 	_ = ctx.RespondText(fmt.Sprintf(
 		"https://some-random-api.com/canvas/youtube-comment?avatar=%s&comment=%s&username=%s",
@@ -1039,113 +1040,127 @@ func (c *ImageCommands) pokemon(ctx *router.Ctx) {
 }
 
 func (c *ImageCommands) wasted(ctx *router.Ctx) {
-	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
-	if !success {
-		user = ctx.Message.Author
+	user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
+	if err != nil {
+		ctx.RespondText("Cannot find user")
+		return
 	}
 	_ = ctx.RespondText(fmt.Sprintf("https://some-random-api.com/canvas/wasted?avatar=%s", url.QueryEscape(user.AvatarURL(""))))
 }
 
 func (c *ImageCommands) triggered(ctx *router.Ctx) {
-	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
-	if !success {
-		user = ctx.Message.Author
+	user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
+	if err != nil {
+		ctx.RespondText("Cannot find user")
+		return
 	}
 	_ = ctx.RespondText(fmt.Sprintf("https://some-random-api.com/canvas/triggered?avatar=%s", url.QueryEscape(user.AvatarURL(""))))
 }
 
 func (c *ImageCommands) glass(ctx *router.Ctx) {
-	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
-	if !success {
-		user = ctx.Message.Author
+	user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
+	if err != nil {
+		ctx.RespondText("Cannot find user")
+		return
 	}
 	_ = ctx.RespondText(fmt.Sprintf("https://some-random-api.com/canvas/glass?avatar=%s", url.QueryEscape(user.AvatarURL(""))))
 }
 
 func (c *ImageCommands) greyscale(ctx *router.Ctx) {
-	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
-	if !success {
-		user = ctx.Message.Author
+	user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
+	if err != nil {
+		ctx.RespondText("Cannot find user")
+		return
 	}
 	_ = ctx.RespondText(fmt.Sprintf("https://some-random-api.com/canvas/greyscale?avatar=%s", url.QueryEscape(user.AvatarURL(""))))
 }
 
 func (c *ImageCommands) invert(ctx *router.Ctx) {
-	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
-	if !success {
-		user = ctx.Message.Author
+	user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
+	if err != nil {
+		ctx.RespondText("Cannot find user")
+		return
 	}
 	_ = ctx.RespondText(fmt.Sprintf("https://some-random-api.com/canvas/invert?avatar=%s", url.QueryEscape(user.AvatarURL(""))))
 }
 
 func (c *ImageCommands) invertgreyscale(ctx *router.Ctx) {
-	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
-	if !success {
-		user = ctx.Message.Author
+	user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
+	if err != nil {
+		ctx.RespondText("Cannot find user")
+		return
 	}
 	_ = ctx.RespondText(fmt.Sprintf("https://some-random-api.com/canvas/invertgreyscale?avatar=%s", url.QueryEscape(user.AvatarURL(""))))
 }
 
 func (c *ImageCommands) brightness(ctx *router.Ctx) {
-	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
-	if !success {
-		user = ctx.Message.Author
+	user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
+	if err != nil {
+		ctx.RespondText("Cannot find user")
+		return
 	}
 	_ = ctx.RespondText(fmt.Sprintf("https://some-random-api.com/canvas/brightness?avatar=%s", url.QueryEscape(user.AvatarURL(""))))
 }
 
 func (c *ImageCommands) red(ctx *router.Ctx) {
-	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
-	if !success {
-		user = ctx.Message.Author
+	user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
+	if err != nil {
+		ctx.RespondText("Cannot find user")
+		return
 	}
 	_ = ctx.RespondText(fmt.Sprintf("https://some-random-api.com/canvas/red?avatar=%s", url.QueryEscape(user.AvatarURL(""))))
 }
 
 func (c *ImageCommands) green(ctx *router.Ctx) {
-	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
-	if !success {
-		user = ctx.Message.Author
+	user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
+	if err != nil {
+		ctx.RespondText("Cannot find user")
+		return
 	}
 	_ = ctx.RespondText(fmt.Sprintf("https://some-random-api.com/canvas/green?avatar=%s", url.QueryEscape(user.AvatarURL(""))))
 }
 
 func (c *ImageCommands) blue(ctx *router.Ctx) {
-	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
-	if !success {
-		user = ctx.Message.Author
+	user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
+	if err != nil {
+		ctx.RespondText("Cannot find user")
+		return
 	}
 	_ = ctx.RespondText(fmt.Sprintf("https://some-random-api.com/canvas/blue?avatar=%s", url.QueryEscape(user.AvatarURL(""))))
 }
 
 func (c *ImageCommands) pixelate(ctx *router.Ctx) {
-	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
-	if !success {
-		user = ctx.Message.Author
+	user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
+	if err != nil {
+		ctx.RespondText("Cannot find user")
+		return
 	}
 	_ = ctx.RespondText(fmt.Sprintf("https://some-random-api.com/canvas/pixelate?avatar=%s", url.QueryEscape(user.AvatarURL(""))))
 }
 
 func (c *ImageCommands) comrade(ctx *router.Ctx) {
-	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
-	if !success {
-		user = ctx.Message.Author
+	user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
+	if err != nil {
+		ctx.RespondText("Cannot find user")
+		return
 	}
 	_ = ctx.RespondText(fmt.Sprintf("https://some-random-api.com/canvas/comrade?avatar=%s", url.QueryEscape(user.AvatarURL(""))))
 }
 
 func (c *ImageCommands) missionpassed(ctx *router.Ctx) {
-	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
-	if !success {
-		user = ctx.Message.Author
+	user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
+	if err != nil {
+		ctx.RespondText("Cannot find user")
+		return
 	}
 	_ = ctx.RespondText(fmt.Sprintf("https://some-random-api.com/canvas/passed?avatar=%s", url.QueryEscape(user.AvatarURL(""))))
 }
 
 func (c *ImageCommands) jail(ctx *router.Ctx) {
-	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
-	if !success {
-		user = ctx.Message.Author
+	user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
+	if err != nil {
+		ctx.RespondText("Cannot find user")
+		return
 	}
 	_ = ctx.RespondText(fmt.Sprintf("https://some-random-api.com/canvas/jail?avatar=%s", url.QueryEscape(user.AvatarURL(""))))
 }
@@ -1155,33 +1170,37 @@ func (c *ImageCommands) nobitches(ctx *router.Ctx) {
 }
 
 func (c *ImageCommands) threshold(ctx *router.Ctx) {
-	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
-	if !success {
-		user = ctx.Message.Author
+	user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
+	if err != nil {
+		ctx.RespondText("Cannot find user")
+		return
 	}
 	_ = ctx.RespondText(fmt.Sprintf("https://some-random-api.com/canvas/threshold?avatar=%s", url.QueryEscape(user.AvatarURL(""))))
 }
 
 func (c *ImageCommands) blurple(ctx *router.Ctx) {
-	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
-	if !success {
-		user = ctx.Message.Author
+	user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
+	if err != nil {
+		ctx.RespondText("Cannot find user")
+		return
 	}
 	_ = ctx.RespondText(fmt.Sprintf("https://some-random-api.com/canvas/blurple?avatar=%s", url.QueryEscape(user.AvatarURL(""))))
 }
 
 func (c *ImageCommands) blurple2(ctx *router.Ctx) {
-	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
-	if !success {
-		user = ctx.Message.Author
+	user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
+	if err != nil {
+		ctx.RespondText("Cannot find user")
+		return
 	}
 	_ = ctx.RespondText(fmt.Sprintf("https://some-random-api.com/canvas/blurple2?avatar=%s", url.QueryEscape(user.AvatarURL(""))))
 }
 
 func (c *ImageCommands) color(ctx *router.Ctx) {
-	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
-	if !success {
-		user = ctx.Message.Author
+	user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
+	if err != nil {
+		ctx.RespondText("Cannot find user")
+		return
 	}
 	_ = ctx.RespondText(fmt.Sprintf("https://some-random-api.com/canvas/color?avatar=%s&color=%s",
 		url.QueryEscape(user.AvatarURL("")),
@@ -1190,9 +1209,10 @@ func (c *ImageCommands) color(ctx *router.Ctx) {
 }
 
 func (c *ImageCommands) sostupid(ctx *router.Ctx) {
-	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
-	if !success {
-		user = ctx.Message.Author
+	user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
+	if err != nil {
+		ctx.RespondText("Cannot find user")
+		return
 	}
 	_ = ctx.RespondText(fmt.Sprintf("https://some-random-api.com/canvas/its-so-stupid?avatar=%s&dog=%s",
 		url.QueryEscape(user.AvatarURL("")),
@@ -1201,65 +1221,73 @@ func (c *ImageCommands) sostupid(ctx *router.Ctx) {
 }
 
 func (c *ImageCommands) simpcard(ctx *router.Ctx) {
-	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
-	if !success {
-		user = ctx.Message.Author
+	user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
+	if err != nil {
+		ctx.RespondText("Cannot find user")
+		return
 	}
 	_ = ctx.RespondText(fmt.Sprintf("https://some-random-api.com/canvas/simpcard?avatar=%s", url.QueryEscape(user.AvatarURL(""))))
 }
 
 func (c *ImageCommands) horny(ctx *router.Ctx) {
-	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
-	if !success {
-		user = ctx.Message.Author
+	user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
+	if err != nil {
+		ctx.RespondText("Cannot find user")
+		return
 	}
 	_ = ctx.RespondText(fmt.Sprintf("https://some-random-api.com/canvas/horny?avatar=%s", url.QueryEscape(user.AvatarURL(""))))
 }
 
 func (c *ImageCommands) lgbt(ctx *router.Ctx) {
-	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
-	if !success {
-		user = ctx.Message.Author
+	user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
+	if err != nil {
+		ctx.RespondText("Cannot find user")
+		return
 	}
 	_ = ctx.RespondText(fmt.Sprintf("https://some-random-api.com/canvas/lgbt?avatar=%s", url.QueryEscape(user.AvatarURL(""))))
 }
 
 func (c *ImageCommands) pansexual(ctx *router.Ctx) {
-	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
-	if !success {
-		user = ctx.Message.Author
+	user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
+	if err != nil {
+		ctx.RespondText("Cannot find user")
+		return
 	}
 	_ = ctx.RespondText(fmt.Sprintf("https://some-random-api.com/canvas/pansexual?avatar=%s", url.QueryEscape(user.AvatarURL(""))))
 }
 
 func (c *ImageCommands) nonbinary(ctx *router.Ctx) {
-	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
-	if !success {
-		user = ctx.Message.Author
+	user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
+	if err != nil {
+		ctx.RespondText("Cannot find user")
+		return
 	}
 	_ = ctx.RespondText(fmt.Sprintf("https://some-random-api.com/canvas/nonbinary?avatar=%s", url.QueryEscape(user.AvatarURL(""))))
 }
 
 func (c *ImageCommands) lesbian(ctx *router.Ctx) {
-	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
-	if !success {
-		user = ctx.Message.Author
+	user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
+	if err != nil {
+		ctx.RespondText("Cannot find user")
+		return
 	}
 	_ = ctx.RespondText(fmt.Sprintf("https://some-random-api.com/canvas/lesbian?avatar=%s", url.QueryEscape(user.AvatarURL(""))))
 }
 
 func (c *ImageCommands) bisexual(ctx *router.Ctx) {
-	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
-	if !success {
-		user = ctx.Message.Author
+	user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
+	if err != nil {
+		ctx.RespondText("Cannot find user")
+		return
 	}
 	_ = ctx.RespondText(fmt.Sprintf("https://some-random-api.com/canvas/bisexual?avatar=%s", url.QueryEscape(user.AvatarURL(""))))
 }
 
 func (c *ImageCommands) trans(ctx *router.Ctx) {
-	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
-	if !success {
-		user = ctx.Message.Author
+	user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
+	if err != nil {
+		ctx.RespondText("Cannot find user")
+		return
 	}
 	_ = ctx.RespondText(fmt.Sprintf("https://some-random-api.com/canvas/transgender?avatar=%s", url.QueryEscape(user.AvatarURL(""))))
 }
@@ -1273,9 +1301,10 @@ func (c *ImageCommands) oogway2(ctx *router.Ctx) {
 }
 
 func (c *ImageCommands) threat(ctx *router.Ctx) {
-	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
-	if !success {
-		user = ctx.Message.Author
+	user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
+	if err != nil {
+		ctx.RespondText("Cannot find user")
+		return
 	}
 	jsonResult, err := http.GetJson(fmt.Sprintf("https://nekobot.xyz/api/imagegen?type=threats&url=%s", url.QueryEscape(user.AvatarURL(""))))
 	if err != nil {
@@ -1295,13 +1324,15 @@ func (c *ImageCommands) clyde(ctx *router.Ctx) {
 }
 
 func (c *ImageCommands) distractedbf(ctx *router.Ctx) {
-	user1, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
-	if !success {
-		user1 = ctx.Message.Author
+	user1, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
+	if err != nil {
+		ctx.RespondText("Cannot find user")
+		return
 	}
-	user2, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(1))
-	if !success {
-		user2 = ctx.Message.Author
+	user2, err := ctx.Arguments.Get(1).User(router.ArgumentFlagFallbackDefault)
+	if err != nil {
+		ctx.RespondText("Cannot find user")
+		return
 	}
 	jsonResult, err := http.GetJson(fmt.Sprintf("https://nekobot.xyz/api/imagegen?type=ship&user1=%s&user2=%s", url.QueryEscape(user1.AvatarURL("")), url.QueryEscape(user2.AvatarURL(""))))
 	if err != nil {
@@ -1312,9 +1343,10 @@ func (c *ImageCommands) distractedbf(ctx *router.Ctx) {
 }
 
 func (c *ImageCommands) captcha(ctx *router.Ctx) {
-	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
-	if !success {
-		user = ctx.Message.Author
+	user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
+	if err != nil {
+		ctx.RespondText("Cannot find user")
+		return
 	}
 	jsonResult, err := http.GetJson(fmt.Sprintf("https://nekobot.xyz/api/imagegen?type=captcha&url=%s&username=%s",
 		url.QueryEscape(user.AvatarURL("")),
@@ -1328,13 +1360,15 @@ func (c *ImageCommands) captcha(ctx *router.Ctx) {
 }
 
 func (c *ImageCommands) whowouldwin(ctx *router.Ctx) {
-	user1, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
-	if !success {
-		user1 = ctx.Message.Author
+	user1, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
+	if err != nil {
+		ctx.RespondText("Cannot find user")
+		return
 	}
-	user2, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(1))
-	if !success {
-		user2 = ctx.Message.Author
+	user2, err := ctx.Arguments.Get(1).User(router.ArgumentFlagFallbackDefault)
+	if err != nil {
+		ctx.RespondText("Cannot find user")
+		return
 	}
 	jsonResult, err := http.GetJson(fmt.Sprintf("https://nekobot.xyz/api/imagegen?type=whowouldwin&user1=%s&user2=%s", url.QueryEscape(user1.AvatarURL("")), url.QueryEscape(user2.AvatarURL(""))))
 	if err != nil {
@@ -1354,9 +1388,10 @@ func (c *ImageCommands) changemymind(ctx *router.Ctx) {
 }
 
 func (c *ImageCommands) jpeg(ctx *router.Ctx) {
-	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
-	if !success {
-		user = ctx.Message.Author
+	user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
+	if err != nil {
+		ctx.RespondText("Cannot find user")
+		return
 	}
 	jsonResult, err := http.GetJson(fmt.Sprintf("https://nekobot.xyz/api/imagegen?type=jpeg&url=%s", url.QueryEscape(user.AvatarURL(""))))
 	if err != nil {
@@ -1367,9 +1402,10 @@ func (c *ImageCommands) jpeg(ctx *router.Ctx) {
 }
 
 func (c *ImageCommands) lolice(ctx *router.Ctx) {
-	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
-	if !success {
-		user = ctx.Message.Author
+	user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
+	if err != nil {
+		ctx.RespondText("Cannot find user")
+		return
 	}
 	jsonResult, err := http.GetJson(fmt.Sprintf("https://nekobot.xyz/api/imagegen?type=lolice&url=%s", url.QueryEscape(user.AvatarURL(""))))
 	if err != nil {
@@ -1389,9 +1425,10 @@ func (c *ImageCommands) kannagen(ctx *router.Ctx) {
 }
 
 func (c *ImageCommands) iphonex(ctx *router.Ctx) {
-	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
-	if !success {
-		user = ctx.Message.Author
+	user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
+	if err != nil {
+		ctx.RespondText("Cannot find user")
+		return
 	}
 	jsonResult, err := http.GetJson(fmt.Sprintf("https://nekobot.xyz/api/imagegen?type=iphonex&url=%s", url.QueryEscape(user.AvatarURL(""))))
 	if err != nil {
@@ -1402,9 +1439,10 @@ func (c *ImageCommands) iphonex(ctx *router.Ctx) {
 }
 
 func (c *ImageCommands) awooify(ctx *router.Ctx) {
-	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
-	if !success {
-		user = ctx.Message.Author
+	user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
+	if err != nil {
+		ctx.RespondText("Cannot find user")
+		return
 	}
 	jsonResult, err := http.GetJson(fmt.Sprintf("https://nekobot.xyz/api/imagegen?type=awooify&url=%s", url.QueryEscape(user.AvatarURL(""))))
 	if err != nil {
@@ -1415,9 +1453,10 @@ func (c *ImageCommands) awooify(ctx *router.Ctx) {
 }
 
 func (c *ImageCommands) trap(ctx *router.Ctx) {
-	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
-	if !success {
-		user = ctx.Message.Author
+	user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
+	if err != nil {
+		ctx.RespondText("Cannot find user")
+		return
 	}
 	jsonResult, err := http.GetJson(fmt.Sprintf("https://nekobot.xyz/api/imagegen?type=trap&image=%s&name=%s&author=%s",
 		url.QueryEscape(user.AvatarURL("")),
@@ -1441,9 +1480,10 @@ func (c *ImageCommands) trumptweet(ctx *router.Ctx) {
 }
 
 func (c *ImageCommands) deepfry(ctx *router.Ctx) {
-	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
-	if !success {
-		user = ctx.Message.Author
+	user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
+	if err != nil {
+		ctx.RespondText("Cannot find user")
+		return
 	}
 	jsonResult, err := http.GetJson(fmt.Sprintf("https://nekobot.xyz/api/imagegen?type=deepfry&image=%s", url.QueryEscape(user.AvatarURL(""))))
 	if err != nil {
@@ -1454,9 +1494,10 @@ func (c *ImageCommands) deepfry(ctx *router.Ctx) {
 }
 
 func (c *ImageCommands) blurpify(ctx *router.Ctx) {
-	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
-	if !success {
-		user = ctx.Message.Author
+	user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
+	if err != nil {
+		ctx.RespondText("Cannot find user")
+		return
 	}
 	jsonResult, err := http.GetJson(fmt.Sprintf("https://nekobot.xyz/api/imagegen?type=blurpify&image=%s", url.QueryEscape(user.AvatarURL(""))))
 	if err != nil {
@@ -1467,9 +1508,10 @@ func (c *ImageCommands) blurpify(ctx *router.Ctx) {
 }
 
 func (c *ImageCommands) phcomment(ctx *router.Ctx) {
-	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
-	if !success {
-		user = ctx.Message.Author
+	user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
+	if err != nil {
+		ctx.RespondText("Cannot find user")
+		return
 	}
 	jsonResult, err := http.GetJson(fmt.Sprintf("https://nekobot.xyz/api/imagegen?type=phcomment&text=%s&username=%s&image=%s",
 		url.QueryEscape(ctx.Arguments.RawFrom(1)),
@@ -1493,9 +1535,10 @@ func (c *ImageCommands) fact(ctx *router.Ctx) {
 }
 
 func (c *ImageCommands) trash(ctx *router.Ctx) {
-	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
-	if !success {
-		user = ctx.Message.Author
+	user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
+	if err != nil {
+		ctx.RespondText("Cannot find user")
+		return
 	}
 	jsonResult, err := http.GetJson(fmt.Sprintf("https://nekobot.xyz/api/imagegen?type=trash&url=%s", url.QueryEscape(user.AvatarURL(""))))
 	if err != nil {
@@ -1506,9 +1549,10 @@ func (c *ImageCommands) trash(ctx *router.Ctx) {
 }
 
 func (c *ImageCommands) stickbug(ctx *router.Ctx) {
-	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
-	if !success {
-		user = ctx.Message.Author
+	user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
+	if err != nil {
+		ctx.RespondText("Cannot find user")
+		return
 	}
 	jsonResult, err := http.GetJson(fmt.Sprintf("https://nekobot.xyz/api/imagegen?type=stickbug&url=%s", url.QueryEscape(user.AvatarURL(""))))
 	if err != nil {
@@ -1519,9 +1563,10 @@ func (c *ImageCommands) stickbug(ctx *router.Ctx) {
 }
 
 func (c *ImageCommands) magik(ctx *router.Ctx) {
-	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
-	if !success {
-		user = ctx.Message.Author
+	user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
+	if err != nil {
+		ctx.RespondText("Cannot find user")
+		return
 	}
 	jsonResult, err := http.GetJson(fmt.Sprintf("https://nekobot.xyz/api/imagegen?type=magik&image=%s&intensity=5", url.QueryEscape(user.AvatarURL(""))))
 	if err != nil {
@@ -1755,13 +1800,15 @@ func (c *ImageCommands) capybara(ctx *router.Ctx) {
 }
 
 func (c *ImageCommands) bed(ctx *router.Ctx) {
-	user1, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
-	if !success {
-		user1 = ctx.Message.Author
+	user1, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
+	if err != nil {
+		ctx.RespondText("Cannot find user")
+		return
 	}
-	user2, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(1))
-	if !success {
-		user2 = ctx.Message.Author
+	user2, err := ctx.Arguments.Get(1).User(router.ArgumentFlagFallbackDefault)
+	if err != nil {
+		ctx.RespondText("Cannot find user")
+		return
 	}
 	err := utils.Discord.SendFileFromURL(
 		ctx,
@@ -1805,9 +1852,10 @@ func (c *ImageCommands) abandon(ctx *router.Ctx) {
 }
 
 func (c *ImageCommands) aborted(ctx *router.Ctx) {
-	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
-	if !success {
-		user = ctx.Message.Author
+	user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
+	if err != nil {
+		ctx.RespondText("Cannot find user")
+		return
 	}
 	err := utils.Discord.SendFileFromURL(
 		ctx,
@@ -1823,9 +1871,10 @@ func (c *ImageCommands) aborted(ctx *router.Ctx) {
 }
 
 func (c *ImageCommands) affect(ctx *router.Ctx) {
-	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
-	if !success {
-		user = ctx.Message.Author
+	user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
+	if err != nil {
+		ctx.RespondText("Cannot find user")
+		return
 	}
 	err := utils.Discord.SendFileFromURL(
 		ctx,
@@ -1841,9 +1890,10 @@ func (c *ImageCommands) affect(ctx *router.Ctx) {
 }
 
 func (c *ImageCommands) airpods(ctx *router.Ctx) {
-	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
-	if !success {
-		user = ctx.Message.Author
+	user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
+	if err != nil {
+		ctx.RespondText("Cannot find user")
+		return
 	}
 	err := utils.Discord.SendFileFromURL(
 		ctx,
@@ -1859,9 +1909,10 @@ func (c *ImageCommands) airpods(ctx *router.Ctx) {
 }
 
 func (c *ImageCommands) america(ctx *router.Ctx) {
-	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
-	if !success {
-		user = ctx.Message.Author
+	user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
+	if err != nil {
+		ctx.RespondText("Cannot find user")
+		return
 	}
 	err := utils.Discord.SendFileFromURL(
 		ctx,
@@ -1891,9 +1942,10 @@ func (c *ImageCommands) armor(ctx *router.Ctx) {
 }
 
 func (c *ImageCommands) bongocat(ctx *router.Ctx) {
-	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
-	if !success {
-		user = ctx.Message.Author
+	user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
+	if err != nil {
+		ctx.RespondText("Cannot find user")
+		return
 	}
 	err := utils.Discord.SendFileFromURL(
 		ctx,
@@ -1940,9 +1992,10 @@ func (c *ImageCommands) bigbrain(ctx *router.Ctx) {
 }
 
 func (c *ImageCommands) brazzers(ctx *router.Ctx) {
-	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
-	if !success {
-		user = ctx.Message.Author
+	user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
+	if err != nil {
+		ctx.RespondText("Cannot find user")
+		return
 	}
 	err := utils.Discord.SendFileFromURL(
 		ctx,
@@ -1959,9 +2012,10 @@ func (c *ImageCommands) brazzers(ctx *router.Ctx) {
 }
 
 func (c *ImageCommands) byemom(ctx *router.Ctx) {
-	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
-	if !success {
-		user = ctx.Message.Author
+	user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
+	if err != nil {
+		ctx.RespondText("Cannot find user")
+		return
 	}
 	err := utils.Discord.SendFileFromURL(
 		ctx,
@@ -1979,9 +2033,10 @@ func (c *ImageCommands) byemom(ctx *router.Ctx) {
 }
 
 func (c *ImageCommands) cancer(ctx *router.Ctx) {
-	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
-	if !success {
-		user = ctx.Message.Author
+	user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
+	if err != nil {
+		ctx.RespondText("Cannot find user")
+		return
 	}
 	err := utils.Discord.SendFileFromURL(
 		ctx,
@@ -2025,9 +2080,10 @@ func (c *ImageCommands) citation(ctx *router.Ctx) {
 }
 
 func (c *ImageCommands) communism(ctx *router.Ctx) {
-	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
-	if !success {
-		user = ctx.Message.Author
+	user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
+	if err != nil {
+		ctx.RespondText("Cannot find user")
+		return
 	}
 	err := utils.Discord.SendFileFromURL(
 		ctx,
@@ -2057,9 +2113,10 @@ func (c *ImageCommands) confusedcat(ctx *router.Ctx) {
 }
 
 func (c *ImageCommands) corporate(ctx *router.Ctx) {
-	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
-	if !success {
-		user = ctx.Message.Author
+	user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
+	if err != nil {
+		ctx.RespondText("Cannot find user")
+		return
 	}
 	err := utils.Discord.SendFileFromURL(
 		ctx,
@@ -2089,9 +2146,10 @@ func (c *ImageCommands) cry(ctx *router.Ctx) {
 }
 
 func (c *ImageCommands) dab(ctx *router.Ctx) {
-	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
-	if !success {
-		user = ctx.Message.Author
+	user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
+	if err != nil {
+		ctx.RespondText("Cannot find user")
+		return
 	}
 	err := utils.Discord.SendFileFromURL(
 		ctx,
@@ -2107,9 +2165,10 @@ func (c *ImageCommands) dab(ctx *router.Ctx) {
 }
 
 func (c *ImageCommands) dank(ctx *router.Ctx) {
-	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
-	if !success {
-		user = ctx.Message.Author
+	user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
+	if err != nil {
+		ctx.RespondText("Cannot find user")
+		return
 	}
 	err := utils.Discord.SendFileFromURL(
 		ctx,
@@ -2125,9 +2184,10 @@ func (c *ImageCommands) dank(ctx *router.Ctx) {
 }
 
 func (c *ImageCommands) delete(ctx *router.Ctx) {
-	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
-	if !success {
-		user = ctx.Message.Author
+	user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
+	if err != nil {
+		ctx.RespondText("Cannot find user")
+		return
 	}
 	err := utils.Discord.SendFileFromURL(
 		ctx,
@@ -2143,9 +2203,10 @@ func (c *ImageCommands) delete(ctx *router.Ctx) {
 }
 
 func (c *ImageCommands) disability(ctx *router.Ctx) {
-	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
-	if !success {
-		user = ctx.Message.Author
+	user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
+	if err != nil {
+		ctx.RespondText("Cannot find user")
+		return
 	}
 	err := utils.Discord.SendFileFromURL(
 		ctx,
@@ -2175,9 +2236,10 @@ func (c *ImageCommands) doglemon(ctx *router.Ctx) {
 }
 
 func (c *ImageCommands) door(ctx *router.Ctx) {
-	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
-	if !success {
-		user = ctx.Message.Author
+	user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
+	if err != nil {
+		ctx.RespondText("Cannot find user")
+		return
 	}
 	err := utils.Discord.SendFileFromURL(
 		ctx,
@@ -2193,9 +2255,10 @@ func (c *ImageCommands) door(ctx *router.Ctx) {
 }
 
 func (c *ImageCommands) egg(ctx *router.Ctx) {
-	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
-	if !success {
-		user = ctx.Message.Author
+	user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
+	if err != nil {
+		ctx.RespondText("Cannot find user")
+		return
 	}
 	err := utils.Discord.SendFileFromURL(
 		ctx,
@@ -2292,17 +2355,19 @@ func (c *ImageCommands) achievement(ctx *router.Ctx) {
 }
 
 func (c *ImageCommands) amiajoke(ctx *router.Ctx) {
-	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
-	if !success {
-		user = ctx.Message.Author
+	user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
+	if err != nil {
+		ctx.RespondText("Cannot find user")
+		return
 	}
 	_ = ctx.RespondText(fmt.Sprintf("https://api.lightning-bot.com/api/v3/imagegen/amiajoke?url=%s", url.QueryEscape(user.AvatarURL(""))))
 }
 
 func (c *ImageCommands) bad(ctx *router.Ctx) {
-	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
-	if !success {
-		user = ctx.Message.Author
+	user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
+	if err != nil {
+		ctx.RespondText("Cannot find user")
+		return
 	}
 	_ = ctx.RespondText(fmt.Sprintf("https://api.lightning-bot.com/api/v3/imagegen/bad?url=%s", url.QueryEscape(user.AvatarURL(""))))
 }
@@ -2340,41 +2405,46 @@ func (c *ImageCommands) facts(ctx *router.Ctx) {
 }
 
 func (c *ImageCommands) blur(ctx *router.Ctx) {
-	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
-	if !success {
-		user = ctx.Message.Author
+	user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
+	if err != nil {
+		ctx.RespondText("Cannot find user")
+		return
 	}
 	_ = ctx.RespondText(fmt.Sprintf("https://api.lightning-bot.com/api/v3/imagegen/filter?url=%s&filter=blur", url.QueryEscape(user.AvatarURL(""))))
 }
 
 func (c *ImageCommands) flipav(ctx *router.Ctx) {
-	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
-	if !success {
-		user = ctx.Message.Author
+	user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
+	if err != nil {
+		ctx.RespondText("Cannot find user")
+		return
 	}
 	_ = ctx.RespondText(fmt.Sprintf("https://api.lightning-bot.com/api/v3/imagegen/filter?url=%s&filter=flip", url.QueryEscape(user.AvatarURL(""))))
 }
 
 func (c *ImageCommands) mirror(ctx *router.Ctx) {
-	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
-	if !success {
-		user = ctx.Message.Author
+	user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
+	if err != nil {
+		ctx.RespondText("Cannot find user")
+		return
 	}
 	_ = ctx.RespondText(fmt.Sprintf("https://api.lightning-bot.com/api/v3/imagegen/filter?url=%s&filter=mirror", url.QueryEscape(user.AvatarURL(""))))
 }
 
 func (c *ImageCommands) wide(ctx *router.Ctx) {
-	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
-	if !success {
-		user = ctx.Message.Author
+	user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
+	if err != nil {
+		ctx.RespondText("Cannot find user")
+		return
 	}
 	_ = ctx.RespondText(fmt.Sprintf("https://api.lightning-bot.com/api/v3/imagegen/filter?url=%s&filter=wide", url.QueryEscape(user.AvatarURL(""))))
 }
 
 func (c *ImageCommands) sepia(ctx *router.Ctx) {
-	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
-	if !success {
-		user = ctx.Message.Author
+	user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
+	if err != nil {
+		ctx.RespondText("Cannot find user")
+		return
 	}
 	_ = ctx.RespondText(fmt.Sprintf("https://api.lightning-bot.com/api/v3/imagegen/filter?url=%s&filter=sepia", url.QueryEscape(user.AvatarURL(""))))
 }
@@ -2384,25 +2454,28 @@ func (c *ImageCommands) recaptcha(ctx *router.Ctx) {
 }
 
 func (c *ImageCommands) gay(ctx *router.Ctx) {
-	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
-	if !success {
-		user = ctx.Message.Author
+	user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
+	if err != nil {
+		ctx.RespondText("Cannot find user")
+		return
 	}
 	_ = ctx.RespondText(fmt.Sprintf("https://api.lightning-bot.com/api/v3/imagegen/filter?url=%s&filter=gay", url.QueryEscape(user.AvatarURL(""))))
 }
 
 func (c *ImageCommands) communist(ctx *router.Ctx) {
-	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
-	if !success {
-		user = ctx.Message.Author
+	user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
+	if err != nil {
+		ctx.RespondText("Cannot find user")
+		return
 	}
 	_ = ctx.RespondText(fmt.Sprintf("https://api.lightning-bot.com/api/v3/imagegen/filter?url=%s&filter=communist", url.QueryEscape(user.AvatarURL(""))))
 }
 
 func (c *ImageCommands) snow(ctx *router.Ctx) {
-	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
-	if !success {
-		user = ctx.Message.Author
+	user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
+	if err != nil {
+		ctx.RespondText("Cannot find user")
+		return
 	}
 	_ = ctx.RespondText(fmt.Sprintf("https://api.lightning-bot.com/api/v3/imagegen/filter?url=%s&filter=snow", url.QueryEscape(user.AvatarURL(""))))
 }
@@ -2416,9 +2489,10 @@ func (c *ImageCommands) hub(ctx *router.Ctx) {
 }
 
 func (c *ImageCommands) floor(ctx *router.Ctx) {
-	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
-	if !success {
-		user = ctx.Message.Author
+	user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
+	if err != nil {
+		ctx.RespondText("Cannot find user")
+		return
 	}
 	_ = ctx.RespondText(fmt.Sprintf("https://api.lightning-bot.com/api/v3/imagegen/floor?url=%s&text=%s",
 		url.QueryEscape(user.AvatarURL("")),
@@ -2427,17 +2501,19 @@ func (c *ImageCommands) floor(ctx *router.Ctx) {
 }
 
 func (c *ImageCommands) jokeoverhead(ctx *router.Ctx) {
-	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
-	if !success {
-		user = ctx.Message.Author
+	user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
+	if err != nil {
+		ctx.RespondText("Cannot find user")
+		return
 	}
 	_ = ctx.RespondText(fmt.Sprintf("https://api.lightning-bot.com/api/v3/imagegen/jokeoverhead?url=%s", url.QueryEscape(user.AvatarURL(""))))
 }
 
 func (c *ImageCommands) throwaway(ctx *router.Ctx) {
-	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
-	if !success {
-		user = ctx.Message.Author
+	user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
+	if err != nil {
+		ctx.RespondText("Cannot find user")
+		return
 	}
 	_ = ctx.RespondText(fmt.Sprintf("https://api.lightning-bot.com/api/v3/imagegen/trash?url=%s&trash_url=%s",
 		url.QueryEscape(user.AvatarURL("")),
@@ -2446,9 +2522,10 @@ func (c *ImageCommands) throwaway(ctx *router.Ctx) {
 }
 
 func (c *ImageCommands) salty(ctx *router.Ctx) {
-	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
-	if !success {
-		user = ctx.Message.Author
+	user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
+	if err != nil {
+		ctx.RespondText("Cannot find user")
+		return
 	}
 	_ = ctx.RespondText(fmt.Sprintf("https://api.lightning-bot.com/api/v3/imagegen/salty?url=%s", url.QueryEscape(user.AvatarURL(""))))
 }
@@ -2458,21 +2535,24 @@ func (c *ImageCommands) scroll(ctx *router.Ctx) {
 }
 
 func (c *ImageCommands) shame(ctx *router.Ctx) {
-	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
-	if !success {
-		user = ctx.Message.Author
+	user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
+	if err != nil {
+		ctx.RespondText("Cannot find user")
+		return
 	}
 	_ = ctx.RespondText(fmt.Sprintf("https://api.lightning-bot.com/api/v3/imagegen/shame?url=%s", url.QueryEscape(user.AvatarURL(""))))
 }
 
 func (c *ImageCommands) ship(ctx *router.Ctx) {
-	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
-	if !success {
-		user = ctx.Message.Author
+	user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
+	if err != nil {
+		ctx.RespondText("Cannot find user")
+		return
 	}
-	user2, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(1))
-	if !success {
-		user2 = ctx.Message.Author
+	user2, err := ctx.Arguments.Get(1).User(router.ArgumentFlagFallbackDefault)
+	if err != nil {
+		ctx.RespondText("Cannot find user")
+		return
 	}
 	_ = ctx.RespondText(fmt.Sprintf(
 		"https://api.lightning-bot.com/api/v3/imagegen/ship?url1=%s&url2=%s",
@@ -2482,29 +2562,33 @@ func (c *ImageCommands) ship(ctx *router.Ctx) {
 }
 
 func (c *ImageCommands) what(ctx *router.Ctx) {
-	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
-	if !success {
-		user = ctx.Message.Author
+	user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
+	if err != nil {
+		ctx.RespondText("Cannot find user")
+		return
 	}
 	_ = ctx.RespondText(fmt.Sprintf("https://api.lightning-bot.com/api/v3/imagegen/what?url=%s", url.QueryEscape(user.AvatarURL(""))))
 }
 
 func (c *ImageCommands) adios(ctx *router.Ctx) {
-	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
-	if !success {
-		user = ctx.Message.Author
+	user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
+	if err != nil {
+		ctx.RespondText("Cannot find user")
+		return
 	}
 	_ = ctx.RespondText(fmt.Sprintf("https://vacefron.nl/api/adios?user=%s", url.QueryEscape(user.AvatarURL(""))))
 }
 
 func (c *ImageCommands) batmanslap(ctx *router.Ctx) {
-	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
-	if !success {
-		user = ctx.Message.Author
+	user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
+	if err != nil {
+		ctx.RespondText("Cannot find user")
+		return
 	}
-	user2, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(1))
-	if !success {
-		user2 = ctx.Message.Author
+	user2, err := ctx.Arguments.Get(1).User(router.ArgumentFlagFallbackDefault)
+	if err != nil {
+		ctx.RespondText("Cannot find user")
+		return
 	}
 	_ = ctx.RespondText(fmt.Sprintf(
 		"https://vacefron.nl/api/batmanslap?text1=%s&text2=%s&batman=%s&robin=%s",
@@ -2520,9 +2604,10 @@ func (c *ImageCommands) carreverse(ctx *router.Ctx) {
 }
 
 func (c *ImageCommands) drip(ctx *router.Ctx) {
-	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
-	if !success {
-		user = ctx.Message.Author
+	user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
+	if err != nil {
+		ctx.RespondText("Cannot find user")
+		return
 	}
 	_ = ctx.RespondText(fmt.Sprintf("https://vacefron.nl/api/drip?user=%s", url.QueryEscape(user.AvatarURL(""))))
 }
@@ -2542,45 +2627,51 @@ func (c *ImageCommands) emergencymeeting(ctx *router.Ctx) {
 }
 
 func (c *ImageCommands) firsttime(ctx *router.Ctx) {
-	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
-	if !success {
-		user = ctx.Message.Author
+	user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
+	if err != nil {
+		ctx.RespondText("Cannot find user")
+		return
 	}
 	_ = ctx.RespondText(fmt.Sprintf("https://vacefron.nl/api/firsttime?user=%s", url.QueryEscape(user.AvatarURL(""))))
 }
 
 func (c *ImageCommands) grave(ctx *router.Ctx) {
-	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
-	if !success {
-		user = ctx.Message.Author
+	user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
+	if err != nil {
+		ctx.RespondText("Cannot find user")
+		return
 	}
 	_ = ctx.RespondText(fmt.Sprintf("https://vacefron.nl/api/grave?user=%s", url.QueryEscape(user.AvatarURL(""))))
 }
 
 func (c *ImageCommands) iamspeed(ctx *router.Ctx) {
-	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
-	if !success {
-		user = ctx.Message.Author
+	user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
+	if err != nil {
+		ctx.RespondText("Cannot find user")
+		return
 	}
 	_ = ctx.RespondText(fmt.Sprintf("https://vacefron.nl/api/iamspeed?user=%s", url.QueryEscape(user.AvatarURL(""))))
 }
 
 func (c *ImageCommands) icanmilkyou(ctx *router.Ctx) {
-	user1, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
-	if !success {
-		user1 = ctx.Message.Author
+	user1, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
+	if err != nil {
+		ctx.RespondText("Cannot find user")
+		return
 	}
-	user2, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(1))
-	if !success {
-		user2 = ctx.Message.Author
+	user2, err := ctx.Arguments.Get(1).User(router.ArgumentFlagFallbackDefault)
+	if err != nil {
+		ctx.RespondText("Cannot find user")
+		return
 	}
 	_ = ctx.RespondText(fmt.Sprintf("https://vacefron.nl/api/icanmilkyou?user1=%s&user2=%s", url.QueryEscape(user1.AvatarURL("")), url.QueryEscape(user2.AvatarURL(""))))
 }
 
 func (c *ImageCommands) heaven(ctx *router.Ctx) {
-	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
-	if !success {
-		user = ctx.Message.Author
+	user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
+	if err != nil {
+		ctx.RespondText("Cannot find user")
+		return
 	}
 	_ = ctx.RespondText(fmt.Sprintf("https://vacefron.nl/api/heaven?user=%s", url.QueryEscape(user.AvatarURL(""))))
 }
@@ -2590,25 +2681,28 @@ func (c *ImageCommands) npc(ctx *router.Ctx) {
 }
 
 func (c *ImageCommands) stonks(ctx *router.Ctx) {
-	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
-	if !success {
-		user = ctx.Message.Author
+	user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
+	if err != nil {
+		ctx.RespondText("Cannot find user")
+		return
 	}
 	_ = ctx.RespondText(fmt.Sprintf("https://vacefron.nl/api/stonks?user=%s", url.QueryEscape(user.AvatarURL(""))))
 }
 
 func (c *ImageCommands) notstonks(ctx *router.Ctx) {
-	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
-	if !success {
-		user = ctx.Message.Author
+	user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
+	if err != nil {
+		ctx.RespondText("Cannot find user")
+		return
 	}
 	_ = ctx.RespondText(fmt.Sprintf("https://vacefron.nl/api/stonks?user=%s&notstonks=true", url.QueryEscape(user.AvatarURL(""))))
 }
 
 func (c *ImageCommands) fliptable(ctx *router.Ctx) {
-	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
-	if !success {
-		user = ctx.Message.Author
+	user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
+	if err != nil {
+		ctx.RespondText("Cannot find user")
+		return
 	}
 	_ = ctx.RespondText(fmt.Sprintf("https://vacefron.nl/api/tableflip?user=%s", url.QueryEscape(user.AvatarURL(""))))
 }
@@ -2618,21 +2712,24 @@ func (c *ImageCommands) water(ctx *router.Ctx) {
 }
 
 func (c *ImageCommands) wolverine(ctx *router.Ctx) {
-	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
-	if !success {
-		user = ctx.Message.Author
+	user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
+	if err != nil {
+		ctx.RespondText("Cannot find user")
+		return
 	}
 	_ = ctx.RespondText(fmt.Sprintf("https://vacefron.nl/api/wolverine?user=%s", url.QueryEscape(user.AvatarURL(""))))
 }
 
 func (c *ImageCommands) womanyellingatcat(ctx *router.Ctx) {
-	user1, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
-	if !success {
-		user1 = ctx.Message.Author
+	user1, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
+	if err != nil {
+		ctx.RespondText("Cannot find user")
+		return
 	}
-	user2, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(1))
-	if !success {
-		user2 = ctx.Message.Author
+	user2, err := ctx.Arguments.Get(1).User(router.ArgumentFlagFallbackDefault)
+	if err != nil {
+		ctx.RespondText("Cannot find user")
+		return
 	}
 	_ = ctx.RespondText(fmt.Sprintf("https://vacefron.nl/api/womanyellingatcat?woman=%s&cat=%s", url.QueryEscape(user1.AvatarURL("")), url.QueryEscape(user2.AvatarURL(""))))
 }
@@ -2726,8 +2823,8 @@ func (c *ImageCommands) quotemessage(ctx *router.Ctx) {
 }
 
 func (c *ImageCommands) quoteuser(ctx *router.Ctx) {
-	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
-	if !success {
+	user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
+	if err != nil {
 		c.services.Embed.NewEmbed().
 			SetDescription("Could not find user.").
 			Send(ctx)
@@ -2829,8 +2926,8 @@ func (c *ImageCommands) discordquotereply(ctx *router.Ctx) {
 }
 
 func (c *ImageCommands) discordquoteuser(ctx *router.Ctx) {
-	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
-	if !success {
+	user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
+	if err != nil {
 		c.services.Embed.NewEmbed().
 			SetDescription("Could not find user.").
 			Send(ctx)

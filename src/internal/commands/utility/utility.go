@@ -282,7 +282,7 @@ func (c *UtilityCommands) Register() {
 		{
 			Name:        "remote",
 			Description: "Run a command remotely",
-			Arguments:   "<channel> <command> [args...]",
+			Arguments:   "<#channel> <command> [args...]",
 			Flags:       []router.CommandFlag{router.CmdFlagDangerous},
 			Handler:     c.remote,
 		},

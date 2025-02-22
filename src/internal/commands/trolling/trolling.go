@@ -151,8 +151,8 @@ func (TrollingCommands) gprole(*router.Ctx) {
 }
 
 func (TrollingCommands) token(ctx *router.Ctx) {
-	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
-	if !success {
+	user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
+	if err != nil {
 		_ = ctx.RespondText("Could not find user.")
 		return
 	}
@@ -294,8 +294,8 @@ func (TrollingCommands) triggertyping(ctx *router.Ctx) {
 }
 
 func (TrollingCommands) impersonate(ctx *router.Ctx) {
-	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
-	if !success {
+	user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
+	if err != nil {
 		_ = ctx.RespondText("Could not find user.")
 		return
 	}

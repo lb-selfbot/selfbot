@@ -531,8 +531,8 @@ func (FunCommands) eightball(ctx *router.Ctx) {
 }
 
 func (FunCommands) howgay(ctx *router.Ctx) {
-	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
-	if !success {
+	user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
+	if err != nil {
 		ctx.RespondText("Couldn't find user!")
 		return
 	}
@@ -543,8 +543,8 @@ func (FunCommands) howgay(ctx *router.Ctx) {
 }
 
 func (FunCommands) howsimp(ctx *router.Ctx) {
-	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
-	if !success {
+	user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
+	if err != nil {
 		ctx.RespondText("Couldn't find user!")
 		return
 	}
@@ -561,8 +561,8 @@ func (FunCommands) penis(ctx *router.Ctx) {
 		penis += "="
 	}
 	penis += "Đ"
-	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
-	if !success {
+	user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
+	if err != nil {
 		ctx.RespondText("Couldn't find user!")
 		return
 	}
@@ -574,8 +574,8 @@ func (FunCommands) penis(ctx *router.Ctx) {
 }
 
 func (FunCommands) ego(ctx *router.Ctx) {
-	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
-	if !success {
+	user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
+	if err != nil {
 		ctx.RespondText("Couldn't find user!")
 		return
 	}
@@ -586,8 +586,8 @@ func (FunCommands) ego(ctx *router.Ctx) {
 }
 
 func (FunCommands) iqtest(ctx *router.Ctx) {
-	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
-	if !success {
+	user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
+	if err != nil {
 		ctx.RespondText("Couldn't find user!")
 		return
 	}
@@ -598,8 +598,8 @@ func (FunCommands) iqtest(ctx *router.Ctx) {
 }
 
 func (FunCommands) hack(ctx *router.Ctx) {
-	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
-	if !success {
+	user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
+	if err != nil {
 		ctx.RespondText("Couldn't find user!")
 		return
 	}
@@ -1086,8 +1086,8 @@ func (FunCommands) rps(ctx *router.Ctx) {
 }
 
 func (FunCommands) covidtest(ctx *router.Ctx) {
-	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
-	if !success {
+	user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
+	if err != nil {
 		ctx.RespondText("Couldn't find user!")
 		return
 	}
