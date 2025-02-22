@@ -461,7 +461,7 @@ func (c *DumpingCommands) dumpemojis(ctx *router.Ctx) {
 
 func (c *DumpingCommands) dumpstickers(ctx *router.Ctx) {
 	guild, err := ctx.Arguments.Get(0).Guild()
-		if err != nil {
+	if err != nil {
 		ctx.RespondText("Error getting server: " + err.Error())
 		return
 	}

@@ -13,493 +13,506 @@ import (
 	"github.com/LightningDev1/LB-Selfbot/internal/router"
 	"github.com/LightningDev1/LB-Selfbot/internal/services"
 	"github.com/LightningDev1/LB-Selfbot/internal/utils"
-	"github.com/LightningDev1/dgc"
+	"github.com/LightningDev1/LB-Selfbot/internal/utils2"
 	"github.com/LightningDev1/discordgo"
 	"github.com/brianvoe/gofakeit/v6"
 	owoifygo "github.com/deadshot465/owoify-go"
 )
 
-func (f FunCommands) RegisterCommands(router *dgc.Router) {
-	router.StartCategory("Fun", "Fun commands")
-	router.RegisterCmd(&dgc.Command{
-		Name:        "eightball",
-		Description: "Asks the 8-Ball a question",
-		Arguments:   "<question>",
-		Handler:     f.eightball,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "howgay",
-		Description: "See how gay a person is",
-		Arguments:   "<user>",
-		Handler:     f.howgay,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "howsimp",
-		Description: "See how simp a person is",
-		Arguments:   "<user>",
-		Handler:     f.howsimp,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "penis",
-		Description: "See how big a person's penis is",
-		Arguments:   "<user>",
-		Handler:     f.penis,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "ego",
-		Description: "See how big a person's ego is",
-		Arguments:   "<user>",
-		Handler:     f.ego,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "iqtest",
-		Description: "Test a person's IQ",
-		Arguments:   "<user>",
-		Handler:     f.iqtest,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "hack",
-		Description: "Fake hack a person",
-		Arguments:   "<user>",
-		Handler:     f.hack,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "insult",
-		Description: "Insult a person",
-		Handler:     f.insult,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "dadjoke",
-		Description: "Send a random dad joke",
-		Handler:     f.dadjoke,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "yomomma",
-		Description: "Send a random yo momma joke",
-		Handler:     f.yomomma,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "wouldyourather",
-		Description: "Send a random would you rather question",
-		Handler:     f.wouldyourather,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "topic",
-		Description: "Send a conversation topic",
-		Handler:     f.topic,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "slot",
-		Description: "Play the slot machine",
-		Handler:     f.slot,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "advice",
-		Description: "Send random advice",
-		Handler:     f.advice,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "catfact",
-		Description: "Send a random cat fact",
-		Handler:     f.catfact,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "dogfact",
-		Description: "Send a random dog fact",
-		Handler:     f.dogfact,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "pandafact",
-		Description: "Send a random panda fact",
-		Handler:     f.pandafact,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "foxfact",
-		Description: "Send a random fox fact",
-		Handler:     f.foxfact,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "koalafact",
-		Description: "Send a random koala fact",
-		Handler:     f.koalafact,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "birdfact",
-		Description: "Send a random bird fact",
-		Handler:     f.birdfact,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "redpandafact",
-		Description: "Send a random red panda fact",
-		Handler:     f.redpandafact,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "whalefact",
-		Description: "Send a random whale fact",
-		Handler:     f.whalefact,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "kangaroofact",
-		Description: "Send a random whale fact",
-		Handler:     f.kangaroofact,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "bunnyfact",
-		Description: "Send a random bunny fact",
-		Handler:     f.bunnyfact,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "lionfact",
-		Description: "Send a random lion fact",
-		Handler:     f.lionfact,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "frogfact",
-		Description: "Send a random frog fact",
-		Handler:     f.frogfact,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "duckfact",
-		Description: "Send a random duck fact",
-		Handler:     f.duckfact,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "penguinfact",
-		Description: "Send a random penguin fact",
-		Handler:     f.penguinfact,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "dolphinfact",
-		Description: "Send a random dolphin fact",
-		Handler:     f.dolphinfact,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "bearfact",
-		Description: "Send a random bear fact",
-		Handler:     f.bearfact,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "axolotlfact",
-		Description: "Send a random axolotl fact",
-		Handler:     f.axolotlfact,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "capybarafact",
-		Description: "Send a random capybara fact",
-		Handler:     f.capybarafact,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "trivia",
-		Description: "Send a random trivia question",
-		Handler:     f.trivia,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "dice",
-		Description: "Roll a dice",
-		Handler:     f.dice,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "randomemoji",
-		Description: "Send a random emoji from ther current server [server only]",
-		Handler:     f.randomemoji,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "randomchannel",
-		Description: "Send a random channel from ther current server [server only]",
-		Handler:     f.randomchannel,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "choose",
-		Description: "Choose a random item from the list of items",
-		Arguments:   "<option1> <option2> ...",
-		Handler:     f.choose,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "poll",
-		Description: "Create a poll",
-		Arguments:   "<question>",
-		Handler:     f.poll,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "numberfact",
-		Description: "Send a random fact about a number",
-		Arguments:   "<number>",
-		Handler:     f.numberfact,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "joke",
-		Description: "Send a random joke",
-		Handler:     f.joke,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "fml",
-		Description: "Send a random fuck my life quote",
-		Handler:     f.fml,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "tronald",
-		Description: "Send a random Donald Trump quote",
-		Handler:     f.tronald,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "kanyewest",
-		Description: "Send a random Kanye West quote",
-		Handler:     f.kanyewest,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "rps",
-		Description: "Play rock paper scissors",
-		Arguments:   "<rock/paper/scissors>",
-		Handler:     f.rps,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "covidtest",
-		Description: "Test someone for Covid-19",
-		Arguments:   "<user>",
-		Handler:     f.covidtest,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "hug",
-		Description: "Send someone",
-		Handler:     f.hug,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "kiss",
-		Description: "Kiss someone",
-		Handler:     f.kiss,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "slap",
-		Description: "Slap someone",
-		Handler:     f.slap,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "cuddle",
-		Description: "Cuddle someone",
-		Handler:     f.cuddle,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "pat",
-		Description: "Pat someone",
-		Handler:     f.pat,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "feed",
-		Description: "Feed someone",
-		Handler:     f.feed,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "wink",
-		Description: "Wink to someone",
-		Handler:     f.wink,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "chucknorris",
-		Description: "Send a random Chuck Norris joke",
-		Handler:     f.chucknorris,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "iss",
-		Description: "Send the current ISS coordinates",
-		Handler:     f.iss,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "apod",
-		Description: "Send NASA's Astronomy Picture Of The Day",
-		Handler:     f.apod,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "httpcat",
-		Description: "Send a HTTP Cat image",
-		Arguments:   "<statuscode>",
-		Handler:     f.httpcat,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "riddle",
-		Description: "Send a random riddle",
-		Handler:     f.riddle,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "quote",
-		Description: "Send a random quote",
-		Handler:     f.quote,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "evilinsult",
-		Description: "Send a random evil insult",
-		Handler:     f.evilinsult,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "owoify",
-		Description: "Owoify text",
-		Arguments:   "<text>",
-		Handler:     f.owoify,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "uwuify",
-		Description: "Uwuify text",
-		Arguments:   "<text>",
-		Handler:     f.uwuify,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "uvuify",
-		Description: "Uvuify text",
-		Arguments:   "<text>",
-		Handler:     f.uvuify,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "rickrollurl",
-		Description: "Send the rick roll url",
-		Handler:     f.rickrollurl,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "rickroll",
-		Description: "Send the rick roll lyrics",
-		Handler:     f.rickroll,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "coinflip",
-		Description: "Flip a coin",
-		Handler:     f.coinflip,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "notfunny",
-		Description: "Send a not funny copypasta",
-		Handler:     f.notfunny,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "randomquestion",
-		Description: "Send a random question",
-		Handler:     f.randomquestion,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "lyrics",
-		Description: "Get the lyrics of a song",
-		Arguments:   "<song name>",
-		Handler:     f.lyrics,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "breakingbadquote",
-		Description: "Send a random Breaking Badquote",
-		Handler:     f.breakingbadquote,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "gameofthronesquote",
-		Description: "Send a random Game of Thrones quote",
-		Handler:     f.gameofthronesquote,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "luciferquote",
-		Description: "Send a random Lucifer quote",
-		Handler:     f.luciferquote,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "strangerthingsquote",
-		Description: "Send a random Stranger Things quote",
-		Handler:     f.strangerthingsquote,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "xkcd",
-		Description: "Send the current XKCD comic",
-		Handler:     f.xkcd,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "boredactivity",
-		Description: "Send a random activity to do when bored",
-		Handler:     f.boredactivity,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "ermahgerd",
-		Description: "Translate text to ERMAHGERD",
-		Arguments:   "<text>",
-		Handler:     f.ermahgerd,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "iseven",
-		Description: "Check if a number is even",
-		Arguments:   "<number>",
-		Handler:     f.iseven,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "agify",
-		Description: "Determine the age of a first name",
-		Arguments:   "<name>",
-		Handler:     f.agify,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "randomword",
-		Description: "Get a random word",
-		Handler:     f.randomword,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "randomweirdword",
-		Description: "Get a random weird word",
-		Handler:     f.randomweirdword,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "startupidea",
-		Description: "Get a random startup idea",
-		Handler:     f.startupidea,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "fakeperson",
-		Description: "Generate an image of a fake person",
-		Handler:     f.fakeperson,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "commitmessage",
-		Description: "Generate a random commit message",
-		Handler:     f.commitmessage,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "showerthought",
-		Description: "Send a random shower thought",
-		Handler:     f.showerthought,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "truth",
-		Description: "Play Truth or Dare",
-		Handler:     f.truth,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "dare",
-		Description: "Play Truth or Dare",
-		Handler:     f.dare,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "neverhaveiever",
-		Description: "Play Never have I ever...",
-		Handler:     f.neverhaveiever,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "paranoia",
-		Description: "Send a random paranoia question",
-		Handler:     f.paranoia,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "randomcolor",
-		Description: "Generate a random color",
-		Handler:     f.randomcolor,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "pickupline",
-		Description: "Generate a pickup line",
-		Handler:     f.pickupline,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "elementinfo",
-		Description: "Get info about a periodic table element",
-		Arguments:   "<element>",
-		Handler:     f.elementinfo,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "randomelement",
-		Description: "Get info about a random periodic table element",
-		Handler:     f.randomelement,
+type FunCommands struct{ services *services.Services }
+
+func NewFunCommands(s *services.Services) *FunCommands {
+	return &FunCommands{services: s}
+}
+func (c *FunCommands) Register() {
+	cmdRouter := c.services.Discord.GetRouter()
+
+	cmdRouter.RegisterCategory(&router.Category{
+		Name:        "Fun",
+		Description: "Fun commands",
+	}, []*router.Command{
+		{
+			Name:        "eightball",
+			Description: "Asks the 8-Ball a question",
+			Arguments:   "<question>",
+			Handler:     c.eightball,
+		},
+		{
+			Name:        "howgay",
+			Description: "See how gay a person is",
+			Arguments:   "<user>",
+			Handler:     c.howgay,
+		},
+		{
+			Name:        "howsimp",
+			Description: "See how simp a person is",
+			Arguments:   "<user>",
+			Handler:     c.howsimp,
+		},
+		{
+			Name:        "penis",
+			Description: "See how big a person's penis is",
+			Arguments:   "<user>",
+			Handler:     c.penis,
+		},
+		{
+			Name:        "ego",
+			Description: "See how big a person's ego is",
+			Arguments:   "<user>",
+			Handler:     c.ego,
+		},
+		{
+			Name:        "iqtest",
+			Description: "Test a person's IQ",
+			Arguments:   "<user>",
+			Handler:     c.iqtest,
+		},
+		{
+			Name:        "hack",
+			Description: "Fake hack a person",
+			Arguments:   "<user>",
+			Handler:     c.hack,
+		},
+		{
+			Name:        "insult",
+			Description: "Insult a person",
+			Handler:     c.insult,
+		},
+		{
+			Name:        "dadjoke",
+			Description: "Send a random dad joke",
+			Handler:     c.dadjoke,
+		},
+		{
+			Name:        "yomomma",
+			Description: "Send a random yo momma joke",
+			Handler:     c.yomomma,
+		},
+		{
+			Name:        "wouldyourather",
+			Description: "Send a random would you rather question",
+			Handler:     c.wouldyourather,
+		},
+		{
+			Name:        "topic",
+			Description: "Send a conversation topic",
+			Handler:     c.topic,
+		},
+		{
+			Name:        "slot",
+			Description: "Play the slot machine",
+			Handler:     c.slot,
+		},
+		{
+			Name:        "advice",
+			Description: "Send random advice",
+			Handler:     c.advice,
+		},
+		{
+			Name:        "catfact",
+			Description: "Send a random cat fact",
+			Handler:     c.catfact,
+		},
+		{
+			Name:        "dogfact",
+			Description: "Send a random dog fact",
+			Handler:     c.dogfact,
+		},
+		{
+			Name:        "pandafact",
+			Description: "Send a random panda fact",
+			Handler:     c.pandafact,
+		},
+		{
+			Name:        "foxfact",
+			Description: "Send a random fox fact",
+			Handler:     c.foxfact,
+		},
+		{
+			Name:        "koalafact",
+			Description: "Send a random koala fact",
+			Handler:     c.koalafact,
+		},
+		{
+			Name:        "birdfact",
+			Description: "Send a random bird fact",
+			Handler:     c.birdfact,
+		},
+		{
+			Name:        "redpandafact",
+			Description: "Send a random red panda fact",
+			Handler:     c.redpandafact,
+		},
+		{
+			Name:        "whalefact",
+			Description: "Send a random whale fact",
+			Handler:     c.whalefact,
+		},
+		{
+			Name:        "kangaroofact",
+			Description: "Send a random whale fact",
+			Handler:     c.kangaroofact,
+		},
+		{
+			Name:        "bunnyfact",
+			Description: "Send a random bunny fact",
+			Handler:     c.bunnyfact,
+		},
+		{
+			Name:        "lionfact",
+			Description: "Send a random lion fact",
+			Handler:     c.lionfact,
+		},
+		{
+			Name:        "frogfact",
+			Description: "Send a random frog fact",
+			Handler:     c.frogfact,
+		},
+		{
+			Name:        "duckfact",
+			Description: "Send a random duck fact",
+			Handler:     c.duckfact,
+		},
+		{
+			Name:        "penguinfact",
+			Description: "Send a random penguin fact",
+			Handler:     c.penguinfact,
+		},
+		{
+			Name:        "dolphinfact",
+			Description: "Send a random dolphin fact",
+			Handler:     c.dolphinfact,
+		},
+		{
+			Name:        "bearfact",
+			Description: "Send a random bear fact",
+			Handler:     c.bearfact,
+		},
+		{
+			Name:        "axolotlfact",
+			Description: "Send a random axolotl fact",
+			Handler:     c.axolotlfact,
+		},
+		{
+			Name:        "capybarafact",
+			Description: "Send a random capybara fact",
+			Handler:     c.capybarafact,
+		},
+		{
+			Name:        "trivia",
+			Description: "Send a random trivia question",
+			Handler:     c.trivia,
+		},
+		{
+			Name:        "dice",
+			Description: "Roll a dice",
+			Handler:     c.dice,
+		},
+		{
+			Name:        "randomemoji",
+			Description: "Send a random server emoji",
+			Arguments:   "[server]",
+			Handler:     c.randomemoji,
+		},
+		{
+			Name:        "randomchannel",
+			Description: "Send a random channel from the server",
+			Arguments:   "[server]",
+			Handler:     c.randomchannel,
+		},
+		{
+			Name:        "choose",
+			Description: "Choose a random item from the list of items",
+			Arguments:   "<option1> <option2> ...",
+			Handler:     c.choose,
+		},
+		{
+			Name:        "poll",
+			Description: "Create a poll",
+			Arguments:   "<question>",
+			Handler:     c.poll,
+		},
+		{
+			Name:        "numberfact",
+			Description: "Send a random fact about a number",
+			Arguments:   "<number>",
+			Handler:     c.numberfact,
+		},
+		{
+			Name:        "joke",
+			Description: "Send a random joke",
+			Handler:     c.joke,
+		},
+		{
+			Name:        "fml",
+			Description: "Send a random fuck my life quote",
+			Handler:     c.fml,
+		},
+		{
+			Name:        "tronald",
+			Description: "Send a random Donald Trump quote",
+			Handler:     c.tronald,
+		},
+		{
+			Name:        "kanyewest",
+			Description: "Send a random Kanye West quote",
+			Handler:     c.kanyewest,
+		},
+		{
+			Name:        "rps",
+			Description: "Play rock paper scissors",
+			Arguments:   "<rock/paper/scissors>",
+			Handler:     c.rps,
+		},
+		{
+			Name:        "covidtest",
+			Description: "Test someone for Covid-19",
+			Arguments:   "<user>",
+			Handler:     c.covidtest,
+		},
+		{
+			Name:        "hug",
+			Description: "Send someone",
+			Handler:     c.hug,
+		},
+		{
+			Name:        "kiss",
+			Description: "Kiss someone",
+			Handler:     c.kiss,
+		},
+		{
+			Name:        "slap",
+			Description: "Slap someone",
+			Handler:     c.slap,
+		},
+		{
+			Name:        "cuddle",
+			Description: "Cuddle someone",
+			Handler:     c.cuddle,
+		},
+		{
+			Name:        "pat",
+			Description: "Pat someone",
+			Handler:     c.pat,
+		},
+		{
+			Name:        "feed",
+			Description: "Feed someone",
+			Handler:     c.feed,
+		},
+		{
+			Name:        "wink",
+			Description: "Wink to someone",
+			Handler:     c.wink,
+		},
+		{
+			Name:        "chucknorris",
+			Description: "Send a random Chuck Norris joke",
+			Handler:     c.chucknorris,
+		},
+		{
+			Name:        "iss",
+			Description: "Send the current ISS coordinates",
+			Handler:     c.iss,
+		},
+		{
+			Name:        "apod",
+			Description: "Send NASA's Astronomy Picture Of The Day",
+			Handler:     c.apod,
+		},
+		{
+			Name:        "httpcat",
+			Description: "Send a HTTP Cat image",
+			Arguments:   "<statuscode>",
+			Handler:     c.httpcat,
+		},
+		{
+			Name:        "riddle",
+			Description: "Send a random riddle",
+			Handler:     c.riddle,
+		},
+		{
+			Name:        "quote",
+			Description: "Send a random quote",
+			Handler:     c.quote,
+		},
+		{
+			Name:        "evilinsult",
+			Description: "Send a random evil insult",
+			Handler:     c.evilinsult,
+		},
+		{
+			Name:        "owoify",
+			Description: "Owoify text",
+			Arguments:   "<text>",
+			Handler:     c.owoify,
+		},
+		{
+			Name:        "uwuify",
+			Description: "Uwuify text",
+			Arguments:   "<text>",
+			Handler:     c.uwuify,
+		},
+		{
+			Name:        "uvuify",
+			Description: "Uvuify text",
+			Arguments:   "<text>",
+			Handler:     c.uvuify,
+		},
+		{
+			Name:        "rickrollurl",
+			Description: "Send the rick roll url",
+			Handler:     c.rickrollurl,
+		},
+		{
+			Name:        "rickroll",
+			Description: "Send the rick roll lyrics",
+			Handler:     c.rickroll,
+		},
+		{
+			Name:        "coinflip",
+			Description: "Flip a coin",
+			Handler:     c.coinflip,
+		},
+		{
+			Name:        "notfunny",
+			Description: "Send a not funny copypasta",
+			Handler:     c.notfunny,
+		},
+		{
+			Name:        "randomquestion",
+			Description: "Send a random question",
+			Handler:     c.randomquestion,
+		},
+		{
+			Name:        "lyrics",
+			Description: "Get the lyrics of a song",
+			Arguments:   "<song name>",
+			Handler:     c.lyrics,
+		},
+		{
+			Name:        "breakingbadquote",
+			Description: "Send a random Breaking Badquote",
+			Handler:     c.breakingbadquote,
+		},
+		{
+			Name:        "gameofthronesquote",
+			Description: "Send a random Game of Thrones quote",
+			Handler:     c.gameofthronesquote,
+		},
+		{
+			Name:        "luciferquote",
+			Description: "Send a random Lucifer quote",
+			Handler:     c.luciferquote,
+		},
+		{
+			Name:        "strangerthingsquote",
+			Description: "Send a random Stranger Things quote",
+			Handler:     c.strangerthingsquote,
+		},
+		{
+			Name:        "xkcd",
+			Description: "Send the current XKCD comic",
+			Handler:     c.xkcd,
+		},
+		{
+			Name:        "boredactivity",
+			Description: "Send a random activity to do when bored",
+			Handler:     c.boredactivity,
+		},
+		{
+			Name:        "ermahgerd",
+			Description: "Translate text to ERMAHGERD",
+			Arguments:   "<text>",
+			Handler:     c.ermahgerd,
+		},
+		{
+			Name:        "iseven",
+			Description: "Check if a number is even",
+			Arguments:   "<number>",
+			Handler:     c.iseven,
+		},
+		{
+			Name:        "agify",
+			Description: "Determine the age of a first name",
+			Arguments:   "<name>",
+			Handler:     c.agify,
+		},
+		{
+			Name:        "randomword",
+			Description: "Get a random word",
+			Handler:     c.randomword,
+		},
+		{
+			Name:        "randomweirdword",
+			Description: "Get a random weird word",
+			Handler:     c.randomweirdword,
+		},
+		{
+			Name:        "startupidea",
+			Description: "Get a random startup idea",
+			Handler:     c.startupidea,
+		},
+		{
+			Name:        "fakeperson",
+			Description: "Generate an image of a fake person",
+			Handler:     c.fakeperson,
+		},
+		{
+			Name:        "commitmessage",
+			Description: "Generate a random commit message",
+			Handler:     c.commitmessage,
+		},
+		{
+			Name:        "showerthought",
+			Description: "Send a random shower thought",
+			Handler:     c.showerthought,
+		},
+		{
+			Name:        "truth",
+			Description: "Play Truth or Dare",
+			Handler:     c.truth,
+		},
+		{
+			Name:        "dare",
+			Description: "Play Truth or Dare",
+			Handler:     c.dare,
+		},
+		{
+			Name:        "neverhaveiever",
+			Description: "Play Never have I ever...",
+			Handler:     c.neverhaveiever,
+		},
+		{
+			Name:        "paranoia",
+			Description: "Send a random paranoia question",
+			Handler:     c.paranoia,
+		},
+		{
+			Name:        "randomcolor",
+			Description: "Generate a random color",
+			Handler:     c.randomcolor,
+		},
+		{
+			Name:        "pickupline",
+			Description: "Generate a pickup line",
+			Handler:     c.pickupline,
+		},
+		{
+			Name:        "elementinfo",
+			Description: "Get info about a periodic table element",
+			Arguments:   "<element>",
+			Handler:     c.elementinfo,
+		},
+		{
+			Name:        "randomelement",
+			Description: "Get info about a random periodic table element",
+			Handler:     c.randomelement,
+		},
 	})
 }
 
-func (FunCommands) eightball(ctx *router.Ctx) {
+func (c *FunCommands) eightball(ctx *router.Ctx) {
 	question := ctx.Arguments.Raw()
 	possibleAnswers := []string{
 		"It is certain",
@@ -530,7 +543,7 @@ func (FunCommands) eightball(ctx *router.Ctx) {
 		Send(ctx)
 }
 
-func (FunCommands) howgay(ctx *router.Ctx) {
+func (c *FunCommands) howgay(ctx *router.Ctx) {
 	user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
 	if err != nil {
 		ctx.RespondText("Couldn't find user!")
@@ -542,7 +555,7 @@ func (FunCommands) howgay(ctx *router.Ctx) {
 		Send(ctx)
 }
 
-func (FunCommands) howsimp(ctx *router.Ctx) {
+func (c *FunCommands) howsimp(ctx *router.Ctx) {
 	user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
 	if err != nil {
 		ctx.RespondText("Couldn't find user!")
@@ -554,7 +567,7 @@ func (FunCommands) howsimp(ctx *router.Ctx) {
 		Send(ctx)
 }
 
-func (FunCommands) penis(ctx *router.Ctx) {
+func (c *FunCommands) penis(ctx *router.Ctx) {
 	penisLength := random.Int(1, 20)
 	penis := "8"
 	for i := 0; i < penisLength; i++ {
@@ -573,7 +586,7 @@ func (FunCommands) penis(ctx *router.Ctx) {
 		Send(ctx)
 }
 
-func (FunCommands) ego(ctx *router.Ctx) {
+func (c *FunCommands) ego(ctx *router.Ctx) {
 	user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
 	if err != nil {
 		ctx.RespondText("Couldn't find user!")
@@ -585,7 +598,7 @@ func (FunCommands) ego(ctx *router.Ctx) {
 		Send(ctx)
 }
 
-func (FunCommands) iqtest(ctx *router.Ctx) {
+func (c *FunCommands) iqtest(ctx *router.Ctx) {
 	user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
 	if err != nil {
 		ctx.RespondText("Couldn't find user!")
@@ -597,7 +610,7 @@ func (FunCommands) iqtest(ctx *router.Ctx) {
 		Send(ctx)
 }
 
-func (FunCommands) hack(ctx *router.Ctx) {
+func (c *FunCommands) hack(ctx *router.Ctx) {
 	user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
 	if err != nil {
 		ctx.RespondText("Couldn't find user!")
@@ -618,7 +631,7 @@ func (FunCommands) hack(ctx *router.Ctx) {
 		Send(ctx)
 }
 
-func (FunCommands) insult(ctx *router.Ctx) {
+func (c *FunCommands) insult(ctx *router.Ctx) {
 	httpResponse := http.Get("https://insult.mattbas.org/api/insult")
 	if httpResponse.Error != nil {
 		ctx.RespondText("An error has occurred.")
@@ -629,7 +642,7 @@ func (FunCommands) insult(ctx *router.Ctx) {
 		Send(ctx)
 }
 
-func (FunCommands) dadjoke(ctx *router.Ctx) {
+func (c *FunCommands) dadjoke(ctx *router.Ctx) {
 	joke, err := http.GetJson("https://icanhazdadjoke.com/", map[string]string{"Accept": "application/json"})
 	if err != nil {
 		ctx.RespondText("An error has occurred.")
@@ -640,7 +653,7 @@ func (FunCommands) dadjoke(ctx *router.Ctx) {
 		Send(ctx)
 }
 
-func (FunCommands) yomomma(ctx *router.Ctx) {
+func (c *FunCommands) yomomma(ctx *router.Ctx) {
 	joke, err := http.GetJson("https://api.yomomma.info/")
 	if err != nil {
 		ctx.RespondText("An error has occurred.")
@@ -651,7 +664,7 @@ func (FunCommands) yomomma(ctx *router.Ctx) {
 		Send(ctx)
 }
 
-func (FunCommands) wouldyourather(ctx *router.Ctx) {
+func (c *FunCommands) wouldyourather(ctx *router.Ctx) {
 	wyrJson, err := http.GetJson("https://api.lightning-bot.com/api/v3/misc/wyr")
 	if err != nil {
 		ctx.RespondText("An error has occurred.")
@@ -664,7 +677,7 @@ func (FunCommands) wouldyourather(ctx *router.Ctx) {
 		Send(ctx)
 }
 
-func (FunCommands) topic(ctx *router.Ctx) {
+func (c *FunCommands) topic(ctx *router.Ctx) {
 	topicJson, err := http.GetJson("https://api.lightning-bot.com/api/v3/misc/topic")
 	if err != nil {
 		ctx.RespondText("An error has occurred.")
@@ -675,7 +688,7 @@ func (FunCommands) topic(ctx *router.Ctx) {
 		Send(ctx)
 }
 
-func (FunCommands) slot(ctx *router.Ctx) {
+func (c *FunCommands) slot(ctx *router.Ctx) {
 	slots := strings.Split("🍎🍊🍐🍋🍉🍇🍓🍒", "")
 	getSlot := func() (string, string) {
 		left := random.Choice(slots)
@@ -716,7 +729,7 @@ func (FunCommands) slot(ctx *router.Ctx) {
 	_, _ = ctx.Session.ChannelMessageEdit(message.ChannelID, message.ID, getEmbed(true))
 }
 
-func (FunCommands) advice(ctx *router.Ctx) {
+func (c *FunCommands) advice(ctx *router.Ctx) {
 	advice, err := http.GetJson("https://api.adviceslip.com/advice")
 	if err != nil {
 		ctx.RespondText("An error has occurred.")
@@ -727,7 +740,7 @@ func (FunCommands) advice(ctx *router.Ctx) {
 		Send(ctx)
 }
 
-func (FunCommands) catfact(ctx *router.Ctx) {
+func (c *FunCommands) catfact(ctx *router.Ctx) {
 	fact, err := http.GetJson("https://some-random-api.com/facts/cat")
 	if err != nil {
 		ctx.RespondText("An error has occurred.")
@@ -738,7 +751,7 @@ func (FunCommands) catfact(ctx *router.Ctx) {
 		Send(ctx)
 }
 
-func (FunCommands) dogfact(ctx *router.Ctx) {
+func (c *FunCommands) dogfact(ctx *router.Ctx) {
 	fact, err := http.GetJson("https://some-random-api.com/facts/dog")
 	if err != nil {
 		ctx.RespondText("An error has occurred.")
@@ -749,7 +762,7 @@ func (FunCommands) dogfact(ctx *router.Ctx) {
 		Send(ctx)
 }
 
-func (FunCommands) pandafact(ctx *router.Ctx) {
+func (c *FunCommands) pandafact(ctx *router.Ctx) {
 	fact, err := http.GetJson("https://some-random-api.com/facts/panda")
 	if err != nil {
 		ctx.RespondText("An error has occurred.")
@@ -760,7 +773,7 @@ func (FunCommands) pandafact(ctx *router.Ctx) {
 		Send(ctx)
 }
 
-func (FunCommands) foxfact(ctx *router.Ctx) {
+func (c *FunCommands) foxfact(ctx *router.Ctx) {
 	fact, err := http.GetJson("https://some-random-api.com/facts/fox")
 	if err != nil {
 		ctx.RespondText("An error has occurred.")
@@ -771,7 +784,7 @@ func (FunCommands) foxfact(ctx *router.Ctx) {
 		Send(ctx)
 }
 
-func (FunCommands) koalafact(ctx *router.Ctx) {
+func (c *FunCommands) koalafact(ctx *router.Ctx) {
 	fact, err := http.GetJson("https://some-random-api.com/facts/koala")
 	if err != nil {
 		ctx.RespondText("An error has occurred.")
@@ -782,7 +795,7 @@ func (FunCommands) koalafact(ctx *router.Ctx) {
 		Send(ctx)
 }
 
-func (FunCommands) birdfact(ctx *router.Ctx) {
+func (c *FunCommands) birdfact(ctx *router.Ctx) {
 	fact, err := http.GetJson("https://api.animality.xyz/fact/bird")
 	if err != nil {
 		ctx.RespondText("An error has occurred.")
@@ -793,7 +806,7 @@ func (FunCommands) birdfact(ctx *router.Ctx) {
 		Send(ctx)
 }
 
-func (FunCommands) redpandafact(ctx *router.Ctx) {
+func (c *FunCommands) redpandafact(ctx *router.Ctx) {
 	fact, err := http.GetJson("https://api.animality.xyz/fact/redpanda")
 	if err != nil {
 		ctx.RespondText("An error has occurred.")
@@ -804,7 +817,7 @@ func (FunCommands) redpandafact(ctx *router.Ctx) {
 		Send(ctx)
 }
 
-func (FunCommands) whalefact(ctx *router.Ctx) {
+func (c *FunCommands) whalefact(ctx *router.Ctx) {
 	fact, err := http.GetJson("https://api.animality.xyz/fact/whale")
 	if err != nil {
 		ctx.RespondText("An error has occurred.")
@@ -815,7 +828,7 @@ func (FunCommands) whalefact(ctx *router.Ctx) {
 		Send(ctx)
 }
 
-func (FunCommands) kangaroofact(ctx *router.Ctx) {
+func (c *FunCommands) kangaroofact(ctx *router.Ctx) {
 	fact, err := http.GetJson("https://api.animality.xyz/fact/kangaroo")
 	if err != nil {
 		ctx.RespondText("An error has occurred.")
@@ -826,7 +839,7 @@ func (FunCommands) kangaroofact(ctx *router.Ctx) {
 		Send(ctx)
 }
 
-func (FunCommands) bunnyfact(ctx *router.Ctx) {
+func (c *FunCommands) bunnyfact(ctx *router.Ctx) {
 	fact, err := http.GetJson("https://api.animality.xyz/fact/bunny")
 	if err != nil {
 		ctx.RespondText("An error has occurred.")
@@ -837,7 +850,7 @@ func (FunCommands) bunnyfact(ctx *router.Ctx) {
 		Send(ctx)
 }
 
-func (FunCommands) lionfact(ctx *router.Ctx) {
+func (c *FunCommands) lionfact(ctx *router.Ctx) {
 	fact, err := http.GetJson("https://api.animality.xyz/fact/lion")
 	if err != nil {
 		ctx.RespondText("An error has occurred.")
@@ -848,7 +861,7 @@ func (FunCommands) lionfact(ctx *router.Ctx) {
 		Send(ctx)
 }
 
-func (FunCommands) frogfact(ctx *router.Ctx) {
+func (c *FunCommands) frogfact(ctx *router.Ctx) {
 	fact, err := http.GetJson("https://api.animality.xyz/fact/frog")
 	if err != nil {
 		ctx.RespondText("An error has occurred.")
@@ -859,7 +872,7 @@ func (FunCommands) frogfact(ctx *router.Ctx) {
 		Send(ctx)
 }
 
-func (FunCommands) duckfact(ctx *router.Ctx) {
+func (c *FunCommands) duckfact(ctx *router.Ctx) {
 	fact, err := http.GetJson("https://api.animality.xyz/fact/duck")
 	if err != nil {
 		ctx.RespondText("An error has occurred.")
@@ -870,7 +883,7 @@ func (FunCommands) duckfact(ctx *router.Ctx) {
 		Send(ctx)
 }
 
-func (FunCommands) penguinfact(ctx *router.Ctx) {
+func (c *FunCommands) penguinfact(ctx *router.Ctx) {
 	fact, err := http.GetJson("https://api.animality.xyz/fact/penguin")
 	if err != nil {
 		ctx.RespondText("An error has occurred.")
@@ -881,7 +894,7 @@ func (FunCommands) penguinfact(ctx *router.Ctx) {
 		Send(ctx)
 }
 
-func (FunCommands) dolphinfact(ctx *router.Ctx) {
+func (c *FunCommands) dolphinfact(ctx *router.Ctx) {
 	fact, err := http.GetJson("https://api.animality.xyz/fact/dolphin")
 	if err != nil {
 		ctx.RespondText("An error has occurred.")
@@ -892,7 +905,7 @@ func (FunCommands) dolphinfact(ctx *router.Ctx) {
 		Send(ctx)
 }
 
-func (FunCommands) bearfact(ctx *router.Ctx) {
+func (c *FunCommands) bearfact(ctx *router.Ctx) {
 	fact, err := http.GetJson("https://api.animality.xyz/fact/bear")
 	if err != nil {
 		ctx.RespondText("An error has occurred.")
@@ -903,7 +916,7 @@ func (FunCommands) bearfact(ctx *router.Ctx) {
 		Send(ctx)
 }
 
-func (FunCommands) axolotlfact(ctx *router.Ctx) {
+func (c *FunCommands) axolotlfact(ctx *router.Ctx) {
 	fact, err := http.GetJson("https://api.animality.xyz/fact/axolotl")
 	if err != nil {
 		ctx.RespondText("An error has occurred.")
@@ -914,7 +927,7 @@ func (FunCommands) axolotlfact(ctx *router.Ctx) {
 		Send(ctx)
 }
 
-func (FunCommands) capybarafact(ctx *router.Ctx) {
+func (c *FunCommands) capybarafact(ctx *router.Ctx) {
 	fact, err := http.GetJson("https://api.animality.xyz/fact/capybara")
 	if err != nil {
 		ctx.RespondText("An error has occurred.")
@@ -925,7 +938,7 @@ func (FunCommands) capybarafact(ctx *router.Ctx) {
 		Send(ctx)
 }
 
-func (FunCommands) trivia(ctx *router.Ctx) {
+func (c *FunCommands) trivia(ctx *router.Ctx) {
 	httpResponse := http.Get("https://opentdb.com/api.php?amount=1")
 	if httpResponse.StatusCode != 200 {
 		ctx.RespondText("An error has occurred.")
@@ -954,17 +967,20 @@ func (FunCommands) trivia(ctx *router.Ctx) {
 		Send(ctx)
 }
 
-func (FunCommands) dice(ctx *router.Ctx) {
+func (c *FunCommands) dice(ctx *router.Ctx) {
 	c.services.Embed.NewEmbed().
 		SetDescription("You rolled: %d", random.Int(1, 6)).
 		Send(ctx)
 }
 
-func (FunCommands) randomemoji(ctx *router.Ctx) {
-	if !utils.Discord.CheckIfInServer(ctx) {
+func (c *FunCommands) randomemoji(ctx *router.Ctx) {
+	guild, err := ctx.Arguments.Get(0).Guild(router.ArgumentFlagFallbackDefault)
+	if err != nil {
+		ctx.RespondText("Couldn't find server!")
 		return
 	}
-	emojis, err := ctx.Session.GuildEmojis(ctx.Message.GuildID)
+
+	emojis, err := ctx.Session.GuildEmojis(guild.ID)
 	if err != nil {
 		ctx.RespondText("An error has occurred.")
 		return
@@ -973,33 +989,34 @@ func (FunCommands) randomemoji(ctx *router.Ctx) {
 	ctx.RespondText(emoji.MessageFormat())
 }
 
-func (FunCommands) randomchannel(ctx *router.Ctx) {
-	if !utils.Discord.CheckIfInServer(ctx) {
+func (c *FunCommands) randomchannel(ctx *router.Ctx) {
+	guild, err := ctx.Arguments.Get(0).Guild(router.ArgumentFlagFallbackDefault)
+	if err != nil {
+		ctx.RespondText("Couldn't find server!")
 		return
 	}
-	channels, err := ctx.Session.GuildChannels(ctx.Message.GuildID)
+
+	channels, err := ctx.Session.GuildChannels(guild.ID)
 	if err != nil {
 		ctx.RespondText("An error has occurred.")
 		return
 	}
-	for index, channel := range channels {
-		if channel.Type != discordgo.ChannelTypeGuildText {
-			// Remove the channel from the list if it is not a text channel
-			channels = append(channels[index:], channels[index+1:]...)
-		}
-	}
+	channels = utils2.Filter(channels, func(channel *discordgo.Channel) bool {
+		return channel.Type == discordgo.ChannelTypeGuildText
+	})
+
 	channel := random.Choice(channels)
 	ctx.RespondText(channel.Mention())
 }
 
-func (FunCommands) choose(ctx *router.Ctx) {
+func (c *FunCommands) choose(ctx *router.Ctx) {
 	choice := random.Choice(strings.Split(ctx.Arguments.Raw(), " "))
 	c.services.Embed.NewEmbed().
 		SetDescription("I choose: %s", choice).
 		Send(ctx)
 }
 
-func (FunCommands) poll(ctx *router.Ctx) {
+func (c *FunCommands) poll(ctx *router.Ctx) {
 	messages := c.services.Embed.NewEmbed().
 		SetDescription("Answer to this poll by reacting with :thumbsup: or :thumbsdown:").
 		AddField("Question", ctx.Arguments.Raw()).
@@ -1011,8 +1028,8 @@ func (FunCommands) poll(ctx *router.Ctx) {
 	}
 }
 
-func (FunCommands) numberfact(ctx *router.Ctx) {
-	number := utils.Arguments["<number>"]
+func (c *FunCommands) numberfact(ctx *router.Ctx) {
+	number := ctx.Arguments.Get(0).Raw()
 	httpResponse := http.Get(fmt.Sprintf("http://numbersapi.com/%s", number))
 	if httpResponse.Error != nil {
 		ctx.RespondText("An error has occurred.")
@@ -1024,7 +1041,7 @@ func (FunCommands) numberfact(ctx *router.Ctx) {
 		Send(ctx)
 }
 
-func (FunCommands) joke(ctx *router.Ctx) {
+func (c *FunCommands) joke(ctx *router.Ctx) {
 	joke, err := http.GetJson("https://v2.jokeapi.dev/joke/Any")
 	if err != nil {
 		ctx.RespondText("An error has occurred.")
@@ -1040,7 +1057,7 @@ func (FunCommands) joke(ctx *router.Ctx) {
 	emb.AddField("Category", joke.Get("category").MustString()).Send(ctx)
 }
 
-func (FunCommands) fml(ctx *router.Ctx) {
+func (c *FunCommands) fml(ctx *router.Ctx) {
 	fmlJson, err := http.GetJson("https://api.lightning-bot.com/api/v3/misc/fml")
 	if err != nil {
 		ctx.RespondText("An error has occurred.")
@@ -1051,7 +1068,7 @@ func (FunCommands) fml(ctx *router.Ctx) {
 		Send(ctx)
 }
 
-func (FunCommands) tronald(ctx *router.Ctx) {
+func (c *FunCommands) tronald(ctx *router.Ctx) {
 	tronald, err := http.GetJson("https://api.tronalddump.io/random/quote", map[string]string{"Accept": "application/hal+json"})
 	if err != nil {
 		ctx.RespondText("An error has occurred.")
@@ -1062,7 +1079,7 @@ func (FunCommands) tronald(ctx *router.Ctx) {
 		Send(ctx)
 }
 
-func (FunCommands) kanyewest(ctx *router.Ctx) {
+func (c *FunCommands) kanyewest(ctx *router.Ctx) {
 	kanyewest, err := http.GetJson("https://api.kanye.rest")
 	if err != nil {
 		ctx.RespondText("An error has occurred.")
@@ -1073,8 +1090,8 @@ func (FunCommands) kanyewest(ctx *router.Ctx) {
 		Send(ctx)
 }
 
-func (FunCommands) rps(ctx *router.Ctx) {
-	choice := utils.Arguments["<rock/paper/scissors>"]
+func (c *FunCommands) rps(ctx *router.Ctx) {
+	choice := ctx.Arguments.Get(0).Raw()
 	if choice != "rock" && choice != "paper" && choice != "scissors" {
 		ctx.RespondText("You can only choose rock, paper or scissors.")
 		return
@@ -1085,7 +1102,7 @@ func (FunCommands) rps(ctx *router.Ctx) {
 		Send(ctx)
 }
 
-func (FunCommands) covidtest(ctx *router.Ctx) {
+func (c *FunCommands) covidtest(ctx *router.Ctx) {
 	user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
 	if err != nil {
 		ctx.RespondText("Couldn't find user!")
@@ -1097,7 +1114,7 @@ func (FunCommands) covidtest(ctx *router.Ctx) {
 		Send(ctx)
 }
 
-func (FunCommands) hug(ctx *router.Ctx) {
+func (c *FunCommands) hug(ctx *router.Ctx) {
 	url, err := utils.Misc.GetImageUrlFromJson("https://nekos.life/api/v2/img/hug", "url")
 	if err != nil {
 		ctx.RespondText("An error has occurred.")
@@ -1106,7 +1123,7 @@ func (FunCommands) hug(ctx *router.Ctx) {
 	ctx.RespondText(url)
 }
 
-func (FunCommands) kiss(ctx *router.Ctx) {
+func (c *FunCommands) kiss(ctx *router.Ctx) {
 	url, err := utils.Misc.GetImageUrlFromJson("https://nekos.life/api/v2/img/kiss", "url")
 	if err != nil {
 		ctx.RespondText("An error has occurred.")
@@ -1115,7 +1132,7 @@ func (FunCommands) kiss(ctx *router.Ctx) {
 	ctx.RespondText(url)
 }
 
-func (FunCommands) slap(ctx *router.Ctx) {
+func (c *FunCommands) slap(ctx *router.Ctx) {
 	url, err := utils.Misc.GetImageUrlFromJson("https://nekos.life/api/v2/img/slap", "url")
 	if err != nil {
 		ctx.RespondText("An error has occurred.")
@@ -1124,7 +1141,7 @@ func (FunCommands) slap(ctx *router.Ctx) {
 	ctx.RespondText(url)
 }
 
-func (FunCommands) cuddle(ctx *router.Ctx) {
+func (c *FunCommands) cuddle(ctx *router.Ctx) {
 	url, err := utils.Misc.GetImageUrlFromJson("https://nekos.life/api/v2/img/cuddle", "url")
 	if err != nil {
 		ctx.RespondText("An error has occurred.")
@@ -1133,7 +1150,7 @@ func (FunCommands) cuddle(ctx *router.Ctx) {
 	ctx.RespondText(url)
 }
 
-func (FunCommands) pat(ctx *router.Ctx) {
+func (c *FunCommands) pat(ctx *router.Ctx) {
 	url, err := utils.Misc.GetImageUrlFromJson("https://nekos.life/api/v2/img/pat", "url")
 	if err != nil {
 		ctx.RespondText("An error has occurred.")
@@ -1142,7 +1159,7 @@ func (FunCommands) pat(ctx *router.Ctx) {
 	ctx.RespondText(url)
 }
 
-func (FunCommands) feed(ctx *router.Ctx) {
+func (c *FunCommands) feed(ctx *router.Ctx) {
 	url, err := utils.Misc.GetImageUrlFromJson("https://nekos.life/api/v2/img/feed", "url")
 	if err != nil {
 		ctx.RespondText("An error has occurred.")
@@ -1151,7 +1168,7 @@ func (FunCommands) feed(ctx *router.Ctx) {
 	ctx.RespondText(url)
 }
 
-func (FunCommands) wink(ctx *router.Ctx) {
+func (c *FunCommands) wink(ctx *router.Ctx) {
 	url, err := utils.Misc.GetImageUrlFromJson("https://some-random-api.com/animu/wink", "link")
 	if err != nil {
 		ctx.RespondText("An error has occurred.")
@@ -1160,7 +1177,7 @@ func (FunCommands) wink(ctx *router.Ctx) {
 	ctx.RespondText(url)
 }
 
-func (FunCommands) chucknorris(ctx *router.Ctx) {
+func (c *FunCommands) chucknorris(ctx *router.Ctx) {
 	joke, err := http.GetJson("https://api.chucknorris.io/jokes/random")
 	if err != nil {
 		ctx.RespondText("An error has occurred.")
@@ -1171,7 +1188,7 @@ func (FunCommands) chucknorris(ctx *router.Ctx) {
 		Send(ctx)
 }
 
-func (FunCommands) iss(ctx *router.Ctx) {
+func (c *FunCommands) iss(ctx *router.Ctx) {
 	iss, err := http.GetJson("http://api.open-notify.org/iss-now.json")
 	if err != nil {
 		ctx.RespondText("An error has occurred.")
@@ -1187,7 +1204,7 @@ func (FunCommands) iss(ctx *router.Ctx) {
 		Send(ctx)
 }
 
-func (FunCommands) apod(ctx *router.Ctx) {
+func (c *FunCommands) apod(ctx *router.Ctx) {
 	apod, err := http.GetJson("https://api.nasa.gov/planetary/apod?api_key=rDenYNQFftu3YADWdUmF9s8iw0cyZckV7vBcibGe")
 	if err != nil {
 		ctx.RespondText("An error has occurred.")
@@ -1210,14 +1227,14 @@ func (FunCommands) apod(ctx *router.Ctx) {
 		Send(ctx)
 }
 
-func (FunCommands) httpcat(ctx *router.Ctx) {
-	statuscode := utils.Arguments["<statuscode>"]
+func (c *FunCommands) httpcat(ctx *router.Ctx) {
+	statuscode := ctx.Arguments.Get(0).Raw()
 	c.services.Embed.NewEmbed().
 		SetImage(fmt.Sprintf("https://http.cat/%s.jpg", statuscode)).
 		Send(ctx)
 }
 
-func (FunCommands) riddle(ctx *router.Ctx) {
+func (c *FunCommands) riddle(ctx *router.Ctx) {
 	riddleJson, err := http.GetJson("https://api.lightning-bot.com/api/v3/misc/riddle")
 	if err != nil {
 		ctx.RespondText("An error has occurred.")
@@ -1229,7 +1246,7 @@ func (FunCommands) riddle(ctx *router.Ctx) {
 		Send(ctx)
 }
 
-func (FunCommands) quote(ctx *router.Ctx) {
+func (c *FunCommands) quote(ctx *router.Ctx) {
 	quote, err := http.GetJson("https://api.quotable.io/random")
 	if err != nil {
 		ctx.RespondText("An error has occurred.")
@@ -1241,7 +1258,7 @@ func (FunCommands) quote(ctx *router.Ctx) {
 		Send(ctx)
 }
 
-func (FunCommands) evilinsult(ctx *router.Ctx) {
+func (c *FunCommands) evilinsult(ctx *router.Ctx) {
 	httpResponse := http.Get("https://evilinsult.com/generate_insult.php?lang=en")
 	if httpResponse.Error != nil {
 		ctx.RespondText("An error has occurred.")
@@ -1252,27 +1269,27 @@ func (FunCommands) evilinsult(ctx *router.Ctx) {
 		Send(ctx)
 }
 
-func (FunCommands) owoify(ctx *router.Ctx) {
+func (c *FunCommands) owoify(ctx *router.Ctx) {
 	ctx.RespondText(owoifygo.Owoify(ctx.Arguments.Raw(), "owo"))
 }
 
-func (FunCommands) uwuify(ctx *router.Ctx) {
+func (c *FunCommands) uwuify(ctx *router.Ctx) {
 	ctx.RespondText(owoifygo.Owoify(ctx.Arguments.Raw(), "uwu"))
 }
 
-func (FunCommands) uvuify(ctx *router.Ctx) {
+func (c *FunCommands) uvuify(ctx *router.Ctx) {
 	ctx.RespondText(owoifygo.Owoify(ctx.Arguments.Raw(), "uvu"))
 }
 
-func (FunCommands) rickrollurl(ctx *router.Ctx) {
+func (c *FunCommands) rickrollurl(ctx *router.Ctx) {
 	ctx.RespondText("https://www.youtube.com/watch?v=dQw4w9WgXcQ")
 }
 
-func (FunCommands) rickroll(ctx *router.Ctx) {
+func (c *FunCommands) rickroll(ctx *router.Ctx) {
 	ctx.RespondText("**We're no strangers to love\nYou know the rules and so do I\nA full commitment's what I'm thinking of\nYou wouldn't get this from any other guy\nI just wanna tell you how I'm feeling\nGotta make you understand\nNever gonna give you up\nNever gonna let you down\nNever gonna run around and desert you\nNever gonna make you cry\nNever gonna say goodbye\nNever gonna tell a lie and hurt you\nWe've known each other for so long\nYour heart's been aching but you're too shy to say it\nInside we both know what's been going on\nWe know the game and we're gonna play it\nAnd if you ask me how I'm feeling\nDon't tell me you're too blind to see\nNever gonna give you up\nNever gonna let you down\nNever gonna run around and desert you\nNever gonna make you cry\nNever gonna say goodbye\nNever gonna tell a lie and hurt you\nNever gonna give you up\nNever gonna let you down\nNever gonna run around and desert you\nNever gonna make you cry\nNever gonna say goodbye\nNever gonna tell a lie and hurt you\nNever gonna give, never gonna give\n(Give you up)\n(Ooh) Never gonna give, never gonna give\n(Give you up)\nWe've known each other for so long\nYour heart's been aching but you're too shy to say it\nInside we both know what's been going on\nWe know the game and we're gonna play it\nI just wanna tell you how I'm feeling\nGotta make you understand\nNever gonna give you up\nNever gonna let you down\nNever gonna run around and desert you\nNever gonna make you cry\nNever gonna say goodbye\nNever gonna tell a lie and hurt you\nNever gonna give you up\nNever gonna let you down\nNever gonna run around and desert you\nNever gonna make you cry\nNever gonna say goodbye\nNever gonna tell a lie and hurt you\nNever gonna give you up\nNever gonna let you down\nNever gonna run around and desert you\nNever gonna make you cry**")
 }
 
-func (FunCommands) coinflip(ctx *router.Ctx) {
+func (c *FunCommands) coinflip(ctx *router.Ctx) {
 	choice := random.Choice([]string{"Heads!", "Tails!"})
 	images := map[string]string{
 		"Heads!": "https://www.ssaurel.com/blog/wp-content/uploads/2017/01/heads.png",
@@ -1284,12 +1301,12 @@ func (FunCommands) coinflip(ctx *router.Ctx) {
 		Send(ctx)
 }
 
-func (FunCommands) notfunny(ctx *router.Ctx) {
+func (c *FunCommands) notfunny(ctx *router.Ctx) {
 	ctx.RespondText("**Not funny I didn't laugh. Your joke is so bad I would have preferred the joke went over my head and you gave up re-telling me the joke. To be honest this is a horrid attempt at trying to get a laugh out of me. Not a chuckle, not a hehe, not even a subtle burst of air out of my esophagus. Science says before you laugh your brain preps your face muscles but I didn't even feel the slightest twitch. 0/10 this joke is so bad I cannot believe anyone legally allowed you to be creative at all. The amount of brain power you must have put into that joke has the potential to power every house on Earth. Get a personality and learn how to make jokes, read a book. I'm not saying this to be funny I genuinely mean it on how this is just bottom barrel embarrassment at comedy. You've single-handedly killed humor and every comedic act on the planet. I'm so disappointed that society has failed as a whole in being able to teach you how to be funny. Honestly if I put in all my power and time to try and make your joke funny it would require Einstein himself to build a device to strap me into so I can be connected to the energy of a billion stars to do it, and even then all that joke would get from people is a subtle scuff. You're lucky I still have the slightest of empathy for you after telling that joke otherwise I would have committed every war crime in the book just to prevent you from attempting any humor ever again. We should put that joke in text books so future generations can be wary of becoming such an absolute comedic failure. Im disappointed, hurt, and outright offended that my precious time has been wasted in my brain understanding that joke. In the time that took I was planning on helping kids who have been orphaned, but because of that you've waisted my time explaining the obscene integrity of your terrible attempt at comedy. Now those kids are suffering without meals and there's nobody to blame but you.**")
 	ctx.RespondText("**I hope you're happy with what you have done and I truly hope you can move on and learn from this piss poor attempt**")
 }
 
-func (FunCommands) randomquestion(ctx *router.Ctx) {
+func (c *FunCommands) randomquestion(ctx *router.Ctx) {
 	question, err := http.GetJson("https://nekos.life/api/v2/why")
 	if err != nil {
 		ctx.RespondText("An error has occurred.")
@@ -1300,7 +1317,7 @@ func (FunCommands) randomquestion(ctx *router.Ctx) {
 		Send(ctx)
 }
 
-func (FunCommands) lyrics(ctx *router.Ctx) {
+func (c *FunCommands) lyrics(ctx *router.Ctx) {
 	lyrics, err := http.GetJson("https://some-random-api.com/lyrics?title=" + url.QueryEscape(ctx.Arguments.Raw()))
 	if err != nil {
 		ctx.RespondText("An error has occurred.")
@@ -1317,7 +1334,7 @@ func (FunCommands) lyrics(ctx *router.Ctx) {
 		Send(ctx)
 }
 
-func (FunCommands) breakingbadquote(ctx *router.Ctx) {
+func (c *FunCommands) breakingbadquote(ctx *router.Ctx) {
 	quote, err := http.GetJson("https://api.lightning-bot.com/api/v3/misc/breaking-bad-quote")
 	if err != nil {
 		ctx.RespondText("An error has occurred.")
@@ -1329,7 +1346,7 @@ func (FunCommands) breakingbadquote(ctx *router.Ctx) {
 		Send(ctx)
 }
 
-func (FunCommands) gameofthronesquote(ctx *router.Ctx) {
+func (c *FunCommands) gameofthronesquote(ctx *router.Ctx) {
 	quote, err := http.GetJson("https://api.lightning-bot.com/api/v3/misc/game-of-thrones-quote")
 	if err != nil {
 		ctx.RespondText("An error has occurred.")
@@ -1341,7 +1358,7 @@ func (FunCommands) gameofthronesquote(ctx *router.Ctx) {
 		Send(ctx)
 }
 
-func (FunCommands) strangerthingsquote(ctx *router.Ctx) {
+func (c *FunCommands) strangerthingsquote(ctx *router.Ctx) {
 	quote, err := http.GetJson("https://api.lightning-bot.com/api/v3/misc/stranger-things-quote")
 	if err != nil {
 		ctx.RespondText("An error has occurred.")
@@ -1353,7 +1370,7 @@ func (FunCommands) strangerthingsquote(ctx *router.Ctx) {
 		Send(ctx)
 }
 
-func (FunCommands) luciferquote(ctx *router.Ctx) {
+func (c *FunCommands) luciferquote(ctx *router.Ctx) {
 	quote, err := http.GetJson("https://api.lightning-bot.com/api/v3/misc/lucifer-quote")
 	if err != nil {
 		ctx.RespondText("An error has occurred.")
@@ -1365,7 +1382,7 @@ func (FunCommands) luciferquote(ctx *router.Ctx) {
 		Send(ctx)
 }
 
-func (FunCommands) xkcd(ctx *router.Ctx) {
+func (c *FunCommands) xkcd(ctx *router.Ctx) {
 	json, err := http.GetJson("https://xkcd.com/info.0.json")
 	if err != nil {
 		ctx.RespondText("An error has occurred.")
@@ -1381,7 +1398,7 @@ func (FunCommands) xkcd(ctx *router.Ctx) {
 		Send(ctx)
 }
 
-func (FunCommands) boredactivity(ctx *router.Ctx) {
+func (c *FunCommands) boredactivity(ctx *router.Ctx) {
 	json, err := http.GetJson("https://www.boredapi.com/api/activity")
 	if err != nil {
 		ctx.RespondText("An error has occurred.")
@@ -1397,11 +1414,11 @@ func (FunCommands) boredactivity(ctx *router.Ctx) {
 		Send(ctx)
 }
 
-func (FunCommands) ermahgerd(ctx *router.Ctx) {
+func (c *FunCommands) ermahgerd(ctx *router.Ctx) {
 	ctx.RespondText(utils.String.Ermahgerd(ctx.Arguments.Raw()))
 }
 
-func (FunCommands) iseven(ctx *router.Ctx) {
+func (c *FunCommands) iseven(ctx *router.Ctx) {
 	number, err := ctx.Arguments.Get(0).Int()
 	if err != nil {
 		ctx.RespondText("Argument <number> must be a number.")
@@ -1414,7 +1431,7 @@ func (FunCommands) iseven(ctx *router.Ctx) {
 		Send(ctx)
 }
 
-func (FunCommands) agify(ctx *router.Ctx) {
+func (c *FunCommands) agify(ctx *router.Ctx) {
 	json, err := http.GetJson("https://api.agify.io?name=" + url.QueryEscape(ctx.Arguments.Raw()))
 	if err != nil {
 		ctx.RespondText("An error has occurred.")
@@ -1428,7 +1445,7 @@ func (FunCommands) agify(ctx *router.Ctx) {
 		Send(ctx)
 }
 
-func (FunCommands) randomword(ctx *router.Ctx) {
+func (c *FunCommands) randomword(ctx *router.Ctx) {
 	json, err := http.GetJson("https://randomwordgenerator.com/json/words_ws.json")
 	if err != nil {
 		ctx.RespondText("An error has occurred.")
@@ -1443,7 +1460,7 @@ func (FunCommands) randomword(ctx *router.Ctx) {
 		Send(ctx)
 }
 
-func (FunCommands) randomweirdword(ctx *router.Ctx) {
+func (c *FunCommands) randomweirdword(ctx *router.Ctx) {
 	json, err := http.GetJson("https://randomwordgenerator.com/json/unusual-words.json")
 	if err != nil {
 		ctx.RespondText("An error has occurred.")
@@ -1459,7 +1476,7 @@ func (FunCommands) randomweirdword(ctx *router.Ctx) {
 		Send(ctx)
 }
 
-func (FunCommands) startupidea(ctx *router.Ctx) {
+func (c *FunCommands) startupidea(ctx *router.Ctx) {
 	httpResponse := http.Get("https://itsthisforthat.com/api.php?text")
 	if httpResponse.Error != nil {
 		ctx.RespondText("An error has occurred.")
@@ -1471,14 +1488,14 @@ func (FunCommands) startupidea(ctx *router.Ctx) {
 		Send(ctx)
 }
 
-func (FunCommands) fakeperson(ctx *router.Ctx) {
+func (c *FunCommands) fakeperson(ctx *router.Ctx) {
 	c.services.Embed.NewEmbed().
 		SetDescription("Fake Person").
 		SetImage("https://thispersondoesnotexist.com?" + fmt.Sprint(random.Int(1000, 9999))).
 		Send(ctx)
 }
 
-func (FunCommands) commitmessage(ctx *router.Ctx) {
+func (c *FunCommands) commitmessage(ctx *router.Ctx) {
 	httpResponse := http.Get("https://whatthecommit.com/index.txt")
 	if httpResponse.Error != nil {
 		ctx.RespondText("An error has occurred.")
@@ -1490,7 +1507,7 @@ func (FunCommands) commitmessage(ctx *router.Ctx) {
 		Send(ctx)
 }
 
-func (FunCommands) showerthought(ctx *router.Ctx) {
+func (c *FunCommands) showerthought(ctx *router.Ctx) {
 	data, err := http.GetJson("https://showerthoughts.nickf.me/api/thoughts/random?limit=1")
 	if err != nil {
 		ctx.RespondText("An error has occurred.")
@@ -1502,7 +1519,7 @@ func (FunCommands) showerthought(ctx *router.Ctx) {
 		Send(ctx)
 }
 
-func (FunCommands) truth(ctx *router.Ctx) {
+func (c *FunCommands) truth(ctx *router.Ctx) {
 	data, err := http.GetJson("https://api.truthordarebot.xyz/v1/truth")
 	if err != nil {
 		ctx.RespondText("An error has occurred.")
@@ -1514,7 +1531,7 @@ func (FunCommands) truth(ctx *router.Ctx) {
 		Send(ctx)
 }
 
-func (FunCommands) dare(ctx *router.Ctx) {
+func (c *FunCommands) dare(ctx *router.Ctx) {
 	data, err := http.GetJson("https://api.truthordarebot.xyz/v1/dare")
 	if err != nil {
 		ctx.RespondText("An error has occurred.")
@@ -1526,7 +1543,7 @@ func (FunCommands) dare(ctx *router.Ctx) {
 		Send(ctx)
 }
 
-func (FunCommands) neverhaveiever(ctx *router.Ctx) {
+func (c *FunCommands) neverhaveiever(ctx *router.Ctx) {
 	data, err := http.GetJson("https://api.truthordarebot.xyz/v1/nhie")
 	if err != nil {
 		ctx.RespondText("An error has occurred.")
@@ -1538,7 +1555,7 @@ func (FunCommands) neverhaveiever(ctx *router.Ctx) {
 		Send(ctx)
 }
 
-func (FunCommands) paranoia(ctx *router.Ctx) {
+func (c *FunCommands) paranoia(ctx *router.Ctx) {
 	data, err := http.GetJson("https://api.truthordarebot.xyz/v1/paranoia")
 	if err != nil {
 		ctx.RespondText("An error has occurred.")
@@ -1550,7 +1567,7 @@ func (FunCommands) paranoia(ctx *router.Ctx) {
 		Send(ctx)
 }
 
-func (FunCommands) randomcolor(ctx *router.Ctx) {
+func (c *FunCommands) randomcolor(ctx *router.Ctx) {
 	r, g, b := random.Int(0, 255), random.Int(0, 255), random.Int(0, 255)
 	hex := fmt.Sprintf("%02x%02x%02x", r, g, b)
 	name := "Unknown"
@@ -1572,7 +1589,7 @@ func (FunCommands) randomcolor(ctx *router.Ctx) {
 	}
 }
 
-func (FunCommands) pickupline(ctx *router.Ctx) {
+func (c *FunCommands) pickupline(ctx *router.Ctx) {
 	data, err := http.GetJson("https://api.popcat.xyz/pickuplines")
 	if err != nil {
 		ctx.RespondText("An error has occurred.")
@@ -1584,7 +1601,7 @@ func (FunCommands) pickupline(ctx *router.Ctx) {
 		Send(ctx)
 }
 
-func (FunCommands) elementinfo(ctx *router.Ctx) {
+func (c *FunCommands) elementinfo(ctx *router.Ctx) {
 	data, err := http.GetJson("https://api.popcat.xyz/periodic-table?element=" + url.QueryEscape(ctx.Arguments.Raw()))
 	if err != nil {
 		ctx.RespondText("An error has occurred.")
@@ -1604,7 +1621,7 @@ func (FunCommands) elementinfo(ctx *router.Ctx) {
 		Send(ctx)
 }
 
-func (FunCommands) randomelement(ctx *router.Ctx) {
+func (c *FunCommands) randomelement(ctx *router.Ctx) {
 	data, err := http.GetJson("https://api.popcat.xyz/periodic-table/random")
 	if err != nil {
 		ctx.RespondText("An error has occurred.")
@@ -1622,14 +1639,4 @@ func (FunCommands) randomelement(ctx *router.Ctx) {
 		AddField("Summary", data.Get("summary").MustString()).
 		SetImage(data.Get("image").MustString()).
 		Send(ctx)
-}
-
-type FunCommands struct{ services *services.Services }
-
-func NewFunCommands(s *services.Services) *FunCommands {
-	return &FunCommands{services: s}
-}
-func (c *FunCommands) Register() {
-	cmdRouter := c.services.Discord.GetRouter()
-
 }
