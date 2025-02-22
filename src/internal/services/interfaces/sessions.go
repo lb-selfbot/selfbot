@@ -13,6 +13,6 @@ type SessionsService interface {
 
 	GetGatewaySessions() []*discordgo.GatewaySession
 	GetLoginSessions() []*discordgo.LoginSession
-	SetLastStatusChange(time time.Time)
 	GetStatus() string
+	SetStatus(status string)
 }

@@ -44,12 +44,13 @@ func (s *SessionsServiceImpl) GetLoginSessions() []*discordgo.LoginSession {
 	return s.loginSessions
 }
 
-func (s *SessionsServiceImpl) SetLastStatusChange(time time.Time) {
-	s.lastStatusChange = time
-}
-
 func (s *SessionsServiceImpl) GetStatus() string {
 	return s.status
+}
+
+func (s *SessionsServiceImpl) SetStatus(status string) {
+	s.status = status
+	s.lastStatusChange = time.Now()
 }
 
 func (s *SessionsServiceImpl) onSessionsReplace(session *discordgo.Session, e *discordgo.SessionsReplace) {

@@ -7,7 +7,6 @@ import (
 	"reflect"
 	"slices"
 	"strings"
-	"time"
 
 	"github.com/LightningDev1/LB-Selfbot/internal/api"
 	"github.com/LightningDev1/LB-Selfbot/internal/config"
@@ -15,7 +14,6 @@ import (
 	"github.com/LightningDev1/LB-Selfbot/internal/router"
 	"github.com/LightningDev1/LB-Selfbot/internal/services"
 	"github.com/LightningDev1/LB-Selfbot/internal/utils"
-	"github.com/LightningDev1/LB-Selfbot/selfbot/sessions"
 	"github.com/LightningDev1/discordgo"
 	"github.com/LightningDev1/discordgo/protos"
 	"google.golang.org/protobuf/types/known/wrapperspb"
@@ -229,23 +227,27 @@ func (c *ActivityCommands) Register() {
 	})
 }
 
-func (a *ActivityCommands) setStatus(session *discordgo.Session, status string) error {
-	sessions.LastStatusChange = time.Now()
-	sessions.Status = status
-
+func (c *ActivityCommands) setStatus(session *discordgo.Session, status string) error {
 	session.State.UserSettings.Status.Status = wrapperspb.String(status)
 	err := session.UserSettingsUpdate(session.State.UserSettings, true)
 	if err != nil {
 		return err
 	}
 
-	return session.UpdateStatusComplex(discordgo.UpdateStatusData{
+	err = session.UpdateStatusComplex(discordgo.UpdateStatusData{
 		AFK:    true,
 		Status: status,
 	})
+	if err != nil {
+		return err
+	}
+
+	c.services.Sessions.SetStatus(status)
+
+	return nil
 }
 
-func (a *ActivityCommands) setCustomStatus(session *discordgo.Session, status string) error {
+func (c *ActivityCommands) setCustomStatus(session *discordgo.Session, status string) error {
 	var customStatus *protos.PreloadedUserSettings_CustomStatus
 	var activity *discordgo.Activity
 
@@ -270,16 +272,16 @@ func (a *ActivityCommands) setCustomStatus(session *discordgo.Session, status st
 	return session.UpdateStatusComplex(discordgo.UpdateStatusData{
 		Activities: []*discordgo.Activity{activity},
 		AFK:        true,
-		Status:     sessions.Status,
+		Status:     c.services.Sessions.GetStatus(),
 	})
 }
 
-func (a *ActivityCommands) status(ctx *router.Ctx) {
+func (c *ActivityCommands) status(ctx *router.Ctx) {
 	status := strings.ToLower(ctx.Arguments.Get(0).Raw())
 
 	switch status {
 	case "online", "dnd", "idle", "invisible":
-		err := a.setStatus(ctx.Session, status)
+		err := c.setStatus(ctx.Session, status)
 		if err != nil {
 			_ = ctx.RespondText("An error occurred while changing your status: " + err.Error())
 			return
@@ -293,8 +295,8 @@ func (a *ActivityCommands) status(ctx *router.Ctx) {
 	}
 }
 
-func (a *ActivityCommands) customstatus(ctx *router.Ctx) {
-	err := a.setCustomStatus(ctx.Session, ctx.Arguments.Raw())
+func (c *ActivityCommands) customstatus(ctx *router.Ctx) {
+	err := c.setCustomStatus(ctx.Session, ctx.Arguments.Raw())
 	if err != nil {
 		_ = ctx.RespondText("An error occurred while changing your custom status: " + err.Error())
 		return
@@ -305,7 +307,7 @@ func (a *ActivityCommands) customstatus(ctx *router.Ctx) {
 		Send(ctx)
 }
 
-func (a *ActivityCommands) clearactivity(ctx *router.Ctx) {
+func (c *ActivityCommands) clearactivity(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
 		_ = ctx.RespondText("Error getting config: " + err.Error())
@@ -323,7 +325,7 @@ func (a *ActivityCommands) clearactivity(ctx *router.Ctx) {
 		Game:       nil,
 		Activities: []*discordgo.Activity{},
 		AFK:        true,
-		Status:     sessions.Status,
+		Status:     c.services.Sessions.GetStatus(),
 	})
 	if err != nil {
 		_ = ctx.RespondText("An error occurred while clearing your activity: " + err.Error())
@@ -335,7 +337,7 @@ func (a *ActivityCommands) clearactivity(ctx *router.Ctx) {
 		Send(ctx)
 }
 
-func (a *ActivityCommands) copyactivity(ctx *router.Ctx) {
+func (c *ActivityCommands) copyactivity(ctx *router.Ctx) {
 	user, err := ctx.Arguments.Get(0).User()
 	if err != nil {
 		_ = ctx.RespondText("Could not find user")
@@ -377,7 +379,7 @@ func (a *ActivityCommands) copyactivity(ctx *router.Ctx) {
 		ctx.Session.UpdateStatusComplex(discordgo.UpdateStatusData{
 			Activities: member.Presence.Activities,
 			AFK:        false,
-			Status:     sessions.Status,
+			Status:     c.services.Sessions.GetStatus(),
 		})
 
 		for _, activity := range member.Presence.Activities {
@@ -421,7 +423,7 @@ func (a *ActivityCommands) copyactivity(ctx *router.Ctx) {
 		Send(ctx)
 }
 
-func (a *ActivityCommands) getactivityjson(ctx *router.Ctx) {
+func (c *ActivityCommands) getactivityjson(ctx *router.Ctx) {
 	user, err := ctx.Arguments.Get(0).User()
 	if err != nil {
 		_ = ctx.RespondText("Could not find user")
@@ -474,7 +476,7 @@ func (a *ActivityCommands) getactivityjson(ctx *router.Ctx) {
 		Send(ctx)
 }
 
-func (a *ActivityCommands) setactivityjson(ctx *router.Ctx) {
+func (c *ActivityCommands) setactivityjson(ctx *router.Ctx) {
 	rawJson := ctx.Arguments.RawFrom(1)
 
 	var activity *discordgo.Activity
@@ -511,11 +513,11 @@ func (a *ActivityCommands) setactivityjson(ctx *router.Ctx) {
 	_ = ctx.Session.UpdateStatusComplex(discordgo.UpdateStatusData{
 		Activities: []*discordgo.Activity{activity},
 		AFK:        true,
-		Status:     sessions.Status,
+		Status:     c.services.Sessions.GetStatus(),
 	})
 }
 
-func (*ActivityCommands) cactivity(ctx *router.Ctx) {
+func (c *ActivityCommands) cactivity(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
 		_ = ctx.RespondText("Error getting config")
@@ -552,7 +554,7 @@ func (*ActivityCommands) cactivity(ctx *router.Ctx) {
 	}
 }
 
-func (*ActivityCommands) capauseforother(ctx *router.Ctx) {
+func (c *ActivityCommands) capauseforother(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
 		_ = ctx.RespondText("Error getting config")
@@ -589,7 +591,7 @@ func (*ActivityCommands) capauseforother(ctx *router.Ctx) {
 	}
 }
 
-func (*ActivityCommands) caconnectiontype(ctx *router.Ctx) {
+func (c *ActivityCommands) caconnectiontype(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
 		_ = ctx.RespondText("Error getting config")
@@ -628,7 +630,7 @@ func (*ActivityCommands) caconnectiontype(ctx *router.Ctx) {
 	}
 }
 
-func (*ActivityCommands) catype(ctx *router.Ctx) {
+func (c *ActivityCommands) catype(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
 		_ = ctx.RespondText("Error getting config")
@@ -675,7 +677,7 @@ func (*ActivityCommands) catype(ctx *router.Ctx) {
 	}
 }
 
-func (*ActivityCommands) caplatform(ctx *router.Ctx) {
+func (c *ActivityCommands) caplatform(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
 		_ = ctx.RespondText("Error getting config")
@@ -720,7 +722,7 @@ func (*ActivityCommands) caplatform(ctx *router.Ctx) {
 	}
 }
 
-func (*ActivityCommands) caclientid(ctx *router.Ctx) {
+func (c *ActivityCommands) caclientid(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
 		_ = ctx.RespondText("Error getting config")
@@ -750,7 +752,7 @@ func (*ActivityCommands) caclientid(ctx *router.Ctx) {
 	}
 }
 
-func (*ActivityCommands) caname(ctx *router.Ctx) {
+func (c *ActivityCommands) caname(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
 		_ = ctx.RespondText("Error getting config")
@@ -776,7 +778,7 @@ func (*ActivityCommands) caname(ctx *router.Ctx) {
 	}
 }
 
-func (*ActivityCommands) castate(ctx *router.Ctx) {
+func (c *ActivityCommands) castate(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
 		_ = ctx.RespondText("Error getting config")
@@ -802,7 +804,7 @@ func (*ActivityCommands) castate(ctx *router.Ctx) {
 	}
 }
 
-func (*ActivityCommands) cadetails(ctx *router.Ctx) {
+func (c *ActivityCommands) cadetails(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
 		_ = ctx.RespondText("Error getting config")
@@ -828,7 +830,7 @@ func (*ActivityCommands) cadetails(ctx *router.Ctx) {
 	}
 }
 
-func (*ActivityCommands) cainvitable(ctx *router.Ctx) {
+func (c *ActivityCommands) cainvitable(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
 		_ = ctx.RespondText("Error getting config")
@@ -865,7 +867,7 @@ func (*ActivityCommands) cainvitable(ctx *router.Ctx) {
 	}
 }
 
-func (*ActivityCommands) catime(ctx *router.Ctx) {
+func (c *ActivityCommands) catime(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
 		_ = ctx.RespondText("Error getting config")
@@ -902,7 +904,7 @@ func (*ActivityCommands) catime(ctx *router.Ctx) {
 	}
 }
 
-func (*ActivityCommands) castreamingurl(ctx *router.Ctx) {
+func (c *ActivityCommands) castreamingurl(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
 		_ = ctx.RespondText("Error getting config")
@@ -928,7 +930,7 @@ func (*ActivityCommands) castreamingurl(ctx *router.Ctx) {
 	}
 }
 
-func (*ActivityCommands) calargeimage(ctx *router.Ctx) {
+func (c *ActivityCommands) calargeimage(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
 		_ = ctx.RespondText("Error getting config")
@@ -954,7 +956,7 @@ func (*ActivityCommands) calargeimage(ctx *router.Ctx) {
 	}
 }
 
-func (*ActivityCommands) calargetext(ctx *router.Ctx) {
+func (c *ActivityCommands) calargetext(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
 		_ = ctx.RespondText("Error getting config")
@@ -980,7 +982,7 @@ func (*ActivityCommands) calargetext(ctx *router.Ctx) {
 	}
 }
 
-func (*ActivityCommands) casmallimage(ctx *router.Ctx) {
+func (c *ActivityCommands) casmallimage(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
 		_ = ctx.RespondText("Error getting config")
@@ -1006,7 +1008,7 @@ func (*ActivityCommands) casmallimage(ctx *router.Ctx) {
 	}
 }
 
-func (*ActivityCommands) casmalltext(ctx *router.Ctx) {
+func (c *ActivityCommands) casmalltext(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
 		_ = ctx.RespondText("Error getting config")
@@ -1032,7 +1034,7 @@ func (*ActivityCommands) casmalltext(ctx *router.Ctx) {
 	}
 }
 
-func (*ActivityCommands) cabutton1(ctx *router.Ctx) {
+func (c *ActivityCommands) cabutton1(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
 		_ = ctx.RespondText("Error getting config")
@@ -1060,7 +1062,7 @@ func (*ActivityCommands) cabutton1(ctx *router.Ctx) {
 	}
 }
 
-func (*ActivityCommands) cabutton2(ctx *router.Ctx) {
+func (c *ActivityCommands) cabutton2(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
 		_ = ctx.RespondText("Error getting config")
@@ -1088,7 +1090,7 @@ func (*ActivityCommands) cabutton2(ctx *router.Ctx) {
 	}
 }
 
-func (*ActivityCommands) capresets(ctx *router.Ctx) {
+func (c *ActivityCommands) capresets(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
 		_ = ctx.RespondText("Error getting config")
@@ -1223,7 +1225,7 @@ func (*ActivityCommands) capresets(ctx *router.Ctx) {
 	}
 }
 
-func (*ActivityCommands) cacreateimagekey(ctx *router.Ctx) {
+func (c *ActivityCommands) cacreateimagekey(ctx *router.Ctx) {
 	url := utils.Arguments["<image url>"]
 
 	if strings.Contains(url, "discordapp.com") {
@@ -1238,7 +1240,7 @@ func (*ActivityCommands) cacreateimagekey(ctx *router.Ctx) {
 		Send(ctx)
 }
 
-func (*ActivityCommands) cacreatespotifykey(ctx *router.Ctx) {
+func (c *ActivityCommands) cacreatespotifykey(ctx *router.Ctx) {
 	bearerToken := utils.Spotify.GetBearerToken(ctx.Session.Identify.Token)
 
 	if bearerToken == "" {
@@ -1268,7 +1270,7 @@ func (*ActivityCommands) cacreatespotifykey(ctx *router.Ctx) {
 		Send(ctx)
 }
 
-func (ActivityCommands) activitypresets(ctx *router.Ctx) {
+func (c *ActivityCommands) activitypresets(ctx *router.Ctx) {
 	switch strings.ToLower(utils.Arguments["<set/values>"]) {
 	case "set":
 		name := strings.ToLower(utils.Arguments["[name]"])
