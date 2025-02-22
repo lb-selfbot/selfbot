@@ -345,7 +345,7 @@ func (c *EventReactionsCommands) Register() {
 
 // Utils
 
-func (EventReactionsCommands) toggleReaction(ctx *router.Ctx, reaction eventreactions.EventReaction) {
+func (c *EventReactionsCommands) toggleReaction(ctx *router.Ctx, reaction eventreactions.EventReaction) {
 	// Delete the raction if it already exists
 	if eventreactions.Exists(reaction) {
 		eventreactions.Remove(reaction)
@@ -362,7 +362,7 @@ func (EventReactionsCommands) toggleReaction(ctx *router.Ctx, reaction eventreac
 		Send(ctx)
 }
 
-func (EventReactionsCommands) mapReactions(ctx *router.Ctx, reactions []eventreactions.EventReaction, errText, title string) {
+func (c *EventReactionsCommands) mapReactions(ctx *router.Ctx, reactions []eventreactions.EventReaction, errText, title string) {
 	if len(reactions) == 0 {
 		c.services.Embed.NewEmbed().
 			SetDescription(errText).
@@ -379,7 +379,7 @@ func (EventReactionsCommands) mapReactions(ctx *router.Ctx, reactions []eventrea
 		Send(ctx)
 }
 
-func (EventReactionsCommands) getGuildOrChannel(ctx *router.Ctx, arg *dgc.Argument) (guild *discordgo.Guild, channel *discordgo.Channel, err error) {
+func (c *EventReactionsCommands) getGuildOrChannel(ctx *router.Ctx, arg *dgc.Argument) (guild *discordgo.Guild, channel *discordgo.Channel, err error) {
 	givenID := utils.Misc.Or(arg.AsChannelMentionID(), arg.Raw())
 
 	if givenID == "" {
@@ -1303,7 +1303,7 @@ func (e EventReactionsCommands) antideletemessages(ctx *router.Ctx) {
 
 // AFK
 
-func (EventReactionsCommands) afkresponder(ctx *router.Ctx) {
+func (c *EventReactionsCommands) afkresponder(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
 		ctx.RespondText("Error getting config")
@@ -1340,7 +1340,7 @@ func (EventReactionsCommands) afkresponder(ctx *router.Ctx) {
 	}
 }
 
-func (EventReactionsCommands) afkonping(ctx *router.Ctx) {
+func (c *EventReactionsCommands) afkonping(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
 		ctx.RespondText("Error getting config")
@@ -1377,7 +1377,7 @@ func (EventReactionsCommands) afkonping(ctx *router.Ctx) {
 	}
 }
 
-func (EventReactionsCommands) afkondm(ctx *router.Ctx) {
+func (c *EventReactionsCommands) afkondm(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
 		ctx.RespondText("Error getting config")
@@ -1414,7 +1414,7 @@ func (EventReactionsCommands) afkondm(ctx *router.Ctx) {
 	}
 }
 
-func (EventReactionsCommands) afkdelay(ctx *router.Ctx) {
+func (c *EventReactionsCommands) afkdelay(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
 		ctx.RespondText("Error getting config")
@@ -1448,7 +1448,7 @@ func (EventReactionsCommands) afkdelay(ctx *router.Ctx) {
 	}
 }
 
-func (EventReactionsCommands) afkrandomdelay(ctx *router.Ctx) {
+func (c *EventReactionsCommands) afkrandomdelay(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
 		ctx.RespondText("Error getting config")
@@ -1485,7 +1485,7 @@ func (EventReactionsCommands) afkrandomdelay(ctx *router.Ctx) {
 	}
 }
 
-func (EventReactionsCommands) afkinactive(ctx *router.Ctx) {
+func (c *EventReactionsCommands) afkinactive(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
 		ctx.RespondText("Error getting config")
@@ -1522,7 +1522,7 @@ func (EventReactionsCommands) afkinactive(ctx *router.Ctx) {
 	}
 }
 
-func (EventReactionsCommands) afkinactivetimeout(ctx *router.Ctx) {
+func (c *EventReactionsCommands) afkinactivetimeout(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
 		ctx.RespondText("Error getting config")
@@ -1556,7 +1556,7 @@ func (EventReactionsCommands) afkinactivetimeout(ctx *router.Ctx) {
 	}
 }
 
-func (EventReactionsCommands) afktyping(ctx *router.Ctx) {
+func (c *EventReactionsCommands) afktyping(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
 		ctx.RespondText("Error getting config")
@@ -1593,7 +1593,7 @@ func (EventReactionsCommands) afktyping(ctx *router.Ctx) {
 	}
 }
 
-func (EventReactionsCommands) afkai(ctx *router.Ctx) {
+func (c *EventReactionsCommands) afkai(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
 		ctx.RespondText("Error getting config")
@@ -1630,7 +1630,7 @@ func (EventReactionsCommands) afkai(ctx *router.Ctx) {
 	}
 }
 
-func (EventReactionsCommands) afkmessage(ctx *router.Ctx) {
+func (c *EventReactionsCommands) afkmessage(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
 		ctx.RespondText("Error getting config")
@@ -1656,7 +1656,7 @@ func (EventReactionsCommands) afkmessage(ctx *router.Ctx) {
 	}
 }
 
-func (EventReactionsCommands) afktriggertype(ctx *router.Ctx) {
+func (c *EventReactionsCommands) afktriggertype(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
 		ctx.RespondText("Error getting config")
@@ -1697,7 +1697,7 @@ func (EventReactionsCommands) afktriggertype(ctx *router.Ctx) {
 	}
 }
 
-func (EventReactionsCommands) afktriggerusers(ctx *router.Ctx) {
+func (c *EventReactionsCommands) afktriggerusers(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
 		ctx.RespondText("Error getting config")
@@ -1780,7 +1780,7 @@ func (EventReactionsCommands) afktriggerusers(ctx *router.Ctx) {
 	}
 }
 
-func (EventReactionsCommands) afktriggerservers(ctx *router.Ctx) {
+func (c *EventReactionsCommands) afktriggerservers(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
 		ctx.RespondText("Error getting config")

@@ -209,7 +209,7 @@ func (p ProtectionsCommands) antimassdm(ctx *router.Ctx) {
 	}
 }
 
-func (ProtectionsCommands) protectedservers(ctx *router.Ctx) {
+func (c *ProtectionsCommands) protectedservers(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
 		ctx.RespondText("Error getting config.")
@@ -429,7 +429,7 @@ func (p ProtectionsCommands) antidelete(ctx *router.Ctx) {
 	}
 }
 
-func (ProtectionsCommands) dm(ctx *router.Ctx) {
+func (c *ProtectionsCommands) dm(ctx *router.Ctx) {
 	var err error
 	var action string
 
@@ -466,7 +466,7 @@ func (ProtectionsCommands) dm(ctx *router.Ctx) {
 		Send(ctx)
 }
 
-func (ProtectionsCommands) friendrequests(ctx *router.Ctx) {
+func (c *ProtectionsCommands) friendrequests(ctx *router.Ctx) {
 	var err error
 	var action string
 

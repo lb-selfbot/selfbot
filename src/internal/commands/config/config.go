@@ -508,7 +508,7 @@ func (c ConfigCommands) RegisterCommands(router *dgc.Router) {
 	})
 }
 
-func (ConfigCommands) commandprefix(ctx *router.Ctx) {
+func (c *ConfigCommands) commandprefix(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
 		ctx.RespondText("Error getting config")
@@ -538,7 +538,7 @@ func (ConfigCommands) commandprefix(ctx *router.Ctx) {
 	}
 }
 
-func (ConfigCommands) commandmode(ctx *router.Ctx) {
+func (c *ConfigCommands) commandmode(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
 		ctx.RespondText("Error getting config")
@@ -583,7 +583,7 @@ func (ConfigCommands) commandmode(ctx *router.Ctx) {
 	}
 }
 
-func (ConfigCommands) title(ctx *router.Ctx) {
+func (c *ConfigCommands) title(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
 		ctx.RespondText("Error getting config")
@@ -609,7 +609,7 @@ func (ConfigCommands) title(ctx *router.Ctx) {
 	}
 }
 
-func (ConfigCommands) footer(ctx *router.Ctx) {
+func (c *ConfigCommands) footer(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
 		ctx.RespondText("Error getting config")
@@ -635,7 +635,7 @@ func (ConfigCommands) footer(ctx *router.Ctx) {
 	}
 }
 
-func (ConfigCommands) delresponses(ctx *router.Ctx) {
+func (c *ConfigCommands) delresponses(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
 		ctx.RespondText("Error getting config")
@@ -672,7 +672,7 @@ func (ConfigCommands) delresponses(ctx *router.Ctx) {
 	}
 }
 
-func (ConfigCommands) delresponsesdelay(ctx *router.Ctx) {
+func (c *ConfigCommands) delresponsesdelay(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
 		ctx.RespondText("Error getting config")
@@ -706,7 +706,7 @@ func (ConfigCommands) delresponsesdelay(ctx *router.Ctx) {
 	}
 }
 
-func (ConfigCommands) delcommands(ctx *router.Ctx) {
+func (c *ConfigCommands) delcommands(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
 		ctx.RespondText("Error getting config")
@@ -743,7 +743,7 @@ func (ConfigCommands) delcommands(ctx *router.Ctx) {
 	}
 }
 
-func (ConfigCommands) clientspoof(ctx *router.Ctx) {
+func (c *ConfigCommands) clientspoof(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
 		ctx.RespondText("Error getting config")
@@ -786,7 +786,7 @@ func (ConfigCommands) clientspoof(ctx *router.Ctx) {
 	}
 }
 
-func (ConfigCommands) timezone(ctx *router.Ctx) {
+func (c *ConfigCommands) timezone(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
 		ctx.RespondText("Error getting config")
@@ -824,7 +824,7 @@ func (ConfigCommands) timezone(ctx *router.Ctx) {
 	}
 }
 
-func (ConfigCommands) embedcolor(ctx *router.Ctx) {
+func (c *ConfigCommands) embedcolor(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
 		ctx.RespondText("Error getting config")
@@ -860,7 +860,7 @@ func (ConfigCommands) embedcolor(ctx *router.Ctx) {
 	}
 }
 
-func (ConfigCommands) embedimage(ctx *router.Ctx) {
+func (c *ConfigCommands) embedimage(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
 		ctx.RespondText("Error getting config")
@@ -886,7 +886,7 @@ func (ConfigCommands) embedimage(ctx *router.Ctx) {
 	}
 }
 
-func (ConfigCommands) embedurl(ctx *router.Ctx) {
+func (c *ConfigCommands) embedurl(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
 		ctx.RespondText("Error getting config")
@@ -912,7 +912,7 @@ func (ConfigCommands) embedurl(ctx *router.Ctx) {
 	}
 }
 
-func (ConfigCommands) forcesubscribedservers(ctx *router.Ctx) {
+func (c *ConfigCommands) forcesubscribedservers(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
 		ctx.RespondText("Error getting config.")
@@ -984,7 +984,7 @@ func (ConfigCommands) forcesubscribedservers(ctx *router.Ctx) {
 	}
 }
 
-func (ConfigCommands) aliases(ctx *router.Ctx) {
+func (c *ConfigCommands) aliases(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
 		ctx.RespondText("Error getting config.")
@@ -1064,7 +1064,7 @@ func (ConfigCommands) aliases(ctx *router.Ctx) {
 	}
 }
 
-func (ConfigCommands) notifications(ctx *router.Ctx) {
+func (c *ConfigCommands) notifications(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
 		ctx.RespondText("Error getting config")
@@ -1108,7 +1108,7 @@ func (ConfigCommands) notifications(ctx *router.Ctx) {
 	}
 }
 
-func (ConfigCommands) nitrosniper(ctx *router.Ctx) {
+func (c *ConfigCommands) nitrosniper(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
 		ctx.RespondText("Error getting config")
@@ -1145,7 +1145,7 @@ func (ConfigCommands) nitrosniper(ctx *router.Ctx) {
 	}
 }
 
-func (ConfigCommands) giveawaysniper(ctx *router.Ctx) {
+func (c *ConfigCommands) giveawaysniper(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
 		ctx.RespondText("Error getting config")
@@ -1182,7 +1182,7 @@ func (ConfigCommands) giveawaysniper(ctx *router.Ctx) {
 	}
 }
 
-func (ConfigCommands) giveawaysnipersleep(ctx *router.Ctx) {
+func (c *ConfigCommands) giveawaysnipersleep(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
 		ctx.RespondText("Error getting config")
@@ -1216,7 +1216,7 @@ func (ConfigCommands) giveawaysnipersleep(ctx *router.Ctx) {
 	}
 }
 
-func (ConfigCommands) customgiveawaybots(ctx *router.Ctx) {
+func (c *ConfigCommands) customgiveawaybots(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
 		ctx.RespondText("Error getting config.")
@@ -1295,7 +1295,7 @@ func (ConfigCommands) customgiveawaybots(ctx *router.Ctx) {
 	}
 }
 
-func (ConfigCommands) sniperblacklist(ctx *router.Ctx) {
+func (c *ConfigCommands) sniperblacklist(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
 		ctx.RespondText("Error getting config.")
@@ -1347,7 +1347,7 @@ func (ConfigCommands) sniperblacklist(ctx *router.Ctx) {
 	}
 }
 
-func (ConfigCommands) sniperserverblacklist(ctx *router.Ctx) {
+func (c *ConfigCommands) sniperserverblacklist(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
 		ctx.RespondText("Error getting config.")
@@ -1419,7 +1419,7 @@ func (ConfigCommands) sniperserverblacklist(ctx *router.Ctx) {
 	}
 }
 
-func (ConfigCommands) privnotesniper(ctx *router.Ctx) {
+func (c *ConfigCommands) privnotesniper(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
 		ctx.RespondText("Error getting config")
@@ -1456,7 +1456,7 @@ func (ConfigCommands) privnotesniper(ctx *router.Ctx) {
 	}
 }
 
-func (ConfigCommands) multitokensniper(ctx *router.Ctx) {
+func (c *ConfigCommands) multitokensniper(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
 		ctx.RespondText("Error getting config")
@@ -1493,7 +1493,7 @@ func (ConfigCommands) multitokensniper(ctx *router.Ctx) {
 	}
 }
 
-func (ConfigCommands) poketwosniper(ctx *router.Ctx) {
+func (c *ConfigCommands) poketwosniper(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
 		ctx.RespondText("Error getting config")
@@ -1530,7 +1530,7 @@ func (ConfigCommands) poketwosniper(ctx *router.Ctx) {
 	}
 }
 
-func (ConfigCommands) poketwosleep(ctx *router.Ctx) {
+func (c *ConfigCommands) poketwosleep(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
 		ctx.RespondText("Error getting config")
@@ -1564,7 +1564,7 @@ func (ConfigCommands) poketwosleep(ctx *router.Ctx) {
 	}
 }
 
-func (ConfigCommands) poketworandomsleep(ctx *router.Ctx) {
+func (c *ConfigCommands) poketworandomsleep(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
 		ctx.RespondText("Error getting config")
@@ -1601,7 +1601,7 @@ func (ConfigCommands) poketworandomsleep(ctx *router.Ctx) {
 	}
 }
 
-func (ConfigCommands) poketwotimeout(ctx *router.Ctx) {
+func (c *ConfigCommands) poketwotimeout(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
 		ctx.RespondText("Error getting config")
@@ -1635,7 +1635,7 @@ func (ConfigCommands) poketwotimeout(ctx *router.Ctx) {
 	}
 }
 
-func (ConfigCommands) poketwotyping(ctx *router.Ctx) {
+func (c *ConfigCommands) poketwotyping(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
 		ctx.RespondText("Error getting config")
@@ -1672,7 +1672,7 @@ func (ConfigCommands) poketwotyping(ctx *router.Ctx) {
 	}
 }
 
-func (ConfigCommands) poketwocatchrate(ctx *router.Ctx) {
+func (c *ConfigCommands) poketwocatchrate(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
 		ctx.RespondText("Error getting config")
@@ -1702,7 +1702,7 @@ func (ConfigCommands) poketwocatchrate(ctx *router.Ctx) {
 	}
 }
 
-func (ConfigCommands) poketwofakeactivity(ctx *router.Ctx) {
+func (c *ConfigCommands) poketwofakeactivity(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
 		ctx.RespondText("Error getting config")
@@ -1739,7 +1739,7 @@ func (ConfigCommands) poketwofakeactivity(ctx *router.Ctx) {
 	}
 }
 
-func (ConfigCommands) poketwochannels(ctx *router.Ctx) {
+func (c *ConfigCommands) poketwochannels(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
 		ctx.RespondText("Error getting config")
@@ -1817,7 +1817,7 @@ func (ConfigCommands) poketwochannels(ctx *router.Ctx) {
 	}
 }
 
-func (ConfigCommands) poketwolanguage(ctx *router.Ctx) {
+func (c *ConfigCommands) poketwolanguage(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
 		ctx.RespondText("Error getting config")
@@ -1862,7 +1862,7 @@ func (ConfigCommands) poketwolanguage(ctx *router.Ctx) {
 	}
 }
 
-func (ConfigCommands) snipertokens(ctx *router.Ctx) {
+func (c *ConfigCommands) snipertokens(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
 		ctx.RespondText("Error getting config")
@@ -1944,7 +1944,7 @@ func createWebhookChannel(ctx *router.Ctx, serverID, categoryID, name string) (s
 	return fmt.Sprintf("https://discord.com/api/webhooks/%s/%s", webhook.ID, webhook.Token), nil
 }
 
-func (ConfigCommands) setupwebhooks(ctx *router.Ctx) {
+func (c *ConfigCommands) setupwebhooks(ctx *router.Ctx) {
 	serverID := ctx.Message.GuildID
 	if utils.Arguments["[server id]"] != "" {
 		serverID = utils.Arguments["[server id]"]
@@ -1978,7 +1978,7 @@ func (ConfigCommands) setupwebhooks(ctx *router.Ctx) {
 		Send(ctx)
 }
 
-func (ConfigCommands) wall(ctx *router.Ctx) {
+func (c *ConfigCommands) wall(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
 		ctx.RespondText("Error getting config")
@@ -2003,7 +2003,7 @@ func (ConfigCommands) wall(ctx *router.Ctx) {
 		Send(ctx)
 }
 
-func (ConfigCommands) wnitrosniper(ctx *router.Ctx) {
+func (c *ConfigCommands) wnitrosniper(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
 		ctx.RespondText("Error getting config")
@@ -2027,7 +2027,7 @@ func (ConfigCommands) wnitrosniper(ctx *router.Ctx) {
 	}
 }
 
-func (ConfigCommands) wgiveawaysniper(ctx *router.Ctx) {
+func (c *ConfigCommands) wgiveawaysniper(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
 		ctx.RespondText("Error getting config")
@@ -2051,7 +2051,7 @@ func (ConfigCommands) wgiveawaysniper(ctx *router.Ctx) {
 	}
 }
 
-func (ConfigCommands) wselfbotdetection(ctx *router.Ctx) {
+func (c *ConfigCommands) wselfbotdetection(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
 		ctx.RespondText("Error getting config")
@@ -2075,7 +2075,7 @@ func (ConfigCommands) wselfbotdetection(ctx *router.Ctx) {
 	}
 }
 
-func (ConfigCommands) wstaffdetection(ctx *router.Ctx) {
+func (c *ConfigCommands) wstaffdetection(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
 		ctx.RespondText("Error getting config")
@@ -2099,7 +2099,7 @@ func (ConfigCommands) wstaffdetection(ctx *router.Ctx) {
 	}
 }
 
-func (ConfigCommands) wnotifiers(ctx *router.Ctx) {
+func (c *ConfigCommands) wnotifiers(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
 		ctx.RespondText("Error getting config")
@@ -2123,7 +2123,7 @@ func (ConfigCommands) wnotifiers(ctx *router.Ctx) {
 	}
 }
 
-func (ConfigCommands) wpingdetection(ctx *router.Ctx) {
+func (c *ConfigCommands) wpingdetection(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
 		ctx.RespondText("Error getting config")
@@ -2147,7 +2147,7 @@ func (ConfigCommands) wpingdetection(ctx *router.Ctx) {
 	}
 }
 
-func (ConfigCommands) wmisc(ctx *router.Ctx) {
+func (c *ConfigCommands) wmisc(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
 		ctx.RespondText("Error getting config")
@@ -2171,7 +2171,7 @@ func (ConfigCommands) wmisc(ctx *router.Ctx) {
 	}
 }
 
-func (ConfigCommands) wsessions(ctx *router.Ctx) {
+func (c *ConfigCommands) wsessions(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
 		ctx.RespondText("Error getting config")
@@ -2195,7 +2195,7 @@ func (ConfigCommands) wsessions(ctx *router.Ctx) {
 	}
 }
 
-func (ConfigCommands) wpingself(ctx *router.Ctx) {
+func (c *ConfigCommands) wpingself(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
 		ctx.RespondText("Error getting config")
@@ -2236,7 +2236,7 @@ func (ConfigCommands) wpingself(ctx *router.Ctx) {
 	}
 }
 
-func (ConfigCommands) wpingeveryone(ctx *router.Ctx) {
+func (c *ConfigCommands) wpingeveryone(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
 		ctx.RespondText("Error getting config")
@@ -2277,7 +2277,7 @@ func (ConfigCommands) wpingeveryone(ctx *router.Ctx) {
 	}
 }
 
-func (ConfigCommands) bannotifier(ctx *router.Ctx) {
+func (c *ConfigCommands) bannotifier(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
 		ctx.RespondText("Error getting config")
@@ -2314,7 +2314,7 @@ func (ConfigCommands) bannotifier(ctx *router.Ctx) {
 	}
 }
 
-func (ConfigCommands) staffdetection(ctx *router.Ctx) {
+func (c *ConfigCommands) staffdetection(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
 		ctx.RespondText("Error getting config")
@@ -2351,7 +2351,7 @@ func (ConfigCommands) staffdetection(ctx *router.Ctx) {
 	}
 }
 
-func (ConfigCommands) pingdetection(ctx *router.Ctx) {
+func (c *ConfigCommands) pingdetection(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
 		ctx.RespondText("Error getting config")
@@ -2388,7 +2388,7 @@ func (ConfigCommands) pingdetection(ctx *router.Ctx) {
 	}
 }
 
-func (ConfigCommands) ticketnotifier(ctx *router.Ctx) {
+func (c *ConfigCommands) ticketnotifier(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
 		ctx.RespondText("Error getting config")
@@ -2425,7 +2425,7 @@ func (ConfigCommands) ticketnotifier(ctx *router.Ctx) {
 	}
 }
 
-func (ConfigCommands) sessionconnected(ctx *router.Ctx) {
+func (c *ConfigCommands) sessionconnected(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
 		ctx.RespondText("Error getting config")
@@ -2462,7 +2462,7 @@ func (ConfigCommands) sessionconnected(ctx *router.Ctx) {
 	}
 }
 
-func (ConfigCommands) sessiondisconnected(ctx *router.Ctx) {
+func (c *ConfigCommands) sessiondisconnected(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
 		ctx.RespondText("Error getting config")
@@ -2499,7 +2499,7 @@ func (ConfigCommands) sessiondisconnected(ctx *router.Ctx) {
 	}
 }
 
-func (ConfigCommands) selfbotdetection(ctx *router.Ctx) {
+func (c *ConfigCommands) selfbotdetection(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
 		ctx.RespondText("Error getting config")
@@ -2536,7 +2536,7 @@ func (ConfigCommands) selfbotdetection(ctx *router.Ctx) {
 	}
 }
 
-func (ConfigCommands) dmtypingnotifier(ctx *router.Ctx) {
+func (c *ConfigCommands) dmtypingnotifier(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
 		ctx.RespondText("Error getting config")
@@ -2573,7 +2573,7 @@ func (ConfigCommands) dmtypingnotifier(ctx *router.Ctx) {
 	}
 }
 
-func (ConfigCommands) dmnotifier(ctx *router.Ctx) {
+func (c *ConfigCommands) dmnotifier(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
 		ctx.RespondText("Error getting config")
@@ -2610,7 +2610,7 @@ func (ConfigCommands) dmnotifier(ctx *router.Ctx) {
 	}
 }
 
-func (ConfigCommands) dmdeletenotifier(ctx *router.Ctx) {
+func (c *ConfigCommands) dmdeletenotifier(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
 		ctx.RespondText("Error getting config")
@@ -2647,7 +2647,7 @@ func (ConfigCommands) dmdeletenotifier(ctx *router.Ctx) {
 	}
 }
 
-func (ConfigCommands) dmeditnotifier(ctx *router.Ctx) {
+func (c *ConfigCommands) dmeditnotifier(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
 		ctx.RespondText("Error getting config")
@@ -2684,7 +2684,7 @@ func (ConfigCommands) dmeditnotifier(ctx *router.Ctx) {
 	}
 }
 
-func (ConfigCommands) messagedeletenotifier(ctx *router.Ctx) {
+func (c *ConfigCommands) messagedeletenotifier(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
 		ctx.RespondText("Error getting config")
@@ -2721,7 +2721,7 @@ func (ConfigCommands) messagedeletenotifier(ctx *router.Ctx) {
 	}
 }
 
-func (ConfigCommands) uitheme(ctx *router.Ctx) {
+func (c *ConfigCommands) uitheme(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
 		ctx.RespondText("Error getting config")
@@ -2755,7 +2755,7 @@ func (ConfigCommands) uitheme(ctx *router.Ctx) {
 	}
 }
 
-func (ConfigCommands) hidetosystray(ctx *router.Ctx) {
+func (c *ConfigCommands) hidetosystray(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
 		ctx.RespondText("Error getting config")
@@ -2792,7 +2792,7 @@ func (ConfigCommands) hidetosystray(ctx *router.Ctx) {
 	}
 }
 
-func (ConfigCommands) runuionstartup(ctx *router.Ctx) {
+func (c *ConfigCommands) runuionstartup(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
 		ctx.RespondText("Error getting config")
@@ -2829,7 +2829,7 @@ func (ConfigCommands) runuionstartup(ctx *router.Ctx) {
 	}
 }
 
-func (ConfigCommands) runbotonstartup(ctx *router.Ctx) {
+func (c *ConfigCommands) runbotonstartup(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
 		ctx.RespondText("Error getting config")

@@ -25,7 +25,7 @@ type HelpMessage struct {
 }
 
 // RegisterHelpCommand registers the help command to the router
-func (h *HelpCommand) RegisterHelpCommand(router *dgc.Router, session *discordgo.Session) {
+func (c *HelpCommand) RegisterHelpCommand(router *dgc.Router, session *discordgo.Session) {
 	// Register the default help command
 	router.StopCategory()
 	router.RegisterCmd(&dgc.Command{
@@ -36,12 +36,12 @@ func (h *HelpCommand) RegisterHelpCommand(router *dgc.Router, session *discordgo
 		Name:        "search",
 		Arguments:   "<query>",
 		Description: "Search for a command",
-		Handler:     h.search,
+		Handler:     c.search,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "repeat",
 		Description: "Repeat the last used command",
-		Handler:     h.repeat,
+		Handler:     c.repeat,
 	})
 
 	for _, category := range router.Categories {
@@ -248,7 +248,7 @@ func renderDefaultGeneralHelpEmbed(router *dgc.Router) *embed.Embed {
 	return emb
 }
 
-func (HelpCommand) search(ctx *router.Ctx) {
+func (c *HelpCommand) search(ctx *router.Ctx) {
 	query := utils.Arguments["<query>"]
 	prefix := ctx.Router.GetPrefixes()[0]
 	var closeCommands []string
@@ -273,7 +273,7 @@ func (HelpCommand) search(ctx *router.Ctx) {
 		Send(ctx)
 }
 
-func (HelpCommand) repeat(ctx *router.Ctx) {
+func (c *HelpCommand) repeat(ctx *router.Ctx) {
 	eventreactions.UsedCommands.Mutex.Lock()
 	defer eventreactions.UsedCommands.Mutex.Unlock()
 
