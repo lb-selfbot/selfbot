@@ -108,11 +108,8 @@ func (c *DumpingCommands) Register() {
 }
 
 func (c *DumpingCommands) dumpall(ctx *router.Ctx) {
-	channel, err := ctx.Arguments.Get(0).Channel()
+	channel, err := ctx.Arguments.Get(0).Channel(router.ArgumentFlagFallbackDefault)
 	if err != nil {
-		channel, _ = utils.Discord.GetChannel(ctx.Session, ctx.Message.ChannelID)
-	}
-	if channel == nil {
 		ctx.RespondText("Error getting channel")
 		return
 	}
@@ -155,11 +152,8 @@ func (c *DumpingCommands) dumpall(ctx *router.Ctx) {
 }
 
 func (c *DumpingCommands) dumpimages(ctx *router.Ctx) {
-	channel, err := ctx.Arguments.Get(0).Channel()
+	channel, err := ctx.Arguments.Get(0).Channel(router.ArgumentFlagFallbackDefault)
 	if err != nil {
-		channel, _ = utils.Discord.GetChannel(ctx.Session, ctx.Message.ChannelID)
-	}
-	if channel == nil {
 		ctx.RespondText("Error getting channel")
 		return
 	}
@@ -197,11 +191,8 @@ func (c *DumpingCommands) dumpimages(ctx *router.Ctx) {
 }
 
 func (c *DumpingCommands) dumpvideos(ctx *router.Ctx) {
-	channel, err := ctx.Arguments.Get(0).Channel()
+	channel, err := ctx.Arguments.Get(0).Channel(router.ArgumentFlagFallbackDefault)
 	if err != nil {
-		channel, _ = utils.Discord.GetChannel(ctx.Session, ctx.Message.ChannelID)
-	}
-	if channel == nil {
 		ctx.RespondText("Error getting channel")
 		return
 	}
@@ -239,11 +230,8 @@ func (c *DumpingCommands) dumpvideos(ctx *router.Ctx) {
 }
 
 func (c *DumpingCommands) dumpaudio(ctx *router.Ctx) {
-	channel, err := ctx.Arguments.Get(0).Channel()
+	channel, err := ctx.Arguments.Get(0).Channel(router.ArgumentFlagFallbackDefault)
 	if err != nil {
-		channel, _ = utils.Discord.GetChannel(ctx.Session, ctx.Message.ChannelID)
-	}
-	if channel == nil {
 		ctx.RespondText("Error getting channel")
 		return
 	}
@@ -281,11 +269,8 @@ func (c *DumpingCommands) dumpaudio(ctx *router.Ctx) {
 }
 
 func (c *DumpingCommands) dumptext(ctx *router.Ctx) {
-	channel, err := ctx.Arguments.Get(0).Channel()
+	channel, err := ctx.Arguments.Get(0).Channel(router.ArgumentFlagFallbackDefault)
 	if err != nil {
-		channel, _ = utils.Discord.GetChannel(ctx.Session, ctx.Message.ChannelID)
-	}
-	if channel == nil {
 		ctx.RespondText("Error getting channel")
 		return
 	}
@@ -323,11 +308,8 @@ func (c *DumpingCommands) dumptext(ctx *router.Ctx) {
 }
 
 func (c *DumpingCommands) dumpattachments(ctx *router.Ctx) {
-	channel, err := ctx.Arguments.Get(0).Channel()
+	channel, err := ctx.Arguments.Get(0).Channel(router.ArgumentFlagFallbackDefault)
 	if err != nil {
-		channel, _ = utils.Discord.GetChannel(ctx.Session, ctx.Message.ChannelID)
-	}
-	if channel == nil {
 		ctx.RespondText("Error getting channel")
 		return
 	}

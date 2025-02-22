@@ -3,154 +3,183 @@ package trolling
 import (
 	"encoding/base64"
 	"fmt"
-	"strconv"
 	"strings"
 	"time"
 
 	"github.com/LightningDev1/discordgo"
 
+	"github.com/LightningDev1/LB-Selfbot/internal/config"
 	"github.com/LightningDev1/LB-Selfbot/internal/constants"
 	"github.com/LightningDev1/LB-Selfbot/internal/random"
 	"github.com/LightningDev1/LB-Selfbot/internal/router"
 	"github.com/LightningDev1/LB-Selfbot/internal/services"
 	"github.com/LightningDev1/LB-Selfbot/internal/utils"
-	"github.com/LightningDev1/dgc"
+	"github.com/LightningDev1/LB-Selfbot/internal/utils2"
 )
 
-func (t TrollingCommands) RegisterCommands(router *dgc.Router) {
-	router.StartCategory("Trolling", "Trolling commands")
-	router.RegisterCmd(&dgc.Command{
-		Name:        "purgehack",
-		Description: "Purge a chat without permissions",
-		Flags:       []router.CommandFlag{router.CmdFlagDangerous},
-		Handler:     t.purgehack,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "ghostping",
-		Description: "Ghostping a user",
-		Arguments:   "<user>",
-		Flags:       []router.CommandFlag{router.CmdFlagDangerous},
-		Handler:     t.ghostping,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "gprole",
-		Description: "Ghostping a role",
-		Arguments:   "<role>",
-		Flags:       []router.CommandFlag{router.CmdFlagDangerous},
-		Handler:     t.gprole,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "token",
-		Description: "Send the first part of someones token",
-		Arguments:   "<user>",
-		Flags:       []router.CommandFlag{router.CmdFlagDangerous},
-		Handler:     t.token,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "trollnitro",
-		Description: "Send a fake nitro link with an image",
-		Flags:       []router.CommandFlag{router.CmdFlagDangerous},
-		Handler:     t.trollnitro,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "fakenitro",
-		Description: "Generate fake nitro codes",
-		Arguments:   "<amount>",
-		Flags:       []router.CommandFlag{router.CmdFlagDangerous},
-		Handler:     t.fakenitro,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "hiddentext",
-		Description: "Hide text behind other text",
-		Arguments:   "<\"text\"> <\"hidden\">",
-		Flags:       []router.CommandFlag{router.CmdFlagDangerous},
-		Handler:     t.hiddentext,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "hiddeninvite",
-		Description: "Hide an invite behind text",
-		Arguments:   "<invite> <text>",
-		Flags:       []router.CommandFlag{router.CmdFlagDangerous},
-		Handler:     t.hiddeninvite,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "hiddenping",
-		Description: "Hide a ping behind text",
-		Arguments:   "<userid> <text>",
-		Flags:       []router.CommandFlag{router.CmdFlagDangerous},
-		Handler:     t.hiddenping,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "hiddenroleping",
-		Description: "Hide a role ping behind text",
-		Arguments:   "<roleid> <text>",
-		Flags:       []router.CommandFlag{router.CmdFlagDangerous},
-		Handler:     t.hiddenroleping,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "hiddeneveryone",
-		Description: "Hide an everyone ping behind text",
-		Arguments:   "<text>",
-		Flags:       []router.CommandFlag{router.CmdFlagDangerous},
-		Handler:     t.hiddeneveryone,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "hiddenhere",
-		Description: "Hide a here ping behind text",
-		Arguments:   "<text>",
-		Flags:       []router.CommandFlag{router.CmdFlagDangerous},
-		Handler:     t.hiddenhere,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "voicemove",
-		Description: "Move to random voice channels",
-		Arguments:   "<amount>",
-		Flags:       []router.CommandFlag{router.CmdFlagDangerous},
-		Handler:     t.voicemove,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "triggertyping",
-		Description: "Fake \"User is typing\" message",
-		Arguments:   "<seconds> [channel]",
-		Flags:       []router.CommandFlag{router.CmdFlagDangerous},
-		Handler:     t.triggertyping,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "impersonate",
-		Description: "Impersonate a user using a webhook",
-		Arguments:   "<user> <text>",
-		Flags:       []router.CommandFlag{router.CmdFlagDangerous},
-		Handler:     t.impersonate,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "fakepings",
-		Description: "Get fake pinged in a channel",
-		Arguments:   "<amount> [channel]",
-		Flags:       []router.CommandFlag{router.CmdFlagDangerous},
-		Handler:     t.fakepings,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "billionpings",
-		Description: "Get a billion pings in a channel",
-		Arguments:   "[channel]",
-		Flags:       []router.CommandFlag{router.CmdFlagDangerous},
-		Handler:     t.billionpings,
+type TrollingCommands struct{ services *services.Services }
+
+func NewTrollingCommands(s *services.Services) *TrollingCommands {
+	return &TrollingCommands{services: s}
+}
+func (c *TrollingCommands) Register() {
+	cmdRouter := c.services.Discord.GetRouter()
+
+	cmdRouter.RegisterCategory(&router.Category{
+		Name:        "Trolling",
+		Description: "Trolling commands",
+	}, []*router.Command{
+		{
+			Name:        "purgehack",
+			Description: "Purge a chat without permissions",
+			Flags:       []router.CommandFlag{router.CmdFlagDangerous},
+			Handler:     c.purgehack,
+		},
+		{
+			Name:        "ghostping",
+			Description: "Ghostping a user",
+			Arguments:   "<user>",
+			Flags:       []router.CommandFlag{router.CmdFlagDangerous},
+			Handler:     c.ghostping,
+		},
+		{
+			Name:        "gprole",
+			Description: "Ghostping a role",
+			Arguments:   "<role>",
+			Flags:       []router.CommandFlag{router.CmdFlagDangerous},
+			Handler:     c.gprole,
+		},
+		{
+			Name:        "token",
+			Description: "Send the first part of someones token",
+			Arguments:   "<user>",
+			Flags:       []router.CommandFlag{router.CmdFlagDangerous},
+			Handler:     c.token,
+		},
+		{
+			Name:        "trollnitro",
+			Description: "Send a fake nitro link with an image",
+			Flags:       []router.CommandFlag{router.CmdFlagDangerous},
+			Handler:     c.trollnitro,
+		},
+		{
+			Name:        "fakenitro",
+			Description: "Generate fake nitro codes",
+			Arguments:   "<amount>",
+			Flags:       []router.CommandFlag{router.CmdFlagDangerous},
+			Handler:     c.fakenitro,
+		},
+		{
+			Name:        "hiddentext",
+			Description: "Hide text behind other text",
+			Arguments:   "<\"text\"> <\"hidden\">",
+			Flags:       []router.CommandFlag{router.CmdFlagDangerous},
+			Handler:     c.hiddentext,
+		},
+		{
+			Name:        "hiddeninvite",
+			Description: "Hide an invite behind text",
+			Arguments:   "<invite> <text>",
+			Flags:       []router.CommandFlag{router.CmdFlagDangerous},
+			Handler:     c.hiddeninvite,
+		},
+		{
+			Name:        "hiddenping",
+			Description: "Hide a ping behind text",
+			Arguments:   "<user id> <text>",
+			Flags:       []router.CommandFlag{router.CmdFlagDangerous},
+			Handler:     c.hiddenping,
+		},
+		{
+			Name:        "hiddenroleping",
+			Description: "Hide a role ping behind text",
+			Arguments:   "<role id> <text>",
+			Flags:       []router.CommandFlag{router.CmdFlagDangerous},
+			Handler:     c.hiddenroleping,
+		},
+		{
+			Name:        "hiddeneveryone",
+			Description: "Hide an everyone ping behind text",
+			Arguments:   "<text>",
+			Flags:       []router.CommandFlag{router.CmdFlagDangerous},
+			Handler:     c.hiddeneveryone,
+		},
+		{
+			Name:        "hiddenhere",
+			Description: "Hide a here ping behind text",
+			Arguments:   "<text>",
+			Flags:       []router.CommandFlag{router.CmdFlagDangerous},
+			Handler:     c.hiddenhere,
+		},
+		{
+			Name:        "voicemove",
+			Description: "Move to random voice channels",
+			Arguments:   "<amount>",
+			Flags:       []router.CommandFlag{router.CmdFlagDangerous},
+			Handler:     c.voicemove,
+		},
+		{
+			Name:        "triggertyping",
+			Description: "Fake \"User is typing\" message",
+			Arguments:   "<duration> [channel]",
+			Flags:       []router.CommandFlag{router.CmdFlagDangerous},
+			Handler:     c.triggertyping,
+		},
+		{
+			Name:        "impersonate",
+			Description: "Impersonate a user using a webhook",
+			Arguments:   "<user> <text>",
+			Flags:       []router.CommandFlag{router.CmdFlagDangerous},
+			Handler:     c.impersonate,
+		},
+		{
+			Name:        "fakepings",
+			Description: "Get fake pinged in a channel",
+			Arguments:   "<amount> [channel]",
+			Flags:       []router.CommandFlag{router.CmdFlagDangerous},
+			Handler:     c.fakepings,
+		},
+		{
+			Name:        "billionpings",
+			Description: "Get a billion pings in a channel",
+			Arguments:   "[channel]",
+			Flags:       []router.CommandFlag{router.CmdFlagDangerous},
+			Handler:     c.billionpings,
+		},
 	})
 }
 
-func (TrollingCommands) purgehack(ctx *router.Ctx) {
+func (c *TrollingCommands) purgehack(ctx *router.Ctx) {
 	ctx.RespondText("ﾠ" + strings.Repeat("\n", 1998) + "ﾠ")
 }
 
-func (TrollingCommands) ghostping(*router.Ctx) {
-	// noop
+func (c *TrollingCommands) ghostping(ctx *router.Ctx) {
+	cfg, err := config.GetConfig()
+	if err != nil {
+		return
+	}
+
+	if cfg.Selfbot.DeleteCommands {
+		return
+	}
+
+	_ = ctx.Session.ChannelMessageDelete(ctx.Message.ChannelID, ctx.Message.ID)
 }
 
-func (TrollingCommands) gprole(*router.Ctx) {
-	// noop
+func (c *TrollingCommands) gprole(ctx *router.Ctx) {
+	cfg, err := config.GetConfig()
+	if err != nil {
+		return
+	}
+
+	if cfg.Selfbot.DeleteCommands {
+		return
+	}
+
+	_ = ctx.Session.ChannelMessageDelete(ctx.Message.ChannelID, ctx.Message.ID)
 }
 
-func (TrollingCommands) token(ctx *router.Ctx) {
+func (c *TrollingCommands) token(ctx *router.Ctx) {
 	user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
 	if err != nil {
 		ctx.RespondText("Could not find user.")
@@ -160,11 +189,11 @@ func (TrollingCommands) token(ctx *router.Ctx) {
 	ctx.RespondText(base64.StdEncoding.EncodeToString([]byte(user.ID)))
 }
 
-func (TrollingCommands) trollnitro(ctx *router.Ctx) {
+func (c *TrollingCommands) trollnitro(ctx *router.Ctx) {
 	ctx.RespondText(fmt.Sprintf("discord\u2024gift/%s %s https://i.imgur.com/0WSpeC1.png", random.String(16), constants.INVISIBLE_TEXT))
 }
 
-func (TrollingCommands) fakenitro(ctx *router.Ctx) {
+func (c *TrollingCommands) fakenitro(ctx *router.Ctx) {
 	amount, err := ctx.Arguments.Get(0).Int()
 	if err != nil {
 		ctx.RespondText("Argument <amount> must be a number.")
@@ -175,46 +204,59 @@ func (TrollingCommands) fakenitro(ctx *router.Ctx) {
 	}
 }
 
-func (TrollingCommands) hiddentext(ctx *router.Ctx) {
+func (c *TrollingCommands) hiddentext(ctx *router.Ctx) {
 	ctx.RespondText(fmt.Sprintf(
 		"%s %s %s",
-		utils.Arguments["<\"text\">"],
+		ctx.Arguments.Get(0).Raw(),
 		constants.INVISIBLE_TEXT,
-		utils.Arguments["<\"hidden\">"],
+		ctx.Arguments.Get(1).Raw(),
 	))
 }
 
-func (TrollingCommands) hiddeninvite(ctx *router.Ctx) {
-	text := ctx.Arguments.RawFrom(1)
-	ctx.RespondText(fmt.Sprintf("%s %s %s", text, constants.INVISIBLE_TEXT, utils.Arguments["<invite>"]))
+func (c *TrollingCommands) hiddeninvite(ctx *router.Ctx) {
+	ctx.RespondText(fmt.Sprintf(
+		"%s %s %s",
+		ctx.Arguments.RawFrom(1),
+		constants.INVISIBLE_TEXT,
+		ctx.Arguments.Get(0).Raw(),
+	))
 }
 
-func (TrollingCommands) hiddenping(ctx *router.Ctx) {
-	text := ctx.Arguments.RawFrom(1)
-	ctx.RespondText(fmt.Sprintf("%s %s <@%s>", text, constants.INVISIBLE_TEXT, utils.Arguments["<userid>"]))
+func (c *TrollingCommands) hiddenping(ctx *router.Ctx) {
+	ctx.RespondText(fmt.Sprintf(
+		"%s %s <@%s>",
+		ctx.Arguments.RawFrom(1),
+		constants.INVISIBLE_TEXT,
+		ctx.Arguments.Get(0).Raw(),
+	))
 }
 
-func (TrollingCommands) hiddenroleping(ctx *router.Ctx) {
-	text := ctx.Arguments.RawFrom(1)
-	ctx.RespondText(fmt.Sprintf("%s %s <@&%s>", text, constants.INVISIBLE_TEXT, utils.Arguments["<roleid>"]))
+func (c *TrollingCommands) hiddenroleping(ctx *router.Ctx) {
+	ctx.RespondText(fmt.Sprintf(
+		"%s %s <@&%s>",
+		ctx.Arguments.RawFrom(1),
+		constants.INVISIBLE_TEXT,
+		ctx.Arguments.Get(0).Raw(),
+	))
 }
 
-func (TrollingCommands) hiddeneveryone(ctx *router.Ctx) {
+func (c *TrollingCommands) hiddeneveryone(ctx *router.Ctx) {
 	ctx.RespondText(fmt.Sprintf("%s %s @everyone", ctx.Arguments.Raw(), constants.INVISIBLE_TEXT))
 }
 
-func (TrollingCommands) hiddenhere(ctx *router.Ctx) {
+func (c *TrollingCommands) hiddenhere(ctx *router.Ctx) {
 	ctx.RespondText(fmt.Sprintf("%s %s @here", ctx.Arguments.Raw(), constants.INVISIBLE_TEXT))
 }
 
-func (TrollingCommands) voicemove(ctx *router.Ctx) {
+func (c *TrollingCommands) voicemove(ctx *router.Ctx) {
 	guild, err := utils.Discord.GetGuild(ctx.Session, ctx.Message.GuildID)
 	if err != nil {
 		ctx.RespondText("Error getting server: " + err.Error())
 		return
 	}
 
-	amount, err := strconv.Atoi(utils.Arguments["<amount>"])
+	amount, err := ctx.Arguments.Get(0).Int()
+	amount = utils2.Clamp(amount, 1, 100)
 	if err != nil {
 		ctx.RespondText("Argument <amount> must be a number.")
 		return
@@ -276,24 +318,23 @@ func (TrollingCommands) voicemove(ctx *router.Ctx) {
 	}
 }
 
-func (TrollingCommands) triggertyping(ctx *router.Ctx) {
-	seconds, err := strconv.Atoi(utils.Arguments["<seconds>"])
+func (c *TrollingCommands) triggertyping(ctx *router.Ctx) {
+	duration, err := ctx.Arguments.Get(0).Duration()
+	duration = utils2.Clamp(duration, 1*time.Second, 7*24*time.Hour)
 	if err != nil {
-		ctx.RespondText("Argument <seconds> must be a number.")
+		ctx.RespondText("Failed to parse duration")
 		return
 	}
-	channel, err := ctx.Arguments.Get(1).Channel()
+
+	channel, err := ctx.Arguments.Get(1).Channel(router.ArgumentFlagFallbackDefault)
 	if err != nil {
-		channel, _ = utils.Discord.GetChannel(ctx.Session, ctx.Message.ChannelID)
-		if channel == nil {
-			ctx.RespondText("Could not find channel")
-			return
-		}
+		ctx.RespondText("Could not find channel")
+		return
 	}
-	utils.Discord.SleepWithTypingFix(ctx.Session, channel.ID, time.Duration(seconds)*time.Second)
+	utils.Discord.SleepWithTypingFix(ctx.Session, channel.ID, duration)
 }
 
-func (TrollingCommands) impersonate(ctx *router.Ctx) {
+func (c *TrollingCommands) impersonate(ctx *router.Ctx) {
 	user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
 	if err != nil {
 		ctx.RespondText("Could not find user.")
@@ -301,27 +342,23 @@ func (TrollingCommands) impersonate(ctx *router.Ctx) {
 	}
 	text := ctx.Arguments.RawFrom(1)
 
-	_, err := utils.Discord.Impersonate(ctx.Session, user, text, ctx.Message.ChannelID)
+	_, err = utils.Discord.Impersonate(ctx.Session, user, text, ctx.Message.ChannelID)
 	if err != nil {
 		ctx.RespondText("An error has occurred: " + err.Error())
 		return
 	}
 }
 
-func (TrollingCommands) fakepings(ctx *router.Ctx) {
-	amount, err := strconv.Atoi(utils.Arguments["<amount>"])
+func (c *TrollingCommands) fakepings(ctx *router.Ctx) {
+	amount, err := ctx.Arguments.Get(0).Int()
+	amount = utils2.Clamp(amount, 1, 1000000000)
 	if err != nil {
 		ctx.RespondText("Argument <amount> must be a number.")
 		return
 	}
 
-	if amount < 1 || amount > 1000000000 {
-		ctx.RespondText("Amount must be between 1 and 1000000000")
-		return
-	}
-
-	channel, success := utils.Discord.TryGetChannelFromMentionWithDefault(ctx, ctx.Arguments.Get(1))
-	if !success {
+	channel, err := ctx.Arguments.Get(1).Channel(router.ArgumentFlagFallbackDefault)
+	if err != nil {
 		ctx.RespondText("Could not find channel")
 		return
 	}
@@ -344,7 +381,7 @@ func (TrollingCommands) fakepings(ctx *router.Ctx) {
 	}
 }
 
-func (TrollingCommands) billionpings(ctx *router.Ctx) {
+func (c *TrollingCommands) billionpings(ctx *router.Ctx) {
 	channel, err := ctx.Arguments.Get(0).Channel(router.ArgumentFlagFallbackDefault)
 	if err != nil {
 		ctx.RespondText("Could not find channel")
@@ -367,14 +404,4 @@ func (TrollingCommands) billionpings(ctx *router.Ctx) {
 		ctx.RespondText("An error has occurred: " + err.Error())
 		return
 	}
-}
-
-type TrollingCommands struct{ services *services.Services }
-
-func NewTrollingCommands(s *services.Services) *TrollingCommands {
-	return &TrollingCommands{services: s}
-}
-func (c *TrollingCommands) Register() {
-	cmdRouter := c.services.Discord.GetRouter()
-
 }

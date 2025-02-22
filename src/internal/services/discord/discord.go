@@ -90,7 +90,6 @@ func (d *DiscordServiceImpl) Init(token string, verbose bool) error {
 	}
 
 	d.session.Token = token
-	d.session.State.TrackVoice = false
 	d.session.State.MaxMessageCount = 50
 	d.session.SetIdentify(cfg.GetClient())
 	d.session.ErrorHandler = d.o11ySvc.DiscordErrorHandler
