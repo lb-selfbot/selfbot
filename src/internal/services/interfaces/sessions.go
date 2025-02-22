@@ -1,8 +1,6 @@
 package interfaces
 
 import (
-	"time"
-
 	"github.com/LightningDev1/discordgo"
 )
 
