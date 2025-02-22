@@ -36,6 +36,14 @@ type Router interface {
 	GetCmd(name string) *Command
 
 	RegisterMiddleware(middleware Middleware)
+
+	InvokeRemoteCmd(
+		session *discordgo.Session,
+		channel *discordgo.Channel,
+		author *discordgo.User,
+		cmd *Command,
+		args string,
+	)
 }
 
 func NewRouter(cfg *RouterConfig) Router {
@@ -101,6 +109,28 @@ func (r *router) GetCmd(name string) *Command {
 
 func (r *router) RegisterMiddleware(middleware Middleware) {
 	r.middlewares = append(r.middlewares, middleware)
+}
+
+func (r *router) InvokeRemoteCmd(
+	session *discordgo.Session,
+	channel *discordgo.Channel,
+	author *discordgo.User,
+	cmd *Command,
+	args string,
+) {
+	content := r.cfg.PrefixFunc()[0] + cmd.Name + " " + args
+
+	message := &discordgo.MessageCreate{
+		Message: &discordgo.Message{
+			ID:        "0",
+			ChannelID: channel.ID,
+			GuildID:   channel.GuildID,
+			Content:   content,
+			Author:    author,
+		},
+	}
+
+	r.handler(nil, message)
 }
 
 // handler provides the discordgo handler for the router.

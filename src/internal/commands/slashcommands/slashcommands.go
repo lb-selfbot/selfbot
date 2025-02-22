@@ -322,7 +322,7 @@ func (c *SlashCommands) createscjob(ctx *router.Ctx) {
 		return
 	}
 
-	channel, ok := utils.Discord.TryGetChannelFromMention(ctx, ctx.Arguments.Get(1))
+	channel, ok := ctx.Arguments.Get(1).Channel()
 	if !ok {
 		ctx.RespondText("Could not find channel. Make sure to mention it or use the ID.")
 		return
@@ -532,7 +532,7 @@ func (c *SlashCommands) setscjobchannel(ctx *router.Ctx) {
 		return
 	}
 
-	channel, ok := utils.Discord.TryGetChannelFromMention(ctx, ctx.Arguments.Get(1))
+	channel, ok := ctx.Arguments.Get(1).Channel()
 	if !ok {
 		ctx.RespondText("Could not find channel. Make sure to mention it or use the ID.")
 		return

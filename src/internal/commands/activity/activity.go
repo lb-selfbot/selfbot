@@ -336,8 +336,8 @@ func (a *ActivityCommands) clearactivity(ctx *router.Ctx) {
 }
 
 func (a *ActivityCommands) copyactivity(ctx *router.Ctx) {
-	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
-	if !success {
+	user, err := ctx.Arguments.Get(0).User()
+	if err != nil {
 		_ = ctx.RespondText("Could not find user")
 		return
 	}
@@ -422,8 +422,8 @@ func (a *ActivityCommands) copyactivity(ctx *router.Ctx) {
 }
 
 func (a *ActivityCommands) getactivityjson(ctx *router.Ctx) {
-	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
-	if !success {
+	user, err := ctx.Arguments.Get(0).User()
+	if err != nil {
 		_ = ctx.RespondText("Could not find user")
 		return
 	}

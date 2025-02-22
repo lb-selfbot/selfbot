@@ -282,8 +282,8 @@ func (TrollingCommands) triggertyping(ctx *router.Ctx) {
 		_ = ctx.RespondText("Argument <seconds> must be a number.")
 		return
 	}
-	channel, success := utils.Discord.TryGetChannelFromMention(ctx, ctx.Arguments.Get(1))
-	if !success {
+	channel, err := ctx.Arguments.Get(1).Channel()
+	if err != nil {
 		channel, _ = utils.Discord.GetChannel(ctx.Session, ctx.Message.ChannelID)
 		if channel == nil {
 			_ = ctx.RespondText("Could not find channel")

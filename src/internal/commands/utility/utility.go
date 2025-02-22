@@ -30,9 +30,8 @@ import (
 	"github.com/LightningDev1/LB-Selfbot/internal/random"
 	"github.com/LightningDev1/LB-Selfbot/internal/router"
 	"github.com/LightningDev1/LB-Selfbot/internal/services"
-	"github.com/LightningDev1/LB-Selfbot/selfbot/eventreactions"
-	"github.com/LightningDev1/LB-Selfbot/selfbot/ipc"
-	"github.com/LightningDev1/LB-Selfbot/selfbot/logging"
+	"github.com/LightningDev1/LB-Selfbot/internal/services/ui"
+	"github.com/LightningDev1/LB-Selfbot/internal/utils2"
 
 	"github.com/LightningDev1/LB-Selfbot/internal/uploaders/destinations"
 	"github.com/LightningDev1/discordgo/protos"
@@ -50,781 +49,811 @@ import (
 	"github.com/LightningDev1/LB-Selfbot/internal/constants"
 	"github.com/LightningDev1/LB-Selfbot/internal/http"
 	"github.com/LightningDev1/LB-Selfbot/internal/utils"
-	"github.com/LightningDev1/dgc"
 	"github.com/LightningDev1/discordgo"
 )
 
-func (u UtilityCommands) RegisterCommands(router *dgc.Router) {
-	router.StartCategory("Utility", "Utility commands")
+type UtilityCommands struct{ services *services.Services }
 
-	// Discord utilities
+func NewUtilityCommands(s *services.Services) *UtilityCommands {
+	return &UtilityCommands{services: s}
+}
+func (c *UtilityCommands) Register() {
+	cmdRouter := c.services.Discord.GetRouter()
 
-	router.RegisterCmd(&dgc.Command{
-		Name:        "copyserver",
-		Description: "Make an exact copy of a server",
-		Arguments:   "[server id] [delay]",
-		Handler:     u.copyserver,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "copychannel",
-		Description: "Make an exact copy of a channel",
-		Arguments:   "<source channel> <dest channel> [limit]",
-		Handler:     u.copychannel,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "leavegroups",
-		Description: "Leave all of your groups",
-		Arguments:   "[silent: on/off]",
-		Handler:     u.leavegroups,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "adminservers",
-		Description: "See all servers you have administator in",
-		Handler:     u.adminservers,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "admingroups",
-		Description: "See all groups you are the owner of",
-		Handler:     u.admingroups,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "joinvc",
-		Description: "Join a voice channel",
-		Arguments:   "<channel id>",
-		Handler:     u.joinvc,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "findserver",
-		Description: "Find a server by ID",
-		Arguments:   "<server id>",
-		Handler:     u.findserver,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "finduser",
-		Description: "Find a user by ID",
-		Arguments:   "<server id>",
-		Handler:     u.finduser,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "snipe",
-		Description: "See the last deleted message in a channel",
-		Arguments:   "[channel]",
-		Handler:     u.snipe,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "editsnipe",
-		Description: "See the last edited message in a channel",
-		Arguments:   "[channel]",
-		Handler:     u.editsnipe,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "firstmessage",
-		Description: "See the first message in the channel",
-		Arguments:   "[channel]",
-		Handler:     u.firstmessage,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "hypesquad",
-		Description: "Change your Hypesquad House",
-		Arguments:   "<bravery/brilliance/balance>",
-		Handler:     u.hypesquad,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "leavehypesquad",
-		Description: "Leave Hypesquad",
-		Handler:     u.leavehypesquad,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "theme",
-		Description: "Change your Discord theme",
-		Arguments:   "<light/dark>",
-		Handler:     u.theme,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "compact",
-		Description: "Toggle Discord compact mode",
-		Arguments:   "<on/off>",
-		Handler:     u.compact,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "devmode",
-		Description: "Toggle Discord developer mode",
-		Arguments:   "<on/off>",
-		Handler:     u.devmode,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "sessionid",
-		Description: "See LightningBot's Discord session ID",
-		Handler:     u.sessionid,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "aboutme",
-		Description: "Change your About Me text",
-		Arguments:   "[text]",
-		Handler:     u.aboutme,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "displayname",
-		Description: "Change your display name",
-		Arguments:   "<text>",
-		Handler:     u.displayname,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "pronouns",
-		Description: "Change your pronouns",
-		Arguments:   "<text>",
-		Handler:     u.pronouns,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "nickscan",
-		Description: "Search for servers with a nickname",
-		Handler:     u.nickscan,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "getmessagejson",
-		Description: "Get a message's JSON data",
-		Arguments:   "<#channel> <message id>",
-		Handler:     u.getmessagejson,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "getembedjson",
-		Description: "Get an embed's JSON data",
-		Arguments:   "<#channel> <message id>",
-		Handler:     u.getembedjson,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "sendmessagejson",
-		Description: "Send a message using raw JSON data",
-		Arguments:   "<#channel> <json>",
-		Handler:     u.sendmessagejson,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "sendinterval",
-		Description: "Send a message every x seconds (flags: DELETE, INSTANT_DEL)",
-		Arguments:   "<interval> <amount> <\"message\"> [flags]",
-		Handler:     u.sendinterval,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "optionpoll",
-		Description: "Create a poll with options",
-		Arguments:   "<\"question\"> <\"option1\"> <\"option2\">",
-		Handler:     u.optionpoll,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "discordpoll",
-		Description: "Create a native Discord poll (options/emojis split by comma)",
-		Arguments:   "<duration> <\"question\"> <\"options\"> [\"emojis\"]",
-		Handler:     u.discordpoll,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "checktoken",
-		Description: "Check if a Discord token is valid",
-		Arguments:   "<token>",
-		Handler:     u.checktoken,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "discordstatus",
-		Description: "Check the Discord status",
-		Handler:     u.discordstatus,
+	cmdRouter.RegisterCategory(&router.Category{
+		Name:        "Utility",
+		Description: "Utility commands",
+	}, []*router.Command{
+		// Discord utilities
+		{
+			Name:        "copyserver",
+			Description: "Make an exact copy of a server",
+			Arguments:   "[server id] [delay]",
+			Handler:     c.copyserver,
+		},
+		{
+			Name:        "copychannel",
+			Description: "Make an exact copy of a channel",
+			Arguments:   "<source channel> <dest channel> [limit]",
+			Handler:     c.copychannel,
+		},
+		{
+			Name:        "leavegroups",
+			Description: "Leave all of your groups",
+			Arguments:   "[silent: on/off]",
+			Handler:     c.leavegroups,
+		},
+		{
+			Name:        "adminservers",
+			Description: "See all servers you have administator in",
+			Handler:     c.adminservers,
+		},
+		{
+			Name:        "admingroups",
+			Description: "See all groups you are the owner of",
+			Handler:     c.admingroups,
+		},
+		{
+			Name:        "joinvc",
+			Description: "Join a voice channel",
+			Arguments:   "<channel id>",
+			Handler:     c.joinvc,
+		},
+		{
+			Name:        "snipe",
+			Description: "See the last deleted message in a channel",
+			Arguments:   "[channel]",
+			Handler:     c.snipe,
+		},
+		{
+			Name:        "editsnipe",
+			Description: "See the last edited message in a channel",
+			Arguments:   "[channel]",
+			Handler:     c.editsnipe,
+		},
+		{
+			Name:        "firstmessage",
+			Description: "See the first message in the channel",
+			Arguments:   "[channel]",
+			Handler:     c.firstmessage,
+		},
+		{
+			Name:        "hypesquad",
+			Description: "Change your Hypesquad House",
+			Arguments:   "<bravery/brilliance/balance>",
+			Handler:     c.hypesquad,
+		},
+		{
+			Name:        "leavehypesquad",
+			Description: "Leave Hypesquad",
+			Handler:     c.leavehypesquad,
+		},
+		{
+			Name:        "theme",
+			Description: "Change your Discord theme",
+			Arguments:   "<dark/light/darker/midnight>",
+			Handler:     c.theme,
+		},
+		{
+			Name:        "compact",
+			Description: "Toggle Discord compact mode",
+			Arguments:   "<on/off>",
+			Handler:     c.compact,
+		},
+		{
+			Name:        "devmode",
+			Description: "Toggle Discord developer mode",
+			Arguments:   "<on/off>",
+			Handler:     c.devmode,
+		},
+		{
+			Name:        "sessionid",
+			Description: "See LightningBot's Discord session ID",
+			Handler:     c.sessionid,
+		},
+		{
+			Name:        "aboutme",
+			Description: "Change your About Me text",
+			Arguments:   "[text]",
+			Handler:     c.aboutme,
+		},
+		{
+			Name:        "displayname",
+			Description: "Change your display name",
+			Arguments:   "<text>",
+			Handler:     c.displayname,
+		},
+		{
+			Name:        "pronouns",
+			Description: "Change your pronouns",
+			Arguments:   "<text>",
+			Handler:     c.pronouns,
+		},
+		{
+			Name:        "nickscan",
+			Description: "Search for servers with a nickname",
+			Handler:     c.nickscan,
+		},
+		{
+			Name:        "getmessagejson",
+			Description: "Get a message's JSON data",
+			Arguments:   "<#channel> <message id>",
+			Handler:     c.getmessagejson,
+		},
+		{
+			Name:        "getembedjson",
+			Description: "Get an embed's JSON data",
+			Arguments:   "<#channel> <message id>",
+			Handler:     c.getembedjson,
+		},
+		{
+			Name:        "sendmessagejson",
+			Description: "Send a message using raw JSON data",
+			Arguments:   "<#channel> <json>",
+			Handler:     c.sendmessagejson,
+		},
+		{
+			Name:        "sendinterval",
+			Description: "Send a message every x seconds (flags: DELETE, INSTANT_DEL)",
+			Arguments:   "<interval> <amount> <\"message\"> [flags]",
+			Handler:     c.sendinterval,
+		},
+		{
+			Name:        "optionpoll",
+			Description: "Create a poll with options",
+			Arguments:   "<\"question\"> <\"option1\"> <\"option2\">",
+			Handler:     c.optionpoll,
+		},
+		{
+			Name:        "discordpoll",
+			Description: "Create a native Discord poll (options/emojis split by comma)",
+			Arguments:   "<duration> <\"question\"> <\"options\"> [\"emojis\"]",
+			Handler:     c.discordpoll,
+		},
+		{
+			Name:        "checktoken",
+			Description: "Check if a Discord token is valid",
+			Arguments:   "<token>",
+			Handler:     c.checktoken,
+		},
+		{
+			Name:        "discordstatus",
+			Description: "Check the Discord status",
+			Handler:     c.discordstatus,
+		},
+
+		// LightningBot Utilities
+		{
+			Name:        "website",
+			Description: "Open the LightningBot website",
+			Flags:       []router.CommandFlag{router.CmdFlagHostingDangerous},
+			Handler:     c.website,
+		},
+		{
+			Name:        "dashboard",
+			Description: "Open the LightningBot dashboard",
+			Flags:       []router.CommandFlag{router.CmdFlagHostingDangerous},
+			Handler:     c.dashboard,
+		},
+		{
+			Name:        "changelog",
+			Description: "See the latest changelog",
+			Handler:     c.changelog,
+		},
+		{
+			Name:        "version",
+			Description: "See the current LightningBot version",
+			Handler:     c.version,
+		},
+		{
+			Name:        "uptime",
+			Description: "See how long the bot has been running for",
+			Handler:     c.uptime,
+		},
+		{
+			Name:        "history",
+			Description: "See used command history",
+			Handler:     c.history,
+		},
+		{
+			Name:        "restartbot",
+			Description: "Restart LightningBot",
+			Flags:       []router.CommandFlag{router.CmdFlagDangerous},
+			Handler:     c.restartbot,
+		},
+		{
+			Name:        "stopbot",
+			Description: "Stop LightningBot",
+			Flags:       []router.CommandFlag{router.CmdFlagDangerous},
+			Handler:     c.stopbot,
+		},
+		{
+			Name:        "cls",
+			Description: "Clear UI console",
+			Flags:       []router.CommandFlag{router.CmdFlagDangerous},
+			Handler:     c.cls,
+		},
+		{
+			Name:        "openfolder",
+			Description: "Open the LightningBot folder",
+			Flags:       []router.CommandFlag{router.CmdFlagDangerous, router.CmdFlagHostingDangerous},
+			Handler:     c.openfolder,
+		},
+		{
+			Name:        "remote",
+			Description: "Run a command remotely",
+			Arguments:   "<channel> <command> [args...]",
+			Flags:       []router.CommandFlag{router.CmdFlagDangerous},
+			Handler:     c.remote,
+		},
+
+		// System utilities
+		{
+			Name:        "systeminfo",
+			Description: "See info about your system",
+			Handler:     c.systeminfo,
+		},
+		{
+			Name:        "shutdownpc",
+			Description: "Shut your PC down",
+			Flags:       []router.CommandFlag{router.CmdFlagDangerous, router.CmdFlagHostingDangerous},
+			Handler:     c.shutdownpc,
+		},
+		{
+			Name:        "restartpc",
+			Description: "Restart your PC",
+			Flags:       []router.CommandFlag{router.CmdFlagDangerous, router.CmdFlagHostingDangerous},
+			Handler:     c.restartpc,
+		},
+		{
+			Name:        "sleeppc",
+			Description: "Put your PC to sleep",
+			Flags:       []router.CommandFlag{router.CmdFlagDangerous, router.CmdFlagHostingDangerous},
+			Handler:     c.sleeppc,
+		},
+		{
+			Name:        "hibernatepc",
+			Description: "Hibernate your PC",
+			Flags:       []router.CommandFlag{router.CmdFlagDangerous, router.CmdFlagHostingDangerous},
+			Handler:     c.hibernatepc,
+		},
+		{
+			Name:        "lockpc",
+			Description: "Lock your PC",
+			Flags:       []router.CommandFlag{router.CmdFlagDangerous, router.CmdFlagHostingDangerous},
+			Handler:     c.lockpc,
+		},
+		{
+			Name:        "activewindow",
+			Description: "View the active window on your PC",
+			Flags:       []router.CommandFlag{router.CmdFlagDangerous, router.CmdFlagHostingDangerous},
+			Handler:     c.activewindow,
+		},
+		{
+			Name:        "calc",
+			Description: "Open the calculator",
+			Flags:       []router.CommandFlag{router.CmdFlagDangerous, router.CmdFlagHostingDangerous},
+			Handler:     c.calc,
+		},
+		{
+			Name:        "notepad",
+			Description: "Open notepad",
+			Flags:       []router.CommandFlag{router.CmdFlagDangerous, router.CmdFlagHostingDangerous},
+			Handler:     c.notepad,
+		},
+		{
+			Name:        "open",
+			Description: "Open a URL in the browser",
+			Arguments:   "<url>",
+			Flags:       []router.CommandFlag{router.CmdFlagDangerous, router.CmdFlagHostingDangerous},
+			Handler:     c.open,
+		},
+
+		// Uploading utilities
+		{
+			Name:        "screenshot",
+			Description: "Take a screenshot",
+			Arguments:   "[delay]",
+			Flags:       []router.CommandFlag{router.CmdFlagDangerous, router.CmdFlagHostingDangerous},
+			Handler:     c.screenshot,
+		},
+		{
+			Name:        "listdestinations",
+			Description: "List all upload destinations",
+			Handler:     c.listdestinations,
+		},
+		{
+			Name:        "uploadss",
+			Description: "Upload a screenshot",
+			Arguments:   "<destination> [delay]",
+			Flags:       []router.CommandFlag{router.CmdFlagDangerous, router.CmdFlagHostingDangerous},
+			Handler:     c.uploadss,
+		},
+		{
+			Name:        "uploadfile",
+			Description: "Upload a file",
+			Arguments:   "<destination> <attachment>",
+			Handler:     c.uploadfile,
+		},
+		{
+			Name:        "uploadlink",
+			Description: "Upload a link",
+			Arguments:   "<destination> <link>",
+			Handler:     c.uploadlink,
+		},
+
+		// Paste utilities
+		{
+			Name:        "paste",
+			Description: "Create a paste",
+			Arguments:   "<text>",
+			Handler:     c.pastebin,
+		},
+		{
+			Name:        "pastefile",
+			Description: "Create a paste from a file",
+			Arguments:   "<filepath>",
+			Handler:     c.pastefile,
+		},
+		{
+			Name:        "tinyurl",
+			Description: "Shorten a URL with TinyURL",
+			Arguments:   "<url>",
+			Handler:     c.tinyurl,
+		},
+
+		// Obfuscation utilities
+		{
+			Name:        "obfuscatepython",
+			Description: "Obfuscate a Python script",
+			Arguments:   "[script/attachment]",
+			Handler:     c.obfuscateFunc("python", "py"),
+		},
+		{
+			Name:        "obfuscatelua",
+			Description: "Obfuscate a Lua script",
+			Arguments:   "[script/attachment]",
+			Handler:     c.obfuscateFunc("lua", "lua"),
+		},
+		{
+			Name:        "obfuscatejs",
+			Description: "Obfuscate a JS script",
+			Arguments:   "[script/attachment]",
+			Handler:     c.obfuscateFunc("javascript", "js"),
+		},
+
+		// ReviewDB utilities
+		{
+			Name:        "reviewdbtoken",
+			Description: "Get your ReviewDB token",
+			Handler:     c.reviewdbtoken,
+		},
+		{
+			Name:        "getreviews",
+			Description: "Get a users ReviewDB reviews",
+			Arguments:   "<user>",
+			Handler:     c.getreviews,
+		},
+		{
+			Name:        "addreview",
+			Description: "Add a ReviewDB review to a user",
+			Arguments:   "<user> <review>",
+			Handler:     c.addreview,
+		},
+
+		// Tag utilities
+		{
+			Name:        "tags",
+			Description: "Manage tags",
+			Arguments:   "<get/add/rm/clear/send> [name] [content]",
+			SubCommands: []*router.Command{
+				{
+					Name:        "get",
+					Description: "Get all tags",
+					Handler:     c.getTags,
+				},
+				{
+					Name:        "add",
+					Description: "Add a tag",
+					Arguments:   "<name> <content>",
+					Handler:     c.addTag,
+				},
+				{
+					Name:        "rm",
+					Description: "Remove a tag",
+					Arguments:   "<name>",
+					Handler:     c.removeTag,
+				},
+				{
+					Name:        "clear",
+					Description: "Clear all tags",
+					Handler:     c.clearTags,
+				},
+			},
+		},
+
+		// Creditcard commands
+		{
+			Name:        "mastercard",
+			Description: "Generate a mastercard credit card",
+			Arguments:   "[name]",
+			Handler:     c.mastercard,
+		},
+		{
+			Name:        "visa16",
+			Description: "Generate a visa credit card (16 characters)",
+			Arguments:   "[name]",
+			Handler:     c.visa16,
+		},
+		{
+			Name:        "visa13",
+			Description: "Generate a visa credit card (13 characters)",
+			Arguments:   "[name]",
+			Handler:     c.visa13,
+		},
+		{
+			Name:        "amex",
+			Description: "Generate an amex credit card",
+			Arguments:   "[name]",
+			Handler:     c.amex,
+		},
+		{
+			Name:        "discover",
+			Description: "Generate a discover credit card",
+			Arguments:   "[name]",
+			Handler:     c.discover,
+		},
+		{
+			Name:        "diners",
+			Description: "Generate a diners credit card",
+			Arguments:   "[name]",
+			Handler:     c.diners,
+		},
+		{
+			Name:        "jcb",
+			Description: "Generate a JCB credit card",
+			Arguments:   "[name]",
+			Handler:     c.jcb,
+		},
+		// Network utilities
+
+		{
+			Name:        "ping",
+			Description: "Check the latency of the bot",
+			Handler:     c.ping,
+		},
+		{
+			Name:        "pingweb",
+			Description: "Check the latency to a website",
+			Arguments:   "<host>",
+			Handler:     c.pingweb,
+		},
+		{
+			Name:        "ipinfo",
+			Description: "Get info about an IP Address",
+			Arguments:   "<ip>",
+			Handler:     c.ipinfo,
+		},
+		{
+			Name:        "portscan",
+			Description: "Scan a host for open ports",
+			Arguments:   "<host>",
+			Handler:     c.portscan,
+		},
+		{
+			Name:        "resolve",
+			Description: "Get a domain's IP address",
+			Arguments:   "<domain>",
+			Handler:     c.resolve,
+		},
+		{
+			Name:        "reversedns",
+			Description: "Find all domains hosted on an IP address",
+			Arguments:   "<ip>",
+			Handler:     c.reversedns,
+		},
+		{
+			Name:        "reversemac",
+			Description: "Find the vender of a MAC address",
+			Arguments:   "<mac>",
+			Handler:     c.reversemac,
+		},
+		{
+			Name:        "headers",
+			Description: "Get URL response headers",
+			Arguments:   "<url>",
+			Handler:     c.headers,
+		},
+		{
+			Name:        "interface",
+			Description: "See your public/local ip and MAC address",
+			Flags:       []router.CommandFlag{router.CmdFlagDangerous, router.CmdFlagHostingDangerous},
+			Handler:     c._interface,
+		},
+
+		// PokeTwo utilities
+		{
+			Name:        "snipepokemon",
+			Description: "Snipe a PokéTwo Pokemon",
+			Arguments:   "[#channel]",
+			Handler:     c.snipepokemon,
+		},
+		{
+			Name:        "detectpokemon",
+			Description: "Detect a PokéTwo Pokemon",
+			Arguments:   "[#channel]",
+			Handler:     c.detectpokemon,
+		},
+
+		// Reminder utilities
+		{
+			Name:        "reminders",
+			Description: "Manage your reminders",
+			Arguments:   "<get/add/rm/clear> [name] [duration] [message]",
+			SubCommands: []*router.Command{
+				{
+					Name:        "get",
+					Description: "Get all reminders",
+					Handler:     c.getReminders,
+				},
+				{
+					Name:        "add",
+					Description: "Add a reminder",
+					Arguments:   "<name> <duration> <message>",
+					Handler:     c.addReminder,
+				},
+				{
+					Name:        "rm",
+					Description: "Remove a reminder",
+					Arguments:   "<name>",
+					Handler:     c.removeReminder,
+				},
+				{
+					Name:        "clear",
+					Description: "Clear all reminders",
+					Handler:     c.clearReminders,
+				},
+			},
+		},
+
+		// Conversion utilities
+		{
+			Name:        "convertvelocity",
+			Description: "Convert velocity from one unit to another",
+			Arguments:   "<value> <source unit> <destination unit>",
+			Handler:     c.convertvelocity,
+		},
+		{
+			Name:        "convertarea",
+			Description: "Convert area from one unit to another",
+			Arguments:   "<value> <source unit> <destination unit>",
+			Handler:     c.convertarea,
+		},
+		{
+			Name:        "convertlength",
+			Description: "Convert length from one unit to another",
+			Arguments:   "<value> <source unit> <destination unit>",
+			Handler:     c.convertlength,
+		},
+		{
+			Name:        "converttemperature",
+			Description: "Convert temperature from one unit to another",
+			Arguments:   "<value> <source unit> <destination unit>",
+			Handler:     c.converttemperature,
+		},
+		{
+			Name:        "converttime",
+			Description: "Convert time from one unit to another",
+			Arguments:   "<value> <source unit> <destination unit>",
+			Handler:     c.converttime,
+		},
+		{
+			Name:        "convertvolume",
+			Description: "Convert volume from one unit to another",
+			Arguments:   "<value> <source unit> <destination unit>",
+			Handler:     c.convertvolume,
+		},
+		{
+			Name:        "convertmass",
+			Description: "Convert mass from one unit to another",
+			Arguments:   "<value> <source unit> <destination unit>",
+			Handler:     c.convertmass,
+		},
+
+		// Misc utilities
+		{
+			Name:        "tts",
+			Description: "Send a Text-To-Speech message",
+			Arguments:   "<language> <text>",
+			Handler:     c.tts,
+		},
+		{
+			Name:        "translate",
+			Description: "Translate text to a language",
+			Arguments:   "<language> <text>",
+			Handler:     c.translate,
+		},
+		{
+			Name:        "detectlang",
+			Description: "Detect a texts language",
+			Arguments:   "<text>",
+			Handler:     c.detectlang,
+		},
+		{
+			Name:        "english",
+			Description: "Translate text to English",
+			Arguments:   "<text>",
+			Handler:     c.english,
+		},
+		{
+			Name:        "define",
+			Description: "Define a word",
+			Arguments:   "<word>",
+			Handler:     c.define,
+		},
+		{
+			Name:        "urbandictionary",
+			Description: "Search someting on the Urban Dictionary",
+			Arguments:   "<word>",
+			Handler:     c.urbandictionary,
+		},
+		{
+			Name:        "wikipedia",
+			Description: "Search someting on Wikipedia",
+			Arguments:   "<query>",
+			Handler:     c.wikipedia,
+		},
+		{
+			Name:        "weather",
+			Description: "Check the weather in a city",
+			Arguments:   "<city>",
+			Handler:     c.weather,
+		},
+		{
+			Name:        "lvbypass",
+			Description: "Bypass a Linkvertise link",
+			Arguments:   "<url>",
+			Handler:     c.lvbypass,
+		},
+		{
+			Name:        "flightinfo",
+			Description: "Get info about a flight",
+			Arguments:   "<flight number>",
+			Handler:     c.flightinfo,
+		},
+		{
+			Name:        "passgen",
+			Description: "Generate a password",
+			Arguments:   "<character amount>",
+			Handler:     c.passgen,
+		},
+		{
+			Name:        "tokengen",
+			Description: "Generate a Discord token",
+			Handler:     c.tokengen,
+		},
+		{
+			Name:        "revimage",
+			Description: "Reverse image search",
+			Arguments:   "<image url>",
+			Handler:     c.revimage,
+		},
+		{
+			Name:        "revavatar",
+			Description: "Reverse image search a users avatar",
+			Arguments:   "<user>",
+			Handler:     c.revavatar,
+		},
+		{
+			Name:        "timezones",
+			Description: "Get a list of timezones for a continent",
+			Arguments:   "<continent>",
+			Handler:     c.timezones,
+		},
+		{
+			Name:        "timezone",
+			Description: "Get information about a timezone",
+			Arguments:   "<timezone>",
+			Handler:     c.timezoneinfo,
+		},
+		{
+			Name:        "calculate",
+			Description: "Calculate something",
+			Arguments:   "<expression>",
+			Handler:     c.calculate,
+		},
+		{
+			Name:        "googlesearch",
+			Description: "Search someting on Google",
+			Arguments:   "<query>",
+			Handler:     c.googlesearch,
+		},
+		{
+			Name:        "youtubesearch",
+			Description: "Search someting on Youtube",
+			Arguments:   "<query>",
+			Handler:     c.youtubesearch,
+		},
+		{
+			Name:        "youtubedl",
+			Description: "Download a YouTube video to the desktop",
+			Arguments:   "<query>",
+			Handler:     c.youtubedl,
+		},
+		{
+			Name:        "amazon",
+			Description: "Search products on Amazon",
+			Arguments:   "<query>",
+			Handler:     c.amazon,
+		},
+		{
+			Name:        "steam",
+			Description: "Search games on Steam",
+			Arguments:   "<query>",
+			Handler:     c.steam,
+		},
+		{
+			Name:        "github",
+			Description: "Search repos on GitHub",
+			Arguments:   "<query>",
+			Handler:     c.github,
+		},
+		{
+			Name:        "stackoverflow",
+			Description: "Search answers on Stack Overflow",
+			Arguments:   "<query>",
+			Handler:     c.stackoverflow,
+		},
+		{
+			Name:        "searchcountry",
+			Description: "Get info about a country",
+			Arguments:   "<country>",
+			Handler:     c.searchcountry,
+		},
+		{
+			Name:        "randomcountry",
+			Description: "Get info about a random country",
+			Arguments:   "<country>",
+			Handler:     c.randomcountry,
+		},
+		{
+			Name:        "loremipsum",
+			Description: "Generate a random placeholder text",
+			Arguments:   "[paragraphs]",
+			Handler:     c.loremipsum,
+		},
+		{
+			Name:        "baconipsum",
+			Description: "Generate a meaty placeholder text",
+			Arguments:   "[paragraphs]",
+			Handler:     c.baconipsum,
+		},
+		{
+			Name:        "previewcolor",
+			Description: "Preview a color",
+			Arguments:   "<rgb/hex>",
+			Handler:     c.previewcolor,
+		},
+		{
+			Name:        "generatekey",
+			Description: "Generate a random license key (X or x for letters, 9 for numbers)",
+			Arguments:   "<format> [amount]",
+			Handler:     c.generatekey,
+		},
+		{
+			Name:        "timestamp",
+			Description: "Create a Discord timestamp",
+			Arguments:   "<time>",
+			Handler:     c.timestampCommand(""),
+		},
+		{
+			Name:        "reltimestamp",
+			Description: "Create a relative Discord timestamp",
+			Arguments:   "<time>",
+			Handler:     c.timestampCommand(":R"),
+		},
 	})
 
-	// LightningBot Utilities
-
-	router.RegisterCmd(&dgc.Command{
-		Name:        "website",
-		Description: "Open the LightningBot website",
-		Flags:       []router.CommandFlag{router.CmdFlagHostingDangerous},
-		Handler:     u.website,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "dashboard",
-		Description: "Open the LightningBot dashboard",
-		Flags:       []router.CommandFlag{router.CmdFlagHostingDangerous},
-		Handler:     u.dashboard,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "changelog",
-		Description: "See the latest changelog",
-		Handler:     u.changelog,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "version",
-		Description: "See the current LightningBot version",
-		Handler:     u.version,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "uptime",
-		Description: "See how long the bot has been running for",
-		Handler:     u.uptime,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "history",
-		Description: "See used command history",
-		Handler:     u.history,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "restartbot",
-		Description: "Restart LightningBot",
-		Flags:       []router.CommandFlag{router.CmdFlagDangerous},
-		Handler:     u.restartbot,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "stopbot",
-		Description: "Stop LightningBot",
-		Flags:       []router.CommandFlag{router.CmdFlagDangerous},
-		Handler:     u.stopbot,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "cls",
-		Description: "Clear UI console",
-		Flags:       []router.CommandFlag{router.CmdFlagDangerous},
-		Handler:     u.cls,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "openfolder",
-		Description: "Open the LightningBot folder",
-		Flags:       []router.CommandFlag{router.CmdFlagDangerous, router.CmdFlagHostingDangerous},
-		Handler:     u.openfolder,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "remote",
-		Description: "Run a command remotely",
-		Arguments:   "<channel> <command> [args...]",
-		Flags:       []router.CommandFlag{router.CmdFlagDangerous},
-		Handler:     u.remote,
-	})
-
-	// System utilities
-
-	router.RegisterCmd(&dgc.Command{
-		Name:        "systeminfo",
-		Description: "See info about your system",
-		Handler:     u.systeminfo,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "shutdownpc",
-		Description: "Shut your PC down",
-		Flags:       []router.CommandFlag{router.CmdFlagDangerous, router.CmdFlagHostingDangerous},
-		Handler:     u.shutdownpc,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "restartpc",
-		Description: "Restart your PC",
-		Flags:       []router.CommandFlag{router.CmdFlagDangerous, router.CmdFlagHostingDangerous},
-		Handler:     u.restartpc,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "sleeppc",
-		Description: "Put your PC to sleep",
-		Flags:       []router.CommandFlag{router.CmdFlagDangerous, router.CmdFlagHostingDangerous},
-		Handler:     u.sleeppc,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "hibernatepc",
-		Description: "Hibernate your PC",
-		Flags:       []router.CommandFlag{router.CmdFlagDangerous, router.CmdFlagHostingDangerous},
-		Handler:     u.hibernatepc,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "lockpc",
-		Description: "Lock your PC",
-		Flags:       []router.CommandFlag{router.CmdFlagDangerous, router.CmdFlagHostingDangerous},
-		Handler:     u.lockpc,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "activewindow",
-		Description: "View the active window on your PC",
-		Flags:       []router.CommandFlag{router.CmdFlagDangerous, router.CmdFlagHostingDangerous},
-		Handler:     u.activewindow,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "calc",
-		Description: "Open the calculator",
-		Flags:       []router.CommandFlag{router.CmdFlagDangerous, router.CmdFlagHostingDangerous},
-		Handler:     u.calc,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "notepad",
-		Description: "Open notepad",
-		Flags:       []router.CommandFlag{router.CmdFlagDangerous, router.CmdFlagHostingDangerous},
-		Handler:     u.notepad,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "open",
-		Description: "Open a URL in the browser",
-		Arguments:   "<url>",
-		Flags:       []router.CommandFlag{router.CmdFlagDangerous, router.CmdFlagHostingDangerous},
-		Handler:     u.open,
-	})
-
-	// Uploading utilities
-
-	router.RegisterCmd(&dgc.Command{
-		Name:        "screenshot",
-		Description: "Take a screenshot",
-		Arguments:   "[delay]",
-		Flags:       []router.CommandFlag{router.CmdFlagDangerous, router.CmdFlagHostingDangerous},
-		Handler:     u.screenshot,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "listdestinations",
-		Description: "List all upload destinations",
-		Handler:     u.listdestinations,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "uploadss",
-		Description: "Upload a screenshot",
-		Arguments:   "<destination> [delay]",
-		Flags:       []router.CommandFlag{router.CmdFlagDangerous, router.CmdFlagHostingDangerous},
-		Handler:     u.uploadss,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "uploadfile",
-		Description: "Upload a file",
-		Arguments:   "<destination> [attachment]",
-		Handler:     u.uploadfile,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "uploadlink",
-		Description: "Upload a link",
-		Arguments:   "<destination> <link>",
-		Handler:     u.uploadlink,
-	})
-
-	// Paste utilities
-
-	router.RegisterCmd(&dgc.Command{
-		Name:        "paste",
-		Description: "Create a paste",
-		Arguments:   "<text>",
-		Handler:     u.pastebin,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "pastefile",
-		Description: "Create a paste from a file",
-		Arguments:   "<filepath>",
-		Handler:     u.pastefile,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "tinyurl",
-		Description: "Shorten a URL with TinyURL",
-		Arguments:   "<url>",
-		Handler:     u.tinyurl,
-	})
-
-	// Obfuscation utilities
-
-	router.RegisterCmd(&dgc.Command{
-		Name:        "obfuscatepython",
-		Description: "Obfuscate a Python script",
-		Arguments:   "[script/attachment]",
-		Handler:     u.obfuscateFunc("python", "py"),
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "obfuscatelua",
-		Description: "Obfuscate a Lua script",
-		Arguments:   "[script/attachment]",
-		Handler:     u.obfuscateFunc("lua", "lua"),
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "obfuscatejs",
-		Description: "Obfuscate a JS script",
-		Arguments:   "[script/attachment]",
-		Handler:     u.obfuscateFunc("javascript", "js"),
-	})
-
-	// ReviewDB utilities
-
-	router.RegisterCmd(&dgc.Command{
-		Name:        "reviewdbtoken",
-		Description: "Get your ReviewDB token",
-		Handler:     u.reviewdbtoken,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "getreviews",
-		Description: "Get a users ReviewDB reviews",
-		Arguments:   "<user>",
-		Handler:     u.getreviews,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "addreview",
-		Description: "Add a ReviewDB review to a user",
-		Arguments:   "<user> <review>",
-		Handler:     u.addreview,
-	})
-
-	// Tag utilities
-
-	router.RegisterCmd(&dgc.Command{
-		Name:        "tags",
-		Description: "Manage tags",
-		Arguments:   "<get/add/rm/clear/send> [name] [content]",
-		Handler:     u.tags,
-	})
-
-	// Creditcard commands
-
-	router.RegisterCmd(&dgc.Command{
-		Name:        "mastercard",
-		Description: "Generate a mastercard credit card",
-		Arguments:   "[name]",
-		Handler:     u.mastercard,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "visa16",
-		Description: "Generate a visa credit card (16 characters)",
-		Arguments:   "[name]",
-		Handler:     u.visa16,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "visa13",
-		Description: "Generate a visa credit card (13 characters)",
-		Arguments:   "[name]",
-		Handler:     u.visa13,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "amex",
-		Description: "Generate an amex credit card",
-		Arguments:   "[name]",
-		Handler:     u.amex,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "discover",
-		Description: "Generate a discover credit card",
-		Arguments:   "[name]",
-		Handler:     u.discover,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "diners",
-		Description: "Generate a diners credit card",
-		Arguments:   "[name]",
-		Handler:     u.diners,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "jcb",
-		Description: "Generate a JCB credit card",
-		Arguments:   "[name]",
-		Handler:     u.jcb,
-	})
-
-	// Network utilities
-
-	router.RegisterCmd(&dgc.Command{
-		Name:        "ping",
-		Description: "Check the latency of the bot",
-		Handler:     u.ping,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "pingweb",
-		Description: "Check the latency to a website",
-		Arguments:   "<host>",
-		Handler:     u.pingweb,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "ipinfo",
-		Description: "Get info about an IP Address",
-		Arguments:   "<ip>",
-		Handler:     u.ipinfo,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "portscan",
-		Description: "Scan a host for open ports",
-		Arguments:   "<host>",
-		Handler:     u.portscan,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "resolve",
-		Description: "Get a domain's IP address",
-		Arguments:   "<domain>",
-		Handler:     u.resolve,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "reversedns",
-		Description: "Find all domains hosted on an IP address",
-		Arguments:   "<ip>",
-		Handler:     u.reversedns,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "reversemac",
-		Description: "Find the vender of a MAC address",
-		Arguments:   "<mac>",
-		Handler:     u.reversemac,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "headers",
-		Description: "Get URL response headers",
-		Arguments:   "<url>",
-		Handler:     u.headers,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "interface",
-		Description: "See your public/local ip and MAC address",
-		Flags:       []router.CommandFlag{router.CmdFlagDangerous, router.CmdFlagHostingDangerous},
-		Handler:     u._interface,
-	})
-
-	// PokeTwo utilities
-
-	router.RegisterCmd(&dgc.Command{
-		Name:        "snipepokemon",
-		Description: "Snipe a PokéTwo Pokemon",
-		Arguments:   "[#channel]",
-		Handler:     u.snipepokemon,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "detectpokemon",
-		Description: "Detect a PokéTwo Pokemon",
-		Arguments:   "[#channel]",
-		Handler:     u.detectpokemon,
-	})
-
-	// Reminder utilities
-
-	router.RegisterCmd(&dgc.Command{
-		Name:        "reminders",
-		Description: "Manage your reminders",
-		Arguments:   "<get/add/rm/clear> [name] [duration] [message]",
-		Handler:     u.reminders,
-	})
-
-	// Conversion utilities
-
-	router.RegisterCmd(&dgc.Command{
-		Name:        "convertvelocity",
-		Description: "Convert velocity from one unit to another",
-		Arguments:   "<value> <source unit> <destination unit>",
-		Handler:     u.convertvelocity,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "convertarea",
-		Description: "Convert area from one unit to another",
-		Arguments:   "<value> <source unit> <destination unit>",
-		Handler:     u.convertarea,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "convertlength",
-		Description: "Convert length from one unit to another",
-		Arguments:   "<value> <source unit> <destination unit>",
-		Handler:     u.convertlength,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "converttemperature",
-		Description: "Convert temperature from one unit to another",
-		Arguments:   "<value> <source unit> <destination unit>",
-		Handler:     u.converttemperature,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "converttime",
-		Description: "Convert time from one unit to another",
-		Arguments:   "<value> <source unit> <destination unit>",
-		Handler:     u.converttime,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "convertvolume",
-		Description: "Convert volume from one unit to another",
-		Arguments:   "<value> <source unit> <destination unit>",
-		Handler:     u.convertvolume,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "convertmass",
-		Description: "Convert mass from one unit to another",
-		Arguments:   "<value> <source unit> <destination unit>",
-		Handler:     u.convertmass,
-	})
-
-	// Misc utilities
-
-	router.RegisterCmd(&dgc.Command{
-		Name:        "tts",
-		Description: "Send a Text-To-Speech message",
-		Arguments:   "<language> <text>",
-		Handler:     u.tts,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "translate",
-		Description: "Translate text to a language",
-		Arguments:   "<language> <text>",
-		Handler:     u.translate,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "detectlang",
-		Description: "Detect a texts language",
-		Arguments:   "<text>",
-		Handler:     u.detectlang,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "english",
-		Description: "Translate text to English",
-		Arguments:   "<text>",
-		Handler:     u.english,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "define",
-		Description: "Define a word",
-		Arguments:   "<word>",
-		Handler:     u.define,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "urbandictionary",
-		Description: "Search someting on the Urban Dictionary",
-		Arguments:   "<word>",
-		Handler:     u.urbandictionary,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "wikipedia",
-		Description: "Search someting on Wikipedia",
-		Arguments:   "<query>",
-		Handler:     u.wikipedia,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "weather",
-		Description: "Check the weather in a city",
-		Arguments:   "<city>",
-		Handler:     u.weather,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "lvbypass",
-		Description: "Bypass a Linkvertise link",
-		Arguments:   "<url>",
-		Handler:     u.lvbypass,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "flightinfo",
-		Description: "Get info about a flight",
-		Arguments:   "<flight number>",
-		Handler:     u.flightinfo,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "passgen",
-		Description: "Generate a password",
-		Arguments:   "<character amount>",
-		Handler:     u.passgen,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "tokengen",
-		Description: "Generate a Discord token",
-		Handler:     u.tokengen,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "revimage",
-		Description: "Reverse image search",
-		Arguments:   "<image url>",
-		Handler:     u.revimage,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "revavatar",
-		Description: "Reverse image search a users avatar",
-		Arguments:   "<user>",
-		Handler:     u.revavatar,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "timezones",
-		Description: "Get a list of timezones for a continent",
-		Arguments:   "<continent>",
-		Handler:     u.timezones,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "timezone",
-		Description: "Get information about a timezone",
-		Arguments:   "<timezone>",
-		Handler:     u.timezoneinfo,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "calculate",
-		Description: "Calculate something",
-		Arguments:   "<expression>",
-		Handler:     u.calculate,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "googlesearch",
-		Description: "Search someting on Google",
-		Arguments:   "<query>",
-		Handler:     u.googlesearch,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "youtubesearch",
-		Description: "Search someting on Youtube",
-		Arguments:   "<query>",
-		Handler:     u.youtubesearch,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "youtubedl",
-		Description: "Download a YouTube video to the desktop",
-		Arguments:   "<query>",
-		Handler:     u.youtubedl,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "amazon",
-		Description: "Search products on Amazon",
-		Arguments:   "<query>",
-		Handler:     u.amazon,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "steam",
-		Description: "Search games on Steam",
-		Arguments:   "<query>",
-		Handler:     u.steam,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "github",
-		Description: "Search repos on GitHub",
-		Arguments:   "<query>",
-		Handler:     u.github,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "stackoverflow",
-		Description: "Search answers on Stack Overflow",
-		Arguments:   "<query>",
-		Handler:     u.stackoverflow,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "searchcountry",
-		Description: "Get info about a country",
-		Arguments:   "<country>",
-		Handler:     u.searchcountry,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "randomcountry",
-		Description: "Get info about a random country",
-		Arguments:   "<country>",
-		Handler:     u.randomcountry,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "loremipsum",
-		Description: "Generate a random placeholder text",
-		Arguments:   "[paragraphs]",
-		Handler:     u.loremipsum,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "baconipsum",
-		Description: "Generate a meaty placeholder text",
-		Arguments:   "[paragraphs]",
-		Handler:     u.baconipsum,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "previewcolor",
-		Description: "Preview a color",
-		Arguments:   "<rgb/hex>",
-		Handler:     u.previewcolor,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "generatekey",
-		Description: "Generate a random license key (X or x for letters, 9 for numbers)",
-		Arguments:   "<format> [amount]",
-		Handler:     u.generatekey,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "timestamp",
-		Description: "Create a Discord timestamp",
-		Arguments:   "<time>",
-		Handler:     u.timestampCommand(""),
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "reltimestamp",
-		Description: "Create a relative Discord timestamp",
-		Arguments:   "<time>",
-		Handler:     u.timestampCommand(":R"),
-	})
 }
 
 // Discord utilities
@@ -836,25 +865,19 @@ func getChannelType(channelType discordgo.ChannelType) discordgo.ChannelType {
 	return discordgo.ChannelTypeGuildText
 }
 
-func (UtilityCommands) copyserver(ctx *router.Ctx) {
-	duration, _ := utils.Misc.ParseDuration(utils.Arguments["[delay]"])
-
-	if duration < time.Second*10 {
+func (c *UtilityCommands) copyserver(ctx *router.Ctx) {
+	duration, err := ctx.Arguments.Get(1).Duration()
+	if err != nil || duration < time.Second*10 {
 		duration = time.Second * 10
 	}
 
-	guild, err := utils.Discord.GetGuild(ctx.Session, utils.Misc.Or(utils.Arguments["[server id]"], ctx.Message.GuildID))
+	guild, err := ctx.Arguments.Get(0).Guild()
 	if err != nil {
 		_ = ctx.RespondText("Error getting server: " + err.Error())
 		return
 	}
 
-	name := fmt.Sprintf("%s - Copy", guild.Name)
-	if len(name) > 100 {
-		name = name[:99]
-	}
-
-	newGuild, err := ctx.Session.GuildCreate(name)
+	newGuild, err := ctx.Session.GuildCreate(fmt.Sprintf("[COPY] %.90s", guild.Name))
 	if err != nil {
 		_ = ctx.RespondText("Error copying server: " + err.Error())
 		return
@@ -991,23 +1014,21 @@ func (UtilityCommands) copyserver(ctx *router.Ctx) {
 		Send(ctx)
 }
 
-func (UtilityCommands) copychannel(ctx *router.Ctx) {
-	sourceChannel, success := utils.Discord.TryGetChannelFromMention(ctx, ctx.Arguments.Get(0))
-	if !success {
-		_ = ctx.RespondText("Could not find channel")
-		return
-	}
-
-	destChannel, success := utils.Discord.TryGetChannelFromMention(ctx, ctx.Arguments.Get(1))
-	if !success {
-		_ = ctx.RespondText("Could not find channel")
-		return
-	}
-
-	limit, err := ctx.Arguments.Get(2).Int()
+func (c *UtilityCommands) copychannel(ctx *router.Ctx) {
+	sourceChannel, err := ctx.Arguments.Get(0).Channel()
 	if err != nil {
-		limit = 100
+		_ = ctx.RespondText("Could not find channel")
+		return
 	}
+
+	destChannel, err := ctx.Arguments.Get(1).Channel()
+	if err != nil {
+		_ = ctx.RespondText("Could not find channel")
+		return
+	}
+
+	limit, _ := ctx.Arguments.Get(2).Int()
+	limit = utils2.Clamp(limit, 1, 100)
 
 	if limit < 1 {
 		_ = ctx.RespondText("Limit must be greater than 0")
@@ -1081,13 +1102,12 @@ func (UtilityCommands) copychannel(ctx *router.Ctx) {
 	}
 }
 
-func (UtilityCommands) leavegroups(ctx *router.Ctx) {
-	rawSilentToggle := strings.ToLower(utils.Arguments["[silent leave: on/off]"])
-	silentToggle := rawSilentToggle == "on"
+func (c *UtilityCommands) leavegroups(ctx *router.Ctx) {
+	isSilent, _ := ctx.Arguments.Get(0).Bool()
 
 	for _, channel := range ctx.Session.State.PrivateChannels {
 		if channel.Type == discordgo.ChannelTypeGroupDM {
-			_, err := ctx.Session.ChannelDelete(channel.ID, silentToggle)
+			_, err := ctx.Session.ChannelDelete(channel.ID, isSilent)
 			if err != nil {
 				_ = ctx.RespondText("Error leaving group: " + err.Error())
 			}
@@ -1097,7 +1117,7 @@ func (UtilityCommands) leavegroups(ctx *router.Ctx) {
 	}
 }
 
-func (UtilityCommands) adminservers(ctx *router.Ctx) {
+func (c *UtilityCommands) adminservers(ctx *router.Ctx) {
 	userId, _ := strconv.Atoi(ctx.Session.State.User.ID)
 
 	adminServerString := ""
@@ -1129,7 +1149,7 @@ func (UtilityCommands) adminservers(ctx *router.Ctx) {
 		Send(ctx)
 }
 
-func (UtilityCommands) admingroups(ctx *router.Ctx) {
+func (c *UtilityCommands) admingroups(ctx *router.Ctx) {
 	adminGroupsString := ""
 	for _, channel := range ctx.Session.State.PrivateChannels {
 		if channel.Type == discordgo.ChannelTypeGroupDM {
@@ -1143,14 +1163,14 @@ func (UtilityCommands) admingroups(ctx *router.Ctx) {
 		Send(ctx)
 }
 
-func (UtilityCommands) joinvc(ctx *router.Ctx) {
-	channel, success := utils.Discord.TryGetChannelFromMention(ctx, ctx.Arguments.Get(0))
-	if !success {
+func (c *UtilityCommands) joinvc(ctx *router.Ctx) {
+	channel, err := ctx.Arguments.Get(0).Channel()
+	if err != nil {
 		_ = ctx.RespondText("Could not find channel")
 		return
 	}
 
-	_, err := ctx.Session.ChannelVoiceJoin(channel.GuildID, channel.ID, false, false)
+	_, err = ctx.Session.ChannelVoiceJoin(channel.GuildID, channel.ID, false, false)
 	if err != nil {
 		_ = ctx.RespondText("Could not join channel")
 		return
@@ -1159,41 +1179,14 @@ func (UtilityCommands) joinvc(ctx *router.Ctx) {
 	_ = ctx.RespondText("Joined channel " + channel.Name)
 }
 
-func (UtilityCommands) findserver(ctx *router.Ctx) {
-	guild, err := utils.Discord.GetGuild(ctx.Session, utils.Misc.Or(utils.Arguments["<server id>"], ctx.Message.GuildID))
+func (c *UtilityCommands) snipe(ctx *router.Ctx) {
+	channel, err := ctx.Arguments.Get(0).Channel(router.ArgumentFlagFallbackDefault)
 	if err != nil {
-		_ = ctx.RespondText("Error getting server: " + err.Error())
+		_ = ctx.RespondText("Could not find channel")
 		return
 	}
-	c.services.Embed.NewEmbed().
-		AddField("Server Name", guild.Name).
-		AddField("Created At", utils.Discord.SnowflakeToTime(guild.ID).Format("2006-01-02 15:04:05")).
-		Send(ctx)
-}
 
-func (UtilityCommands) finduser(ctx *router.Ctx) {
-	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
-	if !success {
-		_ = ctx.RespondText("Could not find user")
-		return
-	}
-	c.services.Embed.NewEmbed().
-		AddField("User", user.String()).
-		AddField("Created At", utils.Discord.SnowflakeToTime(user.ID).Format("2006-01-02 15:04:05")).
-		Send(ctx)
-}
-
-func (UtilityCommands) snipe(ctx *router.Ctx) {
-	channel, success := utils.Discord.TryGetChannelFromMention(ctx, ctx.Arguments.Get(0))
-	if !success {
-		channel, _ = ctx.Session.State.Channel(ctx.Message.ChannelID)
-		if channel == nil {
-			_ = ctx.RespondText("Could not find channel")
-			return
-		}
-	}
-
-	messages := eventreactions.GetDeletedMessages(channel.ID)
+	messages := c.services.EventReactions.GetDeletedMessages(channel.ID)
 	if len(messages) == 0 {
 		c.services.Embed.NewEmbed().
 			SetDescription("No deleted message was found in this channel!").
@@ -1233,17 +1226,14 @@ func (UtilityCommands) snipe(ctx *router.Ctx) {
 		Send(ctx)
 }
 
-func (UtilityCommands) editsnipe(ctx *router.Ctx) {
-	channel, success := utils.Discord.TryGetChannelFromMention(ctx, ctx.Arguments.Get(0))
-	if !success {
-		channel, _ = ctx.Session.State.Channel(ctx.Message.ChannelID)
-		if channel == nil {
-			_ = ctx.RespondText("Could not find channel")
-			return
-		}
+func (c *UtilityCommands) editsnipe(ctx *router.Ctx) {
+	channel, err := ctx.Arguments.Get(0).Channel(router.ArgumentFlagFallbackDefault)
+	if err != nil {
+		_ = ctx.RespondText("Could not find channel")
+		return
 	}
 
-	messages := eventreactions.GetEditedMessages(channel.ID)
+	messages := c.services.EventReactions.GetEditedMessages(channel.ID)
 	if len(messages) == 0 {
 		c.services.Embed.NewEmbed().
 			SetDescription("No deleted message was found in this channel!").
@@ -1262,14 +1252,11 @@ func (UtilityCommands) editsnipe(ctx *router.Ctx) {
 	emb.Send(ctx)
 }
 
-func (UtilityCommands) firstmessage(ctx *router.Ctx) {
-	channel, success := utils.Discord.TryGetChannelFromMention(ctx, ctx.Arguments.Get(0))
-	if !success {
-		channel, _ = ctx.Session.State.Channel(ctx.Message.ChannelID)
-		if channel == nil {
-			_ = ctx.RespondText("Could not find channel")
-			return
-		}
+func (c *UtilityCommands) firstmessage(ctx *router.Ctx) {
+	channel, err := ctx.Arguments.Get(0).Channel(router.ArgumentFlagFallbackDefault)
+	if err != nil {
+		_ = ctx.RespondText("Could not find channel")
+		return
 	}
 	messages, err := ctx.Session.ChannelMessages(channel.ID, 1, "", "1", "")
 	if err != nil {
@@ -1288,18 +1275,14 @@ func (UtilityCommands) firstmessage(ctx *router.Ctx) {
 		Send(ctx)
 }
 
-func (UtilityCommands) hypesquad(ctx *router.Ctx) {
-	houseName := utils.Arguments["<bravery/brilliance/balance>"]
-	var house int
-
-	switch houseName {
-	case "bravery":
-		house = 1
-	case "brilliance":
-		house = 2
-	case "balance":
-		house = 3
-	default:
+func (c *UtilityCommands) hypesquad(ctx *router.Ctx) {
+	houseName := strings.ToLower(ctx.Arguments.Get(0).Raw())
+	house, ok := map[string]int{
+		"bravery":    1,
+		"brilliance": 2,
+		"balance":    3,
+	}[houseName]
+	if !ok {
 		_ = ctx.RespondText("Missing required argument: <bravery/brilliance/balance>")
 		return
 	}
@@ -1314,20 +1297,31 @@ func (UtilityCommands) hypesquad(ctx *router.Ctx) {
 		Send(ctx)
 }
 
-func (UtilityCommands) leavehypesquad(ctx *router.Ctx) {
-	_ = api.LeaveHypesquad(ctx.Session)
+func (c *UtilityCommands) leavehypesquad(ctx *router.Ctx) {
+	err := api.LeaveHypesquad(ctx.Session)
+	if err != nil {
+		_ = ctx.RespondText("Error leaving hypesquad: " + err.Error())
+	}
+
+	c.services.Embed.NewEmbed().
+		SetDescription("Left hypesquad successfully!").
+		Send(ctx)
 }
 
-func (UtilityCommands) theme(ctx *router.Ctx) {
-	themeName := strings.ToUpper(utils.Arguments["<light/dark>"])
-
-	theme, ok := protos.PreloadedUserSettings_Theme_value[themeName]
+func (c *UtilityCommands) theme(ctx *router.Ctx) {
+	themeName := strings.ToLower(ctx.Arguments.Get(0).Raw())
+	theme, ok := map[string]protos.PreloadedUserSettings_Theme{
+		"dark":     1,
+		"light":    2,
+		"darker":   3,
+		"midnight": 4,
+	}[themeName]
 	if !ok {
-		_ = ctx.RespondText("Error: <light/dark> must be either \"light\" or \"dark\"")
+		_ = ctx.RespondText("Missing required argument: <dark/light/darker/midnight>")
 		return
 	}
 
-	ctx.Session.State.UserSettings.Appearance.Theme = protos.PreloadedUserSettings_Theme(theme)
+	ctx.Session.State.UserSettings.Appearance.Theme = theme
 	err := ctx.Session.UserSettingsUpdate(ctx.Session.State.UserSettings, true)
 	if err != nil {
 		_ = ctx.RespondText("Error setting theme: " + err.Error())
@@ -1339,15 +1333,15 @@ func (UtilityCommands) theme(ctx *router.Ctx) {
 		Send(ctx)
 }
 
-func (UtilityCommands) compact(ctx *router.Ctx) {
-	toggle := strings.ToLower(utils.Arguments["<on/off>"])
-	if toggle != "on" && toggle != "off" {
-		_ = ctx.RespondText("Error: <on/off> must be either \"on\" or \"off\"")
+func (c *UtilityCommands) compact(ctx *router.Ctx) {
+	toggle, err := ctx.Arguments.Get(0).Bool()
+	if err != nil {
+		_ = ctx.RespondText("Error parsing argument: " + err.Error())
 		return
 	}
 
-	ctx.Session.State.UserSettings.TextAndImages.MessageDisplayCompact = wrapperspb.Bool(toggle == "on")
-	err := ctx.Session.UserSettingsUpdate(ctx.Session.State.UserSettings, true)
+	ctx.Session.State.UserSettings.TextAndImages.MessageDisplayCompact = wrapperspb.Bool(toggle)
+	err = ctx.Session.UserSettingsUpdate(ctx.Session.State.UserSettings, true)
 	if err != nil {
 		_ = ctx.RespondText("Error setting theme: " + err.Error())
 		return
@@ -1358,15 +1352,15 @@ func (UtilityCommands) compact(ctx *router.Ctx) {
 		Send(ctx)
 }
 
-func (UtilityCommands) devmode(ctx *router.Ctx) {
-	toggle := strings.ToLower(utils.Arguments["<on/off>"])
-	if toggle != "on" && toggle != "off" {
-		_ = ctx.RespondText("Error: <on/off> must be either \"on\" or \"off\"")
+func (c *UtilityCommands) devmode(ctx *router.Ctx) {
+	toggle, err := ctx.Arguments.Get(0).Bool()
+	if err != nil {
+		_ = ctx.RespondText("Error parsing argument: " + err.Error())
 		return
 	}
 
-	ctx.Session.State.UserSettings.Appearance.DeveloperMode = toggle == "on"
-	err := ctx.Session.UserSettingsUpdate(ctx.Session.State.UserSettings, true)
+	ctx.Session.State.UserSettings.Appearance.DeveloperMode = toggle
+	err = ctx.Session.UserSettingsUpdate(ctx.Session.State.UserSettings, true)
 	if err != nil {
 		_ = ctx.RespondText("Error setting theme: " + err.Error())
 		return
@@ -1377,16 +1371,16 @@ func (UtilityCommands) devmode(ctx *router.Ctx) {
 		Send(ctx)
 }
 
-func (UtilityCommands) sessionid(ctx *router.Ctx) {
+func (c *UtilityCommands) sessionid(ctx *router.Ctx) {
 	c.services.Embed.NewEmbed().
 		AddField("Session ID", ctx.Session.State.SessionID).
 		Send(ctx)
 }
 
-func (UtilityCommands) aboutme(ctx *router.Ctx) {
-	var bio any = nil
-	if arg := ctx.Arguments.Raw(); arg != "" {
-		bio = arg
+func (c *UtilityCommands) aboutme(ctx *router.Ctx) {
+	bio := any(ctx.Arguments.Raw())
+	if bio == "" {
+		bio = nil
 	}
 
 	err := api.ChangeSettings(ctx.Session, "/profile", map[string]any{"bio": bio})
@@ -1400,10 +1394,10 @@ func (UtilityCommands) aboutme(ctx *router.Ctx) {
 		Send(ctx)
 }
 
-func (UtilityCommands) displayname(ctx *router.Ctx) {
-	var globalName any = nil
-	if arg := ctx.Arguments.Raw(); arg != "" {
-		globalName = arg
+func (c *UtilityCommands) displayname(ctx *router.Ctx) {
+	globalName := any(ctx.Arguments.Raw())
+	if globalName == "" {
+		globalName = nil
 	}
 
 	err := api.ChangeSettings(ctx.Session, "", map[string]any{"global_name": globalName})
@@ -1417,7 +1411,7 @@ func (UtilityCommands) displayname(ctx *router.Ctx) {
 		Send(ctx)
 }
 
-func (UtilityCommands) pronouns(ctx *router.Ctx) {
+func (c *UtilityCommands) pronouns(ctx *router.Ctx) {
 	err := api.ChangeSettings(ctx.Session, "/profile", map[string]any{"pronouns": ctx.Arguments.Raw()})
 	if err != nil {
 		_ = ctx.RespondText("Error setting pronouns: " + err.Error())
@@ -1429,7 +1423,7 @@ func (UtilityCommands) pronouns(ctx *router.Ctx) {
 		Send(ctx)
 }
 
-func (UtilityCommands) nickscan(ctx *router.Ctx) {
+func (c *UtilityCommands) nickscan(ctx *router.Ctx) {
 	nickText := ""
 	for _, guild := range ctx.Session.State.Guilds {
 		me, err := ctx.Session.State.Member(guild.ID, ctx.Message.Author.ID)
@@ -1449,9 +1443,9 @@ func (UtilityCommands) nickscan(ctx *router.Ctx) {
 		Send(ctx)
 }
 
-func (UtilityCommands) getmessagejson(ctx *router.Ctx) {
-	channel, success := utils.Discord.TryGetChannelFromMention(ctx, ctx.Arguments.Get(0))
-	if !success {
+func (c *UtilityCommands) getmessagejson(ctx *router.Ctx) {
+	channel, err := ctx.Arguments.Get(0).Channel()
+	if err != nil {
 		_ = ctx.RespondText("Could not find channel")
 		return
 	}
@@ -1481,9 +1475,9 @@ func (UtilityCommands) getmessagejson(ctx *router.Ctx) {
 		Send(ctx)
 }
 
-func (UtilityCommands) getembedjson(ctx *router.Ctx) {
-	channel, success := utils.Discord.TryGetChannelFromMention(ctx, ctx.Arguments.Get(0))
-	if !success {
+func (c *UtilityCommands) getembedjson(ctx *router.Ctx) {
+	channel, err := ctx.Arguments.Get(0).Channel()
+	if err != nil {
 		_ = ctx.RespondText("Could not find channel")
 		return
 	}
@@ -1513,9 +1507,9 @@ func (UtilityCommands) getembedjson(ctx *router.Ctx) {
 		Send(ctx)
 }
 
-func (UtilityCommands) sendmessagejson(ctx *router.Ctx) {
-	channel, success := utils.Discord.TryGetChannelFromMention(ctx, ctx.Arguments.Get(0))
-	if !success {
+func (c *UtilityCommands) sendmessagejson(ctx *router.Ctx) {
+	channel, err := ctx.Arguments.Get(0).Channel()
+	if err != nil {
 		_ = ctx.RespondText("Could not find channel")
 		return
 	}
@@ -1523,7 +1517,7 @@ func (UtilityCommands) sendmessagejson(ctx *router.Ctx) {
 	rawData := ctx.Arguments.RawFrom(1)
 
 	var data *discordgo.MessageSend
-	err := json.Unmarshal([]byte(rawData), &data)
+	err = json.Unmarshal([]byte(rawData), &data)
 	if err != nil {
 		_ = ctx.RespondText("Error unmarshaling JSON: " + err.Error())
 		return
@@ -1536,14 +1530,14 @@ func (UtilityCommands) sendmessagejson(ctx *router.Ctx) {
 	}
 }
 
-func (UtilityCommands) sendinterval(ctx *router.Ctx) {
-	interval, err := utils.Misc.ParseDuration(utils.Arguments["<interval>"])
+func (c *UtilityCommands) sendinterval(ctx *router.Ctx) {
+	interval, err := ctx.Arguments.Get(0).Duration()
 	if err != nil {
 		_ = ctx.RespondText("Error parsing interval: " + err.Error())
 		return
 	}
 
-	amount, err := strconv.Atoi(utils.Arguments["<amount>"])
+	amount, err := ctx.Arguments.Get(1).Int()
 	if err != nil {
 		_ = ctx.RespondText("Error parsing amount: " + err.Error())
 		return
@@ -1554,9 +1548,7 @@ func (UtilityCommands) sendinterval(ctx *router.Ctx) {
 		return
 	}
 
-	message := utils.Arguments["<\"message\">"]
-	flags := utils.Arguments["[flags]"]
-
+	message, flags := ctx.Arguments.Get(2).Raw(), ctx.Arguments.Get(3).Raw()
 	instantDelete := strings.Contains(flags, "INSTANT_DEL")
 	delete := strings.Contains(flags, "DELETE")
 
@@ -1578,11 +1570,11 @@ func (UtilityCommands) sendinterval(ctx *router.Ctx) {
 	}
 }
 
-func (UtilityCommands) optionpoll(ctx *router.Ctx) {
+func (c *UtilityCommands) optionpoll(ctx *router.Ctx) {
 	messages := c.services.Embed.NewEmbed().
-		SetDescription("Poll: "+utils.Arguments["<\"question\">"]).
-		AddField("👍", utils.Arguments["<\"option1\">"]).
-		AddField("👎", utils.Arguments["<\"option2\">"]).
+		SetDescription("Poll: "+ctx.Arguments.Get(0).Raw()).
+		AddField("👍", ctx.Arguments.Get(0).Raw()).
+		AddField("👎", ctx.Arguments.Get(0).Raw()).
 		Send(ctx)
 
 	if len(messages) > 0 {
@@ -1591,26 +1583,18 @@ func (UtilityCommands) optionpoll(ctx *router.Ctx) {
 	}
 }
 
-func (UtilityCommands) discordpoll(ctx *router.Ctx) {
-	duration, err := utils.Misc.ParseDuration(utils.Arguments["<duration>"])
+func (c *UtilityCommands) discordpoll(ctx *router.Ctx) {
+	duration, err := ctx.Arguments.Get(0).Duration()
 	if err != nil {
 		_ = ctx.RespondText("Error parsing duration: " + err.Error())
 		return
 	}
 
-	if duration < 1*time.Hour {
-		_ = ctx.RespondText("Error parsing duration: The minimum duration is 1 hour.")
-		return
-	}
+	duration = utils2.Clamp(duration, 1*time.Hour, 168*time.Hour)
 
-	if duration > 168*time.Hour {
-		_ = ctx.RespondText("Error parsing duration: The maximum duration is 7 days.")
-		return
-	}
-
-	question := utils.Arguments["<\"question\">"]
-	options := strings.Split(utils.Arguments["<\"options\">"], ",")
-	emojis := strings.Split(utils.Arguments["[\"emojis\"]"], ",")
+	question := ctx.Arguments.Get(1).Raw()
+	options := strings.Split(ctx.Arguments.Get(2).Raw(), ",")
+	emojis := strings.Split(ctx.Arguments.Get(3).Raw(), ",")
 
 	var pollAnswers []discordgo.PollAnswer
 
@@ -1661,8 +1645,8 @@ func (UtilityCommands) discordpoll(ctx *router.Ctx) {
 	}
 }
 
-func (UtilityCommands) checktoken(ctx *router.Ctx) {
-	token := utils.Arguments["<token>"]
+func (c *UtilityCommands) checktoken(ctx *router.Ctx) {
+	token := ctx.Arguments.Get(0).Raw()
 
 	response, err := api.GetTokenData(ctx.Session, token)
 	if err != nil {
@@ -1702,7 +1686,7 @@ func (UtilityCommands) checktoken(ctx *router.Ctx) {
 		Send(ctx)
 }
 
-func (UtilityCommands) discordstatus(ctx *router.Ctx) {
+func (c *UtilityCommands) discordstatus(ctx *router.Ctx) {
 	httpResponse := http.Get("https://srhpyqt94yxb.statuspage.io/api/v2/summary.json")
 	if httpResponse.Error != nil {
 		_ = ctx.RespondText("An error has occurred.")
@@ -1726,15 +1710,15 @@ func (UtilityCommands) discordstatus(ctx *router.Ctx) {
 
 // LightningBot Utilities
 
-func (UtilityCommands) website(*router.Ctx) {
+func (c *UtilityCommands) website(*router.Ctx) {
 	_ = utils.System.OpenURL("https://lightning-bot.com/")
 }
 
-func (UtilityCommands) dashboard(*router.Ctx) {
+func (c *UtilityCommands) dashboard(*router.Ctx) {
 	_ = utils.System.OpenURL("https://lightning-bot.com/dashboard")
 }
 
-func (UtilityCommands) changelog(ctx *router.Ctx) {
+func (c *UtilityCommands) changelog(ctx *router.Ctx) {
 	resp, err := http.PostJson(
 		"https://api.lightning-bot.com/api/v3/selfbot/check-version",
 		map[string]string{"branch": "selfbot", "version": ""},
@@ -1750,7 +1734,7 @@ func (UtilityCommands) changelog(ctx *router.Ctx) {
 		Send(ctx)
 }
 
-func (UtilityCommands) version(ctx *router.Ctx) {
+func (c *UtilityCommands) version(ctx *router.Ctx) {
 	resp, err := http.PostJson(
 		"https://api.lightning-bot.com/api/v3/selfbot/check-version",
 		map[string]string{"branch": "selfbot", "version": ""},
@@ -1766,93 +1750,78 @@ func (UtilityCommands) version(ctx *router.Ctx) {
 		Send(ctx)
 }
 
-func (UtilityCommands) uptime(ctx *router.Ctx) {
+func (c *UtilityCommands) uptime(ctx *router.Ctx) {
 	c.services.Embed.NewEmbed().
 		AddField("Uptime", utils.Misc.FormatDuration(time.Since(constants.START_TIME))).
 		Send(ctx)
 }
 
-func (UtilityCommands) history(ctx *router.Ctx) {
-	eventreactions.UsedCommands.Mutex.Lock()
-	defer eventreactions.UsedCommands.Mutex.Unlock()
+func (c *UtilityCommands) history(ctx *router.Ctx) {
+	usedCmds := utils2.Limit(c.services.EventReactions.GetUsedCommands(), 10)
 
-	usedCommands := ""
-	index := 1
-	for i := len(eventreactions.UsedCommands.Items) - 1; i >= 0 && i <= 10; i-- {
-		cmd := eventreactions.UsedCommands.Items[i]
-		usedCommands += fmt.Sprintf("%d. %s\n", index, cmd.Event.Content)
-		index++
+	if len(usedCmds) == 0 {
+		c.services.Embed.NewEmbed().
+			SetDescription("No commands have been used yet.").
+			Send(ctx)
+		return
 	}
+
+	usedCmdsReadable := utils2.MapIndexed(usedCmds, func(i int, cmd *router.Ctx) string {
+		return fmt.Sprintf("%d. %s", i+1, cmd.Message.Content)
+	})
+
 	c.services.Embed.NewEmbed().
-		AddField("Used Commands", usedCommands).
+		AddField("Used Commands", strings.Join(usedCmdsReadable, "\n")).
 		Send(ctx)
 }
 
-func (UtilityCommands) restartbot(*router.Ctx) {
+func (c *UtilityCommands) restartbot(*router.Ctx) {
 	if constants.CONSOLE {
 		utils.System.Restart()
 	} else {
-		ipc.IPC.Restart()
+		c.services.IPC.SendRestart()
 	}
 }
 
-func (UtilityCommands) stopbot(*router.Ctx) {
+func (c *UtilityCommands) stopbot(*router.Ctx) {
 	os.Exit(0)
 }
 
-func (UtilityCommands) cls(*router.Ctx) {
-	logging.UI.Clear()
+func (c *UtilityCommands) cls(*router.Ctx) {
+	c.services.UI.ClearConsole()
+	c.services.UI.ShowBanner(ui.BannerConsole | ui.BannerUI)
 }
 
-func (UtilityCommands) openfolder(*router.Ctx) {
+func (c *UtilityCommands) openfolder(*router.Ctx) {
 	_ = utils.System.OpenURL(utils.IO.GetMainFolder())
 }
 
-func (UtilityCommands) remote(ctx *router.Ctx) {
-	channel, success := utils.Discord.TryGetChannelFromMentionWithDefault(ctx, ctx.Arguments.Get(0))
-	if !success {
+func (c *UtilityCommands) remote(ctx *router.Ctx) {
+	channel, err := ctx.Arguments.Get(0).Channel(router.ArgumentFlagFallbackDefault)
+	if err != nil {
 		_ = ctx.RespondText("Could not find channel")
 		return
 	}
 
-	commandName := strings.ToLower(utils.Arguments["<command>"])
+	commandName := ctx.Arguments.Get(1).Raw()
 	args := ctx.Arguments.RawFrom(2)
 
-	var command *dgc.Command
+	cmds := utils2.Filter(ctx.Router.GetCmds(), func(cmd *router.Command) bool {
+		return strings.EqualFold(cmd.Name, commandName)
+	})
 
-	for _, cmd := range ctx.Router.Commands {
-		if strings.ToLower(cmd.Name) == commandName {
-			command = cmd
-			break
-		}
-	}
-
-	if command == nil {
+	if len(cmds) == 0 {
 		_ = ctx.RespondText("Command not found")
 		return
 	}
 
-	cfg, err := config.GetConfig()
-	if err != nil {
-		_ = ctx.RespondText("Error getting config: " + err.Error())
-		return
-	}
-
-	ctx.Router.Handler()(ctx.Session, &discordgo.MessageCreate{
-		Message: &discordgo.Message{
-			ID:        "0",
-			ChannelID: channel.ID,
-			GuildID:   channel.GuildID,
-			Content:   fmt.Sprintf("%s%s %s", cfg.Selfbot.CommandPrefix, command.Name, args),
-			Author:    ctx.Message.Author,
-		},
-	})
+	ctx.Router.InvokeRemoteCmd(ctx.Session, channel, ctx.Message.Author, cmds[0], args)
 
 }
 
 // System Utilities
 
-func (UtilityCommands) systeminfo(ctx *router.Ctx) {
+func (c *UtilityCommands) systeminfo(ctx *router.Ctx) {
 	path := "/"
 	if runtime.GOOS == "windows" {
 		path = "C:"
@@ -1900,27 +1869,27 @@ func (UtilityCommands) systeminfo(ctx *router.Ctx) {
 		Send(ctx)
 }
 
-func (UtilityCommands) shutdownpc(ctx *router.Ctx) {
+func (c *UtilityCommands) shutdownpc(ctx *router.Ctx) {
 	_ = utils.System.ShutdownPC()
 }
 
-func (UtilityCommands) restartpc(ctx *router.Ctx) {
+func (c *UtilityCommands) restartpc(ctx *router.Ctx) {
 	_ = utils.System.RestartPC()
 }
 
-func (UtilityCommands) sleeppc(ctx *router.Ctx) {
+func (c *UtilityCommands) sleeppc(ctx *router.Ctx) {
 	_ = utils.System.SleepPC()
 }
 
-func (UtilityCommands) hibernatepc(ctx *router.Ctx) {
+func (c *UtilityCommands) hibernatepc(ctx *router.Ctx) {
 	_ = utils.System.HibernatePC()
 }
 
-func (UtilityCommands) lockpc(ctx *router.Ctx) {
+func (c *UtilityCommands) lockpc(ctx *router.Ctx) {
 	_ = utils.System.LockPC()
 }
 
-func (UtilityCommands) activewindow(ctx *router.Ctx) {
+func (c *UtilityCommands) activewindow(ctx *router.Ctx) {
 	pid, _ := foreground.GetForegroundPID()
 	title, _ := foreground.GetForegroundTitle()
 
@@ -1930,29 +1899,29 @@ func (UtilityCommands) activewindow(ctx *router.Ctx) {
 		Send(ctx)
 }
 
-func (UtilityCommands) calc(ctx *router.Ctx) {
+func (c *UtilityCommands) calc(ctx *router.Ctx) {
 	if runtime.GOOS != "windows" {
 		_ = ctx.RespondText("This command is only available on Windows")
 	}
 	_ = exec.Command("C:\\Windows\\System32\\calc.exe").Start()
 }
 
-func (UtilityCommands) notepad(ctx *router.Ctx) {
+func (c *UtilityCommands) notepad(ctx *router.Ctx) {
 	if runtime.GOOS != "windows" {
 		_ = ctx.RespondText("This command is only available on Windows")
 	}
 	_ = exec.Command("C:\\Windows\\System32\\notepad.exe").Start()
 }
 
-func (UtilityCommands) open(ctx *router.Ctx) {
+func (c *UtilityCommands) open(ctx *router.Ctx) {
 	_ = utils.System.OpenURL(ctx.Arguments.Raw())
 }
 
 // Uploading utilities
 
-func (UtilityCommands) screenshot(ctx *router.Ctx) {
-	duration, _ := utils.Misc.ParseDuration(utils.Arguments["[delay]"])
-	time.Sleep(duration)
+func (c *UtilityCommands) screenshot(ctx *router.Ctx) {
+	delay, _ := ctx.Arguments.Get(0).Duration()
+	time.Sleep(delay)
 
 	img, err := screenshot.CaptureDisplay(0)
 	if err != nil {
@@ -1971,7 +1940,7 @@ func (UtilityCommands) screenshot(ctx *router.Ctx) {
 	_, _ = ctx.Session.ChannelFileSend(ctx.Message.ChannelID, "screenshot.png", buf)
 }
 
-func (UtilityCommands) listdestinations(ctx *router.Ctx) {
+func (c *UtilityCommands) listdestinations(ctx *router.Ctx) {
 	destinationsString := []string{}
 
 	for name, dest := range destinations.Destinations {
@@ -1987,15 +1956,16 @@ func (UtilityCommands) listdestinations(ctx *router.Ctx) {
 		Send(ctx)
 }
 
-func (UtilityCommands) uploadss(ctx *router.Ctx) {
-	dest, ok := destinations.Destinations[utils.Arguments["<destination>"]]
+func (c *UtilityCommands) uploadss(ctx *router.Ctx) {
+	destName := strings.ToLower(ctx.Arguments.Get(0).Raw())
+	dest, ok := destinations.Destinations[destName]
 	if !ok {
 		_ = ctx.RespondText("Error: invalid destination\n\nUse the `listdestinations` command to view all destinations")
 		return
 	}
 
-	duration, _ := utils.Misc.ParseDuration(utils.Arguments["[delay]"])
-	time.Sleep(duration)
+	delay, _ := ctx.Arguments.Get(1).Duration()
+	time.Sleep(delay)
 
 	img, err := screenshot.CaptureDisplay(0)
 	if err != nil {
@@ -2024,8 +1994,9 @@ func (UtilityCommands) uploadss(ctx *router.Ctx) {
 		Send(ctx)
 }
 
-func (UtilityCommands) uploadfile(ctx *router.Ctx) {
-	dest, ok := destinations.Destinations[utils.Arguments["<destination>"]]
+func (c *UtilityCommands) uploadfile(ctx *router.Ctx) {
+	destName := strings.ToLower(ctx.Arguments.Get(0).Raw())
+	dest, ok := destinations.Destinations[destName]
 	if !ok {
 		_ = ctx.RespondText("Error: invalid destination\n\nUse the `listdestinations` command to view all destinations")
 		return
@@ -2066,14 +2037,15 @@ func (UtilityCommands) uploadfile(ctx *router.Ctx) {
 		Send(ctx)
 }
 
-func (UtilityCommands) uploadlink(ctx *router.Ctx) {
-	dest, ok := destinations.Destinations[utils.Arguments["<destination>"]]
+func (c *UtilityCommands) uploadlink(ctx *router.Ctx) {
+	destName := strings.ToLower(ctx.Arguments.Get(0).Raw())
+	dest, ok := destinations.Destinations[destName]
 	if !ok {
 		_ = ctx.RespondText("Error: invalid destination\n\nUse the `listdestinations` command to view all destinations")
 		return
 	}
 
-	link := utils.Arguments["<link>"]
+	link := ctx.Arguments.Get(1).Raw()
 	parsedURL, err := url.ParseRequestURI(link)
 	if err != nil {
 		_ = ctx.RespondText("Error: invalid link: " + err.Error())
@@ -2112,7 +2084,7 @@ func (UtilityCommands) uploadlink(ctx *router.Ctx) {
 
 // Paste utilities
 
-func (UtilityCommands) pastebin(ctx *router.Ctx) {
+func (c *UtilityCommands) pastebin(ctx *router.Ctx) {
 	paste, err := api.CreatePaste(ctx.Arguments.Raw())
 	if err != nil {
 		_ = ctx.RespondText("An error has occurred.")
@@ -2123,23 +2095,26 @@ func (UtilityCommands) pastebin(ctx *router.Ctx) {
 		Send(ctx)
 }
 
-func (UtilityCommands) pastefile(ctx *router.Ctx) {
-	filePath := utils.Arguments["<filepath>"]
-	if content, success := utils.IO.Read(filePath); success {
-		paste, err := api.CreatePaste(content)
-		if err != nil {
-			_ = ctx.RespondText("An error has occurred.")
-			return
-		}
-		c.services.Embed.NewEmbed().
-			AddField("Paste URL", paste).
-			Send(ctx)
-	} else {
+func (c *UtilityCommands) pastefile(ctx *router.Ctx) {
+	filePath := ctx.Arguments.Get(0).Raw()
+	content, ok := utils.IO.Read(filePath)
+	if !ok {
 		_ = ctx.RespondText("That file does not exist.")
+		return
 	}
+
+	paste, err := api.CreatePaste(content)
+	if err != nil {
+		_ = ctx.RespondText("An error has occurred.")
+		return
+	}
+
+	c.services.Embed.NewEmbed().
+		AddField("Paste URL", paste).
+		Send(ctx)
 }
 
-func (UtilityCommands) tinyurl(ctx *router.Ctx) {
+func (c *UtilityCommands) tinyurl(ctx *router.Ctx) {
 	sourceUrl := ctx.Arguments.Raw()
 	httpResponse := http.Get(fmt.Sprintf("https://tinyurl.com/api-create.php?url=%s", sourceUrl))
 	if httpResponse.Error != nil {
@@ -2154,9 +2129,9 @@ func (UtilityCommands) tinyurl(ctx *router.Ctx) {
 
 // Obfuscation utilities
 
-func (UtilityCommands) obfuscateFunc(lang, ext string) func(ctx *router.Ctx) {
+func (c *UtilityCommands) obfuscateFunc(lang, ext string) func(ctx *router.Ctx) {
 	return func(ctx *router.Ctx) {
-		script := utils.Arguments["[script/attachment]"]
+		script := ctx.Arguments.Raw()
 
 		attachments := ctx.Message.Attachments
 		if script == "" && len(attachments) > 0 {
@@ -2195,7 +2170,7 @@ func (UtilityCommands) obfuscateFunc(lang, ext string) func(ctx *router.Ctx) {
 
 // ReviewDB utilities
 
-func (UtilityCommands) reviewdbtoken(ctx *router.Ctx) {
+func (c *UtilityCommands) reviewdbtoken(ctx *router.Ctx) {
 	token, err := api.GetReviewDBToken(ctx.Session)
 	if err != nil {
 		c.services.Embed.NewEmbed().
@@ -2209,9 +2184,9 @@ func (UtilityCommands) reviewdbtoken(ctx *router.Ctx) {
 		Send(ctx)
 }
 
-func (UtilityCommands) getreviews(ctx *router.Ctx) {
-	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
-	if !success {
+func (c *UtilityCommands) getreviews(ctx *router.Ctx) {
+	user, err := ctx.Arguments.Get(0).User()
+	if err != nil {
 		c.services.Embed.NewEmbed().
 			SetDescription("Could not find user").
 			Send(ctx)
@@ -2237,16 +2212,16 @@ func (UtilityCommands) getreviews(ctx *router.Ctx) {
 		Send(ctx)
 }
 
-func (UtilityCommands) addreview(ctx *router.Ctx) {
-	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
-	if !success {
+func (c *UtilityCommands) addreview(ctx *router.Ctx) {
+	user, err := ctx.Arguments.Get(0).User()
+	if err != nil {
 		c.services.Embed.NewEmbed().
 			SetDescription("Could not find user").
 			Send(ctx)
 		return
 	}
 
-	err := api.AddReviewDBReview(ctx.Session, user.ID, ctx.Arguments.RawFrom(1))
+	err = api.AddReviewDBReview(ctx.Session, user.ID, ctx.Arguments.RawFrom(1))
 	if err != nil {
 		c.services.Embed.NewEmbed().
 			SetDescription("Error adding review: " + err.Error()).
@@ -2261,85 +2236,103 @@ func (UtilityCommands) addreview(ctx *router.Ctx) {
 
 // Tag utilities
 
-func (UtilityCommands) tags(ctx *router.Ctx) {
+func (c *UtilityCommands) getTags(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
-		_ = ctx.RespondText("Error getting config.")
+		_ = ctx.RespondText("Error getting config: " + err.Error())
+		return
+	}
+
+	if len(cfg.Tags) == 0 {
+		c.services.Embed.NewEmbed().
+			SetDescription("No tags found.").
+			Send(ctx)
+		return
+	}
+
+	var tagList []string
+
+	for tag, value := range cfg.Tags {
+		tagList = append(tagList, fmt.Sprintf("%s:\n```\n%s\n```\n", tag, value))
+	}
+
+	c.services.Embed.NewEmbed().
+		AddField("Tags", strings.Join(tagList, "\n")).
+		Send(ctx)
+}
+
+func (c *UtilityCommands) addTag(ctx *router.Ctx) {
+	cfg, err := config.GetConfig()
+	if err != nil {
+		_ = ctx.RespondText("Error getting config: " + err.Error())
 		return
 	}
 
 	if cfg.Tags == nil {
 		cfg.Tags = map[string]string{}
-
-		err = cfg.Save()
-		if err != nil {
-			_ = ctx.RespondText("Error saving config: " + err.Error())
-			return
-		}
 	}
 
-	switch utils.Arguments["<get/set/rm/clear/send>"] {
-	case "get":
-		var tagList []string
+	name := ctx.Arguments.Get(0).Raw()
+	content := ctx.Arguments.RawFrom(1)
 
-		for tag := range cfg.Tags {
-			tagList = append(tagList, fmt.Sprintf("%s:\n%s\n", tag, cfg.Tags[tag]))
-		}
+	cfg.Tags[name] = content
 
-		c.services.Embed.NewEmbed().
-			AddField("Tags", strings.Join(tagList, "\n")).
-			Send(ctx)
-	case "add":
-		name := ctx.Arguments.Get(1).Raw()
-		content := ctx.Arguments.RawFrom(2)
-
-		cfg.Tags[name] = content
-
-		err = cfg.Save()
-		if err != nil {
-			_ = ctx.RespondText("Error saving config: " + err.Error())
-			return
-		}
-
-		c.services.Embed.NewEmbed().
-			SetDescription("Successfully created tag.").
-			Send(ctx)
-	case "rm":
-		delete(cfg.Tags, ctx.Arguments.Get(1).Raw())
-
-		err = cfg.Save()
-		if err != nil {
-			_ = ctx.RespondText("Error saving config: " + err.Error())
-			return
-		}
-
-		c.services.Embed.NewEmbed().
-			SetDescription("Successfully deleted tag").
-			Send(ctx)
-	case "clear":
-		cfg.Tags = map[string]string{}
-		_ = cfg.Save()
-
-		c.services.Embed.NewEmbed().
-			SetDescription("Cleared all tags.").
-			Send(ctx)
-	case "send":
-		name := ctx.Arguments.Get(1).Raw()
-		content, ok := cfg.Tags[name]
-		if !ok {
-			_ = ctx.RespondText("That tag does not exist!")
-			return
-		}
-
-		_ = ctx.RespondText(content)
-	default:
-		_ = ctx.RespondText("Invalid <get/add/rm/clear/send> argument. Use `get`, `add`, `rm`, `clear`, or `send`.")
+	err = cfg.Save()
+	if err != nil {
+		_ = ctx.RespondText("Error saving tags: " + err.Error())
+		return
 	}
+
+	c.services.Embed.NewEmbed().
+		SetDescription("Successfully created tag.").
+		Send(ctx)
+}
+
+func (c *UtilityCommands) removeTag(ctx *router.Ctx) {
+	cfg, err := config.GetConfig()
+	if err != nil {
+		_ = ctx.RespondText("Error getting config: " + err.Error())
+		return
+	}
+
+	name := ctx.Arguments.Get(0).Raw()
+
+	delete(cfg.Tags, name)
+
+	err = cfg.Save()
+	if err != nil {
+		_ = ctx.RespondText("Error saving tags: " + err.Error())
+		return
+	}
+
+	c.services.Embed.NewEmbed().
+		SetDescription("Successfully deleted tag.").
+		Send(ctx)
+}
+
+func (c *UtilityCommands) clearTags(ctx *router.Ctx) {
+	cfg, err := config.GetConfig()
+	if err != nil {
+		_ = ctx.RespondText("Error getting config: " + err.Error())
+		return
+	}
+
+	cfg.Tags = map[string]string{}
+
+	err = cfg.Save()
+	if err != nil {
+		_ = ctx.RespondText("Error saving tags: " + err.Error())
+		return
+	}
+
+	c.services.Embed.NewEmbed().
+		SetDescription("Successfully cleared tags.").
+		Send(ctx)
 }
 
 // Creditcard commands
 
-func (UtilityCommands) mastercard(ctx *router.Ctx) {
+func (c *UtilityCommands) mastercard(ctx *router.Ctx) {
 	creditCard := api.GenerateCreditCard("mastercard", ctx.Arguments.Raw())
 	c.services.Embed.NewEmbed().
 		AddField("Card Type", "Mastercard").
@@ -2350,7 +2343,7 @@ func (UtilityCommands) mastercard(ctx *router.Ctx) {
 		Send(ctx)
 }
 
-func (UtilityCommands) visa16(ctx *router.Ctx) {
+func (c *UtilityCommands) visa16(ctx *router.Ctx) {
 	creditCard := api.GenerateCreditCard("visa16", ctx.Arguments.Raw())
 	c.services.Embed.NewEmbed().
 		AddField("Card Type", "Visa").
@@ -2361,7 +2354,7 @@ func (UtilityCommands) visa16(ctx *router.Ctx) {
 		Send(ctx)
 }
 
-func (UtilityCommands) visa13(ctx *router.Ctx) {
+func (c *UtilityCommands) visa13(ctx *router.Ctx) {
 	creditCard := api.GenerateCreditCard("visa13", ctx.Arguments.Raw())
 	c.services.Embed.NewEmbed().
 		AddField("Card Type", "Visa").
@@ -2372,7 +2365,7 @@ func (UtilityCommands) visa13(ctx *router.Ctx) {
 		Send(ctx)
 }
 
-func (UtilityCommands) amex(ctx *router.Ctx) {
+func (c *UtilityCommands) amex(ctx *router.Ctx) {
 	creditCard := api.GenerateCreditCard("amex", ctx.Arguments.Raw())
 	c.services.Embed.NewEmbed().
 		AddField("Card Type", "American Express").
@@ -2383,7 +2376,7 @@ func (UtilityCommands) amex(ctx *router.Ctx) {
 		Send(ctx)
 }
 
-func (UtilityCommands) discover(ctx *router.Ctx) {
+func (c *UtilityCommands) discover(ctx *router.Ctx) {
 	creditCard := api.GenerateCreditCard("discover", ctx.Arguments.Raw())
 	c.services.Embed.NewEmbed().
 		AddField("Card Type", "Discover").
@@ -2394,7 +2387,7 @@ func (UtilityCommands) discover(ctx *router.Ctx) {
 		Send(ctx)
 }
 
-func (UtilityCommands) diners(ctx *router.Ctx) {
+func (c *UtilityCommands) diners(ctx *router.Ctx) {
 	creditCard := api.GenerateCreditCard("diners", ctx.Arguments.Raw())
 	c.services.Embed.NewEmbed().
 		AddField("Card Type", "Diners").
@@ -2405,7 +2398,7 @@ func (UtilityCommands) diners(ctx *router.Ctx) {
 		Send(ctx)
 }
 
-func (UtilityCommands) jcb(ctx *router.Ctx) {
+func (c *UtilityCommands) jcb(ctx *router.Ctx) {
 	creditCard := api.GenerateCreditCard("jcb", ctx.Arguments.Raw())
 	c.services.Embed.NewEmbed().
 		AddField("Card Type", "JCB").
@@ -2418,7 +2411,7 @@ func (UtilityCommands) jcb(ctx *router.Ctx) {
 
 // Network utilities
 
-func (UtilityCommands) ping(ctx *router.Ctx) {
+func (c *UtilityCommands) ping(ctx *router.Ctx) {
 	emb := c.services.Embed.NewEmbed()
 	time, err := api.Ping("https://lightning-bot.com")
 	if err != nil {
@@ -2437,23 +2430,23 @@ func (UtilityCommands) ping(ctx *router.Ctx) {
 		Send(ctx)
 }
 
-func (UtilityCommands) pingweb(ctx *router.Ctx) {
-	host := utils.Arguments["<host>"]
-	time, err := api.Ping(host)
+func (c *UtilityCommands) pingweb(ctx *router.Ctx) {
+	host := ctx.Arguments.Get(0).Raw()
 	emb := c.services.Embed.NewEmbed()
+
+	time, err := api.Ping(host)
 	if err != nil {
 		emb.AddField("Ping to "+host, "Error")
 	} else {
 		emb.AddField("Ping to "+host, fmt.Sprintf("%dms", time.Milliseconds()))
 	}
+
 	emb.Send(ctx)
 }
 
-func (UtilityCommands) ipinfo(ctx *router.Ctx) {
-	url := fmt.Sprintf(
-		"https://ipinfo.io/%s/json",
-		url.QueryEscape(utils.Arguments["<ip>"]),
-	)
+func (c *UtilityCommands) ipinfo(ctx *router.Ctx) {
+	ip := ctx.Arguments.Get(0).Raw()
+	url := fmt.Sprintf("https://ipinfo.io/%s/json", url.QueryEscape(ip))
 
 	httpResponse := http.Get(url)
 	if httpResponse.Error != nil {
@@ -2476,15 +2469,15 @@ func (UtilityCommands) ipinfo(ctx *router.Ctx) {
 	)
 
 	c.services.Embed.NewEmbed().
-		AddField("IP", utils.Arguments["<ip>"]).
+		AddField("IP", ip).
 		AddField("Hostname", ipinfo.Get("hostname").MustString()).
 		AddField("Timezone", ipinfo.Get("timezone").MustString()).
 		AddField("Location", location).
 		Send(ctx)
 }
 
-func (UtilityCommands) portscan(ctx *router.Ctx) {
-	host := utils.Arguments["<host>"]
+func (c *UtilityCommands) portscan(ctx *router.Ctx) {
+	host := ctx.Arguments.Get(0).Raw()
 	ports := map[string]int{
 		"FTP":            21,
 		"SSH":            22,
@@ -2512,8 +2505,8 @@ func (UtilityCommands) portscan(ctx *router.Ctx) {
 	emb.Send(ctx)
 }
 
-func (UtilityCommands) resolve(ctx *router.Ctx) {
-	domain := utils.Arguments["<domain>"]
+func (c *UtilityCommands) resolve(ctx *router.Ctx) {
+	domain := ctx.Arguments.Get(0).Raw()
 
 	httpResponse := http.Get(fmt.Sprintf("https://json.geoiplookup.io/%s", domain))
 	if httpResponse.Error != nil {
@@ -2534,11 +2527,9 @@ func (UtilityCommands) resolve(ctx *router.Ctx) {
 		Send(ctx)
 }
 
-func (UtilityCommands) reversedns(ctx *router.Ctx) {
-	url := fmt.Sprintf(
-		"https://api.domaintools.com/v1/%s/host-domains/",
-		url.QueryEscape(utils.Arguments["<ip>"]),
-	)
+func (c *UtilityCommands) reversedns(ctx *router.Ctx) {
+	ip := ctx.Arguments.Get(0).Raw()
+	url := fmt.Sprintf("https://api.domaintools.com/v1/%s/host-domains/", ip)
 
 	httpResponse := http.Get(url)
 	if httpResponse.Error != nil {
@@ -2556,13 +2547,13 @@ func (UtilityCommands) reversedns(ctx *router.Ctx) {
 	domains := response.GetPath("response", "ip_addresses", "domain_names").MustStringArray()
 
 	c.services.Embed.NewEmbed().
-		AddField("IP Address", utils.Arguments["<ip>"]).
+		AddField("IP Address", ip).
 		AddField("Domains", strings.Join(domains, ", ")).
 		Send(ctx)
 }
 
-func (UtilityCommands) reversemac(ctx *router.Ctx) {
-	mac := utils.Arguments["<mac>"]
+func (c *UtilityCommands) reversemac(ctx *router.Ctx) {
+	mac := ctx.Arguments.Get(0).Raw()
 	httpResponse := http.Get(fmt.Sprintf("https://api.macvendors.com/%s", mac))
 	if httpResponse.Error != nil {
 		_ = ctx.RespondText("An error has occurred.")
@@ -2578,8 +2569,9 @@ func (UtilityCommands) reversemac(ctx *router.Ctx) {
 		Send(ctx)
 }
 
-func (UtilityCommands) headers(ctx *router.Ctx) {
-	httpResponse := http.Get(utils.Arguments["<url>"])
+func (c *UtilityCommands) headers(ctx *router.Ctx) {
+	url := ctx.Arguments.Get(0).Raw()
+	httpResponse := http.Get(url)
 	if httpResponse.Error != nil {
 		_ = ctx.RespondText("An error has occurred.")
 		return
@@ -2591,12 +2583,12 @@ func (UtilityCommands) headers(ctx *router.Ctx) {
 	}
 
 	c.services.Embed.NewEmbed().
-		AddField("URL", utils.Arguments["<url>"]).
+		AddField("URL", url).
 		AddField("Headers", headers).
 		Send(ctx)
 }
 
-func (UtilityCommands) _interface(ctx *router.Ctx) {
+func (c *UtilityCommands) _interface(ctx *router.Ctx) {
 	c.services.Embed.NewEmbed().
 		AddField("Public IP", api.GetPublicIP()).
 		AddField("Local IP", api.GetLocalIP()).
@@ -2606,19 +2598,14 @@ func (UtilityCommands) _interface(ctx *router.Ctx) {
 
 // Poketwo utilities
 
-func (UtilityCommands) getPoketwoMessage(ctx *router.Ctx) (*discordgo.Message, error) {
-	channelID := ctx.Message.ChannelID
-	channel, success := utils.Discord.TryGetChannelFromMention(ctx, ctx.Arguments.Get(0))
-	if success {
-		channelID = channel.ID
-	}
-
-	if channelID == "" {
+func (c *UtilityCommands) getPoketwoMessage(ctx *router.Ctx) (*discordgo.Message, error) {
+	channel, err := ctx.Arguments.Get(0).Channel(router.ArgumentFlagFallbackDefault)
+	if err != nil {
 		_ = ctx.RespondText("Error: invalid channel")
 		return nil, errors.New("invalid channel")
 	}
 
-	messages, err := utils.Discord.GetChannelMessages(ctx.Session, channelID, 100)
+	messages, err := utils.Discord.GetChannelMessages(ctx.Session, channel.ID, 100)
 	if err != nil {
 		_ = ctx.RespondText("Error getting messages: " + err.Error())
 		return nil, err
@@ -2639,7 +2626,7 @@ func (UtilityCommands) getPoketwoMessage(ctx *router.Ctx) (*discordgo.Message, e
 	return nil, errors.New("no Poketwo message found")
 }
 
-func (c UtilityCommands) snipepokemon(ctx *router.Ctx) {
+func (c *UtilityCommands) snipepokemon(ctx *router.Ctx) {
 	message, err := c.getPoketwoMessage(ctx)
 	if err != nil {
 		return
@@ -2699,7 +2686,7 @@ func (c UtilityCommands) snipepokemon(ctx *router.Ctx) {
 		Send(ctx)
 }
 
-func (c UtilityCommands) detectpokemon(ctx *router.Ctx) {
+func (c *UtilityCommands) detectpokemon(ctx *router.Ctx) {
 	message, err := c.getPoketwoMessage(ctx)
 	if err != nil {
 		return
@@ -2759,149 +2746,142 @@ func (c UtilityCommands) detectpokemon(ctx *router.Ctx) {
 
 // Reminder utilities
 
-func (UtilityCommands) reminders(ctx *router.Ctx) {
+func (c *UtilityCommands) getReminders(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
 		_ = ctx.RespondText("Error getting config.")
 		return
 	}
 
-	var updated bool
+	if len(cfg.Reminders) == 0 {
+		_ = ctx.RespondText("No reminders have been set!")
+		return
+	}
+
+	var reminders []string
 	for _, reminder := range cfg.Reminders {
-		if reminder.Name != "" {
+		reminders = append(reminders, fmt.Sprintf("**ID: %d**: %s - %s", reminder.ID, reminder.Content, reminder.At.Format(time.RFC1123)))
+	}
+
+	c.services.Embed.NewEmbed().
+		AddField("Reminders", strings.Join(reminders, "\n")).
+		Send(ctx)
+}
+
+func (c *UtilityCommands) addReminder(ctx *router.Ctx) {
+	cfg, err := config.GetConfig()
+	if err != nil {
+		_ = ctx.RespondText("Error getting config.")
+		return
+	}
+
+	name := ctx.Arguments.Get(0).Raw()
+
+	for _, reminder := range cfg.Reminders {
+		if reminder.Name != name {
 			continue
 		}
 
-		reminder.Name = fmt.Sprintf("reminder-%d", reminder.ID)
-		updated = true
+		_ = ctx.RespondText("Reminder with that name already exists.")
+		return
 	}
 
-	if updated {
-		err = cfg.Save()
-		if err != nil {
-			_ = ctx.RespondText("Error saving config.")
-			return
-		}
+	duration, err := ctx.Arguments.Get(2).Duration()
+	if err != nil {
+		_ = ctx.RespondText("Invalid duration.")
+		return
 	}
 
-	switch utils.Arguments["<get/set/rm/clear>"] {
-	case "get":
-		if len(cfg.Reminders) == 0 {
-			_ = ctx.RespondText("No reminders have been set!")
-			return
-		}
+	duration = utils2.Clamp(duration, 5*time.Second, 24*time.Hour)
 
-		var reminders []string
-		for _, reminder := range cfg.Reminders {
-			reminders = append(reminders, fmt.Sprintf("**ID: %d**: %s - %s", reminder.ID, reminder.Content, reminder.At.Format(time.RFC1123)))
-		}
+	message := ctx.Arguments.RawFrom(3)
 
-		c.services.Embed.NewEmbed().
-			AddField("Reminders", strings.Join(reminders, "\n")).
-			Send(ctx)
-	case "add":
-		name := ctx.Arguments.Get(1).Raw()
+	cfg.Reminders = append(cfg.Reminders, config.Reminder{
+		Name:    ctx.Arguments.Get(1).Raw(),
+		Content: message,
+		At:      time.Now().Add(duration),
+	})
 
-		var exists bool
-		for _, reminder := range cfg.Reminders {
-			if reminder.Name != name {
-				continue
-			}
-
-			exists = true
-			break
-		}
-
-		if exists {
-			_ = ctx.RespondText("Reminder with that name already exists.")
-			return
-		}
-
-		duration, err := utils.Misc.ParseDuration(ctx.Arguments.Get(2).Raw())
-		if err != nil {
-			_ = ctx.RespondText("Invalid duration.")
-			return
-		}
-
-		if duration.Seconds() < 5 {
-			_ = ctx.RespondText("Duration must be at least 5 seconds.")
-			return
-		}
-
-		message := ctx.Arguments.RawFrom(3)
-
-		cfg.Reminders = append(cfg.Reminders, config.Reminder{
-			Name:    ctx.Arguments.Get(1).Raw(),
-			Content: message,
-			At:      time.Now().Add(duration),
-		})
-
-		err = cfg.Save()
-		if err != nil {
-			_ = ctx.RespondText("Error saving config: " + err.Error())
-			return
-		}
-
-		c.services.Embed.NewEmbed().
-			SetDescription("Successfully set reminder!").
-			Send(ctx)
-	case "rm":
-		name := ctx.Arguments.Get(1).Raw()
-		if name == "" {
-			_ = ctx.RespondText("Invalid name.")
-			return
-		}
-
-		cfg.Reminders = utils.Filter(cfg.Reminders, func(r config.Reminder) bool {
-			return r.Name != name
-		})
-
-		err = cfg.Save()
-		if err != nil {
-			_ = ctx.RespondText("Error saving config: " + err.Error())
-			return
-		}
-
-		c.services.Embed.NewEmbed().
-			SetDescription("Successfully deleted reminder!").
-			Send(ctx)
-	case "clear":
-		cfg.Reminders = []config.Reminder{}
-		_ = cfg.Save()
-
-		c.services.Embed.NewEmbed().
-			SetDescription("Cleared all reminders.").
-			Send(ctx)
-	default:
-		_ = ctx.RespondText("Invalid <get/add/rm/clear> argument. Use `get`, `add`, `rm`, or `clear`.")
+	err = cfg.Save()
+	if err != nil {
+		_ = ctx.RespondText("Error saving config: " + err.Error())
+		return
 	}
+
+	c.services.Embed.NewEmbed().
+		SetDescription("Successfully set reminder!").
+		Send(ctx)
+}
+
+func (c *UtilityCommands) removeReminder(ctx *router.Ctx) {
+	cfg, err := config.GetConfig()
+	if err != nil {
+		_ = ctx.RespondText("Error getting config.")
+		return
+	}
+
+	name := ctx.Arguments.Get(0).Raw()
+
+	cfg.Reminders = utils2.Filter(cfg.Reminders, func(r config.Reminder) bool {
+		return r.Name != name
+	})
+
+	err = cfg.Save()
+	if err != nil {
+		_ = ctx.RespondText("Error saving config: " + err.Error())
+		return
+	}
+
+	c.services.Embed.NewEmbed().
+		SetDescription("Successfully deleted reminder!").
+		Send(ctx)
+}
+
+func (c *UtilityCommands) clearReminders(ctx *router.Ctx) {
+	cfg, err := config.GetConfig()
+	if err != nil {
+		_ = ctx.RespondText("Error getting config.")
+		return
+	}
+
+	cfg.Reminders = []config.Reminder{}
+
+	err = cfg.Save()
+	if err != nil {
+		_ = ctx.RespondText("Error saving config: " + err.Error())
+		return
+	}
+
+	c.services.Embed.NewEmbed().
+		SetDescription("Successfully cleared reminders!").
+		Send(ctx)
 }
 
 // Conversion utilities
 
-func (UtilityCommands) checkIfUnitValid(ctx *router.Ctx, unit string, validUnits []string) bool {
+func (c *UtilityCommands) checkIfUnitValid(ctx *router.Ctx, unit string, validUnits []string) bool {
 	isValid := slices.Contains(validUnits, strings.ToLower(unit))
 	if isValid {
 		return true
 	}
 
 	c.services.Embed.NewEmbed().
-		AddField("Error", "Invalid unit").
+		AddField("Conversion error", "You have specified an invalid unit.").
 		AddField("Valid units", strings.Join(validUnits, ", ")).
 		Send(ctx)
 
 	return false
 }
 
-func (c UtilityCommands) convertvelocity(ctx *router.Ctx) {
-	value, err := strconv.ParseFloat(utils.Arguments["<value>"], 64)
+func (c *UtilityCommands) convertvelocity(ctx *router.Ctx) {
+	value, err := ctx.Arguments.Get(0).Float64()
 	if err != nil {
 		ctx.RespondText("Invalid value")
 		return
 	}
 
-	sourceUnit := utils.Arguments["<source unit>"]
-	destinationUnit := utils.Arguments["<destination unit>"]
+	sourceUnit := ctx.Arguments.Get(1).Raw()
+	destinationUnit := ctx.Arguments.Get(2).Raw()
 
 	if !c.checkIfUnitValid(ctx, sourceUnit, conversion.SpeedUnits) || !c.checkIfUnitValid(ctx, destinationUnit, conversion.SpeedUnits) {
 		return
@@ -2918,15 +2898,15 @@ func (c UtilityCommands) convertvelocity(ctx *router.Ctx) {
 		Send(ctx)
 }
 
-func (c UtilityCommands) convertarea(ctx *router.Ctx) {
-	value, err := strconv.ParseFloat(utils.Arguments["<value>"], 64)
+func (c *UtilityCommands) convertarea(ctx *router.Ctx) {
+	value, err := ctx.Arguments.Get(0).Float64()
 	if err != nil {
 		ctx.RespondText("Invalid value")
 		return
 	}
 
-	sourceUnit := utils.Arguments["<source unit>"]
-	destinationUnit := utils.Arguments["<destination unit>"]
+	sourceUnit := ctx.Arguments.Get(1).Raw()
+	destinationUnit := ctx.Arguments.Get(2).Raw()
 
 	if !c.checkIfUnitValid(ctx, sourceUnit, conversion.AreaUnits) || !c.checkIfUnitValid(ctx, destinationUnit, conversion.AreaUnits) {
 		return
@@ -2943,15 +2923,15 @@ func (c UtilityCommands) convertarea(ctx *router.Ctx) {
 		Send(ctx)
 }
 
-func (c UtilityCommands) convertlength(ctx *router.Ctx) {
-	value, err := strconv.ParseFloat(utils.Arguments["<value>"], 64)
+func (c *UtilityCommands) convertlength(ctx *router.Ctx) {
+	value, err := ctx.Arguments.Get(0).Float64()
 	if err != nil {
 		ctx.RespondText("Invalid value")
 		return
 	}
 
-	sourceUnit := utils.Arguments["<source unit>"]
-	destinationUnit := utils.Arguments["<destination unit>"]
+	sourceUnit := ctx.Arguments.Get(1).Raw()
+	destinationUnit := ctx.Arguments.Get(2).Raw()
 
 	if !c.checkIfUnitValid(ctx, sourceUnit, conversion.LengthUnits) || !c.checkIfUnitValid(ctx, destinationUnit, conversion.LengthUnits) {
 		return
@@ -2968,15 +2948,15 @@ func (c UtilityCommands) convertlength(ctx *router.Ctx) {
 		Send(ctx)
 }
 
-func (c UtilityCommands) converttemperature(ctx *router.Ctx) {
-	value, err := strconv.ParseFloat(utils.Arguments["<value>"], 64)
+func (c *UtilityCommands) converttemperature(ctx *router.Ctx) {
+	value, err := ctx.Arguments.Get(0).Float64()
 	if err != nil {
 		ctx.RespondText("Invalid value")
 		return
 	}
 
-	sourceUnit := utils.Arguments["<source unit>"]
-	destinationUnit := utils.Arguments["<destination unit>"]
+	sourceUnit := ctx.Arguments.Get(1).Raw()
+	destinationUnit := ctx.Arguments.Get(2).Raw()
 
 	if !c.checkIfUnitValid(ctx, sourceUnit, conversion.TemperatureUnits) || !c.checkIfUnitValid(ctx, destinationUnit, conversion.TemperatureUnits) {
 		return
@@ -2993,15 +2973,15 @@ func (c UtilityCommands) converttemperature(ctx *router.Ctx) {
 		Send(ctx)
 }
 
-func (c UtilityCommands) converttime(ctx *router.Ctx) {
-	value, err := strconv.ParseFloat(utils.Arguments["<value>"], 64)
+func (c *UtilityCommands) converttime(ctx *router.Ctx) {
+	value, err := ctx.Arguments.Get(0).Float64()
 	if err != nil {
 		ctx.RespondText("Invalid value")
 		return
 	}
 
-	sourceUnit := utils.Arguments["<source unit>"]
-	destinationUnit := utils.Arguments["<destination unit>"]
+	sourceUnit := ctx.Arguments.Get(1).Raw()
+	destinationUnit := ctx.Arguments.Get(2).Raw()
 
 	if !c.checkIfUnitValid(ctx, sourceUnit, conversion.TimeUnits) || !c.checkIfUnitValid(ctx, destinationUnit, conversion.TimeUnits) {
 		return
@@ -3018,15 +2998,15 @@ func (c UtilityCommands) converttime(ctx *router.Ctx) {
 		Send(ctx)
 }
 
-func (c UtilityCommands) convertvolume(ctx *router.Ctx) {
-	value, err := strconv.ParseFloat(utils.Arguments["<value>"], 64)
+func (c *UtilityCommands) convertvolume(ctx *router.Ctx) {
+	value, err := ctx.Arguments.Get(0).Float64()
 	if err != nil {
 		ctx.RespondText("Invalid value")
 		return
 	}
 
-	sourceUnit := utils.Arguments["<source unit>"]
-	destinationUnit := utils.Arguments["<destination unit>"]
+	sourceUnit := ctx.Arguments.Get(1).Raw()
+	destinationUnit := ctx.Arguments.Get(2).Raw()
 
 	if !c.checkIfUnitValid(ctx, sourceUnit, conversion.VolumeUnits) || !c.checkIfUnitValid(ctx, destinationUnit, conversion.VolumeUnits) {
 		return
@@ -3043,15 +3023,15 @@ func (c UtilityCommands) convertvolume(ctx *router.Ctx) {
 		Send(ctx)
 }
 
-func (c UtilityCommands) convertmass(ctx *router.Ctx) {
-	value, err := strconv.ParseFloat(utils.Arguments["<value>"], 64)
+func (c *UtilityCommands) convertmass(ctx *router.Ctx) {
+	value, err := ctx.Arguments.Get(0).Float64()
 	if err != nil {
 		ctx.RespondText("Invalid value")
 		return
 	}
 
-	sourceUnit := utils.Arguments["<source unit>"]
-	destinationUnit := utils.Arguments["<destination unit>"]
+	sourceUnit := ctx.Arguments.Get(1).Raw()
+	destinationUnit := ctx.Arguments.Get(2).Raw()
 
 	if !c.checkIfUnitValid(ctx, sourceUnit, conversion.MassUnits) || !c.checkIfUnitValid(ctx, destinationUnit, conversion.MassUnits) {
 		return
@@ -3070,8 +3050,8 @@ func (c UtilityCommands) convertmass(ctx *router.Ctx) {
 
 // Misc utilities
 
-func (UtilityCommands) tts(ctx *router.Ctx) {
-	httpResponse := api.TTS(ctx.Arguments.RawFrom(1), utils.Arguments["<language>"])
+func (c *UtilityCommands) tts(ctx *router.Ctx) {
+	httpResponse := api.TTS(ctx.Arguments.RawFrom(1), ctx.Arguments.Get(0).Raw())
 	if httpResponse.Error != nil {
 		_ = ctx.RespondText("An error has occurred.")
 		return
@@ -3089,8 +3069,8 @@ func (UtilityCommands) tts(ctx *router.Ctx) {
 	)
 }
 
-func (UtilityCommands) translate(ctx *router.Ctx) {
-	translateResult := api.Translate(ctx.Arguments.RawFrom(1), utils.Arguments["<language>"])
+func (c *UtilityCommands) translate(ctx *router.Ctx) {
+	translateResult := api.Translate(ctx.Arguments.RawFrom(1), ctx.Arguments.Get(0).Raw())
 	if translateResult.Error != nil {
 		_ = ctx.RespondText("An error has occurred: " + translateResult.Error.Error())
 		return
@@ -3103,7 +3083,7 @@ func (UtilityCommands) translate(ctx *router.Ctx) {
 		Send(ctx)
 }
 
-func (UtilityCommands) detectlang(ctx *router.Ctx) {
+func (c *UtilityCommands) detectlang(ctx *router.Ctx) {
 	translateResult := api.Translate(ctx.Arguments.Raw(), "en")
 	if translateResult.Error != nil {
 		_ = ctx.RespondText("An error has occurred: " + translateResult.Error.Error())
@@ -3116,7 +3096,7 @@ func (UtilityCommands) detectlang(ctx *router.Ctx) {
 		Send(ctx)
 }
 
-func (UtilityCommands) english(ctx *router.Ctx) {
+func (c *UtilityCommands) english(ctx *router.Ctx) {
 	translateResult := api.Translate(ctx.Arguments.Raw(), "en")
 	if translateResult.Error != nil {
 		_ = ctx.RespondText("An error has occurred: " + translateResult.Error.Error())
@@ -3129,7 +3109,7 @@ func (UtilityCommands) english(ctx *router.Ctx) {
 		Send(ctx)
 }
 
-func (UtilityCommands) define(ctx *router.Ctx) {
+func (c *UtilityCommands) define(ctx *router.Ctx) {
 	url := fmt.Sprintf(
 		"https://api.dictionaryapi.dev/api/v2/entries/en/%s",
 		url.QueryEscape(ctx.Arguments.Raw()),
@@ -3173,7 +3153,7 @@ func (UtilityCommands) define(ctx *router.Ctx) {
 		Send(ctx)
 }
 
-func (UtilityCommands) urbandictionary(ctx *router.Ctx) {
+func (c *UtilityCommands) urbandictionary(ctx *router.Ctx) {
 	url := fmt.Sprintf(
 		"https://api.urbandictionary.com/v0/define?term=%s",
 		url.QueryEscape(ctx.Arguments.Raw()),
@@ -3204,7 +3184,7 @@ func (UtilityCommands) urbandictionary(ctx *router.Ctx) {
 		Send(ctx)
 }
 
-func (UtilityCommands) wikipedia(ctx *router.Ctx) {
+func (c *UtilityCommands) wikipedia(ctx *router.Ctx) {
 	query := ctx.Arguments.Raw()
 	article, err := api.WikipediaSearch(query)
 	if err != nil {
@@ -3222,7 +3202,7 @@ func (UtilityCommands) wikipedia(ctx *router.Ctx) {
 		Send(ctx)
 }
 
-func (UtilityCommands) weather(ctx *router.Ctx) {
+func (c *UtilityCommands) weather(ctx *router.Ctx) {
 	weather, err := api.GetWeather(ctx.Arguments.Raw())
 	if err != nil {
 		_ = ctx.RespondText("An error has occurred: " + err.Error())
@@ -3245,7 +3225,7 @@ func (UtilityCommands) weather(ctx *router.Ctx) {
 		Send(ctx)
 }
 
-func (UtilityCommands) lvbypass(ctx *router.Ctx) {
+func (c *UtilityCommands) lvbypass(ctx *router.Ctx) {
 	resp, err := http.GetJson("https://bypass.pm/bypass2?url=" + ctx.Arguments.Raw())
 	if err != nil {
 		_ = ctx.RespondText("An error has occurred: " + err.Error())
@@ -3260,10 +3240,10 @@ func (UtilityCommands) lvbypass(ctx *router.Ctx) {
 		Send(ctx)
 }
 
-func (UtilityCommands) flightinfo(ctx *router.Ctx) {
+func (c *UtilityCommands) flightinfo(ctx *router.Ctx) {
 	uri := fmt.Sprintf(
 		"https://api.flightradar24.com/common/v1/flight/list.json?query=%s&fetchBy=flight&page=1",
-		url.QueryEscape(utils.Arguments["<flight number>"]),
+		url.QueryEscape(ctx.Arguments.Get(0).Raw()),
 	)
 
 	httpResponse := http.Get(uri)
@@ -3295,18 +3275,21 @@ func (UtilityCommands) flightinfo(ctx *router.Ctx) {
 		Send(ctx)
 }
 
-func (UtilityCommands) passgen(ctx *router.Ctx) {
-	charAmount, err := strconv.Atoi(utils.Arguments["<character amount>"])
+func (c *UtilityCommands) passgen(ctx *router.Ctx) {
+	charAmount, err := ctx.Arguments.Get(0).Int()
 	if err != nil {
 		_ = ctx.RespondText("Argument <character amount> must be a number.")
 		return
 	}
+
+	charAmount = utils2.Clamp(charAmount, 1, 1000)
+
 	c.services.Embed.NewEmbed().
 		AddField("Password", random.String(charAmount, "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789#$%&")).
 		Send(ctx)
 }
 
-func (UtilityCommands) tokengen(ctx *router.Ctx) {
+func (c *UtilityCommands) tokengen(ctx *router.Ctx) {
 	httpResponse := http.Get("https://some-random-api.com/bottoken")
 	if httpResponse.Error != nil {
 		_ = ctx.RespondText("Error: " + httpResponse.Error.Error())
@@ -3320,16 +3303,16 @@ func (UtilityCommands) tokengen(ctx *router.Ctx) {
 		Send(ctx)
 }
 
-func (UtilityCommands) revimage(ctx *router.Ctx) {
-	imageUrl := utils.Arguments["<image url>"]
+func (c *UtilityCommands) revimage(ctx *router.Ctx) {
+	imageUrl := ctx.Arguments.Get(0).Raw()
 	c.services.Embed.NewEmbed().
 		AddField("Reverse Image Search URL", fmt.Sprintf("https://www.google.com/searchbyimage?image_url=%s", imageUrl)).
 		Send(ctx)
 }
 
-func (UtilityCommands) revavatar(ctx *router.Ctx) {
-	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
-	if !success {
+func (c *UtilityCommands) revavatar(ctx *router.Ctx) {
+	user, err := ctx.Arguments.Get(0).User()
+	if err != nil {
 		_ = ctx.RespondText("Could not find user")
 		return
 	}
@@ -3338,8 +3321,9 @@ func (UtilityCommands) revavatar(ctx *router.Ctx) {
 		Send(ctx)
 }
 
-func (UtilityCommands) timezones(ctx *router.Ctx) {
-	httpResponse := http.Get("http://worldtimeapi.org/api/timezone/" + url.PathEscape(utils.Arguments["<continent>"]))
+func (c *UtilityCommands) timezones(ctx *router.Ctx) {
+	continent := ctx.Arguments.Get(0).Raw()
+	httpResponse := http.Get("http://worldtimeapi.org/api/timezone/" + url.PathEscape(continent))
 	if httpResponse.Error != nil {
 		_ = ctx.RespondText("Error getting timezones: " + httpResponse.Error.Error())
 		return
@@ -3353,13 +3337,13 @@ func (UtilityCommands) timezones(ctx *router.Ctx) {
 	}
 
 	c.services.Embed.NewEmbed().
-		AddField("Continent", utils.String.Capitalize(utils.Arguments["<continent>"])).
+		AddField("Continent", utils.String.Capitalize(continent)).
 		AddField("Timezones", strings.Join(json.MustStringArray(), ", ")).
 		Send(ctx)
 }
 
-func (UtilityCommands) timezoneinfo(ctx *router.Ctx) {
-	httpResponse := http.Get("http://worldtimeapi.org/api/timezone/" + utils.Arguments["<timezone>"])
+func (c *UtilityCommands) timezoneinfo(ctx *router.Ctx) {
+	httpResponse := http.Get("http://worldtimeapi.org/api/timezone/" + ctx.Arguments.Get(0).Raw())
 	if httpResponse.Error != nil {
 		_ = ctx.RespondText("Error getting timezones: " + httpResponse.Error.Error())
 		return
@@ -3380,8 +3364,10 @@ func (UtilityCommands) timezoneinfo(ctx *router.Ctx) {
 		Send(ctx)
 }
 
-func (UtilityCommands) calculate(ctx *router.Ctx) {
-	tv, err := types.Eval(token.NewFileSet(), nil, token.NoPos, utils.Arguments["<expression>"])
+func (c *UtilityCommands) calculate(ctx *router.Ctx) {
+	expression := ctx.Arguments.Get(0).Raw()
+
+	tv, err := types.Eval(token.NewFileSet(), nil, token.NoPos, expression)
 	if err != nil {
 		_ = ctx.RespondText("Error evaluating expression: " + err.Error())
 		return
@@ -3393,12 +3379,12 @@ func (UtilityCommands) calculate(ctx *router.Ctx) {
 	}
 
 	c.services.Embed.NewEmbed().
-		AddField("Expression", utils.Arguments["<expression>"]).
+		AddField("Expression", ctx.Arguments.Get(0).Raw()).
 		AddField("Solution", tv.Value.String()).
 		Send(ctx)
 }
 
-func (UtilityCommands) googlesearch(ctx *router.Ctx) {
+func (c *UtilityCommands) googlesearch(ctx *router.Ctx) {
 	results, err := api.GoogleSearch(ctx.Arguments.Raw())
 	if err != nil {
 		_ = ctx.RespondText("An error has occurred.")
@@ -3412,7 +3398,7 @@ func (UtilityCommands) googlesearch(ctx *router.Ctx) {
 	emb.Send(ctx)
 }
 
-func (UtilityCommands) youtubesearch(ctx *router.Ctx) {
+func (c *UtilityCommands) youtubesearch(ctx *router.Ctx) {
 	results, err := api.GoogleSearch(ctx.Arguments.Raw() + " site:youtube.com")
 	if err != nil {
 		_ = ctx.RespondText("An error has occurred.")
@@ -3430,7 +3416,7 @@ func (UtilityCommands) youtubesearch(ctx *router.Ctx) {
 	emb.Send(ctx)
 }
 
-func (UtilityCommands) youtubedl(ctx *router.Ctx) {
+func (c *UtilityCommands) youtubedl(ctx *router.Ctx) {
 	results, err := api.GoogleSearch(ctx.Arguments.Raw() + " site:youtube.com")
 	if err != nil {
 		_ = ctx.RespondText("An error has occurred: " + err.Error())
@@ -3489,35 +3475,35 @@ func (UtilityCommands) youtubedl(ctx *router.Ctx) {
 	}
 }
 
-func (UtilityCommands) amazon(ctx *router.Ctx) {
+func (c *UtilityCommands) amazon(ctx *router.Ctx) {
 	query := ctx.Arguments.Raw()
 	c.services.Embed.NewEmbed().
 		AddField("Amazon Search", fmt.Sprintf("https://www.amazon.com/s?k=%s", url.QueryEscape(query))).
 		Send(ctx)
 }
 
-func (UtilityCommands) steam(ctx *router.Ctx) {
+func (c *UtilityCommands) steam(ctx *router.Ctx) {
 	query := ctx.Arguments.Raw()
 	c.services.Embed.NewEmbed().
 		AddField("Steam Search", fmt.Sprintf("https://store.steampowered.com/search/?term=%s", url.QueryEscape(query))).
 		Send(ctx)
 }
 
-func (UtilityCommands) github(ctx *router.Ctx) {
+func (c *UtilityCommands) github(ctx *router.Ctx) {
 	query := ctx.Arguments.Raw()
 	c.services.Embed.NewEmbed().
 		AddField("GitHub Search", fmt.Sprintf("https://github.com/search?q=%s", url.QueryEscape(query))).
 		Send(ctx)
 }
 
-func (UtilityCommands) stackoverflow(ctx *router.Ctx) {
+func (c *UtilityCommands) stackoverflow(ctx *router.Ctx) {
 	query := ctx.Arguments.Raw()
 	c.services.Embed.NewEmbed().
 		AddField("Stack Overflow Search", fmt.Sprintf("https://stackoverflow.com/search?q=%s", url.QueryEscape(query))).
 		Send(ctx)
 }
 
-func (UtilityCommands) searchcountry(ctx *router.Ctx) {
+func (c *UtilityCommands) searchcountry(ctx *router.Ctx) {
 	httpResponse := http.Get(fmt.Sprintf("https://restcountries.com/v3.1/name/%s?fullText=true", ctx.Arguments.Raw()))
 	if httpResponse.Error != nil {
 		_ = ctx.RespondText("An error has occurred.")
@@ -3556,7 +3542,7 @@ func (UtilityCommands) searchcountry(ctx *router.Ctx) {
 		Send(ctx)
 }
 
-func (UtilityCommands) randomcountry(ctx *router.Ctx) {
+func (c *UtilityCommands) randomcountry(ctx *router.Ctx) {
 	httpResponse := http.Get("https://restcountries.com/v3.1/all")
 	if httpResponse.Error != nil {
 		_ = ctx.RespondText("An error has occurred.")
@@ -3595,7 +3581,7 @@ func (UtilityCommands) randomcountry(ctx *router.Ctx) {
 		Send(ctx)
 }
 
-func (UtilityCommands) loremipsum(ctx *router.Ctx) {
+func (c *UtilityCommands) loremipsum(ctx *router.Ctx) {
 	paragrahps, err := ctx.Arguments.Get(0).Int()
 	if err != nil {
 		paragrahps = 1
@@ -3612,7 +3598,7 @@ func (UtilityCommands) loremipsum(ctx *router.Ctx) {
 		Send(ctx)
 }
 
-func (UtilityCommands) baconipsum(ctx *router.Ctx) {
+func (c *UtilityCommands) baconipsum(ctx *router.Ctx) {
 	paragrahps, err := ctx.Arguments.Get(0).Int()
 	if err != nil {
 		paragrahps = 1
@@ -3629,8 +3615,8 @@ func (UtilityCommands) baconipsum(ctx *router.Ctx) {
 		Send(ctx)
 }
 
-func (UtilityCommands) previewcolor(ctx *router.Ctx) {
-	color := utils.Arguments["<rgb/hex>"]
+func (c *UtilityCommands) previewcolor(ctx *router.Ctx) {
+	color := ctx.Arguments.Get(0).Raw()
 	color = strings.ReplaceAll(color, "#", "")
 
 	var r, g, b int
@@ -3671,12 +3657,10 @@ func (UtilityCommands) previewcolor(ctx *router.Ctx) {
 	}
 }
 
-func (UtilityCommands) generatekey(ctx *router.Ctx) {
-	format := utils.Arguments["<format>"]
-	amount, _ := strconv.Atoi(utils.Arguments["[amount]"])
-	if amount == 0 {
-		amount = 1
-	}
+func (c *UtilityCommands) generatekey(ctx *router.Ctx) {
+	format := ctx.Arguments.Get(0).Raw()
+	amount, _ := ctx.Arguments.Get(1).Int()
+	amount = utils2.Clamp(amount, 1, 100)
 
 	var keys []string
 
@@ -3704,7 +3688,7 @@ func (UtilityCommands) generatekey(ctx *router.Ctx) {
 		Send(ctx)
 }
 
-func (UtilityCommands) timestampCommand(flags string) func(ctx *router.Ctx) {
+func (c *UtilityCommands) timestampCommand(flags string) func(ctx *router.Ctx) {
 	return func(ctx *router.Ctx) {
 		timestamp, err := api.GPT(utils.Misc.CreateAISystemTimestamp(), ctx.Arguments.Raw())
 		if err != nil {
@@ -3725,14 +3709,4 @@ func (UtilityCommands) timestampCommand(flags string) func(ctx *router.Ctx) {
 
 		_ = ctx.RespondText(fmt.Sprintf("<t:%d%s>", time.Unix(), flags))
 	}
-}
-
-type UtilityCommands struct{ services *services.Services }
-
-func NewUtilityCommands(s *services.Services) *UtilityCommands {
-	return &UtilityCommands{services: s}
-}
-func (c *UtilityCommands) Register() {
-	cmdRouter := c.services.Discord.GetRouter()
-
 }

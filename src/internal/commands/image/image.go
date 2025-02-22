@@ -14,985 +14,985 @@ import (
 	"github.com/LightningDev1/dgc"
 )
 
-func (i ImageCommands) RegisterCommands(router *dgc.Router) {
+func (c *ImageCommands) RegisterCommands(router *dgc.Router) {
 	router.StartCategory("Image", "Image commands")
 	router.RegisterCmd(&dgc.Command{
 		Name:        "tweet",
 		Description: "Tweet a message",
 		Arguments:   "<username> <text>",
-		Handler:     i.tweet,
+		Handler:     c.tweet,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "meme",
 		Description: "Send a random meme",
-		Handler:     i.meme,
+		Handler:     c.meme,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "ytcomment",
 		Description: "Make a fake YouTube comment",
 		Arguments:   "<user> <text>",
-		Handler:     i.ytcomment,
+		Handler:     c.ytcomment,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "pokemon",
 		Description: "Send a random Pokémon image",
-		Handler:     i.pokemon,
+		Handler:     c.pokemon,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "wasted",
 		Description: "Add a wasted overlay on the users avatar",
 		Arguments:   "[user]",
-		Handler:     i.wasted,
+		Handler:     c.wasted,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "triggered",
 		Description: "Add a triggered overlay on the users avatar",
 		Arguments:   "[user]",
-		Handler:     i.triggered,
+		Handler:     c.triggered,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "glass",
 		Description: "Add a glass overlay on the users avatar",
 		Arguments:   "[user]",
-		Handler:     i.glass,
+		Handler:     c.glass,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "greyscale",
 		Description: "Add a greyscale overlay on the users avatar",
 		Arguments:   "[user]",
-		Handler:     i.greyscale,
+		Handler:     c.greyscale,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "invert",
 		Description: "Invert the users avatar",
 		Arguments:   "[user]",
-		Handler:     i.invert,
+		Handler:     c.invert,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "invertgreyscale",
 		Description: "Invert and greyscale the users avatar",
 		Arguments:   "[user]",
-		Handler:     i.invertgreyscale,
+		Handler:     c.invertgreyscale,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "brightness",
 		Description: "Make the users avatar brighter",
 		Arguments:   "[user]",
-		Handler:     i.brightness,
+		Handler:     c.brightness,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "red",
 		Description: "Make the users avatar red",
 		Arguments:   "[user]",
-		Handler:     i.red,
+		Handler:     c.red,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "green",
 		Description: "Make the users avatar green",
 		Arguments:   "[user]",
-		Handler:     i.green,
+		Handler:     c.green,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "blue",
 		Description: "Make the users avatar blue",
 		Arguments:   "[user]",
-		Handler:     i.blue,
+		Handler:     c.blue,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "pixelate",
 		Description: "Pixelate the users avatar",
 		Arguments:   "[user]",
-		Handler:     i.pixelate,
+		Handler:     c.pixelate,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "comrade",
 		Description: "Add comrade overlay on users avatar",
 		Arguments:   "[user]",
-		Handler:     i.comrade,
+		Handler:     c.comrade,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "missionpassed",
 		Description: "Add Mission Passed overlay on users avatar",
 		Arguments:   "[user]",
-		Handler:     i.missionpassed,
+		Handler:     c.missionpassed,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "jail",
 		Description: "Add jail overlay on users avatar",
 		Arguments:   "[user]",
-		Handler:     i.jail,
+		Handler:     c.jail,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "nobitches",
 		Description: "Make a no bitches meme",
 		Arguments:   "<text>",
-		Handler:     i.nobitches,
+		Handler:     c.nobitches,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "threat",
 		Description: "Make biggest threats meme",
 		Arguments:   "[user]",
-		Handler:     i.threat,
+		Handler:     c.threat,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "threshold",
 		Description: "Add a threshold filter to a users avatar",
 		Arguments:   "<user>",
-		Handler:     i.threshold,
+		Handler:     c.threshold,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "blurple",
 		Description: "Make the users avatar blurple",
-		Handler:     i.blurple,
+		Handler:     c.blurple,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "blurple2",
 		Description: "Make the users avatar new blurple",
-		Handler:     i.blurple2,
+		Handler:     c.blurple2,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "color",
 		Description: "Make the users avatar a custom color",
 		Arguments:   "<user> <color>",
-		Handler:     i.color,
+		Handler:     c.color,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "sostupid",
 		Description: "Make an it's so stupid meme",
 		Arguments:   "<user> <text>",
-		Handler:     i.sostupid,
+		Handler:     c.sostupid,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "simpcard",
 		Description: "Make a simp card for a user",
 		Arguments:   "<user>",
-		Handler:     i.simpcard,
+		Handler:     c.simpcard,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "horny",
 		Description: "Make a horny card for a user",
 		Arguments:   "<user>",
-		Handler:     i.horny,
+		Handler:     c.horny,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "lgbt",
 		Description: "Add an lgbt border to the user",
 		Arguments:   "<user>",
-		Handler:     i.lgbt,
+		Handler:     c.lgbt,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "pansexual",
 		Description: "Add a pansexual border to the user",
 		Arguments:   "<user>",
-		Handler:     i.pansexual,
+		Handler:     c.pansexual,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "nonbinary",
 		Description: "Add a nonbinary border to the user",
 		Arguments:   "<user>",
-		Handler:     i.nonbinary,
+		Handler:     c.nonbinary,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "lesbian2",
 		Description: "Add a lesbian border to the user",
 		Arguments:   "<user>",
-		Handler:     i.lesbian,
+		Handler:     c.lesbian,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "bisexual",
 		Description: "Add a bisexual border to the user",
 		Arguments:   "<user>",
-		Handler:     i.bisexual,
+		Handler:     c.bisexual,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "trans",
 		Description: "Add a trans border to the user",
 		Arguments:   "<user>",
-		Handler:     i.trans,
+		Handler:     c.trans,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "oogway",
 		Description: "Make a master oogway meme",
 		Arguments:   "<text>",
-		Handler:     i.oogway,
+		Handler:     c.oogway,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "oogway2",
 		Description: "Make a master oogway meme",
 		Arguments:   "<text>",
-		Handler:     i.oogway2,
+		Handler:     c.oogway2,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "clyde",
 		Description: "Make Clyde say something",
 		Arguments:   "<text>",
-		Handler:     i.clyde,
+		Handler:     c.clyde,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "gay",
 		Description: "Add a rainbow overlay on the users avatar",
 		Arguments:   "<user>",
-		Handler:     i.gay,
+		Handler:     c.gay,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "distractedbf",
 		Description: "Make a distracted boyfriend meme with the users",
 		Arguments:   "<user1> <user2>",
-		Handler:     i.distractedbf,
+		Handler:     c.distractedbf,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "captcha",
 		Description: "Make a captcha meme",
 		Arguments:   "<user> <text>",
-		Handler:     i.captcha,
+		Handler:     c.captcha,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "whowouldwin",
 		Description: "Make a who would win meme",
 		Arguments:   "<user1> <user2>",
-		Handler:     i.whowouldwin,
+		Handler:     c.whowouldwin,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "jpeg",
 		Description: "JPEG a users avatar",
 		Arguments:   "<user>",
-		Handler:     i.jpeg,
+		Handler:     c.jpeg,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "lolice",
 		Description: "Make a lolice meme",
 		Arguments:   "<user>",
-		Handler:     i.lolice,
+		Handler:     c.lolice,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "kannagen",
 		Description: "Make a kannagen meme",
 		Arguments:   "<user1> <user2>",
-		Handler:     i.kannagen,
+		Handler:     c.kannagen,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "iphonex",
 		Description: "Put users profile picture on an iPhone X",
 		Arguments:   "<user1> <user2>",
-		Handler:     i.iphonex,
+		Handler:     c.iphonex,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "awooify",
 		Description: "Awooify the user",
 		Arguments:   "<user1> <user2>",
-		Handler:     i.awooify,
+		Handler:     c.awooify,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "trap",
 		Description: "Make a trap card",
 		Arguments:   "<user>",
-		Handler:     i.trap,
+		Handler:     c.trap,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "trumptweet",
 		Description: "Make a fake Trump tweet",
 		Arguments:   "<text>",
-		Handler:     i.trumptweet,
+		Handler:     c.trumptweet,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "deepfry",
 		Description: "Deepfry the users avatar",
 		Arguments:   "<text>",
-		Handler:     i.deepfry,
+		Handler:     c.deepfry,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "blurpify",
 		Description: "Blurpify the users avatar",
 		Arguments:   "<text>",
-		Handler:     i.blurpify,
+		Handler:     c.blurpify,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "phcomment",
 		Description: "Make the user comment something on PornHub",
 		Arguments:   "<user> <text>",
-		Handler:     i.phcomment,
+		Handler:     c.phcomment,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "fact",
 		Description: "Make a fact meme",
 		Arguments:   "<user>",
-		Handler:     i.fact,
+		Handler:     c.fact,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "trash",
 		Description: "Make a trash meme",
 		Arguments:   "<user>",
-		Handler:     i.trash,
+		Handler:     c.trash,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "stickbug",
 		Description: "Make a stickbug meme",
 		Arguments:   "<user>",
-		Handler:     i.stickbug,
+		Handler:     c.stickbug,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "magik",
 		Description: "Make a users avatar magik",
 		Arguments:   "<user>",
-		Handler:     i.magik,
+		Handler:     c.magik,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "randomgif",
 		Description: "Send a random GIF from Giphy",
-		Handler:     i.randomgif,
+		Handler:     c.randomgif,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "searchgif",
 		Description: "Search GIFs on Giphy",
 		Arguments:   "<query>",
-		Handler:     i.searchgif,
+		Handler:     c.searchgif,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "communist",
 		Description: "Make the user a communist",
 		Arguments:   "<user>",
-		Handler:     i.communist,
+		Handler:     c.communist,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "snow",
 		Description: "Add a snow overlay the the users avatar",
 		Arguments:   "<user>",
-		Handler:     i.snow,
+		Handler:     c.snow,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "hub",
 		Description: "Make a PornHub logo with custom text",
 		Arguments:   "<\"text1\"> <\"text2\">",
-		Handler:     i.hub,
+		Handler:     c.hub,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "floor",
 		Description: "Make a floor meme",
 		Arguments:   "<user> <text>",
-		Handler:     i.floor,
+		Handler:     c.floor,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "jokeoverhead",
 		Description: "When someone doesn't understand a joke",
 		Arguments:   "<user>",
-		Handler:     i.jokeoverhead,
+		Handler:     c.jokeoverhead,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "throwaway",
 		Description: "Throw a user away",
 		Arguments:   "<user>",
-		Handler:     i.throwaway,
+		Handler:     c.throwaway,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "salty",
 		Description: "Make a user salty",
 		Arguments:   "<user>",
-		Handler:     i.salty,
+		Handler:     c.salty,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "scroll",
 		Description: "Make a scroll meme",
 		Arguments:   "<text>",
-		Handler:     i.scroll,
+		Handler:     c.scroll,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "shame",
 		Description: "Shame a user",
 		Arguments:   "<user>",
-		Handler:     i.shame,
+		Handler:     c.shame,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "ship",
 		Description: "Ship users",
 		Arguments:   "<user1> <user2>",
-		Handler:     i.ship,
+		Handler:     c.ship,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "what",
 		Description: "Make a what meme",
 		Arguments:   "<user>",
-		Handler:     i.what,
+		Handler:     c.what,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "sadcat",
 		Description: "Send an image of a sad cat",
-		Handler:     i.sadcat,
+		Handler:     c.sadcat,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "bird",
 		Description: "Send an image of a bird",
-		Handler:     i.bird,
+		Handler:     c.bird,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "cat",
 		Description: "Send an image of a cat",
-		Handler:     i.cat,
+		Handler:     c.cat,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "catgif",
 		Description: "Send a GIF of a cat",
-		Handler:     i.catgif,
+		Handler:     c.catgif,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "catsays",
 		Description: "Make a cat say something",
 		Arguments:   "<text>",
-		Handler:     i.catsays,
+		Handler:     c.catsays,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "dog",
 		Description: "Send an image of a dog",
-		Handler:     i.dog,
+		Handler:     c.dog,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "panda",
 		Description: "Send an image of a panda",
-		Handler:     i.panda,
+		Handler:     c.panda,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "redpanda",
 		Description: "Send an image of a red panda",
-		Handler:     i.redpanda,
+		Handler:     c.redpanda,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "koala",
 		Description: "Send an image of a koala",
-		Handler:     i.koala,
+		Handler:     c.koala,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "raccoon",
 		Description: "Send an image of a raccoon",
-		Handler:     i.raccoon,
+		Handler:     c.raccoon,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "fox",
 		Description: "Send an image of a fox",
-		Handler:     i.fox,
+		Handler:     c.fox,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "shibe",
 		Description: "Send an image of a shiba inu/shibe/doge",
-		Handler:     i.shibe,
+		Handler:     c.shibe,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "whale",
 		Description: "Send an image of a whale",
-		Handler:     i.whale,
+		Handler:     c.whale,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "kangaroo",
 		Description: "Send an image of a kangaroo",
-		Handler:     i.kangaroo,
+		Handler:     c.kangaroo,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "bunny",
 		Description: "Send an image of a bunny",
-		Handler:     i.bunny,
+		Handler:     c.bunny,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "lion",
 		Description: "Send an image of a lion",
-		Handler:     i.lion,
+		Handler:     c.lion,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "frog",
 		Description: "Send an image of a frog",
-		Handler:     i.frog,
+		Handler:     c.frog,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "duck",
 		Description: "Send an image of a duck",
-		Handler:     i.duck,
+		Handler:     c.duck,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "penguin",
 		Description: "Send an image of a penguin",
-		Handler:     i.penguin,
+		Handler:     c.penguin,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "dolphin",
 		Description: "Send an image of a dolphin",
-		Handler:     i.dolphin,
+		Handler:     c.dolphin,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "bear",
 		Description: "Send an image of a bear",
-		Handler:     i.bear,
+		Handler:     c.bear,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "axolotl",
 		Description: "Send an image of an axolotl",
-		Handler:     i.axolotl,
+		Handler:     c.axolotl,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "capybara",
 		Description: "Send an image of a capybara",
-		Handler:     i.capybara,
+		Handler:     c.capybara,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "balloon",
 		Description: "Make a balloon meme",
 		Arguments:   "<\"text1\"> <\"text2\">",
-		Handler:     i.balloon,
+		Handler:     c.balloon,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "abandon",
 		Description: "Make an abandon meme",
 		Arguments:   "<text>",
-		Handler:     i.abandon,
+		Handler:     c.abandon,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "aborted",
 		Description: "Make an aborted meme",
 		Arguments:   "<user>",
-		Handler:     i.aborted,
+		Handler:     c.aborted,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "affect",
 		Description: "Make an affect meme",
 		Arguments:   "<user>",
-		Handler:     i.affect,
+		Handler:     c.affect,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "airpods",
 		Description: "Add AirPods to the users avatar",
 		Arguments:   "<user>",
-		Handler:     i.airpods,
+		Handler:     c.airpods,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "america",
 		Description: "Patriotize the user",
 		Arguments:   "<user>",
-		Handler:     i.america,
+		Handler:     c.america,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "armor",
 		Description: "Make an armor meme",
 		Arguments:   "<text>",
-		Handler:     i.armor,
+		Handler:     c.armor,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "bed",
 		Description: "Make a bed meme",
 		Arguments:   "<user1> <user2>",
-		Handler:     i.bed,
+		Handler:     c.bed,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "bongocat",
 		Description: "Make a bongocat meme",
 		Arguments:   "<user>",
-		Handler:     i.bongocat,
+		Handler:     c.bongocat,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "boo",
 		Description: "Make a boo meme",
 		Arguments:   "<\"text1\"> <\"text2\">",
-		Handler:     i.boo,
+		Handler:     c.boo,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "bigbrain",
 		Description: "Make a big brain meme",
 		Arguments:   "<\"item 1\"> <\"item 2\"> <\"item 3\"> <\"item 4\">",
-		Handler:     i.bigbrain,
+		Handler:     c.bigbrain,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "brazzers",
 		Description: "Make a brazzers meme",
 		Arguments:   "<user>",
-		Handler:     i.brazzers,
+		Handler:     c.brazzers,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "byemom",
 		Description: "Make a byemom meme",
 		Arguments:   "<user> <text>",
-		Handler:     i.byemom,
+		Handler:     c.byemom,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "cancer",
 		Description: "Make a Squidward cancer meme",
 		Arguments:   "<user>",
-		Handler:     i.cancer,
+		Handler:     c.cancer,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "changemymind",
 		Description: "Make a change my mind meme",
 		Arguments:   "<text>",
-		Handler:     i.changemymind,
+		Handler:     c.changemymind,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "cheating",
 		Description: "Make a cheating meme",
 		Arguments:   "<\"text1\"> <\"text2\">",
-		Handler:     i.cheating,
+		Handler:     c.cheating,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "citation",
 		Description: "Make a citation meme",
 		Arguments:   "<\"text1\"> <\"text2\"> <\"text3\">",
-		Handler:     i.citation,
+		Handler:     c.citation,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "communism",
 		Description: "Make the user a communist",
 		Arguments:   "<user>",
-		Handler:     i.communism,
+		Handler:     c.communism,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "confusedcat",
 		Description: "Make a confused cat meme",
 		Arguments:   "<\"text1\"> <\"text2\">",
-		Handler:     i.confusedcat,
+		Handler:     c.confusedcat,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "corporate",
 		Description: "Make a corporate meme",
 		Arguments:   "<user>",
-		Handler:     i.corporate,
+		Handler:     c.corporate,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "cry",
 		Description: "Make a cry meme",
 		Arguments:   "<text>",
-		Handler:     i.cry,
+		Handler:     c.cry,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "dab",
 		Description: "Make a dab meme",
 		Arguments:   "<user>",
-		Handler:     i.dab,
+		Handler:     c.dab,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "dank",
 		Description: "Make a dank meme",
 		Arguments:   "<user>",
-		Handler:     i.dank,
+		Handler:     c.dank,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "delete",
 		Description: "Make a delete meme",
 		Arguments:   "<user>",
-		Handler:     i.delete,
+		Handler:     c.delete,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "disability",
 		Description: "Make a disability meme",
 		Arguments:   "<user>",
-		Handler:     i.disability,
+		Handler:     c.disability,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "doglemon",
 		Description: "Make a dog lemon meme",
 		Arguments:   "<\"text1\"> <\"text2\">",
-		Handler:     i.doglemon,
+		Handler:     c.doglemon,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "door",
 		Description: "Make a door meme",
 		Arguments:   "<user>",
-		Handler:     i.door,
+		Handler:     c.door,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "egg",
 		Description: "Make a egg meme",
 		Arguments:   "<user>",
-		Handler:     i.egg,
+		Handler:     c.egg,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "excuseme",
 		Description: "Make an excuse me meme",
 		Arguments:   "<text>",
-		Handler:     i.excuseme,
+		Handler:     c.excuseme,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "expanddong",
 		Description: "Make an expand dong meme",
 		Arguments:   "<text>",
-		Handler:     i.expanddong,
+		Handler:     c.expanddong,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "expandingwwe",
 		Description: "Make an expanding WWE meme",
 		Arguments:   "<\"item 1\"> <\"item 2\"> <\"item 3\"> <\"item 4\"> <\"item 5\">",
-		Handler:     i.expandingwwe,
+		Handler:     c.expandingwwe,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "recaptcha",
 		Description: "Make a recaptcha",
 		Arguments:   "<text>",
-		Handler:     i.recaptcha,
+		Handler:     c.recaptcha,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "qrcode",
 		Description: "Make a QR Code",
 		Arguments:   "<text>",
-		Handler:     i.qrcode,
+		Handler:     c.qrcode,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "darkqrcode",
 		Description: "Make a dark QR Code",
 		Arguments:   "<text>",
-		Handler:     i.darkqrcode,
+		Handler:     c.darkqrcode,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "rule34",
 		Description: "Random rule 34 image",
-		Handler:     i.rule34,
+		Handler:     c.rule34,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "achievement",
 		Description: "Make a minecraft achievement",
 		Arguments:   "<text>",
-		Handler:     i.achievement,
+		Handler:     c.achievement,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "amiajoke",
 		Description: "Make an am I a joke meme",
 		Arguments:   "<user>",
-		Handler:     i.amiajoke,
+		Handler:     c.amiajoke,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "bad",
 		Description: "Make a bad meme",
 		Arguments:   "<user>",
-		Handler:     i.bad,
+		Handler:     c.bad,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "calling",
 		Description: "Make a calling meme",
 		Arguments:   "<text>",
-		Handler:     i.calling,
+		Handler:     c.calling,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "didyoumean",
 		Description: "Make a did you mean meme",
 		Arguments:   "<\"top\"> <\"bottom\">",
-		Handler:     i.didyoumean,
+		Handler:     c.didyoumean,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "drake",
 		Description: "Make a drake meme",
 		Arguments:   "<\"top\"> <\"bottom\">",
-		Handler:     i.drake,
+		Handler:     c.drake,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "ayano",
 		Description: "Make an ayano meme",
 		Arguments:   "<\"top\"> <\"bottom\">",
-		Handler:     i.ayano,
+		Handler:     c.ayano,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "facts",
 		Description: "Make a facts meme",
 		Arguments:   "<text>",
-		Handler:     i.facts,
+		Handler:     c.facts,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "blur",
 		Description: "Blur the user's avatar",
 		Arguments:   "<user>",
-		Handler:     i.blur,
+		Handler:     c.blur,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "flipav",
 		Description: "Flip the user's avatar",
 		Arguments:   "<user>",
-		Handler:     i.flipav,
+		Handler:     c.flipav,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "mirror",
 		Description: "Mirror the user's avatar",
 		Arguments:   "<user>",
-		Handler:     i.mirror,
+		Handler:     c.mirror,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "wide",
 		Description: "Make the user's avatar wide",
 		Arguments:   "<user>",
-		Handler:     i.wide,
+		Handler:     c.wide,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "sepia",
 		Description: "Make the user's avatar sepia",
 		Arguments:   "<user>",
-		Handler:     i.sepia,
+		Handler:     c.sepia,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "adios",
 		Description: "Make an adios meme",
 		Arguments:   "<user>",
-		Handler:     i.adios,
+		Handler:     c.adios,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "batmanslap",
 		Description: "Make a batmanslap meme",
 		Arguments:   "<user1> <user2> <\"text1\"> <\"text2\">",
-		Handler:     i.batmanslap,
+		Handler:     c.batmanslap,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "carreverse",
 		Description: "Make a car reverse meme",
 		Arguments:   "<text>",
-		Handler:     i.carreverse,
+		Handler:     c.carreverse,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "drip",
 		Description: "Give the user some drip",
 		Arguments:   "<user>",
-		Handler:     i.drip,
+		Handler:     c.drip,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "impostor",
 		Description: "Make an Among Us impostor meme",
 		Arguments:   "<text>",
-		Handler:     i.impostor,
+		Handler:     c.impostor,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "notimpostor",
 		Description: "Make an Among Us not impostor meme",
 		Arguments:   "<text>",
-		Handler:     i.notimpostor,
+		Handler:     c.notimpostor,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "emergencymeeting",
 		Description: "Make an Among Us emergency meeting meme",
 		Arguments:   "<text>",
-		Handler:     i.emergencymeeting,
+		Handler:     c.emergencymeeting,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "firsttime",
 		Description: "Make a first time meme",
 		Arguments:   "<user>",
-		Handler:     i.firsttime,
+		Handler:     c.firsttime,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "grave",
 		Description: "Make a grave meme",
 		Arguments:   "<user>",
-		Handler:     i.grave,
+		Handler:     c.grave,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "iamspeed",
 		Description: "Make an i am speed meme",
 		Arguments:   "<user>",
-		Handler:     i.iamspeed,
+		Handler:     c.iamspeed,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "icanmilkyou",
 		Description: "Make an i can milk you meme",
 		Arguments:   "<user1> <user2>",
-		Handler:     i.icanmilkyou,
+		Handler:     c.icanmilkyou,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "heaven",
 		Description: "Make a heaven meme",
 		Arguments:   "<user>",
-		Handler:     i.heaven,
+		Handler:     c.heaven,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "npc",
 		Description: "Make an npc meme",
 		Arguments:   "<\"text1\"> <\"text2\">",
-		Handler:     i.npc,
+		Handler:     c.npc,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "stonks",
 		Description: "Make a stonks meme",
 		Arguments:   "<user>",
-		Handler:     i.stonks,
+		Handler:     c.stonks,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "notstonks",
 		Description: "Make a not stonks meme",
 		Arguments:   "<user>",
-		Handler:     i.notstonks,
+		Handler:     c.notstonks,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "fliptable",
 		Description: "Make the user flip a table",
 		Arguments:   "<user>",
-		Handler:     i.fliptable,
+		Handler:     c.fliptable,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "water",
 		Description: "Make a water meme",
 		Arguments:   "<text>",
-		Handler:     i.water,
+		Handler:     c.water,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "wolverine",
 		Description: "Make a wolverine meme",
 		Arguments:   "<user>",
-		Handler:     i.wolverine,
+		Handler:     c.wolverine,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "womanyellingatcat",
 		Description: "Make a woman yelling at cat meme",
 		Arguments:   "<user1> <user2>",
-		Handler:     i.womanyellingatcat,
+		Handler:     c.womanyellingatcat,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "pikachu",
 		Description: "Send a random Pikachu image",
-		Handler:     i.pikachu,
+		Handler:     c.pikachu,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "speechbubble",
 		Description: "Add a speech bubble to an image",
 		Arguments:   "[force GIF: on/off] [link/attachment]",
-		Handler:     i.speechbubble,
+		Handler:     c.speechbubble,
 	})
 
 	router.RegisterCmd(&dgc.Command{
 		Name:        "quotereply",
 		Description: "Quote the message you replied to",
 		Arguments:   "[background url]",
-		Handler:     i.quotereply,
+		Handler:     c.quotereply,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "quotemessage",
 		Description: "Quote a message",
 		Arguments:   "<message id> [channel id]",
-		Handler:     i.quotemessage,
+		Handler:     c.quotemessage,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "quoteuser",
 		Description: "Quote a user",
 		Arguments:   "<@user> <\"text\"> [background url]",
-		Handler:     i.quoteuser,
+		Handler:     c.quoteuser,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "quotetext",
 		Description: "Quote using text",
 		Arguments:   "<\"author\"> <\"text\"> [background url]",
-		Handler:     i.quotetext,
+		Handler:     c.quotetext,
 	})
 
 	router.RegisterCmd(&dgc.Command{
 		Name:        "discordquotereply",
 		Description: "Quote the Discord message you replied to",
-		Handler:     i.discordquotereply,
+		Handler:     c.discordquotereply,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "discordquotemessage",
 		Description: "Quote a Discord message",
 		Arguments:   "<message id> [channel id]",
-		Handler:     i.discordquotemessage,
+		Handler:     c.discordquotemessage,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "discordquoteuser",
 		Description: "Quote a user",
 		Arguments:   "<@user> <\"text\">",
-		Handler:     i.discordquoteuser,
+		Handler:     c.discordquoteuser,
 	})
 	router.RegisterCmd(&dgc.Command{
 		Name:        "discordquotetext",
 		Description: "Quote a Discord message",
 		Arguments:   "<\"author\"> <\"text\"> <avatar url>",
-		Handler:     i.discordquotetext,
+		Handler:     c.discordquotetext,
 	})
 }
 
-func (ImageCommands) tweet(ctx *router.Ctx) {
+func (c *ImageCommands) tweet(ctx *router.Ctx) {
 	jsonResult, err := http.GetJson(fmt.Sprintf(
 		"https://nekobot.xyz/api/imagegen?type=tweet&text=%s&username=%s",
 		url.QueryEscape(ctx.Arguments.RawFrom(1)),
@@ -1005,7 +1005,7 @@ func (ImageCommands) tweet(ctx *router.Ctx) {
 	_ = ctx.RespondText(jsonResult.Get("message").MustString())
 }
 
-func (ImageCommands) meme(ctx *router.Ctx) {
+func (c *ImageCommands) meme(ctx *router.Ctx) {
 	jsonResult, err := http.GetJson("https://api.lightning-bot.com/api/v3/misc/meme")
 	if err != nil {
 		_ = ctx.RespondText("An error has occurred: " + err.Error())
@@ -1021,7 +1021,7 @@ func (ImageCommands) meme(ctx *router.Ctx) {
 		Send(ctx)
 }
 
-func (ImageCommands) ytcomment(ctx *router.Ctx) {
+func (c *ImageCommands) ytcomment(ctx *router.Ctx) {
 	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
 		user = ctx.Message.Author
@@ -1034,11 +1034,11 @@ func (ImageCommands) ytcomment(ctx *router.Ctx) {
 	))
 }
 
-func (ImageCommands) pokemon(ctx *router.Ctx) {
+func (c *ImageCommands) pokemon(ctx *router.Ctx) {
 	_ = ctx.RespondText(fmt.Sprintf("https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/%d.png", random.Int(1, 898)))
 }
 
-func (ImageCommands) wasted(ctx *router.Ctx) {
+func (c *ImageCommands) wasted(ctx *router.Ctx) {
 	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
 		user = ctx.Message.Author
@@ -1046,7 +1046,7 @@ func (ImageCommands) wasted(ctx *router.Ctx) {
 	_ = ctx.RespondText(fmt.Sprintf("https://some-random-api.com/canvas/wasted?avatar=%s", url.QueryEscape(user.AvatarURL(""))))
 }
 
-func (ImageCommands) triggered(ctx *router.Ctx) {
+func (c *ImageCommands) triggered(ctx *router.Ctx) {
 	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
 		user = ctx.Message.Author
@@ -1054,7 +1054,7 @@ func (ImageCommands) triggered(ctx *router.Ctx) {
 	_ = ctx.RespondText(fmt.Sprintf("https://some-random-api.com/canvas/triggered?avatar=%s", url.QueryEscape(user.AvatarURL(""))))
 }
 
-func (ImageCommands) glass(ctx *router.Ctx) {
+func (c *ImageCommands) glass(ctx *router.Ctx) {
 	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
 		user = ctx.Message.Author
@@ -1062,7 +1062,7 @@ func (ImageCommands) glass(ctx *router.Ctx) {
 	_ = ctx.RespondText(fmt.Sprintf("https://some-random-api.com/canvas/glass?avatar=%s", url.QueryEscape(user.AvatarURL(""))))
 }
 
-func (ImageCommands) greyscale(ctx *router.Ctx) {
+func (c *ImageCommands) greyscale(ctx *router.Ctx) {
 	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
 		user = ctx.Message.Author
@@ -1070,7 +1070,7 @@ func (ImageCommands) greyscale(ctx *router.Ctx) {
 	_ = ctx.RespondText(fmt.Sprintf("https://some-random-api.com/canvas/greyscale?avatar=%s", url.QueryEscape(user.AvatarURL(""))))
 }
 
-func (ImageCommands) invert(ctx *router.Ctx) {
+func (c *ImageCommands) invert(ctx *router.Ctx) {
 	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
 		user = ctx.Message.Author
@@ -1078,7 +1078,7 @@ func (ImageCommands) invert(ctx *router.Ctx) {
 	_ = ctx.RespondText(fmt.Sprintf("https://some-random-api.com/canvas/invert?avatar=%s", url.QueryEscape(user.AvatarURL(""))))
 }
 
-func (ImageCommands) invertgreyscale(ctx *router.Ctx) {
+func (c *ImageCommands) invertgreyscale(ctx *router.Ctx) {
 	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
 		user = ctx.Message.Author
@@ -1086,7 +1086,7 @@ func (ImageCommands) invertgreyscale(ctx *router.Ctx) {
 	_ = ctx.RespondText(fmt.Sprintf("https://some-random-api.com/canvas/invertgreyscale?avatar=%s", url.QueryEscape(user.AvatarURL(""))))
 }
 
-func (ImageCommands) brightness(ctx *router.Ctx) {
+func (c *ImageCommands) brightness(ctx *router.Ctx) {
 	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
 		user = ctx.Message.Author
@@ -1094,7 +1094,7 @@ func (ImageCommands) brightness(ctx *router.Ctx) {
 	_ = ctx.RespondText(fmt.Sprintf("https://some-random-api.com/canvas/brightness?avatar=%s", url.QueryEscape(user.AvatarURL(""))))
 }
 
-func (ImageCommands) red(ctx *router.Ctx) {
+func (c *ImageCommands) red(ctx *router.Ctx) {
 	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
 		user = ctx.Message.Author
@@ -1102,7 +1102,7 @@ func (ImageCommands) red(ctx *router.Ctx) {
 	_ = ctx.RespondText(fmt.Sprintf("https://some-random-api.com/canvas/red?avatar=%s", url.QueryEscape(user.AvatarURL(""))))
 }
 
-func (ImageCommands) green(ctx *router.Ctx) {
+func (c *ImageCommands) green(ctx *router.Ctx) {
 	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
 		user = ctx.Message.Author
@@ -1110,7 +1110,7 @@ func (ImageCommands) green(ctx *router.Ctx) {
 	_ = ctx.RespondText(fmt.Sprintf("https://some-random-api.com/canvas/green?avatar=%s", url.QueryEscape(user.AvatarURL(""))))
 }
 
-func (ImageCommands) blue(ctx *router.Ctx) {
+func (c *ImageCommands) blue(ctx *router.Ctx) {
 	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
 		user = ctx.Message.Author
@@ -1118,7 +1118,7 @@ func (ImageCommands) blue(ctx *router.Ctx) {
 	_ = ctx.RespondText(fmt.Sprintf("https://some-random-api.com/canvas/blue?avatar=%s", url.QueryEscape(user.AvatarURL(""))))
 }
 
-func (ImageCommands) pixelate(ctx *router.Ctx) {
+func (c *ImageCommands) pixelate(ctx *router.Ctx) {
 	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
 		user = ctx.Message.Author
@@ -1126,7 +1126,7 @@ func (ImageCommands) pixelate(ctx *router.Ctx) {
 	_ = ctx.RespondText(fmt.Sprintf("https://some-random-api.com/canvas/pixelate?avatar=%s", url.QueryEscape(user.AvatarURL(""))))
 }
 
-func (ImageCommands) comrade(ctx *router.Ctx) {
+func (c *ImageCommands) comrade(ctx *router.Ctx) {
 	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
 		user = ctx.Message.Author
@@ -1134,7 +1134,7 @@ func (ImageCommands) comrade(ctx *router.Ctx) {
 	_ = ctx.RespondText(fmt.Sprintf("https://some-random-api.com/canvas/comrade?avatar=%s", url.QueryEscape(user.AvatarURL(""))))
 }
 
-func (ImageCommands) missionpassed(ctx *router.Ctx) {
+func (c *ImageCommands) missionpassed(ctx *router.Ctx) {
 	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
 		user = ctx.Message.Author
@@ -1142,7 +1142,7 @@ func (ImageCommands) missionpassed(ctx *router.Ctx) {
 	_ = ctx.RespondText(fmt.Sprintf("https://some-random-api.com/canvas/passed?avatar=%s", url.QueryEscape(user.AvatarURL(""))))
 }
 
-func (ImageCommands) jail(ctx *router.Ctx) {
+func (c *ImageCommands) jail(ctx *router.Ctx) {
 	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
 		user = ctx.Message.Author
@@ -1150,11 +1150,11 @@ func (ImageCommands) jail(ctx *router.Ctx) {
 	_ = ctx.RespondText(fmt.Sprintf("https://some-random-api.com/canvas/jail?avatar=%s", url.QueryEscape(user.AvatarURL(""))))
 }
 
-func (ImageCommands) nobitches(ctx *router.Ctx) {
+func (c *ImageCommands) nobitches(ctx *router.Ctx) {
 	_ = ctx.RespondText(fmt.Sprintf("https://some-random-api.com/canvas/nobitches?no=%s", url.QueryEscape(ctx.Arguments.Raw())))
 }
 
-func (ImageCommands) threshold(ctx *router.Ctx) {
+func (c *ImageCommands) threshold(ctx *router.Ctx) {
 	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
 		user = ctx.Message.Author
@@ -1162,7 +1162,7 @@ func (ImageCommands) threshold(ctx *router.Ctx) {
 	_ = ctx.RespondText(fmt.Sprintf("https://some-random-api.com/canvas/threshold?avatar=%s", url.QueryEscape(user.AvatarURL(""))))
 }
 
-func (ImageCommands) blurple(ctx *router.Ctx) {
+func (c *ImageCommands) blurple(ctx *router.Ctx) {
 	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
 		user = ctx.Message.Author
@@ -1170,7 +1170,7 @@ func (ImageCommands) blurple(ctx *router.Ctx) {
 	_ = ctx.RespondText(fmt.Sprintf("https://some-random-api.com/canvas/blurple?avatar=%s", url.QueryEscape(user.AvatarURL(""))))
 }
 
-func (ImageCommands) blurple2(ctx *router.Ctx) {
+func (c *ImageCommands) blurple2(ctx *router.Ctx) {
 	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
 		user = ctx.Message.Author
@@ -1178,7 +1178,7 @@ func (ImageCommands) blurple2(ctx *router.Ctx) {
 	_ = ctx.RespondText(fmt.Sprintf("https://some-random-api.com/canvas/blurple2?avatar=%s", url.QueryEscape(user.AvatarURL(""))))
 }
 
-func (ImageCommands) color(ctx *router.Ctx) {
+func (c *ImageCommands) color(ctx *router.Ctx) {
 	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
 		user = ctx.Message.Author
@@ -1189,7 +1189,7 @@ func (ImageCommands) color(ctx *router.Ctx) {
 	))
 }
 
-func (ImageCommands) sostupid(ctx *router.Ctx) {
+func (c *ImageCommands) sostupid(ctx *router.Ctx) {
 	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
 		user = ctx.Message.Author
@@ -1200,7 +1200,7 @@ func (ImageCommands) sostupid(ctx *router.Ctx) {
 	))
 }
 
-func (ImageCommands) simpcard(ctx *router.Ctx) {
+func (c *ImageCommands) simpcard(ctx *router.Ctx) {
 	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
 		user = ctx.Message.Author
@@ -1208,7 +1208,7 @@ func (ImageCommands) simpcard(ctx *router.Ctx) {
 	_ = ctx.RespondText(fmt.Sprintf("https://some-random-api.com/canvas/simpcard?avatar=%s", url.QueryEscape(user.AvatarURL(""))))
 }
 
-func (ImageCommands) horny(ctx *router.Ctx) {
+func (c *ImageCommands) horny(ctx *router.Ctx) {
 	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
 		user = ctx.Message.Author
@@ -1216,7 +1216,7 @@ func (ImageCommands) horny(ctx *router.Ctx) {
 	_ = ctx.RespondText(fmt.Sprintf("https://some-random-api.com/canvas/horny?avatar=%s", url.QueryEscape(user.AvatarURL(""))))
 }
 
-func (ImageCommands) lgbt(ctx *router.Ctx) {
+func (c *ImageCommands) lgbt(ctx *router.Ctx) {
 	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
 		user = ctx.Message.Author
@@ -1224,7 +1224,7 @@ func (ImageCommands) lgbt(ctx *router.Ctx) {
 	_ = ctx.RespondText(fmt.Sprintf("https://some-random-api.com/canvas/lgbt?avatar=%s", url.QueryEscape(user.AvatarURL(""))))
 }
 
-func (ImageCommands) pansexual(ctx *router.Ctx) {
+func (c *ImageCommands) pansexual(ctx *router.Ctx) {
 	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
 		user = ctx.Message.Author
@@ -1232,7 +1232,7 @@ func (ImageCommands) pansexual(ctx *router.Ctx) {
 	_ = ctx.RespondText(fmt.Sprintf("https://some-random-api.com/canvas/pansexual?avatar=%s", url.QueryEscape(user.AvatarURL(""))))
 }
 
-func (ImageCommands) nonbinary(ctx *router.Ctx) {
+func (c *ImageCommands) nonbinary(ctx *router.Ctx) {
 	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
 		user = ctx.Message.Author
@@ -1240,7 +1240,7 @@ func (ImageCommands) nonbinary(ctx *router.Ctx) {
 	_ = ctx.RespondText(fmt.Sprintf("https://some-random-api.com/canvas/nonbinary?avatar=%s", url.QueryEscape(user.AvatarURL(""))))
 }
 
-func (ImageCommands) lesbian(ctx *router.Ctx) {
+func (c *ImageCommands) lesbian(ctx *router.Ctx) {
 	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
 		user = ctx.Message.Author
@@ -1248,7 +1248,7 @@ func (ImageCommands) lesbian(ctx *router.Ctx) {
 	_ = ctx.RespondText(fmt.Sprintf("https://some-random-api.com/canvas/lesbian?avatar=%s", url.QueryEscape(user.AvatarURL(""))))
 }
 
-func (ImageCommands) bisexual(ctx *router.Ctx) {
+func (c *ImageCommands) bisexual(ctx *router.Ctx) {
 	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
 		user = ctx.Message.Author
@@ -1256,7 +1256,7 @@ func (ImageCommands) bisexual(ctx *router.Ctx) {
 	_ = ctx.RespondText(fmt.Sprintf("https://some-random-api.com/canvas/bisexual?avatar=%s", url.QueryEscape(user.AvatarURL(""))))
 }
 
-func (ImageCommands) trans(ctx *router.Ctx) {
+func (c *ImageCommands) trans(ctx *router.Ctx) {
 	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
 		user = ctx.Message.Author
@@ -1264,15 +1264,15 @@ func (ImageCommands) trans(ctx *router.Ctx) {
 	_ = ctx.RespondText(fmt.Sprintf("https://some-random-api.com/canvas/transgender?avatar=%s", url.QueryEscape(user.AvatarURL(""))))
 }
 
-func (ImageCommands) oogway(ctx *router.Ctx) {
+func (c *ImageCommands) oogway(ctx *router.Ctx) {
 	_ = ctx.RespondText(fmt.Sprintf("https://some-random-api.com/canvas/oogway?quote=%s", url.QueryEscape(ctx.Arguments.Raw())))
 }
 
-func (ImageCommands) oogway2(ctx *router.Ctx) {
+func (c *ImageCommands) oogway2(ctx *router.Ctx) {
 	_ = ctx.RespondText(fmt.Sprintf("https://some-random-api.com/canvas/oogway2?quote=%s", url.QueryEscape(ctx.Arguments.Raw())))
 }
 
-func (ImageCommands) threat(ctx *router.Ctx) {
+func (c *ImageCommands) threat(ctx *router.Ctx) {
 	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
 		user = ctx.Message.Author
@@ -1285,7 +1285,7 @@ func (ImageCommands) threat(ctx *router.Ctx) {
 	_ = ctx.RespondText(jsonResult.Get("message").MustString())
 }
 
-func (ImageCommands) clyde(ctx *router.Ctx) {
+func (c *ImageCommands) clyde(ctx *router.Ctx) {
 	jsonResult, err := http.GetJson(fmt.Sprintf("https://nekobot.xyz/api/imagegen?type=clyde&text=%s", url.QueryEscape(ctx.Arguments.Raw())))
 	if err != nil {
 		_ = ctx.RespondText("An error has occurred: " + err.Error())
@@ -1294,7 +1294,7 @@ func (ImageCommands) clyde(ctx *router.Ctx) {
 	_ = ctx.RespondText(jsonResult.Get("message").MustString())
 }
 
-func (ImageCommands) distractedbf(ctx *router.Ctx) {
+func (c *ImageCommands) distractedbf(ctx *router.Ctx) {
 	user1, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
 		user1 = ctx.Message.Author
@@ -1311,7 +1311,7 @@ func (ImageCommands) distractedbf(ctx *router.Ctx) {
 	_ = ctx.RespondText(jsonResult.Get("message").MustString())
 }
 
-func (ImageCommands) captcha(ctx *router.Ctx) {
+func (c *ImageCommands) captcha(ctx *router.Ctx) {
 	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
 		user = ctx.Message.Author
@@ -1327,7 +1327,7 @@ func (ImageCommands) captcha(ctx *router.Ctx) {
 	_ = ctx.RespondText(jsonResult.Get("message").MustString())
 }
 
-func (ImageCommands) whowouldwin(ctx *router.Ctx) {
+func (c *ImageCommands) whowouldwin(ctx *router.Ctx) {
 	user1, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
 		user1 = ctx.Message.Author
@@ -1344,7 +1344,7 @@ func (ImageCommands) whowouldwin(ctx *router.Ctx) {
 	_ = ctx.RespondText(jsonResult.Get("message").MustString())
 }
 
-func (ImageCommands) changemymind(ctx *router.Ctx) {
+func (c *ImageCommands) changemymind(ctx *router.Ctx) {
 	jsonResult, err := http.GetJson(fmt.Sprintf("https://nekobot.xyz/api/imagegen?type=changemymind&text=%s", url.QueryEscape(ctx.Arguments.Raw())))
 	if err != nil {
 		_ = ctx.RespondText("An error has occurred: " + err.Error())
@@ -1353,7 +1353,7 @@ func (ImageCommands) changemymind(ctx *router.Ctx) {
 	_ = ctx.RespondText(jsonResult.Get("message").MustString())
 }
 
-func (ImageCommands) jpeg(ctx *router.Ctx) {
+func (c *ImageCommands) jpeg(ctx *router.Ctx) {
 	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
 		user = ctx.Message.Author
@@ -1366,7 +1366,7 @@ func (ImageCommands) jpeg(ctx *router.Ctx) {
 	_ = ctx.RespondText(jsonResult.Get("message").MustString())
 }
 
-func (ImageCommands) lolice(ctx *router.Ctx) {
+func (c *ImageCommands) lolice(ctx *router.Ctx) {
 	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
 		user = ctx.Message.Author
@@ -1379,7 +1379,7 @@ func (ImageCommands) lolice(ctx *router.Ctx) {
 	_ = ctx.RespondText(jsonResult.Get("message").MustString())
 }
 
-func (ImageCommands) kannagen(ctx *router.Ctx) {
+func (c *ImageCommands) kannagen(ctx *router.Ctx) {
 	jsonResult, err := http.GetJson(fmt.Sprintf("https://nekobot.xyz/api/imagegen?type=kannagen&text=%s", url.QueryEscape(ctx.Arguments.Raw())))
 	if err != nil {
 		_ = ctx.RespondText("An error has occurred: " + err.Error())
@@ -1388,7 +1388,7 @@ func (ImageCommands) kannagen(ctx *router.Ctx) {
 	_ = ctx.RespondText(jsonResult.Get("message").MustString())
 }
 
-func (ImageCommands) iphonex(ctx *router.Ctx) {
+func (c *ImageCommands) iphonex(ctx *router.Ctx) {
 	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
 		user = ctx.Message.Author
@@ -1401,7 +1401,7 @@ func (ImageCommands) iphonex(ctx *router.Ctx) {
 	_ = ctx.RespondText(jsonResult.Get("message").MustString())
 }
 
-func (ImageCommands) awooify(ctx *router.Ctx) {
+func (c *ImageCommands) awooify(ctx *router.Ctx) {
 	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
 		user = ctx.Message.Author
@@ -1414,7 +1414,7 @@ func (ImageCommands) awooify(ctx *router.Ctx) {
 	_ = ctx.RespondText(jsonResult.Get("message").MustString())
 }
 
-func (ImageCommands) trap(ctx *router.Ctx) {
+func (c *ImageCommands) trap(ctx *router.Ctx) {
 	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
 		user = ctx.Message.Author
@@ -1431,7 +1431,7 @@ func (ImageCommands) trap(ctx *router.Ctx) {
 	_ = ctx.RespondText(jsonResult.Get("message").MustString())
 }
 
-func (ImageCommands) trumptweet(ctx *router.Ctx) {
+func (c *ImageCommands) trumptweet(ctx *router.Ctx) {
 	jsonResult, err := http.GetJson(fmt.Sprintf("https://nekobot.xyz/api/imagegen?type=trumptweet&text=%s", url.QueryEscape(ctx.Arguments.Raw())))
 	if err != nil {
 		_ = ctx.RespondText("An error has occurred: " + err.Error())
@@ -1440,7 +1440,7 @@ func (ImageCommands) trumptweet(ctx *router.Ctx) {
 	_ = ctx.RespondText(jsonResult.Get("message").MustString())
 }
 
-func (ImageCommands) deepfry(ctx *router.Ctx) {
+func (c *ImageCommands) deepfry(ctx *router.Ctx) {
 	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
 		user = ctx.Message.Author
@@ -1453,7 +1453,7 @@ func (ImageCommands) deepfry(ctx *router.Ctx) {
 	_ = ctx.RespondText(jsonResult.Get("message").MustString())
 }
 
-func (ImageCommands) blurpify(ctx *router.Ctx) {
+func (c *ImageCommands) blurpify(ctx *router.Ctx) {
 	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
 		user = ctx.Message.Author
@@ -1466,7 +1466,7 @@ func (ImageCommands) blurpify(ctx *router.Ctx) {
 	_ = ctx.RespondText(jsonResult.Get("message").MustString())
 }
 
-func (ImageCommands) phcomment(ctx *router.Ctx) {
+func (c *ImageCommands) phcomment(ctx *router.Ctx) {
 	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
 		user = ctx.Message.Author
@@ -1483,7 +1483,7 @@ func (ImageCommands) phcomment(ctx *router.Ctx) {
 	_ = ctx.RespondText(jsonResult.Get("message").MustString())
 }
 
-func (ImageCommands) fact(ctx *router.Ctx) {
+func (c *ImageCommands) fact(ctx *router.Ctx) {
 	jsonResult, err := http.GetJson(fmt.Sprintf("https://nekobot.xyz/api/imagegen?type=fact&text=%s", url.QueryEscape(ctx.Arguments.Raw())))
 	if err != nil {
 		_ = ctx.RespondText("An error has occurred: " + err.Error())
@@ -1492,7 +1492,7 @@ func (ImageCommands) fact(ctx *router.Ctx) {
 	_ = ctx.RespondText(jsonResult.Get("message").MustString())
 }
 
-func (ImageCommands) trash(ctx *router.Ctx) {
+func (c *ImageCommands) trash(ctx *router.Ctx) {
 	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
 		user = ctx.Message.Author
@@ -1505,7 +1505,7 @@ func (ImageCommands) trash(ctx *router.Ctx) {
 	_ = ctx.RespondText(jsonResult.Get("message").MustString())
 }
 
-func (ImageCommands) stickbug(ctx *router.Ctx) {
+func (c *ImageCommands) stickbug(ctx *router.Ctx) {
 	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
 		user = ctx.Message.Author
@@ -1518,7 +1518,7 @@ func (ImageCommands) stickbug(ctx *router.Ctx) {
 	_ = ctx.RespondText(jsonResult.Get("message").MustString())
 }
 
-func (ImageCommands) magik(ctx *router.Ctx) {
+func (c *ImageCommands) magik(ctx *router.Ctx) {
 	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
 		user = ctx.Message.Author
@@ -1531,7 +1531,7 @@ func (ImageCommands) magik(ctx *router.Ctx) {
 	_ = ctx.RespondText(jsonResult.Get("message").MustString())
 }
 
-func (ImageCommands) randomgif(ctx *router.Ctx) {
+func (c *ImageCommands) randomgif(ctx *router.Ctx) {
 	jsonResult, err := http.GetJson("https://api.giphy.com/v1/gifs/random?api_key=ldQeNHnpL3WcCxJE1uO8HTk17ICn8i34&tag=&rating=R&limit=1&lang=en&offset=0")
 	if err != nil {
 		_ = ctx.RespondText("An error has occurred: " + err.Error())
@@ -1540,7 +1540,7 @@ func (ImageCommands) randomgif(ctx *router.Ctx) {
 	_ = ctx.RespondText(jsonResult.GetPath("data", "bitly_url").MustString())
 }
 
-func (ImageCommands) searchgif(ctx *router.Ctx) {
+func (c *ImageCommands) searchgif(ctx *router.Ctx) {
 	jsonResult, err := http.GetJson(fmt.Sprintf("https://api.giphy.com/v1/gifs/search?api_key=ldQeNHnpL3WcCxJE1uO8HTk17ICn8i34&q=%s&limit=1&offset=0&rating=R&lang=en", url.QueryEscape(ctx.Arguments.Raw())))
 	if err != nil {
 		_ = ctx.RespondText("An error has occurred: " + err.Error())
@@ -1553,7 +1553,7 @@ func (ImageCommands) searchgif(ctx *router.Ctx) {
 	_ = ctx.RespondText(jsonResult.Get("data").GetIndex(0).Get("bitly_url").MustString())
 }
 
-func (ImageCommands) sadcat(ctx *router.Ctx) {
+func (c *ImageCommands) sadcat(ctx *router.Ctx) {
 	imageUrl, err := utils.Misc.GetImageUrlFromJson("https://api.alexflipnote.dev/sadcat", "file")
 	if err != nil {
 		_ = ctx.RespondText("An error has occurred: " + err.Error())
@@ -1562,7 +1562,7 @@ func (ImageCommands) sadcat(ctx *router.Ctx) {
 	_ = ctx.RespondText(imageUrl)
 }
 
-func (ImageCommands) bird(ctx *router.Ctx) {
+func (c *ImageCommands) bird(ctx *router.Ctx) {
 	imageUrl, err := utils.Misc.GetImageUrlFromJson("https://api.alexflipnote.dev/birb", "file")
 	if err != nil {
 		_ = ctx.RespondText("An error has occurred: " + err.Error())
@@ -1571,28 +1571,28 @@ func (ImageCommands) bird(ctx *router.Ctx) {
 	_ = ctx.RespondText(imageUrl)
 }
 
-func (ImageCommands) cat(ctx *router.Ctx) {
+func (c *ImageCommands) cat(ctx *router.Ctx) {
 	err := utils.Discord.SendFileFromURL(ctx, "https://cataas.com/cat", "cat.jpg")
 	if err != nil {
 		_ = ctx.RespondText("An error has occurred: " + err.Error())
 	}
 }
 
-func (ImageCommands) catgif(ctx *router.Ctx) {
+func (c *ImageCommands) catgif(ctx *router.Ctx) {
 	err := utils.Discord.SendFileFromURL(ctx, "https://cataas.com/cat/gif", "cat.gif")
 	if err != nil {
 		_ = ctx.RespondText("An error has occurred: " + err.Error())
 	}
 }
 
-func (ImageCommands) catsays(ctx *router.Ctx) {
+func (c *ImageCommands) catsays(ctx *router.Ctx) {
 	err := utils.Discord.SendFileFromURL(ctx, "https://cataas.com/cat/says/"+url.PathEscape(ctx.Arguments.Raw()), "cat.jpg")
 	if err != nil {
 		_ = ctx.RespondText("An error has occurred: " + err.Error())
 	}
 }
 
-func (ImageCommands) dog(ctx *router.Ctx) {
+func (c *ImageCommands) dog(ctx *router.Ctx) {
 	imageUrl, err := utils.Misc.GetImageUrlFromJson("https://dog.ceo/api/breeds/image/random", "message")
 	if err != nil {
 		_ = ctx.RespondText("An error has occurred: " + err.Error())
@@ -1601,7 +1601,7 @@ func (ImageCommands) dog(ctx *router.Ctx) {
 	_ = ctx.RespondText(imageUrl)
 }
 
-func (ImageCommands) panda(ctx *router.Ctx) {
+func (c *ImageCommands) panda(ctx *router.Ctx) {
 	imageUrl, err := utils.Misc.GetImageUrlFromJson("https://some-random-api.com/img/panda", "link")
 	if err != nil {
 		_ = ctx.RespondText("An error has occurred: " + err.Error())
@@ -1610,7 +1610,7 @@ func (ImageCommands) panda(ctx *router.Ctx) {
 	_ = ctx.RespondText(imageUrl)
 }
 
-func (ImageCommands) redpanda(ctx *router.Ctx) {
+func (c *ImageCommands) redpanda(ctx *router.Ctx) {
 	imageUrl, err := utils.Misc.GetImageUrlFromJson("https://some-random-api.com/img/red_panda", "link")
 	if err != nil {
 		_ = ctx.RespondText("An error has occurred: " + err.Error())
@@ -1619,7 +1619,7 @@ func (ImageCommands) redpanda(ctx *router.Ctx) {
 	_ = ctx.RespondText(imageUrl)
 }
 
-func (ImageCommands) koala(ctx *router.Ctx) {
+func (c *ImageCommands) koala(ctx *router.Ctx) {
 	imageUrl, err := utils.Misc.GetImageUrlFromJson("https://some-random-api.com/img/koala", "link")
 	if err != nil {
 		_ = ctx.RespondText("An error has occurred: " + err.Error())
@@ -1628,7 +1628,7 @@ func (ImageCommands) koala(ctx *router.Ctx) {
 	_ = ctx.RespondText(imageUrl)
 }
 
-func (ImageCommands) raccoon(ctx *router.Ctx) {
+func (c *ImageCommands) raccoon(ctx *router.Ctx) {
 	imageUrl, err := utils.Misc.GetImageUrlFromJson("https://some-random-api.com/img/raccoon", "link")
 	if err != nil {
 		_ = ctx.RespondText("An error has occurred: " + err.Error())
@@ -1637,7 +1637,7 @@ func (ImageCommands) raccoon(ctx *router.Ctx) {
 	_ = ctx.RespondText(imageUrl)
 }
 
-func (ImageCommands) fox(ctx *router.Ctx) {
+func (c *ImageCommands) fox(ctx *router.Ctx) {
 	imageUrl, err := utils.Misc.GetImageUrlFromJson("https://randomfox.ca/floof", "image")
 	if err != nil {
 		_ = ctx.RespondText("An error has occurred: " + err.Error())
@@ -1646,7 +1646,7 @@ func (ImageCommands) fox(ctx *router.Ctx) {
 	_ = ctx.RespondText(imageUrl)
 }
 
-func (ImageCommands) shibe(ctx *router.Ctx) {
+func (c *ImageCommands) shibe(ctx *router.Ctx) {
 	jsonResult, err := http.GetJson("https://shibe.online/api/shibes?count=1&urls=true&httpsUrls=true")
 	if err != nil {
 		_ = ctx.RespondText("An error has occurred: " + err.Error())
@@ -1655,7 +1655,7 @@ func (ImageCommands) shibe(ctx *router.Ctx) {
 	_ = ctx.RespondText(jsonResult.GetIndex(0).MustString())
 }
 
-func (ImageCommands) whale(ctx *router.Ctx) {
+func (c *ImageCommands) whale(ctx *router.Ctx) {
 	imageUrl, err := utils.Misc.GetImageUrlFromJson("https://api.animality.xyz/img/whale", "link")
 	if err != nil {
 		_ = ctx.RespondText("An error has occurred: " + err.Error())
@@ -1664,7 +1664,7 @@ func (ImageCommands) whale(ctx *router.Ctx) {
 	_ = ctx.RespondText(imageUrl)
 }
 
-func (ImageCommands) kangaroo(ctx *router.Ctx) {
+func (c *ImageCommands) kangaroo(ctx *router.Ctx) {
 	imageUrl, err := utils.Misc.GetImageUrlFromJson("https://api.animality.xyz/img/kangaroo", "link")
 	if err != nil {
 		_ = ctx.RespondText("An error has occurred: " + err.Error())
@@ -1673,7 +1673,7 @@ func (ImageCommands) kangaroo(ctx *router.Ctx) {
 	_ = ctx.RespondText(imageUrl)
 }
 
-func (ImageCommands) bunny(ctx *router.Ctx) {
+func (c *ImageCommands) bunny(ctx *router.Ctx) {
 	imageUrl, err := utils.Misc.GetImageUrlFromJson("https://api.animality.xyz/img/bunny", "link")
 	if err != nil {
 		_ = ctx.RespondText("An error has occurred: " + err.Error())
@@ -1682,7 +1682,7 @@ func (ImageCommands) bunny(ctx *router.Ctx) {
 	_ = ctx.RespondText(imageUrl)
 }
 
-func (ImageCommands) lion(ctx *router.Ctx) {
+func (c *ImageCommands) lion(ctx *router.Ctx) {
 	imageUrl, err := utils.Misc.GetImageUrlFromJson("https://api.animality.xyz/img/lion", "link")
 	if err != nil {
 		_ = ctx.RespondText("An error has occurred: " + err.Error())
@@ -1691,7 +1691,7 @@ func (ImageCommands) lion(ctx *router.Ctx) {
 	_ = ctx.RespondText(imageUrl)
 }
 
-func (ImageCommands) frog(ctx *router.Ctx) {
+func (c *ImageCommands) frog(ctx *router.Ctx) {
 	imageUrl, err := utils.Misc.GetImageUrlFromJson("https://api.animality.xyz/img/frog", "link")
 	if err != nil {
 		_ = ctx.RespondText("An error has occurred: " + err.Error())
@@ -1700,7 +1700,7 @@ func (ImageCommands) frog(ctx *router.Ctx) {
 	_ = ctx.RespondText(imageUrl)
 }
 
-func (ImageCommands) duck(ctx *router.Ctx) {
+func (c *ImageCommands) duck(ctx *router.Ctx) {
 	imageUrl, err := utils.Misc.GetImageUrlFromJson("https://api.animality.xyz/img/duck", "link")
 	if err != nil {
 		_ = ctx.RespondText("An error has occurred: " + err.Error())
@@ -1709,7 +1709,7 @@ func (ImageCommands) duck(ctx *router.Ctx) {
 	_ = ctx.RespondText(imageUrl)
 }
 
-func (ImageCommands) penguin(ctx *router.Ctx) {
+func (c *ImageCommands) penguin(ctx *router.Ctx) {
 	imageUrl, err := utils.Misc.GetImageUrlFromJson("https://api.animality.xyz/img/penguin", "link")
 	if err != nil {
 		_ = ctx.RespondText("An error has occurred: " + err.Error())
@@ -1718,7 +1718,7 @@ func (ImageCommands) penguin(ctx *router.Ctx) {
 	_ = ctx.RespondText(imageUrl)
 }
 
-func (ImageCommands) dolphin(ctx *router.Ctx) {
+func (c *ImageCommands) dolphin(ctx *router.Ctx) {
 	imageUrl, err := utils.Misc.GetImageUrlFromJson("https://api.animality.xyz/img/dolphin", "link")
 	if err != nil {
 		_ = ctx.RespondText("An error has occurred: " + err.Error())
@@ -1727,7 +1727,7 @@ func (ImageCommands) dolphin(ctx *router.Ctx) {
 	_ = ctx.RespondText(imageUrl)
 }
 
-func (ImageCommands) bear(ctx *router.Ctx) {
+func (c *ImageCommands) bear(ctx *router.Ctx) {
 	imageUrl, err := utils.Misc.GetImageUrlFromJson("https://api.animality.xyz/img/bear", "link")
 	if err != nil {
 		_ = ctx.RespondText("An error has occurred: " + err.Error())
@@ -1736,7 +1736,7 @@ func (ImageCommands) bear(ctx *router.Ctx) {
 	_ = ctx.RespondText(imageUrl)
 }
 
-func (ImageCommands) axolotl(ctx *router.Ctx) {
+func (c *ImageCommands) axolotl(ctx *router.Ctx) {
 	imageUrl, err := utils.Misc.GetImageUrlFromJson("https://api.animality.xyz/img/axolotl", "link")
 	if err != nil {
 		_ = ctx.RespondText("An error has occurred: " + err.Error())
@@ -1745,7 +1745,7 @@ func (ImageCommands) axolotl(ctx *router.Ctx) {
 	_ = ctx.RespondText(imageUrl)
 }
 
-func (ImageCommands) capybara(ctx *router.Ctx) {
+func (c *ImageCommands) capybara(ctx *router.Ctx) {
 	imageUrl, err := utils.Misc.GetImageUrlFromJson("https://api.animality.xyz/img/capybara", "link")
 	if err != nil {
 		_ = ctx.RespondText("An error has occurred: " + err.Error())
@@ -1754,7 +1754,7 @@ func (ImageCommands) capybara(ctx *router.Ctx) {
 	_ = ctx.RespondText(imageUrl)
 }
 
-func (ImageCommands) bed(ctx *router.Ctx) {
+func (c *ImageCommands) bed(ctx *router.Ctx) {
 	user1, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
 		user1 = ctx.Message.Author
@@ -1776,7 +1776,7 @@ func (ImageCommands) bed(ctx *router.Ctx) {
 	}
 }
 
-func (ImageCommands) balloon(ctx *router.Ctx) {
+func (c *ImageCommands) balloon(ctx *router.Ctx) {
 	err := utils.Discord.SendFileFromURL(
 		ctx,
 		"https://imgen.lightning-bot.com/balloon",
@@ -1790,7 +1790,7 @@ func (ImageCommands) balloon(ctx *router.Ctx) {
 	}
 }
 
-func (ImageCommands) abandon(ctx *router.Ctx) {
+func (c *ImageCommands) abandon(ctx *router.Ctx) {
 	err := utils.Discord.SendFileFromURL(
 		ctx,
 		"https://imgen.lightning-bot.com/abandon",
@@ -1804,7 +1804,7 @@ func (ImageCommands) abandon(ctx *router.Ctx) {
 	}
 }
 
-func (ImageCommands) aborted(ctx *router.Ctx) {
+func (c *ImageCommands) aborted(ctx *router.Ctx) {
 	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
 		user = ctx.Message.Author
@@ -1822,7 +1822,7 @@ func (ImageCommands) aborted(ctx *router.Ctx) {
 	}
 }
 
-func (ImageCommands) affect(ctx *router.Ctx) {
+func (c *ImageCommands) affect(ctx *router.Ctx) {
 	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
 		user = ctx.Message.Author
@@ -1840,7 +1840,7 @@ func (ImageCommands) affect(ctx *router.Ctx) {
 	}
 }
 
-func (ImageCommands) airpods(ctx *router.Ctx) {
+func (c *ImageCommands) airpods(ctx *router.Ctx) {
 	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
 		user = ctx.Message.Author
@@ -1858,7 +1858,7 @@ func (ImageCommands) airpods(ctx *router.Ctx) {
 	}
 }
 
-func (ImageCommands) america(ctx *router.Ctx) {
+func (c *ImageCommands) america(ctx *router.Ctx) {
 	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
 		user = ctx.Message.Author
@@ -1876,7 +1876,7 @@ func (ImageCommands) america(ctx *router.Ctx) {
 	}
 }
 
-func (ImageCommands) armor(ctx *router.Ctx) {
+func (c *ImageCommands) armor(ctx *router.Ctx) {
 	err := utils.Discord.SendFileFromURL(
 		ctx,
 		"https://imgen.lightning-bot.com/armor",
@@ -1890,7 +1890,7 @@ func (ImageCommands) armor(ctx *router.Ctx) {
 	}
 }
 
-func (ImageCommands) bongocat(ctx *router.Ctx) {
+func (c *ImageCommands) bongocat(ctx *router.Ctx) {
 	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
 		user = ctx.Message.Author
@@ -1908,7 +1908,7 @@ func (ImageCommands) bongocat(ctx *router.Ctx) {
 	}
 }
 
-func (ImageCommands) boo(ctx *router.Ctx) {
+func (c *ImageCommands) boo(ctx *router.Ctx) {
 	err := utils.Discord.SendFileFromURL(
 		ctx,
 		"https://imgen.lightning-bot.com/boo",
@@ -1922,7 +1922,7 @@ func (ImageCommands) boo(ctx *router.Ctx) {
 	}
 }
 
-func (ImageCommands) bigbrain(ctx *router.Ctx) {
+func (c *ImageCommands) bigbrain(ctx *router.Ctx) {
 	err := utils.Discord.SendFileFromURL(
 		ctx,
 		"https://imgen.lightning-bot.com/brain",
@@ -1939,7 +1939,7 @@ func (ImageCommands) bigbrain(ctx *router.Ctx) {
 	}
 }
 
-func (ImageCommands) brazzers(ctx *router.Ctx) {
+func (c *ImageCommands) brazzers(ctx *router.Ctx) {
 	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
 		user = ctx.Message.Author
@@ -1958,7 +1958,7 @@ func (ImageCommands) brazzers(ctx *router.Ctx) {
 
 }
 
-func (ImageCommands) byemom(ctx *router.Ctx) {
+func (c *ImageCommands) byemom(ctx *router.Ctx) {
 	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
 		user = ctx.Message.Author
@@ -1978,7 +1978,7 @@ func (ImageCommands) byemom(ctx *router.Ctx) {
 	}
 }
 
-func (ImageCommands) cancer(ctx *router.Ctx) {
+func (c *ImageCommands) cancer(ctx *router.Ctx) {
 	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
 		user = ctx.Message.Author
@@ -1996,7 +1996,7 @@ func (ImageCommands) cancer(ctx *router.Ctx) {
 	}
 }
 
-func (ImageCommands) cheating(ctx *router.Ctx) {
+func (c *ImageCommands) cheating(ctx *router.Ctx) {
 	err := utils.Discord.SendFileFromURL(
 		ctx,
 		"https://imgen.lightning-bot.com/cheating",
@@ -2010,7 +2010,7 @@ func (ImageCommands) cheating(ctx *router.Ctx) {
 	}
 }
 
-func (ImageCommands) citation(ctx *router.Ctx) {
+func (c *ImageCommands) citation(ctx *router.Ctx) {
 	err := utils.Discord.SendFileFromURL(
 		ctx,
 		"https://imgen.lightning-bot.com/citation",
@@ -2024,7 +2024,7 @@ func (ImageCommands) citation(ctx *router.Ctx) {
 	}
 }
 
-func (ImageCommands) communism(ctx *router.Ctx) {
+func (c *ImageCommands) communism(ctx *router.Ctx) {
 	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
 		user = ctx.Message.Author
@@ -2042,7 +2042,7 @@ func (ImageCommands) communism(ctx *router.Ctx) {
 	}
 }
 
-func (ImageCommands) confusedcat(ctx *router.Ctx) {
+func (c *ImageCommands) confusedcat(ctx *router.Ctx) {
 	err := utils.Discord.SendFileFromURL(
 		ctx,
 		"https://imgen.lightning-bot.com/confusedcat",
@@ -2056,7 +2056,7 @@ func (ImageCommands) confusedcat(ctx *router.Ctx) {
 	}
 }
 
-func (ImageCommands) corporate(ctx *router.Ctx) {
+func (c *ImageCommands) corporate(ctx *router.Ctx) {
 	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
 		user = ctx.Message.Author
@@ -2074,7 +2074,7 @@ func (ImageCommands) corporate(ctx *router.Ctx) {
 	}
 }
 
-func (ImageCommands) cry(ctx *router.Ctx) {
+func (c *ImageCommands) cry(ctx *router.Ctx) {
 	err := utils.Discord.SendFileFromURL(
 		ctx,
 		"https://imgen.lightning-bot.com/cry",
@@ -2088,7 +2088,7 @@ func (ImageCommands) cry(ctx *router.Ctx) {
 	}
 }
 
-func (ImageCommands) dab(ctx *router.Ctx) {
+func (c *ImageCommands) dab(ctx *router.Ctx) {
 	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
 		user = ctx.Message.Author
@@ -2106,7 +2106,7 @@ func (ImageCommands) dab(ctx *router.Ctx) {
 	}
 }
 
-func (ImageCommands) dank(ctx *router.Ctx) {
+func (c *ImageCommands) dank(ctx *router.Ctx) {
 	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
 		user = ctx.Message.Author
@@ -2124,7 +2124,7 @@ func (ImageCommands) dank(ctx *router.Ctx) {
 	}
 }
 
-func (ImageCommands) delete(ctx *router.Ctx) {
+func (c *ImageCommands) delete(ctx *router.Ctx) {
 	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
 		user = ctx.Message.Author
@@ -2142,7 +2142,7 @@ func (ImageCommands) delete(ctx *router.Ctx) {
 	}
 }
 
-func (ImageCommands) disability(ctx *router.Ctx) {
+func (c *ImageCommands) disability(ctx *router.Ctx) {
 	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
 		user = ctx.Message.Author
@@ -2160,7 +2160,7 @@ func (ImageCommands) disability(ctx *router.Ctx) {
 	}
 }
 
-func (ImageCommands) doglemon(ctx *router.Ctx) {
+func (c *ImageCommands) doglemon(ctx *router.Ctx) {
 	err := utils.Discord.SendFileFromURL(
 		ctx,
 		"https://imgen.lightning-bot.com/doglemon",
@@ -2174,7 +2174,7 @@ func (ImageCommands) doglemon(ctx *router.Ctx) {
 	}
 }
 
-func (ImageCommands) door(ctx *router.Ctx) {
+func (c *ImageCommands) door(ctx *router.Ctx) {
 	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
 		user = ctx.Message.Author
@@ -2192,7 +2192,7 @@ func (ImageCommands) door(ctx *router.Ctx) {
 	}
 }
 
-func (ImageCommands) egg(ctx *router.Ctx) {
+func (c *ImageCommands) egg(ctx *router.Ctx) {
 	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
 		user = ctx.Message.Author
@@ -2210,7 +2210,7 @@ func (ImageCommands) egg(ctx *router.Ctx) {
 	}
 }
 
-func (ImageCommands) excuseme(ctx *router.Ctx) {
+func (c *ImageCommands) excuseme(ctx *router.Ctx) {
 	err := utils.Discord.SendFileFromURL(
 		ctx,
 		"https://imgen.lightning-bot.com/excuseme",
@@ -2224,7 +2224,7 @@ func (ImageCommands) excuseme(ctx *router.Ctx) {
 	}
 }
 
-func (ImageCommands) expanddong(ctx *router.Ctx) {
+func (c *ImageCommands) expanddong(ctx *router.Ctx) {
 	err := utils.Discord.SendFileFromURL(
 		ctx,
 		"https://imgen.lightning-bot.com/expanddong",
@@ -2238,7 +2238,7 @@ func (ImageCommands) expanddong(ctx *router.Ctx) {
 	}
 }
 
-func (ImageCommands) expandingwwe(ctx *router.Ctx) {
+func (c *ImageCommands) expandingwwe(ctx *router.Ctx) {
 	err := utils.Discord.SendFileFromURL(
 		ctx,
 		"https://imgen.lightning-bot.com/expandingwwe",
@@ -2256,7 +2256,7 @@ func (ImageCommands) expandingwwe(ctx *router.Ctx) {
 	}
 }
 
-func (ImageCommands) qrcode(ctx *router.Ctx) {
+func (c *ImageCommands) qrcode(ctx *router.Ctx) {
 	err := utils.Discord.SendFileFromURL(
 		ctx,
 		fmt.Sprintf("https://www.qrcoder.co.uk/api/v1/?type=png&text=%s&int=1&background=FFFFFF&foreground=000000&eo=000000&ei=000000&size=8&padding=2", url.QueryEscape(ctx.Arguments.Raw())),
@@ -2267,7 +2267,7 @@ func (ImageCommands) qrcode(ctx *router.Ctx) {
 	}
 }
 
-func (ImageCommands) darkqrcode(ctx *router.Ctx) {
+func (c *ImageCommands) darkqrcode(ctx *router.Ctx) {
 	err := utils.Discord.SendFileFromURL(
 		ctx,
 		fmt.Sprintf("https://www.qrcoder.co.uk/api/v1/?type=png&text=%s&int=1&background=000&foreground=FFFFFF&eo=FFFFFF&ei=FFFFFF&size=8&padding=2", url.QueryEscape(ctx.Arguments.Raw())),
@@ -2278,7 +2278,7 @@ func (ImageCommands) darkqrcode(ctx *router.Ctx) {
 	}
 }
 
-func (ImageCommands) rule34(ctx *router.Ctx) {
+func (c *ImageCommands) rule34(ctx *router.Ctx) {
 	jsonResult, err := http.GetJson("https://api.rule34.xxx/index.php?page=dapi&s=post&q=index&json=1")
 	if err != nil {
 		_ = ctx.RespondText("An error has occurred: " + err.Error())
@@ -2287,11 +2287,11 @@ func (ImageCommands) rule34(ctx *router.Ctx) {
 	_ = ctx.RespondText(jsonResult.GetIndex(rand.Intn(len(jsonResult.MustArray()))).Get("file_url").MustString())
 }
 
-func (ImageCommands) achievement(ctx *router.Ctx) {
+func (c *ImageCommands) achievement(ctx *router.Ctx) {
 	_ = ctx.RespondText(fmt.Sprintf("https://api.lightning-bot.com/api/v3/imagegen/achievement?text=%s", url.QueryEscape(ctx.Arguments.Raw())))
 }
 
-func (ImageCommands) amiajoke(ctx *router.Ctx) {
+func (c *ImageCommands) amiajoke(ctx *router.Ctx) {
 	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
 		user = ctx.Message.Author
@@ -2299,7 +2299,7 @@ func (ImageCommands) amiajoke(ctx *router.Ctx) {
 	_ = ctx.RespondText(fmt.Sprintf("https://api.lightning-bot.com/api/v3/imagegen/amiajoke?url=%s", url.QueryEscape(user.AvatarURL(""))))
 }
 
-func (ImageCommands) bad(ctx *router.Ctx) {
+func (c *ImageCommands) bad(ctx *router.Ctx) {
 	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
 		user = ctx.Message.Author
@@ -2307,11 +2307,11 @@ func (ImageCommands) bad(ctx *router.Ctx) {
 	_ = ctx.RespondText(fmt.Sprintf("https://api.lightning-bot.com/api/v3/imagegen/bad?url=%s", url.QueryEscape(user.AvatarURL(""))))
 }
 
-func (ImageCommands) calling(ctx *router.Ctx) {
+func (c *ImageCommands) calling(ctx *router.Ctx) {
 	_ = ctx.RespondText(fmt.Sprintf("https://api.lightning-bot.com/api/v3/imagegen/calling?text=%s", url.QueryEscape(ctx.Arguments.Raw())))
 }
 
-func (ImageCommands) didyoumean(ctx *router.Ctx) {
+func (c *ImageCommands) didyoumean(ctx *router.Ctx) {
 	_ = ctx.RespondText(fmt.Sprintf(
 		"https://api.lightning-bot.com/api/v3/imagegen/didyoumean?top=%s&bottom=%s",
 		url.QueryEscape(utils.Arguments["<\"top\">"]),
@@ -2319,7 +2319,7 @@ func (ImageCommands) didyoumean(ctx *router.Ctx) {
 	))
 }
 
-func (ImageCommands) drake(ctx *router.Ctx) {
+func (c *ImageCommands) drake(ctx *router.Ctx) {
 	_ = ctx.RespondText(fmt.Sprintf(
 		"https://api.lightning-bot.com/api/v3/imagegen/drake?top=%s&bottom=%s&ayano=false",
 		url.QueryEscape(utils.Arguments["<\"top\">"]),
@@ -2327,7 +2327,7 @@ func (ImageCommands) drake(ctx *router.Ctx) {
 	))
 }
 
-func (ImageCommands) ayano(ctx *router.Ctx) {
+func (c *ImageCommands) ayano(ctx *router.Ctx) {
 	_ = ctx.RespondText(fmt.Sprintf(
 		"https://api.lightning-bot.com/api/v3/imagegen/drake?top=%s&bottom=%s&ayano=true",
 		url.QueryEscape(utils.Arguments["<\"top\">"]),
@@ -2335,11 +2335,11 @@ func (ImageCommands) ayano(ctx *router.Ctx) {
 	))
 }
 
-func (ImageCommands) facts(ctx *router.Ctx) {
+func (c *ImageCommands) facts(ctx *router.Ctx) {
 	_ = ctx.RespondText(fmt.Sprintf("https://api.lightning-bot.com/api/v3/imagegen/facts?text=%s", url.QueryEscape(ctx.Arguments.Raw())))
 }
 
-func (ImageCommands) blur(ctx *router.Ctx) {
+func (c *ImageCommands) blur(ctx *router.Ctx) {
 	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
 		user = ctx.Message.Author
@@ -2347,7 +2347,7 @@ func (ImageCommands) blur(ctx *router.Ctx) {
 	_ = ctx.RespondText(fmt.Sprintf("https://api.lightning-bot.com/api/v3/imagegen/filter?url=%s&filter=blur", url.QueryEscape(user.AvatarURL(""))))
 }
 
-func (ImageCommands) flipav(ctx *router.Ctx) {
+func (c *ImageCommands) flipav(ctx *router.Ctx) {
 	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
 		user = ctx.Message.Author
@@ -2355,7 +2355,7 @@ func (ImageCommands) flipav(ctx *router.Ctx) {
 	_ = ctx.RespondText(fmt.Sprintf("https://api.lightning-bot.com/api/v3/imagegen/filter?url=%s&filter=flip", url.QueryEscape(user.AvatarURL(""))))
 }
 
-func (ImageCommands) mirror(ctx *router.Ctx) {
+func (c *ImageCommands) mirror(ctx *router.Ctx) {
 	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
 		user = ctx.Message.Author
@@ -2363,7 +2363,7 @@ func (ImageCommands) mirror(ctx *router.Ctx) {
 	_ = ctx.RespondText(fmt.Sprintf("https://api.lightning-bot.com/api/v3/imagegen/filter?url=%s&filter=mirror", url.QueryEscape(user.AvatarURL(""))))
 }
 
-func (ImageCommands) wide(ctx *router.Ctx) {
+func (c *ImageCommands) wide(ctx *router.Ctx) {
 	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
 		user = ctx.Message.Author
@@ -2371,7 +2371,7 @@ func (ImageCommands) wide(ctx *router.Ctx) {
 	_ = ctx.RespondText(fmt.Sprintf("https://api.lightning-bot.com/api/v3/imagegen/filter?url=%s&filter=wide", url.QueryEscape(user.AvatarURL(""))))
 }
 
-func (ImageCommands) sepia(ctx *router.Ctx) {
+func (c *ImageCommands) sepia(ctx *router.Ctx) {
 	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
 		user = ctx.Message.Author
@@ -2379,11 +2379,11 @@ func (ImageCommands) sepia(ctx *router.Ctx) {
 	_ = ctx.RespondText(fmt.Sprintf("https://api.lightning-bot.com/api/v3/imagegen/filter?url=%s&filter=sepia", url.QueryEscape(user.AvatarURL(""))))
 }
 
-func (ImageCommands) recaptcha(ctx *router.Ctx) {
+func (c *ImageCommands) recaptcha(ctx *router.Ctx) {
 	_ = ctx.RespondText(fmt.Sprintf("https://api.lightning-bot.com/api/v3/imagegen/captcha?text=%s", url.QueryEscape(ctx.Arguments.Raw())))
 }
 
-func (ImageCommands) gay(ctx *router.Ctx) {
+func (c *ImageCommands) gay(ctx *router.Ctx) {
 	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
 		user = ctx.Message.Author
@@ -2391,7 +2391,7 @@ func (ImageCommands) gay(ctx *router.Ctx) {
 	_ = ctx.RespondText(fmt.Sprintf("https://api.lightning-bot.com/api/v3/imagegen/filter?url=%s&filter=gay", url.QueryEscape(user.AvatarURL(""))))
 }
 
-func (ImageCommands) communist(ctx *router.Ctx) {
+func (c *ImageCommands) communist(ctx *router.Ctx) {
 	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
 		user = ctx.Message.Author
@@ -2399,7 +2399,7 @@ func (ImageCommands) communist(ctx *router.Ctx) {
 	_ = ctx.RespondText(fmt.Sprintf("https://api.lightning-bot.com/api/v3/imagegen/filter?url=%s&filter=communist", url.QueryEscape(user.AvatarURL(""))))
 }
 
-func (ImageCommands) snow(ctx *router.Ctx) {
+func (c *ImageCommands) snow(ctx *router.Ctx) {
 	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
 		user = ctx.Message.Author
@@ -2407,7 +2407,7 @@ func (ImageCommands) snow(ctx *router.Ctx) {
 	_ = ctx.RespondText(fmt.Sprintf("https://api.lightning-bot.com/api/v3/imagegen/filter?url=%s&filter=snow", url.QueryEscape(user.AvatarURL(""))))
 }
 
-func (ImageCommands) hub(ctx *router.Ctx) {
+func (c *ImageCommands) hub(ctx *router.Ctx) {
 	_ = ctx.RespondText(fmt.Sprintf(
 		"https://api.lightning-bot.com/api/v3/imagegen/pornhub?text1=%s&text2=%s",
 		url.QueryEscape(utils.Arguments["<\"text1\">"]),
@@ -2415,7 +2415,7 @@ func (ImageCommands) hub(ctx *router.Ctx) {
 	))
 }
 
-func (ImageCommands) floor(ctx *router.Ctx) {
+func (c *ImageCommands) floor(ctx *router.Ctx) {
 	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
 		user = ctx.Message.Author
@@ -2426,7 +2426,7 @@ func (ImageCommands) floor(ctx *router.Ctx) {
 	))
 }
 
-func (ImageCommands) jokeoverhead(ctx *router.Ctx) {
+func (c *ImageCommands) jokeoverhead(ctx *router.Ctx) {
 	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
 		user = ctx.Message.Author
@@ -2434,7 +2434,7 @@ func (ImageCommands) jokeoverhead(ctx *router.Ctx) {
 	_ = ctx.RespondText(fmt.Sprintf("https://api.lightning-bot.com/api/v3/imagegen/jokeoverhead?url=%s", url.QueryEscape(user.AvatarURL(""))))
 }
 
-func (ImageCommands) throwaway(ctx *router.Ctx) {
+func (c *ImageCommands) throwaway(ctx *router.Ctx) {
 	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
 		user = ctx.Message.Author
@@ -2445,7 +2445,7 @@ func (ImageCommands) throwaway(ctx *router.Ctx) {
 	))
 }
 
-func (ImageCommands) salty(ctx *router.Ctx) {
+func (c *ImageCommands) salty(ctx *router.Ctx) {
 	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
 		user = ctx.Message.Author
@@ -2453,11 +2453,11 @@ func (ImageCommands) salty(ctx *router.Ctx) {
 	_ = ctx.RespondText(fmt.Sprintf("https://api.lightning-bot.com/api/v3/imagegen/salty?url=%s", url.QueryEscape(user.AvatarURL(""))))
 }
 
-func (ImageCommands) scroll(ctx *router.Ctx) {
+func (c *ImageCommands) scroll(ctx *router.Ctx) {
 	_ = ctx.RespondText(fmt.Sprintf("https://api.lightning-bot.com/api/v3/imagegen/scroll?text=%s", url.QueryEscape(ctx.Arguments.Raw())))
 }
 
-func (ImageCommands) shame(ctx *router.Ctx) {
+func (c *ImageCommands) shame(ctx *router.Ctx) {
 	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
 		user = ctx.Message.Author
@@ -2465,7 +2465,7 @@ func (ImageCommands) shame(ctx *router.Ctx) {
 	_ = ctx.RespondText(fmt.Sprintf("https://api.lightning-bot.com/api/v3/imagegen/shame?url=%s", url.QueryEscape(user.AvatarURL(""))))
 }
 
-func (ImageCommands) ship(ctx *router.Ctx) {
+func (c *ImageCommands) ship(ctx *router.Ctx) {
 	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
 		user = ctx.Message.Author
@@ -2481,7 +2481,7 @@ func (ImageCommands) ship(ctx *router.Ctx) {
 	))
 }
 
-func (ImageCommands) what(ctx *router.Ctx) {
+func (c *ImageCommands) what(ctx *router.Ctx) {
 	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
 		user = ctx.Message.Author
@@ -2489,7 +2489,7 @@ func (ImageCommands) what(ctx *router.Ctx) {
 	_ = ctx.RespondText(fmt.Sprintf("https://api.lightning-bot.com/api/v3/imagegen/what?url=%s", url.QueryEscape(user.AvatarURL(""))))
 }
 
-func (ImageCommands) adios(ctx *router.Ctx) {
+func (c *ImageCommands) adios(ctx *router.Ctx) {
 	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
 		user = ctx.Message.Author
@@ -2497,7 +2497,7 @@ func (ImageCommands) adios(ctx *router.Ctx) {
 	_ = ctx.RespondText(fmt.Sprintf("https://vacefron.nl/api/adios?user=%s", url.QueryEscape(user.AvatarURL(""))))
 }
 
-func (ImageCommands) batmanslap(ctx *router.Ctx) {
+func (c *ImageCommands) batmanslap(ctx *router.Ctx) {
 	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
 		user = ctx.Message.Author
@@ -2515,11 +2515,11 @@ func (ImageCommands) batmanslap(ctx *router.Ctx) {
 	))
 }
 
-func (ImageCommands) carreverse(ctx *router.Ctx) {
+func (c *ImageCommands) carreverse(ctx *router.Ctx) {
 	_ = ctx.RespondText(fmt.Sprintf("https://vacefron.nl/api/carreverse?text=%s", url.QueryEscape(ctx.Arguments.Raw())))
 }
 
-func (ImageCommands) drip(ctx *router.Ctx) {
+func (c *ImageCommands) drip(ctx *router.Ctx) {
 	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
 		user = ctx.Message.Author
@@ -2527,21 +2527,21 @@ func (ImageCommands) drip(ctx *router.Ctx) {
 	_ = ctx.RespondText(fmt.Sprintf("https://vacefron.nl/api/drip?user=%s", url.QueryEscape(user.AvatarURL(""))))
 }
 
-func (ImageCommands) impostor(ctx *router.Ctx) {
+func (c *ImageCommands) impostor(ctx *router.Ctx) {
 	crewmate := random.Choice([]string{"black", "blue", "brown", "cyan", "darkgreen", "lime", "orange", "pink", "purple", "red", "white", "yellow"})
 	_ = ctx.RespondText(fmt.Sprintf("https://vacefron.nl/api/ejected?name=%s&impostor=true&crewmate=%s", ctx.Arguments.Raw(), crewmate))
 }
 
-func (ImageCommands) notimpostor(ctx *router.Ctx) {
+func (c *ImageCommands) notimpostor(ctx *router.Ctx) {
 	crewmate := random.Choice([]string{"black", "blue", "brown", "cyan", "darkgreen", "lime", "orange", "pink", "purple", "red", "white", "yellow"})
 	_ = ctx.RespondText(fmt.Sprintf("https://vacefron.nl/api/ejected?name=%s&impostor=false&crewmate=%s", ctx.Arguments.Raw(), crewmate))
 }
 
-func (ImageCommands) emergencymeeting(ctx *router.Ctx) {
+func (c *ImageCommands) emergencymeeting(ctx *router.Ctx) {
 	_ = ctx.RespondText(fmt.Sprintf("https://vacefron.nl/api/emergencymeeting?text=%s", url.QueryEscape(ctx.Arguments.Raw())))
 }
 
-func (ImageCommands) firsttime(ctx *router.Ctx) {
+func (c *ImageCommands) firsttime(ctx *router.Ctx) {
 	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
 		user = ctx.Message.Author
@@ -2549,7 +2549,7 @@ func (ImageCommands) firsttime(ctx *router.Ctx) {
 	_ = ctx.RespondText(fmt.Sprintf("https://vacefron.nl/api/firsttime?user=%s", url.QueryEscape(user.AvatarURL(""))))
 }
 
-func (ImageCommands) grave(ctx *router.Ctx) {
+func (c *ImageCommands) grave(ctx *router.Ctx) {
 	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
 		user = ctx.Message.Author
@@ -2557,7 +2557,7 @@ func (ImageCommands) grave(ctx *router.Ctx) {
 	_ = ctx.RespondText(fmt.Sprintf("https://vacefron.nl/api/grave?user=%s", url.QueryEscape(user.AvatarURL(""))))
 }
 
-func (ImageCommands) iamspeed(ctx *router.Ctx) {
+func (c *ImageCommands) iamspeed(ctx *router.Ctx) {
 	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
 		user = ctx.Message.Author
@@ -2565,7 +2565,7 @@ func (ImageCommands) iamspeed(ctx *router.Ctx) {
 	_ = ctx.RespondText(fmt.Sprintf("https://vacefron.nl/api/iamspeed?user=%s", url.QueryEscape(user.AvatarURL(""))))
 }
 
-func (ImageCommands) icanmilkyou(ctx *router.Ctx) {
+func (c *ImageCommands) icanmilkyou(ctx *router.Ctx) {
 	user1, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
 		user1 = ctx.Message.Author
@@ -2577,7 +2577,7 @@ func (ImageCommands) icanmilkyou(ctx *router.Ctx) {
 	_ = ctx.RespondText(fmt.Sprintf("https://vacefron.nl/api/icanmilkyou?user1=%s&user2=%s", url.QueryEscape(user1.AvatarURL("")), url.QueryEscape(user2.AvatarURL(""))))
 }
 
-func (ImageCommands) heaven(ctx *router.Ctx) {
+func (c *ImageCommands) heaven(ctx *router.Ctx) {
 	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
 		user = ctx.Message.Author
@@ -2585,11 +2585,11 @@ func (ImageCommands) heaven(ctx *router.Ctx) {
 	_ = ctx.RespondText(fmt.Sprintf("https://vacefron.nl/api/heaven?user=%s", url.QueryEscape(user.AvatarURL(""))))
 }
 
-func (ImageCommands) npc(ctx *router.Ctx) {
+func (c *ImageCommands) npc(ctx *router.Ctx) {
 	_ = ctx.RespondText(fmt.Sprintf("https://vacefron.nl/api/npc?text1=%s&text2=%s", url.QueryEscape(utils.Arguments["<\"text1\">"]), url.QueryEscape(utils.Arguments["<\"text2\">"])))
 }
 
-func (ImageCommands) stonks(ctx *router.Ctx) {
+func (c *ImageCommands) stonks(ctx *router.Ctx) {
 	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
 		user = ctx.Message.Author
@@ -2597,7 +2597,7 @@ func (ImageCommands) stonks(ctx *router.Ctx) {
 	_ = ctx.RespondText(fmt.Sprintf("https://vacefron.nl/api/stonks?user=%s", url.QueryEscape(user.AvatarURL(""))))
 }
 
-func (ImageCommands) notstonks(ctx *router.Ctx) {
+func (c *ImageCommands) notstonks(ctx *router.Ctx) {
 	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
 		user = ctx.Message.Author
@@ -2605,7 +2605,7 @@ func (ImageCommands) notstonks(ctx *router.Ctx) {
 	_ = ctx.RespondText(fmt.Sprintf("https://vacefron.nl/api/stonks?user=%s&notstonks=true", url.QueryEscape(user.AvatarURL(""))))
 }
 
-func (ImageCommands) fliptable(ctx *router.Ctx) {
+func (c *ImageCommands) fliptable(ctx *router.Ctx) {
 	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
 		user = ctx.Message.Author
@@ -2613,11 +2613,11 @@ func (ImageCommands) fliptable(ctx *router.Ctx) {
 	_ = ctx.RespondText(fmt.Sprintf("https://vacefron.nl/api/tableflip?user=%s", url.QueryEscape(user.AvatarURL(""))))
 }
 
-func (ImageCommands) water(ctx *router.Ctx) {
+func (c *ImageCommands) water(ctx *router.Ctx) {
 	_ = ctx.RespondText(fmt.Sprintf("https://vacefron.nl/api/water?text=%s", url.QueryEscape(ctx.Arguments.Raw())))
 }
 
-func (ImageCommands) wolverine(ctx *router.Ctx) {
+func (c *ImageCommands) wolverine(ctx *router.Ctx) {
 	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
 		user = ctx.Message.Author
@@ -2625,7 +2625,7 @@ func (ImageCommands) wolverine(ctx *router.Ctx) {
 	_ = ctx.RespondText(fmt.Sprintf("https://vacefron.nl/api/wolverine?user=%s", url.QueryEscape(user.AvatarURL(""))))
 }
 
-func (ImageCommands) womanyellingatcat(ctx *router.Ctx) {
+func (c *ImageCommands) womanyellingatcat(ctx *router.Ctx) {
 	user1, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
 		user1 = ctx.Message.Author
@@ -2637,7 +2637,7 @@ func (ImageCommands) womanyellingatcat(ctx *router.Ctx) {
 	_ = ctx.RespondText(fmt.Sprintf("https://vacefron.nl/api/womanyellingatcat?woman=%s&cat=%s", url.QueryEscape(user1.AvatarURL("")), url.QueryEscape(user2.AvatarURL(""))))
 }
 
-func (ImageCommands) pikachu(ctx *router.Ctx) {
+func (c *ImageCommands) pikachu(ctx *router.Ctx) {
 	imageUrl, err := utils.Misc.GetImageUrlFromJson("https://some-random-api.com/img/pikachu", "link")
 	if err != nil {
 		_ = ctx.RespondText("An error has occurred: " + err.Error())
@@ -2646,7 +2646,7 @@ func (ImageCommands) pikachu(ctx *router.Ctx) {
 	_ = ctx.RespondText(imageUrl)
 }
 
-func (ImageCommands) speechbubble(ctx *router.Ctx) {
+func (c *ImageCommands) speechbubble(ctx *router.Ctx) {
 	link := utils.Arguments["[link/attachment]"]
 
 	attachments := ctx.Message.Attachments
@@ -2682,7 +2682,7 @@ func (ImageCommands) speechbubble(ctx *router.Ctx) {
 	_ = ctx.RespondText("https://api.lightning-bot.com" + httpResponse.Header.Get("Location"))
 }
 
-func (ImageCommands) quotereply(ctx *router.Ctx) {
+func (c *ImageCommands) quotereply(ctx *router.Ctx) {
 	if ctx.Message.ReferencedMessage == nil {
 		c.services.Embed.NewEmbed().
 			SetDescription("You must reply to a message to use quotereply.").
@@ -2700,17 +2700,13 @@ func (ImageCommands) quotereply(ctx *router.Ctx) {
 	))
 }
 
-func (ImageCommands) quotemessage(ctx *router.Ctx) {
-	channel, success := utils.Discord.TryGetChannelFromMention(ctx, ctx.Arguments.Get(1))
-	if !success {
-		var err error
-		channel, err = ctx.Session.State.Channel(ctx.Message.ChannelID)
-		if err != nil {
-			c.services.Embed.NewEmbed().
-				SetDescription("Could not find channel.").
-				Send(ctx)
-			return
-		}
+func (c *ImageCommands) quotemessage(ctx *router.Ctx) {
+	channel, err := ctx.Arguments.Get(1).Channel(router.ArgumentFlagFallbackDefault)
+	if err != nil {
+		c.services.Embed.NewEmbed().
+			SetDescription("Could not find channel.").
+			Send(ctx)
+		return
 	}
 
 	m, err := utils.Discord.GetChannelMessage(ctx.Session, channel.ID, utils.Arguments["<message id>"])
@@ -2729,7 +2725,7 @@ func (ImageCommands) quotemessage(ctx *router.Ctx) {
 	))
 }
 
-func (ImageCommands) quoteuser(ctx *router.Ctx) {
+func (c *ImageCommands) quoteuser(ctx *router.Ctx) {
 	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
 		c.services.Embed.NewEmbed().
@@ -2746,7 +2742,7 @@ func (ImageCommands) quoteuser(ctx *router.Ctx) {
 	))
 }
 
-func (ImageCommands) quotetext(ctx *router.Ctx) {
+func (c *ImageCommands) quotetext(ctx *router.Ctx) {
 	_ = ctx.RespondText(fmt.Sprintf(
 		"https://api.lightning-bot.com/api/v3/imagegen/quote?author=%s&text=%s&background=%s",
 		url.QueryEscape(utils.Arguments["<\"author\">"]),
@@ -2755,7 +2751,7 @@ func (ImageCommands) quotetext(ctx *router.Ctx) {
 	))
 }
 
-func (ImageCommands) getRoleColor(ctx *router.Ctx, userID string) string {
+func (c *ImageCommands) getRoleColor(ctx *router.Ctx, userID string) string {
 	if ctx.Message.GuildID == "" {
 		return ""
 	}
@@ -2781,17 +2777,13 @@ func (ImageCommands) getRoleColor(ctx *router.Ctx, userID string) string {
 	return authorColor
 }
 
-func (i ImageCommands) discordquotemessage(ctx *router.Ctx) {
-	channel, success := utils.Discord.TryGetChannelFromMention(ctx, ctx.Arguments.Get(1))
-	if !success {
-		var err error
-		channel, err = ctx.Session.State.Channel(ctx.Message.ChannelID)
-		if err != nil {
-			c.services.Embed.NewEmbed().
-				SetDescription("Could not find channel.").
-				Send(ctx)
-			return
-		}
+func (c *ImageCommands) discordquotemessage(ctx *router.Ctx) {
+	channel, err := ctx.Arguments.Get(1).Channel(router.ArgumentFlagFallbackDefault)
+	if err != nil {
+		c.services.Embed.NewEmbed().
+			SetDescription("Could not find channel.").
+			Send(ctx)
+		return
 	}
 
 	m, err := utils.Discord.GetChannelMessage(ctx.Session, channel.ID, utils.Arguments["<message id>"])
@@ -2802,7 +2794,7 @@ func (i ImageCommands) discordquotemessage(ctx *router.Ctx) {
 		return
 	}
 
-	authorColor := i.getRoleColor(ctx, m.Author.ID)
+	authorColor := c.getRoleColor(ctx, m.Author.ID)
 
 	_ = ctx.RespondText(fmt.Sprintf(
 		"https://api.lightning-bot.com/api/v3/imagegen/discordquote?author=%s&author_url=%s&author_color=%s&text=%s&timestamp=%s",
@@ -2814,7 +2806,7 @@ func (i ImageCommands) discordquotemessage(ctx *router.Ctx) {
 	))
 }
 
-func (i ImageCommands) discordquotereply(ctx *router.Ctx) {
+func (c *ImageCommands) discordquotereply(ctx *router.Ctx) {
 	if ctx.Message.ReferencedMessage == nil {
 		c.services.Embed.NewEmbed().
 			SetDescription("You must reply to a message to use quotereply.").
@@ -2824,7 +2816,7 @@ func (i ImageCommands) discordquotereply(ctx *router.Ctx) {
 
 	m := ctx.Message.ReferencedMessage
 
-	authorColor := i.getRoleColor(ctx, m.Author.ID)
+	authorColor := c.getRoleColor(ctx, m.Author.ID)
 
 	_ = ctx.RespondText(fmt.Sprintf(
 		"https://api.lightning-bot.com/api/v3/imagegen/discordquote?author=%s&author_url=%s&author_color=%s&text=%s&timestamp=%s",
@@ -2836,7 +2828,7 @@ func (i ImageCommands) discordquotereply(ctx *router.Ctx) {
 	))
 }
 
-func (ImageCommands) discordquoteuser(ctx *router.Ctx) {
+func (c *ImageCommands) discordquoteuser(ctx *router.Ctx) {
 	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
 	if !success {
 		c.services.Embed.NewEmbed().
@@ -2853,7 +2845,7 @@ func (ImageCommands) discordquoteuser(ctx *router.Ctx) {
 	))
 }
 
-func (ImageCommands) discordquotetext(ctx *router.Ctx) {
+func (c *ImageCommands) discordquotetext(ctx *router.Ctx) {
 	_ = ctx.RespondText(fmt.Sprintf(
 		"https://api.lightning-bot.com/api/v3/imagegen/discordquote?author=%s&author_url=%s&text=%s",
 		url.QueryEscape(utils.Arguments["<\"author\">"]),

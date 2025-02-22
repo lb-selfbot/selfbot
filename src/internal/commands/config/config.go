@@ -10,8 +10,6 @@ import (
 	"github.com/LightningDev1/LB-Selfbot/internal/config"
 	"github.com/LightningDev1/LB-Selfbot/internal/router"
 	"github.com/LightningDev1/LB-Selfbot/internal/services"
-	"github.com/LightningDev1/LB-Selfbot/selfbot/eventreactions"
-	"github.com/LightningDev1/LB-Selfbot/selfbot/logging"
 
 	"github.com/LightningDev1/LB-Selfbot/internal/utils"
 	"github.com/LightningDev1/dgc"
@@ -1770,8 +1768,8 @@ func (ConfigCommands) poketwochannels(ctx *router.Ctx) {
 			AddField("PokéTwo Sniper Channels", strings.Join(channels, "\n")).
 			Send(ctx)
 	case "add":
-		channel, success := utils.Discord.TryGetChannelFromMention(ctx, ctx.Arguments.Get(1))
-		if !success {
+		channel, err := ctx.Arguments.Get(1).Channel()
+		if err != nil {
 			_ = ctx.RespondText("Could not find channel")
 			return
 		}
@@ -1788,8 +1786,8 @@ func (ConfigCommands) poketwochannels(ctx *router.Ctx) {
 			SetDescription(fmt.Sprintf("Added %s to the PokéTwo sniper catch list.", channel.Mention())).
 			Send(ctx)
 	case "rm":
-		channel, success := utils.Discord.TryGetChannelFromMention(ctx, ctx.Arguments.Get(1))
-		if !success {
+		channel, err := ctx.Arguments.Get(1).Channel()
+		if err != nil {
 			_ = ctx.RespondText("Could not find channel")
 			return
 		}

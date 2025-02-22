@@ -141,7 +141,14 @@ func (a *Argument) Int() (int, error) {
 
 // Bool returns the argument as a bool.
 func (a *Argument) Bool() (bool, error) {
-	return strconv.ParseBool(a.raw)
+	switch arg := strings.ToLower(a.raw); arg {
+	case "on":
+		return true, nil
+	case "off":
+		return false, nil
+	default:
+		return strconv.ParseBool(arg)
+	}
 }
 
 // MustBool returns the argument as a bool or panics if it fails.
@@ -196,7 +203,13 @@ func (a *Argument) MustFloat64() float64 {
 
 // Duration returns the argument as a duration.
 func (a *Argument) Duration() (time.Duration, error) {
-	return time.ParseDuration(a.raw)
+	d, err := time.ParseDuration(a.raw)
+	if err == nil {
+		return d, nil
+	}
+
+	// Fallback to seconds
+	return time.ParseDuration(a.raw + "s")
 }
 
 // MustDuration returns the argument as a duration or panics if it fails.

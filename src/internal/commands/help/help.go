@@ -11,7 +11,7 @@ import (
 	"github.com/LightningDev1/LB-Selfbot/internal/services"
 	"github.com/LightningDev1/LB-Selfbot/internal/utils"
 	"github.com/LightningDev1/LB-Selfbot/selfbot/embed"
-	"github.com/LightningDev1/LB-Selfbot/selfbot/eventreactions"
+
 	"github.com/LightningDev1/dgc"
 	"github.com/LightningDev1/discordgo"
 )

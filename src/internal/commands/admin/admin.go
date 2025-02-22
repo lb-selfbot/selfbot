@@ -578,8 +578,8 @@ func (c *AdminCommands) Register() {
 // Channel Control
 
 func (*AdminCommands) channelinfo(ctx *router.Ctx) {
-	channel, success := utils.Discord.TryGetChannelFromMention(ctx, ctx.Arguments.Get(0))
-	if !success {
+	channel, err := ctx.Arguments.Get(0).Channel()
+	if err != nil {
 		_ = ctx.RespondText("Could not find channel")
 		return
 	}
@@ -688,8 +688,8 @@ func (*AdminCommands) category(ctx *router.Ctx) {
 }
 
 func (*AdminCommands) deletecategory(ctx *router.Ctx) {
-	channel, success := utils.Discord.TryGetChannelFromMention(ctx, ctx.Arguments.Get(0))
-	if !success {
+	channel, err := ctx.Arguments.Get(0).Channel()
+	if err != nil {
 		_ = ctx.RespondText("Could not find category")
 		return
 	}
@@ -705,8 +705,8 @@ func (*AdminCommands) deletecategory(ctx *router.Ctx) {
 }
 
 func (*AdminCommands) renamechannel(ctx *router.Ctx) {
-	channel, success := utils.Discord.TryGetChannelFromMention(ctx, ctx.Arguments.Get(0))
-	if !success {
+	channel, err := ctx.Arguments.Get(0).Channel()
+	if err != nil {
 		_ = ctx.RespondText("Could not find channel")
 		return
 	}
@@ -726,8 +726,8 @@ func (*AdminCommands) renamechannel(ctx *router.Ctx) {
 }
 
 func (*AdminCommands) deletechannel(ctx *router.Ctx) {
-	channel, success := utils.Discord.TryGetChannelFromMention(ctx, ctx.Arguments.Get(0))
-	if !success {
+	channel, err := ctx.Arguments.Get(0).Channel()
+	if err != nil {
 		_ = ctx.RespondText("Could not find channel")
 		return
 	}
@@ -744,8 +744,8 @@ func (*AdminCommands) deletechannel(ctx *router.Ctx) {
 }
 
 func (*AdminCommands) slowmode(ctx *router.Ctx) {
-	channel, success := utils.Discord.TryGetChannelFromMention(ctx, ctx.Arguments.Get(0))
-	if !success {
+	channel, err := ctx.Arguments.Get(0).Channel()
+	if err != nil {
 		_ = ctx.RespondText("Could not find channel")
 		return
 	}
@@ -772,8 +772,8 @@ func (*AdminCommands) slowmode(ctx *router.Ctx) {
 }
 
 func (*AdminCommands) removeslowmode(ctx *router.Ctx) {
-	channel, success := utils.Discord.TryGetChannelFromMention(ctx, ctx.Arguments.Get(0))
-	if !success {
+	channel, err := ctx.Arguments.Get(0).Channel()
+	if err != nil {
 		_ = ctx.RespondText("Could not find channel")
 		return
 	}
@@ -794,8 +794,8 @@ func (*AdminCommands) removeslowmode(ctx *router.Ctx) {
 }
 
 func (*AdminCommands) lockchannel(ctx *router.Ctx) {
-	channel, success := utils.Discord.TryGetChannelFromMention(ctx, ctx.Arguments.Get(0))
-	if !success {
+	channel, err := ctx.Arguments.Get(0).Channel()
+	if err != nil {
 		_ = ctx.RespondText("Could not find channel")
 		return
 	}
@@ -822,8 +822,8 @@ func (*AdminCommands) lockchannel(ctx *router.Ctx) {
 }
 
 func (*AdminCommands) unlockchannel(ctx *router.Ctx) {
-	channel, success := utils.Discord.TryGetChannelFromMention(ctx, ctx.Arguments.Get(0))
-	if !success {
+	channel, err := ctx.Arguments.Get(0).Channel()
+	if err != nil {
 		_ = ctx.RespondText("Could not find channel")
 		return
 	}
@@ -861,7 +861,7 @@ func (*AdminCommands) purge(ctx *router.Ctx) {
 		delay = 1
 	}
 
-	channel, success := utils.Discord.TryGetChannelFromMention(ctx, ctx.Arguments.Get(2))
+	channel, success := ctx.Arguments.Get(2).Channel()
 	channelID := ctx.Message.ChannelID
 	if success {
 		channelID = channel.ID
@@ -896,7 +896,7 @@ func (*AdminCommands) purgeself(ctx *router.Ctx) {
 		delaySec = 1
 	}
 
-	channel, success := utils.Discord.TryGetChannelFromMention(ctx, ctx.Arguments.Get(2))
+	channel, success := ctx.Arguments.Get(2).Channel()
 	channelID := ctx.Message.ChannelID
 	if success {
 		channelID = channel.ID
@@ -926,8 +926,8 @@ func (*AdminCommands) purgeuser(ctx *router.Ctx) {
 		return
 	}
 
-	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(1))
-	if !success {
+	user, err := ctx.Arguments.Get(1).User()
+	if err != nil {
 		_ = ctx.RespondText("Could not find user")
 		return
 	}
@@ -937,7 +937,7 @@ func (*AdminCommands) purgeuser(ctx *router.Ctx) {
 		delaySec = 1
 	}
 
-	channel, success := utils.Discord.TryGetChannelFromMention(ctx, ctx.Arguments.Get(3))
+	channel, success := ctx.Arguments.Get(3).Channel()
 	channelID := ctx.Message.ChannelID
 	if success {
 		channelID = channel.ID
@@ -960,7 +960,7 @@ func (*AdminCommands) purgeuser(ctx *router.Ctx) {
 }
 
 func (*AdminCommands) purgerange(ctx *router.Ctx) {
-	channel, success := utils.Discord.TryGetChannelFromMention(ctx, ctx.Arguments.Get(2))
+	channel, success := ctx.Arguments.Get(2).Channel()
 	channelID := ctx.Message.ChannelID
 	if success {
 		channelID = channel.ID
@@ -995,13 +995,10 @@ func (*AdminCommands) purgerange(ctx *router.Ctx) {
 }
 
 func (*AdminCommands) nuke(ctx *router.Ctx) {
-	channel, success := utils.Discord.TryGetChannelFromMention(ctx, ctx.Arguments.Get(0))
-	if !success {
-		channel, _ = ctx.Session.State.Channel(ctx.Message.ChannelID)
-		if channel == nil {
-			_ = ctx.RespondText("Could not find channel")
-			return
-		}
+	channel, err := ctx.Arguments.Get(0).Channel(router.ArgumentFlagFallbackDefault)
+	if err != nil {
+		_ = ctx.RespondText("Could not find channel")
+		return
 	}
 
 	_, err := ctx.Session.ChannelDelete(channel.ID)
@@ -1038,13 +1035,10 @@ func (*AdminCommands) nuke(ctx *router.Ctx) {
 }
 
 func (*AdminCommands) ackchannel(ctx *router.Ctx) {
-	channel, success := utils.Discord.TryGetChannelFromMention(ctx, ctx.Arguments.Get(0))
-	if !success {
-		channel, _ = ctx.Session.State.Channel(ctx.Message.ChannelID)
-		if channel == nil {
-			_ = ctx.RespondText("Could not find channel")
-			return
-		}
+	channel, err := ctx.Arguments.Get(0).Channel(router.ArgumentFlagFallbackDefault)
+	if err != nil {
+		_ = ctx.RespondText("Could not find channel")
+		return
 	}
 	messages, _ := utils.Discord.GetChannelMessages(ctx.Session, channel.ID, 50)
 	if len(messages) > 0 {
@@ -1053,8 +1047,8 @@ func (*AdminCommands) ackchannel(ctx *router.Ctx) {
 }
 
 func (*AdminCommands) ackmessage(ctx *router.Ctx) {
-	channel, success := utils.Discord.TryGetChannelFromMention(ctx, ctx.Arguments.Get(0))
-	if !success {
+	channel, err := ctx.Arguments.Get(0).Channel()
+	if err != nil {
 		_ = ctx.RespondText("Could not find channel")
 		return
 	}
@@ -1254,8 +1248,8 @@ func (*AdminCommands) userinfo(ctx *router.Ctx) {
 }
 
 func (*AdminCommands) userage(ctx *router.Ctx) {
-	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
-	if !success {
+	user, err := ctx.Arguments.Get(0).User()
+	if err != nil {
 		_ = ctx.RespondText("Could not find user")
 		return
 	}
@@ -1267,8 +1261,8 @@ func (*AdminCommands) userage(ctx *router.Ctx) {
 }
 
 func (*AdminCommands) mutualfriends(ctx *router.Ctx) {
-	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
-	if !success {
+	user, err := ctx.Arguments.Get(0).User()
+	if err != nil {
 		_ = ctx.RespondText("Could not find user")
 		return
 	}
@@ -1288,8 +1282,8 @@ func (*AdminCommands) mutualfriends(ctx *router.Ctx) {
 }
 
 func (*AdminCommands) mutualservers(ctx *router.Ctx) {
-	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
-	if !success {
+	user, err := ctx.Arguments.Get(0).User()
+	if err != nil {
 		_ = ctx.RespondText("Could not find user")
 		return
 	}
@@ -1338,8 +1332,8 @@ func (*AdminCommands) platform(ctx *router.Ctx) {
 }
 
 func (*AdminCommands) avatar(ctx *router.Ctx) {
-	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
-	if !success {
+	user, err := ctx.Arguments.Get(0).User()
+	if err != nil {
 		_ = ctx.RespondText("Could not find user")
 		return
 	}
@@ -1351,8 +1345,8 @@ func (*AdminCommands) avatar(ctx *router.Ctx) {
 }
 
 func (*AdminCommands) banner(ctx *router.Ctx) {
-	user, success := utils.Discord.TryGetUserFromMention(ctx.Session, ctx.Arguments.Get(0))
-	if !success {
+	user, err := ctx.Arguments.Get(0).User()
+	if err != nil {
 		_ = ctx.RespondText("Could not find user")
 		return
 	}
@@ -2084,7 +2078,7 @@ func (*AdminCommands) deleteserver(ctx *router.Ctx) {
 // Invite Control
 
 func (*AdminCommands) invite(ctx *router.Ctx) {
-	channel, success := utils.Discord.TryGetChannelFromMention(ctx, ctx.Arguments.Get(0))
+	channel, success := ctx.Arguments.Get(0).Channel()
 	channelID := ctx.Message.ChannelID
 	if success {
 		channelID = channel.ID
@@ -2203,7 +2197,7 @@ func (m *AdminCommands) serverinvites(ctx *router.Ctx) {
 }
 
 func (m *AdminCommands) channelinvites(ctx *router.Ctx) {
-	channel, success := utils.Discord.TryGetChannelFromMention(ctx, ctx.Arguments.Get(0))
+	channel, success := ctx.Arguments.Get(0).Channel()
 	channelID := ctx.Message.ChannelID
 	if success {
 		channelID = channel.ID

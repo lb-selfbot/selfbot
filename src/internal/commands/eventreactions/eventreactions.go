@@ -10,7 +10,7 @@ import (
 	"github.com/LightningDev1/LB-Selfbot/internal/router"
 	"github.com/LightningDev1/LB-Selfbot/internal/services"
 	"github.com/LightningDev1/LB-Selfbot/internal/utils"
-	"github.com/LightningDev1/LB-Selfbot/selfbot/eventreactions"
+
 	"github.com/LightningDev1/dgc"
 	"github.com/LightningDev1/discordgo"
 )
@@ -577,8 +577,8 @@ func (e EventReactionsCommands) pingairesponse(ctx *router.Ctx) {
 func (e EventReactionsCommands) mirrorchannel(ctx *router.Ctx) {
 	switch strings.ToLower(utils.Arguments["<toggle/list/clear>"]) {
 	case "toggle":
-		srcChannel, srcOk := utils.Discord.TryGetChannelFromMention(ctx, ctx.Arguments.Get(1))
-		destChannel, destOk := utils.Discord.TryGetChannelFromMention(ctx, ctx.Arguments.Get(2))
+		srcChannel, srcOk := ctx.Arguments.Get(1).Channel()
+		destChannel, destOk := ctx.Arguments.Get(2).Channel()
 		if !srcOk || !destOk {
 			c.services.Embed.NewEmbed().
 				SetDescription("Could not find channel").

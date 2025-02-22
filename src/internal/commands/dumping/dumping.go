@@ -108,8 +108,8 @@ func (c *DumpingCommands) Register() {
 }
 
 func (*DumpingCommands) dumpall(ctx *router.Ctx) {
-	channel, success := utils.Discord.TryGetChannelFromMention(ctx, ctx.Arguments.Get(0))
-	if !success {
+	channel, err := ctx.Arguments.Get(0).Channel()
+	if err != nil {
 		channel, _ = utils.Discord.GetChannel(ctx.Session, ctx.Message.ChannelID)
 	}
 	if channel == nil {
@@ -155,8 +155,8 @@ func (*DumpingCommands) dumpall(ctx *router.Ctx) {
 }
 
 func (*DumpingCommands) dumpimages(ctx *router.Ctx) {
-	channel, success := utils.Discord.TryGetChannelFromMention(ctx, ctx.Arguments.Get(0))
-	if !success {
+	channel, err := ctx.Arguments.Get(0).Channel()
+	if err != nil {
 		channel, _ = utils.Discord.GetChannel(ctx.Session, ctx.Message.ChannelID)
 	}
 	if channel == nil {
@@ -197,8 +197,8 @@ func (*DumpingCommands) dumpimages(ctx *router.Ctx) {
 }
 
 func (*DumpingCommands) dumpvideos(ctx *router.Ctx) {
-	channel, success := utils.Discord.TryGetChannelFromMention(ctx, ctx.Arguments.Get(0))
-	if !success {
+	channel, err := ctx.Arguments.Get(0).Channel()
+	if err != nil {
 		channel, _ = utils.Discord.GetChannel(ctx.Session, ctx.Message.ChannelID)
 	}
 	if channel == nil {
@@ -239,8 +239,8 @@ func (*DumpingCommands) dumpvideos(ctx *router.Ctx) {
 }
 
 func (*DumpingCommands) dumpaudio(ctx *router.Ctx) {
-	channel, success := utils.Discord.TryGetChannelFromMention(ctx, ctx.Arguments.Get(0))
-	if !success {
+	channel, err := ctx.Arguments.Get(0).Channel()
+	if err != nil {
 		channel, _ = utils.Discord.GetChannel(ctx.Session, ctx.Message.ChannelID)
 	}
 	if channel == nil {
@@ -281,8 +281,8 @@ func (*DumpingCommands) dumpaudio(ctx *router.Ctx) {
 }
 
 func (*DumpingCommands) dumptext(ctx *router.Ctx) {
-	channel, success := utils.Discord.TryGetChannelFromMention(ctx, ctx.Arguments.Get(0))
-	if !success {
+	channel, err := ctx.Arguments.Get(0).Channel()
+	if err != nil {
 		channel, _ = utils.Discord.GetChannel(ctx.Session, ctx.Message.ChannelID)
 	}
 	if channel == nil {
@@ -323,8 +323,8 @@ func (*DumpingCommands) dumptext(ctx *router.Ctx) {
 }
 
 func (*DumpingCommands) dumpattachments(ctx *router.Ctx) {
-	channel, success := utils.Discord.TryGetChannelFromMention(ctx, ctx.Arguments.Get(0))
-	if !success {
+	channel, err := ctx.Arguments.Get(0).Channel()
+	if err != nil {
 		channel, _ = utils.Discord.GetChannel(ctx.Session, ctx.Message.ChannelID)
 	}
 	if channel == nil {
@@ -363,8 +363,8 @@ func (*DumpingCommands) dumpattachments(ctx *router.Ctx) {
 func (*DumpingCommands) dumpfiletype(ctx *router.Ctx) {
 	extension := strings.ReplaceAll(utils.Arguments["<extension>"], ".", "")
 
-	channel, success := utils.Discord.TryGetChannelFromMention(ctx, ctx.Arguments.Get(1))
-	if !success {
+	channel, err := ctx.Arguments.Get(1).Channel()
+	if err != nil {
 		channel, _ = utils.Discord.GetChannel(ctx.Session, ctx.Message.ChannelID)
 	}
 	if channel == nil {
@@ -407,8 +407,8 @@ func (*DumpingCommands) dumpfiletype(ctx *router.Ctx) {
 func (*DumpingCommands) dumpcontenttype(ctx *router.Ctx) {
 	contentType := strings.ToLower(utils.Arguments["<content type>"])
 
-	channel, success := utils.Discord.TryGetChannelFromMention(ctx, ctx.Arguments.Get(1))
-	if !success {
+	channel, err := ctx.Arguments.Get(1).Channel()
+	if err != nil {
 		channel, _ = utils.Discord.GetChannel(ctx.Session, ctx.Message.ChannelID)
 	}
 	if channel == nil {
