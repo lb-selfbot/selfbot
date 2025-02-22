@@ -527,7 +527,7 @@ func (e EventReactionsCommands) pingReaction(ctx *router.Ctx, reactionType event
 		eventreactions.RemoveAll(reactionType)
 
 		c.services.Embed.NewEmbed().
-			SetDescription(fmt.Sprintf("Cleared all ping --> %s reactions.", reaction)).
+			SetDescription("Cleared all ping --> %s reactions.", reaction).
 			Send(ctx)
 	default:
 		c.services.Embed.NewEmbed().
@@ -905,7 +905,7 @@ func (e EventReactionsCommands) reactspam(ctx *router.Ctx) {
 		reaction.Reaction = strings.ReplaceAll(reaction.Reaction, ">", "")
 
 		if reaction.Reaction == "" {
-			_ = ctx.RespondText("Reaction cannot be empty!")
+			ctx.RespondText("Reaction cannot be empty!")
 			return
 		}
 
@@ -1246,7 +1246,7 @@ func (e EventReactionsCommands) antigroupchat(ctx *router.Ctx) {
 
 	rawToggle := strings.ToLower(utils.Arguments["<on/off>"])
 	if rawToggle != "on" && rawToggle != "off" {
-		_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
+		ctx.RespondText("Invalid value. Use `on` or `off`.")
 		return
 	}
 	toggle = rawToggle == "on"
@@ -1279,7 +1279,7 @@ func (e EventReactionsCommands) antideletemessages(ctx *router.Ctx) {
 	case "toggle":
 		channel, success := utils.Discord.TryGetChannelFromMentionWithDefault(ctx, ctx.Arguments.Get(1))
 		if !success {
-			_ = ctx.RespondText("Could not find channel")
+			ctx.RespondText("Could not find channel")
 			return
 		}
 
@@ -1306,7 +1306,7 @@ func (e EventReactionsCommands) antideletemessages(ctx *router.Ctx) {
 func (EventReactionsCommands) afkresponder(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
-		_ = ctx.RespondText("Error getting config")
+		ctx.RespondText("Error getting config")
 		return
 	}
 
@@ -1318,7 +1318,7 @@ func (EventReactionsCommands) afkresponder(ctx *router.Ctx) {
 	case "set":
 		toggle := strings.ToLower(utils.Arguments["[on/off]"])
 		if toggle != "on" && toggle != "off" {
-			_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
+			ctx.RespondText("Invalid value. Use `on` or `off`.")
 			return
 		}
 
@@ -1336,14 +1336,14 @@ func (EventReactionsCommands) afkresponder(ctx *router.Ctx) {
 			SetDescription("Turned " + utils.Misc.FormatBoolOnOff(cfg.AFK.Enabled) + " AFK Responder").
 			Send(ctx)
 	default:
-		_ = ctx.RespondText("Invalid <get/set/toggle> argument. Use `get`, `set` or `toggle`.")
+		ctx.RespondText("Invalid <get/set/toggle> argument. Use `get`, `set` or `toggle`.")
 	}
 }
 
 func (EventReactionsCommands) afkonping(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
-		_ = ctx.RespondText("Error getting config")
+		ctx.RespondText("Error getting config")
 		return
 	}
 
@@ -1355,7 +1355,7 @@ func (EventReactionsCommands) afkonping(ctx *router.Ctx) {
 	case "set":
 		toggle := strings.ToLower(utils.Arguments["[on/off]"])
 		if toggle != "on" && toggle != "off" {
-			_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
+			ctx.RespondText("Invalid value. Use `on` or `off`.")
 			return
 		}
 
@@ -1373,14 +1373,14 @@ func (EventReactionsCommands) afkonping(ctx *router.Ctx) {
 			SetDescription("Turned " + utils.Misc.FormatBoolOnOff(cfg.AFK.OnPing) + " AFK On Ping").
 			Send(ctx)
 	default:
-		_ = ctx.RespondText("Invalid <get/set/toggle> argument. Use `get`, `set` or `toggle`.")
+		ctx.RespondText("Invalid <get/set/toggle> argument. Use `get`, `set` or `toggle`.")
 	}
 }
 
 func (EventReactionsCommands) afkondm(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
-		_ = ctx.RespondText("Error getting config")
+		ctx.RespondText("Error getting config")
 		return
 	}
 
@@ -1392,7 +1392,7 @@ func (EventReactionsCommands) afkondm(ctx *router.Ctx) {
 	case "set":
 		toggle := strings.ToLower(utils.Arguments["[on/off]"])
 		if toggle != "on" && toggle != "off" {
-			_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
+			ctx.RespondText("Invalid value. Use `on` or `off`.")
 			return
 		}
 
@@ -1410,14 +1410,14 @@ func (EventReactionsCommands) afkondm(ctx *router.Ctx) {
 			SetDescription("Turned " + utils.Misc.FormatBoolOnOff(cfg.AFK.OnDM) + " AFK On DM").
 			Send(ctx)
 	default:
-		_ = ctx.RespondText("Invalid <get/set/toggle> argument. Use `get`, `set` or `toggle`.")
+		ctx.RespondText("Invalid <get/set/toggle> argument. Use `get`, `set` or `toggle`.")
 	}
 }
 
 func (EventReactionsCommands) afkdelay(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
-		_ = ctx.RespondText("Error getting config")
+		ctx.RespondText("Error getting config")
 		return
 	}
 
@@ -1431,7 +1431,7 @@ func (EventReactionsCommands) afkdelay(ctx *router.Ctx) {
 	case "set":
 		delay, err := utils.Misc.ParseDuration(utils.Arguments["[value]"])
 		if err != nil {
-			_ = ctx.RespondText("Invalid duration: " + err.Error())
+			ctx.RespondText("Invalid duration: " + err.Error())
 			return
 		}
 
@@ -1441,17 +1441,17 @@ func (EventReactionsCommands) afkdelay(ctx *router.Ctx) {
 		formatted := utils.Misc.FormatDuration(time.Duration(cfg.AFK.Delay) * time.Second)
 
 		c.services.Embed.NewEmbed().
-			SetDescription(fmt.Sprintf("AFK Delay set to %s.", formatted)).
+			SetDescription("AFK Delay set to %s.", formatted).
 			Send(ctx)
 	default:
-		_ = ctx.RespondText("Invalid <get/set> argument. Use `get` or `set`.")
+		ctx.RespondText("Invalid <get/set> argument. Use `get` or `set`.")
 	}
 }
 
 func (EventReactionsCommands) afkrandomdelay(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
-		_ = ctx.RespondText("Error getting config")
+		ctx.RespondText("Error getting config")
 		return
 	}
 
@@ -1463,7 +1463,7 @@ func (EventReactionsCommands) afkrandomdelay(ctx *router.Ctx) {
 	case "set":
 		toggle := strings.ToLower(utils.Arguments["[on/off]"])
 		if toggle != "on" && toggle != "off" {
-			_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
+			ctx.RespondText("Invalid value. Use `on` or `off`.")
 			return
 		}
 
@@ -1481,14 +1481,14 @@ func (EventReactionsCommands) afkrandomdelay(ctx *router.Ctx) {
 			SetDescription("Turned " + utils.Misc.FormatBoolOnOff(cfg.AFK.RandomDelay) + " AFK Random Delay").
 			Send(ctx)
 	default:
-		_ = ctx.RespondText("Invalid <get/set/toggle> argument. Use `get`, `set` or `toggle`.")
+		ctx.RespondText("Invalid <get/set/toggle> argument. Use `get`, `set` or `toggle`.")
 	}
 }
 
 func (EventReactionsCommands) afkinactive(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
-		_ = ctx.RespondText("Error getting config")
+		ctx.RespondText("Error getting config")
 		return
 	}
 
@@ -1500,7 +1500,7 @@ func (EventReactionsCommands) afkinactive(ctx *router.Ctx) {
 	case "set":
 		toggle := strings.ToLower(utils.Arguments["[on/off]"])
 		if toggle != "on" && toggle != "off" {
-			_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
+			ctx.RespondText("Invalid value. Use `on` or `off`.")
 			return
 		}
 
@@ -1518,14 +1518,14 @@ func (EventReactionsCommands) afkinactive(ctx *router.Ctx) {
 			SetDescription("Turned " + utils.Misc.FormatBoolOnOff(cfg.AFK.MustBeInactive) + " AFK Must Be Inactive").
 			Send(ctx)
 	default:
-		_ = ctx.RespondText("Invalid <get/set/toggle> argument. Use `get`, `set` or `toggle`.")
+		ctx.RespondText("Invalid <get/set/toggle> argument. Use `get`, `set` or `toggle`.")
 	}
 }
 
 func (EventReactionsCommands) afkinactivetimeout(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
-		_ = ctx.RespondText("Error getting config")
+		ctx.RespondText("Error getting config")
 		return
 	}
 
@@ -1539,7 +1539,7 @@ func (EventReactionsCommands) afkinactivetimeout(ctx *router.Ctx) {
 	case "set":
 		delay, err := utils.Misc.ParseDuration(utils.Arguments["[value]"])
 		if err != nil {
-			_ = ctx.RespondText("Invalid duration: " + err.Error())
+			ctx.RespondText("Invalid duration: " + err.Error())
 			return
 		}
 
@@ -1549,17 +1549,17 @@ func (EventReactionsCommands) afkinactivetimeout(ctx *router.Ctx) {
 		formatted := utils.Misc.FormatDuration(time.Duration(cfg.AFK.InactiveTimeout) * time.Second)
 
 		c.services.Embed.NewEmbed().
-			SetDescription(fmt.Sprintf("AFK Inactive Timeout set to %s.", formatted)).
+			SetDescription("AFK Inactive Timeout set to %s.", formatted).
 			Send(ctx)
 	default:
-		_ = ctx.RespondText("Invalid <get/set> argument. Use `get` or `set`.")
+		ctx.RespondText("Invalid <get/set> argument. Use `get` or `set`.")
 	}
 }
 
 func (EventReactionsCommands) afktyping(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
-		_ = ctx.RespondText("Error getting config")
+		ctx.RespondText("Error getting config")
 		return
 	}
 
@@ -1571,7 +1571,7 @@ func (EventReactionsCommands) afktyping(ctx *router.Ctx) {
 	case "set":
 		toggle := strings.ToLower(utils.Arguments["[on/off]"])
 		if toggle != "on" && toggle != "off" {
-			_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
+			ctx.RespondText("Invalid value. Use `on` or `off`.")
 			return
 		}
 
@@ -1589,14 +1589,14 @@ func (EventReactionsCommands) afktyping(ctx *router.Ctx) {
 			SetDescription("Turned " + utils.Misc.FormatBoolOnOff(cfg.AFK.Typing) + " AFK Typing").
 			Send(ctx)
 	default:
-		_ = ctx.RespondText("Invalid <get/set/toggle> argument. Use `get`, `set` or `toggle`.")
+		ctx.RespondText("Invalid <get/set/toggle> argument. Use `get`, `set` or `toggle`.")
 	}
 }
 
 func (EventReactionsCommands) afkai(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
-		_ = ctx.RespondText("Error getting config")
+		ctx.RespondText("Error getting config")
 		return
 	}
 
@@ -1608,7 +1608,7 @@ func (EventReactionsCommands) afkai(ctx *router.Ctx) {
 	case "set":
 		toggle := strings.ToLower(utils.Arguments["[on/off]"])
 		if toggle != "on" && toggle != "off" {
-			_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
+			ctx.RespondText("Invalid value. Use `on` or `off`.")
 			return
 		}
 
@@ -1626,14 +1626,14 @@ func (EventReactionsCommands) afkai(ctx *router.Ctx) {
 			SetDescription("Turned " + utils.Misc.FormatBoolOnOff(cfg.AFK.AI) + " AFK AI Response").
 			Send(ctx)
 	default:
-		_ = ctx.RespondText("Invalid <get/set/toggle> argument. Use `get`, `set` or `toggle`.")
+		ctx.RespondText("Invalid <get/set/toggle> argument. Use `get`, `set` or `toggle`.")
 	}
 }
 
 func (EventReactionsCommands) afkmessage(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
-		_ = ctx.RespondText("Error getting config")
+		ctx.RespondText("Error getting config")
 		return
 	}
 
@@ -1652,14 +1652,14 @@ func (EventReactionsCommands) afkmessage(ctx *router.Ctx) {
 			SetDescription("AFK Message set to " + value).
 			Send(ctx)
 	default:
-		_ = ctx.RespondText("Invalid <get/set> argument. Use `get` or `set`.")
+		ctx.RespondText("Invalid <get/set> argument. Use `get` or `set`.")
 	}
 }
 
 func (EventReactionsCommands) afktriggertype(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
-		_ = ctx.RespondText("Error getting config")
+		ctx.RespondText("Error getting config")
 		return
 	}
 
@@ -1679,7 +1679,7 @@ func (EventReactionsCommands) afktriggertype(ctx *router.Ctx) {
 		case "blacklist":
 			cfg.AFK.TriggerList.Type = "Blacklist"
 		default:
-			_ = ctx.RespondText("Invalid trigger type. Use `[p]afktriggertype values` to get a list of available types.")
+			ctx.RespondText("Invalid trigger type. Use `[p]afktriggertype values` to get a list of available types.")
 			return
 		}
 
@@ -1693,14 +1693,14 @@ func (EventReactionsCommands) afktriggertype(ctx *router.Ctx) {
 			SetDescription("Available AFK Trigger Type values: `Global`, `Whitelist`, `Blacklist`.").
 			Send(ctx)
 	default:
-		_ = ctx.RespondText("Invalid <get/set/values> argument. Use `get` or `set` or `values`.")
+		ctx.RespondText("Invalid <get/set/values> argument. Use `get` or `set` or `values`.")
 	}
 }
 
 func (EventReactionsCommands) afktriggerusers(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
-		_ = ctx.RespondText("Error getting config")
+		ctx.RespondText("Error getting config")
 		return
 	}
 
@@ -1735,7 +1735,7 @@ func (EventReactionsCommands) afktriggerusers(ctx *router.Ctx) {
 		}
 
 		if slices.Contains(cfg.AFK.TriggerList.Users, user.ID) {
-			_ = ctx.RespondText("User is already in the AFK Triggerlist.")
+			ctx.RespondText("User is already in the AFK Triggerlist.")
 			return
 		}
 
@@ -1744,7 +1744,7 @@ func (EventReactionsCommands) afktriggerusers(ctx *router.Ctx) {
 		_ = cfg.Save()
 
 		c.services.Embed.NewEmbed().
-			SetDescription(fmt.Sprintf("Added %s to the AFK Triggerlist.", user.Mention())).
+			SetDescription("Added %s to the AFK Triggerlist.", user.Mention()).
 			Send(ctx)
 	case "rm":
 		user, err := ctx.Arguments.Get(1).User(router.ArgumentFlagFallbackDefault)
@@ -1757,7 +1757,7 @@ func (EventReactionsCommands) afktriggerusers(ctx *router.Ctx) {
 		}
 
 		if !slices.Contains(cfg.AFK.TriggerList.Users, user.ID) {
-			_ = ctx.RespondText("User already isn't in the AFK Triggerlist.")
+			ctx.RespondText("User already isn't in the AFK Triggerlist.")
 			return
 		}
 
@@ -1766,7 +1766,7 @@ func (EventReactionsCommands) afktriggerusers(ctx *router.Ctx) {
 		_ = cfg.Save()
 
 		c.services.Embed.NewEmbed().
-			SetDescription(fmt.Sprintf("Removed %s from the AFK Triggerlist.", user.Mention())).
+			SetDescription("Removed %s from the AFK Triggerlist.", user.Mention()).
 			Send(ctx)
 	case "clear":
 		cfg.AFK.TriggerList.Users = []string{}
@@ -1776,14 +1776,14 @@ func (EventReactionsCommands) afktriggerusers(ctx *router.Ctx) {
 			SetDescription("Cleared all users from the AFK Triggerlist.").
 			Send(ctx)
 	default:
-		_ = ctx.RespondText("Invalid <get/add/rm/clear> argument. Use `get`, `add`, `rm`, or `clear`.")
+		ctx.RespondText("Invalid <get/add/rm/clear> argument. Use `get`, `add`, `rm`, or `clear`.")
 	}
 }
 
 func (EventReactionsCommands) afktriggerservers(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
-		_ = ctx.RespondText("Error getting config")
+		ctx.RespondText("Error getting config")
 		return
 	}
 
@@ -1814,7 +1814,7 @@ func (EventReactionsCommands) afktriggerservers(ctx *router.Ctx) {
 		}
 
 		if slices.Contains(cfg.AFK.TriggerList.Servers, guild.ID) {
-			_ = ctx.RespondText(fmt.Sprintf("Server %s is already in the AFK Triggerlist!", guild.Name))
+			ctx.RespondText(fmt.Sprintf("Server %s is already in the AFK Triggerlist!", guild.Name))
 			return
 		}
 
@@ -1823,7 +1823,7 @@ func (EventReactionsCommands) afktriggerservers(ctx *router.Ctx) {
 		_ = cfg.Save()
 
 		c.services.Embed.NewEmbed().
-			SetDescription(fmt.Sprintf("Added %s to the AFK Triggerlist.", guild.Name)).
+			SetDescription("Added %s to the AFK Triggerlist.", guild.Name).
 			Send(ctx)
 	case "rm":
 		guild, err := utils.Discord.GetGuild(ctx.Session, utils.Misc.Or(utils.Arguments["[server id]"], ctx.Message.GuildID))
@@ -1835,7 +1835,7 @@ func (EventReactionsCommands) afktriggerservers(ctx *router.Ctx) {
 		}
 
 		if !slices.Contains(cfg.AFK.TriggerList.Servers, guild.ID) {
-			_ = ctx.RespondText(fmt.Sprintf("Server %s already isn't in the AFK Triggerlist!", guild.Name))
+			ctx.RespondText(fmt.Sprintf("Server %s already isn't in the AFK Triggerlist!", guild.Name))
 			return
 		}
 
@@ -1844,7 +1844,7 @@ func (EventReactionsCommands) afktriggerservers(ctx *router.Ctx) {
 		_ = cfg.Save()
 
 		c.services.Embed.NewEmbed().
-			SetDescription(fmt.Sprintf("Removed %s from the AFK Triggerlist.", guild.Name)).
+			SetDescription("Removed %s from the AFK Triggerlist.", guild.Name).
 			Send(ctx)
 	case "clear":
 		cfg.AFK.TriggerList.Servers = []string{}
@@ -1854,6 +1854,6 @@ func (EventReactionsCommands) afktriggerservers(ctx *router.Ctx) {
 			SetDescription("Cleared all servers from the AFK Triggerlist.").
 			Send(ctx)
 	default:
-		_ = ctx.RespondText("Invalid <get/add/rm/clear> argument. Use `get`, `add`, `rm`, or `clear`.")
+		ctx.RespondText("Invalid <get/add/rm/clear> argument. Use `get`, `add`, `rm`, or `clear`.")
 	}
 }

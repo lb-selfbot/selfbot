@@ -139,7 +139,7 @@ func (t TrollingCommands) RegisterCommands(router *dgc.Router) {
 }
 
 func (TrollingCommands) purgehack(ctx *router.Ctx) {
-	_ = ctx.RespondText("ﾠ" + strings.Repeat("\n", 1998) + "ﾠ")
+	ctx.RespondText("ﾠ" + strings.Repeat("\n", 1998) + "ﾠ")
 }
 
 func (TrollingCommands) ghostping(*router.Ctx) {
@@ -153,30 +153,30 @@ func (TrollingCommands) gprole(*router.Ctx) {
 func (TrollingCommands) token(ctx *router.Ctx) {
 	user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
 	if err != nil {
-		_ = ctx.RespondText("Could not find user.")
+		ctx.RespondText("Could not find user.")
 		return
 	}
 
-	_ = ctx.RespondText(base64.StdEncoding.EncodeToString([]byte(user.ID)))
+	ctx.RespondText(base64.StdEncoding.EncodeToString([]byte(user.ID)))
 }
 
 func (TrollingCommands) trollnitro(ctx *router.Ctx) {
-	_ = ctx.RespondText(fmt.Sprintf("discord\u2024gift/%s %s https://i.imgur.com/0WSpeC1.png", random.String(16), constants.INVISIBLE_TEXT))
+	ctx.RespondText(fmt.Sprintf("discord\u2024gift/%s %s https://i.imgur.com/0WSpeC1.png", random.String(16), constants.INVISIBLE_TEXT))
 }
 
 func (TrollingCommands) fakenitro(ctx *router.Ctx) {
 	amount, err := ctx.Arguments.Get(0).Int()
 	if err != nil {
-		_ = ctx.RespondText("Argument <amount> must be a number.")
+		ctx.RespondText("Argument <amount> must be a number.")
 		return
 	}
 	for i := 0; i < amount; i++ {
-		_ = ctx.RespondText("https://discord.gift/" + random.String(16))
+		ctx.RespondText("https://discord.gift/" + random.String(16))
 	}
 }
 
 func (TrollingCommands) hiddentext(ctx *router.Ctx) {
-	_ = ctx.RespondText(fmt.Sprintf(
+	ctx.RespondText(fmt.Sprintf(
 		"%s %s %s",
 		utils.Arguments["<\"text\">"],
 		constants.INVISIBLE_TEXT,
@@ -186,37 +186,37 @@ func (TrollingCommands) hiddentext(ctx *router.Ctx) {
 
 func (TrollingCommands) hiddeninvite(ctx *router.Ctx) {
 	text := ctx.Arguments.RawFrom(1)
-	_ = ctx.RespondText(fmt.Sprintf("%s %s %s", text, constants.INVISIBLE_TEXT, utils.Arguments["<invite>"]))
+	ctx.RespondText(fmt.Sprintf("%s %s %s", text, constants.INVISIBLE_TEXT, utils.Arguments["<invite>"]))
 }
 
 func (TrollingCommands) hiddenping(ctx *router.Ctx) {
 	text := ctx.Arguments.RawFrom(1)
-	_ = ctx.RespondText(fmt.Sprintf("%s %s <@%s>", text, constants.INVISIBLE_TEXT, utils.Arguments["<userid>"]))
+	ctx.RespondText(fmt.Sprintf("%s %s <@%s>", text, constants.INVISIBLE_TEXT, utils.Arguments["<userid>"]))
 }
 
 func (TrollingCommands) hiddenroleping(ctx *router.Ctx) {
 	text := ctx.Arguments.RawFrom(1)
-	_ = ctx.RespondText(fmt.Sprintf("%s %s <@&%s>", text, constants.INVISIBLE_TEXT, utils.Arguments["<roleid>"]))
+	ctx.RespondText(fmt.Sprintf("%s %s <@&%s>", text, constants.INVISIBLE_TEXT, utils.Arguments["<roleid>"]))
 }
 
 func (TrollingCommands) hiddeneveryone(ctx *router.Ctx) {
-	_ = ctx.RespondText(fmt.Sprintf("%s %s @everyone", ctx.Arguments.Raw(), constants.INVISIBLE_TEXT))
+	ctx.RespondText(fmt.Sprintf("%s %s @everyone", ctx.Arguments.Raw(), constants.INVISIBLE_TEXT))
 }
 
 func (TrollingCommands) hiddenhere(ctx *router.Ctx) {
-	_ = ctx.RespondText(fmt.Sprintf("%s %s @here", ctx.Arguments.Raw(), constants.INVISIBLE_TEXT))
+	ctx.RespondText(fmt.Sprintf("%s %s @here", ctx.Arguments.Raw(), constants.INVISIBLE_TEXT))
 }
 
 func (TrollingCommands) voicemove(ctx *router.Ctx) {
 	guild, err := utils.Discord.GetGuild(ctx.Session, ctx.Message.GuildID)
 	if err != nil {
-		_ = ctx.RespondText("Error getting server: " + err.Error())
+		ctx.RespondText("Error getting server: " + err.Error())
 		return
 	}
 
 	amount, err := strconv.Atoi(utils.Arguments["<amount>"])
 	if err != nil {
-		_ = ctx.RespondText("Argument <amount> must be a number.")
+		ctx.RespondText("Argument <amount> must be a number.")
 		return
 	}
 
@@ -242,7 +242,7 @@ func (TrollingCommands) voicemove(ctx *router.Ctx) {
 	})
 
 	if len(channels) == 0 {
-		_ = ctx.RespondText("No voice channels found")
+		ctx.RespondText("No voice channels found")
 		return
 	}
 
@@ -262,7 +262,7 @@ func (TrollingCommands) voicemove(ctx *router.Ctx) {
 
 		_, err := ctx.Session.ChannelVoiceJoin(ctx.Message.GuildID, channel.ID, false, true)
 		if err != nil {
-			_ = ctx.RespondText("Error joining voice channel: " + err.Error())
+			ctx.RespondText("Error joining voice channel: " + err.Error())
 			return
 		}
 
@@ -279,14 +279,14 @@ func (TrollingCommands) voicemove(ctx *router.Ctx) {
 func (TrollingCommands) triggertyping(ctx *router.Ctx) {
 	seconds, err := strconv.Atoi(utils.Arguments["<seconds>"])
 	if err != nil {
-		_ = ctx.RespondText("Argument <seconds> must be a number.")
+		ctx.RespondText("Argument <seconds> must be a number.")
 		return
 	}
 	channel, err := ctx.Arguments.Get(1).Channel()
 	if err != nil {
 		channel, _ = utils.Discord.GetChannel(ctx.Session, ctx.Message.ChannelID)
 		if channel == nil {
-			_ = ctx.RespondText("Could not find channel")
+			ctx.RespondText("Could not find channel")
 			return
 		}
 	}
@@ -296,14 +296,14 @@ func (TrollingCommands) triggertyping(ctx *router.Ctx) {
 func (TrollingCommands) impersonate(ctx *router.Ctx) {
 	user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
 	if err != nil {
-		_ = ctx.RespondText("Could not find user.")
+		ctx.RespondText("Could not find user.")
 		return
 	}
 	text := ctx.Arguments.RawFrom(1)
 
 	_, err := utils.Discord.Impersonate(ctx.Session, user, text, ctx.Message.ChannelID)
 	if err != nil {
-		_ = ctx.RespondText("An error has occurred: " + err.Error())
+		ctx.RespondText("An error has occurred: " + err.Error())
 		return
 	}
 }
@@ -311,60 +311,60 @@ func (TrollingCommands) impersonate(ctx *router.Ctx) {
 func (TrollingCommands) fakepings(ctx *router.Ctx) {
 	amount, err := strconv.Atoi(utils.Arguments["<amount>"])
 	if err != nil {
-		_ = ctx.RespondText("Argument <amount> must be a number.")
+		ctx.RespondText("Argument <amount> must be a number.")
 		return
 	}
 
 	if amount < 1 || amount > 1000000000 {
-		_ = ctx.RespondText("Amount must be between 1 and 1000000000")
+		ctx.RespondText("Amount must be between 1 and 1000000000")
 		return
 	}
 
 	channel, success := utils.Discord.TryGetChannelFromMentionWithDefault(ctx, ctx.Arguments.Get(1))
 	if !success {
-		_ = ctx.RespondText("Could not find channel")
+		ctx.RespondText("Could not find channel")
 		return
 	}
 
 	messages, err := utils.Discord.GetChannelMessages(ctx.Session, channel.ID, 10)
 	if err != nil {
-		_ = ctx.RespondText("An error has occurred: " + err.Error())
+		ctx.RespondText("An error has occurred: " + err.Error())
 		return
 	}
 
 	if len(messages) == 0 {
-		_ = ctx.RespondText("No messages found in channel")
+		ctx.RespondText("No messages found in channel")
 		return
 	}
 
 	err = ctx.Session.MessageUnack(channel.ID, messages[0].ID, amount)
 	if err != nil {
-		_ = ctx.RespondText("An error has occurred: " + err.Error())
+		ctx.RespondText("An error has occurred: " + err.Error())
 		return
 	}
 }
 
 func (TrollingCommands) billionpings(ctx *router.Ctx) {
-	channel, success := utils.Discord.TryGetChannelFromMentionWithDefault(ctx, ctx.Arguments.Get(0))
-	if !success {
-		_ = ctx.RespondText("Could not find channel")
+	channel, err := ctx.Arguments.Get(0).Channel(router.ArgumentFlagFallbackDefault)
+	if err != nil {
+		ctx.RespondText("Could not find channel")
 		return
 	}
 
 	messages, err := utils.Discord.GetChannelMessages(ctx.Session, channel.ID, 10)
 	if err != nil {
-		_ = ctx.RespondText("An error has occurred: " + err.Error())
+		ctx.RespondText("An error has occurred: " + err.Error())
 		return
 	}
 
 	if len(messages) == 0 {
-		_ = ctx.RespondText("No messages found in channel")
+		ctx.RespondText("No messages found in channel")
 		return
 	}
 
 	err = ctx.Session.MessageUnack(channel.ID, messages[0].ID, 1000000000)
 	if err != nil {
-		_ = ctx.RespondText("An error has occurred: " + err.Error())
+		ctx.RespondText("An error has occurred: " + err.Error())
 		return
 	}
 }

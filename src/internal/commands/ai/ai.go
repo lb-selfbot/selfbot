@@ -69,7 +69,7 @@ func (c *AICommands) chatgpt(ctx *router.Ctx) {
 
 	response, err := api.GPT(system, message)
 	if err != nil {
-		_ = ctx.RespondText("Error getting response: " + err.Error())
+		ctx.RespondText("Error getting response: " + err.Error())
 		return
 	}
 
@@ -86,7 +86,7 @@ func (c *AICommands) gpt4(ctx *router.Ctx) {
 
 	response, err := api.GPT(system, message, "gpt-4")
 	if err != nil {
-		_ = ctx.RespondText("Error getting response: " + err.Error())
+		ctx.RespondText("Error getting response: " + err.Error())
 		return
 	}
 
@@ -142,7 +142,7 @@ func (c *AICommands) imagine(ctx *router.Ctx) {
 
 	image, err := api.GenerateImage(prompt, negPrompt, modelValue)
 	if err != nil {
-		_ = ctx.RespondText("Error getting response: " + err.Error())
+		ctx.RespondText("Error getting response: " + err.Error())
 		return
 	}
 
@@ -152,7 +152,7 @@ func (c *AICommands) imagine(ctx *router.Ctx) {
 func (c *AICommands) ocrlink(ctx *router.Ctx) {
 	text, err := api.OCR(ctx.Arguments.Raw())
 	if err != nil {
-		_ = ctx.RespondText("Error getting response: " + err.Error())
+		ctx.RespondText("Error getting response: " + err.Error())
 		return
 	}
 
@@ -167,13 +167,13 @@ func (c *AICommands) ocrfile(ctx *router.Ctx) {
 	attachments := ctx.Message.Attachments
 
 	if len(attachments) == 0 {
-		_ = ctx.RespondText("Error: you must provide an image as an attachment.")
+		ctx.RespondText("Error: you must provide an image as an attachment.")
 		return
 	}
 
 	text, err := api.OCR(attachments[0].URL)
 	if err != nil {
-		_ = ctx.RespondText("Error getting response: " + err.Error())
+		ctx.RespondText("Error getting response: " + err.Error())
 		return
 	}
 

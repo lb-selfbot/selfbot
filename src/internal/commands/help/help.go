@@ -189,7 +189,7 @@ func renderCategoryHelp(router *dgc.Router, category *dgc.Category, rawArgument 
 	page = int(math.Max(0, float64(page-1)))
 
 	emb := c.services.Embed.NewEmbed().
-		SetDescription(fmt.Sprintf("<> is required, [] is optional\n\nAmount of %s commands: %d", category.Name, len(category.Commands))).
+		SetDescription("<> is required, [] is optional\n\nAmount of %s commands: %d", category.Name, len(category.Commands)).
 		SetSubtext(fmt.Sprintf("Page: %d/%d", page+1, len(helpPages)))
 
 	cfg, _ := config.GetConfig()
@@ -201,7 +201,7 @@ func renderCategoryHelp(router *dgc.Router, category *dgc.Category, rawArgument 
 			emb.AddField("Commands", helpPages[page], true, true)
 		}
 	} else {
-		return c.services.Embed.NewEmbed().SetDescription(fmt.Sprintf("That page does not exist! %s has %d pages.", category.Name, len(helpPages)))
+		return c.services.Embed.NewEmbed().SetDescription("That page does not exist! %s has %d pages.", category.Name, len(helpPages))
 	}
 	if len(helpPages) > 1 {
 		if cfg.Selfbot.CommandMode == "WebhookEmbed" {
@@ -227,7 +227,7 @@ func renderDefaultGeneralHelpEmbed(router *dgc.Router) *embed.Embed {
 	prefix := router.GetPrefixes()[0]
 
 	emb := c.services.Embed.NewEmbed().
-		SetDescription(fmt.Sprintf("LightningBot %s Help\nAmount of Commands: %d, <> is required, [] is optional\n", constants.VERSION, len(router.Commands)))
+		SetDescription("LightningBot %s Help\nAmount of Commands: %d, <> is required, [] is optional\n", constants.VERSION, len(router.Commands))
 
 	if cfg.Selfbot.CommandMode == "WebhookEmbed" {
 		emb.Description += "\n\n**Categories**\n" + categoriesString
@@ -263,12 +263,12 @@ func (HelpCommand) search(ctx *router.Ctx) {
 	}
 	if len(closeCommands) == 0 {
 		c.services.Embed.NewEmbed().
-			SetDescription(fmt.Sprintf("No commands found for query `%s`", query)).
+			SetDescription("No commands found for query `%s`", query).
 			Send(ctx)
 		return
 	}
 	c.services.Embed.NewEmbed().
-		SetDescription(fmt.Sprintf("Found %d commands for query `%s`", len(closeCommands), query)).
+		SetDescription("Found %d commands for query `%s`", len(closeCommands), query).
 		AddField("Commands", strings.Join(closeCommands, "\n"), true, true).
 		Send(ctx)
 }

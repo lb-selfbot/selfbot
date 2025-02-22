@@ -873,13 +873,13 @@ func (c *UtilityCommands) copyserver(ctx *router.Ctx) {
 
 	guild, err := ctx.Arguments.Get(0).Guild()
 	if err != nil {
-		_ = ctx.RespondText("Error getting server: " + err.Error())
+		ctx.RespondText("Error getting server: " + err.Error())
 		return
 	}
 
 	newGuild, err := ctx.Session.GuildCreate(fmt.Sprintf("[COPY] %.90s", guild.Name))
 	if err != nil {
-		_ = ctx.RespondText("Error copying server: " + err.Error())
+		ctx.RespondText("Error copying server: " + err.Error())
 		return
 	}
 
@@ -913,7 +913,7 @@ func (c *UtilityCommands) copyserver(ctx *router.Ctx) {
 			Mentionable: &role.Mentionable,
 		})
 		if err != nil {
-			_ = ctx.RespondText("Error copying server: " + err.Error())
+			ctx.RespondText("Error copying server: " + err.Error())
 			return
 		}
 
@@ -924,7 +924,7 @@ func (c *UtilityCommands) copyserver(ctx *router.Ctx) {
 
 	newChannels, err := ctx.Session.GuildChannels(newGuild.ID)
 	if err != nil {
-		_ = ctx.RespondText("Error copying server: " + err.Error())
+		ctx.RespondText("Error copying server: " + err.Error())
 		return
 	}
 
@@ -933,7 +933,7 @@ func (c *UtilityCommands) copyserver(ctx *router.Ctx) {
 	for _, channel := range newChannels {
 		_, err := ctx.Session.ChannelDelete(channel.ID)
 		if err != nil {
-			_ = ctx.RespondText("Error copying server: " + err.Error())
+			ctx.RespondText("Error copying server: " + err.Error())
 			return
 		}
 
@@ -942,7 +942,7 @@ func (c *UtilityCommands) copyserver(ctx *router.Ctx) {
 
 	channels, err := ctx.Session.GuildChannels(guild.ID)
 	if err != nil {
-		_ = ctx.RespondText("Error copying server: " + err.Error())
+		ctx.RespondText("Error copying server: " + err.Error())
 		return
 	}
 
@@ -965,7 +965,7 @@ func (c *UtilityCommands) copyserver(ctx *router.Ctx) {
 			NSFW:                 channel.NSFW,
 		})
 		if err != nil {
-			_ = ctx.RespondText("Error copying server: " + err.Error())
+			ctx.RespondText("Error copying server: " + err.Error())
 			return
 		}
 
@@ -982,7 +982,7 @@ func (c *UtilityCommands) copyserver(ctx *router.Ctx) {
 			PermissionOverwrites: overwrites,
 		})
 		if err != nil {
-			_ = ctx.RespondText("Error copying server: " + err.Error())
+			ctx.RespondText("Error copying server: " + err.Error())
 			return
 		}
 
@@ -1002,7 +1002,7 @@ func (c *UtilityCommands) copyserver(ctx *router.Ctx) {
 				NSFW:                 channel.NSFW,
 			})
 			if err != nil {
-				_ = ctx.RespondText("Error copying server: " + err.Error())
+				ctx.RespondText("Error copying server: " + err.Error())
 				return
 			}
 
@@ -1017,13 +1017,13 @@ func (c *UtilityCommands) copyserver(ctx *router.Ctx) {
 func (c *UtilityCommands) copychannel(ctx *router.Ctx) {
 	sourceChannel, err := ctx.Arguments.Get(0).Channel()
 	if err != nil {
-		_ = ctx.RespondText("Could not find channel")
+		ctx.RespondText("Could not find channel")
 		return
 	}
 
 	destChannel, err := ctx.Arguments.Get(1).Channel()
 	if err != nil {
-		_ = ctx.RespondText("Could not find channel")
+		ctx.RespondText("Could not find channel")
 		return
 	}
 
@@ -1031,13 +1031,13 @@ func (c *UtilityCommands) copychannel(ctx *router.Ctx) {
 	limit = utils2.Clamp(limit, 1, 100)
 
 	if limit < 1 {
-		_ = ctx.RespondText("Limit must be greater than 0")
+		ctx.RespondText("Limit must be greater than 0")
 		return
 	}
 
 	messages, err := utils.Discord.GetChannelMessages(ctx.Session, sourceChannel.ID, limit)
 	if err != nil {
-		_ = ctx.RespondText("Error getting source messages: " + err.Error())
+		ctx.RespondText("Error getting source messages: " + err.Error())
 		return
 	}
 
@@ -1048,7 +1048,7 @@ func (c *UtilityCommands) copychannel(ctx *router.Ctx) {
 		return timeI.Before(timeJ)
 	})
 
-	_ = ctx.RespondText(fmt.Sprintf(
+	ctx.RespondText(fmt.Sprintf(
 		"Copying %d messages...\n\nEstimated time required: %s",
 		len(messages),
 		time.Duration(len(messages)*2)*time.Second,
@@ -1056,7 +1056,7 @@ func (c *UtilityCommands) copychannel(ctx *router.Ctx) {
 
 	webhook, err := ctx.Session.WebhookCreate(destChannel.ID, "LightningBot - Copy Channel", "")
 	if err != nil {
-		_ = ctx.RespondText("Error creating destination webhook: " + err.Error())
+		ctx.RespondText("Error creating destination webhook: " + err.Error())
 		return
 	}
 
@@ -1087,7 +1087,7 @@ func (c *UtilityCommands) copychannel(ctx *router.Ctx) {
 			Embeds:     message.Embeds,
 		})
 		if err != nil {
-			_ = ctx.RespondText("Error sending message: " + err.Error())
+			ctx.RespondText("Error sending message: " + err.Error())
 		}
 
 		time.Sleep(750 * time.Millisecond)
@@ -1109,7 +1109,7 @@ func (c *UtilityCommands) leavegroups(ctx *router.Ctx) {
 		if channel.Type == discordgo.ChannelTypeGroupDM {
 			_, err := ctx.Session.ChannelDelete(channel.ID, isSilent)
 			if err != nil {
-				_ = ctx.RespondText("Error leaving group: " + err.Error())
+				ctx.RespondText("Error leaving group: " + err.Error())
 			}
 
 			time.Sleep(2 * time.Second)
@@ -1166,23 +1166,23 @@ func (c *UtilityCommands) admingroups(ctx *router.Ctx) {
 func (c *UtilityCommands) joinvc(ctx *router.Ctx) {
 	channel, err := ctx.Arguments.Get(0).Channel()
 	if err != nil {
-		_ = ctx.RespondText("Could not find channel")
+		ctx.RespondText("Could not find channel")
 		return
 	}
 
 	_, err = ctx.Session.ChannelVoiceJoin(channel.GuildID, channel.ID, false, false)
 	if err != nil {
-		_ = ctx.RespondText("Could not join channel")
+		ctx.RespondText("Could not join channel")
 		return
 	}
 
-	_ = ctx.RespondText("Joined channel " + channel.Name)
+	ctx.RespondText("Joined channel " + channel.Name)
 }
 
 func (c *UtilityCommands) snipe(ctx *router.Ctx) {
 	channel, err := ctx.Arguments.Get(0).Channel(router.ArgumentFlagFallbackDefault)
 	if err != nil {
-		_ = ctx.RespondText("Could not find channel")
+		ctx.RespondText("Could not find channel")
 		return
 	}
 
@@ -1229,7 +1229,7 @@ func (c *UtilityCommands) snipe(ctx *router.Ctx) {
 func (c *UtilityCommands) editsnipe(ctx *router.Ctx) {
 	channel, err := ctx.Arguments.Get(0).Channel(router.ArgumentFlagFallbackDefault)
 	if err != nil {
-		_ = ctx.RespondText("Could not find channel")
+		ctx.RespondText("Could not find channel")
 		return
 	}
 
@@ -1255,16 +1255,16 @@ func (c *UtilityCommands) editsnipe(ctx *router.Ctx) {
 func (c *UtilityCommands) firstmessage(ctx *router.Ctx) {
 	channel, err := ctx.Arguments.Get(0).Channel(router.ArgumentFlagFallbackDefault)
 	if err != nil {
-		_ = ctx.RespondText("Could not find channel")
+		ctx.RespondText("Could not find channel")
 		return
 	}
 	messages, err := ctx.Session.ChannelMessages(channel.ID, 1, "", "1", "")
 	if err != nil {
-		_ = ctx.RespondText("Error getting messages")
+		ctx.RespondText("Error getting messages")
 		return
 	}
 	if len(messages) != 1 {
-		_ = ctx.RespondText("Error getting messages")
+		ctx.RespondText("Error getting messages")
 		return
 	}
 	c.services.Embed.NewEmbed().
@@ -1283,13 +1283,13 @@ func (c *UtilityCommands) hypesquad(ctx *router.Ctx) {
 		"balance":    3,
 	}[houseName]
 	if !ok {
-		_ = ctx.RespondText("Missing required argument: <bravery/brilliance/balance>")
+		ctx.RespondText("Missing required argument: <bravery/brilliance/balance>")
 		return
 	}
 
 	err := api.SetHypesquad(ctx.Session, house)
 	if err != nil {
-		_ = ctx.RespondText("Error setting hypesquad: " + err.Error())
+		ctx.RespondText("Error setting hypesquad: " + err.Error())
 	}
 
 	c.services.Embed.NewEmbed().
@@ -1300,7 +1300,7 @@ func (c *UtilityCommands) hypesquad(ctx *router.Ctx) {
 func (c *UtilityCommands) leavehypesquad(ctx *router.Ctx) {
 	err := api.LeaveHypesquad(ctx.Session)
 	if err != nil {
-		_ = ctx.RespondText("Error leaving hypesquad: " + err.Error())
+		ctx.RespondText("Error leaving hypesquad: " + err.Error())
 	}
 
 	c.services.Embed.NewEmbed().
@@ -1317,14 +1317,14 @@ func (c *UtilityCommands) theme(ctx *router.Ctx) {
 		"midnight": 4,
 	}[themeName]
 	if !ok {
-		_ = ctx.RespondText("Missing required argument: <dark/light/darker/midnight>")
+		ctx.RespondText("Missing required argument: <dark/light/darker/midnight>")
 		return
 	}
 
 	ctx.Session.State.UserSettings.Appearance.Theme = theme
 	err := ctx.Session.UserSettingsUpdate(ctx.Session.State.UserSettings, true)
 	if err != nil {
-		_ = ctx.RespondText("Error setting theme: " + err.Error())
+		ctx.RespondText("Error setting theme: " + err.Error())
 		return
 	}
 
@@ -1336,14 +1336,14 @@ func (c *UtilityCommands) theme(ctx *router.Ctx) {
 func (c *UtilityCommands) compact(ctx *router.Ctx) {
 	toggle, err := ctx.Arguments.Get(0).Bool()
 	if err != nil {
-		_ = ctx.RespondText("Error parsing argument: " + err.Error())
+		ctx.RespondText("Error parsing argument: " + err.Error())
 		return
 	}
 
 	ctx.Session.State.UserSettings.TextAndImages.MessageDisplayCompact = wrapperspb.Bool(toggle)
 	err = ctx.Session.UserSettingsUpdate(ctx.Session.State.UserSettings, true)
 	if err != nil {
-		_ = ctx.RespondText("Error setting theme: " + err.Error())
+		ctx.RespondText("Error setting theme: " + err.Error())
 		return
 	}
 
@@ -1355,14 +1355,14 @@ func (c *UtilityCommands) compact(ctx *router.Ctx) {
 func (c *UtilityCommands) devmode(ctx *router.Ctx) {
 	toggle, err := ctx.Arguments.Get(0).Bool()
 	if err != nil {
-		_ = ctx.RespondText("Error parsing argument: " + err.Error())
+		ctx.RespondText("Error parsing argument: " + err.Error())
 		return
 	}
 
 	ctx.Session.State.UserSettings.Appearance.DeveloperMode = toggle
 	err = ctx.Session.UserSettingsUpdate(ctx.Session.State.UserSettings, true)
 	if err != nil {
-		_ = ctx.RespondText("Error setting theme: " + err.Error())
+		ctx.RespondText("Error setting theme: " + err.Error())
 		return
 	}
 
@@ -1385,7 +1385,7 @@ func (c *UtilityCommands) aboutme(ctx *router.Ctx) {
 
 	err := api.ChangeSettings(ctx.Session, "/profile", map[string]any{"bio": bio})
 	if err != nil {
-		_ = ctx.RespondText("Error setting bio: " + err.Error())
+		ctx.RespondText("Error setting bio: " + err.Error())
 		return
 	}
 
@@ -1402,7 +1402,7 @@ func (c *UtilityCommands) displayname(ctx *router.Ctx) {
 
 	err := api.ChangeSettings(ctx.Session, "", map[string]any{"global_name": globalName})
 	if err != nil {
-		_ = ctx.RespondText("Error setting display name: " + err.Error())
+		ctx.RespondText("Error setting display name: " + err.Error())
 		return
 	}
 
@@ -1414,7 +1414,7 @@ func (c *UtilityCommands) displayname(ctx *router.Ctx) {
 func (c *UtilityCommands) pronouns(ctx *router.Ctx) {
 	err := api.ChangeSettings(ctx.Session, "/profile", map[string]any{"pronouns": ctx.Arguments.Raw()})
 	if err != nil {
-		_ = ctx.RespondText("Error setting pronouns: " + err.Error())
+		ctx.RespondText("Error setting pronouns: " + err.Error())
 		return
 	}
 
@@ -1446,18 +1446,18 @@ func (c *UtilityCommands) nickscan(ctx *router.Ctx) {
 func (c *UtilityCommands) getmessagejson(ctx *router.Ctx) {
 	channel, err := ctx.Arguments.Get(0).Channel()
 	if err != nil {
-		_ = ctx.RespondText("Could not find channel")
+		ctx.RespondText("Could not find channel")
 		return
 	}
 
 	messages, err := ctx.Session.ChannelMessages(channel.ID, 1, "", "", ctx.Arguments.Get(1).Raw())
 	if err != nil {
-		_ = ctx.RespondText("Could not get message: " + err.Error())
+		ctx.RespondText("Could not get message: " + err.Error())
 		return
 	}
 
 	if len(messages) == 0 {
-		_ = ctx.RespondText("Could not find message")
+		ctx.RespondText("Could not find message")
 		return
 	}
 
@@ -1465,7 +1465,7 @@ func (c *UtilityCommands) getmessagejson(ctx *router.Ctx) {
 
 	jsonData, err := json.MarshalIndent(message, "", "  ")
 	if err != nil {
-		_ = ctx.RespondText("Error marshaling JSON")
+		ctx.RespondText("Error marshaling JSON")
 		return
 	}
 
@@ -1478,18 +1478,18 @@ func (c *UtilityCommands) getmessagejson(ctx *router.Ctx) {
 func (c *UtilityCommands) getembedjson(ctx *router.Ctx) {
 	channel, err := ctx.Arguments.Get(0).Channel()
 	if err != nil {
-		_ = ctx.RespondText("Could not find channel")
+		ctx.RespondText("Could not find channel")
 		return
 	}
 
 	messages, err := ctx.Session.ChannelMessages(channel.ID, 1, "", "", ctx.Arguments.Get(1).Raw())
 	if err != nil {
-		_ = ctx.RespondText("Could not get message: " + err.Error())
+		ctx.RespondText("Could not get message: " + err.Error())
 		return
 	}
 
 	if len(messages) == 0 {
-		_ = ctx.RespondText("Could not find message")
+		ctx.RespondText("Could not find message")
 		return
 	}
 
@@ -1497,7 +1497,7 @@ func (c *UtilityCommands) getembedjson(ctx *router.Ctx) {
 
 	jsonData, err := json.MarshalIndent(message.Embeds, "", "  ")
 	if err != nil {
-		_ = ctx.RespondText("Error marshaling JSON")
+		ctx.RespondText("Error marshaling JSON")
 		return
 	}
 
@@ -1510,7 +1510,7 @@ func (c *UtilityCommands) getembedjson(ctx *router.Ctx) {
 func (c *UtilityCommands) sendmessagejson(ctx *router.Ctx) {
 	channel, err := ctx.Arguments.Get(0).Channel()
 	if err != nil {
-		_ = ctx.RespondText("Could not find channel")
+		ctx.RespondText("Could not find channel")
 		return
 	}
 
@@ -1519,13 +1519,13 @@ func (c *UtilityCommands) sendmessagejson(ctx *router.Ctx) {
 	var data *discordgo.MessageSend
 	err = json.Unmarshal([]byte(rawData), &data)
 	if err != nil {
-		_ = ctx.RespondText("Error unmarshaling JSON: " + err.Error())
+		ctx.RespondText("Error unmarshaling JSON: " + err.Error())
 		return
 	}
 
 	_, err = ctx.Session.ChannelMessageSendComplex(channel.ID, data)
 	if err != nil {
-		_ = ctx.RespondText("Error sending message: " + err.Error())
+		ctx.RespondText("Error sending message: " + err.Error())
 		return
 	}
 }
@@ -1533,18 +1533,18 @@ func (c *UtilityCommands) sendmessagejson(ctx *router.Ctx) {
 func (c *UtilityCommands) sendinterval(ctx *router.Ctx) {
 	interval, err := ctx.Arguments.Get(0).Duration()
 	if err != nil {
-		_ = ctx.RespondText("Error parsing interval: " + err.Error())
+		ctx.RespondText("Error parsing interval: " + err.Error())
 		return
 	}
 
 	amount, err := ctx.Arguments.Get(1).Int()
 	if err != nil {
-		_ = ctx.RespondText("Error parsing amount: " + err.Error())
+		ctx.RespondText("Error parsing amount: " + err.Error())
 		return
 	}
 
 	if amount < 1 {
-		_ = ctx.RespondText("Error parsing amount: amount must be at least 1")
+		ctx.RespondText("Error parsing amount: amount must be at least 1")
 		return
 	}
 
@@ -1586,7 +1586,7 @@ func (c *UtilityCommands) optionpoll(ctx *router.Ctx) {
 func (c *UtilityCommands) discordpoll(ctx *router.Ctx) {
 	duration, err := ctx.Arguments.Get(0).Duration()
 	if err != nil {
-		_ = ctx.RespondText("Error parsing duration: " + err.Error())
+		ctx.RespondText("Error parsing duration: " + err.Error())
 		return
 	}
 
@@ -1627,7 +1627,7 @@ func (c *UtilityCommands) discordpoll(ctx *router.Ctx) {
 	}
 
 	if len(pollAnswers) == 0 {
-		_ = ctx.RespondText("Error parsing options: At least one option must be provided.")
+		ctx.RespondText("Error parsing options: At least one option must be provided.")
 		return
 	}
 
@@ -1641,7 +1641,7 @@ func (c *UtilityCommands) discordpoll(ctx *router.Ctx) {
 		},
 	})
 	if err != nil {
-		_ = ctx.RespondText("Error sending poll: " + err.Error())
+		ctx.RespondText("Error sending poll: " + err.Error())
 	}
 }
 
@@ -1651,7 +1651,7 @@ func (c *UtilityCommands) checktoken(ctx *router.Ctx) {
 	response, err := api.GetTokenData(ctx.Session, token)
 	if err != nil {
 		if !bytes.Contains(response, []byte("401: Unauthorized")) {
-			_ = ctx.RespondText("An error has occurred: " + err.Error())
+			ctx.RespondText("An error has occurred: " + err.Error())
 			return
 		}
 
@@ -1663,7 +1663,7 @@ func (c *UtilityCommands) checktoken(ctx *router.Ctx) {
 
 	tokenData, err := simplejson.NewJson(response)
 	if err != nil {
-		_ = ctx.RespondText("An error has occurred: " + err.Error())
+		ctx.RespondText("An error has occurred: " + err.Error())
 		return
 	}
 
@@ -1689,7 +1689,7 @@ func (c *UtilityCommands) checktoken(ctx *router.Ctx) {
 func (c *UtilityCommands) discordstatus(ctx *router.Ctx) {
 	httpResponse := http.Get("https://srhpyqt94yxb.statuspage.io/api/v2/summary.json")
 	if httpResponse.Error != nil {
-		_ = ctx.RespondText("An error has occurred.")
+		ctx.RespondText("An error has occurred.")
 		return
 	}
 
@@ -1724,7 +1724,7 @@ func (c *UtilityCommands) changelog(ctx *router.Ctx) {
 		map[string]string{"branch": "selfbot", "version": ""},
 	)
 	if err != nil {
-		_ = ctx.RespondText("An error has occurred: " + err.Error())
+		ctx.RespondText("An error has occurred: " + err.Error())
 		return
 	}
 
@@ -1740,7 +1740,7 @@ func (c *UtilityCommands) version(ctx *router.Ctx) {
 		map[string]string{"branch": "selfbot", "version": ""},
 	)
 	if err != nil {
-		_ = ctx.RespondText("An error has occurred: " + err.Error())
+		ctx.RespondText("An error has occurred: " + err.Error())
 		return
 	}
 
@@ -1799,7 +1799,7 @@ func (c *UtilityCommands) openfolder(*router.Ctx) {
 func (c *UtilityCommands) remote(ctx *router.Ctx) {
 	channel, err := ctx.Arguments.Get(0).Channel(router.ArgumentFlagFallbackDefault)
 	if err != nil {
-		_ = ctx.RespondText("Could not find channel")
+		ctx.RespondText("Could not find channel")
 		return
 	}
 
@@ -1811,7 +1811,7 @@ func (c *UtilityCommands) remote(ctx *router.Ctx) {
 	})
 
 	if len(cmds) == 0 {
-		_ = ctx.RespondText("Command not found")
+		ctx.RespondText("Command not found")
 		return
 	}
 
@@ -1829,18 +1829,18 @@ func (c *UtilityCommands) systeminfo(ctx *router.Ctx) {
 
 	hostStat, err := host.Info()
 	if err != nil {
-		_ = ctx.RespondText("Error getting host info: " + err.Error())
+		ctx.RespondText("Error getting host info: " + err.Error())
 		return
 	}
 
 	cpuStat, err := cpu.Info()
 	if err != nil {
-		_ = ctx.RespondText("Error getting cpu info: " + err.Error())
+		ctx.RespondText("Error getting cpu info: " + err.Error())
 		return
 	}
 
 	if len(cpuStat) < 1 {
-		_ = ctx.RespondText("Error getting cpu info: No CPUs found")
+		ctx.RespondText("Error getting cpu info: No CPUs found")
 		return
 	}
 
@@ -1848,13 +1848,13 @@ func (c *UtilityCommands) systeminfo(ctx *router.Ctx) {
 
 	vmStat, err := mem.VirtualMemory()
 	if err != nil {
-		_ = ctx.RespondText("Error getting memory info: " + err.Error())
+		ctx.RespondText("Error getting memory info: " + err.Error())
 		return
 	}
 
 	diskStat, err := disk.Usage(path)
 	if err != nil {
-		_ = ctx.RespondText("Error getting disk info: " + err.Error())
+		ctx.RespondText("Error getting disk info: " + err.Error())
 		return
 	}
 
@@ -1901,14 +1901,14 @@ func (c *UtilityCommands) activewindow(ctx *router.Ctx) {
 
 func (c *UtilityCommands) calc(ctx *router.Ctx) {
 	if runtime.GOOS != "windows" {
-		_ = ctx.RespondText("This command is only available on Windows")
+		ctx.RespondText("This command is only available on Windows")
 	}
 	_ = exec.Command("C:\\Windows\\System32\\calc.exe").Start()
 }
 
 func (c *UtilityCommands) notepad(ctx *router.Ctx) {
 	if runtime.GOOS != "windows" {
-		_ = ctx.RespondText("This command is only available on Windows")
+		ctx.RespondText("This command is only available on Windows")
 	}
 	_ = exec.Command("C:\\Windows\\System32\\notepad.exe").Start()
 }
@@ -1925,7 +1925,7 @@ func (c *UtilityCommands) screenshot(ctx *router.Ctx) {
 
 	img, err := screenshot.CaptureDisplay(0)
 	if err != nil {
-		_ = ctx.RespondText("Error capturing screenshot: " + err.Error())
+		ctx.RespondText("Error capturing screenshot: " + err.Error())
 		return
 	}
 
@@ -1933,7 +1933,7 @@ func (c *UtilityCommands) screenshot(ctx *router.Ctx) {
 
 	err = png.Encode(buf, img)
 	if err != nil {
-		_ = ctx.RespondText("Error encoding image: " + err.Error())
+		ctx.RespondText("Error encoding image: " + err.Error())
 		return
 	}
 
@@ -1960,7 +1960,7 @@ func (c *UtilityCommands) uploadss(ctx *router.Ctx) {
 	destName := strings.ToLower(ctx.Arguments.Get(0).Raw())
 	dest, ok := destinations.Destinations[destName]
 	if !ok {
-		_ = ctx.RespondText("Error: invalid destination\n\nUse the `listdestinations` command to view all destinations")
+		ctx.RespondText("Error: invalid destination\n\nUse the `listdestinations` command to view all destinations")
 		return
 	}
 
@@ -1969,7 +1969,7 @@ func (c *UtilityCommands) uploadss(ctx *router.Ctx) {
 
 	img, err := screenshot.CaptureDisplay(0)
 	if err != nil {
-		_ = ctx.RespondText("Error capturing screenshot: " + err.Error())
+		ctx.RespondText("Error capturing screenshot: " + err.Error())
 		return
 	}
 
@@ -1977,13 +1977,13 @@ func (c *UtilityCommands) uploadss(ctx *router.Ctx) {
 
 	err = png.Encode(buf, img)
 	if err != nil {
-		_ = ctx.RespondText("Error encoding image: " + err.Error())
+		ctx.RespondText("Error encoding image: " + err.Error())
 		return
 	}
 
 	result, err := dest.Upload(buf, "screenshot.png")
 	if err != nil {
-		_ = ctx.RespondText("Error uploading screenshot: " + err.Error())
+		ctx.RespondText("Error uploading screenshot: " + err.Error())
 		return
 	}
 
@@ -1998,20 +1998,20 @@ func (c *UtilityCommands) uploadfile(ctx *router.Ctx) {
 	destName := strings.ToLower(ctx.Arguments.Get(0).Raw())
 	dest, ok := destinations.Destinations[destName]
 	if !ok {
-		_ = ctx.RespondText("Error: invalid destination\n\nUse the `listdestinations` command to view all destinations")
+		ctx.RespondText("Error: invalid destination\n\nUse the `listdestinations` command to view all destinations")
 		return
 	}
 
 	attachments := ctx.Message.Attachments
 
 	if len(attachments) == 0 {
-		_ = ctx.RespondText("Error: you must provide a file as an attachment.")
+		ctx.RespondText("Error: you must provide a file as an attachment.")
 		return
 	}
 
 	resp, err := nethttp.Get(attachments[0].URL)
 	if err != nil {
-		_ = ctx.RespondText("Error downloading file: " + err.Error())
+		ctx.RespondText("Error downloading file: " + err.Error())
 		return
 	}
 	defer resp.Body.Close()
@@ -2020,13 +2020,13 @@ func (c *UtilityCommands) uploadfile(ctx *router.Ctx) {
 
 	_, err = buf.ReadFrom(resp.Body)
 	if err != nil {
-		_ = ctx.RespondText("Error reading file body: " + err.Error())
+		ctx.RespondText("Error reading file body: " + err.Error())
 		return
 	}
 
 	result, err := dest.Upload(buf, attachments[0].Filename)
 	if err != nil {
-		_ = ctx.RespondText("Error uploading file: " + err.Error())
+		ctx.RespondText("Error uploading file: " + err.Error())
 		return
 	}
 
@@ -2041,14 +2041,14 @@ func (c *UtilityCommands) uploadlink(ctx *router.Ctx) {
 	destName := strings.ToLower(ctx.Arguments.Get(0).Raw())
 	dest, ok := destinations.Destinations[destName]
 	if !ok {
-		_ = ctx.RespondText("Error: invalid destination\n\nUse the `listdestinations` command to view all destinations")
+		ctx.RespondText("Error: invalid destination\n\nUse the `listdestinations` command to view all destinations")
 		return
 	}
 
 	link := ctx.Arguments.Get(1).Raw()
 	parsedURL, err := url.ParseRequestURI(link)
 	if err != nil {
-		_ = ctx.RespondText("Error: invalid link: " + err.Error())
+		ctx.RespondText("Error: invalid link: " + err.Error())
 		return
 	}
 
@@ -2056,7 +2056,7 @@ func (c *UtilityCommands) uploadlink(ctx *router.Ctx) {
 
 	resp, err := nethttp.Get(link)
 	if err != nil {
-		_ = ctx.RespondText("Error downloading file: " + err.Error())
+		ctx.RespondText("Error downloading file: " + err.Error())
 		return
 	}
 	defer resp.Body.Close()
@@ -2065,13 +2065,13 @@ func (c *UtilityCommands) uploadlink(ctx *router.Ctx) {
 
 	_, err = buf.ReadFrom(resp.Body)
 	if err != nil {
-		_ = ctx.RespondText("Error reading file body: " + err.Error())
+		ctx.RespondText("Error reading file body: " + err.Error())
 		return
 	}
 
 	result, err := dest.Upload(buf, fileName)
 	if err != nil {
-		_ = ctx.RespondText("Error uploading file: " + err.Error())
+		ctx.RespondText("Error uploading file: " + err.Error())
 		return
 	}
 
@@ -2087,7 +2087,7 @@ func (c *UtilityCommands) uploadlink(ctx *router.Ctx) {
 func (c *UtilityCommands) pastebin(ctx *router.Ctx) {
 	paste, err := api.CreatePaste(ctx.Arguments.Raw())
 	if err != nil {
-		_ = ctx.RespondText("An error has occurred.")
+		ctx.RespondText("An error has occurred.")
 		return
 	}
 	c.services.Embed.NewEmbed().
@@ -2099,13 +2099,13 @@ func (c *UtilityCommands) pastefile(ctx *router.Ctx) {
 	filePath := ctx.Arguments.Get(0).Raw()
 	content, ok := utils.IO.Read(filePath)
 	if !ok {
-		_ = ctx.RespondText("That file does not exist.")
+		ctx.RespondText("That file does not exist.")
 		return
 	}
 
 	paste, err := api.CreatePaste(content)
 	if err != nil {
-		_ = ctx.RespondText("An error has occurred.")
+		ctx.RespondText("An error has occurred.")
 		return
 	}
 
@@ -2118,7 +2118,7 @@ func (c *UtilityCommands) tinyurl(ctx *router.Ctx) {
 	sourceUrl := ctx.Arguments.Raw()
 	httpResponse := http.Get(fmt.Sprintf("https://tinyurl.com/api-create.php?url=%s", sourceUrl))
 	if httpResponse.Error != nil {
-		_ = ctx.RespondText("An error has occurred.")
+		ctx.RespondText("An error has occurred.")
 		return
 	}
 	c.services.Embed.NewEmbed().
@@ -2137,7 +2137,7 @@ func (c *UtilityCommands) obfuscateFunc(lang, ext string) func(ctx *router.Ctx) 
 		if script == "" && len(attachments) > 0 {
 			httpResponse := http.Get(attachments[0].URL)
 			if httpResponse.Error != nil {
-				_ = ctx.RespondText("Error getting script: " + httpResponse.Error.Error())
+				ctx.RespondText("Error getting script: " + httpResponse.Error.Error())
 				return
 			}
 
@@ -2145,13 +2145,13 @@ func (c *UtilityCommands) obfuscateFunc(lang, ext string) func(ctx *router.Ctx) 
 		}
 
 		if script == "" {
-			_ = ctx.RespondText("Error: you must provide a script as an attachment or argument.")
+			ctx.RespondText("Error: you must provide a script as an attachment or argument.")
 			return
 		}
 
 		obf := api.Obfuscate(lang, script)
 		if strings.HasPrefix(obf, "An error") {
-			_ = ctx.RespondText(obf)
+			ctx.RespondText(obf)
 			return
 		}
 
@@ -2239,7 +2239,7 @@ func (c *UtilityCommands) addreview(ctx *router.Ctx) {
 func (c *UtilityCommands) getTags(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
-		_ = ctx.RespondText("Error getting config: " + err.Error())
+		ctx.RespondText("Error getting config: " + err.Error())
 		return
 	}
 
@@ -2264,7 +2264,7 @@ func (c *UtilityCommands) getTags(ctx *router.Ctx) {
 func (c *UtilityCommands) addTag(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
-		_ = ctx.RespondText("Error getting config: " + err.Error())
+		ctx.RespondText("Error getting config: " + err.Error())
 		return
 	}
 
@@ -2279,7 +2279,7 @@ func (c *UtilityCommands) addTag(ctx *router.Ctx) {
 
 	err = cfg.Save()
 	if err != nil {
-		_ = ctx.RespondText("Error saving tags: " + err.Error())
+		ctx.RespondText("Error saving tags: " + err.Error())
 		return
 	}
 
@@ -2291,7 +2291,7 @@ func (c *UtilityCommands) addTag(ctx *router.Ctx) {
 func (c *UtilityCommands) removeTag(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
-		_ = ctx.RespondText("Error getting config: " + err.Error())
+		ctx.RespondText("Error getting config: " + err.Error())
 		return
 	}
 
@@ -2301,7 +2301,7 @@ func (c *UtilityCommands) removeTag(ctx *router.Ctx) {
 
 	err = cfg.Save()
 	if err != nil {
-		_ = ctx.RespondText("Error saving tags: " + err.Error())
+		ctx.RespondText("Error saving tags: " + err.Error())
 		return
 	}
 
@@ -2313,7 +2313,7 @@ func (c *UtilityCommands) removeTag(ctx *router.Ctx) {
 func (c *UtilityCommands) clearTags(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
-		_ = ctx.RespondText("Error getting config: " + err.Error())
+		ctx.RespondText("Error getting config: " + err.Error())
 		return
 	}
 
@@ -2321,7 +2321,7 @@ func (c *UtilityCommands) clearTags(ctx *router.Ctx) {
 
 	err = cfg.Save()
 	if err != nil {
-		_ = ctx.RespondText("Error saving tags: " + err.Error())
+		ctx.RespondText("Error saving tags: " + err.Error())
 		return
 	}
 
@@ -2450,14 +2450,14 @@ func (c *UtilityCommands) ipinfo(ctx *router.Ctx) {
 
 	httpResponse := http.Get(url)
 	if httpResponse.Error != nil {
-		_ = ctx.RespondText("An error has occurred.")
+		ctx.RespondText("An error has occurred.")
 		return
 	}
 
 	ipinfo := httpResponse.Json()
 
 	if ipinfo.Get("status").MustInt(0) == 404 {
-		_ = ctx.RespondText("No results found.")
+		ctx.RespondText("No results found.")
 		return
 	}
 
@@ -2510,7 +2510,7 @@ func (c *UtilityCommands) resolve(ctx *router.Ctx) {
 
 	httpResponse := http.Get(fmt.Sprintf("https://json.geoiplookup.io/%s", domain))
 	if httpResponse.Error != nil {
-		_ = ctx.RespondText("An error has occurred.")
+		ctx.RespondText("An error has occurred.")
 		return
 	}
 
@@ -2533,7 +2533,7 @@ func (c *UtilityCommands) reversedns(ctx *router.Ctx) {
 
 	httpResponse := http.Get(url)
 	if httpResponse.Error != nil {
-		_ = ctx.RespondText("An error has occurred.")
+		ctx.RespondText("An error has occurred.")
 		return
 	}
 
@@ -2556,7 +2556,7 @@ func (c *UtilityCommands) reversemac(ctx *router.Ctx) {
 	mac := ctx.Arguments.Get(0).Raw()
 	httpResponse := http.Get(fmt.Sprintf("https://api.macvendors.com/%s", mac))
 	if httpResponse.Error != nil {
-		_ = ctx.RespondText("An error has occurred.")
+		ctx.RespondText("An error has occurred.")
 		return
 	}
 	if strings.Contains(string(httpResponse.Body), "Not Found") {
@@ -2573,7 +2573,7 @@ func (c *UtilityCommands) headers(ctx *router.Ctx) {
 	url := ctx.Arguments.Get(0).Raw()
 	httpResponse := http.Get(url)
 	if httpResponse.Error != nil {
-		_ = ctx.RespondText("An error has occurred.")
+		ctx.RespondText("An error has occurred.")
 		return
 	}
 
@@ -2601,13 +2601,13 @@ func (c *UtilityCommands) _interface(ctx *router.Ctx) {
 func (c *UtilityCommands) getPoketwoMessage(ctx *router.Ctx) (*discordgo.Message, error) {
 	channel, err := ctx.Arguments.Get(0).Channel(router.ArgumentFlagFallbackDefault)
 	if err != nil {
-		_ = ctx.RespondText("Error: invalid channel")
+		ctx.RespondText("Error: invalid channel")
 		return nil, errors.New("invalid channel")
 	}
 
 	messages, err := utils.Discord.GetChannelMessages(ctx.Session, channel.ID, 100)
 	if err != nil {
-		_ = ctx.RespondText("Error getting messages: " + err.Error())
+		ctx.RespondText("Error getting messages: " + err.Error())
 		return nil, err
 	}
 
@@ -2622,7 +2622,7 @@ func (c *UtilityCommands) getPoketwoMessage(ctx *router.Ctx) (*discordgo.Message
 		}
 	}
 
-	_ = ctx.RespondText("Error: no Poketwo message found in channel")
+	ctx.RespondText("Error: no Poketwo message found in channel")
 	return nil, errors.New("no Poketwo message found")
 }
 
@@ -2637,7 +2637,7 @@ func (c *UtilityCommands) snipepokemon(ctx *router.Ctx) {
 	// Download the Pokémon image
 	resp := http.Get(emb.Image.URL)
 	if resp.Error != nil {
-		_ = ctx.RespondText("Error downloading image: " + resp.Error.Error())
+		ctx.RespondText("Error downloading image: " + resp.Error.Error())
 		return
 	}
 
@@ -2645,7 +2645,7 @@ func (c *UtilityCommands) snipepokemon(ctx *router.Ctx) {
 
 	cfg, err := config.GetConfig()
 	if err != nil {
-		_ = ctx.RespondText("Error getting config: " + err.Error())
+		ctx.RespondText("Error getting config: " + err.Error())
 		return
 	}
 
@@ -2676,7 +2676,7 @@ func (c *UtilityCommands) snipepokemon(ctx *router.Ctx) {
 
 	_, err = ctx.Session.ChannelMessageSend(message.ChannelID, "<@716390085896962058> c "+strings.ToLower(label))
 	if err != nil {
-		_ = ctx.RespondText("Error catching Pokémon: " + err.Error())
+		ctx.RespondText("Error catching Pokémon: " + err.Error())
 		return
 	}
 
@@ -2697,7 +2697,7 @@ func (c *UtilityCommands) detectpokemon(ctx *router.Ctx) {
 	// Download the Pokémon image
 	resp := http.Get(emb.Image.URL)
 	if resp.Error != nil {
-		_ = ctx.RespondText("Error downloading image: " + resp.Error.Error())
+		ctx.RespondText("Error downloading image: " + resp.Error.Error())
 		return
 	}
 
@@ -2705,7 +2705,7 @@ func (c *UtilityCommands) detectpokemon(ctx *router.Ctx) {
 
 	cfg, err := config.GetConfig()
 	if err != nil {
-		_ = ctx.RespondText("Error getting config: " + err.Error())
+		ctx.RespondText("Error getting config: " + err.Error())
 		return
 	}
 
@@ -2749,12 +2749,12 @@ func (c *UtilityCommands) detectpokemon(ctx *router.Ctx) {
 func (c *UtilityCommands) getReminders(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
-		_ = ctx.RespondText("Error getting config.")
+		ctx.RespondText("Error getting config.")
 		return
 	}
 
 	if len(cfg.Reminders) == 0 {
-		_ = ctx.RespondText("No reminders have been set!")
+		ctx.RespondText("No reminders have been set!")
 		return
 	}
 
@@ -2771,7 +2771,7 @@ func (c *UtilityCommands) getReminders(ctx *router.Ctx) {
 func (c *UtilityCommands) addReminder(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
-		_ = ctx.RespondText("Error getting config.")
+		ctx.RespondText("Error getting config.")
 		return
 	}
 
@@ -2782,13 +2782,13 @@ func (c *UtilityCommands) addReminder(ctx *router.Ctx) {
 			continue
 		}
 
-		_ = ctx.RespondText("Reminder with that name already exists.")
+		ctx.RespondText("Reminder with that name already exists.")
 		return
 	}
 
 	duration, err := ctx.Arguments.Get(2).Duration()
 	if err != nil {
-		_ = ctx.RespondText("Invalid duration.")
+		ctx.RespondText("Invalid duration.")
 		return
 	}
 
@@ -2804,7 +2804,7 @@ func (c *UtilityCommands) addReminder(ctx *router.Ctx) {
 
 	err = cfg.Save()
 	if err != nil {
-		_ = ctx.RespondText("Error saving config: " + err.Error())
+		ctx.RespondText("Error saving config: " + err.Error())
 		return
 	}
 
@@ -2816,7 +2816,7 @@ func (c *UtilityCommands) addReminder(ctx *router.Ctx) {
 func (c *UtilityCommands) removeReminder(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
-		_ = ctx.RespondText("Error getting config.")
+		ctx.RespondText("Error getting config.")
 		return
 	}
 
@@ -2828,7 +2828,7 @@ func (c *UtilityCommands) removeReminder(ctx *router.Ctx) {
 
 	err = cfg.Save()
 	if err != nil {
-		_ = ctx.RespondText("Error saving config: " + err.Error())
+		ctx.RespondText("Error saving config: " + err.Error())
 		return
 	}
 
@@ -2840,7 +2840,7 @@ func (c *UtilityCommands) removeReminder(ctx *router.Ctx) {
 func (c *UtilityCommands) clearReminders(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
-		_ = ctx.RespondText("Error getting config.")
+		ctx.RespondText("Error getting config.")
 		return
 	}
 
@@ -2848,7 +2848,7 @@ func (c *UtilityCommands) clearReminders(ctx *router.Ctx) {
 
 	err = cfg.Save()
 	if err != nil {
-		_ = ctx.RespondText("Error saving config: " + err.Error())
+		ctx.RespondText("Error saving config: " + err.Error())
 		return
 	}
 
@@ -3053,12 +3053,12 @@ func (c *UtilityCommands) convertmass(ctx *router.Ctx) {
 func (c *UtilityCommands) tts(ctx *router.Ctx) {
 	httpResponse := api.TTS(ctx.Arguments.RawFrom(1), ctx.Arguments.Get(0).Raw())
 	if httpResponse.Error != nil {
-		_ = ctx.RespondText("An error has occurred.")
+		ctx.RespondText("An error has occurred.")
 		return
 	}
 
 	if httpResponse.StatusCode == 400 {
-		_ = ctx.RespondText("Invalid language. Please use an ISO 639-1 language code. See https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes for more information.")
+		ctx.RespondText("Invalid language. Please use an ISO 639-1 language code. See https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes for more information.")
 		return
 	}
 
@@ -3072,7 +3072,7 @@ func (c *UtilityCommands) tts(ctx *router.Ctx) {
 func (c *UtilityCommands) translate(ctx *router.Ctx) {
 	translateResult := api.Translate(ctx.Arguments.RawFrom(1), ctx.Arguments.Get(0).Raw())
 	if translateResult.Error != nil {
-		_ = ctx.RespondText("An error has occurred: " + translateResult.Error.Error())
+		ctx.RespondText("An error has occurred: " + translateResult.Error.Error())
 		return
 	}
 	c.services.Embed.NewEmbed().
@@ -3086,7 +3086,7 @@ func (c *UtilityCommands) translate(ctx *router.Ctx) {
 func (c *UtilityCommands) detectlang(ctx *router.Ctx) {
 	translateResult := api.Translate(ctx.Arguments.Raw(), "en")
 	if translateResult.Error != nil {
-		_ = ctx.RespondText("An error has occurred: " + translateResult.Error.Error())
+		ctx.RespondText("An error has occurred: " + translateResult.Error.Error())
 		return
 	}
 	c.services.Embed.NewEmbed().
@@ -3099,7 +3099,7 @@ func (c *UtilityCommands) detectlang(ctx *router.Ctx) {
 func (c *UtilityCommands) english(ctx *router.Ctx) {
 	translateResult := api.Translate(ctx.Arguments.Raw(), "en")
 	if translateResult.Error != nil {
-		_ = ctx.RespondText("An error has occurred: " + translateResult.Error.Error())
+		ctx.RespondText("An error has occurred: " + translateResult.Error.Error())
 		return
 	}
 	c.services.Embed.NewEmbed().
@@ -3117,14 +3117,14 @@ func (c *UtilityCommands) define(ctx *router.Ctx) {
 
 	httpResponse := http.Get(url)
 	if httpResponse.Error != nil {
-		_ = ctx.RespondText("An error has occurred.")
+		ctx.RespondText("An error has occurred.")
 		return
 	}
 
 	list := httpResponse.Json()
 
 	if len(list.MustArray()) == 0 {
-		_ = ctx.RespondText("No results found.")
+		ctx.RespondText("No results found.")
 		return
 	}
 
@@ -3161,14 +3161,14 @@ func (c *UtilityCommands) urbandictionary(ctx *router.Ctx) {
 
 	httpResponse := http.Get(url)
 	if httpResponse.Error != nil {
-		_ = ctx.RespondText("An error has occurred.")
+		ctx.RespondText("An error has occurred.")
 		return
 	}
 
 	list := httpResponse.Json().Get("list")
 
 	if len(list.MustArray()) == 0 {
-		_ = ctx.RespondText("No results found.")
+		ctx.RespondText("No results found.")
 		return
 	}
 
@@ -3188,7 +3188,7 @@ func (c *UtilityCommands) wikipedia(ctx *router.Ctx) {
 	query := ctx.Arguments.Raw()
 	article, err := api.WikipediaSearch(query)
 	if err != nil {
-		_ = ctx.RespondText("An error has occurred.")
+		ctx.RespondText("An error has occurred.")
 		return
 	}
 
@@ -3205,12 +3205,12 @@ func (c *UtilityCommands) wikipedia(ctx *router.Ctx) {
 func (c *UtilityCommands) weather(ctx *router.Ctx) {
 	weather, err := api.GetWeather(ctx.Arguments.Raw())
 	if err != nil {
-		_ = ctx.RespondText("An error has occurred: " + err.Error())
+		ctx.RespondText("An error has occurred: " + err.Error())
 		return
 	}
 
 	c.services.Embed.NewEmbed().
-		SetDescription(fmt.Sprintf("Weather in %s, %s", weather.Get("name").MustString(), weather.GetPath("sys", "country").MustString())).
+		SetDescription("Weather in %s, %s", weather.Get("name").MustString(), weather.GetPath("sys", "country").MustString()).
 		AddField("Description", utils.String.Capitalize(weather.Get("weather").GetIndex(0).Get("description").MustString())).
 		AddField("Temperature", fmt.Sprintf("%.2f °C", math.Round(weather.GetPath("main", "temp").MustFloat64()-273.15))).
 		AddField("Feels Like", fmt.Sprintf("%.2f °C", math.Round(weather.GetPath("main", "feels_like").MustFloat64()-273.15))).
@@ -3228,7 +3228,7 @@ func (c *UtilityCommands) weather(ctx *router.Ctx) {
 func (c *UtilityCommands) lvbypass(ctx *router.Ctx) {
 	resp, err := http.GetJson("https://bypass.pm/bypass2?url=" + ctx.Arguments.Raw())
 	if err != nil {
-		_ = ctx.RespondText("An error has occurred: " + err.Error())
+		ctx.RespondText("An error has occurred: " + err.Error())
 		return
 	}
 
@@ -3248,14 +3248,14 @@ func (c *UtilityCommands) flightinfo(ctx *router.Ctx) {
 
 	httpResponse := http.Get(uri)
 	if httpResponse.Error != nil {
-		_ = ctx.RespondText("An error has occurred.")
+		ctx.RespondText("An error has occurred.")
 		return
 	}
 
 	json := httpResponse.Json()
 
 	if _, exists := json.CheckGet("errors"); exists {
-		_ = ctx.RespondText("That flight does not exist or an error has occurred.")
+		ctx.RespondText("That flight does not exist or an error has occurred.")
 		return
 	}
 
@@ -3278,7 +3278,7 @@ func (c *UtilityCommands) flightinfo(ctx *router.Ctx) {
 func (c *UtilityCommands) passgen(ctx *router.Ctx) {
 	charAmount, err := ctx.Arguments.Get(0).Int()
 	if err != nil {
-		_ = ctx.RespondText("Argument <character amount> must be a number.")
+		ctx.RespondText("Argument <character amount> must be a number.")
 		return
 	}
 
@@ -3292,7 +3292,7 @@ func (c *UtilityCommands) passgen(ctx *router.Ctx) {
 func (c *UtilityCommands) tokengen(ctx *router.Ctx) {
 	httpResponse := http.Get("https://some-random-api.com/bottoken")
 	if httpResponse.Error != nil {
-		_ = ctx.RespondText("Error: " + httpResponse.Error.Error())
+		ctx.RespondText("Error: " + httpResponse.Error.Error())
 		return
 	}
 
@@ -3313,7 +3313,7 @@ func (c *UtilityCommands) revimage(ctx *router.Ctx) {
 func (c *UtilityCommands) revavatar(ctx *router.Ctx) {
 	user, err := ctx.Arguments.Get(0).User()
 	if err != nil {
-		_ = ctx.RespondText("Could not find user")
+		ctx.RespondText("Could not find user")
 		return
 	}
 	c.services.Embed.NewEmbed().
@@ -3325,14 +3325,14 @@ func (c *UtilityCommands) timezones(ctx *router.Ctx) {
 	continent := ctx.Arguments.Get(0).Raw()
 	httpResponse := http.Get("http://worldtimeapi.org/api/timezone/" + url.PathEscape(continent))
 	if httpResponse.Error != nil {
-		_ = ctx.RespondText("Error getting timezones: " + httpResponse.Error.Error())
+		ctx.RespondText("Error getting timezones: " + httpResponse.Error.Error())
 		return
 	}
 
 	json := httpResponse.Json()
 
 	if err := json.Get("error").MustString(); err != "" {
-		_ = ctx.RespondText("Error getting timezones: " + err)
+		ctx.RespondText("Error getting timezones: " + err)
 		return
 	}
 
@@ -3345,14 +3345,14 @@ func (c *UtilityCommands) timezones(ctx *router.Ctx) {
 func (c *UtilityCommands) timezoneinfo(ctx *router.Ctx) {
 	httpResponse := http.Get("http://worldtimeapi.org/api/timezone/" + ctx.Arguments.Get(0).Raw())
 	if httpResponse.Error != nil {
-		_ = ctx.RespondText("Error getting timezones: " + httpResponse.Error.Error())
+		ctx.RespondText("Error getting timezones: " + httpResponse.Error.Error())
 		return
 	}
 
 	json := httpResponse.Json()
 
 	if err := json.Get("error").MustString(); err != "" {
-		_ = ctx.RespondText("Error getting timezones: " + err)
+		ctx.RespondText("Error getting timezones: " + err)
 		return
 	}
 
@@ -3369,12 +3369,12 @@ func (c *UtilityCommands) calculate(ctx *router.Ctx) {
 
 	tv, err := types.Eval(token.NewFileSet(), nil, token.NoPos, expression)
 	if err != nil {
-		_ = ctx.RespondText("Error evaluating expression: " + err.Error())
+		ctx.RespondText("Error evaluating expression: " + err.Error())
 		return
 	}
 
 	if tv.Value == nil {
-		_ = ctx.RespondText("Error evaluating expression: nil value")
+		ctx.RespondText("Error evaluating expression: nil value")
 		return
 	}
 
@@ -3387,7 +3387,7 @@ func (c *UtilityCommands) calculate(ctx *router.Ctx) {
 func (c *UtilityCommands) googlesearch(ctx *router.Ctx) {
 	results, err := api.GoogleSearch(ctx.Arguments.Raw())
 	if err != nil {
-		_ = ctx.RespondText("An error has occurred.")
+		ctx.RespondText("An error has occurred.")
 		return
 	}
 	emb := c.services.Embed.NewEmbed()
@@ -3401,7 +3401,7 @@ func (c *UtilityCommands) googlesearch(ctx *router.Ctx) {
 func (c *UtilityCommands) youtubesearch(ctx *router.Ctx) {
 	results, err := api.GoogleSearch(ctx.Arguments.Raw() + " site:youtube.com")
 	if err != nil {
-		_ = ctx.RespondText("An error has occurred.")
+		ctx.RespondText("An error has occurred.")
 		return
 	}
 	emb := c.services.Embed.NewEmbed()
@@ -3419,7 +3419,7 @@ func (c *UtilityCommands) youtubesearch(ctx *router.Ctx) {
 func (c *UtilityCommands) youtubedl(ctx *router.Ctx) {
 	results, err := api.GoogleSearch(ctx.Arguments.Raw() + " site:youtube.com")
 	if err != nil {
-		_ = ctx.RespondText("An error has occurred: " + err.Error())
+		ctx.RespondText("An error has occurred: " + err.Error())
 		return
 	}
 	for i := 0; i < len(results.MustArray()); i++ {
@@ -3434,17 +3434,17 @@ func (c *UtilityCommands) youtubedl(ctx *router.Ctx) {
 
 		video, err := client.GetVideo(resultUrl)
 		if err != nil {
-			_ = ctx.RespondText("An error has occurred: " + err.Error())
+			ctx.RespondText("An error has occurred: " + err.Error())
 			return
 		}
 
-		_ = ctx.RespondText(fmt.Sprintf("Downloading %s...", video.Title))
+		ctx.RespondText(fmt.Sprintf("Downloading %s...", video.Title))
 
 		formats := video.Formats.WithAudioChannels()
 
 		stream, _, err := client.GetStream(video, &formats[0])
 		if err != nil {
-			_ = ctx.RespondText("An error has occurred: " + err.Error())
+			ctx.RespondText("An error has occurred: " + err.Error())
 			return
 		}
 
@@ -3456,20 +3456,20 @@ func (c *UtilityCommands) youtubedl(ctx *router.Ctx) {
 
 		file, err := os.Create(downloadPath)
 		if err != nil {
-			_ = ctx.RespondText("An error has occurred: " + err.Error())
+			ctx.RespondText("An error has occurred: " + err.Error())
 			return
 		}
 		defer file.Close()
 
 		_, err = io.Copy(file, stream)
 		if err != nil {
-			_ = ctx.RespondText("An error has occurred: " + err.Error())
+			ctx.RespondText("An error has occurred: " + err.Error())
 			_ = file.Close()
 			return
 		}
 
 		_ = utils.System.OpenURL(downloadPath)
-		_ = ctx.RespondText(fmt.Sprintf("Successfully downloaded %s", video.Title))
+		ctx.RespondText(fmt.Sprintf("Successfully downloaded %s", video.Title))
 
 		break
 	}
@@ -3506,7 +3506,7 @@ func (c *UtilityCommands) stackoverflow(ctx *router.Ctx) {
 func (c *UtilityCommands) searchcountry(ctx *router.Ctx) {
 	httpResponse := http.Get(fmt.Sprintf("https://restcountries.com/v3.1/name/%s?fullText=true", ctx.Arguments.Raw()))
 	if httpResponse.Error != nil {
-		_ = ctx.RespondText("An error has occurred.")
+		ctx.RespondText("An error has occurred.")
 		return
 	}
 
@@ -3545,7 +3545,7 @@ func (c *UtilityCommands) searchcountry(ctx *router.Ctx) {
 func (c *UtilityCommands) randomcountry(ctx *router.Ctx) {
 	httpResponse := http.Get("https://restcountries.com/v3.1/all")
 	if httpResponse.Error != nil {
-		_ = ctx.RespondText("An error has occurred.")
+		ctx.RespondText("An error has occurred.")
 		return
 	}
 
@@ -3589,7 +3589,7 @@ func (c *UtilityCommands) loremipsum(ctx *router.Ctx) {
 
 	httpResponse := http.Get(fmt.Sprintf("https://loripsum.net/api/%d/short/plaintext", paragrahps))
 	if httpResponse.Error != nil {
-		_ = ctx.RespondText("An error has occurred.")
+		ctx.RespondText("An error has occurred.")
 		return
 	}
 
@@ -3606,7 +3606,7 @@ func (c *UtilityCommands) baconipsum(ctx *router.Ctx) {
 
 	httpResponse := http.Get(fmt.Sprintf("https://baconipsum.com/api/?type=all-meat&paras=%d&format=text", paragrahps))
 	if httpResponse.Error != nil {
-		_ = ctx.RespondText("An error has occurred.")
+		ctx.RespondText("An error has occurred.")
 		return
 	}
 
@@ -3628,7 +3628,7 @@ func (c *UtilityCommands) previewcolor(ctx *router.Ctx) {
 		// Parse RGB
 		rgb := strings.Split(color, ",")
 		if len(rgb) != 3 {
-			_ = ctx.RespondText("Invalid RGB format. Use R,G,B (e.g. 255,255,255)")
+			ctx.RespondText("Invalid RGB format. Use R,G,B (e.g. 255,255,255)")
 			return
 		}
 
@@ -3692,21 +3692,21 @@ func (c *UtilityCommands) timestampCommand(flags string) func(ctx *router.Ctx) {
 	return func(ctx *router.Ctx) {
 		timestamp, err := api.GPT(utils.Misc.CreateAISystemTimestamp(), ctx.Arguments.Raw())
 		if err != nil {
-			_ = ctx.RespondText("An error has occurred while parsing the timestamp.")
+			ctx.RespondText("An error has occurred while parsing the timestamp.")
 			return
 		}
 
 		if timestamp == "UNABLE" {
-			_ = ctx.RespondText("Please provide a valid date/time.")
+			ctx.RespondText("Please provide a valid date/time.")
 			return
 		}
 
 		time, err := time.Parse(time.RFC3339, timestamp)
 		if err != nil {
-			_ = ctx.RespondText("An error has occurred while parsing the timestamp.")
+			ctx.RespondText("An error has occurred while parsing the timestamp.")
 			return
 		}
 
-		_ = ctx.RespondText(fmt.Sprintf("<t:%d%s>", time.Unix(), flags))
+		ctx.RespondText(fmt.Sprintf("<t:%d%s>", time.Unix(), flags))
 	}
 }

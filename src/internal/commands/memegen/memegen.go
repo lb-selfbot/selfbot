@@ -47,7 +47,7 @@ func (c *MemeGenCommands) Register() {
 func (MemeGenCommands) randommeme(ctx *router.Ctx) {
 	template, err := http.GetJson("https://api.imgflip.com/get_memes")
 	if err != nil {
-		_ = ctx.RespondText("An error has occurred.")
+		ctx.RespondText("An error has occurred.")
 		return
 	}
 
@@ -60,7 +60,7 @@ func (MemeGenCommands) randommeme(ctx *router.Ctx) {
 
 	image, err := api.CreateMeme(templateID, utils.Arguments["<\"top\">"], utils.Arguments["<\"bottom\">"])
 	if err != nil {
-		_ = ctx.RespondText("An error has occurred: " + err.Error())
+		ctx.RespondText("An error has occurred: " + err.Error())
 		return
 	}
 
@@ -73,11 +73,11 @@ func (MemeGenCommands) randommeme(ctx *router.Ctx) {
 func (MemeGenCommands) custommeme(ctx *router.Ctx) {
 	image, err := api.CreateMeme(utils.Arguments["<template id>"], utils.Arguments["<\"top\">"], utils.Arguments["<\"bottom\">"])
 	if err != nil {
-		_ = ctx.RespondText("An error has occurred: " + err.Error())
+		ctx.RespondText("An error has occurred: " + err.Error())
 		return
 	}
 
-	_ = ctx.RespondText(image)
+	ctx.RespondText(image)
 }
 
 func (MemeGenCommands) generateFunc(templateID string) func(ctx *router.Ctx) {
@@ -88,10 +88,10 @@ func (MemeGenCommands) generateFunc(templateID string) func(ctx *router.Ctx) {
 	return func(ctx *router.Ctx) {
 		image, err := api.CreateMeme(templateID, utils.Arguments["<\"top\">"], utils.Arguments["<\"bottom\">"])
 		if err != nil {
-			_ = ctx.RespondText("An error has occurred: " + err.Error())
+			ctx.RespondText("An error has occurred: " + err.Error())
 			return
 		}
 
-		_ = ctx.RespondText(image)
+		ctx.RespondText(image)
 	}
 }

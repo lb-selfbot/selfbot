@@ -116,7 +116,7 @@ func (c *CurrencyCommands) generateAddressFunc(name, shortCode string, power int
 	return func(ctx *router.Ctx) {
 		address := ctx.Arguments.Get(0).Raw()
 		if address == "" {
-			_ = ctx.RespondText("Please provide an address.")
+			ctx.RespondText("Please provide an address.")
 			return
 		}
 
@@ -124,7 +124,7 @@ func (c *CurrencyCommands) generateAddressFunc(name, shortCode string, power int
 
 		httpResponse := http.Get(url)
 		if httpResponse.Error != nil {
-			_ = ctx.RespondText("An error has occurred.")
+			ctx.RespondText("An error has occurred.")
 			return
 		}
 
@@ -135,7 +135,7 @@ func (c *CurrencyCommands) generateAddressFunc(name, shortCode string, power int
 		totalSent := float64(json.Get("total_sent").MustInt64()) / math.Pow10(power)
 
 		c.services.Embed.NewEmbed().
-			SetDescription(fmt.Sprintf("%s Address Info", name)).
+			SetDescription("%s Address Info", name).
 			AddField("Address", address, true).
 			AddField("Balance", fmt.Sprintf("%.8f %s", balance, shortCode), true).
 			AddField("Transactions", transactions, true).
@@ -149,7 +149,7 @@ func (c *CurrencyCommands) generateTransactionFunc(name, shortCode string, power
 	return func(ctx *router.Ctx) {
 		hash := ctx.Arguments.Get(0).Raw()
 		if hash == "" {
-			_ = ctx.RespondText("Please provide an transaction hash.")
+			ctx.RespondText("Please provide an transaction hash.")
 			return
 		}
 
@@ -157,7 +157,7 @@ func (c *CurrencyCommands) generateTransactionFunc(name, shortCode string, power
 
 		httpResponse := http.Get(url)
 		if httpResponse.Error != nil {
-			_ = ctx.RespondText("An error has occurred.")
+			ctx.RespondText("An error has occurred.")
 			return
 		}
 
@@ -169,7 +169,7 @@ func (c *CurrencyCommands) generateTransactionFunc(name, shortCode string, power
 		addresses := strings.Join(json.Get("addresses").MustStringArray(), ",\n")
 
 		c.services.Embed.NewEmbed().
-			SetDescription(fmt.Sprintf("%s Transaction Info", name)).
+			SetDescription("%s Transaction Info", name).
 			AddField("Transaction Hash", hash, true).
 			AddField("Total Amount", fmt.Sprintf("%.8f %s", total, shortCode), true).
 			AddField("Fees", fmt.Sprintf("%.8f %s", fees, shortCode), true).
@@ -188,14 +188,14 @@ func (c *CurrencyCommands) priceinfo(ctx *router.Ctx) {
 
 	httpResponse := http.Get(fmt.Sprintf("https://min-api.cryptocompare.com/data/pricemultifull?fsyms=%s&tsyms=%s", from, to))
 	if httpResponse.Error != nil {
-		_ = ctx.RespondText("An error has occurred: " + httpResponse.Error.Error())
+		ctx.RespondText("An error has occurred: " + httpResponse.Error.Error())
 		return
 	}
 
 	json := httpResponse.Json()
 
 	if msg := json.Get("Message").MustString(); msg != "" {
-		_ = ctx.RespondText("An error has occurred: " + msg)
+		ctx.RespondText("An error has occurred: " + msg)
 		return
 	}
 
@@ -291,7 +291,7 @@ func (c *CurrencyCommands) symbolinfo(ctx *router.Ctx) {
 	}
 
 	emb := c.services.Embed.NewEmbed().
-		SetDescription(fmt.Sprintf("Stock info for %s", symbol))
+		SetDescription("Stock info for %s", symbol)
 
 	for key := range globalQuote.MustMap() {
 		data := globalQuote.Get(key).MustString()

@@ -323,11 +323,11 @@ func (c *TextCommands) Register() {
 }
 
 func (c *TextCommands) empty(ctx *router.Ctx) {
-	_ = ctx.RespondText("_ _")
+	ctx.RespondText("_ _")
 }
 
 func (c *TextCommands) reverse(ctx *router.Ctx) {
-	_ = ctx.RespondText(utils.String.Reverse(ctx.Arguments.Raw()))
+	ctx.RespondText(utils.String.Reverse(ctx.Arguments.Raw()))
 }
 
 func (c *TextCommands) alphabet(ctx *router.Ctx) {
@@ -341,23 +341,23 @@ func (c *TextCommands) alphabet(ctx *router.Ctx) {
 
 func (c *TextCommands) ascii(ctx *router.Ctx) {
 	ascii := figure.NewFigure(ctx.Arguments.Raw(), "", false).String()
-	_ = ctx.RespondText("```" + ascii + "```")
+	ctx.RespondText("```" + ascii + "```")
 }
 
 func (c *TextCommands) bold(ctx *router.Ctx) {
-	_ = ctx.RespondText("**" + ctx.Arguments.Raw() + "**")
+	ctx.RespondText("**" + ctx.Arguments.Raw() + "**")
 }
 
 func (c *TextCommands) strike(ctx *router.Ctx) {
-	_ = ctx.RespondText("~~" + ctx.Arguments.Raw() + "~~")
+	ctx.RespondText("~~" + ctx.Arguments.Raw() + "~~")
 }
 
 func (c *TextCommands) italic(ctx *router.Ctx) {
-	_ = ctx.RespondText("*" + ctx.Arguments.Raw() + "*")
+	ctx.RespondText("*" + ctx.Arguments.Raw() + "*")
 }
 
 func (c *TextCommands) spoiler(ctx *router.Ctx) {
-	_ = ctx.RespondText("||" + ctx.Arguments.Raw() + "||")
+	ctx.RespondText("||" + ctx.Arguments.Raw() + "||")
 }
 
 func (c *TextCommands) lspoiler(ctx *router.Ctx) {
@@ -367,7 +367,7 @@ func (c *TextCommands) lspoiler(ctx *router.Ctx) {
 		char := string(chars[i])
 		finalString = finalString + "||" + char + "||"
 	}
-	_ = ctx.RespondText(finalString)
+	ctx.RespondText(finalString)
 }
 
 func (c *TextCommands) leet(ctx *router.Ctx) {
@@ -393,7 +393,7 @@ func (c *TextCommands) leet(ctx *router.Ctx) {
 	for _, element := range leetChars {
 		text = strings.ReplaceAll(text, element[0], element[1])
 	}
-	_ = ctx.RespondText(text)
+	ctx.RespondText(text)
 }
 
 func (c *TextCommands) devowel(ctx *router.Ctx) {
@@ -402,7 +402,7 @@ func (c *TextCommands) devowel(ctx *router.Ctx) {
 	for _, element := range vowels {
 		text = strings.ReplaceAll(text, element, "")
 	}
-	_ = ctx.RespondText(text)
+	ctx.RespondText(text)
 }
 
 func (c *TextCommands) edit(ctx *router.Ctx) {
@@ -410,7 +410,7 @@ func (c *TextCommands) edit(ctx *router.Ctx) {
 	currentText := string(fullText[0])
 	message, err := ctx.Session.ChannelMessageSend(ctx.Message.ChannelID, currentText)
 	if err != nil {
-		_ = ctx.RespondText("An error has occurred: " + err.Error())
+		ctx.RespondText("An error has occurred: " + err.Error())
 		return
 	}
 	for i := 1; i < len(fullText); i++ {
@@ -454,23 +454,23 @@ func (c *TextCommands) emojify(ctx *router.Ctx) {
 	for _, element := range emojiChars {
 		text = strings.ReplaceAll(text, element[0], element[1])
 	}
-	_ = ctx.RespondText(text)
+	ctx.RespondText(text)
 }
 
 func (c *TextCommands) shrug(ctx *router.Ctx) {
-	_ = ctx.RespondText("¯\\_(ツ)_/¯")
+	ctx.RespondText("¯\\_(ツ)_/¯")
 }
 
 func (c *TextCommands) lenny(ctx *router.Ctx) {
-	_ = ctx.RespondText("( ͡° ͜ʖ ͡°)")
+	ctx.RespondText("( ͡° ͜ʖ ͡°)")
 }
 
 func (c *TextCommands) tableflip(ctx *router.Ctx) {
-	_ = ctx.RespondText("(╯°□°）╯︵ ┻━┻")
+	ctx.RespondText("(╯°□°）╯︵ ┻━┻")
 }
 
 func (c *TextCommands) unflip(ctx *router.Ctx) {
-	_ = ctx.RespondText("┬─┬ ノ( ゜-゜ノ)")
+	ctx.RespondText("┬─┬ ノ( ゜-゜ノ)")
 }
 
 func (c *TextCommands) clap(ctx *router.Ctx) {
@@ -482,7 +482,7 @@ func (c *TextCommands) clap(ctx *router.Ctx) {
 	for _, element := range clapChars {
 		text = strings.ReplaceAll(text, element[0], element[1])
 	}
-	_ = ctx.RespondText(text)
+	ctx.RespondText(text)
 }
 
 func (c *TextCommands) zalgo(ctx *router.Ctx) {
@@ -519,32 +519,32 @@ func (c *TextCommands) zalgo(ctx *router.Ctx) {
 	for _, element := range zalgoChars {
 		text = strings.ReplaceAll(text, element[0], element[1])
 	}
-	_ = ctx.RespondText(text)
+	ctx.RespondText(text)
 }
 
 func (c *TextCommands) unzalgo(ctx *router.Ctx) {
 	text := utils.String.FilterAlphaNumeric(ctx.Arguments.Raw())
-	_ = ctx.RespondText(text)
+	ctx.RespondText(text)
 }
 
 func (c *TextCommands) upper(ctx *router.Ctx) {
 	text := strings.ToUpper(ctx.Arguments.Raw())
-	_ = ctx.RespondText(text)
+	ctx.RespondText(text)
 }
 
 func (c *TextCommands) lower(ctx *router.Ctx) {
 	text := strings.ToLower(ctx.Arguments.Raw())
-	_ = ctx.RespondText(text)
+	ctx.RespondText(text)
 }
 
 func (c *TextCommands) fliptext(ctx *router.Ctx) {
 	text := utils.String.Flip(ctx.Arguments.Raw(), false)
-	_ = ctx.RespondText(text)
+	ctx.RespondText(text)
 }
 
 func (c *TextCommands) unfliptext(ctx *router.Ctx) {
 	text := utils.String.Flip(ctx.Arguments.Raw(), true)
-	_ = ctx.RespondText(text)
+	ctx.RespondText(text)
 }
 
 func (c *TextCommands) wave(ctx *router.Ctx) {
@@ -556,28 +556,28 @@ func (c *TextCommands) wave(ctx *router.Ctx) {
 		wave += strings.Repeat(" ", i) + ctx.Arguments.Raw() + "\n"
 	}
 
-	_ = ctx.RespondText(wave)
+	ctx.RespondText(wave)
 }
 
 func (c *TextCommands) customwave(ctx *router.Ctx) {
 	width, err := ctx.Arguments.Get(0).Int()
 	if err != nil {
-		_ = ctx.RespondText("Width must be a number!")
+		ctx.RespondText("Width must be a number!")
 		return
 	}
 
 	if width <= 0 {
-		_ = ctx.RespondText("Width must be a positive number!")
+		ctx.RespondText("Width must be a positive number!")
 		return
 	}
 
 	iterations, err := ctx.Arguments.Get(1).Int()
 	if err != nil {
-		_ = ctx.RespondText("Iterations must be a number!")
+		ctx.RespondText("Iterations must be a number!")
 	}
 
 	if iterations <= 0 {
-		_ = ctx.RespondText("Iterations must be a positive number!")
+		ctx.RespondText("Iterations must be a positive number!")
 		return
 	}
 
@@ -591,13 +591,13 @@ func (c *TextCommands) customwave(ctx *router.Ctx) {
 		wave += strings.Repeat(" ", i) + text + "\n"
 	}
 
-	_ = ctx.RespondText(wave)
+	ctx.RespondText(wave)
 }
 
 func (c *TextCommands) zwc(ctx *router.Ctx) {
 	text := ctx.Arguments.Raw()
 	text = strings.Join(strings.Split(text, ""), "\u200B")
-	_ = ctx.RespondText(text)
+	ctx.RespondText(text)
 }
 
 func (c *TextCommands) distance(ctx *router.Ctx) {
@@ -614,7 +614,7 @@ func (c *TextCommands) codeblock(ctx *router.Ctx) {
 	language := ctx.Arguments.Get(0).Raw()
 	code := ctx.Arguments.RawFrom(1)
 
-	_ = ctx.RespondText("```" + strings.ToLower(language) + "\n" + code + "\n```")
+	ctx.RespondText("```" + strings.ToLower(language) + "\n" + code + "\n```")
 }
 
 // Animation commands
@@ -769,7 +769,7 @@ func (c *TextCommands) fap(ctx *router.Ctx) {
 func (c *TextCommands) countup(ctx *router.Ctx) {
 	number, err := ctx.Arguments.Get(0).Int()
 	if err != nil {
-		_ = ctx.RespondText("Argument <number> must be a number.")
+		ctx.RespondText("Argument <number> must be a number.")
 		return
 	}
 
@@ -790,7 +790,7 @@ func (c *TextCommands) countup(ctx *router.Ctx) {
 func (c *TextCommands) countdown(ctx *router.Ctx) {
 	number, err := ctx.Arguments.Get(0).Int()
 	if err != nil {
-		_ = ctx.RespondText("Argument <number> must be a number.")
+		ctx.RespondText("Argument <number> must be a number.")
 		return
 	}
 
@@ -875,12 +875,12 @@ func (c *TextCommands) customanimation(ctx *router.Ctx) {
 	_ = os.MkdirAll(folder, os.ModePerm)
 	path := filepath.Join(folder, utils.IO.SanitizeFilename(name+".txt"))
 	if _, err := os.Stat(path); os.IsNotExist(err) {
-		_ = ctx.RespondText("Animation does not exist.")
+		ctx.RespondText("Animation does not exist.")
 		return
 	}
 	rawAnimation, ok := utils.IO.Read(path)
 	if !ok {
-		_ = ctx.RespondText("Animation could not be read.")
+		ctx.RespondText("Animation could not be read.")
 		return
 	}
 	animationFrames := strings.Split(rawAnimation, "\n")
@@ -914,13 +914,13 @@ func (c *TextCommands) encode(ctx *router.Ctx) {
 
 	encoding, ok := encodings.Encodings[encodingName]
 	if !ok {
-		_ = ctx.RespondText("Invalid encoding! Use `[p]encodings` to get a list of all available encodings.")
+		ctx.RespondText("Invalid encoding! Use `[p]encodings` to get a list of all available encodings.")
 		return
 	}
 
 	encoded, err := encoding.Encode(text)
 	if err != nil {
-		_ = ctx.RespondText("An error has occurred: " + err.Error())
+		ctx.RespondText("An error has occurred: " + err.Error())
 		return
 	}
 
@@ -936,7 +936,7 @@ func (c *TextCommands) decode(ctx *router.Ctx) {
 
 	encoding, ok := encodings.Encodings[encodingName]
 	if !ok {
-		_ = ctx.RespondText("Invalid encoding! Use `[p]encodings` to get a list of all available encodings.")
+		ctx.RespondText("Invalid encoding! Use `[p]encodings` to get a list of all available encodings.")
 		return
 	}
 
@@ -946,7 +946,7 @@ func (c *TextCommands) decode(ctx *router.Ctx) {
 
 	decoded, err := encoding.Decode(text)
 	if err != nil {
-		_ = ctx.RespondText("An error has occurred: " + err.Error())
+		ctx.RespondText("An error has occurred: " + err.Error())
 		return
 	}
 
@@ -973,7 +973,7 @@ func (c *TextCommands) hash(ctx *router.Ctx) {
 
 	hashFunc, ok := encodings.Hashes[hashName]
 	if !ok {
-		_ = ctx.RespondText("Invalid hash! Use `[p]hashes` to get a list of all available hashes.")
+		ctx.RespondText("Invalid hash! Use `[p]hashes` to get a list of all available hashes.")
 		return
 	}
 
@@ -1001,13 +1001,13 @@ func (c *TextCommands) encrypt(ctx *router.Ctx) {
 
 	encryption, ok := encodings.Encryptions[encryptionName]
 	if !ok {
-		_ = ctx.RespondText("Invalid encryption! Use `[p]encryptions` to get a list of all available encryptions.")
+		ctx.RespondText("Invalid encryption! Use `[p]encryptions` to get a list of all available encryptions.")
 		return
 	}
 
 	encrypted, err := encryption.Encrypt(text, key)
 	if err != nil {
-		_ = ctx.RespondText("An error has occurred: " + err.Error())
+		ctx.RespondText("An error has occurred: " + err.Error())
 		return
 	}
 
@@ -1022,13 +1022,13 @@ func (c *TextCommands) decrypt(ctx *router.Ctx) {
 
 	encryption, ok := encodings.Encryptions[encryptionName]
 	if !ok {
-		_ = ctx.RespondText("Invalid encryption! Use `[p]encryptions` to get a list of all available encryptions.")
+		ctx.RespondText("Invalid encryption! Use `[p]encryptions` to get a list of all available encryptions.")
 		return
 	}
 
 	encrypted, err := encryption.Decrypt(text, key)
 	if err != nil {
-		_ = ctx.RespondText("An error has occurred: " + err.Error())
+		ctx.RespondText("An error has occurred: " + err.Error())
 		return
 	}
 

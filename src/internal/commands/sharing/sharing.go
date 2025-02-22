@@ -64,7 +64,7 @@ func (c *SharingCommands) Register() {
 func (*SharingCommands) sharedusers(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
-		_ = ctx.RespondText("Error getting config")
+		ctx.RespondText("Error getting config")
 		return
 	}
 
@@ -98,7 +98,7 @@ func (*SharingCommands) sharedusers(ctx *router.Ctx) {
 		}
 
 		if slices.Contains(cfg.Sharing.SharedUsers, user.ID) {
-			_ = ctx.RespondText("User is already in the Shared Users list.")
+			ctx.RespondText("User is already in the Shared Users list.")
 			return
 		}
 
@@ -107,7 +107,7 @@ func (*SharingCommands) sharedusers(ctx *router.Ctx) {
 		_ = cfg.Save()
 
 		c.services.Embed.NewEmbed().
-			SetDescription(fmt.Sprintf("Added %s to the Shared Users list.", user.Mention())).
+			SetDescription("Added %s to the Shared Users list.", user.Mention()).
 			Send(ctx)
 	case "rm":
 		user, err := ctx.Arguments.Get(1).User(router.ArgumentFlagFallbackDefault)
@@ -119,7 +119,7 @@ func (*SharingCommands) sharedusers(ctx *router.Ctx) {
 		}
 
 		if !slices.Contains(cfg.Sharing.SharedUsers, user.ID) {
-			_ = ctx.RespondText("User already isn't in the Shared Users list.")
+			ctx.RespondText("User already isn't in the Shared Users list.")
 			return
 		}
 
@@ -128,7 +128,7 @@ func (*SharingCommands) sharedusers(ctx *router.Ctx) {
 		_ = cfg.Save()
 
 		c.services.Embed.NewEmbed().
-			SetDescription(fmt.Sprintf("Removed %s from the Shared Users list.", user.Mention())).
+			SetDescription("Removed %s from the Shared Users list.", user.Mention()).
 			Send(ctx)
 	case "clear":
 		cfg.Sharing.SharedUsers = []string{}
@@ -138,14 +138,14 @@ func (*SharingCommands) sharedusers(ctx *router.Ctx) {
 			SetDescription("Cleared all users from the Shared Users list.").
 			Send(ctx)
 	default:
-		_ = ctx.RespondText("Invalid <get/add/rm/clear> argument. Use `get`, `add`, `rm`, or `clear`.")
+		ctx.RespondText("Invalid <get/add/rm/clear> argument. Use `get`, `add`, `rm`, or `clear`.")
 	}
 }
 
 func (*SharingCommands) sharedcategories(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
-		_ = ctx.RespondText("Error getting config.")
+		ctx.RespondText("Error getting config.")
 		return
 	}
 
@@ -169,12 +169,12 @@ func (*SharingCommands) sharedcategories(ctx *router.Ctx) {
 		}
 
 		if !found {
-			_ = ctx.RespondText("Category not found. Use `[p]sharedcategories values` to get a list of available categories.")
+			ctx.RespondText("Category not found. Use `[p]sharedcategories values` to get a list of available categories.")
 			return
 		}
 
 		if slices.Contains(cfg.Sharing.SharedCategories, entry) {
-			_ = ctx.RespondText("Category is already in the Shared Categories list!")
+			ctx.RespondText("Category is already in the Shared Categories list!")
 			return
 		}
 
@@ -199,12 +199,12 @@ func (*SharingCommands) sharedcategories(ctx *router.Ctx) {
 		}
 
 		if !found {
-			_ = ctx.RespondText("Category not found. Use `[p]sharedcategories values` to get a list of available categories.")
+			ctx.RespondText("Category not found. Use `[p]sharedcategories values` to get a list of available categories.")
 			return
 		}
 
 		if !slices.Contains(cfg.Sharing.SharedCategories, entry) {
-			_ = ctx.RespondText("Category already isn't in the Shared Categories list!")
+			ctx.RespondText("Category already isn't in the Shared Categories list!")
 			return
 		}
 
@@ -232,14 +232,14 @@ func (*SharingCommands) sharedcategories(ctx *router.Ctx) {
 			AddField("Available Command Categories", strings.Join(categories, ", ")).
 			Send(ctx)
 	default:
-		_ = ctx.RespondText("Invalid <get/add/rm/clear/values> argument. Use `get`, `add`, `rm`, `clear` or `values`.")
+		ctx.RespondText("Invalid <get/add/rm/clear/values> argument. Use `get`, `add`, `rm`, `clear` or `values`.")
 	}
 }
 
 func (*SharingCommands) sharedcommands(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
-		_ = ctx.RespondText("Error getting config.")
+		ctx.RespondText("Error getting config.")
 		return
 	}
 
@@ -263,12 +263,12 @@ func (*SharingCommands) sharedcommands(ctx *router.Ctx) {
 		}
 
 		if !found {
-			_ = ctx.RespondText("Command not found. Use `[p]sharedcommands values` to get a list of available commands.")
+			ctx.RespondText("Command not found. Use `[p]sharedcommands values` to get a list of available commands.")
 			return
 		}
 
 		if slices.Contains(cfg.Sharing.SharedCommands, entry) {
-			_ = ctx.RespondText("Command is already in the Shared Commands list!")
+			ctx.RespondText("Command is already in the Shared Commands list!")
 			return
 		}
 
@@ -293,12 +293,12 @@ func (*SharingCommands) sharedcommands(ctx *router.Ctx) {
 		}
 
 		if !found {
-			_ = ctx.RespondText("Command not found. Use `[p]sharedcommands values` to get a list of available commands.")
+			ctx.RespondText("Command not found. Use `[p]sharedcommands values` to get a list of available commands.")
 			return
 		}
 
 		if !slices.Contains(cfg.Sharing.SharedCommands, entry) {
-			_ = ctx.RespondText("Command already isn't in the Shared Commands list!")
+			ctx.RespondText("Command already isn't in the Shared Commands list!")
 			return
 		}
 
@@ -320,14 +320,14 @@ func (*SharingCommands) sharedcommands(ctx *router.Ctx) {
 			AddField("Available Commands", "Use `[p]help` or view <https://docs.lightning-bot.com/category/commands> for a list of commands.").
 			Send(ctx)
 	default:
-		_ = ctx.RespondText("Invalid <get/add/rm/clear/values> argument. Use `get`, `add`, `rm`, `clear` or `values`.")
+		ctx.RespondText("Invalid <get/add/rm/clear/values> argument. Use `get`, `add`, `rm`, `clear` or `values`.")
 	}
 }
 
 func (*SharingCommands) shareall(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
-		_ = ctx.RespondText("Error getting config")
+		ctx.RespondText("Error getting config")
 		return
 	}
 
@@ -339,7 +339,7 @@ func (*SharingCommands) shareall(ctx *router.Ctx) {
 	case "set":
 		toggle := strings.ToLower(utils.Arguments["[on/off]"])
 		if toggle != "on" && toggle != "off" {
-			_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
+			ctx.RespondText("Invalid value. Use `on` or `off`.")
 			return
 		}
 
@@ -357,14 +357,14 @@ func (*SharingCommands) shareall(ctx *router.Ctx) {
 			SetDescription("Turned " + utils.Misc.FormatBoolOnOff(cfg.Sharing.ShareAll) + " Share All Commands").
 			Send(ctx)
 	default:
-		_ = ctx.RespondText("Invalid <get/set/toggle> argument. Use `get`, `set` or `toggle`.")
+		ctx.RespondText("Invalid <get/set/toggle> argument. Use `get`, `set` or `toggle`.")
 	}
 }
 
 func (*SharingCommands) blockdangerous(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
-		_ = ctx.RespondText("Error getting config")
+		ctx.RespondText("Error getting config")
 		return
 	}
 
@@ -376,7 +376,7 @@ func (*SharingCommands) blockdangerous(ctx *router.Ctx) {
 	case "set":
 		toggle := strings.ToLower(utils.Arguments["[on/off]"])
 		if toggle != "on" && toggle != "off" {
-			_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
+			ctx.RespondText("Invalid value. Use `on` or `off`.")
 			return
 		}
 
@@ -394,6 +394,6 @@ func (*SharingCommands) blockdangerous(ctx *router.Ctx) {
 			SetDescription("Turned " + utils.Misc.FormatBoolOnOff(cfg.Sharing.BlockDangerousCommands) + " Sharing Block Dangerous").
 			Send(ctx)
 	default:
-		_ = ctx.RespondText("Invalid <get/set/toggle> argument. Use `get`, `set` or `toggle`.")
+		ctx.RespondText("Invalid <get/set/toggle> argument. Use `get`, `set` or `toggle`.")
 	}
 }

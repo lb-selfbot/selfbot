@@ -113,7 +113,7 @@ func (*DumpingCommands) dumpall(ctx *router.Ctx) {
 		channel, _ = utils.Discord.GetChannel(ctx.Session, ctx.Message.ChannelID)
 	}
 	if channel == nil {
-		_ = ctx.RespondText("Error getting channel")
+		ctx.RespondText("Error getting channel")
 		return
 	}
 	server, _ := ctx.Session.State.Guild(channel.GuildID)
@@ -123,7 +123,7 @@ func (*DumpingCommands) dumpall(ctx *router.Ctx) {
 	}
 	messages, err := utils.Discord.GetChannelMessages(ctx.Session, channel.ID, 1000)
 	if err != nil {
-		_ = ctx.RespondText("Error getting messages")
+		ctx.RespondText("Error getting messages")
 		return
 	}
 	logString := fmt.Sprintf(
@@ -150,7 +150,7 @@ func (*DumpingCommands) dumpall(ctx *router.Ctx) {
 	_ = utils.IO.Write(filePath, logString)
 	_ = utils.System.OpenURL(filePath)
 	c.services.Embed.NewEmbed().
-		SetDescription(fmt.Sprintf("Dumped %d messages from %s", len(messages), channel.Name)).
+		SetDescription("Dumped %d messages from %s", len(messages), channel.Name).
 		Send(ctx)
 }
 
@@ -160,12 +160,12 @@ func (*DumpingCommands) dumpimages(ctx *router.Ctx) {
 		channel, _ = utils.Discord.GetChannel(ctx.Session, ctx.Message.ChannelID)
 	}
 	if channel == nil {
-		_ = ctx.RespondText("Error getting channel")
+		ctx.RespondText("Error getting channel")
 		return
 	}
 	messages, err := utils.Discord.GetChannelMessages(ctx.Session, channel.ID, 1000)
 	if err != nil {
-		_ = ctx.RespondText("Error getting messages")
+		ctx.RespondText("Error getting messages")
 		return
 	}
 	folder := filepath.Join(utils.IO.GetMainFolder(), "Dumping", "Images", utils.IO.SanitizeFilename(channel.Name))
@@ -192,7 +192,7 @@ func (*DumpingCommands) dumpimages(ctx *router.Ctx) {
 		}
 	}
 	c.services.Embed.NewEmbed().
-		SetDescription(fmt.Sprintf("Dumped %d images from %s", images, channel.Name)).
+		SetDescription("Dumped %d images from %s", images, channel.Name).
 		Send(ctx)
 }
 
@@ -202,12 +202,12 @@ func (*DumpingCommands) dumpvideos(ctx *router.Ctx) {
 		channel, _ = utils.Discord.GetChannel(ctx.Session, ctx.Message.ChannelID)
 	}
 	if channel == nil {
-		_ = ctx.RespondText("Error getting channel")
+		ctx.RespondText("Error getting channel")
 		return
 	}
 	messages, err := utils.Discord.GetChannelMessages(ctx.Session, channel.ID, 1000)
 	if err != nil {
-		_ = ctx.RespondText("Error getting messages")
+		ctx.RespondText("Error getting messages")
 		return
 	}
 	folder := filepath.Join(utils.IO.GetMainFolder(), "Dumping", "Videos", utils.IO.SanitizeFilename(channel.Name))
@@ -234,7 +234,7 @@ func (*DumpingCommands) dumpvideos(ctx *router.Ctx) {
 		}
 	}
 	c.services.Embed.NewEmbed().
-		SetDescription(fmt.Sprintf("Dumped %d videos from %s", videos, channel.Name)).
+		SetDescription("Dumped %d videos from %s", videos, channel.Name).
 		Send(ctx)
 }
 
@@ -244,12 +244,12 @@ func (*DumpingCommands) dumpaudio(ctx *router.Ctx) {
 		channel, _ = utils.Discord.GetChannel(ctx.Session, ctx.Message.ChannelID)
 	}
 	if channel == nil {
-		_ = ctx.RespondText("Error getting channel")
+		ctx.RespondText("Error getting channel")
 		return
 	}
 	messages, err := utils.Discord.GetChannelMessages(ctx.Session, channel.ID, 1000)
 	if err != nil {
-		_ = ctx.RespondText("Error getting messages")
+		ctx.RespondText("Error getting messages")
 		return
 	}
 	folder := filepath.Join(utils.IO.GetMainFolder(), "Dumping", "Audio", utils.IO.SanitizeFilename(channel.Name))
@@ -276,7 +276,7 @@ func (*DumpingCommands) dumpaudio(ctx *router.Ctx) {
 		}
 	}
 	c.services.Embed.NewEmbed().
-		SetDescription(fmt.Sprintf("Dumped %d audios from %s", audios, channel.Name)).
+		SetDescription("Dumped %d audios from %s", audios, channel.Name).
 		Send(ctx)
 }
 
@@ -286,12 +286,12 @@ func (*DumpingCommands) dumptext(ctx *router.Ctx) {
 		channel, _ = utils.Discord.GetChannel(ctx.Session, ctx.Message.ChannelID)
 	}
 	if channel == nil {
-		_ = ctx.RespondText("Error getting channel")
+		ctx.RespondText("Error getting channel")
 		return
 	}
 	messages, err := utils.Discord.GetChannelMessages(ctx.Session, channel.ID, 1000)
 	if err != nil {
-		_ = ctx.RespondText("Error getting messages")
+		ctx.RespondText("Error getting messages")
 		return
 	}
 	folder := filepath.Join(utils.IO.GetMainFolder(), "Dumping", "Text", utils.IO.SanitizeFilename(channel.Name))
@@ -318,7 +318,7 @@ func (*DumpingCommands) dumptext(ctx *router.Ctx) {
 		}
 	}
 	c.services.Embed.NewEmbed().
-		SetDescription(fmt.Sprintf("Dumped %d texts from %s", texts, channel.Name)).
+		SetDescription("Dumped %d texts from %s", texts, channel.Name).
 		Send(ctx)
 }
 
@@ -328,12 +328,12 @@ func (*DumpingCommands) dumpattachments(ctx *router.Ctx) {
 		channel, _ = utils.Discord.GetChannel(ctx.Session, ctx.Message.ChannelID)
 	}
 	if channel == nil {
-		_ = ctx.RespondText("Error getting channel")
+		ctx.RespondText("Error getting channel")
 		return
 	}
 	messages, err := utils.Discord.GetChannelMessages(ctx.Session, channel.ID, 1000)
 	if err != nil {
-		_ = ctx.RespondText("Error getting messages")
+		ctx.RespondText("Error getting messages")
 		return
 	}
 	folder := filepath.Join(utils.IO.GetMainFolder(), "Dumping", "Attachments", utils.IO.SanitizeFilename(channel.Name))
@@ -356,7 +356,7 @@ func (*DumpingCommands) dumpattachments(ctx *router.Ctx) {
 		}
 	}
 	c.services.Embed.NewEmbed().
-		SetDescription(fmt.Sprintf("Dumped %d attachments from %s", attachments, channel.Name)).
+		SetDescription("Dumped %d attachments from %s", attachments, channel.Name).
 		Send(ctx)
 }
 
@@ -368,12 +368,12 @@ func (*DumpingCommands) dumpfiletype(ctx *router.Ctx) {
 		channel, _ = utils.Discord.GetChannel(ctx.Session, ctx.Message.ChannelID)
 	}
 	if channel == nil {
-		_ = ctx.RespondText("Error getting channel")
+		ctx.RespondText("Error getting channel")
 		return
 	}
 	messages, err := utils.Discord.GetChannelMessages(ctx.Session, channel.ID, 1000)
 	if err != nil {
-		_ = ctx.RespondText("Error getting messages")
+		ctx.RespondText("Error getting messages")
 		return
 	}
 	folder := filepath.Join(utils.IO.GetMainFolder(), "Dumping", utils.IO.SanitizeFilename("FileType-"+extension), utils.IO.SanitizeFilename(channel.Name))
@@ -400,7 +400,7 @@ func (*DumpingCommands) dumpfiletype(ctx *router.Ctx) {
 		}
 	}
 	c.services.Embed.NewEmbed().
-		SetDescription(fmt.Sprintf("Dumped %d attachments from %s", attachments, channel.Name)).
+		SetDescription("Dumped %d attachments from %s", attachments, channel.Name).
 		Send(ctx)
 }
 
@@ -412,12 +412,12 @@ func (*DumpingCommands) dumpcontenttype(ctx *router.Ctx) {
 		channel, _ = utils.Discord.GetChannel(ctx.Session, ctx.Message.ChannelID)
 	}
 	if channel == nil {
-		_ = ctx.RespondText("Error getting channel")
+		ctx.RespondText("Error getting channel")
 		return
 	}
 	messages, err := utils.Discord.GetChannelMessages(ctx.Session, channel.ID, 1000)
 	if err != nil {
-		_ = ctx.RespondText("Error getting messages")
+		ctx.RespondText("Error getting messages")
 		return
 	}
 	folder := filepath.Join(utils.IO.GetMainFolder(), "Dumping", utils.IO.SanitizeFilename("ContentType-"+contentType), utils.IO.SanitizeFilename(channel.Name))
@@ -444,19 +444,19 @@ func (*DumpingCommands) dumpcontenttype(ctx *router.Ctx) {
 		}
 	}
 	c.services.Embed.NewEmbed().
-		SetDescription(fmt.Sprintf("Dumped %d attachments from %s", attachments, channel.Name)).
+		SetDescription("Dumped %d attachments from %s", attachments, channel.Name).
 		Send(ctx)
 }
 
 func (*DumpingCommands) dumpemojis(ctx *router.Ctx) {
 	guild, err := utils.Discord.GetGuild(ctx.Session, utils.Misc.Or(utils.Arguments["[server id]"], ctx.Message.GuildID))
 	if err != nil {
-		_ = ctx.RespondText("Error getting server: " + err.Error())
+		ctx.RespondText("Error getting server: " + err.Error())
 		return
 	}
 	emojis, err := ctx.Session.GuildEmojis(guild.ID)
 	if err != nil {
-		_ = ctx.RespondText("Error getting emojis: " + err.Error())
+		ctx.RespondText("Error getting emojis: " + err.Error())
 		return
 	}
 	folder := filepath.Join(utils.IO.GetMainFolder(), "Dumping", "Emojis", utils.IO.SanitizeFilename(guild.Name))
@@ -481,14 +481,14 @@ func (*DumpingCommands) dumpemojis(ctx *router.Ctx) {
 		_ = utils.IO.WriteBytes(filePath, httpResponse.Body)
 	}
 	c.services.Embed.NewEmbed().
-		SetDescription(fmt.Sprintf("Dumped %d emojis from %s", len(emojis), guild.Name)).
+		SetDescription("Dumped %d emojis from %s", len(emojis), guild.Name).
 		Send(ctx)
 }
 
 func (*DumpingCommands) dumpstickers(ctx *router.Ctx) {
 	guild, err := utils.Discord.GetGuild(ctx.Session, utils.Misc.Or(utils.Arguments["[server id]"], ctx.Message.GuildID))
 	if err != nil {
-		_ = ctx.RespondText("Error getting server: " + err.Error())
+		ctx.RespondText("Error getting server: " + err.Error())
 		return
 	}
 	folder := filepath.Join(utils.IO.GetMainFolder(), "Dumping", "Stickers", utils.IO.SanitizeFilename(guild.Name))
@@ -520,14 +520,14 @@ func (*DumpingCommands) dumpstickers(ctx *router.Ctx) {
 		_ = utils.IO.WriteBytes(filePath, httpResponse.Body)
 	}
 	c.services.Embed.NewEmbed().
-		SetDescription(fmt.Sprintf("Dumped %d stickers from %s", len(guild.Stickers), guild.Name)).
+		SetDescription("Dumped %d stickers from %s", len(guild.Stickers), guild.Name).
 		Send(ctx)
 }
 
 func (*DumpingCommands) dumpavatars(ctx *router.Ctx) {
 	guild, err := utils.Discord.GetGuild(ctx.Session, utils.Misc.Or(utils.Arguments["[server id]"], ctx.Message.GuildID))
 	if err != nil {
-		_ = ctx.RespondText("Error getting server: " + err.Error())
+		ctx.RespondText("Error getting server: " + err.Error())
 		return
 	}
 
@@ -555,14 +555,14 @@ func (*DumpingCommands) dumpavatars(ctx *router.Ctx) {
 		_ = utils.IO.WriteBytes(filePath, httpResponse.Body)
 	}
 	c.services.Embed.NewEmbed().
-		SetDescription(fmt.Sprintf("Dumped %d avatars from %s", len(guild.Members), guild.Name)).
+		SetDescription("Dumped %d avatars from %s", len(guild.Members), guild.Name).
 		Send(ctx)
 }
 
 func (*DumpingCommands) dumpchannels(ctx *router.Ctx) {
 	guild, err := utils.Discord.GetGuild(ctx.Session, utils.Misc.Or(utils.Arguments["[server id]"], ctx.Message.GuildID))
 	if err != nil {
-		_ = ctx.RespondText("Error getting server: " + err.Error())
+		ctx.RespondText("Error getting server: " + err.Error())
 		return
 	}
 	categories, categoryChannels, looseChannels := utils.Discord.MapCategories(guild.Channels)
@@ -585,14 +585,14 @@ func (*DumpingCommands) dumpchannels(ctx *router.Ctx) {
 	_ = utils.IO.Write(filePath, logString)
 	_ = utils.System.OpenURL(filePath)
 	c.services.Embed.NewEmbed().
-		SetDescription(fmt.Sprintf("Dumped %d channels from %s", len(guild.Channels), guild.Name)).
+		SetDescription("Dumped %d channels from %s", len(guild.Channels), guild.Name).
 		Send(ctx)
 }
 
 func (*DumpingCommands) dumpmembers(ctx *router.Ctx) {
 	guild, err := utils.Discord.GetGuild(ctx.Session, utils.Misc.Or(utils.Arguments["[server id]"], ctx.Message.GuildID))
 	if err != nil {
-		_ = ctx.RespondText("Error getting server: " + err.Error())
+		ctx.RespondText("Error getting server: " + err.Error())
 		return
 	}
 
@@ -613,6 +613,6 @@ func (*DumpingCommands) dumpmembers(ctx *router.Ctx) {
 	runtime.GC()
 
 	c.services.Embed.NewEmbed().
-		SetDescription(fmt.Sprintf("Dumped %d members from %s", len(guild.Members), guild.Name)).
+		SetDescription("Dumped %d members from %s", len(guild.Members), guild.Name).
 		Send(ctx)
 }

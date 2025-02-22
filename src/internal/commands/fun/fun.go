@@ -621,7 +621,7 @@ func (FunCommands) hack(ctx *router.Ctx) {
 func (FunCommands) insult(ctx *router.Ctx) {
 	httpResponse := http.Get("https://insult.mattbas.org/api/insult")
 	if httpResponse.Error != nil {
-		_ = ctx.RespondText("An error has occurred.")
+		ctx.RespondText("An error has occurred.")
 		return
 	}
 	c.services.Embed.NewEmbed().
@@ -632,7 +632,7 @@ func (FunCommands) insult(ctx *router.Ctx) {
 func (FunCommands) dadjoke(ctx *router.Ctx) {
 	joke, err := http.GetJson("https://icanhazdadjoke.com/", map[string]string{"Accept": "application/json"})
 	if err != nil {
-		_ = ctx.RespondText("An error has occurred.")
+		ctx.RespondText("An error has occurred.")
 		return
 	}
 	c.services.Embed.NewEmbed().
@@ -643,7 +643,7 @@ func (FunCommands) dadjoke(ctx *router.Ctx) {
 func (FunCommands) yomomma(ctx *router.Ctx) {
 	joke, err := http.GetJson("https://api.yomomma.info/")
 	if err != nil {
-		_ = ctx.RespondText("An error has occurred.")
+		ctx.RespondText("An error has occurred.")
 		return
 	}
 	c.services.Embed.NewEmbed().
@@ -654,7 +654,7 @@ func (FunCommands) yomomma(ctx *router.Ctx) {
 func (FunCommands) wouldyourather(ctx *router.Ctx) {
 	wyrJson, err := http.GetJson("https://api.lightning-bot.com/api/v3/misc/wyr")
 	if err != nil {
-		_ = ctx.RespondText("An error has occurred.")
+		ctx.RespondText("An error has occurred.")
 		return
 	}
 	c.services.Embed.NewEmbed().
@@ -667,7 +667,7 @@ func (FunCommands) wouldyourather(ctx *router.Ctx) {
 func (FunCommands) topic(ctx *router.Ctx) {
 	topicJson, err := http.GetJson("https://api.lightning-bot.com/api/v3/misc/topic")
 	if err != nil {
-		_ = ctx.RespondText("An error has occurred.")
+		ctx.RespondText("An error has occurred.")
 		return
 	}
 	c.services.Embed.NewEmbed().
@@ -719,7 +719,7 @@ func (FunCommands) slot(ctx *router.Ctx) {
 func (FunCommands) advice(ctx *router.Ctx) {
 	advice, err := http.GetJson("https://api.adviceslip.com/advice")
 	if err != nil {
-		_ = ctx.RespondText("An error has occurred.")
+		ctx.RespondText("An error has occurred.")
 		return
 	}
 	c.services.Embed.NewEmbed().
@@ -730,7 +730,7 @@ func (FunCommands) advice(ctx *router.Ctx) {
 func (FunCommands) catfact(ctx *router.Ctx) {
 	fact, err := http.GetJson("https://some-random-api.com/facts/cat")
 	if err != nil {
-		_ = ctx.RespondText("An error has occurred.")
+		ctx.RespondText("An error has occurred.")
 		return
 	}
 	c.services.Embed.NewEmbed().
@@ -741,7 +741,7 @@ func (FunCommands) catfact(ctx *router.Ctx) {
 func (FunCommands) dogfact(ctx *router.Ctx) {
 	fact, err := http.GetJson("https://some-random-api.com/facts/dog")
 	if err != nil {
-		_ = ctx.RespondText("An error has occurred.")
+		ctx.RespondText("An error has occurred.")
 		return
 	}
 	c.services.Embed.NewEmbed().
@@ -752,7 +752,7 @@ func (FunCommands) dogfact(ctx *router.Ctx) {
 func (FunCommands) pandafact(ctx *router.Ctx) {
 	fact, err := http.GetJson("https://some-random-api.com/facts/panda")
 	if err != nil {
-		_ = ctx.RespondText("An error has occurred.")
+		ctx.RespondText("An error has occurred.")
 		return
 	}
 	c.services.Embed.NewEmbed().
@@ -763,7 +763,7 @@ func (FunCommands) pandafact(ctx *router.Ctx) {
 func (FunCommands) foxfact(ctx *router.Ctx) {
 	fact, err := http.GetJson("https://some-random-api.com/facts/fox")
 	if err != nil {
-		_ = ctx.RespondText("An error has occurred.")
+		ctx.RespondText("An error has occurred.")
 		return
 	}
 	c.services.Embed.NewEmbed().
@@ -774,7 +774,7 @@ func (FunCommands) foxfact(ctx *router.Ctx) {
 func (FunCommands) koalafact(ctx *router.Ctx) {
 	fact, err := http.GetJson("https://some-random-api.com/facts/koala")
 	if err != nil {
-		_ = ctx.RespondText("An error has occurred.")
+		ctx.RespondText("An error has occurred.")
 		return
 	}
 	c.services.Embed.NewEmbed().
@@ -785,7 +785,7 @@ func (FunCommands) koalafact(ctx *router.Ctx) {
 func (FunCommands) birdfact(ctx *router.Ctx) {
 	fact, err := http.GetJson("https://api.animality.xyz/fact/bird")
 	if err != nil {
-		_ = ctx.RespondText("An error has occurred.")
+		ctx.RespondText("An error has occurred.")
 		return
 	}
 	c.services.Embed.NewEmbed().
@@ -796,7 +796,7 @@ func (FunCommands) birdfact(ctx *router.Ctx) {
 func (FunCommands) redpandafact(ctx *router.Ctx) {
 	fact, err := http.GetJson("https://api.animality.xyz/fact/redpanda")
 	if err != nil {
-		_ = ctx.RespondText("An error has occurred.")
+		ctx.RespondText("An error has occurred.")
 		return
 	}
 	c.services.Embed.NewEmbed().
@@ -807,7 +807,7 @@ func (FunCommands) redpandafact(ctx *router.Ctx) {
 func (FunCommands) whalefact(ctx *router.Ctx) {
 	fact, err := http.GetJson("https://api.animality.xyz/fact/whale")
 	if err != nil {
-		_ = ctx.RespondText("An error has occurred.")
+		ctx.RespondText("An error has occurred.")
 		return
 	}
 	c.services.Embed.NewEmbed().
@@ -818,7 +818,7 @@ func (FunCommands) whalefact(ctx *router.Ctx) {
 func (FunCommands) kangaroofact(ctx *router.Ctx) {
 	fact, err := http.GetJson("https://api.animality.xyz/fact/kangaroo")
 	if err != nil {
-		_ = ctx.RespondText("An error has occurred.")
+		ctx.RespondText("An error has occurred.")
 		return
 	}
 	c.services.Embed.NewEmbed().
@@ -829,7 +829,7 @@ func (FunCommands) kangaroofact(ctx *router.Ctx) {
 func (FunCommands) bunnyfact(ctx *router.Ctx) {
 	fact, err := http.GetJson("https://api.animality.xyz/fact/bunny")
 	if err != nil {
-		_ = ctx.RespondText("An error has occurred.")
+		ctx.RespondText("An error has occurred.")
 		return
 	}
 	c.services.Embed.NewEmbed().
@@ -840,7 +840,7 @@ func (FunCommands) bunnyfact(ctx *router.Ctx) {
 func (FunCommands) lionfact(ctx *router.Ctx) {
 	fact, err := http.GetJson("https://api.animality.xyz/fact/lion")
 	if err != nil {
-		_ = ctx.RespondText("An error has occurred.")
+		ctx.RespondText("An error has occurred.")
 		return
 	}
 	c.services.Embed.NewEmbed().
@@ -851,7 +851,7 @@ func (FunCommands) lionfact(ctx *router.Ctx) {
 func (FunCommands) frogfact(ctx *router.Ctx) {
 	fact, err := http.GetJson("https://api.animality.xyz/fact/frog")
 	if err != nil {
-		_ = ctx.RespondText("An error has occurred.")
+		ctx.RespondText("An error has occurred.")
 		return
 	}
 	c.services.Embed.NewEmbed().
@@ -862,7 +862,7 @@ func (FunCommands) frogfact(ctx *router.Ctx) {
 func (FunCommands) duckfact(ctx *router.Ctx) {
 	fact, err := http.GetJson("https://api.animality.xyz/fact/duck")
 	if err != nil {
-		_ = ctx.RespondText("An error has occurred.")
+		ctx.RespondText("An error has occurred.")
 		return
 	}
 	c.services.Embed.NewEmbed().
@@ -873,7 +873,7 @@ func (FunCommands) duckfact(ctx *router.Ctx) {
 func (FunCommands) penguinfact(ctx *router.Ctx) {
 	fact, err := http.GetJson("https://api.animality.xyz/fact/penguin")
 	if err != nil {
-		_ = ctx.RespondText("An error has occurred.")
+		ctx.RespondText("An error has occurred.")
 		return
 	}
 	c.services.Embed.NewEmbed().
@@ -884,7 +884,7 @@ func (FunCommands) penguinfact(ctx *router.Ctx) {
 func (FunCommands) dolphinfact(ctx *router.Ctx) {
 	fact, err := http.GetJson("https://api.animality.xyz/fact/dolphin")
 	if err != nil {
-		_ = ctx.RespondText("An error has occurred.")
+		ctx.RespondText("An error has occurred.")
 		return
 	}
 	c.services.Embed.NewEmbed().
@@ -895,7 +895,7 @@ func (FunCommands) dolphinfact(ctx *router.Ctx) {
 func (FunCommands) bearfact(ctx *router.Ctx) {
 	fact, err := http.GetJson("https://api.animality.xyz/fact/bear")
 	if err != nil {
-		_ = ctx.RespondText("An error has occurred.")
+		ctx.RespondText("An error has occurred.")
 		return
 	}
 	c.services.Embed.NewEmbed().
@@ -906,7 +906,7 @@ func (FunCommands) bearfact(ctx *router.Ctx) {
 func (FunCommands) axolotlfact(ctx *router.Ctx) {
 	fact, err := http.GetJson("https://api.animality.xyz/fact/axolotl")
 	if err != nil {
-		_ = ctx.RespondText("An error has occurred.")
+		ctx.RespondText("An error has occurred.")
 		return
 	}
 	c.services.Embed.NewEmbed().
@@ -917,7 +917,7 @@ func (FunCommands) axolotlfact(ctx *router.Ctx) {
 func (FunCommands) capybarafact(ctx *router.Ctx) {
 	fact, err := http.GetJson("https://api.animality.xyz/fact/capybara")
 	if err != nil {
-		_ = ctx.RespondText("An error has occurred.")
+		ctx.RespondText("An error has occurred.")
 		return
 	}
 	c.services.Embed.NewEmbed().
@@ -928,14 +928,14 @@ func (FunCommands) capybarafact(ctx *router.Ctx) {
 func (FunCommands) trivia(ctx *router.Ctx) {
 	httpResponse := http.Get("https://opentdb.com/api.php?amount=1")
 	if httpResponse.StatusCode != 200 {
-		_ = ctx.RespondText("An error has occurred.")
+		ctx.RespondText("An error has occurred.")
 		return
 	}
 
 	data := httpResponse.Json()
 
 	if data.Get("response_code").MustInt64() != 0 {
-		_ = ctx.RespondText("An error has occurred.")
+		ctx.RespondText("An error has occurred.")
 		return
 	}
 
@@ -956,7 +956,7 @@ func (FunCommands) trivia(ctx *router.Ctx) {
 
 func (FunCommands) dice(ctx *router.Ctx) {
 	c.services.Embed.NewEmbed().
-		SetDescription(fmt.Sprintf("You rolled: %d", random.Int(1, 6))).
+		SetDescription("You rolled: %d", random.Int(1, 6)).
 		Send(ctx)
 }
 
@@ -966,11 +966,11 @@ func (FunCommands) randomemoji(ctx *router.Ctx) {
 	}
 	emojis, err := ctx.Session.GuildEmojis(ctx.Message.GuildID)
 	if err != nil {
-		_ = ctx.RespondText("An error has occurred.")
+		ctx.RespondText("An error has occurred.")
 		return
 	}
 	emoji := random.Choice(emojis)
-	_ = ctx.RespondText(emoji.MessageFormat())
+	ctx.RespondText(emoji.MessageFormat())
 }
 
 func (FunCommands) randomchannel(ctx *router.Ctx) {
@@ -979,7 +979,7 @@ func (FunCommands) randomchannel(ctx *router.Ctx) {
 	}
 	channels, err := ctx.Session.GuildChannels(ctx.Message.GuildID)
 	if err != nil {
-		_ = ctx.RespondText("An error has occurred.")
+		ctx.RespondText("An error has occurred.")
 		return
 	}
 	for index, channel := range channels {
@@ -989,13 +989,13 @@ func (FunCommands) randomchannel(ctx *router.Ctx) {
 		}
 	}
 	channel := random.Choice(channels)
-	_ = ctx.RespondText(channel.Mention())
+	ctx.RespondText(channel.Mention())
 }
 
 func (FunCommands) choose(ctx *router.Ctx) {
 	choice := random.Choice(strings.Split(ctx.Arguments.Raw(), " "))
 	c.services.Embed.NewEmbed().
-		SetDescription(fmt.Sprintf("I choose: %s", choice)).
+		SetDescription("I choose: %s", choice).
 		Send(ctx)
 }
 
@@ -1015,7 +1015,7 @@ func (FunCommands) numberfact(ctx *router.Ctx) {
 	number := utils.Arguments["<number>"]
 	httpResponse := http.Get(fmt.Sprintf("http://numbersapi.com/%s", number))
 	if httpResponse.Error != nil {
-		_ = ctx.RespondText("An error has occurred.")
+		ctx.RespondText("An error has occurred.")
 		return
 	}
 	c.services.Embed.NewEmbed().
@@ -1027,7 +1027,7 @@ func (FunCommands) numberfact(ctx *router.Ctx) {
 func (FunCommands) joke(ctx *router.Ctx) {
 	joke, err := http.GetJson("https://v2.jokeapi.dev/joke/Any")
 	if err != nil {
-		_ = ctx.RespondText("An error has occurred.")
+		ctx.RespondText("An error has occurred.")
 		return
 	}
 	emb := c.services.Embed.NewEmbed()
@@ -1043,7 +1043,7 @@ func (FunCommands) joke(ctx *router.Ctx) {
 func (FunCommands) fml(ctx *router.Ctx) {
 	fmlJson, err := http.GetJson("https://api.lightning-bot.com/api/v3/misc/fml")
 	if err != nil {
-		_ = ctx.RespondText("An error has occurred.")
+		ctx.RespondText("An error has occurred.")
 		return
 	}
 	c.services.Embed.NewEmbed().
@@ -1054,7 +1054,7 @@ func (FunCommands) fml(ctx *router.Ctx) {
 func (FunCommands) tronald(ctx *router.Ctx) {
 	tronald, err := http.GetJson("https://api.tronalddump.io/random/quote", map[string]string{"Accept": "application/hal+json"})
 	if err != nil {
-		_ = ctx.RespondText("An error has occurred.")
+		ctx.RespondText("An error has occurred.")
 		return
 	}
 	c.services.Embed.NewEmbed().
@@ -1065,7 +1065,7 @@ func (FunCommands) tronald(ctx *router.Ctx) {
 func (FunCommands) kanyewest(ctx *router.Ctx) {
 	kanyewest, err := http.GetJson("https://api.kanye.rest")
 	if err != nil {
-		_ = ctx.RespondText("An error has occurred.")
+		ctx.RespondText("An error has occurred.")
 		return
 	}
 	c.services.Embed.NewEmbed().
@@ -1076,7 +1076,7 @@ func (FunCommands) kanyewest(ctx *router.Ctx) {
 func (FunCommands) rps(ctx *router.Ctx) {
 	choice := utils.Arguments["<rock/paper/scissors>"]
 	if choice != "rock" && choice != "paper" && choice != "scissors" {
-		_ = ctx.RespondText("You can only choose rock, paper or scissors.")
+		ctx.RespondText("You can only choose rock, paper or scissors.")
 		return
 	}
 	c.services.Embed.NewEmbed().
@@ -1100,70 +1100,70 @@ func (FunCommands) covidtest(ctx *router.Ctx) {
 func (FunCommands) hug(ctx *router.Ctx) {
 	url, err := utils.Misc.GetImageUrlFromJson("https://nekos.life/api/v2/img/hug", "url")
 	if err != nil {
-		_ = ctx.RespondText("An error has occurred.")
+		ctx.RespondText("An error has occurred.")
 		return
 	}
-	_ = ctx.RespondText(url)
+	ctx.RespondText(url)
 }
 
 func (FunCommands) kiss(ctx *router.Ctx) {
 	url, err := utils.Misc.GetImageUrlFromJson("https://nekos.life/api/v2/img/kiss", "url")
 	if err != nil {
-		_ = ctx.RespondText("An error has occurred.")
+		ctx.RespondText("An error has occurred.")
 		return
 	}
-	_ = ctx.RespondText(url)
+	ctx.RespondText(url)
 }
 
 func (FunCommands) slap(ctx *router.Ctx) {
 	url, err := utils.Misc.GetImageUrlFromJson("https://nekos.life/api/v2/img/slap", "url")
 	if err != nil {
-		_ = ctx.RespondText("An error has occurred.")
+		ctx.RespondText("An error has occurred.")
 		return
 	}
-	_ = ctx.RespondText(url)
+	ctx.RespondText(url)
 }
 
 func (FunCommands) cuddle(ctx *router.Ctx) {
 	url, err := utils.Misc.GetImageUrlFromJson("https://nekos.life/api/v2/img/cuddle", "url")
 	if err != nil {
-		_ = ctx.RespondText("An error has occurred.")
+		ctx.RespondText("An error has occurred.")
 		return
 	}
-	_ = ctx.RespondText(url)
+	ctx.RespondText(url)
 }
 
 func (FunCommands) pat(ctx *router.Ctx) {
 	url, err := utils.Misc.GetImageUrlFromJson("https://nekos.life/api/v2/img/pat", "url")
 	if err != nil {
-		_ = ctx.RespondText("An error has occurred.")
+		ctx.RespondText("An error has occurred.")
 		return
 	}
-	_ = ctx.RespondText(url)
+	ctx.RespondText(url)
 }
 
 func (FunCommands) feed(ctx *router.Ctx) {
 	url, err := utils.Misc.GetImageUrlFromJson("https://nekos.life/api/v2/img/feed", "url")
 	if err != nil {
-		_ = ctx.RespondText("An error has occurred.")
+		ctx.RespondText("An error has occurred.")
 		return
 	}
-	_ = ctx.RespondText(url)
+	ctx.RespondText(url)
 }
 
 func (FunCommands) wink(ctx *router.Ctx) {
 	url, err := utils.Misc.GetImageUrlFromJson("https://some-random-api.com/animu/wink", "link")
 	if err != nil {
-		_ = ctx.RespondText("An error has occurred.")
+		ctx.RespondText("An error has occurred.")
 		return
 	}
-	_ = ctx.RespondText(url)
+	ctx.RespondText(url)
 }
 
 func (FunCommands) chucknorris(ctx *router.Ctx) {
 	joke, err := http.GetJson("https://api.chucknorris.io/jokes/random")
 	if err != nil {
-		_ = ctx.RespondText("An error has occurred.")
+		ctx.RespondText("An error has occurred.")
 		return
 	}
 	c.services.Embed.NewEmbed().
@@ -1174,7 +1174,7 @@ func (FunCommands) chucknorris(ctx *router.Ctx) {
 func (FunCommands) iss(ctx *router.Ctx) {
 	iss, err := http.GetJson("http://api.open-notify.org/iss-now.json")
 	if err != nil {
-		_ = ctx.RespondText("An error has occurred.")
+		ctx.RespondText("An error has occurred.")
 		return
 	}
 	latitude := iss.GetPath("iss_position", "latitude").MustString()
@@ -1190,7 +1190,7 @@ func (FunCommands) iss(ctx *router.Ctx) {
 func (FunCommands) apod(ctx *router.Ctx) {
 	apod, err := http.GetJson("https://api.nasa.gov/planetary/apod?api_key=rDenYNQFftu3YADWdUmF9s8iw0cyZckV7vBcibGe")
 	if err != nil {
-		_ = ctx.RespondText("An error has occurred.")
+		ctx.RespondText("An error has occurred.")
 		return
 	}
 	copyright := apod.Get("copyright").MustString()
@@ -1220,7 +1220,7 @@ func (FunCommands) httpcat(ctx *router.Ctx) {
 func (FunCommands) riddle(ctx *router.Ctx) {
 	riddleJson, err := http.GetJson("https://api.lightning-bot.com/api/v3/misc/riddle")
 	if err != nil {
-		_ = ctx.RespondText("An error has occurred.")
+		ctx.RespondText("An error has occurred.")
 		return
 	}
 	c.services.Embed.NewEmbed().
@@ -1232,7 +1232,7 @@ func (FunCommands) riddle(ctx *router.Ctx) {
 func (FunCommands) quote(ctx *router.Ctx) {
 	quote, err := http.GetJson("https://api.quotable.io/random")
 	if err != nil {
-		_ = ctx.RespondText("An error has occurred.")
+		ctx.RespondText("An error has occurred.")
 		return
 	}
 	c.services.Embed.NewEmbed().
@@ -1244,7 +1244,7 @@ func (FunCommands) quote(ctx *router.Ctx) {
 func (FunCommands) evilinsult(ctx *router.Ctx) {
 	httpResponse := http.Get("https://evilinsult.com/generate_insult.php?lang=en")
 	if httpResponse.Error != nil {
-		_ = ctx.RespondText("An error has occurred.")
+		ctx.RespondText("An error has occurred.")
 		return
 	}
 	c.services.Embed.NewEmbed().
@@ -1253,23 +1253,23 @@ func (FunCommands) evilinsult(ctx *router.Ctx) {
 }
 
 func (FunCommands) owoify(ctx *router.Ctx) {
-	_ = ctx.RespondText(owoifygo.Owoify(ctx.Arguments.Raw(), "owo"))
+	ctx.RespondText(owoifygo.Owoify(ctx.Arguments.Raw(), "owo"))
 }
 
 func (FunCommands) uwuify(ctx *router.Ctx) {
-	_ = ctx.RespondText(owoifygo.Owoify(ctx.Arguments.Raw(), "uwu"))
+	ctx.RespondText(owoifygo.Owoify(ctx.Arguments.Raw(), "uwu"))
 }
 
 func (FunCommands) uvuify(ctx *router.Ctx) {
-	_ = ctx.RespondText(owoifygo.Owoify(ctx.Arguments.Raw(), "uvu"))
+	ctx.RespondText(owoifygo.Owoify(ctx.Arguments.Raw(), "uvu"))
 }
 
 func (FunCommands) rickrollurl(ctx *router.Ctx) {
-	_ = ctx.RespondText("https://www.youtube.com/watch?v=dQw4w9WgXcQ")
+	ctx.RespondText("https://www.youtube.com/watch?v=dQw4w9WgXcQ")
 }
 
 func (FunCommands) rickroll(ctx *router.Ctx) {
-	_ = ctx.RespondText("**We're no strangers to love\nYou know the rules and so do I\nA full commitment's what I'm thinking of\nYou wouldn't get this from any other guy\nI just wanna tell you how I'm feeling\nGotta make you understand\nNever gonna give you up\nNever gonna let you down\nNever gonna run around and desert you\nNever gonna make you cry\nNever gonna say goodbye\nNever gonna tell a lie and hurt you\nWe've known each other for so long\nYour heart's been aching but you're too shy to say it\nInside we both know what's been going on\nWe know the game and we're gonna play it\nAnd if you ask me how I'm feeling\nDon't tell me you're too blind to see\nNever gonna give you up\nNever gonna let you down\nNever gonna run around and desert you\nNever gonna make you cry\nNever gonna say goodbye\nNever gonna tell a lie and hurt you\nNever gonna give you up\nNever gonna let you down\nNever gonna run around and desert you\nNever gonna make you cry\nNever gonna say goodbye\nNever gonna tell a lie and hurt you\nNever gonna give, never gonna give\n(Give you up)\n(Ooh) Never gonna give, never gonna give\n(Give you up)\nWe've known each other for so long\nYour heart's been aching but you're too shy to say it\nInside we both know what's been going on\nWe know the game and we're gonna play it\nI just wanna tell you how I'm feeling\nGotta make you understand\nNever gonna give you up\nNever gonna let you down\nNever gonna run around and desert you\nNever gonna make you cry\nNever gonna say goodbye\nNever gonna tell a lie and hurt you\nNever gonna give you up\nNever gonna let you down\nNever gonna run around and desert you\nNever gonna make you cry\nNever gonna say goodbye\nNever gonna tell a lie and hurt you\nNever gonna give you up\nNever gonna let you down\nNever gonna run around and desert you\nNever gonna make you cry**")
+	ctx.RespondText("**We're no strangers to love\nYou know the rules and so do I\nA full commitment's what I'm thinking of\nYou wouldn't get this from any other guy\nI just wanna tell you how I'm feeling\nGotta make you understand\nNever gonna give you up\nNever gonna let you down\nNever gonna run around and desert you\nNever gonna make you cry\nNever gonna say goodbye\nNever gonna tell a lie and hurt you\nWe've known each other for so long\nYour heart's been aching but you're too shy to say it\nInside we both know what's been going on\nWe know the game and we're gonna play it\nAnd if you ask me how I'm feeling\nDon't tell me you're too blind to see\nNever gonna give you up\nNever gonna let you down\nNever gonna run around and desert you\nNever gonna make you cry\nNever gonna say goodbye\nNever gonna tell a lie and hurt you\nNever gonna give you up\nNever gonna let you down\nNever gonna run around and desert you\nNever gonna make you cry\nNever gonna say goodbye\nNever gonna tell a lie and hurt you\nNever gonna give, never gonna give\n(Give you up)\n(Ooh) Never gonna give, never gonna give\n(Give you up)\nWe've known each other for so long\nYour heart's been aching but you're too shy to say it\nInside we both know what's been going on\nWe know the game and we're gonna play it\nI just wanna tell you how I'm feeling\nGotta make you understand\nNever gonna give you up\nNever gonna let you down\nNever gonna run around and desert you\nNever gonna make you cry\nNever gonna say goodbye\nNever gonna tell a lie and hurt you\nNever gonna give you up\nNever gonna let you down\nNever gonna run around and desert you\nNever gonna make you cry\nNever gonna say goodbye\nNever gonna tell a lie and hurt you\nNever gonna give you up\nNever gonna let you down\nNever gonna run around and desert you\nNever gonna make you cry**")
 }
 
 func (FunCommands) coinflip(ctx *router.Ctx) {
@@ -1285,14 +1285,14 @@ func (FunCommands) coinflip(ctx *router.Ctx) {
 }
 
 func (FunCommands) notfunny(ctx *router.Ctx) {
-	_ = ctx.RespondText("**Not funny I didn't laugh. Your joke is so bad I would have preferred the joke went over my head and you gave up re-telling me the joke. To be honest this is a horrid attempt at trying to get a laugh out of me. Not a chuckle, not a hehe, not even a subtle burst of air out of my esophagus. Science says before you laugh your brain preps your face muscles but I didn't even feel the slightest twitch. 0/10 this joke is so bad I cannot believe anyone legally allowed you to be creative at all. The amount of brain power you must have put into that joke has the potential to power every house on Earth. Get a personality and learn how to make jokes, read a book. I'm not saying this to be funny I genuinely mean it on how this is just bottom barrel embarrassment at comedy. You've single-handedly killed humor and every comedic act on the planet. I'm so disappointed that society has failed as a whole in being able to teach you how to be funny. Honestly if I put in all my power and time to try and make your joke funny it would require Einstein himself to build a device to strap me into so I can be connected to the energy of a billion stars to do it, and even then all that joke would get from people is a subtle scuff. You're lucky I still have the slightest of empathy for you after telling that joke otherwise I would have committed every war crime in the book just to prevent you from attempting any humor ever again. We should put that joke in text books so future generations can be wary of becoming such an absolute comedic failure. Im disappointed, hurt, and outright offended that my precious time has been wasted in my brain understanding that joke. In the time that took I was planning on helping kids who have been orphaned, but because of that you've waisted my time explaining the obscene integrity of your terrible attempt at comedy. Now those kids are suffering without meals and there's nobody to blame but you.**")
-	_ = ctx.RespondText("**I hope you're happy with what you have done and I truly hope you can move on and learn from this piss poor attempt**")
+	ctx.RespondText("**Not funny I didn't laugh. Your joke is so bad I would have preferred the joke went over my head and you gave up re-telling me the joke. To be honest this is a horrid attempt at trying to get a laugh out of me. Not a chuckle, not a hehe, not even a subtle burst of air out of my esophagus. Science says before you laugh your brain preps your face muscles but I didn't even feel the slightest twitch. 0/10 this joke is so bad I cannot believe anyone legally allowed you to be creative at all. The amount of brain power you must have put into that joke has the potential to power every house on Earth. Get a personality and learn how to make jokes, read a book. I'm not saying this to be funny I genuinely mean it on how this is just bottom barrel embarrassment at comedy. You've single-handedly killed humor and every comedic act on the planet. I'm so disappointed that society has failed as a whole in being able to teach you how to be funny. Honestly if I put in all my power and time to try and make your joke funny it would require Einstein himself to build a device to strap me into so I can be connected to the energy of a billion stars to do it, and even then all that joke would get from people is a subtle scuff. You're lucky I still have the slightest of empathy for you after telling that joke otherwise I would have committed every war crime in the book just to prevent you from attempting any humor ever again. We should put that joke in text books so future generations can be wary of becoming such an absolute comedic failure. Im disappointed, hurt, and outright offended that my precious time has been wasted in my brain understanding that joke. In the time that took I was planning on helping kids who have been orphaned, but because of that you've waisted my time explaining the obscene integrity of your terrible attempt at comedy. Now those kids are suffering without meals and there's nobody to blame but you.**")
+	ctx.RespondText("**I hope you're happy with what you have done and I truly hope you can move on and learn from this piss poor attempt**")
 }
 
 func (FunCommands) randomquestion(ctx *router.Ctx) {
 	question, err := http.GetJson("https://nekos.life/api/v2/why")
 	if err != nil {
-		_ = ctx.RespondText("An error has occurred.")
+		ctx.RespondText("An error has occurred.")
 		return
 	}
 	c.services.Embed.NewEmbed().
@@ -1303,11 +1303,11 @@ func (FunCommands) randomquestion(ctx *router.Ctx) {
 func (FunCommands) lyrics(ctx *router.Ctx) {
 	lyrics, err := http.GetJson("https://some-random-api.com/lyrics?title=" + url.QueryEscape(ctx.Arguments.Raw()))
 	if err != nil {
-		_ = ctx.RespondText("An error has occurred.")
+		ctx.RespondText("An error has occurred.")
 		return
 	}
 	if lyrics.Get("error").MustString() != "" {
-		_ = ctx.RespondText("Could not find lyrics.")
+		ctx.RespondText("Could not find lyrics.")
 		return
 	}
 	c.services.Embed.NewEmbed().
@@ -1320,7 +1320,7 @@ func (FunCommands) lyrics(ctx *router.Ctx) {
 func (FunCommands) breakingbadquote(ctx *router.Ctx) {
 	quote, err := http.GetJson("https://api.lightning-bot.com/api/v3/misc/breaking-bad-quote")
 	if err != nil {
-		_ = ctx.RespondText("An error has occurred.")
+		ctx.RespondText("An error has occurred.")
 		return
 	}
 	c.services.Embed.NewEmbed().
@@ -1332,7 +1332,7 @@ func (FunCommands) breakingbadquote(ctx *router.Ctx) {
 func (FunCommands) gameofthronesquote(ctx *router.Ctx) {
 	quote, err := http.GetJson("https://api.lightning-bot.com/api/v3/misc/game-of-thrones-quote")
 	if err != nil {
-		_ = ctx.RespondText("An error has occurred.")
+		ctx.RespondText("An error has occurred.")
 		return
 	}
 	c.services.Embed.NewEmbed().
@@ -1344,7 +1344,7 @@ func (FunCommands) gameofthronesquote(ctx *router.Ctx) {
 func (FunCommands) strangerthingsquote(ctx *router.Ctx) {
 	quote, err := http.GetJson("https://api.lightning-bot.com/api/v3/misc/stranger-things-quote")
 	if err != nil {
-		_ = ctx.RespondText("An error has occurred.")
+		ctx.RespondText("An error has occurred.")
 		return
 	}
 	c.services.Embed.NewEmbed().
@@ -1356,7 +1356,7 @@ func (FunCommands) strangerthingsquote(ctx *router.Ctx) {
 func (FunCommands) luciferquote(ctx *router.Ctx) {
 	quote, err := http.GetJson("https://api.lightning-bot.com/api/v3/misc/lucifer-quote")
 	if err != nil {
-		_ = ctx.RespondText("An error has occurred.")
+		ctx.RespondText("An error has occurred.")
 		return
 	}
 	c.services.Embed.NewEmbed().
@@ -1368,7 +1368,7 @@ func (FunCommands) luciferquote(ctx *router.Ctx) {
 func (FunCommands) xkcd(ctx *router.Ctx) {
 	json, err := http.GetJson("https://xkcd.com/info.0.json")
 	if err != nil {
-		_ = ctx.RespondText("An error has occurred.")
+		ctx.RespondText("An error has occurred.")
 		return
 	}
 
@@ -1384,7 +1384,7 @@ func (FunCommands) xkcd(ctx *router.Ctx) {
 func (FunCommands) boredactivity(ctx *router.Ctx) {
 	json, err := http.GetJson("https://www.boredapi.com/api/activity")
 	if err != nil {
-		_ = ctx.RespondText("An error has occurred.")
+		ctx.RespondText("An error has occurred.")
 		return
 	}
 
@@ -1404,7 +1404,7 @@ func (FunCommands) ermahgerd(ctx *router.Ctx) {
 func (FunCommands) iseven(ctx *router.Ctx) {
 	number, err := ctx.Arguments.Get(0).Int()
 	if err != nil {
-		_ = ctx.RespondText("Argument <number> must be a number.")
+		ctx.RespondText("Argument <number> must be a number.")
 		return
 	}
 
@@ -1417,7 +1417,7 @@ func (FunCommands) iseven(ctx *router.Ctx) {
 func (FunCommands) agify(ctx *router.Ctx) {
 	json, err := http.GetJson("https://api.agify.io?name=" + url.QueryEscape(ctx.Arguments.Raw()))
 	if err != nil {
-		_ = ctx.RespondText("An error has occurred.")
+		ctx.RespondText("An error has occurred.")
 		return
 	}
 
@@ -1431,7 +1431,7 @@ func (FunCommands) agify(ctx *router.Ctx) {
 func (FunCommands) randomword(ctx *router.Ctx) {
 	json, err := http.GetJson("https://randomwordgenerator.com/json/words_ws.json")
 	if err != nil {
-		_ = ctx.RespondText("An error has occurred.")
+		ctx.RespondText("An error has occurred.")
 		return
 	}
 
@@ -1446,7 +1446,7 @@ func (FunCommands) randomword(ctx *router.Ctx) {
 func (FunCommands) randomweirdword(ctx *router.Ctx) {
 	json, err := http.GetJson("https://randomwordgenerator.com/json/unusual-words.json")
 	if err != nil {
-		_ = ctx.RespondText("An error has occurred.")
+		ctx.RespondText("An error has occurred.")
 		return
 	}
 
@@ -1462,7 +1462,7 @@ func (FunCommands) randomweirdword(ctx *router.Ctx) {
 func (FunCommands) startupidea(ctx *router.Ctx) {
 	httpResponse := http.Get("https://itsthisforthat.com/api.php?text")
 	if httpResponse.Error != nil {
-		_ = ctx.RespondText("An error has occurred.")
+		ctx.RespondText("An error has occurred.")
 		return
 	}
 
@@ -1481,7 +1481,7 @@ func (FunCommands) fakeperson(ctx *router.Ctx) {
 func (FunCommands) commitmessage(ctx *router.Ctx) {
 	httpResponse := http.Get("https://whatthecommit.com/index.txt")
 	if httpResponse.Error != nil {
-		_ = ctx.RespondText("An error has occurred.")
+		ctx.RespondText("An error has occurred.")
 		return
 	}
 
@@ -1493,7 +1493,7 @@ func (FunCommands) commitmessage(ctx *router.Ctx) {
 func (FunCommands) showerthought(ctx *router.Ctx) {
 	data, err := http.GetJson("https://showerthoughts.nickf.me/api/thoughts/random?limit=1")
 	if err != nil {
-		_ = ctx.RespondText("An error has occurred.")
+		ctx.RespondText("An error has occurred.")
 		return
 	}
 
@@ -1505,7 +1505,7 @@ func (FunCommands) showerthought(ctx *router.Ctx) {
 func (FunCommands) truth(ctx *router.Ctx) {
 	data, err := http.GetJson("https://api.truthordarebot.xyz/v1/truth")
 	if err != nil {
-		_ = ctx.RespondText("An error has occurred.")
+		ctx.RespondText("An error has occurred.")
 		return
 	}
 
@@ -1517,7 +1517,7 @@ func (FunCommands) truth(ctx *router.Ctx) {
 func (FunCommands) dare(ctx *router.Ctx) {
 	data, err := http.GetJson("https://api.truthordarebot.xyz/v1/dare")
 	if err != nil {
-		_ = ctx.RespondText("An error has occurred.")
+		ctx.RespondText("An error has occurred.")
 		return
 	}
 
@@ -1529,7 +1529,7 @@ func (FunCommands) dare(ctx *router.Ctx) {
 func (FunCommands) neverhaveiever(ctx *router.Ctx) {
 	data, err := http.GetJson("https://api.truthordarebot.xyz/v1/nhie")
 	if err != nil {
-		_ = ctx.RespondText("An error has occurred.")
+		ctx.RespondText("An error has occurred.")
 		return
 	}
 
@@ -1541,7 +1541,7 @@ func (FunCommands) neverhaveiever(ctx *router.Ctx) {
 func (FunCommands) paranoia(ctx *router.Ctx) {
 	data, err := http.GetJson("https://api.truthordarebot.xyz/v1/paranoia")
 	if err != nil {
-		_ = ctx.RespondText("An error has occurred.")
+		ctx.RespondText("An error has occurred.")
 		return
 	}
 
@@ -1575,7 +1575,7 @@ func (FunCommands) randomcolor(ctx *router.Ctx) {
 func (FunCommands) pickupline(ctx *router.Ctx) {
 	data, err := http.GetJson("https://api.popcat.xyz/pickuplines")
 	if err != nil {
-		_ = ctx.RespondText("An error has occurred.")
+		ctx.RespondText("An error has occurred.")
 		return
 	}
 
@@ -1587,7 +1587,7 @@ func (FunCommands) pickupline(ctx *router.Ctx) {
 func (FunCommands) elementinfo(ctx *router.Ctx) {
 	data, err := http.GetJson("https://api.popcat.xyz/periodic-table?element=" + url.QueryEscape(ctx.Arguments.Raw()))
 	if err != nil {
-		_ = ctx.RespondText("An error has occurred.")
+		ctx.RespondText("An error has occurred.")
 		return
 	}
 
@@ -1607,7 +1607,7 @@ func (FunCommands) elementinfo(ctx *router.Ctx) {
 func (FunCommands) randomelement(ctx *router.Ctx) {
 	data, err := http.GetJson("https://api.popcat.xyz/periodic-table/random")
 	if err != nil {
-		_ = ctx.RespondText("An error has occurred.")
+		ctx.RespondText("An error has occurred.")
 		return
 	}
 

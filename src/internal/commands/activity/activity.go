@@ -283,41 +283,41 @@ func (c *ActivityCommands) status(ctx *router.Ctx) {
 	case "online", "dnd", "idle", "invisible":
 		err := c.setStatus(ctx.Session, status)
 		if err != nil {
-			_ = ctx.RespondText("An error occurred while changing your status: " + err.Error())
+			ctx.RespondText("An error occurred while changing your status: " + err.Error())
 			return
 		}
 
 		c.services.Embed.NewEmbed().
-			SetDescription(fmt.Sprintf("Successfully set status to `%s`!", status)).
+			SetDescription("Successfully set status to `%s`!", status).
 			Send(ctx)
 	default:
-		_ = ctx.RespondText("Invalid status argument. Use `online`, `dnd`, `idle`, or `invisible`.")
+		ctx.RespondText("Invalid status argument. Use `online`, `dnd`, `idle`, or `invisible`.")
 	}
 }
 
 func (c *ActivityCommands) customstatus(ctx *router.Ctx) {
 	err := c.setCustomStatus(ctx.Session, ctx.Arguments.Raw())
 	if err != nil {
-		_ = ctx.RespondText("An error occurred while changing your custom status: " + err.Error())
+		ctx.RespondText("An error occurred while changing your custom status: " + err.Error())
 		return
 	}
 
 	c.services.Embed.NewEmbed().
-		SetDescription(fmt.Sprintf("Successfully set custom status to `%s`!", ctx.Arguments.Raw())).
+		SetDescription("Successfully set custom status to `%s`!", ctx.Arguments.Raw()).
 		Send(ctx)
 }
 
 func (c *ActivityCommands) clearactivity(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
-		_ = ctx.RespondText("Error getting config: " + err.Error())
+		ctx.RespondText("Error getting config: " + err.Error())
 		return
 	}
 
 	cfg.Activity.Enabled = false
 	err = cfg.Save()
 	if err != nil {
-		_ = ctx.RespondText("Error saving config: " + err.Error())
+		ctx.RespondText("Error saving config: " + err.Error())
 		return
 	}
 
@@ -328,7 +328,7 @@ func (c *ActivityCommands) clearactivity(ctx *router.Ctx) {
 		Status:     c.services.Sessions.GetStatus(),
 	})
 	if err != nil {
-		_ = ctx.RespondText("An error occurred while clearing your activity: " + err.Error())
+		ctx.RespondText("An error occurred while clearing your activity: " + err.Error())
 		return
 	}
 
@@ -340,7 +340,7 @@ func (c *ActivityCommands) clearactivity(ctx *router.Ctx) {
 func (c *ActivityCommands) copyactivity(ctx *router.Ctx) {
 	user, err := ctx.Arguments.Get(0).User()
 	if err != nil {
-		_ = ctx.RespondText("Could not find user")
+		ctx.RespondText("Could not find user")
 		return
 	}
 
@@ -356,7 +356,7 @@ func (c *ActivityCommands) copyactivity(ctx *router.Ctx) {
 	} else {
 		profile, err := ctx.Session.UserProfile(user.ID)
 		if err != nil {
-			_ = ctx.RespondText("Could not find user")
+			ctx.RespondText("Could not find user")
 			return
 		}
 
@@ -426,7 +426,7 @@ func (c *ActivityCommands) copyactivity(ctx *router.Ctx) {
 func (c *ActivityCommands) getactivityjson(ctx *router.Ctx) {
 	user, err := ctx.Arguments.Get(0).User()
 	if err != nil {
-		_ = ctx.RespondText("Could not find user")
+		ctx.RespondText("Could not find user")
 		return
 	}
 
@@ -439,7 +439,7 @@ func (c *ActivityCommands) getactivityjson(ctx *router.Ctx) {
 	} else {
 		profile, err := ctx.Session.UserProfile(user.ID)
 		if err != nil {
-			_ = ctx.RespondText("Could not find user")
+			ctx.RespondText("Could not find user")
 			return
 		}
 
@@ -482,7 +482,7 @@ func (c *ActivityCommands) setactivityjson(ctx *router.Ctx) {
 	var activity *discordgo.Activity
 	err := json.Unmarshal([]byte(rawJson), &activity)
 	if err != nil {
-		_ = ctx.RespondText("Invalid activity JSON! " + err.Error())
+		ctx.RespondText("Invalid activity JSON! " + err.Error())
 		return
 	}
 
@@ -520,7 +520,7 @@ func (c *ActivityCommands) setactivityjson(ctx *router.Ctx) {
 func (c *ActivityCommands) cactivity(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
-		_ = ctx.RespondText("Error getting config")
+		ctx.RespondText("Error getting config")
 		return
 	}
 
@@ -532,7 +532,7 @@ func (c *ActivityCommands) cactivity(ctx *router.Ctx) {
 	case "set":
 		toggle := strings.ToLower(utils.Arguments["[on/off]"])
 		if toggle != "on" && toggle != "off" {
-			_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
+			ctx.RespondText("Invalid value. Use `on` or `off`.")
 			return
 		}
 
@@ -550,14 +550,14 @@ func (c *ActivityCommands) cactivity(ctx *router.Ctx) {
 			SetDescription("Turned " + utils.Misc.FormatBoolOnOff(cfg.Activity.Enabled) + " Custom Activity").
 			Send(ctx)
 	default:
-		_ = ctx.RespondText("Invalid <get/set/toggle> argument. Use `get`, `set` or `toggle`.")
+		ctx.RespondText("Invalid <get/set/toggle> argument. Use `get`, `set` or `toggle`.")
 	}
 }
 
 func (c *ActivityCommands) capauseforother(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
-		_ = ctx.RespondText("Error getting config")
+		ctx.RespondText("Error getting config")
 		return
 	}
 
@@ -569,7 +569,7 @@ func (c *ActivityCommands) capauseforother(ctx *router.Ctx) {
 	case "set":
 		toggle := strings.ToLower(utils.Arguments["[on/off]"])
 		if toggle != "on" && toggle != "off" {
-			_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
+			ctx.RespondText("Invalid value. Use `on` or `off`.")
 			return
 		}
 
@@ -587,14 +587,14 @@ func (c *ActivityCommands) capauseforother(ctx *router.Ctx) {
 			SetDescription("Turned " + utils.Misc.FormatBoolOnOff(cfg.Activity.PauseForOther) + " Pause Custom Activity for other Activity").
 			Send(ctx)
 	default:
-		_ = ctx.RespondText("Invalid <get/set/toggle> argument. Use `get`, `set` or `toggle`.")
+		ctx.RespondText("Invalid <get/set/toggle> argument. Use `get`, `set` or `toggle`.")
 	}
 }
 
 func (c *ActivityCommands) caconnectiontype(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
-		_ = ctx.RespondText("Error getting config")
+		ctx.RespondText("Error getting config")
 		return
 	}
 
@@ -612,7 +612,7 @@ func (c *ActivityCommands) caconnectiontype(ctx *router.Ctx) {
 		case "ca", "customactivity":
 			cfg.Activity.ActivityType = "CustomActivity"
 		default:
-			_ = ctx.RespondText("Invalid connection type. Use `[p]caconnectiontype values` to get a list of available values.")
+			ctx.RespondText("Invalid connection type. Use `[p]caconnectiontype values` to get a list of available values.")
 			return
 		}
 
@@ -626,14 +626,14 @@ func (c *ActivityCommands) caconnectiontype(ctx *router.Ctx) {
 			SetDescription("Available connection types: `RPC`, `CA`/`CustomActivity`").
 			Send(ctx)
 	default:
-		_ = ctx.RespondText("Invalid <get/set/values> argument. Use `get`, `set` or `values`.")
+		ctx.RespondText("Invalid <get/set/values> argument. Use `get`, `set` or `values`.")
 	}
 }
 
 func (c *ActivityCommands) catype(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
-		_ = ctx.RespondText("Error getting config")
+		ctx.RespondText("Error getting config")
 		return
 	}
 
@@ -659,7 +659,7 @@ func (c *ActivityCommands) catype(ctx *router.Ctx) {
 		case "spotify":
 			cfg.Activity.Type = "Spotify"
 		default:
-			_ = ctx.RespondText("Invalid connection type. Use `[p]catype values` to get a list of available values.")
+			ctx.RespondText("Invalid connection type. Use `[p]catype values` to get a list of available values.")
 			return
 		}
 
@@ -673,14 +673,14 @@ func (c *ActivityCommands) catype(ctx *router.Ctx) {
 			SetDescription("Available connection types: `Playing`, `Listening`, `Watching`, `Streaming`, `Competing`, `Spotify`.").
 			Send(ctx)
 	default:
-		_ = ctx.RespondText("Invalid <get/set/values> argument. Use `get`, `set` or `values`.")
+		ctx.RespondText("Invalid <get/set/values> argument. Use `get`, `set` or `values`.")
 	}
 }
 
 func (c *ActivityCommands) caplatform(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
-		_ = ctx.RespondText("Error getting config")
+		ctx.RespondText("Error getting config")
 		return
 	}
 
@@ -704,7 +704,7 @@ func (c *ActivityCommands) caplatform(ctx *router.Ctx) {
 		case "samsung":
 			cfg.Activity.Platform = "Samsung"
 		default:
-			_ = ctx.RespondText("Invalid platform. Use `[p]caplatform values` to get a list of available values.")
+			ctx.RespondText("Invalid platform. Use `[p]caplatform values` to get a list of available values.")
 			return
 		}
 
@@ -718,14 +718,14 @@ func (c *ActivityCommands) caplatform(ctx *router.Ctx) {
 			SetDescription("Available connection types: `Default`, `PS4`, `PS5`, `Xbox`, `Samsung`.").
 			Send(ctx)
 	default:
-		_ = ctx.RespondText("Invalid <get/set/values> argument. Use `get`, `set` or `values`.")
+		ctx.RespondText("Invalid <get/set/values> argument. Use `get`, `set` or `values`.")
 	}
 }
 
 func (c *ActivityCommands) caclientid(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
-		_ = ctx.RespondText("Error getting config")
+		ctx.RespondText("Error getting config")
 		return
 	}
 
@@ -737,7 +737,7 @@ func (c *ActivityCommands) caclientid(ctx *router.Ctx) {
 	case "set":
 		value := utils.Arguments["[value]"]
 		if value == "" {
-			_ = ctx.RespondText("You must provide a value to set!")
+			ctx.RespondText("You must provide a value to set!")
 			return
 		}
 
@@ -748,14 +748,14 @@ func (c *ActivityCommands) caclientid(ctx *router.Ctx) {
 			SetDescription("Custom Activity Client ID set to " + value).
 			Send(ctx)
 	default:
-		_ = ctx.RespondText("Invalid <get/set> argument. Use `get` or `set`.")
+		ctx.RespondText("Invalid <get/set> argument. Use `get` or `set`.")
 	}
 }
 
 func (c *ActivityCommands) caname(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
-		_ = ctx.RespondText("Error getting config")
+		ctx.RespondText("Error getting config")
 		return
 	}
 
@@ -774,14 +774,14 @@ func (c *ActivityCommands) caname(ctx *router.Ctx) {
 			SetDescription("Custom Activity Name set to " + value).
 			Send(ctx)
 	default:
-		_ = ctx.RespondText("Invalid <get/set> argument. Use `get` or `set`.")
+		ctx.RespondText("Invalid <get/set> argument. Use `get` or `set`.")
 	}
 }
 
 func (c *ActivityCommands) castate(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
-		_ = ctx.RespondText("Error getting config")
+		ctx.RespondText("Error getting config")
 		return
 	}
 
@@ -800,14 +800,14 @@ func (c *ActivityCommands) castate(ctx *router.Ctx) {
 			SetDescription("Custom Activity State set to " + value).
 			Send(ctx)
 	default:
-		_ = ctx.RespondText("Invalid <get/set> argument. Use `get` or `set`.")
+		ctx.RespondText("Invalid <get/set> argument. Use `get` or `set`.")
 	}
 }
 
 func (c *ActivityCommands) cadetails(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
-		_ = ctx.RespondText("Error getting config")
+		ctx.RespondText("Error getting config")
 		return
 	}
 
@@ -826,14 +826,14 @@ func (c *ActivityCommands) cadetails(ctx *router.Ctx) {
 			SetDescription("Custom Activity Details set to " + value).
 			Send(ctx)
 	default:
-		_ = ctx.RespondText("Invalid <get/set> argument. Use `get` or `set`.")
+		ctx.RespondText("Invalid <get/set> argument. Use `get` or `set`.")
 	}
 }
 
 func (c *ActivityCommands) cainvitable(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
-		_ = ctx.RespondText("Error getting config")
+		ctx.RespondText("Error getting config")
 		return
 	}
 
@@ -845,7 +845,7 @@ func (c *ActivityCommands) cainvitable(ctx *router.Ctx) {
 	case "set":
 		toggle := strings.ToLower(utils.Arguments["[on/off]"])
 		if toggle != "on" && toggle != "off" {
-			_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
+			ctx.RespondText("Invalid value. Use `on` or `off`.")
 			return
 		}
 
@@ -863,14 +863,14 @@ func (c *ActivityCommands) cainvitable(ctx *router.Ctx) {
 			SetDescription("Turned " + utils.Misc.FormatBoolOnOff(cfg.Activity.Invitable) + " Custom Activity Invitable").
 			Send(ctx)
 	default:
-		_ = ctx.RespondText("Invalid <get/set/toggle> argument. Use `get`, `set` or `toggle`.")
+		ctx.RespondText("Invalid <get/set/toggle> argument. Use `get`, `set` or `toggle`.")
 	}
 }
 
 func (c *ActivityCommands) catime(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
-		_ = ctx.RespondText("Error getting config")
+		ctx.RespondText("Error getting config")
 		return
 	}
 
@@ -882,7 +882,7 @@ func (c *ActivityCommands) catime(ctx *router.Ctx) {
 	case "set":
 		toggle := strings.ToLower(utils.Arguments["[on/off]"])
 		if toggle != "on" && toggle != "off" {
-			_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
+			ctx.RespondText("Invalid value. Use `on` or `off`.")
 			return
 		}
 
@@ -900,14 +900,14 @@ func (c *ActivityCommands) catime(ctx *router.Ctx) {
 			SetDescription("Turned " + utils.Misc.FormatBoolOnOff(cfg.Activity.Time) + " Custom Activity Time").
 			Send(ctx)
 	default:
-		_ = ctx.RespondText("Invalid <get/set/toggle> argument. Use `get`, `set` or `toggle`.")
+		ctx.RespondText("Invalid <get/set/toggle> argument. Use `get`, `set` or `toggle`.")
 	}
 }
 
 func (c *ActivityCommands) castreamingurl(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
-		_ = ctx.RespondText("Error getting config")
+		ctx.RespondText("Error getting config")
 		return
 	}
 
@@ -926,14 +926,14 @@ func (c *ActivityCommands) castreamingurl(ctx *router.Ctx) {
 			SetDescription("Custom Activity Streaming URL set to " + value).
 			Send(ctx)
 	default:
-		_ = ctx.RespondText("Invalid <get/set> argument. Use `get` or `set`.")
+		ctx.RespondText("Invalid <get/set> argument. Use `get` or `set`.")
 	}
 }
 
 func (c *ActivityCommands) calargeimage(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
-		_ = ctx.RespondText("Error getting config")
+		ctx.RespondText("Error getting config")
 		return
 	}
 
@@ -952,14 +952,14 @@ func (c *ActivityCommands) calargeimage(ctx *router.Ctx) {
 			SetDescription("Custom Activity Large Image set to " + value).
 			Send(ctx)
 	default:
-		_ = ctx.RespondText("Invalid <get/set> argument. Use `get` or `set`.")
+		ctx.RespondText("Invalid <get/set> argument. Use `get` or `set`.")
 	}
 }
 
 func (c *ActivityCommands) calargetext(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
-		_ = ctx.RespondText("Error getting config")
+		ctx.RespondText("Error getting config")
 		return
 	}
 
@@ -978,14 +978,14 @@ func (c *ActivityCommands) calargetext(ctx *router.Ctx) {
 			SetDescription("Custom Activity Large Image Text set to " + value).
 			Send(ctx)
 	default:
-		_ = ctx.RespondText("Invalid <get/set> argument. Use `get` or `set`.")
+		ctx.RespondText("Invalid <get/set> argument. Use `get` or `set`.")
 	}
 }
 
 func (c *ActivityCommands) casmallimage(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
-		_ = ctx.RespondText("Error getting config")
+		ctx.RespondText("Error getting config")
 		return
 	}
 
@@ -1004,14 +1004,14 @@ func (c *ActivityCommands) casmallimage(ctx *router.Ctx) {
 			SetDescription("Custom Activity Small Image set to " + value).
 			Send(ctx)
 	default:
-		_ = ctx.RespondText("Invalid <get/set> argument. Use `get` or `set`.")
+		ctx.RespondText("Invalid <get/set> argument. Use `get` or `set`.")
 	}
 }
 
 func (c *ActivityCommands) casmalltext(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
-		_ = ctx.RespondText("Error getting config")
+		ctx.RespondText("Error getting config")
 		return
 	}
 
@@ -1030,14 +1030,14 @@ func (c *ActivityCommands) casmalltext(ctx *router.Ctx) {
 			SetDescription("Custom Activity Small Image Text set to " + value).
 			Send(ctx)
 	default:
-		_ = ctx.RespondText("Invalid <get/set> argument. Use `get` or `set`.")
+		ctx.RespondText("Invalid <get/set> argument. Use `get` or `set`.")
 	}
 }
 
 func (c *ActivityCommands) cabutton1(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
-		_ = ctx.RespondText("Error getting config")
+		ctx.RespondText("Error getting config")
 		return
 	}
 
@@ -1055,17 +1055,17 @@ func (c *ActivityCommands) cabutton1(ctx *router.Ctx) {
 		_ = cfg.Save()
 
 		c.services.Embed.NewEmbed().
-			SetDescription(fmt.Sprintf("CA Button 1 set to %s (%s)", label, url)).
+			SetDescription("CA Button 1 set to %s (%s)", label, url).
 			Send(ctx)
 	default:
-		_ = ctx.RespondText("Invalid <get/set> argument. Use `get` or `set`.")
+		ctx.RespondText("Invalid <get/set> argument. Use `get` or `set`.")
 	}
 }
 
 func (c *ActivityCommands) cabutton2(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
-		_ = ctx.RespondText("Error getting config")
+		ctx.RespondText("Error getting config")
 		return
 	}
 
@@ -1083,17 +1083,17 @@ func (c *ActivityCommands) cabutton2(ctx *router.Ctx) {
 		_ = cfg.Save()
 
 		c.services.Embed.NewEmbed().
-			SetDescription(fmt.Sprintf("CA Button 2 set to %s (%s)", label, url)).
+			SetDescription("CA Button 2 set to %s (%s)", label, url).
 			Send(ctx)
 	default:
-		_ = ctx.RespondText("Invalid <get/set> argument. Use `get` or `set`.")
+		ctx.RespondText("Invalid <get/set> argument. Use `get` or `set`.")
 	}
 }
 
 func (c *ActivityCommands) capresets(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
-		_ = ctx.RespondText("Error getting config")
+		ctx.RespondText("Error getting config")
 		return
 	}
 
@@ -1116,14 +1116,14 @@ func (c *ActivityCommands) capresets(ctx *router.Ctx) {
 		}
 
 		c.services.Embed.NewEmbed().
-			SetDescription(fmt.Sprintf("Current Custom Activity preset is `%s`.", currentPreset)).
+			SetDescription("Current Custom Activity preset is `%s`.", currentPreset).
 			Send(ctx)
 	case "load":
 		name := utils.Arguments["[name]"]
 
 		preset, ok := cfg.ActivityPresets[name]
 		if !ok {
-			c.services.Embed.NewEmbed().SetDescription(fmt.Sprintf("CA Preset `%s` not found.", name)).Send(ctx)
+			c.services.Embed.NewEmbed().SetDescription("CA Preset `%s` not found.", name).Send(ctx)
 			return
 		}
 
@@ -1131,7 +1131,7 @@ func (c *ActivityCommands) capresets(ctx *router.Ctx) {
 		_ = cfg.Save()
 
 		c.services.Embed.NewEmbed().
-			SetDescription(fmt.Sprintf("Loaded Custom Activity preset `%s`.", name)).
+			SetDescription("Loaded Custom Activity preset `%s`.", name).
 			Send(ctx)
 	case "next":
 		var currentPreset string
@@ -1165,12 +1165,12 @@ func (c *ActivityCommands) capresets(ctx *router.Ctx) {
 		_ = cfg.Save()
 
 		c.services.Embed.NewEmbed().
-			SetDescription(fmt.Sprintf("Loaded next CA preset `%s`.", nextPresetName)).
+			SetDescription("Loaded next CA preset `%s`.", nextPresetName).
 			Send(ctx)
 	case "save":
 		name := utils.Arguments["[name]"]
 		if name == "" {
-			_ = ctx.RespondText("You must provide a name to save the preset as!")
+			ctx.RespondText("You must provide a name to save the preset as!")
 			return
 		}
 
@@ -1182,13 +1182,13 @@ func (c *ActivityCommands) capresets(ctx *router.Ctx) {
 		_ = cfg.Save()
 
 		c.services.Embed.NewEmbed().
-			SetDescription(fmt.Sprintf("Saved current activity as preset `%s`.", name)).
+			SetDescription("Saved current activity as preset `%s`.", name).
 			Send(ctx)
 	case "rm":
 		name := utils.Arguments["[name]"]
 
 		if _, ok := cfg.ActivityPresets[name]; !ok {
-			c.services.Embed.NewEmbed().SetDescription(fmt.Sprintf("Preset `%s` not found.", name)).Send(ctx)
+			c.services.Embed.NewEmbed().SetDescription("Preset `%s` not found.", name).Send(ctx)
 			return
 		}
 
@@ -1196,7 +1196,7 @@ func (c *ActivityCommands) capresets(ctx *router.Ctx) {
 		_ = cfg.Save()
 
 		c.services.Embed.NewEmbed().
-			SetDescription(fmt.Sprintf("Deleted activity preset `%s`.", name)).
+			SetDescription("Deleted activity preset `%s`.", name).
 			Send(ctx)
 	case "list":
 		var presets []string
@@ -1221,7 +1221,7 @@ func (c *ActivityCommands) capresets(ctx *router.Ctx) {
 			SetDescription("Cleared all activity presets.").
 			Send(ctx)
 	default:
-		_ = ctx.RespondText("Invalid <get/load/next/save/rm/list/clear> argument. Use `get`, `load`, `next`, `save`, `rm`, `list` or `clear`.")
+		ctx.RespondText("Invalid <get/load/next/save/rm/list/clear> argument. Use `get`, `load`, `next`, `save`, `rm`, `list` or `clear`.")
 	}
 }
 
@@ -1229,7 +1229,7 @@ func (c *ActivityCommands) cacreateimagekey(ctx *router.Ctx) {
 	url := utils.Arguments["<image url>"]
 
 	if strings.Contains(url, "discordapp.com") {
-		_ = ctx.RespondText("Your image seems to be hosted on Discord. Please use a different link to create an image key, as this might not work. You can try uploading it to a free image hoster like Imgur or ImgBB (but make sure to use the direct link to the image if you do. The URL should end with .png, .jpg or .gif).")
+		ctx.RespondText("Your image seems to be hosted on Discord. Please use a different link to create an image key, as this might not work. You can try uploading it to a free image hoster like Imgur or ImgBB (but make sure to use the direct link to the image if you do. The URL should end with .png, .jpg or .gif).")
 	}
 
 	imageKey := api.GenImageKey(url)
@@ -1244,7 +1244,7 @@ func (c *ActivityCommands) cacreatespotifykey(ctx *router.Ctx) {
 	bearerToken := utils.Spotify.GetBearerToken(ctx.Session.Identify.Token)
 
 	if bearerToken == "" {
-		_ = ctx.RespondText("Could not find a Spotify connection. Please connect your Spotify account to your Discord.")
+		ctx.RespondText("Could not find a Spotify connection. Please connect your Spotify account to your Discord.")
 		return
 	}
 
@@ -1258,7 +1258,7 @@ func (c *ActivityCommands) cacreatespotifykey(ctx *router.Ctx) {
 
 	imageUrl := song.Get("album").Get("images").GetIndex(0).Get("url").MustString()
 	if httpResponse.Error != nil || imageUrl == "" {
-		_ = ctx.RespondText("A Spotify error occurred: Song not found.")
+		ctx.RespondText("A Spotify error occurred: Song not found.")
 		return
 	}
 
@@ -1278,7 +1278,7 @@ func (c *ActivityCommands) activitypresets(ctx *router.Ctx) {
 
 		cfg, err := config.GetConfig()
 		if err != nil {
-			_ = ctx.RespondText("Error getting config: " + err.Error())
+			ctx.RespondText("Error getting config: " + err.Error())
 			return
 		}
 
@@ -1324,7 +1324,7 @@ func (c *ActivityCommands) activitypresets(ctx *router.Ctx) {
 			activity.Platform = "PS5"
 			activity.LargeImage = "mp:external/mLiXAArsDKgwP6Wb7mvDrBn4mFbJUZLxndTK5D2dL8s/https/i.vgy.me/JhGfvq.jpg"
 		default:
-			_ = ctx.RespondText("Invalid preset name. Use `youtube`, `twitch`, `discord`, `rickroll`, or `gta6`.")
+			ctx.RespondText("Invalid preset name. Use `youtube`, `twitch`, `discord`, `rickroll`, or `gta6`.")
 			return
 		}
 
@@ -1332,11 +1332,11 @@ func (c *ActivityCommands) activitypresets(ctx *router.Ctx) {
 		_ = cfg.Save()
 
 		c.services.Embed.NewEmbed().
-			SetDescription(fmt.Sprintf("Successfully set activity preset `%s`!", name)).
+			SetDescription("Successfully set activity preset `%s`!", name).
 			Send(ctx)
 	case "values":
-		_ = ctx.RespondText("Available activity presets: `youtube`, `twitch`, `discord`, `rickroll`, `gta6`.")
+		ctx.RespondText("Available activity presets: `youtube`, `twitch`, `discord`, `rickroll`, `gta6`.")
 	default:
-		_ = ctx.RespondText("Invalid argument. Use `set` or `values`.")
+		ctx.RespondText("Invalid argument. Use `set` or `values`.")
 	}
 }

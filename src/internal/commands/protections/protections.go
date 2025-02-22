@@ -101,7 +101,7 @@ func (p ProtectionsCommands) RegisterCommands(router *dgc.Router) {
 func (p ProtectionsCommands) antiphishing(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
-		_ = ctx.RespondText("Error getting config")
+		ctx.RespondText("Error getting config")
 		return
 	}
 
@@ -113,7 +113,7 @@ func (p ProtectionsCommands) antiphishing(ctx *router.Ctx) {
 	case "set":
 		toggle := strings.ToLower(utils.Arguments["[on/off]"])
 		if toggle != "on" && toggle != "off" {
-			_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
+			ctx.RespondText("Invalid value. Use `on` or `off`.")
 			return
 		}
 
@@ -131,14 +131,14 @@ func (p ProtectionsCommands) antiphishing(ctx *router.Ctx) {
 			SetDescription("Turned " + utils.Misc.FormatBoolOnOff(cfg.Protections.AntiPhishing) + " Anti Phishing").
 			Send(ctx)
 	default:
-		_ = ctx.RespondText("Invalid <get/set/toggle> argument. Use `get` or `set` or `toggle`.")
+		ctx.RespondText("Invalid <get/set/toggle> argument. Use `get` or `set` or `toggle`.")
 	}
 }
 
 func (p ProtectionsCommands) antifriendrequest(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
-		_ = ctx.RespondText("Error getting config")
+		ctx.RespondText("Error getting config")
 		return
 	}
 
@@ -150,7 +150,7 @@ func (p ProtectionsCommands) antifriendrequest(ctx *router.Ctx) {
 	case "set":
 		toggle := strings.ToLower(utils.Arguments["[on/off]"])
 		if toggle != "on" && toggle != "off" {
-			_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
+			ctx.RespondText("Invalid value. Use `on` or `off`.")
 			return
 		}
 
@@ -168,14 +168,14 @@ func (p ProtectionsCommands) antifriendrequest(ctx *router.Ctx) {
 			SetDescription("Turned " + utils.Misc.FormatBoolOnOff(cfg.Protections.AntiFriendRequest) + " Anti Friend Request Spam").
 			Send(ctx)
 	default:
-		_ = ctx.RespondText("Invalid <get/set/toggle> argument. Use `get` or `set` or `toggle`.")
+		ctx.RespondText("Invalid <get/set/toggle> argument. Use `get` or `set` or `toggle`.")
 	}
 }
 
 func (p ProtectionsCommands) antimassdm(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
-		_ = ctx.RespondText("Error getting config")
+		ctx.RespondText("Error getting config")
 		return
 	}
 
@@ -187,7 +187,7 @@ func (p ProtectionsCommands) antimassdm(ctx *router.Ctx) {
 	case "set":
 		toggle := strings.ToLower(utils.Arguments["[on/off]"])
 		if toggle != "on" && toggle != "off" {
-			_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
+			ctx.RespondText("Invalid value. Use `on` or `off`.")
 			return
 		}
 
@@ -205,14 +205,14 @@ func (p ProtectionsCommands) antimassdm(ctx *router.Ctx) {
 			SetDescription("Turned " + utils.Misc.FormatBoolOnOff(cfg.Protections.AntiMassDM) + " Anti Mass DM / DM Spam").
 			Send(ctx)
 	default:
-		_ = ctx.RespondText("Invalid <get/set/toggle> argument. Use `get` or `set` or `toggle`.")
+		ctx.RespondText("Invalid <get/set/toggle> argument. Use `get` or `set` or `toggle`.")
 	}
 }
 
 func (ProtectionsCommands) protectedservers(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
-		_ = ctx.RespondText("Error getting config.")
+		ctx.RespondText("Error getting config.")
 		return
 	}
 
@@ -236,12 +236,12 @@ func (ProtectionsCommands) protectedservers(ctx *router.Ctx) {
 	case "add":
 		guild, err := utils.Discord.GetGuild(ctx.Session, utils.Misc.Or(utils.Arguments["[server id]"], ctx.Message.GuildID))
 		if err != nil {
-			_ = ctx.RespondText("Could not find server.")
+			ctx.RespondText("Could not find server.")
 			return
 		}
 
 		if slices.Contains(cfg.Protections.ServerProtections.ProtectedServers, guild.ID) {
-			_ = ctx.RespondText(fmt.Sprintf("Server %s is already in the Protected Servers List!", guild.Name))
+			ctx.RespondText(fmt.Sprintf("Server %s is already in the Protected Servers List!", guild.Name))
 			return
 		}
 
@@ -249,17 +249,17 @@ func (ProtectionsCommands) protectedservers(ctx *router.Ctx) {
 		_ = cfg.Save()
 
 		c.services.Embed.NewEmbed().
-			SetDescription(fmt.Sprintf("Added %s to the Protected Servers List.", guild.Name)).
+			SetDescription("Added %s to the Protected Servers List.", guild.Name).
 			Send(ctx)
 	case "rm":
 		guild, err := utils.Discord.GetGuild(ctx.Session, utils.Misc.Or(utils.Arguments["[server id]"], ctx.Message.GuildID))
 		if err != nil {
-			_ = ctx.RespondText("Could not find server.")
+			ctx.RespondText("Could not find server.")
 			return
 		}
 
 		if !slices.Contains(cfg.Protections.ServerProtections.ProtectedServers, guild.ID) {
-			_ = ctx.RespondText(fmt.Sprintf("Server %s already isn't in the Protected Servers List!", guild.Name))
+			ctx.RespondText(fmt.Sprintf("Server %s already isn't in the Protected Servers List!", guild.Name))
 			return
 		}
 
@@ -267,7 +267,7 @@ func (ProtectionsCommands) protectedservers(ctx *router.Ctx) {
 		_ = cfg.Save()
 
 		c.services.Embed.NewEmbed().
-			SetDescription(fmt.Sprintf("Removed %s from the Protected Servers List.", guild.Name)).
+			SetDescription("Removed %s from the Protected Servers List.", guild.Name).
 			Send(ctx)
 	case "clear":
 		cfg.Protections.ServerProtections.ProtectedServers = []string{}
@@ -277,14 +277,14 @@ func (ProtectionsCommands) protectedservers(ctx *router.Ctx) {
 			SetDescription("Cleared all Protected Servers List entries.").
 			Send(ctx)
 	default:
-		_ = ctx.RespondText("Invalid <get/add/rm/clear> argument. Use `get`, `add`, `rm`, or `clear`.")
+		ctx.RespondText("Invalid <get/add/rm/clear> argument. Use `get`, `add`, `rm`, or `clear`.")
 	}
 }
 
 func (p ProtectionsCommands) antiinvite(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
-		_ = ctx.RespondText("Error getting config")
+		ctx.RespondText("Error getting config")
 		return
 	}
 
@@ -296,7 +296,7 @@ func (p ProtectionsCommands) antiinvite(ctx *router.Ctx) {
 	case "set":
 		toggle := strings.ToLower(utils.Arguments["[on/off]"])
 		if toggle != "on" && toggle != "off" {
-			_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
+			ctx.RespondText("Invalid value. Use `on` or `off`.")
 			return
 		}
 
@@ -314,14 +314,14 @@ func (p ProtectionsCommands) antiinvite(ctx *router.Ctx) {
 			SetDescription("Turned " + utils.Misc.FormatBoolOnOff(cfg.Protections.ServerProtections.AntiInvite) + " Anti Invite (Server Protections)").
 			Send(ctx)
 	default:
-		_ = ctx.RespondText("Invalid <get/set/toggle> argument. Use `get` or `set` or `toggle`.")
+		ctx.RespondText("Invalid <get/set/toggle> argument. Use `get` or `set` or `toggle`.")
 	}
 }
 
 func (p ProtectionsCommands) antispam(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
-		_ = ctx.RespondText("Error getting config")
+		ctx.RespondText("Error getting config")
 		return
 	}
 
@@ -333,7 +333,7 @@ func (p ProtectionsCommands) antispam(ctx *router.Ctx) {
 	case "set":
 		toggle := strings.ToLower(utils.Arguments["[on/off]"])
 		if toggle != "on" && toggle != "off" {
-			_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
+			ctx.RespondText("Invalid value. Use `on` or `off`.")
 			return
 		}
 
@@ -351,14 +351,14 @@ func (p ProtectionsCommands) antispam(ctx *router.Ctx) {
 			SetDescription("Turned " + utils.Misc.FormatBoolOnOff(cfg.Protections.ServerProtections.AntiSpam) + " Anti Spam (Server Protections)").
 			Send(ctx)
 	default:
-		_ = ctx.RespondText("Invalid <get/set/toggle> argument. Use `get` or `set` or `toggle`.")
+		ctx.RespondText("Invalid <get/set/toggle> argument. Use `get` or `set` or `toggle`.")
 	}
 }
 
 func (p ProtectionsCommands) antiupper(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
-		_ = ctx.RespondText("Error getting config")
+		ctx.RespondText("Error getting config")
 		return
 	}
 
@@ -370,7 +370,7 @@ func (p ProtectionsCommands) antiupper(ctx *router.Ctx) {
 	case "set":
 		toggle := strings.ToLower(utils.Arguments["[on/off]"])
 		if toggle != "on" && toggle != "off" {
-			_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
+			ctx.RespondText("Invalid value. Use `on` or `off`.")
 			return
 		}
 
@@ -388,14 +388,14 @@ func (p ProtectionsCommands) antiupper(ctx *router.Ctx) {
 			SetDescription("Turned " + utils.Misc.FormatBoolOnOff(cfg.Protections.ServerProtections.AntiUpper) + " Anti Upper (Server Protections)").
 			Send(ctx)
 	default:
-		_ = ctx.RespondText("Invalid <get/set/toggle> argument. Use `get` or `set` or `toggle`.")
+		ctx.RespondText("Invalid <get/set/toggle> argument. Use `get` or `set` or `toggle`.")
 	}
 }
 
 func (p ProtectionsCommands) antidelete(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
-		_ = ctx.RespondText("Error getting config")
+		ctx.RespondText("Error getting config")
 		return
 	}
 
@@ -407,7 +407,7 @@ func (p ProtectionsCommands) antidelete(ctx *router.Ctx) {
 	case "set":
 		toggle := strings.ToLower(utils.Arguments["[on/off]"])
 		if toggle != "on" && toggle != "off" {
-			_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
+			ctx.RespondText("Invalid value. Use `on` or `off`.")
 			return
 		}
 
@@ -425,7 +425,7 @@ func (p ProtectionsCommands) antidelete(ctx *router.Ctx) {
 			SetDescription("Turned " + utils.Misc.FormatBoolOnOff(cfg.Protections.ServerProtections.AntiDelete) + " Anti Delete (Server Protections)").
 			Send(ctx)
 	default:
-		_ = ctx.RespondText("Invalid <get/set/toggle> argument. Use `get` or `set` or `toggle`.")
+		ctx.RespondText("Invalid <get/set/toggle> argument. Use `get` or `set` or `toggle`.")
 	}
 }
 
@@ -452,12 +452,12 @@ func (ProtectionsCommands) dm(ctx *router.Ctx) {
 
 		action = "Closed"
 	default:
-		_ = ctx.RespondText("Invalid <open/close> argument. Use `open` or `close`.")
+		ctx.RespondText("Invalid <open/close> argument. Use `open` or `close`.")
 		return
 	}
 
 	if err != nil {
-		_ = ctx.RespondText("Error changing settings: " + err.Error())
+		ctx.RespondText("Error changing settings: " + err.Error())
 		return
 	}
 
@@ -478,12 +478,12 @@ func (ProtectionsCommands) friendrequests(ctx *router.Ctx) {
 		err = api.AllowFriendRequests(ctx.Session, false)
 		action = "Denied"
 	default:
-		_ = ctx.RespondText("Invalid <allow/deny> argument. Use `allow` or `deny`.")
+		ctx.RespondText("Invalid <allow/deny> argument. Use `allow` or `deny`.")
 		return
 	}
 
 	if err != nil {
-		_ = ctx.RespondText("Error changing settings: " + err.Error())
+		ctx.RespondText("Error changing settings: " + err.Error())
 		return
 	}
 

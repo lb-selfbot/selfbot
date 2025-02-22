@@ -92,7 +92,7 @@ func (c *RedditCommands) generateFunc(subreddit string) func(ctx *router.Ctx) {
 	return func(ctx *router.Ctx) {
 		post, success := api.GetImageFromSubreddit(subreddit)
 		if !success || post == nil {
-			_ = ctx.RespondText("That subreddit is invalid.")
+			ctx.RespondText("That subreddit is invalid.")
 			return
 		}
 
@@ -109,7 +109,7 @@ func (c *RedditCommands) subreddit(ctx *router.Ctx) {
 
 	post, success := api.GetImageFromSubreddit(subreddit)
 	if !success || post == nil {
-		_ = ctx.RespondText("That subreddit is invalid.")
+		ctx.RespondText("That subreddit is invalid.")
 		return
 	}
 

@@ -131,7 +131,7 @@ func (c *SpotifyCommands) Register() {
 func (c *SpotifyCommands) GetBearerToken(ctx *router.Ctx) (string, bool) {
 	bearerToken := utils.Spotify.GetBearerToken(ctx.Session.Identify.Token)
 	if bearerToken == "" {
-		_ = ctx.RespondText("Could not find a Spotify connection. Please connect your Spotify account to your Discord.")
+		ctx.RespondText("Could not find a Spotify connection. Please connect your Spotify account to your Discord.")
 		return "", false
 	}
 
@@ -140,7 +140,7 @@ func (c *SpotifyCommands) GetBearerToken(ctx *router.Ctx) (string, bool) {
 
 func (c *SpotifyCommands) checkResponse(ctx *router.Ctx, httpResponse *http.HttpResponse) bool {
 	if httpResponse.Error != nil {
-		_ = ctx.RespondText("An error has occurred: " + httpResponse.Error.Error())
+		ctx.RespondText("An error has occurred: " + httpResponse.Error.Error())
 		return false
 	}
 
@@ -148,7 +148,7 @@ func (c *SpotifyCommands) checkResponse(ctx *router.Ctx, httpResponse *http.Http
 	errorReason = strings.ReplaceAll(errorReason, "NO_ACTIVE_DEVICE", "No active device found")
 
 	if errorReason != "" {
-		_ = ctx.RespondText(fmt.Sprintf("A Spotify error occurred: `%s`", errorReason))
+		ctx.RespondText(fmt.Sprintf("A Spotify error occurred: `%s`", errorReason))
 		return false
 	}
 
@@ -157,7 +157,7 @@ func (c *SpotifyCommands) checkResponse(ctx *router.Ctx, httpResponse *http.Http
 
 func (c *SpotifyCommands) HandleRequest(ctx *router.Ctx, httpResponse *http.HttpResponse, onSuccess string) {
 	if httpResponse.Error != nil {
-		_ = ctx.RespondText("An error has occurred: " + httpResponse.Error.Error())
+		ctx.RespondText("An error has occurred: " + httpResponse.Error.Error())
 		return
 	}
 
@@ -166,7 +166,7 @@ func (c *SpotifyCommands) HandleRequest(ctx *router.Ctx, httpResponse *http.Http
 		return
 	}
 
-	_ = ctx.RespondText(onSuccess)
+	ctx.RespondText(onSuccess)
 }
 
 func (c *SpotifyCommands) spause(ctx *router.Ctx) {
@@ -228,13 +228,13 @@ func (c *SpotifyCommands) splay(ctx *router.Ctx) {
 		headers,
 	)
 	if searchResponse.Error != nil {
-		_ = ctx.RespondText("An error has occurred.")
+		ctx.RespondText("An error has occurred.")
 		return
 	}
 
 	search := searchResponse.Json().GetPath("tracks", "items")
 	if len(search.MustArray()) == 0 {
-		_ = ctx.RespondText("No songs found.")
+		ctx.RespondText("No songs found.")
 		return
 	}
 
@@ -273,13 +273,13 @@ func (c *SpotifyCommands) squeue(ctx *router.Ctx) {
 		headers,
 	)
 	if searchResponse.Error != nil {
-		_ = ctx.RespondText("An error has occurred.")
+		ctx.RespondText("An error has occurred.")
 		return
 	}
 
 	search := searchResponse.Json().GetPath("tracks", "items")
 	if len(search.MustArray()) == 0 {
-		_ = ctx.RespondText("No songs found.")
+		ctx.RespondText("No songs found.")
 		return
 	}
 
@@ -310,7 +310,7 @@ func (c *SpotifyCommands) splaying(ctx *router.Ctx) {
 	httpResponse := http.Get("https://api.spotify.com/v1/me/player/currently-playing", map[string]string{"Authorization": bearerToken})
 	song, success := httpResponse.Json().CheckGet("item")
 	if httpResponse.Error != nil || !success {
-		_ = ctx.RespondText("A Spotify error occurred: No song currently playing")
+		ctx.RespondText("A Spotify error occurred: No song currently playing")
 		return
 	}
 
@@ -343,7 +343,7 @@ func (c *SpotifyCommands) svolume(ctx *router.Ctx) {
 	volume, err := ctx.Arguments.Get(0).Int()
 	volume = utils2.Clamp(volume, 0, 100)
 	if err != nil {
-		_ = ctx.RespondText("Argument <volume> must be a number.")
+		ctx.RespondText("Argument <volume> must be a number.")
 		return
 	}
 
@@ -364,7 +364,7 @@ func (c *SpotifyCommands) sshuffle(ctx *router.Ctx) {
 
 	toggle, err := ctx.Arguments.Get(0).Bool()
 	if err != nil {
-		_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
+		ctx.RespondText("Invalid value. Use `on` or `off`.")
 		return
 	}
 
@@ -387,7 +387,7 @@ func (c *SpotifyCommands) srepeat(ctx *router.Ctx) {
 
 	state := ctx.Arguments.Get(0).Raw()
 	if !slices.Contains([]string{"track", "context", "off"}, state) {
-		_ = ctx.RespondText("Invalid value. Use `track`, `context` or `off`.")
+		ctx.RespondText("Invalid value. Use `track`, `context` or `off`.")
 		return
 	}
 
@@ -408,7 +408,7 @@ func (c *SpotifyCommands) sseek(ctx *router.Ctx) {
 
 	timestamp, err := ctx.Arguments.Get(0).Duration()
 	if err != nil {
-		_ = ctx.RespondText("Invalid value. Use a timestamp like `1m30s`.")
+		ctx.RespondText("Invalid value. Use a timestamp like `1m30s`.")
 		return
 	}
 
@@ -502,7 +502,7 @@ func (c *SpotifyCommands) slistenalong(ctx *router.Ctx) {
 	})
 
 	if len(spotifySessions) == 0 {
-		_ = ctx.RespondText("No Spotify sessions found.")
+		ctx.RespondText("No Spotify sessions found.")
 		return
 	}
 
@@ -517,7 +517,7 @@ func (c *SpotifyCommands) slistenalong(ctx *router.Ctx) {
 		Flags: 0,
 	})
 	if err != nil {
-		_ = ctx.RespondText("An error has occurred while sending the invite: " + err.Error())
+		ctx.RespondText("An error has occurred while sending the invite: " + err.Error())
 		return
 	}
 }

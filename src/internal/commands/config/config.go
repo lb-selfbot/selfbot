@@ -511,7 +511,7 @@ func (c ConfigCommands) RegisterCommands(router *dgc.Router) {
 func (ConfigCommands) commandprefix(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
-		_ = ctx.RespondText("Error getting config")
+		ctx.RespondText("Error getting config")
 		return
 	}
 
@@ -523,7 +523,7 @@ func (ConfigCommands) commandprefix(ctx *router.Ctx) {
 	case "set":
 		value := utils.Arguments["[value]"]
 		if value == "" {
-			_ = ctx.RespondText("You must provide a value to set!")
+			ctx.RespondText("You must provide a value to set!")
 			return
 		}
 
@@ -534,14 +534,14 @@ func (ConfigCommands) commandprefix(ctx *router.Ctx) {
 			SetDescription("Command prefix set to " + value).
 			Send(ctx)
 	default:
-		_ = ctx.RespondText("Invalid <get/set> argument. Use `get` or `set`.")
+		ctx.RespondText("Invalid <get/set> argument. Use `get` or `set`.")
 	}
 }
 
 func (ConfigCommands) commandmode(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
-		_ = ctx.RespondText("Error getting config")
+		ctx.RespondText("Error getting config")
 		return
 	}
 
@@ -565,7 +565,7 @@ func (ConfigCommands) commandmode(ctx *router.Ctx) {
 		case "urlembed":
 			cfg.Selfbot.CommandMode = "URLEmbed"
 		default:
-			_ = ctx.RespondText("Invalid command mode. Use `[p]commandmode values` to get a list of available command modes.")
+			ctx.RespondText("Invalid command mode. Use `[p]commandmode values` to get a list of available command modes.")
 			return
 		}
 
@@ -579,14 +579,14 @@ func (ConfigCommands) commandmode(ctx *router.Ctx) {
 			SetDescription("Available command modes: Codeblock, Text, Indent, WebhookEmbed, URLEmbed").
 			Send(ctx)
 	default:
-		_ = ctx.RespondText("Invalid <get/set/values> argument. Use `get` or `set` or `values`.")
+		ctx.RespondText("Invalid <get/set/values> argument. Use `get` or `set` or `values`.")
 	}
 }
 
 func (ConfigCommands) title(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
-		_ = ctx.RespondText("Error getting config")
+		ctx.RespondText("Error getting config")
 		return
 	}
 
@@ -605,14 +605,14 @@ func (ConfigCommands) title(ctx *router.Ctx) {
 			SetDescription("Title set to " + value).
 			Send(ctx)
 	default:
-		_ = ctx.RespondText("Invalid <get/set> argument. Use `get` or `set`.")
+		ctx.RespondText("Invalid <get/set> argument. Use `get` or `set`.")
 	}
 }
 
 func (ConfigCommands) footer(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
-		_ = ctx.RespondText("Error getting config")
+		ctx.RespondText("Error getting config")
 		return
 	}
 
@@ -631,14 +631,14 @@ func (ConfigCommands) footer(ctx *router.Ctx) {
 			SetDescription("Footer set to " + value).
 			Send(ctx)
 	default:
-		_ = ctx.RespondText("Invalid <get/set> argument. Use `get` or `set`.")
+		ctx.RespondText("Invalid <get/set> argument. Use `get` or `set`.")
 	}
 }
 
 func (ConfigCommands) delresponses(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
-		_ = ctx.RespondText("Error getting config")
+		ctx.RespondText("Error getting config")
 		return
 	}
 
@@ -650,7 +650,7 @@ func (ConfigCommands) delresponses(ctx *router.Ctx) {
 	case "set":
 		toggle := strings.ToLower(utils.Arguments["[on/off]"])
 		if toggle != "on" && toggle != "off" {
-			_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
+			ctx.RespondText("Invalid value. Use `on` or `off`.")
 			return
 		}
 
@@ -668,14 +668,14 @@ func (ConfigCommands) delresponses(ctx *router.Ctx) {
 			SetDescription("Turned " + utils.Misc.FormatBoolOnOff(cfg.Selfbot.DeleteResponses) + " delete responses").
 			Send(ctx)
 	default:
-		_ = ctx.RespondText("Invalid <get/set/toggle> argument. Use `get` or `set` or `toggle`.")
+		ctx.RespondText("Invalid <get/set/toggle> argument. Use `get` or `set` or `toggle`.")
 	}
 }
 
 func (ConfigCommands) delresponsesdelay(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
-		_ = ctx.RespondText("Error getting config")
+		ctx.RespondText("Error getting config")
 		return
 	}
 
@@ -689,7 +689,7 @@ func (ConfigCommands) delresponsesdelay(ctx *router.Ctx) {
 	case "set":
 		delay, err := utils.Misc.ParseDuration(utils.Arguments["[value]"])
 		if err != nil {
-			_ = ctx.RespondText("Invalid duration: " + err.Error())
+			ctx.RespondText("Invalid duration: " + err.Error())
 			return
 		}
 
@@ -699,17 +699,17 @@ func (ConfigCommands) delresponsesdelay(ctx *router.Ctx) {
 		formatted := utils.Misc.FormatDuration(time.Duration(cfg.Selfbot.DeleteResponsesDelay) * time.Second)
 
 		c.services.Embed.NewEmbed().
-			SetDescription(fmt.Sprintf("Delete responses delay set to %s.", formatted)).
+			SetDescription("Delete responses delay set to %s.", formatted).
 			Send(ctx)
 	default:
-		_ = ctx.RespondText("Invalid <get/set> argument. Use `get` or `set`.")
+		ctx.RespondText("Invalid <get/set> argument. Use `get` or `set`.")
 	}
 }
 
 func (ConfigCommands) delcommands(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
-		_ = ctx.RespondText("Error getting config")
+		ctx.RespondText("Error getting config")
 		return
 	}
 
@@ -721,7 +721,7 @@ func (ConfigCommands) delcommands(ctx *router.Ctx) {
 	case "set":
 		toggle := strings.ToLower(utils.Arguments["[on/off]"])
 		if toggle != "on" && toggle != "off" {
-			_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
+			ctx.RespondText("Invalid value. Use `on` or `off`.")
 			return
 		}
 
@@ -739,14 +739,14 @@ func (ConfigCommands) delcommands(ctx *router.Ctx) {
 			SetDescription("Turned " + utils.Misc.FormatBoolOnOff(cfg.Selfbot.DeleteCommands) + " delete commands").
 			Send(ctx)
 	default:
-		_ = ctx.RespondText("Invalid <get/set/toggle> argument. Use `get` or `set` or `toggle`.")
+		ctx.RespondText("Invalid <get/set/toggle> argument. Use `get` or `set` or `toggle`.")
 	}
 }
 
 func (ConfigCommands) clientspoof(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
-		_ = ctx.RespondText("Error getting config")
+		ctx.RespondText("Error getting config")
 		return
 	}
 
@@ -768,7 +768,7 @@ func (ConfigCommands) clientspoof(ctx *router.Ctx) {
 		case "console":
 			cfg.Selfbot.Client = "Console"
 		default:
-			_ = ctx.RespondText("Invalid client. Use `[p]clientspoof values` to get a list of available clients.")
+			ctx.RespondText("Invalid client. Use `[p]clientspoof values` to get a list of available clients.")
 			return
 		}
 
@@ -782,14 +782,14 @@ func (ConfigCommands) clientspoof(ctx *router.Ctx) {
 			SetDescription("Available client spoof values: Desktop, Web, Mobile, Console").
 			Send(ctx)
 	default:
-		_ = ctx.RespondText("Invalid <get/set/values> argument. Use `get` or `set` or `values`.")
+		ctx.RespondText("Invalid <get/set/values> argument. Use `get` or `set` or `values`.")
 	}
 }
 
 func (ConfigCommands) timezone(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
-		_ = ctx.RespondText("Error getting config")
+		ctx.RespondText("Error getting config")
 		return
 	}
 
@@ -809,7 +809,7 @@ func (ConfigCommands) timezone(ctx *router.Ctx) {
 	case "set":
 		timezone := utils.Arguments["[value]"]
 		if _, err := time.LoadLocation(timezone); err != nil {
-			_ = ctx.RespondText("Invalid timezone: " + err.Error())
+			ctx.RespondText("Invalid timezone: " + err.Error())
 			return
 		}
 
@@ -820,14 +820,14 @@ func (ConfigCommands) timezone(ctx *router.Ctx) {
 			SetDescription("Timezone set to " + cfg.Selfbot.Timezone).
 			Send(ctx)
 	default:
-		_ = ctx.RespondText("Invalid <get/set> argument. Use `get` or `set`.")
+		ctx.RespondText("Invalid <get/set> argument. Use `get` or `set`.")
 	}
 }
 
 func (ConfigCommands) embedcolor(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
-		_ = ctx.RespondText("Error getting config")
+		ctx.RespondText("Error getting config")
 		return
 	}
 
@@ -839,13 +839,13 @@ func (ConfigCommands) embedcolor(ctx *router.Ctx) {
 	case "set":
 		color := strings.TrimPrefix(utils.Arguments["[hex color]"], "#")
 		if len(color) != 6 {
-			_ = ctx.RespondText("Invalid hex color. Use a 6-digit hex color.")
+			ctx.RespondText("Invalid hex color. Use a 6-digit hex color.")
 			return
 		}
 
 		_, _, _, err := utils.Misc.HexToRGB(color)
 		if err != nil {
-			_ = ctx.RespondText("Invalid hex color: " + err.Error() + ". Use a 6-digit hex color.")
+			ctx.RespondText("Invalid hex color: " + err.Error() + ". Use a 6-digit hex color.")
 			return
 		}
 
@@ -856,14 +856,14 @@ func (ConfigCommands) embedcolor(ctx *router.Ctx) {
 			SetDescription("Embed Color set to " + cfg.Selfbot.EmbedColor).
 			Send(ctx)
 	default:
-		_ = ctx.RespondText("Invalid <get/set> argument. Use `get` or `set`.")
+		ctx.RespondText("Invalid <get/set> argument. Use `get` or `set`.")
 	}
 }
 
 func (ConfigCommands) embedimage(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
-		_ = ctx.RespondText("Error getting config")
+		ctx.RespondText("Error getting config")
 		return
 	}
 
@@ -882,14 +882,14 @@ func (ConfigCommands) embedimage(ctx *router.Ctx) {
 			SetDescription("Embed Image set to " + cfg.Selfbot.EmbedImage).
 			Send(ctx)
 	default:
-		_ = ctx.RespondText("Invalid <get/set> argument. Use `get` or `set`.")
+		ctx.RespondText("Invalid <get/set> argument. Use `get` or `set`.")
 	}
 }
 
 func (ConfigCommands) embedurl(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
-		_ = ctx.RespondText("Error getting config")
+		ctx.RespondText("Error getting config")
 		return
 	}
 
@@ -908,14 +908,14 @@ func (ConfigCommands) embedurl(ctx *router.Ctx) {
 			SetDescription("Embed URL set to " + cfg.Selfbot.EmbedURL).
 			Send(ctx)
 	default:
-		_ = ctx.RespondText("Invalid <get/set> argument. Use `get` or `set`.")
+		ctx.RespondText("Invalid <get/set> argument. Use `get` or `set`.")
 	}
 }
 
 func (ConfigCommands) forcesubscribedservers(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
-		_ = ctx.RespondText("Error getting config.")
+		ctx.RespondText("Error getting config.")
 		return
 	}
 
@@ -939,12 +939,12 @@ func (ConfigCommands) forcesubscribedservers(ctx *router.Ctx) {
 	case "add":
 		guild, err := utils.Discord.GetGuild(ctx.Session, utils.Misc.Or(utils.Arguments["[server id]"], ctx.Message.GuildID))
 		if err != nil {
-			_ = ctx.RespondText("Could not find server.")
+			ctx.RespondText("Could not find server.")
 			return
 		}
 
 		if slices.Contains(cfg.Selfbot.ForceSubscribedServers, guild.ID) {
-			_ = ctx.RespondText(fmt.Sprintf("Server %s is already force subscribed!", guild.Name))
+			ctx.RespondText(fmt.Sprintf("Server %s is already force subscribed!", guild.Name))
 			return
 		}
 
@@ -952,17 +952,17 @@ func (ConfigCommands) forcesubscribedservers(ctx *router.Ctx) {
 		_ = cfg.Save()
 
 		c.services.Embed.NewEmbed().
-			SetDescription(fmt.Sprintf("Added %s to the force subscribed servers list.", guild.Name)).
+			SetDescription("Added %s to the force subscribed servers list.", guild.Name).
 			Send(ctx)
 	case "rm":
 		guild, err := utils.Discord.GetGuild(ctx.Session, utils.Misc.Or(utils.Arguments["[server id]"], ctx.Message.GuildID))
 		if err != nil {
-			_ = ctx.RespondText("Could not find server.")
+			ctx.RespondText("Could not find server.")
 			return
 		}
 
 		if !slices.Contains(cfg.Selfbot.ForceSubscribedServers, guild.ID) {
-			_ = ctx.RespondText(fmt.Sprintf("Server %s already isn't force subscribed!", guild.Name))
+			ctx.RespondText(fmt.Sprintf("Server %s already isn't force subscribed!", guild.Name))
 			return
 		}
 
@@ -970,7 +970,7 @@ func (ConfigCommands) forcesubscribedservers(ctx *router.Ctx) {
 		_ = cfg.Save()
 
 		c.services.Embed.NewEmbed().
-			SetDescription(fmt.Sprintf("Removed %s from the force subscribed servers list.", guild.Name)).
+			SetDescription("Removed %s from the force subscribed servers list.", guild.Name).
 			Send(ctx)
 	case "clear":
 		cfg.Selfbot.ForceSubscribedServers = []string{}
@@ -980,14 +980,14 @@ func (ConfigCommands) forcesubscribedservers(ctx *router.Ctx) {
 			SetDescription("Cleared all force subscribed servers.").
 			Send(ctx)
 	default:
-		_ = ctx.RespondText("Invalid <get/add/rm/clear> argument. Use `get`, `add`, `rm`, or `clear`.")
+		ctx.RespondText("Invalid <get/add/rm/clear> argument. Use `get`, `add`, `rm`, or `clear`.")
 	}
 }
 
 func (ConfigCommands) aliases(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
-		_ = ctx.RespondText("Error getting config.")
+		ctx.RespondText("Error getting config.")
 		return
 	}
 
@@ -1011,17 +1011,17 @@ func (ConfigCommands) aliases(ctx *router.Ctx) {
 		alias, cmd := utils.Arguments["[alias]"], utils.Arguments["[command]"]
 
 		if alias == "" || cmd == "" {
-			_ = ctx.RespondText("You must provide an alias and a command.")
+			ctx.RespondText("You must provide an alias and a command.")
 			return
 		}
 
 		if _, ok := cfg.Selfbot.CommandAliases[alias]; ok {
-			_ = ctx.RespondText("Alias already exists.")
+			ctx.RespondText("Alias already exists.")
 			return
 		}
 
 		if ctx.Router.GetCmd(cmd) == nil {
-			_ = ctx.RespondText("Command does not exist.")
+			ctx.RespondText("Command does not exist.")
 			return
 		}
 
@@ -1031,14 +1031,14 @@ func (ConfigCommands) aliases(ctx *router.Ctx) {
 		_ = eventreactions.LoadAliases(ctx.Router)
 
 		c.services.Embed.NewEmbed().
-			SetDescription(fmt.Sprintf("Added alias `%s` for command `%s`.", alias, cmd)).
+			SetDescription("Added alias `%s` for command `%s`.", alias, cmd).
 			Send(ctx)
 	case "rm":
 		alias := utils.Arguments["[alias]"]
 
 		cmd, ok := cfg.Selfbot.CommandAliases[alias]
 		if !ok {
-			_ = ctx.RespondText("Alias doesn't exist.")
+			ctx.RespondText("Alias doesn't exist.")
 			return
 		}
 
@@ -1048,7 +1048,7 @@ func (ConfigCommands) aliases(ctx *router.Ctx) {
 		_ = eventreactions.LoadAliases(ctx.Router)
 
 		c.services.Embed.NewEmbed().
-			SetDescription(fmt.Sprintf("Removed alias `%s` for command `%s`.", alias, cmd)).
+			SetDescription("Removed alias `%s` for command `%s`.", alias, cmd).
 			Send(ctx)
 	case "clear":
 		cfg.Selfbot.CommandAliases = make(map[string]string)
@@ -1060,14 +1060,14 @@ func (ConfigCommands) aliases(ctx *router.Ctx) {
 			SetDescription("Cleared all aliases.").
 			Send(ctx)
 	default:
-		_ = ctx.RespondText("Invalid <get/add/rm/clear> argument. Use `get`, `add`, `rm`, or `clear`.")
+		ctx.RespondText("Invalid <get/add/rm/clear> argument. Use `get`, `add`, `rm`, or `clear`.")
 	}
 }
 
 func (ConfigCommands) notifications(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
-		_ = ctx.RespondText("Error getting config")
+		ctx.RespondText("Error getting config")
 		return
 	}
 
@@ -1079,7 +1079,7 @@ func (ConfigCommands) notifications(ctx *router.Ctx) {
 	case "set":
 		toggle := strings.ToLower(utils.Arguments["[on/off]"])
 		if toggle != "on" && toggle != "off" {
-			_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
+			ctx.RespondText("Invalid value. Use `on` or `off`.")
 			return
 		}
 
@@ -1104,14 +1104,14 @@ func (ConfigCommands) notifications(ctx *router.Ctx) {
 			Send(ctx)
 
 	default:
-		_ = ctx.RespondText("Invalid <get/set/toggle/example> argument. Use `get` or `set` or `toggle` or `example`.")
+		ctx.RespondText("Invalid <get/set/toggle/example> argument. Use `get` or `set` or `toggle` or `example`.")
 	}
 }
 
 func (ConfigCommands) nitrosniper(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
-		_ = ctx.RespondText("Error getting config")
+		ctx.RespondText("Error getting config")
 		return
 	}
 
@@ -1123,7 +1123,7 @@ func (ConfigCommands) nitrosniper(ctx *router.Ctx) {
 	case "set":
 		toggle := strings.ToLower(utils.Arguments["[on/off]"])
 		if toggle != "on" && toggle != "off" {
-			_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
+			ctx.RespondText("Invalid value. Use `on` or `off`.")
 			return
 		}
 
@@ -1141,14 +1141,14 @@ func (ConfigCommands) nitrosniper(ctx *router.Ctx) {
 			SetDescription("Turned " + utils.Misc.FormatBoolOnOff(cfg.Snipers.NitroSniper) + " nitro sniper").
 			Send(ctx)
 	default:
-		_ = ctx.RespondText("Invalid <get/set/toggle> argument. Use `get` or `set` or `toggle`.")
+		ctx.RespondText("Invalid <get/set/toggle> argument. Use `get` or `set` or `toggle`.")
 	}
 }
 
 func (ConfigCommands) giveawaysniper(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
-		_ = ctx.RespondText("Error getting config")
+		ctx.RespondText("Error getting config")
 		return
 	}
 
@@ -1160,7 +1160,7 @@ func (ConfigCommands) giveawaysniper(ctx *router.Ctx) {
 	case "set":
 		toggle := strings.ToLower(utils.Arguments["[on/off]"])
 		if toggle != "on" && toggle != "off" {
-			_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
+			ctx.RespondText("Invalid value. Use `on` or `off`.")
 			return
 		}
 
@@ -1178,14 +1178,14 @@ func (ConfigCommands) giveawaysniper(ctx *router.Ctx) {
 			SetDescription("Turned " + utils.Misc.FormatBoolOnOff(cfg.Snipers.GiveawaySniper.Enabled) + " giveaway sniper").
 			Send(ctx)
 	default:
-		_ = ctx.RespondText("Invalid <get/set/toggle> argument. Use `get` or `set` or `toggle`.")
+		ctx.RespondText("Invalid <get/set/toggle> argument. Use `get` or `set` or `toggle`.")
 	}
 }
 
 func (ConfigCommands) giveawaysnipersleep(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
-		_ = ctx.RespondText("Error getting config")
+		ctx.RespondText("Error getting config")
 		return
 	}
 
@@ -1199,7 +1199,7 @@ func (ConfigCommands) giveawaysnipersleep(ctx *router.Ctx) {
 	case "set":
 		delay, err := utils.Misc.ParseDuration(utils.Arguments["[value]"])
 		if err != nil {
-			_ = ctx.RespondText("Invalid duration: " + err.Error())
+			ctx.RespondText("Invalid duration: " + err.Error())
 			return
 		}
 
@@ -1209,17 +1209,17 @@ func (ConfigCommands) giveawaysnipersleep(ctx *router.Ctx) {
 		formatted := utils.Misc.FormatDuration(time.Duration(cfg.Snipers.GiveawaySniper.Sleep) * time.Second)
 
 		c.services.Embed.NewEmbed().
-			SetDescription(fmt.Sprintf("Giveaway sniper sleep set to %s.", formatted)).
+			SetDescription("Giveaway sniper sleep set to %s.", formatted).
 			Send(ctx)
 	default:
-		_ = ctx.RespondText("Invalid <get/set> argument. Use `get` or `set`.")
+		ctx.RespondText("Invalid <get/set> argument. Use `get` or `set`.")
 	}
 }
 
 func (ConfigCommands) customgiveawaybots(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
-		_ = ctx.RespondText("Error getting config.")
+		ctx.RespondText("Error getting config.")
 		return
 	}
 
@@ -1246,13 +1246,13 @@ func (ConfigCommands) customgiveawaybots(ctx *router.Ctx) {
 	case "add":
 		bot, err := ctx.Arguments.Get(1).User(router.ArgumentFlagFallbackDefault)
 		if err != nil {
-			_ = ctx.RespondText("Could not find bot.")
+			ctx.RespondText("Could not find bot.")
 			return
 
 		}
 
 		if slices.Contains(cfg.Snipers.GiveawaySniper.CustomBots, bot.ID) {
-			_ = ctx.RespondText("Bot is already in the custom bots list.")
+			ctx.RespondText("Bot is already in the custom bots list.")
 			return
 		}
 
@@ -1261,18 +1261,18 @@ func (ConfigCommands) customgiveawaybots(ctx *router.Ctx) {
 		_ = cfg.Save()
 
 		c.services.Embed.NewEmbed().
-			SetDescription(fmt.Sprintf("Added %s to the custom giveaway bots list.", bot.Mention())).
+			SetDescription("Added %s to the custom giveaway bots list.", bot.Mention()).
 			Send(ctx)
 	case "rm":
 		bot, err := ctx.Arguments.Get(1).User(router.ArgumentFlagFallbackDefault)
 		if err != nil {
-			_ = ctx.RespondText("Could not find bot.")
+			ctx.RespondText("Could not find bot.")
 			return
 
 		}
 
 		if !slices.Contains(cfg.Snipers.GiveawaySniper.CustomBots, bot.ID) {
-			_ = ctx.RespondText("Bot already isn't in the custom bots list.")
+			ctx.RespondText("Bot already isn't in the custom bots list.")
 			return
 		}
 
@@ -1281,7 +1281,7 @@ func (ConfigCommands) customgiveawaybots(ctx *router.Ctx) {
 		_ = cfg.Save()
 
 		c.services.Embed.NewEmbed().
-			SetDescription(fmt.Sprintf("Removed %s from the custom giveaway bots list.", bot.Mention())).
+			SetDescription("Removed %s from the custom giveaway bots list.", bot.Mention()).
 			Send(ctx)
 	case "clear":
 		cfg.Snipers.GiveawaySniper.CustomBots = []string{}
@@ -1291,14 +1291,14 @@ func (ConfigCommands) customgiveawaybots(ctx *router.Ctx) {
 			SetDescription("Cleared all custom giveaway bots.").
 			Send(ctx)
 	default:
-		_ = ctx.RespondText("Invalid <get/add/rm/clear> argument. Use `get`, `add`, `rm`, or `clear`.")
+		ctx.RespondText("Invalid <get/add/rm/clear> argument. Use `get`, `add`, `rm`, or `clear`.")
 	}
 }
 
 func (ConfigCommands) sniperblacklist(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
-		_ = ctx.RespondText("Error getting config.")
+		ctx.RespondText("Error getting config.")
 		return
 	}
 
@@ -1311,7 +1311,7 @@ func (ConfigCommands) sniperblacklist(ctx *router.Ctx) {
 		entry := ctx.Arguments.RawFrom(1)
 
 		if slices.Contains(cfg.Snipers.Blacklist, entry) {
-			_ = ctx.RespondText("Value is already in the blacklist!")
+			ctx.RespondText("Value is already in the blacklist!")
 			return
 		}
 
@@ -1325,7 +1325,7 @@ func (ConfigCommands) sniperblacklist(ctx *router.Ctx) {
 		entry := ctx.Arguments.RawFrom(1)
 
 		if !slices.Contains(cfg.Snipers.Blacklist, entry) {
-			_ = ctx.RespondText("Value already isn't in the blacklist!")
+			ctx.RespondText("Value already isn't in the blacklist!")
 			return
 		}
 
@@ -1343,14 +1343,14 @@ func (ConfigCommands) sniperblacklist(ctx *router.Ctx) {
 			SetDescription("Cleared all sniper blacklist entries.").
 			Send(ctx)
 	default:
-		_ = ctx.RespondText("Invalid <get/add/rm/clear> argument. Use `get`, `add`, `rm`, or `clear`.")
+		ctx.RespondText("Invalid <get/add/rm/clear> argument. Use `get`, `add`, `rm`, or `clear`.")
 	}
 }
 
 func (ConfigCommands) sniperserverblacklist(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
-		_ = ctx.RespondText("Error getting config.")
+		ctx.RespondText("Error getting config.")
 		return
 	}
 
@@ -1374,12 +1374,12 @@ func (ConfigCommands) sniperserverblacklist(ctx *router.Ctx) {
 	case "add":
 		guild, err := utils.Discord.GetGuild(ctx.Session, utils.Misc.Or(utils.Arguments["[server id]"], ctx.Message.GuildID))
 		if err != nil {
-			_ = ctx.RespondText("Could not find server.")
+			ctx.RespondText("Could not find server.")
 			return
 		}
 
 		if slices.Contains(cfg.Snipers.ServerBlacklist, guild.ID) {
-			_ = ctx.RespondText(fmt.Sprintf("Server %s is already in the blacklist!", guild.Name))
+			ctx.RespondText(fmt.Sprintf("Server %s is already in the blacklist!", guild.Name))
 			return
 		}
 
@@ -1387,17 +1387,17 @@ func (ConfigCommands) sniperserverblacklist(ctx *router.Ctx) {
 		_ = cfg.Save()
 
 		c.services.Embed.NewEmbed().
-			SetDescription(fmt.Sprintf("Added %s to the sniper server blacklist.", guild.Name)).
+			SetDescription("Added %s to the sniper server blacklist.", guild.Name).
 			Send(ctx)
 	case "rm":
 		guild, err := utils.Discord.GetGuild(ctx.Session, utils.Misc.Or(utils.Arguments["[server id]"], ctx.Message.GuildID))
 		if err != nil {
-			_ = ctx.RespondText("Could not find server.")
+			ctx.RespondText("Could not find server.")
 			return
 		}
 
 		if !slices.Contains(cfg.Snipers.ServerBlacklist, guild.ID) {
-			_ = ctx.RespondText(fmt.Sprintf("Server %s already isn't in the blacklist!", guild.Name))
+			ctx.RespondText(fmt.Sprintf("Server %s already isn't in the blacklist!", guild.Name))
 			return
 		}
 
@@ -1405,7 +1405,7 @@ func (ConfigCommands) sniperserverblacklist(ctx *router.Ctx) {
 		_ = cfg.Save()
 
 		c.services.Embed.NewEmbed().
-			SetDescription(fmt.Sprintf("Removed %s from the sniper server blacklist.", guild.Name)).
+			SetDescription("Removed %s from the sniper server blacklist.", guild.Name).
 			Send(ctx)
 	case "clear":
 		cfg.Snipers.ServerBlacklist = []string{}
@@ -1415,14 +1415,14 @@ func (ConfigCommands) sniperserverblacklist(ctx *router.Ctx) {
 			SetDescription("Cleared all sniper server blacklist entries.").
 			Send(ctx)
 	default:
-		_ = ctx.RespondText("Invalid <get/add/rm/clear> argument. Use `get`, `add`, `rm`, or `clear`.")
+		ctx.RespondText("Invalid <get/add/rm/clear> argument. Use `get`, `add`, `rm`, or `clear`.")
 	}
 }
 
 func (ConfigCommands) privnotesniper(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
-		_ = ctx.RespondText("Error getting config")
+		ctx.RespondText("Error getting config")
 		return
 	}
 
@@ -1434,7 +1434,7 @@ func (ConfigCommands) privnotesniper(ctx *router.Ctx) {
 	case "set":
 		toggle := strings.ToLower(utils.Arguments["[on/off]"])
 		if toggle != "on" && toggle != "off" {
-			_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
+			ctx.RespondText("Invalid value. Use `on` or `off`.")
 			return
 		}
 
@@ -1452,14 +1452,14 @@ func (ConfigCommands) privnotesniper(ctx *router.Ctx) {
 			SetDescription("Turned " + utils.Misc.FormatBoolOnOff(cfg.Snipers.PrivnoteSniper) + " Privnote sniper").
 			Send(ctx)
 	default:
-		_ = ctx.RespondText("Invalid <get/set/toggle> argument. Use `get` or `set` or `toggle`.")
+		ctx.RespondText("Invalid <get/set/toggle> argument. Use `get` or `set` or `toggle`.")
 	}
 }
 
 func (ConfigCommands) multitokensniper(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
-		_ = ctx.RespondText("Error getting config")
+		ctx.RespondText("Error getting config")
 		return
 	}
 
@@ -1471,7 +1471,7 @@ func (ConfigCommands) multitokensniper(ctx *router.Ctx) {
 	case "set":
 		toggle := strings.ToLower(utils.Arguments["[on/off]"])
 		if toggle != "on" && toggle != "off" {
-			_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
+			ctx.RespondText("Invalid value. Use `on` or `off`.")
 			return
 		}
 
@@ -1489,14 +1489,14 @@ func (ConfigCommands) multitokensniper(ctx *router.Ctx) {
 			SetDescription("Turned " + utils.Misc.FormatBoolOnOff(cfg.Snipers.MultiTokenSniper) + " multi token sniper").
 			Send(ctx)
 	default:
-		_ = ctx.RespondText("Invalid <get/set/toggle> argument. Use `get` or `set` or `toggle`.")
+		ctx.RespondText("Invalid <get/set/toggle> argument. Use `get` or `set` or `toggle`.")
 	}
 }
 
 func (ConfigCommands) poketwosniper(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
-		_ = ctx.RespondText("Error getting config")
+		ctx.RespondText("Error getting config")
 		return
 	}
 
@@ -1508,7 +1508,7 @@ func (ConfigCommands) poketwosniper(ctx *router.Ctx) {
 	case "set":
 		toggle := strings.ToLower(utils.Arguments["[on/off]"])
 		if toggle != "on" && toggle != "off" {
-			_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
+			ctx.RespondText("Invalid value. Use `on` or `off`.")
 			return
 		}
 
@@ -1526,14 +1526,14 @@ func (ConfigCommands) poketwosniper(ctx *router.Ctx) {
 			SetDescription("Turned " + utils.Misc.FormatBoolOnOff(cfg.Snipers.PokeTwoSniper.Enabled) + " PokéTwo sniper").
 			Send(ctx)
 	default:
-		_ = ctx.RespondText("Invalid <get/set/toggle> argument. Use `get` or `set` or `toggle`.")
+		ctx.RespondText("Invalid <get/set/toggle> argument. Use `get` or `set` or `toggle`.")
 	}
 }
 
 func (ConfigCommands) poketwosleep(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
-		_ = ctx.RespondText("Error getting config")
+		ctx.RespondText("Error getting config")
 		return
 	}
 
@@ -1547,7 +1547,7 @@ func (ConfigCommands) poketwosleep(ctx *router.Ctx) {
 	case "set":
 		delay, err := utils.Misc.ParseDuration(utils.Arguments["[value]"])
 		if err != nil {
-			_ = ctx.RespondText("Invalid duration: " + err.Error())
+			ctx.RespondText("Invalid duration: " + err.Error())
 			return
 		}
 
@@ -1557,17 +1557,17 @@ func (ConfigCommands) poketwosleep(ctx *router.Ctx) {
 		formatted := utils.Misc.FormatDuration(time.Duration(cfg.Snipers.PokeTwoSniper.Sleep) * time.Second)
 
 		c.services.Embed.NewEmbed().
-			SetDescription(fmt.Sprintf("PokéTwo sniper sleep set to %s.", formatted)).
+			SetDescription("PokéTwo sniper sleep set to %s.", formatted).
 			Send(ctx)
 	default:
-		_ = ctx.RespondText("Invalid <get/set> argument. Use `get` or `set`.")
+		ctx.RespondText("Invalid <get/set> argument. Use `get` or `set`.")
 	}
 }
 
 func (ConfigCommands) poketworandomsleep(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
-		_ = ctx.RespondText("Error getting config")
+		ctx.RespondText("Error getting config")
 		return
 	}
 
@@ -1579,7 +1579,7 @@ func (ConfigCommands) poketworandomsleep(ctx *router.Ctx) {
 	case "set":
 		toggle := strings.ToLower(utils.Arguments["[on/off]"])
 		if toggle != "on" && toggle != "off" {
-			_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
+			ctx.RespondText("Invalid value. Use `on` or `off`.")
 			return
 		}
 
@@ -1597,14 +1597,14 @@ func (ConfigCommands) poketworandomsleep(ctx *router.Ctx) {
 			SetDescription("Turned " + utils.Misc.FormatBoolOnOff(cfg.Snipers.PokeTwoSniper.RandomSleep) + " PokéTwo random sleep").
 			Send(ctx)
 	default:
-		_ = ctx.RespondText("Invalid <get/set/toggle> argument. Use `get` or `set` or `toggle`.")
+		ctx.RespondText("Invalid <get/set/toggle> argument. Use `get` or `set` or `toggle`.")
 	}
 }
 
 func (ConfigCommands) poketwotimeout(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
-		_ = ctx.RespondText("Error getting config")
+		ctx.RespondText("Error getting config")
 		return
 	}
 
@@ -1618,7 +1618,7 @@ func (ConfigCommands) poketwotimeout(ctx *router.Ctx) {
 	case "set":
 		delay, err := utils.Misc.ParseDuration(utils.Arguments["[value]"])
 		if err != nil {
-			_ = ctx.RespondText("Invalid duration: " + err.Error())
+			ctx.RespondText("Invalid duration: " + err.Error())
 			return
 		}
 
@@ -1628,17 +1628,17 @@ func (ConfigCommands) poketwotimeout(ctx *router.Ctx) {
 		formatted := utils.Misc.FormatDuration(time.Duration(cfg.Snipers.PokeTwoSniper.Timeout) * time.Second)
 
 		c.services.Embed.NewEmbed().
-			SetDescription(fmt.Sprintf("PokéTwo sniper tiumeout set to %s.", formatted)).
+			SetDescription("PokéTwo sniper tiumeout set to %s.", formatted).
 			Send(ctx)
 	default:
-		_ = ctx.RespondText("Invalid <get/set> argument. Use `get` or `set`.")
+		ctx.RespondText("Invalid <get/set> argument. Use `get` or `set`.")
 	}
 }
 
 func (ConfigCommands) poketwotyping(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
-		_ = ctx.RespondText("Error getting config")
+		ctx.RespondText("Error getting config")
 		return
 	}
 
@@ -1650,7 +1650,7 @@ func (ConfigCommands) poketwotyping(ctx *router.Ctx) {
 	case "set":
 		toggle := strings.ToLower(utils.Arguments["[on/off]"])
 		if toggle != "on" && toggle != "off" {
-			_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
+			ctx.RespondText("Invalid value. Use `on` or `off`.")
 			return
 		}
 
@@ -1668,14 +1668,14 @@ func (ConfigCommands) poketwotyping(ctx *router.Ctx) {
 			SetDescription("Turned " + utils.Misc.FormatBoolOnOff(cfg.Snipers.PokeTwoSniper.Typing) + " PokéTwo typing").
 			Send(ctx)
 	default:
-		_ = ctx.RespondText("Invalid <get/set/toggle> argument. Use `get` or `set` or `toggle`.")
+		ctx.RespondText("Invalid <get/set/toggle> argument. Use `get` or `set` or `toggle`.")
 	}
 }
 
 func (ConfigCommands) poketwocatchrate(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
-		_ = ctx.RespondText("Error getting config")
+		ctx.RespondText("Error getting config")
 		return
 	}
 
@@ -1687,7 +1687,7 @@ func (ConfigCommands) poketwocatchrate(ctx *router.Ctx) {
 	case "set":
 		catchRate, err := strconv.Atoi(strings.ReplaceAll(utils.Arguments["[percentage]"], "%", ""))
 		if err != nil || catchRate < 1 || catchRate > 100 {
-			_ = ctx.RespondText("Argument [percentage] must be a percentage in the format `1-100%`.")
+			ctx.RespondText("Argument [percentage] must be a percentage in the format `1-100%`.")
 			return
 		}
 
@@ -1695,17 +1695,17 @@ func (ConfigCommands) poketwocatchrate(ctx *router.Ctx) {
 		_ = cfg.Save()
 
 		c.services.Embed.NewEmbed().
-			SetDescription(fmt.Sprintf("PokéTwo catch rate set to %d%%", cfg.Snipers.PokeTwoSniper.CatchRate)).
+			SetDescription("PokéTwo catch rate set to %d%%", cfg.Snipers.PokeTwoSniper.CatchRate).
 			Send(ctx)
 	default:
-		_ = ctx.RespondText("Invalid <get/set> argument. Use `get` or `set`.")
+		ctx.RespondText("Invalid <get/set> argument. Use `get` or `set`.")
 	}
 }
 
 func (ConfigCommands) poketwofakeactivity(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
-		_ = ctx.RespondText("Error getting config")
+		ctx.RespondText("Error getting config")
 		return
 	}
 
@@ -1717,7 +1717,7 @@ func (ConfigCommands) poketwofakeactivity(ctx *router.Ctx) {
 	case "set":
 		toggle := strings.ToLower(utils.Arguments["[on/off]"])
 		if toggle != "on" && toggle != "off" {
-			_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
+			ctx.RespondText("Invalid value. Use `on` or `off`.")
 			return
 		}
 
@@ -1735,14 +1735,14 @@ func (ConfigCommands) poketwofakeactivity(ctx *router.Ctx) {
 			SetDescription("Turned " + utils.Misc.FormatBoolOnOff(cfg.Snipers.PokeTwoSniper.FakeActivity) + " PokéTwo fake activity").
 			Send(ctx)
 	default:
-		_ = ctx.RespondText("Invalid <get/set/toggle> argument. Use `get` or `set` or `toggle`.")
+		ctx.RespondText("Invalid <get/set/toggle> argument. Use `get` or `set` or `toggle`.")
 	}
 }
 
 func (ConfigCommands) poketwochannels(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
-		_ = ctx.RespondText("Error getting config")
+		ctx.RespondText("Error getting config")
 		return
 	}
 
@@ -1772,12 +1772,12 @@ func (ConfigCommands) poketwochannels(ctx *router.Ctx) {
 	case "add":
 		channel, err := ctx.Arguments.Get(1).Channel()
 		if err != nil {
-			_ = ctx.RespondText("Could not find channel")
+			ctx.RespondText("Could not find channel")
 			return
 		}
 
 		if slices.Contains(cfg.Snipers.PokeTwoSniper.Channels, channel.ID) {
-			_ = ctx.RespondText("Channel is already in the catch list!")
+			ctx.RespondText("Channel is already in the catch list!")
 			return
 		}
 
@@ -1785,17 +1785,17 @@ func (ConfigCommands) poketwochannels(ctx *router.Ctx) {
 		_ = cfg.Save()
 
 		c.services.Embed.NewEmbed().
-			SetDescription(fmt.Sprintf("Added %s to the PokéTwo sniper catch list.", channel.Mention())).
+			SetDescription("Added %s to the PokéTwo sniper catch list.", channel.Mention()).
 			Send(ctx)
 	case "rm":
 		channel, err := ctx.Arguments.Get(1).Channel()
 		if err != nil {
-			_ = ctx.RespondText("Could not find channel")
+			ctx.RespondText("Could not find channel")
 			return
 		}
 
 		if !slices.Contains(cfg.Snipers.PokeTwoSniper.Channels, channel.ID) {
-			_ = ctx.RespondText("Channel is not in the catch list!")
+			ctx.RespondText("Channel is not in the catch list!")
 			return
 		}
 
@@ -1803,7 +1803,7 @@ func (ConfigCommands) poketwochannels(ctx *router.Ctx) {
 		_ = cfg.Save()
 
 		c.services.Embed.NewEmbed().
-			SetDescription(fmt.Sprintf("Removed %s from the PokéTwo sniper catch list.", channel.Mention())).
+			SetDescription("Removed %s from the PokéTwo sniper catch list.", channel.Mention()).
 			Send(ctx)
 	case "clear":
 		cfg.Snipers.PokeTwoSniper.Channels = []string{}
@@ -1813,14 +1813,14 @@ func (ConfigCommands) poketwochannels(ctx *router.Ctx) {
 			SetDescription("Cleared all PokéTwo sniper channels.").
 			Send(ctx)
 	default:
-		_ = ctx.RespondText("Invalid <get/add/rm/clear> argument. Use `get`, `add`, `rm`, or `clear`.")
+		ctx.RespondText("Invalid <get/add/rm/clear> argument. Use `get`, `add`, `rm`, or `clear`.")
 	}
 }
 
 func (ConfigCommands) poketwolanguage(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
-		_ = ctx.RespondText("Error getting config")
+		ctx.RespondText("Error getting config")
 		return
 	}
 
@@ -1844,28 +1844,28 @@ func (ConfigCommands) poketwolanguage(ctx *router.Ctx) {
 		case "de", "german":
 			cfg.Snipers.PokeTwoSniper.CatchLanguage = "German"
 		default:
-			_ = ctx.RespondText("Invalid language. `[p]poketwolanguages values` to view all available values.")
+			ctx.RespondText("Invalid language. `[p]poketwolanguages values` to view all available values.")
 			return
 		}
 
 		_ = cfg.Save()
 
 		c.services.Embed.NewEmbed().
-			SetDescription(fmt.Sprintf("PokéTwo catch language set to %s.", cfg.Snipers.PokeTwoSniper.CatchLanguage)).
+			SetDescription("PokéTwo catch language set to %s.", cfg.Snipers.PokeTwoSniper.CatchLanguage).
 			Send(ctx)
 	case "values":
 		c.services.Embed.NewEmbed().
 			SetDescription("Valid languages: `english`/`en`, `japanese`/`ja`, `japanese_t`/`ja_t` (transliterated), `french`/`fr`, `german`/`de`.").
 			Send(ctx)
 	default:
-		_ = ctx.RespondText("Invalid <get/set/values> argument. Use `get`, `set`, or `values`.")
+		ctx.RespondText("Invalid <get/set/values> argument. Use `get`, `set`, or `values`.")
 	}
 }
 
 func (ConfigCommands) snipertokens(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
-		_ = ctx.RespondText("Error getting config")
+		ctx.RespondText("Error getting config")
 		return
 	}
 
@@ -1892,7 +1892,7 @@ func (ConfigCommands) snipertokens(ctx *router.Ctx) {
 		_ = cfg.Save()
 
 		c.services.Embed.NewEmbed().
-			SetDescription(fmt.Sprintf("Added %d token(s) to the multi token sniper.", added)).
+			SetDescription("Added %d token(s) to the multi token sniper.", added).
 			Send(ctx)
 	case "rm":
 		entries := strings.Split(ctx.Arguments.Raw(), ",")
@@ -1912,7 +1912,7 @@ func (ConfigCommands) snipertokens(ctx *router.Ctx) {
 		_ = cfg.Save()
 
 		c.services.Embed.NewEmbed().
-			SetDescription(fmt.Sprintf("Removed %d token(s) from the multi token sniper.", added)).
+			SetDescription("Removed %d token(s) from the multi token sniper.", added).
 			Send(ctx)
 	case "clear":
 		cfg.Snipers.Tokens = []string{}
@@ -1922,7 +1922,7 @@ func (ConfigCommands) snipertokens(ctx *router.Ctx) {
 			SetDescription("Cleared all sniper tokens.").
 			Send(ctx)
 	default:
-		_ = ctx.RespondText("Invalid <get/add/rm/clear> argument. Use `get`, `add`, `rm`, or `clear`.")
+		ctx.RespondText("Invalid <get/add/rm/clear> argument. Use `get`, `add`, `rm`, or `clear`.")
 	}
 }
 
@@ -1952,13 +1952,13 @@ func (ConfigCommands) setupwebhooks(ctx *router.Ctx) {
 
 	cfg, err := config.GetConfig()
 	if err != nil {
-		_ = ctx.RespondText("Error getting config")
+		ctx.RespondText("Error getting config")
 		return
 	}
 
 	category, err := ctx.Session.GuildChannelCreate(serverID, "LightningBot", discordgo.ChannelTypeGuildCategory)
 	if err != nil {
-		_ = ctx.RespondText("Failed to create category: " + err.Error())
+		ctx.RespondText("Failed to create category: " + err.Error())
 		return
 	}
 
@@ -1981,7 +1981,7 @@ func (ConfigCommands) setupwebhooks(ctx *router.Ctx) {
 func (ConfigCommands) wall(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
-		_ = ctx.RespondText("Error getting config")
+		ctx.RespondText("Error getting config")
 		return
 	}
 
@@ -2006,7 +2006,7 @@ func (ConfigCommands) wall(ctx *router.Ctx) {
 func (ConfigCommands) wnitrosniper(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
-		_ = ctx.RespondText("Error getting config")
+		ctx.RespondText("Error getting config")
 		return
 	}
 
@@ -2023,14 +2023,14 @@ func (ConfigCommands) wnitrosniper(ctx *router.Ctx) {
 			SetDescription("Set nitro sniper webhook to " + utils.Arguments["[webhook url]"]).
 			Send(ctx)
 	default:
-		_ = ctx.RespondText("Invalid <get/set> argument. Use `get` or `set`.")
+		ctx.RespondText("Invalid <get/set> argument. Use `get` or `set`.")
 	}
 }
 
 func (ConfigCommands) wgiveawaysniper(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
-		_ = ctx.RespondText("Error getting config")
+		ctx.RespondText("Error getting config")
 		return
 	}
 
@@ -2047,14 +2047,14 @@ func (ConfigCommands) wgiveawaysniper(ctx *router.Ctx) {
 			SetDescription("Set giveaway sniper webhook to " + utils.Arguments["[webhook url]"]).
 			Send(ctx)
 	default:
-		_ = ctx.RespondText("Invalid <get/set> argument. Use `get` or `set`.")
+		ctx.RespondText("Invalid <get/set> argument. Use `get` or `set`.")
 	}
 }
 
 func (ConfigCommands) wselfbotdetection(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
-		_ = ctx.RespondText("Error getting config")
+		ctx.RespondText("Error getting config")
 		return
 	}
 
@@ -2071,14 +2071,14 @@ func (ConfigCommands) wselfbotdetection(ctx *router.Ctx) {
 			SetDescription("Set selfbot detection webhook to " + utils.Arguments["[webhook url]"]).
 			Send(ctx)
 	default:
-		_ = ctx.RespondText("Invalid <get/set> argument. Use `get` or `set`.")
+		ctx.RespondText("Invalid <get/set> argument. Use `get` or `set`.")
 	}
 }
 
 func (ConfigCommands) wstaffdetection(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
-		_ = ctx.RespondText("Error getting config")
+		ctx.RespondText("Error getting config")
 		return
 	}
 
@@ -2095,14 +2095,14 @@ func (ConfigCommands) wstaffdetection(ctx *router.Ctx) {
 			SetDescription("Set staff detection webhook to " + utils.Arguments["[webhook url]"]).
 			Send(ctx)
 	default:
-		_ = ctx.RespondText("Invalid <get/set> argument. Use `get` or `set`.")
+		ctx.RespondText("Invalid <get/set> argument. Use `get` or `set`.")
 	}
 }
 
 func (ConfigCommands) wnotifiers(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
-		_ = ctx.RespondText("Error getting config")
+		ctx.RespondText("Error getting config")
 		return
 	}
 
@@ -2119,14 +2119,14 @@ func (ConfigCommands) wnotifiers(ctx *router.Ctx) {
 			SetDescription("Set notifiers webhook to " + utils.Arguments["[webhook url]"]).
 			Send(ctx)
 	default:
-		_ = ctx.RespondText("Invalid <get/set> argument. Use `get` or `set`.")
+		ctx.RespondText("Invalid <get/set> argument. Use `get` or `set`.")
 	}
 }
 
 func (ConfigCommands) wpingdetection(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
-		_ = ctx.RespondText("Error getting config")
+		ctx.RespondText("Error getting config")
 		return
 	}
 
@@ -2143,14 +2143,14 @@ func (ConfigCommands) wpingdetection(ctx *router.Ctx) {
 			SetDescription("Set ping detection webhook to " + utils.Arguments["[webhook url]"]).
 			Send(ctx)
 	default:
-		_ = ctx.RespondText("Invalid <get/set> argument. Use `get` or `set`.")
+		ctx.RespondText("Invalid <get/set> argument. Use `get` or `set`.")
 	}
 }
 
 func (ConfigCommands) wmisc(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
-		_ = ctx.RespondText("Error getting config")
+		ctx.RespondText("Error getting config")
 		return
 	}
 
@@ -2167,14 +2167,14 @@ func (ConfigCommands) wmisc(ctx *router.Ctx) {
 			SetDescription("Set misc webhook to " + utils.Arguments["[webhook url]"]).
 			Send(ctx)
 	default:
-		_ = ctx.RespondText("Invalid <get/set> argument. Use `get` or `set`.")
+		ctx.RespondText("Invalid <get/set> argument. Use `get` or `set`.")
 	}
 }
 
 func (ConfigCommands) wsessions(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
-		_ = ctx.RespondText("Error getting config")
+		ctx.RespondText("Error getting config")
 		return
 	}
 
@@ -2191,14 +2191,14 @@ func (ConfigCommands) wsessions(ctx *router.Ctx) {
 			SetDescription("Set sessions webhook to " + utils.Arguments["[webhook url]"]).
 			Send(ctx)
 	default:
-		_ = ctx.RespondText("Invalid <get/set> argument. Use `get` or `set`.")
+		ctx.RespondText("Invalid <get/set> argument. Use `get` or `set`.")
 	}
 }
 
 func (ConfigCommands) wpingself(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
-		_ = ctx.RespondText("Error getting config")
+		ctx.RespondText("Error getting config")
 		return
 	}
 
@@ -2218,7 +2218,7 @@ func (ConfigCommands) wpingself(ctx *router.Ctx) {
 		case "important":
 			cfg.Webhooks.PingSelfMode = "Important"
 		default:
-			_ = ctx.RespondText("Invalid Webhook Ping Self mode. Use `[p]wpingself values` to get a list of available modes.")
+			ctx.RespondText("Invalid Webhook Ping Self mode. Use `[p]wpingself values` to get a list of available modes.")
 			return
 		}
 
@@ -2232,14 +2232,14 @@ func (ConfigCommands) wpingself(ctx *router.Ctx) {
 			SetDescription("Available Webhook Ping Self modes: Disabled, Always, Important").
 			Send(ctx)
 	default:
-		_ = ctx.RespondText("Invalid <get/set/values> argument. Use `get`, `set`, or `values`.")
+		ctx.RespondText("Invalid <get/set/values> argument. Use `get`, `set`, or `values`.")
 	}
 }
 
 func (ConfigCommands) wpingeveryone(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
-		_ = ctx.RespondText("Error getting config")
+		ctx.RespondText("Error getting config")
 		return
 	}
 
@@ -2259,7 +2259,7 @@ func (ConfigCommands) wpingeveryone(ctx *router.Ctx) {
 		case "important":
 			cfg.Webhooks.PingEveryoneMode = "Important"
 		default:
-			_ = ctx.RespondText("Invalid Webhook Ping Everyone mode. Use `[p]wpingeveryone values` to get a list of available modes.")
+			ctx.RespondText("Invalid Webhook Ping Everyone mode. Use `[p]wpingeveryone values` to get a list of available modes.")
 			return
 		}
 
@@ -2273,14 +2273,14 @@ func (ConfigCommands) wpingeveryone(ctx *router.Ctx) {
 			SetDescription("Available Webhook Ping Everyone modes: Disabled, Always, Important").
 			Send(ctx)
 	default:
-		_ = ctx.RespondText("Invalid <get/set/values> argument. Use `get`, `set`, or `values`.")
+		ctx.RespondText("Invalid <get/set/values> argument. Use `get`, `set`, or `values`.")
 	}
 }
 
 func (ConfigCommands) bannotifier(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
-		_ = ctx.RespondText("Error getting config")
+		ctx.RespondText("Error getting config")
 		return
 	}
 
@@ -2292,7 +2292,7 @@ func (ConfigCommands) bannotifier(ctx *router.Ctx) {
 	case "set":
 		toggle := strings.ToLower(utils.Arguments["[on/off]"])
 		if toggle != "on" && toggle != "off" {
-			_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
+			ctx.RespondText("Invalid value. Use `on` or `off`.")
 			return
 		}
 
@@ -2310,14 +2310,14 @@ func (ConfigCommands) bannotifier(ctx *router.Ctx) {
 			SetDescription("Turned " + utils.Misc.FormatBoolOnOff(cfg.Events.BanNotifier) + " ban notifier").
 			Send(ctx)
 	default:
-		_ = ctx.RespondText("Invalid <get/set/toggle> argument. Use `get` or `set` or `toggle`.")
+		ctx.RespondText("Invalid <get/set/toggle> argument. Use `get` or `set` or `toggle`.")
 	}
 }
 
 func (ConfigCommands) staffdetection(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
-		_ = ctx.RespondText("Error getting config")
+		ctx.RespondText("Error getting config")
 		return
 	}
 
@@ -2329,7 +2329,7 @@ func (ConfigCommands) staffdetection(ctx *router.Ctx) {
 	case "set":
 		toggle := strings.ToLower(utils.Arguments["[on/off]"])
 		if toggle != "on" && toggle != "off" {
-			_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
+			ctx.RespondText("Invalid value. Use `on` or `off`.")
 			return
 		}
 
@@ -2347,14 +2347,14 @@ func (ConfigCommands) staffdetection(ctx *router.Ctx) {
 			SetDescription("Turned " + utils.Misc.FormatBoolOnOff(cfg.Events.DiscordStaffDetection) + " staff detection").
 			Send(ctx)
 	default:
-		_ = ctx.RespondText("Invalid <get/set/toggle> argument. Use `get` or `set` or `toggle`.")
+		ctx.RespondText("Invalid <get/set/toggle> argument. Use `get` or `set` or `toggle`.")
 	}
 }
 
 func (ConfigCommands) pingdetection(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
-		_ = ctx.RespondText("Error getting config")
+		ctx.RespondText("Error getting config")
 		return
 	}
 
@@ -2366,7 +2366,7 @@ func (ConfigCommands) pingdetection(ctx *router.Ctx) {
 	case "set":
 		toggle := strings.ToLower(utils.Arguments["[on/off]"])
 		if toggle != "on" && toggle != "off" {
-			_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
+			ctx.RespondText("Invalid value. Use `on` or `off`.")
 			return
 		}
 
@@ -2384,14 +2384,14 @@ func (ConfigCommands) pingdetection(ctx *router.Ctx) {
 			SetDescription("Turned " + utils.Misc.FormatBoolOnOff(cfg.Events.GhostPingDetection) + " ping detection").
 			Send(ctx)
 	default:
-		_ = ctx.RespondText("Invalid <get/set/toggle> argument. Use `get` or `set` or `toggle`.")
+		ctx.RespondText("Invalid <get/set/toggle> argument. Use `get` or `set` or `toggle`.")
 	}
 }
 
 func (ConfigCommands) ticketnotifier(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
-		_ = ctx.RespondText("Error getting config")
+		ctx.RespondText("Error getting config")
 		return
 	}
 
@@ -2403,7 +2403,7 @@ func (ConfigCommands) ticketnotifier(ctx *router.Ctx) {
 	case "set":
 		toggle := strings.ToLower(utils.Arguments["[on/off]"])
 		if toggle != "on" && toggle != "off" {
-			_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
+			ctx.RespondText("Invalid value. Use `on` or `off`.")
 			return
 		}
 
@@ -2421,14 +2421,14 @@ func (ConfigCommands) ticketnotifier(ctx *router.Ctx) {
 			SetDescription("Turned " + utils.Misc.FormatBoolOnOff(cfg.Events.TicketNotifier) + " ticket notifier").
 			Send(ctx)
 	default:
-		_ = ctx.RespondText("Invalid <get/set/toggle> argument. Use `get` or `set` or `toggle`.")
+		ctx.RespondText("Invalid <get/set/toggle> argument. Use `get` or `set` or `toggle`.")
 	}
 }
 
 func (ConfigCommands) sessionconnected(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
-		_ = ctx.RespondText("Error getting config")
+		ctx.RespondText("Error getting config")
 		return
 	}
 
@@ -2440,7 +2440,7 @@ func (ConfigCommands) sessionconnected(ctx *router.Ctx) {
 	case "set":
 		toggle := strings.ToLower(utils.Arguments["[on/off]"])
 		if toggle != "on" && toggle != "off" {
-			_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
+			ctx.RespondText("Invalid value. Use `on` or `off`.")
 			return
 		}
 
@@ -2458,14 +2458,14 @@ func (ConfigCommands) sessionconnected(ctx *router.Ctx) {
 			SetDescription("Turned " + utils.Misc.FormatBoolOnOff(cfg.Events.SessionConnected) + " session connected notifier").
 			Send(ctx)
 	default:
-		_ = ctx.RespondText("Invalid <get/set/toggle> argument. Use `get` or `set` or `toggle`.")
+		ctx.RespondText("Invalid <get/set/toggle> argument. Use `get` or `set` or `toggle`.")
 	}
 }
 
 func (ConfigCommands) sessiondisconnected(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
-		_ = ctx.RespondText("Error getting config")
+		ctx.RespondText("Error getting config")
 		return
 	}
 
@@ -2477,7 +2477,7 @@ func (ConfigCommands) sessiondisconnected(ctx *router.Ctx) {
 	case "set":
 		toggle := strings.ToLower(utils.Arguments["[on/off]"])
 		if toggle != "on" && toggle != "off" {
-			_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
+			ctx.RespondText("Invalid value. Use `on` or `off`.")
 			return
 		}
 
@@ -2495,14 +2495,14 @@ func (ConfigCommands) sessiondisconnected(ctx *router.Ctx) {
 			SetDescription("Turned " + utils.Misc.FormatBoolOnOff(cfg.Events.SessionDisconnected) + " session disconnected notifier").
 			Send(ctx)
 	default:
-		_ = ctx.RespondText("Invalid <get/set/toggle> argument. Use `get` or `set` or `toggle`.")
+		ctx.RespondText("Invalid <get/set/toggle> argument. Use `get` or `set` or `toggle`.")
 	}
 }
 
 func (ConfigCommands) selfbotdetection(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
-		_ = ctx.RespondText("Error getting config")
+		ctx.RespondText("Error getting config")
 		return
 	}
 
@@ -2514,7 +2514,7 @@ func (ConfigCommands) selfbotdetection(ctx *router.Ctx) {
 	case "set":
 		toggle := strings.ToLower(utils.Arguments["[on/off]"])
 		if toggle != "on" && toggle != "off" {
-			_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
+			ctx.RespondText("Invalid value. Use `on` or `off`.")
 			return
 		}
 
@@ -2532,14 +2532,14 @@ func (ConfigCommands) selfbotdetection(ctx *router.Ctx) {
 			SetDescription("Turned " + utils.Misc.FormatBoolOnOff(cfg.Events.SelfbotDetection) + " selfbot detection").
 			Send(ctx)
 	default:
-		_ = ctx.RespondText("Invalid <get/set/toggle> argument. Use `get` or `set` or `toggle`.")
+		ctx.RespondText("Invalid <get/set/toggle> argument. Use `get` or `set` or `toggle`.")
 	}
 }
 
 func (ConfigCommands) dmtypingnotifier(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
-		_ = ctx.RespondText("Error getting config")
+		ctx.RespondText("Error getting config")
 		return
 	}
 
@@ -2551,7 +2551,7 @@ func (ConfigCommands) dmtypingnotifier(ctx *router.Ctx) {
 	case "set":
 		toggle := strings.ToLower(utils.Arguments["[on/off]"])
 		if toggle != "on" && toggle != "off" {
-			_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
+			ctx.RespondText("Invalid value. Use `on` or `off`.")
 			return
 		}
 
@@ -2569,14 +2569,14 @@ func (ConfigCommands) dmtypingnotifier(ctx *router.Ctx) {
 			SetDescription("Turned " + utils.Misc.FormatBoolOnOff(cfg.Events.DMTypingNotifier) + " DM typing notifier").
 			Send(ctx)
 	default:
-		_ = ctx.RespondText("Invalid <get/set/toggle> argument. Use `get` or `set` or `toggle`.")
+		ctx.RespondText("Invalid <get/set/toggle> argument. Use `get` or `set` or `toggle`.")
 	}
 }
 
 func (ConfigCommands) dmnotifier(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
-		_ = ctx.RespondText("Error getting config")
+		ctx.RespondText("Error getting config")
 		return
 	}
 
@@ -2588,7 +2588,7 @@ func (ConfigCommands) dmnotifier(ctx *router.Ctx) {
 	case "set":
 		toggle := strings.ToLower(utils.Arguments["[on/off]"])
 		if toggle != "on" && toggle != "off" {
-			_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
+			ctx.RespondText("Invalid value. Use `on` or `off`.")
 			return
 		}
 
@@ -2606,14 +2606,14 @@ func (ConfigCommands) dmnotifier(ctx *router.Ctx) {
 			SetDescription("Turned " + utils.Misc.FormatBoolOnOff(cfg.Events.DMNotifier) + " DM notifier").
 			Send(ctx)
 	default:
-		_ = ctx.RespondText("Invalid <get/set/toggle> argument. Use `get` or `set` or `toggle`.")
+		ctx.RespondText("Invalid <get/set/toggle> argument. Use `get` or `set` or `toggle`.")
 	}
 }
 
 func (ConfigCommands) dmdeletenotifier(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
-		_ = ctx.RespondText("Error getting config")
+		ctx.RespondText("Error getting config")
 		return
 	}
 
@@ -2625,7 +2625,7 @@ func (ConfigCommands) dmdeletenotifier(ctx *router.Ctx) {
 	case "set":
 		toggle := strings.ToLower(utils.Arguments["[on/off]"])
 		if toggle != "on" && toggle != "off" {
-			_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
+			ctx.RespondText("Invalid value. Use `on` or `off`.")
 			return
 		}
 
@@ -2643,14 +2643,14 @@ func (ConfigCommands) dmdeletenotifier(ctx *router.Ctx) {
 			SetDescription("Turned " + utils.Misc.FormatBoolOnOff(cfg.Events.DMDeleteNotifier) + " DM delete notifier").
 			Send(ctx)
 	default:
-		_ = ctx.RespondText("Invalid <get/set/toggle> argument. Use `get` or `set` or `toggle`.")
+		ctx.RespondText("Invalid <get/set/toggle> argument. Use `get` or `set` or `toggle`.")
 	}
 }
 
 func (ConfigCommands) dmeditnotifier(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
-		_ = ctx.RespondText("Error getting config")
+		ctx.RespondText("Error getting config")
 		return
 	}
 
@@ -2662,7 +2662,7 @@ func (ConfigCommands) dmeditnotifier(ctx *router.Ctx) {
 	case "set":
 		toggle := strings.ToLower(utils.Arguments["[on/off]"])
 		if toggle != "on" && toggle != "off" {
-			_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
+			ctx.RespondText("Invalid value. Use `on` or `off`.")
 			return
 		}
 
@@ -2680,14 +2680,14 @@ func (ConfigCommands) dmeditnotifier(ctx *router.Ctx) {
 			SetDescription("Turned " + utils.Misc.FormatBoolOnOff(cfg.Events.DMEditNotifier) + " DM edit notifier").
 			Send(ctx)
 	default:
-		_ = ctx.RespondText("Invalid <get/set/toggle> argument. Use `get` or `set` or `toggle`.")
+		ctx.RespondText("Invalid <get/set/toggle> argument. Use `get` or `set` or `toggle`.")
 	}
 }
 
 func (ConfigCommands) messagedeletenotifier(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
-		_ = ctx.RespondText("Error getting config")
+		ctx.RespondText("Error getting config")
 		return
 	}
 
@@ -2699,7 +2699,7 @@ func (ConfigCommands) messagedeletenotifier(ctx *router.Ctx) {
 	case "set":
 		toggle := strings.ToLower(utils.Arguments["[on/off]"])
 		if toggle != "on" && toggle != "off" {
-			_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
+			ctx.RespondText("Invalid value. Use `on` or `off`.")
 			return
 		}
 
@@ -2717,14 +2717,14 @@ func (ConfigCommands) messagedeletenotifier(ctx *router.Ctx) {
 			SetDescription("Turned " + utils.Misc.FormatBoolOnOff(cfg.Events.MessageDeleteNotifier) + " message delete notifier").
 			Send(ctx)
 	default:
-		_ = ctx.RespondText("Invalid <get/set/toggle> argument. Use `get` or `set` or `toggle`.")
+		ctx.RespondText("Invalid <get/set/toggle> argument. Use `get` or `set` or `toggle`.")
 	}
 }
 
 func (ConfigCommands) uitheme(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
-		_ = ctx.RespondText("Error getting config")
+		ctx.RespondText("Error getting config")
 		return
 	}
 
@@ -2736,7 +2736,7 @@ func (ConfigCommands) uitheme(ctx *router.Ctx) {
 	case "set":
 		theme := strings.ToLower(utils.Arguments["[value]"])
 		if theme != "light" && theme != "dark" {
-			_ = ctx.RespondText("Invalid value. Use `light` or `dark`.")
+			ctx.RespondText("Invalid value. Use `light` or `dark`.")
 			return
 		}
 
@@ -2751,14 +2751,14 @@ func (ConfigCommands) uitheme(ctx *router.Ctx) {
 			SetDescription("Valid themes: `light`, `dark`.").
 			Send(ctx)
 	default:
-		_ = ctx.RespondText("Invalid <get/set/values> argument. Use `get`, `set`, or `values`.")
+		ctx.RespondText("Invalid <get/set/values> argument. Use `get`, `set`, or `values`.")
 	}
 }
 
 func (ConfigCommands) hidetosystray(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
-		_ = ctx.RespondText("Error getting config")
+		ctx.RespondText("Error getting config")
 		return
 	}
 
@@ -2770,7 +2770,7 @@ func (ConfigCommands) hidetosystray(ctx *router.Ctx) {
 	case "set":
 		toggle := strings.ToLower(utils.Arguments["[on/off]"])
 		if toggle != "on" && toggle != "off" {
-			_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
+			ctx.RespondText("Invalid value. Use `on` or `off`.")
 			return
 		}
 
@@ -2788,14 +2788,14 @@ func (ConfigCommands) hidetosystray(ctx *router.Ctx) {
 			SetDescription("Turned " + utils.Misc.FormatBoolOnOff(cfg.UI.HideToSystemTray) + " hide to system tray").
 			Send(ctx)
 	default:
-		_ = ctx.RespondText("Invalid <get/set/toggle> argument. Use `get` or `set` or `toggle`.")
+		ctx.RespondText("Invalid <get/set/toggle> argument. Use `get` or `set` or `toggle`.")
 	}
 }
 
 func (ConfigCommands) runuionstartup(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
-		_ = ctx.RespondText("Error getting config")
+		ctx.RespondText("Error getting config")
 		return
 	}
 
@@ -2807,7 +2807,7 @@ func (ConfigCommands) runuionstartup(ctx *router.Ctx) {
 	case "set":
 		toggle := strings.ToLower(utils.Arguments["[on/off]"])
 		if toggle != "on" && toggle != "off" {
-			_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
+			ctx.RespondText("Invalid value. Use `on` or `off`.")
 			return
 		}
 
@@ -2825,14 +2825,14 @@ func (ConfigCommands) runuionstartup(ctx *router.Ctx) {
 			SetDescription("Turned " + utils.Misc.FormatBoolOnOff(cfg.UI.RunOnStartup) + " run UI on startup").
 			Send(ctx)
 	default:
-		_ = ctx.RespondText("Invalid <get/set/toggle> argument. Use `get` or `set` or `toggle`.")
+		ctx.RespondText("Invalid <get/set/toggle> argument. Use `get` or `set` or `toggle`.")
 	}
 }
 
 func (ConfigCommands) runbotonstartup(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
-		_ = ctx.RespondText("Error getting config")
+		ctx.RespondText("Error getting config")
 		return
 	}
 
@@ -2844,7 +2844,7 @@ func (ConfigCommands) runbotonstartup(ctx *router.Ctx) {
 	case "set":
 		toggle := strings.ToLower(utils.Arguments["[on/off]"])
 		if toggle != "on" && toggle != "off" {
-			_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
+			ctx.RespondText("Invalid value. Use `on` or `off`.")
 			return
 		}
 
@@ -2862,7 +2862,7 @@ func (ConfigCommands) runbotonstartup(ctx *router.Ctx) {
 			SetDescription("Turned " + utils.Misc.FormatBoolOnOff(cfg.UI.RunSelfbotOnStartup) + " run selfbot on startup").
 			Send(ctx)
 	default:
-		_ = ctx.RespondText("Invalid <get/set/toggle> argument. Use `get` or `set` or `toggle`.")
+		ctx.RespondText("Invalid <get/set/toggle> argument. Use `get` or `set` or `toggle`.")
 	}
 }
 

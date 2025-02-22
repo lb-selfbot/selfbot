@@ -595,7 +595,7 @@ func (c *SlashCommands) setscjobpaused(ctx *router.Ctx) {
 	var err error
 	job.Paused, err = ctx.Arguments.Get(1).Bool()
 	if err != nil {
-		_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
+		ctx.RespondText("Invalid value. Use `on` or `off`.")
 		return
 	}
 
