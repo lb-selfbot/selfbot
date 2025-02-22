@@ -2,11 +2,11 @@ package slashcommands
 
 import (
 	"fmt"
-	"strings"
 	"time"
 
 	"github.com/LightningDev1/LB-Selfbot/internal/router"
 	"github.com/LightningDev1/LB-Selfbot/internal/services"
+	"github.com/LightningDev1/LB-Selfbot/internal/services/interfaces"
 	"github.com/LightningDev1/LB-Selfbot/internal/services/scjobs"
 	"github.com/LightningDev1/LB-Selfbot/internal/utils"
 	"github.com/LightningDev1/discordgo"
@@ -338,7 +338,7 @@ func (c *SlashCommands) createscjob(ctx *router.Ctx) {
 		return
 	}
 
-	interval, err := utils.Misc.ParseDuration(utils.Arguments["<interval>"])
+	interval, err := ctx.Arguments.Get(3).Duration()
 	if err != nil {
 		ctx.RespondText("An error occurred while parsing the interval. Make sure to use a valid duration (i.e. 30s, 5m, or 5h).")
 		return
@@ -358,7 +358,7 @@ func (c *SlashCommands) createscjob(ctx *router.Ctx) {
 	}
 
 	commands = utils.Filter(commands, func(command *discordgo.ApplicationCommand) bool {
-		return command.Name == utils.Arguments["<command>"] && command.ApplicationID == appID
+		return command.Name == ctx.Arguments.Get(4).Raw() && command.ApplicationID == appID
 	})
 
 	if len(commands) == 0 {
@@ -368,27 +368,27 @@ func (c *SlashCommands) createscjob(ctx *router.Ctx) {
 
 	command := commands[0]
 
-	_, err = c.services.SCJobs.ArgumentsToCommandOptions(command.Options, ctx.Arguments, 5)
+	_, err = scjobs.ArgumentsToCommandOptions(command.Options, ctx.Arguments, 5)
 	if err != nil {
 		ctx.RespondText("An error occurred while parsing your arguments to command options: " + err.Error())
 		return
 	}
 
-	job := &c.services.SCJobs.Job{
+	job := &interfaces.SCJob{
 		Name: name,
-		CommandObject: c.services.SCJobs.DiscordObject{
+		CommandObject: interfaces.DiscordObject{
 			Name: command.Name,
 			ID:   command.ID,
 		},
-		ApplicationObject: c.services.SCJobs.DiscordObject{
+		ApplicationObject: interfaces.DiscordObject{
 			Name: bot.Username,
 			ID:   appID,
 		},
-		ChannelObject: c.services.SCJobs.DiscordObject{
+		ChannelObject: interfaces.DiscordObject{
 			Name: channel.Name,
 			ID:   channel.ID,
 		},
-		GuildObject: c.services.SCJobs.DiscordObject{
+		GuildObject: interfaces.DiscordObject{
 			Name: guild.Name,
 			ID:   guild.ID,
 		},
@@ -397,12 +397,6 @@ func (c *SlashCommands) createscjob(ctx *router.Ctx) {
 
 		// Set command so the job handler won't have to fetch it again
 		Command: command,
-	}
-
-	err = job.Load(ctx.Session)
-	if err != nil {
-		ctx.RespondText("An error occurred while loading the job data: " + err.Error())
-		return
 	}
 
 	err = c.services.SCJobs.AddJob(job)
@@ -467,7 +461,7 @@ func (c *SlashCommands) setscjobcommand(ctx *router.Ctx) {
 	}
 
 	commands = utils.Filter(commands, func(command *discordgo.ApplicationCommand) bool {
-		return command.Name == utils.Arguments["<command>"] && command.ApplicationID == appID
+		return command.Name == ctx.Arguments.Get(2).Raw() && command.ApplicationID == appID
 	})
 
 	if len(commands) == 0 {
@@ -477,18 +471,18 @@ func (c *SlashCommands) setscjobcommand(ctx *router.Ctx) {
 
 	command := commands[0]
 
-	_, err = c.services.SCJobs.ArgumentsToCommandOptions(command.Options, ctx.Arguments, 4)
+	_, err = scjobs.ArgumentsToCommandOptions(command.Options, ctx.Arguments, 4)
 	if err != nil {
 		ctx.RespondText("An error occurred while parsing your arguments to command options: " + err.Error())
 		return
 	}
 
-	job.CommandObject = c.services.SCJobs.DiscordObject{
+	job.CommandObject = interfaces.DiscordObject{
 		Name: command.Name,
 		ID:   command.ID,
 	}
 
-	job.ApplicationObject = c.services.SCJobs.DiscordObject{
+	job.ApplicationObject = interfaces.DiscordObject{
 		Name: bot.Username,
 		ID:   command.ApplicationID,
 	}
@@ -496,12 +490,6 @@ func (c *SlashCommands) setscjobcommand(ctx *router.Ctx) {
 	job.RawArguments = ctx.Arguments.RawFrom(3)
 
 	job.Command = command
-
-	err = job.Load(ctx.Session)
-	if err != nil {
-		ctx.RespondText("An error occurred while loading the job data: " + err.Error())
-		return
-	}
 
 	err = c.services.SCJobs.SaveJobs()
 	if err != nil {
@@ -542,20 +530,14 @@ func (c *SlashCommands) setscjobchannel(ctx *router.Ctx) {
 		return
 	}
 
-	job.ChannelObject = c.services.SCJobs.DiscordObject{
+	job.ChannelObject = interfaces.DiscordObject{
 		Name: channel.Name,
 		ID:   channel.ID,
 	}
 
-	job.GuildObject = c.services.SCJobs.DiscordObject{
+	job.GuildObject = interfaces.DiscordObject{
 		Name: guild.Name,
 		ID:   guild.ID,
-	}
-
-	err = job.Load(ctx.Session)
-	if err != nil {
-		ctx.RespondText("An error occurred while loading the job data: " + err.Error())
-		return
 	}
 
 	err = c.services.SCJobs.SaveJobs()
@@ -580,19 +562,13 @@ func (c *SlashCommands) setscjobinterval(ctx *router.Ctx) {
 		return
 	}
 
-	interval, err := utils.Misc.ParseDuration(utils.Arguments["<interval>"])
+	interval, err := ctx.Arguments.Get(1).Duration()
 	if err != nil {
 		ctx.RespondText("An error occurred while parsing the interval. Make sure to use a valid duration (i.e. 30s, 5m, or 5h).")
 		return
 	}
 
 	job.IntervalSec = int(interval.Seconds())
-
-	err = job.Load(ctx.Session)
-	if err != nil {
-		ctx.RespondText("An error occurred while loading the job data: " + err.Error())
-		return
-	}
 
 	err = c.services.SCJobs.SaveJobs()
 	if err != nil {
@@ -616,17 +592,10 @@ func (c *SlashCommands) setscjobpaused(ctx *router.Ctx) {
 		return
 	}
 
-	toggle := strings.ToLower(utils.Arguments["<on/off>"])
-	if toggle != "on" && toggle != "off" {
-		_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
-		return
-	}
-
-	job.Paused = toggle == "on"
-
-	err := job.Load(ctx.Session)
+	var err error
+	job.Paused, err = ctx.Arguments.Get(1).Bool()
 	if err != nil {
-		ctx.RespondText("An error occurred while loading the job data: " + err.Error())
+		_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
 		return
 	}
 
@@ -639,6 +608,6 @@ func (c *SlashCommands) setscjobpaused(ctx *router.Ctx) {
 	c.services.Embed.NewEmbed().
 		SetDescription("Successfully updated slash command job").
 		AddField("Job Name", job.Name).
-		AddField("Paused", toggle).
+		AddField("Paused", utils.Misc.FormatBoolOnOff(job.Paused)).
 		Send(ctx)
 }
