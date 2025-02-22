@@ -26,13 +26,13 @@ func (c *MemeGenCommands) Register() {
 		{
 			Name:        "randommeme",
 			Description: "Send a random meme with custom text",
-			Arguments:   "randommeme <\"top\"> <\"bottom\">",
+			Arguments:   "<\"top\"> <\"bottom\">",
 			Handler:     m.randommeme,
 		},
 		{
 			Name:        "custommeme",
 			Description: "Send a meme based on a template",
-			Arguments:   "custommeme <template id> <\"top\"> <\"bottom\">",
+			Arguments:   "<template id> <\"top\"> <\"bottom\">",
 			Handler:     m.custommeme,
 		},
 		{

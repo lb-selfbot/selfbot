@@ -11,99 +11,108 @@ import (
 	"github.com/LightningDev1/LB-Selfbot/internal/router"
 	"github.com/LightningDev1/LB-Selfbot/internal/services"
 	"github.com/LightningDev1/LB-Selfbot/internal/utils"
-	"github.com/LightningDev1/dgc"
 )
 
-func (c CurrencyCommands) RegisterCommands(router *dgc.Router) {
-	router.StartCategory("Currency", "Information about (crypto)currencies")
+type CurrencyCommands struct{ services *services.Services }
 
-	router.RegisterCmd(&dgc.Command{
-		Name:        "btcaddress",
-		Description: "Get information about a Bitcoin address",
-		Arguments:   "<address>",
-		Handler:     c.generateAddressFunc("Bitcoin", "BTC", 8),
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "btctransaction",
-		Description: "Get information about a Bitcoin transaction",
-		Arguments:   "<hash>",
-		Handler:     c.generateTransactionFunc("Bitcoin", "BTC", 8),
-	})
+func NewCurrencyCommands(s *services.Services) *CurrencyCommands {
+	return &CurrencyCommands{services: s}
+}
+func (c *CurrencyCommands) Register() {
+	cmdRouter := c.services.Discord.GetRouter()
 
-	router.RegisterCmd(&dgc.Command{
-		Name:        "ethaddress",
-		Description: "Get information about an Ethereum address",
-		Arguments:   "<address>",
-		Handler:     c.generateAddressFunc("Ethereum", "ETH", 18),
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "ethtransaction",
-		Description: "Get information about an Ethereum transaction",
-		Arguments:   "<hash>",
-		Handler:     c.generateTransactionFunc("Ethereum", "ETH", 18),
-	})
+	cmdRouter.RegisterCategory(&router.Category{
+		Name:        "Currency",
+		Description: "Info about (crypto)currencies",
+	}, []*router.Command{
+		{
+			Name:        "btcaddress",
+			Description: "Get information about a Bitcoin address",
+			Arguments:   "<address>",
+			Handler:     c.generateAddressFunc("Bitcoin", "BTC", 8),
+		},
+		{
+			Name:        "btctransaction",
+			Description: "Get information about a Bitcoin transaction",
+			Arguments:   "<hash>",
+			Handler:     c.generateTransactionFunc("Bitcoin", "BTC", 8),
+		},
 
-	router.RegisterCmd(&dgc.Command{
-		Name:        "ltcaddress",
-		Description: "Get information about a Litecoin address",
-		Arguments:   "<address>",
-		Handler:     c.generateAddressFunc("Litecoin", "LTC", 8),
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "ltctransaction",
-		Description: "Get information about a Litecoin transaction",
-		Arguments:   "<address>",
-		Handler:     c.generateTransactionFunc("Litecoin", "LTC", 8),
-	})
+		{
+			Name:        "ethaddress",
+			Description: "Get information about an Ethereum address",
+			Arguments:   "<address>",
+			Handler:     c.generateAddressFunc("Ethereum", "ETH", 18),
+		},
+		{
+			Name:        "ethtransaction",
+			Description: "Get information about an Ethereum transaction",
+			Arguments:   "<hash>",
+			Handler:     c.generateTransactionFunc("Ethereum", "ETH", 18),
+		},
 
-	router.RegisterCmd(&dgc.Command{
-		Name:        "dashaddress",
-		Description: "Get information about a Dash address",
-		Arguments:   "<address>",
-		Handler:     c.generateAddressFunc("Dash", "DASH", 8),
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "dashtransaction",
-		Description: "Get information about a Dash transaction",
-		Arguments:   "<address>",
-		Handler:     c.generateTransactionFunc("Dash", "DASH", 8),
-	})
+		{
+			Name:        "ltcaddress",
+			Description: "Get information about a Litecoin address",
+			Arguments:   "<address>",
+			Handler:     c.generateAddressFunc("Litecoin", "LTC", 8),
+		},
+		{
+			Name:        "ltctransaction",
+			Description: "Get information about a Litecoin transaction",
+			Arguments:   "<address>",
+			Handler:     c.generateTransactionFunc("Litecoin", "LTC", 8),
+		},
 
-	router.RegisterCmd(&dgc.Command{
-		Name:        "dogeaddress",
-		Description: "Get information about a Dogecoin address",
-		Arguments:   "<address>",
-		Handler:     c.generateAddressFunc("Dogecoin", "DOGE", 8),
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "dogetransaction",
-		Description: "Get information about a Dogecoin transaction",
-		Arguments:   "<address>",
-		Handler:     c.generateTransactionFunc("Dogecoin", "DOGE", 8),
-	})
+		{
+			Name:        "dashaddress",
+			Description: "Get information about a Dash address",
+			Arguments:   "<address>",
+			Handler:     c.generateAddressFunc("Dash", "DASH", 8),
+		},
+		{
+			Name:        "dashtransaction",
+			Description: "Get information about a Dash transaction",
+			Arguments:   "<address>",
+			Handler:     c.generateTransactionFunc("Dash", "DASH", 8),
+		},
 
-	router.RegisterCmd(&dgc.Command{
-		Name:        "priceinfo",
-		Description: "Get price information from a (crypto)currency",
-		Arguments:   "<from symbol> [to symbol]",
-		Handler:     c.priceinfo,
-	})
+		{
+			Name:        "dogeaddress",
+			Description: "Get information about a Dogecoin address",
+			Arguments:   "<address>",
+			Handler:     c.generateAddressFunc("Dogecoin", "DOGE", 8),
+		},
+		{
+			Name:        "dogetransaction",
+			Description: "Get information about a Dogecoin transaction",
+			Arguments:   "<address>",
+			Handler:     c.generateTransactionFunc("Dogecoin", "DOGE", 8),
+		},
 
-	router.RegisterCmd(&dgc.Command{
-		Name:        "searchsymbol",
-		Description: "Search for a stock market symbol",
-		Arguments:   "<query>",
-		Handler:     c.searchsymbol,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "symbolinfo",
-		Description: "Get information about a stock market symbol",
-		Arguments:   "<symbol>",
-		Handler:     c.symbolinfo,
+		{
+			Name:        "priceinfo",
+			Description: "Get price information from a (crypto)currency",
+			Arguments:   "<from symbol> [to symbol]",
+			Handler:     c.priceinfo,
+		},
+
+		{
+			Name:        "searchsymbol",
+			Description: "Search for a stock market symbol",
+			Arguments:   "<query>",
+			Handler:     c.searchsymbol,
+		},
+		{
+			Name:        "symbolinfo",
+			Description: "Get information about a stock market symbol",
+			Arguments:   "<symbol>",
+			Handler:     c.symbolinfo,
+		},
 	})
 }
 
-func (CurrencyCommands) generateAddressFunc(name, shortCode string, power int) func(ctx *router.Ctx) {
+func (c *CurrencyCommands) generateAddressFunc(name, shortCode string, power int) func(ctx *router.Ctx) {
 	return func(ctx *router.Ctx) {
 		address := ctx.Arguments.Get(0).Raw()
 		if address == "" {
@@ -136,7 +145,7 @@ func (CurrencyCommands) generateAddressFunc(name, shortCode string, power int) f
 	}
 }
 
-func (CurrencyCommands) generateTransactionFunc(name, shortCode string, power int) func(ctx *router.Ctx) {
+func (c *CurrencyCommands) generateTransactionFunc(name, shortCode string, power int) func(ctx *router.Ctx) {
 	return func(ctx *router.Ctx) {
 		hash := ctx.Arguments.Get(0).Raw()
 		if hash == "" {
@@ -171,8 +180,8 @@ func (CurrencyCommands) generateTransactionFunc(name, shortCode string, power in
 	}
 }
 
-func (CurrencyCommands) priceinfo(ctx *router.Ctx) {
-	from, to := utils.Arguments["<from symbol>"], utils.Arguments["[to symbol]"]
+func (c *CurrencyCommands) priceinfo(ctx *router.Ctx) {
+	from, to := ctx.Arguments.Get(0).Raw(), ctx.Arguments.Get(1).Raw()
 	if to == "" {
 		to = "USD,EUR"
 	}
@@ -224,7 +233,7 @@ func (CurrencyCommands) priceinfo(ctx *router.Ctx) {
 	emb.Send(ctx)
 }
 
-func (CurrencyCommands) searchsymbol(ctx *router.Ctx) {
+func (c *CurrencyCommands) searchsymbol(ctx *router.Ctx) {
 	uri := fmt.Sprintf(
 		"https://www.alphavantage.co/query?function=SYMBOL_SEARCH&keywords=%s&apikey=KBJ3RJS2JAYNH3WD",
 		url.QueryEscape(ctx.Arguments.Raw()),
@@ -260,7 +269,7 @@ func (CurrencyCommands) searchsymbol(ctx *router.Ctx) {
 	emb.Send(ctx)
 }
 
-func (CurrencyCommands) symbolinfo(ctx *router.Ctx) {
+func (c *CurrencyCommands) symbolinfo(ctx *router.Ctx) {
 	symbol := strings.ToUpper(ctx.Arguments.Raw())
 
 	uri := fmt.Sprintf(
@@ -293,14 +302,4 @@ func (CurrencyCommands) symbolinfo(ctx *router.Ctx) {
 	}
 
 	emb.Send(ctx)
-}
-
-type CurrencyCommands struct{ services *services.Services }
-
-func NewCurrencyCommands(s *services.Services) *CurrencyCommands {
-	return &CurrencyCommands{services: s}
-}
-func (c *CurrencyCommands) Register() {
-	cmdRouter := c.services.Discord.GetRouter()
-
 }
