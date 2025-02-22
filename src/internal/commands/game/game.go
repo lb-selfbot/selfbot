@@ -11,7 +11,6 @@ import (
 	"github.com/LightningDev1/LB-Selfbot/internal/router"
 	"github.com/LightningDev1/LB-Selfbot/internal/services"
 	"github.com/LightningDev1/LB-Selfbot/internal/utils"
-	"github.com/LightningDev1/dgc"
 	"github.com/LightningDev1/discordgo"
 	"github.com/bitly/go-simplejson"
 )
@@ -24,114 +23,114 @@ func NewGameCommands(s *services.Services) *GameCommands {
 func (c *GameCommands) Register() {
 	cmdRouter := c.services.Discord.GetRouter()
 
+	cmdRouter.RegisterCategory(&router.Category{
+		Name:        "Game",
+		Description: "Info about games",
+	}, []*router.Command{
+		{
+			Name:        "mcuuid",
+			Description: "Get the minecraft uuid of a player",
+			Arguments:   "<username>",
+			Handler:     c.mcuuid,
+		},
+		{
+			Name:        "mcnamehistory",
+			Description: "Get the minecraft name history of a player",
+			Arguments:   "<uuid>",
+			Handler:     c.mcnamehistory,
+		},
+		{
+			Name:        "fnmap",
+			Description: "Get the current Fortnite map",
+			Handler:     c.fnmap,
+		},
+		{
+			Name:        "fnmappois",
+			Description: "Get the current Fortnite map with POIs",
+			Handler:     c.fnmappois,
+		},
+		{
+			Name:        "fnrandomplaylist",
+			Description: "Get a random Fortnite playlist",
+			Handler:     c.fnrandomplaylist,
+		},
+		{
+			Name:        "fnrandombanner",
+			Description: "Get a random Fortnite banner",
+			Handler:     c.fnrandombanner,
+		},
+		{
+			Name:        "fnstats",
+			Description: "Get a player's Fortnite stats",
+			Arguments:   "<username>",
+			Handler:     c.fnstats,
+		},
+		{
+			Name:        "fncreatorcode",
+			Description: "Get info about a Fortnite creator code",
+			Arguments:   "<code>",
+			Handler:     c.fncreatorcode,
+		},
+		{
+			Name:        "fnrandomcosmetic",
+			Description: "Get a random Fortnite cosmetic",
+			Handler:     c.fnrandomcosmetic,
+		},
+		{
+			Name:        "fnstatus",
+			Description: "Get the current Fortnite status",
+			Handler:     c.fnstatus,
+		},
+		{
+			Name:        "alstatus",
+			Description: "Get the Apex legends status",
+			Handler:     c.alstatus,
+		},
+		{
+			Name:        "alnews",
+			Description: "Get the latest Apex legends news",
+			Handler:     c.alnews,
+		},
+		{
+			Name:        "alstats",
+			Description: "Get a player's Apex legends stats",
+			Arguments:   "<platform> <username>",
+			Handler:     c.alstats,
+		},
+		{
+			Name:        "gtastatus",
+			Description: "Get the current GTA status",
+			Handler:     c.gtastatus,
+		},
+		{
+			Name:        "fivemplayers",
+			Description: "Get the amount of players on a FiveM server",
+			Arguments:   "<ip:port>",
+			Handler:     c.fivemplayers,
+		},
+		{
+			Name:        "fiveminfo",
+			Description: "Get info about a FiveM server",
+			Arguments:   "<ip:port>",
+			Handler:     c.fiveminfo,
+		},
+		{
+			Name:        "hltbsearch",
+			Description: "Search for a game on HowLongToBeat",
+			Arguments:   "<game>",
+			Handler:     c.hltbsearch,
+		},
+		{
+			Name:        "hltbinfo",
+			Description: "Get info about a game on HowLongToBeat",
+			Arguments:   "<game id>",
+			Handler:     c.hltbinfo,
+		},
+	})
 }
 
-func (g *GameCommands) RegisterCommands(router *dgc.Router) {
-	router.StartCategory("Game", "Game commands")
-	router.RegisterCmd(&dgc.Command{
-		Name:        "mcuuid",
-		Description: "Get the minecraft uuid of a player",
-		Arguments:   "<username>",
-		Handler:     g.mcuuid,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "mcnamehistory",
-		Description: "Get the minecraft name history of a player",
-		Arguments:   "<uuid>",
-		Handler:     g.mcnamehistory,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "fnmap",
-		Description: "Get the current Fortnite map",
-		Handler:     g.fnmap,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "fnmappois",
-		Description: "Get the current Fortnite map with POIs",
-		Handler:     g.fnmappois,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "fnrandomplaylist",
-		Description: "Get a random Fortnite playlist",
-		Handler:     g.fnrandomplaylist,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "fnrandombanner",
-		Description: "Get a random Fortnite banner",
-		Handler:     g.fnrandombanner,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "fnstats",
-		Description: "Get a player's Fortnite stats",
-		Arguments:   "<username>",
-		Handler:     g.fnstats,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "fncreatorcode",
-		Description: "Get info about a Fortnite creator code",
-		Arguments:   "<code>",
-		Handler:     g.fncreatorcode,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "fnrandomcosmetic",
-		Description: "Get a random Fortnite cosmetic",
-		Handler:     g.fnrandomcosmetic,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "fnstatus",
-		Description: "Get the current Fortnite status",
-		Handler:     g.fnstatus,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "alstatus",
-		Description: "Get the Apex legends status",
-		Handler:     g.alstatus,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "alnews",
-		Description: "Get the latest Apex legends news",
-		Handler:     g.alnews,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "alstats",
-		Description: "Get a player's Apex legends stats",
-		Arguments:   "<platform> <username>",
-		Handler:     g.alstats,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "gtastatus",
-		Description: "Get the current GTA status",
-		Handler:     g.gtastatus,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "fivemplayers",
-		Description: "Get the amount of players on a FiveM server",
-		Arguments:   "<ip:port>",
-		Handler:     g.fivemplayers,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "fiveminfo",
-		Description: "Get info about a FiveM server",
-		Arguments:   "<ip:port>",
-		Handler:     g.fiveminfo,
-	})
-
-	router.RegisterCmd(&dgc.Command{
-		Name:        "hltbsearch",
-		Description: "Search for a game on HowLongToBeat",
-		Arguments:   "<game>",
-		Handler:     g.hltbsearch,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "hltbinfo",
-		Description: "Get info about a game on HowLongToBeat",
-		Arguments:   "<game id>",
-		Handler:     g.hltbinfo,
-	})
-}
-
-func (GameCommands) mcuuid(ctx *router.Ctx) {
-	username := utils.Arguments["<username>"]
+func (c *GameCommands) mcuuid(ctx *router.Ctx) {
+	username := ctx.Arguments.Get(0).Raw()
 
 	resp, err := http.PostJson(
 		"https://api.mojang.com/profiles/minecraft",
@@ -150,8 +149,8 @@ func (GameCommands) mcuuid(ctx *router.Ctx) {
 		Send(ctx)
 }
 
-func (GameCommands) mcnamehistory(ctx *router.Ctx) {
-	uuid := utils.Arguments["<uuid>"]
+func (c *GameCommands) mcnamehistory(ctx *router.Ctx) {
+	uuid := ctx.Arguments.Get(0).Raw()
 	res, err := http.GetJson(fmt.Sprintf("https://api.mojang.com/user/profiles/%s/names", url.QueryEscape(uuid)))
 	if err != nil {
 		ctx.RespondText("An error has occurred.")
@@ -171,7 +170,7 @@ func (GameCommands) mcnamehistory(ctx *router.Ctx) {
 		Send(ctx)
 }
 
-func (GameCommands) fnmap(ctx *router.Ctx) {
+func (c *GameCommands) fnmap(ctx *router.Ctx) {
 	res, err := http.GetJson("https://fortnite-api.com/v1/map")
 	if err != nil {
 		ctx.RespondText("An error has occurred.")
@@ -183,7 +182,7 @@ func (GameCommands) fnmap(ctx *router.Ctx) {
 		Send(ctx)
 }
 
-func (GameCommands) fnmappois(ctx *router.Ctx) {
+func (c *GameCommands) fnmappois(ctx *router.Ctx) {
 	res, err := http.GetJson("https://fortnite-api.com/v1/map")
 	if err != nil {
 		ctx.RespondText("An error has occurred.")
@@ -195,7 +194,7 @@ func (GameCommands) fnmappois(ctx *router.Ctx) {
 		Send(ctx)
 }
 
-func (GameCommands) fnrandomplaylist(ctx *router.Ctx) {
+func (c *GameCommands) fnrandomplaylist(ctx *router.Ctx) {
 	playlists, err := http.GetJson("https://fortnite-api.com/v1/playlists")
 	if err != nil {
 		ctx.RespondText("An error has occurred.")
@@ -213,7 +212,7 @@ func (GameCommands) fnrandomplaylist(ctx *router.Ctx) {
 		Send(ctx)
 }
 
-func (GameCommands) fnrandombanner(ctx *router.Ctx) {
+func (c *GameCommands) fnrandombanner(ctx *router.Ctx) {
 	banners, err := http.GetJson("https://fortnite-api.com/v1/banners")
 	if err != nil {
 		ctx.RespondText("An error has occurred.")
@@ -231,8 +230,8 @@ func (GameCommands) fnrandombanner(ctx *router.Ctx) {
 		Send(ctx)
 }
 
-func (GameCommands) fnstats(ctx *router.Ctx) {
-	username := utils.Arguments["<username>"]
+func (c *GameCommands) fnstats(ctx *router.Ctx) {
+	username := ctx.Arguments.Get(0).Raw()
 	user, err := http.GetJson(
 		fmt.Sprintf("https://fortnite-api.com/v1/stats/br/v2?name=%s", url.QueryEscape(username)),
 		map[string]string{
@@ -261,8 +260,8 @@ func (GameCommands) fnstats(ctx *router.Ctx) {
 		Send(ctx)
 }
 
-func (GameCommands) fncreatorcode(ctx *router.Ctx) {
-	code := utils.Arguments["<code>"]
+func (c *GameCommands) fncreatorcode(ctx *router.Ctx) {
+	code := ctx.Arguments.Get(0).Raw()
 	res, err := http.GetJson(fmt.Sprintf("https://fortnite-api.com/v2/creatorcode/search?name=%s", url.QueryEscape(code)))
 	if err != nil {
 		ctx.RespondText("An error has occurred.")
@@ -282,7 +281,7 @@ func (GameCommands) fncreatorcode(ctx *router.Ctx) {
 		Send(ctx)
 }
 
-func (GameCommands) fnrandomcosmetic(ctx *router.Ctx) {
+func (c *GameCommands) fnrandomcosmetic(ctx *router.Ctx) {
 	cosmetics, err := http.GetJson("https://fortnite-api.com/v2/cosmetics/br")
 	if err != nil {
 		ctx.RespondText("An error has occurred.")
@@ -305,7 +304,7 @@ func (GameCommands) fnrandomcosmetic(ctx *router.Ctx) {
 		Send(ctx)
 }
 
-func (GameCommands) fnstatus(ctx *router.Ctx) {
+func (c *GameCommands) fnstatus(ctx *router.Ctx) {
 	httpResponse := http.Get("https://status.epicgames.com/api/v2/status.json")
 	if httpResponse.Error != nil {
 		ctx.RespondText("An error has occurred.")
@@ -319,7 +318,7 @@ func (GameCommands) fnstatus(ctx *router.Ctx) {
 		Send(ctx)
 }
 
-func (GameCommands) alstatus(ctx *router.Ctx) {
+func (c *GameCommands) alstatus(ctx *router.Ctx) {
 	status, err := http.GetJson("https://api.mozambiquehe.re/servers?auth=IgUq5IRUFvvFxdXbrgmy")
 	if err != nil {
 		ctx.RespondText("An error has occurred.")
@@ -337,7 +336,7 @@ func (GameCommands) alstatus(ctx *router.Ctx) {
 		Send(ctx)
 }
 
-func (GameCommands) alnews(ctx *router.Ctx) {
+func (c *GameCommands) alnews(ctx *router.Ctx) {
 	newsList, err := http.GetJson("https://api.mozambiquehe.re/news?lang=en-us&auth=IgUq5IRUFvvFxdXbrgmy")
 	if err != nil {
 		ctx.RespondText("An error has occurred.")
@@ -354,8 +353,8 @@ func (GameCommands) alnews(ctx *router.Ctx) {
 	emb.Send(ctx)
 }
 
-func (GameCommands) alstats(ctx *router.Ctx) {
-	platform := utils.Arguments["<platform>"]
+func (c *GameCommands) alstats(ctx *router.Ctx) {
+	platform := ctx.Arguments.Get(0).Raw()
 	if platform != "ps4" && platform != "xbox" && platform != "pc" {
 		ctx.RespondText("Invalid platform.")
 		return
@@ -365,7 +364,7 @@ func (GameCommands) alstats(ctx *router.Ctx) {
 		fmt.Sprintf(
 			"https://api.mozambiquehe.re/bridge?version=4&platform=%s&player=%s&auth=IgUq5IRUFvvFxdXbrgmy",
 			url.QueryEscape(strings.ToUpper(platform)),
-			url.QueryEscape(utils.Arguments["<username>"]),
+			url.QueryEscape(ctx.Arguments.Get(1).Raw()),
 		),
 	)
 	if err != nil {
@@ -395,7 +394,7 @@ func (GameCommands) alstats(ctx *router.Ctx) {
 		Send(ctx)
 }
 
-func (GameCommands) gtastatus(ctx *router.Ctx) {
+func (c *GameCommands) gtastatus(ctx *router.Ctx) {
 	status, err := http.GetJson("https://support.rockstargames.com/services/status.json")
 	if err != nil {
 		ctx.RespondText("An error has occurred.")
@@ -418,8 +417,9 @@ func (GameCommands) gtastatus(ctx *router.Ctx) {
 	emb.Send(ctx)
 }
 
-func (GameCommands) fivemplayers(ctx *router.Ctx) {
-	httpResponse := http.Get("http://" + utils.Arguments["<ip:port>"] + "/dynamic.json")
+func (c *GameCommands) fivemplayers(ctx *router.Ctx) {
+	host := ctx.Arguments.Get(0).Raw()
+	httpResponse := http.Get("http://" + host + "/dynamic.json")
 	if httpResponse.Error != nil {
 		ctx.RespondText("An error has occurred.")
 		return
@@ -428,14 +428,15 @@ func (GameCommands) fivemplayers(ctx *router.Ctx) {
 	json := httpResponse.Json()
 
 	c.services.Embed.NewEmbed().
-		AddField("Host", utils.Arguments["<ip:port>"]).
+		AddField("Host", host).
 		AddField("Players", fmt.Sprint(json.Get("clients").MustInt())).
 		AddField("Max Players", json.Get("sv_maxclients").MustString()).
 		Send(ctx)
 }
 
-func (GameCommands) fiveminfo(ctx *router.Ctx) {
-	httpResponse := http.Get("http://" + utils.Arguments["<ip:port>"] + "/dynamic.json")
+func (c *GameCommands) fiveminfo(ctx *router.Ctx) {
+	host := ctx.Arguments.Get(0).Raw()
+	httpResponse := http.Get("http://" + host + "/dynamic.json")
 	if httpResponse.Error != nil {
 		ctx.RespondText("An error has occurred.")
 		return
@@ -444,7 +445,7 @@ func (GameCommands) fiveminfo(ctx *router.Ctx) {
 	json := httpResponse.Json()
 
 	c.services.Embed.NewEmbed().
-		AddField("Host", utils.Arguments["<ip:port>"]).
+		AddField("Host", host).
 		AddField("Server Name", json.Get("hostname").MustString()).
 		AddField("Game Type", json.Get("gametype").MustString()).
 		AddField("Map", json.Get("mapname").MustString()).
@@ -472,7 +473,7 @@ var HLTBHeaders = map[string]string{
 	"User-Agent":         discordgo.UserAgentWeb,
 }
 
-func (GameCommands) hltbsearch(ctx *router.Ctx) {
+func (c *GameCommands) hltbsearch(ctx *router.Ctx) {
 	resp, err := http.PostJson(
 		"https://howlongtobeat.com/api/search",
 		map[string]any{
@@ -532,9 +533,9 @@ func secondsToTime(seconds int) string {
 	return fmt.Sprintf("%d Hours, %d Minutes", hours, minutes)
 }
 
-func (GameCommands) hltbinfo(ctx *router.Ctx) {
+func (c *GameCommands) hltbinfo(ctx *router.Ctx) {
 	httpResponse := http.Post(
-		"https://howlongtobeat.com/game?id="+utils.Arguments["<game id>"],
+		"https://howlongtobeat.com/game?id="+ctx.Arguments.Get(0).Raw(),
 		nil,
 		HLTBHeaders,
 	)
