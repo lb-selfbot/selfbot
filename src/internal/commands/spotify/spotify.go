@@ -3,6 +3,7 @@ package spotify
 import (
 	"fmt"
 	"net/url"
+	"slices"
 	"strconv"
 	"strings"
 
@@ -10,115 +11,125 @@ import (
 	"github.com/LightningDev1/LB-Selfbot/internal/router"
 	"github.com/LightningDev1/LB-Selfbot/internal/services"
 	"github.com/LightningDev1/LB-Selfbot/internal/utils"
-	"github.com/LightningDev1/LB-Selfbot/selfbot/sessions"
-	"github.com/LightningDev1/dgc"
+	"github.com/LightningDev1/LB-Selfbot/internal/utils2"
 	"github.com/LightningDev1/discordgo"
 )
 
-func (s SpotifyCommands) RegisterCommands(router *dgc.Router) {
-	router.StartCategory("Spotify", "Spotify control commands")
-	router.RegisterCmd(&dgc.Command{
-		Name:        "spause",
-		Description: "Pause Spotify Music",
-		Flags:       []router.CommandFlag{router.CmdFlagDangerous},
-		Handler:     s.spause,
+type SpotifyCommands struct{ services *services.Services }
+
+func NewSpotifyCommands(s *services.Services) *SpotifyCommands {
+	return &SpotifyCommands{services: s}
+}
+func (c *SpotifyCommands) Register() {
+	cmdRouter := c.services.Discord.GetRouter()
+
+	cmdRouter.RegisterCategory(&router.Category{
+		Name:        "Spotify",
+		Description: "Control your Spotify music",
+	}, []*router.Command{
+		{
+			Name:        "spause",
+			Description: "Pause Spotify Music",
+			Flags:       []router.CommandFlag{router.CmdFlagDangerous},
+			Handler:     c.spause,
+		},
+		{
+			Name:        "sresume",
+			Description: "Resume Spotify Music",
+			Flags:       []router.CommandFlag{router.CmdFlagDangerous},
+			Handler:     c.sresume,
+		},
+		{
+			Name:        "sprevious",
+			Description: "Play the previous song",
+			Flags:       []router.CommandFlag{router.CmdFlagDangerous},
+			Handler:     c.sprevious,
+		},
+		{
+			Name:        "snext",
+			Description: "Play the next song",
+			Flags:       []router.CommandFlag{router.CmdFlagDangerous},
+			Handler:     c.snext,
+		},
+		{
+			Name:        "splay",
+			Description: "Play a song on Spotify",
+			Arguments:   "<song name>",
+			Flags:       []router.CommandFlag{router.CmdFlagDangerous},
+			Handler:     c.splay,
+		},
+		{
+			Name:        "squeue",
+			Description: "Queue a song to play after the current one",
+			Arguments:   "<song name>",
+			Flags:       []router.CommandFlag{router.CmdFlagDangerous},
+			Handler:     c.squeue,
+		},
+		{
+			Name:        "splaying",
+			Description: "Current playing song info",
+			Flags:       []router.CommandFlag{router.CmdFlagDangerous},
+			Handler:     c.splaying,
+		},
+		{
+			Name:        "svolume",
+			Description: "Change Spotify volume",
+			Arguments:   "<volume>",
+			Flags:       []router.CommandFlag{router.CmdFlagDangerous},
+			Handler:     c.svolume,
+		},
+		{
+			Name:        "sshuffle",
+			Description: "Turn shuffle on or off",
+			Arguments:   "<on/off>",
+			Flags:       []router.CommandFlag{router.CmdFlagDangerous},
+			Handler:     c.sshuffle,
+		},
+		{
+			Name:        "srepeat",
+			Description: "Change the Spotify repeat mode",
+			Arguments:   "<track/context/off>",
+			Flags:       []router.CommandFlag{router.CmdFlagDangerous},
+			Handler:     c.srepeat,
+		},
+		{
+			Name:        "sseek",
+			Description: "Seek to a specific time in the song",
+			Arguments:   "<timestamp>",
+			Flags:       []router.CommandFlag{router.CmdFlagDangerous},
+			Handler:     c.sseek,
+		},
+		{
+			Name:        "sdevices",
+			Description: "Get your available Spotify devices",
+			Flags:       []router.CommandFlag{router.CmdFlagDangerous},
+			Handler:     c.sdevices,
+		},
+		{
+			Name:        "sprofile",
+			Description: "Get your Spotify profile info",
+			Flags:       []router.CommandFlag{router.CmdFlagDangerous},
+			Handler:     c.sprofile,
+		},
+		{
+			Name:        "sbearertoken",
+			Description: "Get your Spotify bearer token used for the API",
+			Flags:       []router.CommandFlag{router.CmdFlagDangerous},
+			Handler:     c.sbearertoken,
+		},
+		{
+			Name:        "slistenalong",
+			Description: "Send a Spotify listen along invite",
+			Arguments:   "[content]",
+			Flags:       []router.CommandFlag{router.CmdFlagDangerous},
+			Handler:     c.slistenalong,
+		},
 	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "sresume",
-		Description: "Resume Spotify Music",
-		Flags:       []router.CommandFlag{router.CmdFlagDangerous},
-		Handler:     s.sresume,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "sprevious",
-		Description: "Play the previous song",
-		Flags:       []router.CommandFlag{router.CmdFlagDangerous},
-		Handler:     s.sprevious,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "snext",
-		Description: "Play the next song",
-		Flags:       []router.CommandFlag{router.CmdFlagDangerous},
-		Handler:     s.snext,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "splay",
-		Description: "Play a song on Spotify",
-		Arguments:   "<song name>",
-		Flags:       []router.CommandFlag{router.CmdFlagDangerous},
-		Handler:     s.splay,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "squeue",
-		Description: "Queue a song to play after the current one",
-		Arguments:   "<song name>",
-		Flags:       []router.CommandFlag{router.CmdFlagDangerous},
-		Handler:     s.squeue,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "splaying",
-		Description: "Current playing song info",
-		Flags:       []router.CommandFlag{router.CmdFlagDangerous},
-		Handler:     s.splaying,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "svolume",
-		Description: "Change Spotify volume",
-		Arguments:   "<volume>",
-		Flags:       []router.CommandFlag{router.CmdFlagDangerous},
-		Handler:     s.svolume,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "sshuffle",
-		Description: "Turn shuffle on or off",
-		Arguments:   "<on/off>",
-		Flags:       []router.CommandFlag{router.CmdFlagDangerous},
-		Handler:     s.sshuffle,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "srepeat",
-		Description: "Change the Spotify repeat mode",
-		Arguments:   "<track/context/off>",
-		Flags:       []router.CommandFlag{router.CmdFlagDangerous},
-		Handler:     s.srepeat,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "sseek",
-		Description: "Seek to a specific time in the song",
-		Arguments:   "<seconds>",
-		Flags:       []router.CommandFlag{router.CmdFlagDangerous},
-		Handler:     s.sseek,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "sdevices",
-		Description: "Get your available Spotify devices",
-		Flags:       []router.CommandFlag{router.CmdFlagDangerous},
-		Handler:     s.sdevices,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "sprofile",
-		Description: "Get your Spotify profile info",
-		Flags:       []router.CommandFlag{router.CmdFlagDangerous},
-		Handler:     s.sprofile,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "sbearertoken",
-		Description: "Get your Spotify bearer token used for the API",
-		Flags:       []router.CommandFlag{router.CmdFlagDangerous},
-		Handler:     s.sbearertoken,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "slistenalong",
-		Description: "Send a Spotify listen along invite",
-		Arguments:   "[content]",
-		Flags:       []router.CommandFlag{router.CmdFlagDangerous},
-		Handler:     s.slistenalong,
-	})
+
 }
 
-func (s SpotifyCommands) GetBearerToken(ctx *router.Ctx) (string, bool) {
+func (c *SpotifyCommands) GetBearerToken(ctx *router.Ctx) (string, bool) {
 	bearerToken := utils.Spotify.GetBearerToken(ctx.Session.Identify.Token)
-
 	if bearerToken == "" {
 		_ = ctx.RespondText("Could not find a Spotify connection. Please connect your Spotify account to your Discord.")
 		return "", false
@@ -127,7 +138,7 @@ func (s SpotifyCommands) GetBearerToken(ctx *router.Ctx) (string, bool) {
 	return bearerToken, true
 }
 
-func (s SpotifyCommands) checkResponse(ctx *router.Ctx, httpResponse *http.HttpResponse) bool {
+func (c *SpotifyCommands) checkResponse(ctx *router.Ctx, httpResponse *http.HttpResponse) bool {
 	if httpResponse.Error != nil {
 		_ = ctx.RespondText("An error has occurred: " + httpResponse.Error.Error())
 		return false
@@ -144,68 +155,68 @@ func (s SpotifyCommands) checkResponse(ctx *router.Ctx, httpResponse *http.HttpR
 	return true
 }
 
-func (s SpotifyCommands) HandleRequest(ctx *router.Ctx, httpResponse *http.HttpResponse, onSuccess string) {
+func (c *SpotifyCommands) HandleRequest(ctx *router.Ctx, httpResponse *http.HttpResponse, onSuccess string) {
 	if httpResponse.Error != nil {
 		_ = ctx.RespondText("An error has occurred: " + httpResponse.Error.Error())
 		return
 	}
 
 	// Check the response if the body isn't empty
-	if len(httpResponse.Body) != 0 && !s.checkResponse(ctx, httpResponse) {
+	if len(httpResponse.Body) != 0 && !c.checkResponse(ctx, httpResponse) {
 		return
 	}
 
 	_ = ctx.RespondText(onSuccess)
 }
 
-func (s SpotifyCommands) spause(ctx *router.Ctx) {
-	bearerToken, success := s.GetBearerToken(ctx)
+func (c *SpotifyCommands) spause(ctx *router.Ctx) {
+	bearerToken, success := c.GetBearerToken(ctx)
 	if !success {
 		return
 	}
 
 	httpResponse := http.Put("https://api.spotify.com/v1/me/player/pause", nil, map[string]string{"Authorization": bearerToken})
 
-	s.HandleRequest(ctx, httpResponse, "Successfully paused music.")
+	c.HandleRequest(ctx, httpResponse, "Successfully paused music.")
 }
 
-func (s SpotifyCommands) sresume(ctx *router.Ctx) {
-	bearerToken, success := s.GetBearerToken(ctx)
+func (c *SpotifyCommands) sresume(ctx *router.Ctx) {
+	bearerToken, success := c.GetBearerToken(ctx)
 	if !success {
 		return
 	}
 
 	httpResponse := http.Put("https://api.spotify.com/v1/me/player/play", nil, map[string]string{"Authorization": bearerToken})
 
-	s.HandleRequest(ctx, httpResponse, "Successfully resumed music.")
+	c.HandleRequest(ctx, httpResponse, "Successfully resumed music.")
 }
 
-func (s SpotifyCommands) sprevious(ctx *router.Ctx) {
-	bearerToken, success := s.GetBearerToken(ctx)
+func (c *SpotifyCommands) sprevious(ctx *router.Ctx) {
+	bearerToken, success := c.GetBearerToken(ctx)
 	if !success {
 		return
 	}
 
 	httpResponse := http.Post("https://api.spotify.com/v1/me/player/previous", nil, map[string]string{"Authorization": bearerToken})
 
-	s.HandleRequest(ctx, httpResponse, "Successfully playing previous song.")
+	c.HandleRequest(ctx, httpResponse, "Successfully playing previous song.")
 }
 
-func (s SpotifyCommands) snext(ctx *router.Ctx) {
-	bearerToken, success := s.GetBearerToken(ctx)
+func (c *SpotifyCommands) snext(ctx *router.Ctx) {
+	bearerToken, success := c.GetBearerToken(ctx)
 	if !success {
 		return
 	}
 
 	httpResponse := http.Post("https://api.spotify.com/v1/me/player/next", nil, map[string]string{"Authorization": bearerToken})
 
-	s.HandleRequest(ctx, httpResponse, "Successfully playing next song.")
+	c.HandleRequest(ctx, httpResponse, "Successfully playing next song.")
 }
 
-func (s SpotifyCommands) splay(ctx *router.Ctx) {
+func (c *SpotifyCommands) splay(ctx *router.Ctx) {
 	songName := ctx.Arguments.Raw()
 
-	bearerToken, success := s.GetBearerToken(ctx)
+	bearerToken, success := c.GetBearerToken(ctx)
 	if !success {
 		return
 	}
@@ -240,17 +251,17 @@ func (s SpotifyCommands) splay(ctx *router.Ctx) {
 
 	httpResponse := http.Post("https://api.spotify.com/v1/me/player/next", nil, headers)
 
-	s.HandleRequest(
+	c.HandleRequest(
 		ctx,
 		httpResponse,
 		fmt.Sprintf("Successfully playing %s - %s.", strings.Join(songArtists, ", "), songName),
 	)
 }
 
-func (s SpotifyCommands) squeue(ctx *router.Ctx) {
+func (c *SpotifyCommands) squeue(ctx *router.Ctx) {
 	songName := ctx.Arguments.Raw()
 
-	bearerToken, success := s.GetBearerToken(ctx)
+	bearerToken, success := c.GetBearerToken(ctx)
 	if !success {
 		return
 	}
@@ -283,15 +294,15 @@ func (s SpotifyCommands) squeue(ctx *router.Ctx) {
 		headers,
 	)
 
-	s.HandleRequest(
+	c.HandleRequest(
 		ctx,
 		httpResponse,
 		fmt.Sprintf("Successfully queued %s - %s.", strings.Join(songArtists, ", "), songName),
 	)
 }
 
-func (s SpotifyCommands) splaying(ctx *router.Ctx) {
-	bearerToken, success := s.GetBearerToken(ctx)
+func (c *SpotifyCommands) splaying(ctx *router.Ctx) {
+	bearerToken, success := c.GetBearerToken(ctx)
 	if !success {
 		return
 	}
@@ -323,42 +334,41 @@ func (s SpotifyCommands) splaying(ctx *router.Ctx) {
 		Send(ctx)
 }
 
-func (s SpotifyCommands) svolume(ctx *router.Ctx) {
-	bearerToken, success := s.GetBearerToken(ctx)
+func (c *SpotifyCommands) svolume(ctx *router.Ctx) {
+	bearerToken, success := c.GetBearerToken(ctx)
 	if !success {
 		return
 	}
 
-	volumeStr := utils.Arguments["<volume>"]
-	volume, err := strconv.Atoi(volumeStr)
-	if err != nil || volume < 0 || volume > 100 {
-		_ = ctx.RespondText("Volume must be between 0 and 100.")
+	volume, err := ctx.Arguments.Get(0).Int()
+	volume = utils2.Clamp(volume, 0, 100)
+	if err != nil {
+		_ = ctx.RespondText("Argument <volume> must be a number.")
 		return
 	}
 
 	httpResponse := http.Put(
-		fmt.Sprintf("https://api.spotify.com/v1/me/player/volume?volume_percent=%s", volumeStr),
+		fmt.Sprintf("https://api.spotify.com/v1/me/player/volume?volume_percent=%d", volume),
 		nil,
 		map[string]string{"Authorization": bearerToken},
 	)
 
-	s.HandleRequest(ctx, httpResponse, fmt.Sprintf("Successfully set volume to: %s.", volumeStr))
+	c.HandleRequest(ctx, httpResponse, fmt.Sprintf("Successfully set volume to: %d.", volume))
 }
 
-func (s SpotifyCommands) sshuffle(ctx *router.Ctx) {
-	bearerToken, success := s.GetBearerToken(ctx)
+func (c *SpotifyCommands) sshuffle(ctx *router.Ctx) {
+	bearerToken, success := c.GetBearerToken(ctx)
 	if !success {
 		return
 	}
 
-	toggle := strings.ToLower(utils.Arguments["<on/off>"])
-	if toggle != "on" && toggle != "off" {
+	toggle, err := ctx.Arguments.Get(0).Bool()
+	if err != nil {
 		_ = ctx.RespondText("Invalid value. Use `on` or `off`.")
 		return
 	}
 
-	state := strings.ReplaceAll(toggle, "on", "true")
-	state = strings.ReplaceAll(state, "off", "false")
+	state := strconv.FormatBool(toggle)
 
 	httpResponse := http.Put(
 		fmt.Sprintf("https://api.spotify.com/v1/me/player/shuffle?state=%s", state),
@@ -366,17 +376,17 @@ func (s SpotifyCommands) sshuffle(ctx *router.Ctx) {
 		map[string]string{"Authorization": bearerToken},
 	)
 
-	s.HandleRequest(ctx, httpResponse, fmt.Sprintf("Successfully turned shuffle %s.", toggle))
+	c.HandleRequest(ctx, httpResponse, fmt.Sprintf("Successfully turned shuffle %s.", toggle))
 }
 
-func (s SpotifyCommands) srepeat(ctx *router.Ctx) {
-	bearerToken, success := s.GetBearerToken(ctx)
+func (c *SpotifyCommands) srepeat(ctx *router.Ctx) {
+	bearerToken, success := c.GetBearerToken(ctx)
 	if !success {
 		return
 	}
 
-	state := strings.ToLower(utils.Arguments["<track/context/off>"])
-	if state != "track" && state != "context" && state != "off" {
+	state := ctx.Arguments.Get(0).Raw()
+	if !slices.Contains([]string{"track", "context", "off"}, state) {
 		_ = ctx.RespondText("Invalid value. Use `track`, `context` or `off`.")
 		return
 	}
@@ -387,38 +397,38 @@ func (s SpotifyCommands) srepeat(ctx *router.Ctx) {
 		map[string]string{"Authorization": bearerToken},
 	)
 
-	s.HandleRequest(ctx, httpResponse, fmt.Sprintf("Successfully set Spotify repeat mode to %s.", state))
+	c.HandleRequest(ctx, httpResponse, fmt.Sprintf("Successfully set Spotify repeat mode to %s.", state))
 }
 
-func (s SpotifyCommands) sseek(ctx *router.Ctx) {
-	bearerToken, success := s.GetBearerToken(ctx)
+func (c *SpotifyCommands) sseek(ctx *router.Ctx) {
+	bearerToken, success := c.GetBearerToken(ctx)
 	if !success {
 		return
 	}
 
-	seconds, err := strconv.Atoi(utils.Arguments["<seconds>"])
+	timestamp, err := ctx.Arguments.Get(0).Duration()
 	if err != nil {
-		_ = ctx.RespondText("Argument <seconds> must be a number.")
+		_ = ctx.RespondText("Invalid value. Use a timestamp like `1m30s`.")
 		return
 	}
 
 	httpResponse := http.Put(
-		fmt.Sprintf("https://api.spotify.com/v1/me/player/seek?position_ms=%d", seconds*1000),
+		fmt.Sprintf("https://api.spotify.com/v1/me/player/seek?position_ms=%d", timestamp.Milliseconds()),
 		nil,
 		map[string]string{"Authorization": bearerToken},
 	)
 
-	s.HandleRequest(ctx, httpResponse, fmt.Sprintf("Sucessfully seeked song to %d seconds.", seconds))
+	c.HandleRequest(ctx, httpResponse, fmt.Sprintf("Sucessfully seeked song to %s.", timestamp.String()))
 }
 
-func (s SpotifyCommands) sdevices(ctx *router.Ctx) {
-	bearerToken, success := s.GetBearerToken(ctx)
+func (c *SpotifyCommands) sdevices(ctx *router.Ctx) {
+	bearerToken, success := c.GetBearerToken(ctx)
 	if !success {
 		return
 	}
 
 	httpResponse := http.Get("https://api.spotify.com/v1/me/player/devices", map[string]string{"Authorization": bearerToken})
-	if !s.checkResponse(ctx, httpResponse) {
+	if !c.checkResponse(ctx, httpResponse) {
 		return
 	}
 
@@ -446,14 +456,14 @@ func (s SpotifyCommands) sdevices(ctx *router.Ctx) {
 		Send(ctx)
 }
 
-func (s SpotifyCommands) sprofile(ctx *router.Ctx) {
-	bearerToken, success := s.GetBearerToken(ctx)
+func (c *SpotifyCommands) sprofile(ctx *router.Ctx) {
+	bearerToken, success := c.GetBearerToken(ctx)
 	if !success {
 		return
 	}
 
 	httpResponse := http.Get("https://api.spotify.com/v1/me", map[string]string{"Authorization": bearerToken})
-	if !s.checkResponse(ctx, httpResponse) {
+	if !c.checkResponse(ctx, httpResponse) {
 		return
 	}
 
@@ -469,14 +479,14 @@ func (s SpotifyCommands) sprofile(ctx *router.Ctx) {
 		Send(ctx)
 }
 
-func (s SpotifyCommands) sbearertoken(ctx *router.Ctx) {
-	bearerToken, success := s.GetBearerToken(ctx)
+func (c *SpotifyCommands) sbearertoken(ctx *router.Ctx) {
+	bearerToken, success := c.GetBearerToken(ctx)
 	if !success {
 		return
 	}
 
 	httpResponse := http.Get("https://api.spotify.com/v1/me", map[string]string{"Authorization": bearerToken})
-	if !s.checkResponse(ctx, httpResponse) {
+	if !c.checkResponse(ctx, httpResponse) {
 		return
 	}
 
@@ -486,8 +496,8 @@ func (s SpotifyCommands) sbearertoken(ctx *router.Ctx) {
 		Send(ctx)
 }
 
-func (s SpotifyCommands) slistenalong(ctx *router.Ctx) {
-	spotifySessions := utils.Filter(sessions.GatewaySessions, func(s *discordgo.GatewaySession) bool {
+func (c *SpotifyCommands) slistenalong(ctx *router.Ctx) {
+	spotifySessions := utils.Filter(c.services.Sessions.GetGatewaySessions(), func(s *discordgo.GatewaySession) bool {
 		return len(s.Activities) != 0 && s.Activities[0].Name == "Spotify"
 	})
 
@@ -510,14 +520,4 @@ func (s SpotifyCommands) slistenalong(ctx *router.Ctx) {
 		_ = ctx.RespondText("An error has occurred while sending the invite: " + err.Error())
 		return
 	}
-}
-
-type SpotifyCommands struct{ services *services.Services }
-
-func NewSpotifyCommands(s *services.Services) *SpotifyCommands {
-	return &SpotifyCommands{services: s}
-}
-func (c *SpotifyCommands) Register() {
-	cmdRouter := c.services.Discord.GetRouter()
-
 }
