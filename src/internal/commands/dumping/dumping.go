@@ -30,84 +30,84 @@ func (c *DumpingCommands) Register() {
 			Name:        "dumpall",
 			Description: "Dump all messages in a channel",
 			Arguments:   "[channel]",
-			Handler:     d.dumpall,
+			Handler:     c.dumpall,
 		},
 		{
 			Name:        "dumpimages",
 			Description: "Dump all images in a channel",
 			Arguments:   "[channel]",
-			Handler:     d.dumpimages,
+			Handler:     c.dumpimages,
 		},
 		{
 			Name:        "dumpvideos",
 			Description: "Dump all videos in a channel",
 			Arguments:   "[channel]",
-			Handler:     d.dumpvideos,
+			Handler:     c.dumpvideos,
 		},
 		{
 			Name:        "dumpaudio",
 			Description: "Dump all audio files in a channel",
 			Arguments:   "[channel]",
-			Handler:     d.dumpaudio,
+			Handler:     c.dumpaudio,
 		},
 		{
 			Name:        "dumptext",
 			Description: "Dump all text files in a channel",
 			Arguments:   "[channel]",
-			Handler:     d.dumptext,
+			Handler:     c.dumptext,
 		},
 		{
 			Name:        "dumpattachments",
 			Description: "Dump all attachments in a channel",
 			Arguments:   "[channel]",
-			Handler:     d.dumpattachments,
+			Handler:     c.dumpattachments,
 		},
 		{
 			Name:        "dumpfiletype",
 			Description: "Dump certain files in a channel",
 			Arguments:   "<extension> [channel]",
-			Handler:     d.dumpfiletype,
+			Handler:     c.dumpfiletype,
 		},
 		{
 			Name:        "dumpcontenttype",
 			Description: "Dump certain files in a channel",
 			Arguments:   "<content type> [channel]",
-			Handler:     d.dumpcontenttype,
+			Handler:     c.dumpcontenttype,
 		},
 		{
 			Name:        "dumpemojis",
 			Description: "Dump all emojis in a server",
 			Arguments:   "[server id]",
-			Handler:     d.dumpemojis,
+			Handler:     c.dumpemojis,
 		},
 		{
 			Name:        "dumpstickers",
 			Description: "Dump all stickers in a server",
 			Arguments:   "[server id]",
-			Handler:     d.dumpstickers,
+			Handler:     c.dumpstickers,
 		},
 		{
 			Name:        "dumpavatars",
 			Description: "Dump all avatars from members in a server",
 			Arguments:   "[server id]",
-			Handler:     d.dumpavatars,
+			Handler:     c.dumpavatars,
 		},
 		{
 			Name:        "dumpchannels",
 			Description: "Dump all channels in a server",
 			Arguments:   "[server id]",
-			Handler:     d.dumpchannels,
+			Handler:     c.dumpchannels,
 		},
 		{
 			Name:        "dumpmembers",
 			Description: "Dump all members in a server",
 			Arguments:   "[server id]",
-			Handler:     d.dumpmembers,
+			Handler:     c.dumpmembers,
 		},
 	})
 }
 
-func (*DumpingCommands) dumpall(ctx *router.Ctx) {
+func (c *DumpingCommands) dumpall(ctx *router.Ctx) {
 	channel, err := ctx.Arguments.Get(0).Channel()
 	if err != nil {
 		channel, _ = utils.Discord.GetChannel(ctx.Session, ctx.Message.ChannelID)
@@ -154,7 +154,7 @@ func (*DumpingCommands) dumpall(ctx *router.Ctx) {
 		Send(ctx)
 }
 
-func (*DumpingCommands) dumpimages(ctx *router.Ctx) {
+func (c *DumpingCommands) dumpimages(ctx *router.Ctx) {
 	channel, err := ctx.Arguments.Get(0).Channel()
 	if err != nil {
 		channel, _ = utils.Discord.GetChannel(ctx.Session, ctx.Message.ChannelID)
@@ -196,7 +196,7 @@ func (*DumpingCommands) dumpimages(ctx *router.Ctx) {
 		Send(ctx)
 }
 
-func (*DumpingCommands) dumpvideos(ctx *router.Ctx) {
+func (c *DumpingCommands) dumpvideos(ctx *router.Ctx) {
 	channel, err := ctx.Arguments.Get(0).Channel()
 	if err != nil {
 		channel, _ = utils.Discord.GetChannel(ctx.Session, ctx.Message.ChannelID)
@@ -238,7 +238,7 @@ func (*DumpingCommands) dumpvideos(ctx *router.Ctx) {
 		Send(ctx)
 }
 
-func (*DumpingCommands) dumpaudio(ctx *router.Ctx) {
+func (c *DumpingCommands) dumpaudio(ctx *router.Ctx) {
 	channel, err := ctx.Arguments.Get(0).Channel()
 	if err != nil {
 		channel, _ = utils.Discord.GetChannel(ctx.Session, ctx.Message.ChannelID)
@@ -280,7 +280,7 @@ func (*DumpingCommands) dumpaudio(ctx *router.Ctx) {
 		Send(ctx)
 }
 
-func (*DumpingCommands) dumptext(ctx *router.Ctx) {
+func (c *DumpingCommands) dumptext(ctx *router.Ctx) {
 	channel, err := ctx.Arguments.Get(0).Channel()
 	if err != nil {
 		channel, _ = utils.Discord.GetChannel(ctx.Session, ctx.Message.ChannelID)
@@ -322,7 +322,7 @@ func (*DumpingCommands) dumptext(ctx *router.Ctx) {
 		Send(ctx)
 }
 
-func (*DumpingCommands) dumpattachments(ctx *router.Ctx) {
+func (c *DumpingCommands) dumpattachments(ctx *router.Ctx) {
 	channel, err := ctx.Arguments.Get(0).Channel()
 	if err != nil {
 		channel, _ = utils.Discord.GetChannel(ctx.Session, ctx.Message.ChannelID)
@@ -360,14 +360,10 @@ func (*DumpingCommands) dumpattachments(ctx *router.Ctx) {
 		Send(ctx)
 }
 
-func (*DumpingCommands) dumpfiletype(ctx *router.Ctx) {
-	extension := strings.ReplaceAll(utils.Arguments["<extension>"], ".", "")
-
-	channel, err := ctx.Arguments.Get(1).Channel()
+func (c *DumpingCommands) dumpfiletype(ctx *router.Ctx) {
+	extension := strings.ReplaceAll(ctx.Arguments.Get(0).Raw(), ".", "")
+	channel, err := ctx.Arguments.Get(1).Channel(router.ArgumentFlagFallbackDefault)
 	if err != nil {
-		channel, _ = utils.Discord.GetChannel(ctx.Session, ctx.Message.ChannelID)
-	}
-	if channel == nil {
 		ctx.RespondText("Error getting channel")
 		return
 	}
@@ -404,14 +400,10 @@ func (*DumpingCommands) dumpfiletype(ctx *router.Ctx) {
 		Send(ctx)
 }
 
-func (*DumpingCommands) dumpcontenttype(ctx *router.Ctx) {
-	contentType := strings.ToLower(utils.Arguments["<content type>"])
-
-	channel, err := ctx.Arguments.Get(1).Channel()
+func (c *DumpingCommands) dumpcontenttype(ctx *router.Ctx) {
+	contentType := strings.ToLower(ctx.Arguments.Get(0).Raw())
+	channel, err := ctx.Arguments.Get(1).Channel(router.ArgumentFlagFallbackDefault)
 	if err != nil {
-		channel, _ = utils.Discord.GetChannel(ctx.Session, ctx.Message.ChannelID)
-	}
-	if channel == nil {
 		ctx.RespondText("Error getting channel")
 		return
 	}
@@ -448,8 +440,8 @@ func (*DumpingCommands) dumpcontenttype(ctx *router.Ctx) {
 		Send(ctx)
 }
 
-func (*DumpingCommands) dumpemojis(ctx *router.Ctx) {
-	guild, err := utils.Discord.GetGuild(ctx.Session, utils.Misc.Or(utils.Arguments["[server id]"], ctx.Message.GuildID))
+func (c *DumpingCommands) dumpemojis(ctx *router.Ctx) {
+	guild, err := ctx.Arguments.Get(0).Guild()
 	if err != nil {
 		ctx.RespondText("Error getting server: " + err.Error())
 		return
@@ -485,9 +477,9 @@ func (*DumpingCommands) dumpemojis(ctx *router.Ctx) {
 		Send(ctx)
 }
 
-func (*DumpingCommands) dumpstickers(ctx *router.Ctx) {
-	guild, err := utils.Discord.GetGuild(ctx.Session, utils.Misc.Or(utils.Arguments["[server id]"], ctx.Message.GuildID))
-	if err != nil {
+func (c *DumpingCommands) dumpstickers(ctx *router.Ctx) {
+	guild, err := ctx.Arguments.Get(0).Guild()
+		if err != nil {
 		ctx.RespondText("Error getting server: " + err.Error())
 		return
 	}
@@ -524,8 +516,8 @@ func (*DumpingCommands) dumpstickers(ctx *router.Ctx) {
 		Send(ctx)
 }
 
-func (*DumpingCommands) dumpavatars(ctx *router.Ctx) {
-	guild, err := utils.Discord.GetGuild(ctx.Session, utils.Misc.Or(utils.Arguments["[server id]"], ctx.Message.GuildID))
+func (c *DumpingCommands) dumpavatars(ctx *router.Ctx) {
+	guild, err := ctx.Arguments.Get(0).Guild()
 	if err != nil {
 		ctx.RespondText("Error getting server: " + err.Error())
 		return
@@ -559,8 +551,8 @@ func (*DumpingCommands) dumpavatars(ctx *router.Ctx) {
 		Send(ctx)
 }
 
-func (*DumpingCommands) dumpchannels(ctx *router.Ctx) {
-	guild, err := utils.Discord.GetGuild(ctx.Session, utils.Misc.Or(utils.Arguments["[server id]"], ctx.Message.GuildID))
+func (c *DumpingCommands) dumpchannels(ctx *router.Ctx) {
+	guild, err := ctx.Arguments.Get(0).Guild()
 	if err != nil {
 		ctx.RespondText("Error getting server: " + err.Error())
 		return
@@ -589,8 +581,8 @@ func (*DumpingCommands) dumpchannels(ctx *router.Ctx) {
 		Send(ctx)
 }
 
-func (*DumpingCommands) dumpmembers(ctx *router.Ctx) {
-	guild, err := utils.Discord.GetGuild(ctx.Session, utils.Misc.Or(utils.Arguments["[server id]"], ctx.Message.GuildID))
+func (c *DumpingCommands) dumpmembers(ctx *router.Ctx) {
+	guild, err := ctx.Arguments.Get(0).Guild()
 	if err != nil {
 		ctx.RespondText("Error getting server: " + err.Error())
 		return
