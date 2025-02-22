@@ -2,7 +2,6 @@ package utility
 
 import (
 	"bytes"
-	"encoding/base64"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -886,7 +885,7 @@ func (c *UtilityCommands) copyserver(ctx *router.Ctx) {
 	time.Sleep(duration)
 
 	iconResp := http.Get(guild.IconURL())
-	icon := "data:image/png;base64," + base64.StdEncoding.EncodeToString(iconResp.Body)
+	icon := utils.Misc.ImageToBase64(iconResp.Body)
 
 	_, _ = ctx.Session.GuildEdit(newGuild.ID, &discordgo.GuildParams{
 		VerificationLevel:           &guild.VerificationLevel,

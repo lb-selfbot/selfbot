@@ -344,8 +344,7 @@ func (c *ActivityCommands) copyactivity(ctx *router.Ctx) {
 		return
 	}
 
-	rawSaveToConfig := strings.ToLower(utils.Arguments["[save to config: on/off]"])
-	saveToConfig := rawSaveToConfig == "on"
+	saveToConfig, _ := ctx.Arguments.Get(1).Bool()
 
 	var guilds []string
 
@@ -486,8 +485,7 @@ func (c *ActivityCommands) setactivityjson(ctx *router.Ctx) {
 		return
 	}
 
-	rawSaveToConfig := strings.ToLower(utils.Arguments["<save to config: on/off>"])
-	saveToConfig := rawSaveToConfig == "on"
+	saveToConfig, _ := ctx.Arguments.Get(0).Bool()
 
 	if saveToConfig {
 		cfg, err := config.GetConfig()
@@ -1226,7 +1224,7 @@ func (c *ActivityCommands) capresets(ctx *router.Ctx) {
 }
 
 func (c *ActivityCommands) cacreateimagekey(ctx *router.Ctx) {
-	url := utils.Arguments["<image url>"]
+	url := ctx.Arguments.Get(0).Raw()
 
 	if strings.Contains(url, "discordapp.com") {
 		ctx.RespondText("Your image seems to be hosted on Discord. Please use a different link to create an image key, as this might not work. You can try uploading it to a free image hoster like Imgur or ImgBB (but make sure to use the direct link to the image if you do. The URL should end with .png, .jpg or .gif).")
@@ -1235,7 +1233,7 @@ func (c *ActivityCommands) cacreateimagekey(ctx *router.Ctx) {
 	imageKey := api.GenImageKey(url)
 
 	c.services.Embed.NewEmbed().
-		AddField("Image URL", utils.Arguments["<image url>"]).
+		AddField("Image URL", url).
 		AddField("Image Key", imageKey).
 		Send(ctx)
 }

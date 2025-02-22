@@ -82,7 +82,7 @@ func (a *AuthServiceImpl) CheckNonce() {
 		return
 	}
 
-	logging.Error("An AuthWS error has occurred. Error code: " + utils.Random.String(8))
+	logging.Error("An AuthWS error has occurred. Error code: " + random.String(8))
 	os.Exit(1)
 }
 

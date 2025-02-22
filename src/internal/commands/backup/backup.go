@@ -359,7 +359,7 @@ func (c *BackupCommands) backupProfile(ctx *router.Ctx) {
 
 	var avatar string
 	if avatarResponse.Body != nil {
-		avatar = "data:image/png;base64," + base64.StdEncoding.EncodeToString(avatarResponse.Body)
+		avatar = utils.Misc.ImageToBase64(avatarResponse.Body)
 	}
 
 	profile, err := ctx.Session.UserProfile(ctx.Session.State.User.ID)

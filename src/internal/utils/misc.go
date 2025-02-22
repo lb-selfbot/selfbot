@@ -11,6 +11,7 @@ import (
 	"io"
 	"math"
 	"net"
+	"slices"
 	"strconv"
 	"strings"
 	"time"
@@ -106,15 +107,6 @@ func (MiscUtils) FormatDurationShort(duration time.Duration) string {
 		int64(remainingMinutes), int64(remainingSeconds))
 }
 
-func (MiscUtils) ParseDuration(text string) (time.Duration, error) {
-	d, err := time.ParseDuration(text)
-	if err == nil {
-		return d, nil
-	}
-
-	return time.ParseDuration(text + "s")
-}
-
 // GetDistance returns the Levenshtein distance between two strings.
 func (MiscUtils) GetDistance(str1, str2 string) int {
 	s1len := len(str1)
@@ -142,16 +134,7 @@ func (MiscUtils) GetDistance(str1, str2 string) int {
 }
 
 func (MiscUtils) Minimum(a, b, c int) int {
-	if a < b {
-		if a < c {
-			return a
-		}
-	} else {
-		if b < c {
-			return b
-		}
-	}
-	return c
+	return min(a, min(b, c))
 }
 
 func (MiscUtils) HexToRGB(hex string) (int, int, int, error) {
@@ -181,7 +164,7 @@ func (MiscUtils) HexToRGB(hex string) (int, int, int, error) {
 
 func (MiscUtils) CreateSawtoothWave(width, iterations int) []int {
 	var list []int
-	for i := 0; i < iterations; i++ {
+	for range iterations {
 		for j := 0; j <= width; j++ {
 			if j == width {
 				for k := width - 1; k >= 0; k-- {
@@ -262,7 +245,7 @@ var Misc = &MiscUtils{}
 func RemoveSliceItem[T comparable](s []T, e T) []T {
 	for i, v := range s {
 		if v == e {
-			return append(s[:i], s[i+1:]...)
+			return slices.Delete(s, i, i+1)
 		}
 	}
 	return s
