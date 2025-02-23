@@ -1303,17 +1303,17 @@ func (c *EventReactionsCommands) afkresponder(ctx *router.Ctx) {
 			AddField("AFK Responder", utils.Misc.FormatBoolOnOff(cfg.AFK.Enabled)).
 			Send(ctx)
 	case "set":
-		toggle := strings.ToLower(utils.Arguments["[on/off]"])
-		if toggle != "on" && toggle != "off" {
+		toggle, err := ctx.Arguments.Get(0).Bool()
+		if err != nil {
 			ctx.RespondText("Invalid value. Use `on` or `off`.")
 			return
 		}
 
-		cfg.AFK.Enabled = toggle == "on"
+		cfg.AFK.Enabled = toggle
 		_ = cfg.Save()
 
 		c.services.Embed.NewEmbed().
-			SetDescription("Turned " + toggle + " AFK Responder").
+			SetDescription("Turned " + utils.Misc.FormatBoolOnOff(toggle) + " AFK Responder").
 			Send(ctx)
 	case "toggle":
 		cfg.AFK.Enabled = !cfg.AFK.Enabled
@@ -1340,17 +1340,17 @@ func (c *EventReactionsCommands) afkonping(ctx *router.Ctx) {
 			AddField("AFK On Ping", utils.Misc.FormatBoolOnOff(cfg.AFK.OnPing)).
 			Send(ctx)
 	case "set":
-		toggle := strings.ToLower(utils.Arguments["[on/off]"])
-		if toggle != "on" && toggle != "off" {
+		toggle, err := ctx.Arguments.Get(0).Bool()
+		if err != nil {
 			ctx.RespondText("Invalid value. Use `on` or `off`.")
 			return
 		}
 
-		cfg.AFK.OnPing = toggle == "on"
+		cfg.AFK.OnPing = toggle
 		_ = cfg.Save()
 
 		c.services.Embed.NewEmbed().
-			SetDescription("Turned " + toggle + " AFK On Ping").
+			SetDescription("Turned " + utils.Misc.FormatBoolOnOff(toggle) + " AFK On Ping").
 			Send(ctx)
 	case "toggle":
 		cfg.AFK.OnPing = !cfg.AFK.OnPing
@@ -1377,17 +1377,17 @@ func (c *EventReactionsCommands) afkondm(ctx *router.Ctx) {
 			AddField("AFK On DM", utils.Misc.FormatBoolOnOff(cfg.AFK.OnDM)).
 			Send(ctx)
 	case "set":
-		toggle := strings.ToLower(utils.Arguments["[on/off]"])
-		if toggle != "on" && toggle != "off" {
+		toggle, err := ctx.Arguments.Get(0).Bool()
+		if err != nil {
 			ctx.RespondText("Invalid value. Use `on` or `off`.")
 			return
 		}
 
-		cfg.AFK.OnDM = toggle == "on"
+		cfg.AFK.OnDM = toggle
 		_ = cfg.Save()
 
 		c.services.Embed.NewEmbed().
-			SetDescription("Turned " + toggle + " AFK On DM").
+			SetDescription("Turned " + utils.Misc.FormatBoolOnOff(toggle) + " AFK On DM").
 			Send(ctx)
 	case "toggle":
 		cfg.AFK.OnDM = !cfg.AFK.OnDM
@@ -1448,17 +1448,17 @@ func (c *EventReactionsCommands) afkrandomdelay(ctx *router.Ctx) {
 			AddField("AFK Random Delay", utils.Misc.FormatBoolOnOff(cfg.AFK.RandomDelay)).
 			Send(ctx)
 	case "set":
-		toggle := strings.ToLower(utils.Arguments["[on/off]"])
-		if toggle != "on" && toggle != "off" {
+		toggle, err := ctx.Arguments.Get(0).Bool()
+		if err != nil {
 			ctx.RespondText("Invalid value. Use `on` or `off`.")
 			return
 		}
 
-		cfg.AFK.RandomDelay = toggle == "on"
+		cfg.AFK.RandomDelay = toggle
 		_ = cfg.Save()
 
 		c.services.Embed.NewEmbed().
-			SetDescription("Turned " + toggle + " AFK Random Delay").
+			SetDescription("Turned " + utils.Misc.FormatBoolOnOff(toggle) + " AFK Random Delay").
 			Send(ctx)
 	case "toggle":
 		cfg.AFK.RandomDelay = !cfg.AFK.RandomDelay
@@ -1485,17 +1485,17 @@ func (c *EventReactionsCommands) afkinactive(ctx *router.Ctx) {
 			AddField("AFK Must Be Inactive", utils.Misc.FormatBoolOnOff(cfg.AFK.MustBeInactive)).
 			Send(ctx)
 	case "set":
-		toggle := strings.ToLower(utils.Arguments["[on/off]"])
-		if toggle != "on" && toggle != "off" {
+		toggle, err := ctx.Arguments.Get(0).Bool()
+		if err != nil {
 			ctx.RespondText("Invalid value. Use `on` or `off`.")
 			return
 		}
 
-		cfg.AFK.MustBeInactive = toggle == "on"
+		cfg.AFK.MustBeInactive = toggle
 		_ = cfg.Save()
 
 		c.services.Embed.NewEmbed().
-			SetDescription("Turned " + toggle + " AFK Must Be Inactive").
+			SetDescription("Turned " + utils.Misc.FormatBoolOnOff(toggle) + " AFK Must Be Inactive").
 			Send(ctx)
 	case "toggle":
 		cfg.AFK.MustBeInactive = !cfg.AFK.MustBeInactive
@@ -1556,17 +1556,17 @@ func (c *EventReactionsCommands) afktyping(ctx *router.Ctx) {
 			AddField("AFK Typing", utils.Misc.FormatBoolOnOff(cfg.AFK.Typing)).
 			Send(ctx)
 	case "set":
-		toggle := strings.ToLower(utils.Arguments["[on/off]"])
-		if toggle != "on" && toggle != "off" {
+		toggle, err := ctx.Arguments.Get(0).Bool()
+		if err != nil {
 			ctx.RespondText("Invalid value. Use `on` or `off`.")
 			return
 		}
 
-		cfg.AFK.Typing = toggle == "on"
+		cfg.AFK.Typing = toggle
 		_ = cfg.Save()
 
 		c.services.Embed.NewEmbed().
-			SetDescription("Turned " + toggle + " AFK Typing").
+			SetDescription("Turned " + utils.Misc.FormatBoolOnOff(toggle) + " AFK Typing").
 			Send(ctx)
 	case "toggle":
 		cfg.AFK.Typing = !cfg.AFK.Typing
@@ -1593,17 +1593,17 @@ func (c *EventReactionsCommands) afkai(ctx *router.Ctx) {
 			AddField("AFK AI Response", utils.Misc.FormatBoolOnOff(cfg.AFK.AI)).
 			Send(ctx)
 	case "set":
-		toggle := strings.ToLower(utils.Arguments["[on/off]"])
-		if toggle != "on" && toggle != "off" {
+		toggle, err := ctx.Arguments.Get(0).Bool()
+		if err != nil {
 			ctx.RespondText("Invalid value. Use `on` or `off`.")
 			return
 		}
 
-		cfg.AFK.AI = toggle == "on"
+		cfg.AFK.AI = toggle
 		_ = cfg.Save()
 
 		c.services.Embed.NewEmbed().
-			SetDescription("Turned " + toggle + " AFK AI Response").
+			SetDescription("Turned " + utils.Misc.FormatBoolOnOff(toggle) + " AFK AI Response").
 			Send(ctx)
 	case "toggle":
 		cfg.AFK.AI = !cfg.AFK.AI

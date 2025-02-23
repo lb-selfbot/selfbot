@@ -337,17 +337,17 @@ func (c *SharingCommands) shareall(ctx *router.Ctx) {
 			AddField("Share All Commands", utils.Misc.FormatBoolOnOff(cfg.Sharing.ShareAll)).
 			Send(ctx)
 	case "set":
-		toggle := strings.ToLower(utils.Arguments["[on/off]"])
-		if toggle != "on" && toggle != "off" {
+		toggle, err := ctx.Arguments.Get(0).Bool()
+		if err != nil {
 			ctx.RespondText("Invalid value. Use `on` or `off`.")
 			return
 		}
 
-		cfg.Sharing.ShareAll = toggle == "on"
+		cfg.Sharing.ShareAll = toggle
 		_ = cfg.Save()
 
 		c.services.Embed.NewEmbed().
-			SetDescription("Turned " + toggle + " Share All Commands").
+			SetDescription("Turned " + utils.Misc.FormatBoolOnOff(toggle) + " Share All Commands").
 			Send(ctx)
 	case "toggle":
 		cfg.Sharing.ShareAll = !cfg.Sharing.ShareAll
@@ -374,17 +374,17 @@ func (c *SharingCommands) blockdangerous(ctx *router.Ctx) {
 			AddField("Sharing Block Dangerous", utils.Misc.FormatBoolOnOff(cfg.Sharing.BlockDangerousCommands)).
 			Send(ctx)
 	case "set":
-		toggle := strings.ToLower(utils.Arguments["[on/off]"])
-		if toggle != "on" && toggle != "off" {
+		toggle, err := ctx.Arguments.Get(0).Bool()
+		if err != nil {
 			ctx.RespondText("Invalid value. Use `on` or `off`.")
 			return
 		}
 
-		cfg.Sharing.BlockDangerousCommands = toggle == "on"
+		cfg.Sharing.BlockDangerousCommands = toggle
 		_ = cfg.Save()
 
 		c.services.Embed.NewEmbed().
-			SetDescription("Turned " + toggle + " Sharing Block Dangerous").
+			SetDescription("Turned " + utils.Misc.FormatBoolOnOff(toggle) + " Sharing Block Dangerous").
 			Send(ctx)
 	case "toggle":
 		cfg.Sharing.BlockDangerousCommands = !cfg.Sharing.BlockDangerousCommands

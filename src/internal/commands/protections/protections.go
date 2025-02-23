@@ -111,17 +111,17 @@ func (c *ProtectionsCommands) antiphishing(ctx *router.Ctx) {
 			AddField("Anti Phishing", utils.Misc.FormatBoolOnOff(cfg.Protections.AntiPhishing)).
 			Send(ctx)
 	case "set":
-		toggle := strings.ToLower(utils.Arguments["[on/off]"])
-		if toggle != "on" && toggle != "off" {
+		toggle, err := ctx.Arguments.Get(0).Bool()
+		if err != nil {
 			ctx.RespondText("Invalid value. Use `on` or `off`.")
 			return
 		}
 
-		cfg.Protections.AntiPhishing = toggle == "on"
+		cfg.Protections.AntiPhishing = toggle
 		_ = cfg.Save()
 
 		c.services.Embed.NewEmbed().
-			SetDescription("Turned " + toggle + " Anti Phishing").
+			SetDescription("Turned " + utils.Misc.FormatBoolOnOff(toggle) + " Anti Phishing").
 			Send(ctx)
 	case "toggle":
 		cfg.Protections.AntiPhishing = !cfg.Protections.AntiPhishing
@@ -148,17 +148,17 @@ func (c *ProtectionsCommands) antifriendrequest(ctx *router.Ctx) {
 			AddField("Anti Friend Request Spam", utils.Misc.FormatBoolOnOff(cfg.Protections.AntiFriendRequest)).
 			Send(ctx)
 	case "set":
-		toggle := strings.ToLower(utils.Arguments["[on/off]"])
-		if toggle != "on" && toggle != "off" {
+		toggle, err := ctx.Arguments.Get(0).Bool()
+		if err != nil {
 			ctx.RespondText("Invalid value. Use `on` or `off`.")
 			return
 		}
 
-		cfg.Protections.AntiFriendRequest = toggle == "on"
+		cfg.Protections.AntiFriendRequest = toggle
 		_ = cfg.Save()
 
 		c.services.Embed.NewEmbed().
-			SetDescription("Turned " + toggle + " Anti Friend Request Spam").
+			SetDescription("Turned " + utils.Misc.FormatBoolOnOff(toggle) + " Anti Friend Request Spam").
 			Send(ctx)
 	case "toggle":
 		cfg.Protections.AntiFriendRequest = !cfg.Protections.AntiFriendRequest
@@ -185,17 +185,17 @@ func (c *ProtectionsCommands) antimassdm(ctx *router.Ctx) {
 			AddField("Anti Mass DM / DM Spam", utils.Misc.FormatBoolOnOff(cfg.Protections.AntiMassDM)).
 			Send(ctx)
 	case "set":
-		toggle := strings.ToLower(utils.Arguments["[on/off]"])
-		if toggle != "on" && toggle != "off" {
+		toggle, err := ctx.Arguments.Get(0).Bool()
+		if err != nil {
 			ctx.RespondText("Invalid value. Use `on` or `off`.")
 			return
 		}
 
-		cfg.Protections.AntiMassDM = toggle == "on"
+		cfg.Protections.AntiMassDM = toggle
 		_ = cfg.Save()
 
 		c.services.Embed.NewEmbed().
-			SetDescription("Turned " + toggle + " Anti Mass DM / DM Spam").
+			SetDescription("Turned " + utils.Misc.FormatBoolOnOff(toggle) + " Anti Mass DM / DM Spam").
 			Send(ctx)
 	case "toggle":
 		cfg.Protections.AntiMassDM = !cfg.Protections.AntiMassDM
@@ -294,17 +294,17 @@ func (c *ProtectionsCommands) antiinvite(ctx *router.Ctx) {
 			AddField("Anti Invite (Server Protections)", utils.Misc.FormatBoolOnOff(cfg.Protections.ServerProtections.AntiInvite)).
 			Send(ctx)
 	case "set":
-		toggle := strings.ToLower(utils.Arguments["[on/off]"])
-		if toggle != "on" && toggle != "off" {
+		toggle, err := ctx.Arguments.Get(0).Bool()
+		if err != nil {
 			ctx.RespondText("Invalid value. Use `on` or `off`.")
 			return
 		}
 
-		cfg.Protections.ServerProtections.AntiInvite = toggle == "on"
+		cfg.Protections.ServerProtections.AntiInvite = toggle
 		_ = cfg.Save()
 
 		c.services.Embed.NewEmbed().
-			SetDescription("Turned " + toggle + " Anti Invite (Server Protections)").
+			SetDescription("Turned " + utils.Misc.FormatBoolOnOff(toggle) + " Anti Invite (Server Protections)").
 			Send(ctx)
 	case "toggle":
 		cfg.Protections.ServerProtections.AntiInvite = !cfg.Protections.ServerProtections.AntiInvite
@@ -331,17 +331,17 @@ func (c *ProtectionsCommands) antispam(ctx *router.Ctx) {
 			AddField("Anti Spam (Server Protections)", utils.Misc.FormatBoolOnOff(cfg.Protections.ServerProtections.AntiSpam)).
 			Send(ctx)
 	case "set":
-		toggle := strings.ToLower(utils.Arguments["[on/off]"])
-		if toggle != "on" && toggle != "off" {
+		toggle, err := ctx.Arguments.Get(0).Bool()
+		if err != nil {
 			ctx.RespondText("Invalid value. Use `on` or `off`.")
 			return
 		}
 
-		cfg.Protections.ServerProtections.AntiSpam = toggle == "on"
+		cfg.Protections.ServerProtections.AntiSpam = toggle
 		_ = cfg.Save()
 
 		c.services.Embed.NewEmbed().
-			SetDescription("Turned " + toggle + " Anti Spam (Server Protections)").
+			SetDescription("Turned " + utils.Misc.FormatBoolOnOff(toggle) + " Anti Spam (Server Protections)").
 			Send(ctx)
 	case "toggle":
 		cfg.Protections.ServerProtections.AntiSpam = !cfg.Protections.ServerProtections.AntiSpam
@@ -368,17 +368,17 @@ func (c *ProtectionsCommands) antiupper(ctx *router.Ctx) {
 			AddField("Anti Upper (Server Protections)", utils.Misc.FormatBoolOnOff(cfg.Protections.ServerProtections.AntiUpper)).
 			Send(ctx)
 	case "set":
-		toggle := strings.ToLower(utils.Arguments["[on/off]"])
-		if toggle != "on" && toggle != "off" {
+		toggle, err := ctx.Arguments.Get(0).Bool()
+		if err != nil {
 			ctx.RespondText("Invalid value. Use `on` or `off`.")
 			return
 		}
 
-		cfg.Protections.ServerProtections.AntiUpper = toggle == "on"
+		cfg.Protections.ServerProtections.AntiUpper = toggle
 		_ = cfg.Save()
 
 		c.services.Embed.NewEmbed().
-			SetDescription("Turned " + toggle + " Anti Upper (Server Protections)").
+			SetDescription("Turned " + utils.Misc.FormatBoolOnOff(toggle) + " Anti Upper (Server Protections)").
 			Send(ctx)
 	case "toggle":
 		cfg.Protections.ServerProtections.AntiUpper = !cfg.Protections.ServerProtections.AntiUpper
@@ -405,17 +405,17 @@ func (c *ProtectionsCommands) antidelete(ctx *router.Ctx) {
 			AddField("Anti Delete (Server Protections)", utils.Misc.FormatBoolOnOff(cfg.Protections.ServerProtections.AntiDelete)).
 			Send(ctx)
 	case "set":
-		toggle := strings.ToLower(utils.Arguments["[on/off]"])
-		if toggle != "on" && toggle != "off" {
+		toggle, err := ctx.Arguments.Get(0).Bool()
+		if err != nil {
 			ctx.RespondText("Invalid value. Use `on` or `off`.")
 			return
 		}
 
-		cfg.Protections.ServerProtections.AntiDelete = toggle == "on"
+		cfg.Protections.ServerProtections.AntiDelete = toggle
 		_ = cfg.Save()
 
 		c.services.Embed.NewEmbed().
-			SetDescription("Turned " + toggle + " Anti Delete (Server Protections)").
+			SetDescription("Turned " + utils.Misc.FormatBoolOnOff(toggle) + " Anti Delete (Server Protections)").
 			Send(ctx)
 	case "toggle":
 		cfg.Protections.ServerProtections.AntiDelete = !cfg.Protections.ServerProtections.AntiDelete
