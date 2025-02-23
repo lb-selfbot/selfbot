@@ -16,496 +16,451 @@ import (
 	"github.com/LightningDev1/discordgo"
 )
 
-func (c ConfigCommands) RegisterCommands(router *dgc.Router) {
+type ConfigCommands struct{ services *services.Services }
+
+func NewConfigCommands(s *services.Services) *ConfigCommands {
+	return &ConfigCommands{services: s}
+}
+func (c *ConfigCommands) Register() {
+	cmdRouter := c.services.Discord.GetRouter()
+
+	cmdRouter.RegisterCategory(&router.Category{
+		Name:        "Config",
+		Description: "Modify the bot's configuration",
+	}, []*router.Command{
+		{
+			Name:        "commandprefix",
+			Description: "Get or set the command prefix",
+			Arguments:   "<get/set> [value]",
+			Flags:       []router.CommandFlag{router.CmdFlagDangerous},
+			Handler:     c.commandprefix,
+		},
+		{
+			Name:        "commandmode",
+			Description: "Get or set the command mode",
+			Arguments:   "<get/set/values> [value]",
+			Flags:       []router.CommandFlag{router.CmdFlagDangerous},
+			Handler:     c.commandmode,
+		},
+		{
+			Name:        "title",
+			Description: "Get or set the title",
+			Arguments:   "<get/set> [value]",
+			Flags:       []router.CommandFlag{router.CmdFlagDangerous},
+			Handler:     c.title,
+		},
+		{
+			Name:        "footer",
+			Description: "Get or set the footer",
+			Arguments:   "<get/set> [value]",
+			Flags:       []router.CommandFlag{router.CmdFlagDangerous},
+			Handler:     c.footer,
+		},
+		{
+			Name:        "delresponses",
+			Description: "Get, set or toggle if the bot should delete responses to commands",
+			Arguments:   "<get/set/toggle> [on/off]",
+			Flags:       []router.CommandFlag{router.CmdFlagDangerous},
+			Handler:     c.delresponses,
+		},
+		{
+			Name:        "delresponsesdelay",
+			Description: "Get or set the delay before deleting responses",
+			Arguments:   "<get/set> [value]",
+			Flags:       []router.CommandFlag{router.CmdFlagDangerous},
+			Handler:     c.delresponsesdelay,
+		},
+		{
+			Name:        "delcommands",
+			Description: "Get, set or toggle if the bot should delete commands",
+			Arguments:   "<get/set/toggle> [on/off]",
+			Flags:       []router.CommandFlag{router.CmdFlagDangerous},
+			Handler:     c.delcommands,
+		},
+		{
+			Name:        "clientspoof",
+			Description: "Get or set the bot's client spoof",
+			Arguments:   "<get/set/values> [value]",
+			Flags:       []router.CommandFlag{router.CmdFlagDangerous},
+			Handler:     c.clientspoof,
+		},
+		{
+			Name:        "timezone",
+			Description: "Get or set the timezone",
+			Arguments:   "<get/set> [value]",
+			Flags:       []router.CommandFlag{router.CmdFlagDangerous},
+			Handler:     c.timezone,
+		},
+		{
+			Name:        "embedcolor",
+			Description: "Get or set the Embed Color (for URL Embeds)",
+			Arguments:   "<get/set> [hex color]",
+			Flags:       []router.CommandFlag{router.CmdFlagDangerous},
+			Handler:     c.embedcolor,
+		},
+		{
+			Name:        "embedimage",
+			Description: "Get or set the Embed Image (for URL Embeds)",
+			Arguments:   "<get/set> [url]",
+			Flags:       []router.CommandFlag{router.CmdFlagDangerous},
+			Handler:     c.embedimage,
+		},
+		{
+			Name:        "embedurl",
+			Description: "Get or set the Embed URL (for URL Embeds)",
+			Arguments:   "<get/set> [url]",
+			Flags:       []router.CommandFlag{router.CmdFlagDangerous},
+			Handler:     c.embedurl,
+		},
+		{
+			Name:        "forcesubscribedservers",
+			Description: "Get, add, remove or clear force subscribed servers",
+			Arguments:   "<get/add/rm/clear> [server id]",
+			Flags:       []router.CommandFlag{router.CmdFlagDangerous},
+			Handler:     c.forcesubscribedservers,
+		},
+		{
+			Name:        "aliases",
+			Description: "Get, add, remove or clear command aliases",
+			Arguments:   "<get/add/rm/clear> [alias] [command]",
+			Flags:       []router.CommandFlag{router.CmdFlagDangerous},
+			Handler:     c.aliases,
+		},
+		{
+			Name:        "notifications",
+			Description: "Get, set, toggle, or get an example of toast notifications",
+			Arguments:   "<get/set/toggle/example> [on/off]",
+			Flags:       []router.CommandFlag{router.CmdFlagDangerous},
+			Handler:     c.notifications,
+		},
+		{
+			Name:        "nitrosniper",
+			Description: "Get, set or toggle the Nitro Sniper",
+			Arguments:   "<get/set/toggle> [on/off]",
+			Flags:       []router.CommandFlag{router.CmdFlagDangerous},
+			Handler:     c.nitrosniper,
+		},
+		{
+			Name:        "giveawaysniper",
+			Description: "Get, set or toggle the Giveaway Sniper",
+			Arguments:   "<get/set/toggle> [on/off]",
+			Flags:       []router.CommandFlag{router.CmdFlagDangerous},
+			Handler:     c.giveawaysniper,
+		},
+		{
+			Name:        "giveawaysnipersleep",
+			Description: "Get or set the Giveaway Sniper sleep delay",
+			Arguments:   "<get/set> [value]",
+			Flags:       []router.CommandFlag{router.CmdFlagDangerous},
+			Handler:     c.giveawaysnipersleep,
+		},
+		{
+			Name:        "customgiveawaybots",
+			Description: "Get, add, remove or clear custom giveaway bots",
+			Arguments:   "<get/add/rm/clear> [bot]",
+			Flags:       []router.CommandFlag{router.CmdFlagDangerous},
+			Handler:     c.customgiveawaybots,
+		},
+		{
+			Name:        "sniperblacklist",
+			Description: "Get, add, remove or clear the sniper blacklist",
+			Arguments:   "<get/add/rm/clear> [value]",
+			Flags:       []router.CommandFlag{router.CmdFlagDangerous},
+			Handler:     c.sniperblacklist,
+		},
+		{
+			Name:        "sniperserverblacklist",
+			Description: "Get, add, remove or clear the sniper server blacklist",
+			Arguments:   "<get/add/rm/clear> [server id]",
+			Flags:       []router.CommandFlag{router.CmdFlagDangerous},
+			Handler:     c.sniperserverblacklist,
+		},
+		{
+			Name:        "multitokensniper",
+			Description: "Get, set or toggle the Multi Token Sniper",
+			Arguments:   "<get/set/toggle> [on/off]",
+			Flags:       []router.CommandFlag{router.CmdFlagDangerous},
+			Handler:     c.multitokensniper,
+		},
+		{
+			Name:        "snipertokens",
+			Description: "Get, add, remove or clear Multi Token Sniper tokens",
+			Arguments:   "<get/add/rm/clear> [value]",
+			Flags:       []router.CommandFlag{router.CmdFlagDangerous},
+			Handler:     c.snipertokens,
+		},
+		{
+			Name:        "privnotesniper",
+			Description: "Get, set or toggle the Privnote Sniper",
+			Arguments:   "<get/set/toggle> [on/off]",
+			Flags:       []router.CommandFlag{router.CmdFlagDangerous},
+			Handler:     c.privnotesniper,
+		},
+		{
+			Name:        "poketwosniper",
+			Description: "Get, set or toggle the PokéTwo Sniper",
+			Arguments:   "<get/set/toggle> [on/off]",
+			Flags:       []router.CommandFlag{router.CmdFlagDangerous},
+			Handler:     c.poketwosniper,
+		},
+		{
+			Name:        "poketwosleep",
+			Description: "Get or set the PokéTwo Sniper catch delay",
+			Arguments:   "<get/set> [value]",
+			Flags:       []router.CommandFlag{router.CmdFlagDangerous},
+			Handler:     c.poketwosleep,
+		},
+		{
+			Name:        "poketworandomsleep",
+			Description: "Get, set or toggle the PokéTwo Sniper random sleep",
+			Arguments:   "<get/set/toggle> [on/off]",
+			Flags:       []router.CommandFlag{router.CmdFlagDangerous},
+			Handler:     c.poketworandomsleep,
+		},
+		{
+			Name:        "poketwotimeout",
+			Description: "Get or set the PokéTwo Sniper timeout",
+			Arguments:   "<get/set> [value]",
+			Flags:       []router.CommandFlag{router.CmdFlagDangerous},
+			Handler:     c.poketwotimeout,
+		},
+		{
+			Name:        "poketwotyping",
+			Description: "Get, set or toggle the PokéTwo typing",
+			Arguments:   "<get/set/toggle> [on/off]",
+			Flags:       []router.CommandFlag{router.CmdFlagDangerous},
+			Handler:     c.poketwotyping,
+		},
+		{
+			Name:        "poketwocatchrate",
+			Description: "Get or set the PokéTwo catch rate",
+			Arguments:   "<get/set> [percentage]",
+			Flags:       []router.CommandFlag{router.CmdFlagDangerous},
+			Handler:     c.poketwocatchrate,
+		},
+		{
+			Name:        "poketwofakeactivity",
+			Description: "Get, set or toggle the PokéTwo fake activity",
+			Arguments:   "<get/set/toggle> [on/off]",
+			Flags:       []router.CommandFlag{router.CmdFlagDangerous},
+			Handler:     c.poketwofakeactivity,
+		},
+		{
+			Name:        "poketwochannels",
+			Description: "Get, add, remove or clear PokéTwo channels",
+			Arguments:   "<get/add/rm/clear> [channel]",
+			Flags:       []router.CommandFlag{router.CmdFlagDangerous},
+			Handler:     c.poketwochannels,
+		},
+		{
+			Name:        "poketwolanguage",
+			Description: "Get or set the PokéTwo Sniper catch language",
+			Arguments:   "<get/set/values> [language]",
+			Flags:       []router.CommandFlag{router.CmdFlagDangerous},
+			Handler:     c.poketwolanguage,
+		},
+		{
+			Name:        "setupwebhooks",
+			Description: "Automatically set up all webhooks",
+			Arguments:   "[server id]",
+			Flags:       []router.CommandFlag{router.CmdFlagDangerous},
+			Handler:     c.setupwebhooks,
+		},
+		{
+			Name:        "wall",
+			Description: "Set all webhooks at once",
+			Arguments:   "[webhook url]",
+			Flags:       []router.CommandFlag{router.CmdFlagDangerous},
+			Handler:     c.wall,
+		},
+		{
+			Name:        "wnitrosniper",
+			Description: "Get or set the Nitro Sniper webhook",
+			Arguments:   "<get/set> [webhook url]",
+			Flags:       []router.CommandFlag{router.CmdFlagDangerous},
+			Handler:     c.wnitrosniper,
+		},
+		{
+			Name:        "wgiveawaysniper",
+			Description: "Get or set the Giveaway Sniper webhook",
+			Arguments:   "<get/set> [webhook url]",
+			Flags:       []router.CommandFlag{router.CmdFlagDangerous},
+			Handler:     c.wgiveawaysniper,
+		},
+		{
+			Name:        "wselfbotdetection",
+			Description: "Get or set the Selfbot Detection webhook",
+			Arguments:   "<get/set> [webhook url]",
+			Flags:       []router.CommandFlag{router.CmdFlagDangerous},
+			Handler:     c.wselfbotdetection,
+		},
+		{
+			Name:        "wstaffdetection",
+			Description: "Get or set the Staff Detection webhook",
+			Arguments:   "<get/set> [webhook url]",
+			Flags:       []router.CommandFlag{router.CmdFlagDangerous},
+			Handler:     c.wstaffdetection,
+		},
+		{
+			Name:        "wnotifiers",
+			Description: "Get or set the Notifiers webhook",
+			Arguments:   "<get/set> [webhook url]",
+			Flags:       []router.CommandFlag{router.CmdFlagDangerous},
+			Handler:     c.wnotifiers,
+		},
+		{
+			Name:        "wpingdetection",
+			Description: "Get or set the Ping Detection webhook",
+			Arguments:   "<get/set> [webhook url]",
+			Flags:       []router.CommandFlag{router.CmdFlagDangerous},
+			Handler:     c.wpingdetection,
+		},
+		{
+			Name:        "wmisc",
+			Description: "Get or set the Miscellaneous webhook",
+			Arguments:   "<get/set> [webhook url]",
+			Flags:       []router.CommandFlag{router.CmdFlagDangerous},
+			Handler:     c.wmisc,
+		},
+		{
+			Name:        "wsessions",
+			Description: "Get or set the Sessions webhook",
+			Arguments:   "<get/set> [webhook url]",
+			Flags:       []router.CommandFlag{router.CmdFlagDangerous},
+			Handler:     c.wsessions,
+		},
+		{
+			Name:        "wpingself",
+			Description: "Get, set or toggle Ping Self for webhooks",
+			Arguments:   "<get/set/values> [value]",
+			Flags:       []router.CommandFlag{router.CmdFlagDangerous},
+			Handler:     c.wpingself,
+		},
+		{
+			Name:        "wpingeveryone",
+			Description: "Get, set or toggle Ping Everyone for webhooks",
+			Arguments:   "<get/set/values> [value]",
+			Flags:       []router.CommandFlag{router.CmdFlagDangerous},
+			Handler:     c.wpingeveryone,
+		},
+		{
+			Name:        "bannotifier",
+			Description: "Get, set or toggle the Ban Notifier",
+			Arguments:   "<get/set/toggle> [on/off]",
+			Flags:       []router.CommandFlag{router.CmdFlagDangerous},
+			Handler:     c.bannotifier,
+		},
+		{
+			Name:        "staffdetection",
+			Description: "Get, set or toggle the Staff Detection",
+			Arguments:   "<get/set/toggle> [on/off]",
+			Flags:       []router.CommandFlag{router.CmdFlagDangerous},
+			Handler:     c.staffdetection,
+		},
+		{
+			Name:        "pingdetection",
+			Description: "Get, set or toggle the Ping Detection",
+			Arguments:   "<get/set/toggle> [on/off]",
+			Flags:       []router.CommandFlag{router.CmdFlagDangerous},
+			Handler:     c.pingdetection,
+		},
+		{
+			Name:        "ticketnotifier",
+			Description: "Get, set or toggle the Ticket Notifier",
+			Arguments:   "<get/set/toggle> [on/off]",
+			Flags:       []router.CommandFlag{router.CmdFlagDangerous},
+			Handler:     c.ticketnotifier,
+		},
+		{
+			Name:        "sessionconnected",
+			Description: "Get, set or toggle the Session Connected Notifier",
+			Arguments:   "<get/set/toggle> [on/off]",
+			Flags:       []router.CommandFlag{router.CmdFlagDangerous},
+			Handler:     c.sessionconnected,
+		},
+		{
+			Name:        "sessiondisconnected",
+			Description: "Get, set or toggle the Session Disconnected Notifier",
+			Arguments:   "<get/set/toggle> [on/off]",
+			Flags:       []router.CommandFlag{router.CmdFlagDangerous},
+			Handler:     c.sessiondisconnected,
+		},
+		{
+			Name:        "selfbotdetection",
+			Description: "Get, set or toggle the Selfbot Detection",
+			Arguments:   "<get/set/toggle> [on/off]",
+			Flags:       []router.CommandFlag{router.CmdFlagDangerous},
+			Handler:     c.selfbotdetection,
+		},
+		{
+			Name:        "dmtypingnotifier",
+			Description: "Get, set or toggle the DM Typing Notifier",
+			Arguments:   "<get/set/toggle> [on/off]",
+			Flags:       []router.CommandFlag{router.CmdFlagDangerous},
+			Handler:     c.dmtypingnotifier,
+		},
+		{
+			Name:        "dmnotifier",
+			Description: "Get, set or toggle the DM Notifier",
+			Arguments:   "<get/set/toggle> [on/off]",
+			Flags:       []router.CommandFlag{router.CmdFlagDangerous},
+			Handler:     c.dmnotifier,
+		},
+		{
+			Name:        "dmeditnotifier",
+			Description: "Get, set or toggle the DM Edit Notifier",
+			Arguments:   "<get/set/toggle> [on/off]",
+			Flags:       []router.CommandFlag{router.CmdFlagDangerous},
+			Handler:     c.dmeditnotifier,
+		},
+		{
+			Name:        "dmdeletenotifier",
+			Description: "Get, set or toggle the DM Delete Notifier",
+			Arguments:   "<get/set/toggle> [on/off]",
+			Flags:       []router.CommandFlag{router.CmdFlagDangerous},
+			Handler:     c.dmdeletenotifier,
+		},
+		{
+			Name:        "messagedeletenotifier",
+			Description: "Get, set or toggle the Message Delete Notifier",
+			Arguments:   "<get/set/toggle> [on/off]",
+			Flags:       []router.CommandFlag{router.CmdFlagDangerous},
+			Handler:     c.messagedeletenotifier,
+		},
+		{
+			Name:        "uitheme",
+			Description: "Get or set the UI theme",
+			Arguments:   "<get/set/values> [value]",
+			Flags:       []router.CommandFlag{router.CmdFlagDangerous},
+			Handler:     c.uitheme,
+		},
+		{
+			Name:        "hidetosystray",
+			Description: "Get, set or toggle Hide UI To Systray",
+			Arguments:   "<get/set/toggle> [on/off]",
+			Flags:       []router.CommandFlag{router.CmdFlagDangerous},
+			Handler:     c.hidetosystray,
+		},
+		{
+			Name:        "runuionstartup",
+			Description: "Get, set or toggle Run UI on Startup",
+			Arguments:   "<get/set/toggle> [on/off]",
+			Flags:       []router.CommandFlag{router.CmdFlagDangerous},
+			Handler:     c.runuionstartup,
+		},
+		{
+			Name:        "runbotonstartup",
+			Description: "Get, set or toggle Run Selfbot on Startup",
+			Arguments:   "<get/set/toggle> [on/off]",
+			Flags:       []router.CommandFlag{router.CmdFlagDangerous},
+			Handler:     c.runbotonstartup,
+		},
+	})
+}
+
+func (c *ConfigCommands) RegisterCommands(router *dgc.Router) {
 	router.StartCategory("Config", "Modify the bot's configuration")
 
-	router.RegisterCmd(&dgc.Command{
-		Name:        "commandprefix",
-		Description: "Get or set the command prefix",
-		Arguments:   "<get/set> [value]",
-		Flags:       []router.CommandFlag{router.CmdFlagDangerous},
-		Handler:     c.commandprefix,
-	})
-
-	router.RegisterCmd(&dgc.Command{
-		Name:        "commandmode",
-		Description: "Get or set the command mode",
-		Arguments:   "<get/set/values> [value]",
-		Flags:       []router.CommandFlag{router.CmdFlagDangerous},
-		Handler:     c.commandmode,
-	})
-
-	router.RegisterCmd(&dgc.Command{
-		Name:        "title",
-		Description: "Get or set the title",
-		Arguments:   "<get/set> [value]",
-		Flags:       []router.CommandFlag{router.CmdFlagDangerous},
-		Handler:     c.title,
-	})
-
-	router.RegisterCmd(&dgc.Command{
-		Name:        "footer",
-		Description: "Get or set the footer",
-		Arguments:   "<get/set> [value]",
-		Flags:       []router.CommandFlag{router.CmdFlagDangerous},
-		Handler:     c.footer,
-	})
-
-	router.RegisterCmd(&dgc.Command{
-		Name:        "delresponses",
-		Description: "Get, set or toggle if the bot should delete responses to commands",
-		Arguments:   "<get/set/toggle> [on/off]",
-		Flags:       []router.CommandFlag{router.CmdFlagDangerous},
-		Handler:     c.delresponses,
-	})
-
-	router.RegisterCmd(&dgc.Command{
-		Name:        "delresponsesdelay",
-		Description: "Get or set the delay before deleting responses",
-		Arguments:   "<get/set> [value]",
-		Flags:       []router.CommandFlag{router.CmdFlagDangerous},
-		Handler:     c.delresponsesdelay,
-	})
-
-	router.RegisterCmd(&dgc.Command{
-		Name:        "delcommands",
-		Description: "Get, set or toggle if the bot should delete commands",
-		Arguments:   "<get/set/toggle> [on/off]",
-		Flags:       []router.CommandFlag{router.CmdFlagDangerous},
-		Handler:     c.delcommands,
-	})
-
-	router.RegisterCmd(&dgc.Command{
-		Name:        "clientspoof",
-		Description: "Get or set the bot's client spoof",
-		Arguments:   "<get/set/values> [value]",
-		Flags:       []router.CommandFlag{router.CmdFlagDangerous},
-		Handler:     c.clientspoof,
-	})
-
-	router.RegisterCmd(&dgc.Command{
-		Name:        "timezone",
-		Description: "Get or set the timezone",
-		Arguments:   "<get/set> [value]",
-		Flags:       []router.CommandFlag{router.CmdFlagDangerous},
-		Handler:     c.timezone,
-	})
-
-	router.RegisterCmd(&dgc.Command{
-		Name:        "embedcolor",
-		Description: "Get or set the Embed Color (for URL Embeds)",
-		Arguments:   "<get/set> [hex color]",
-		Flags:       []router.CommandFlag{router.CmdFlagDangerous},
-		Handler:     c.embedcolor,
-	})
-
-	router.RegisterCmd(&dgc.Command{
-		Name:        "embedimage",
-		Description: "Get or set the Embed Image (for URL Embeds)",
-		Arguments:   "<get/set> [url]",
-		Flags:       []router.CommandFlag{router.CmdFlagDangerous},
-		Handler:     c.embedimage,
-	})
-
-	router.RegisterCmd(&dgc.Command{
-		Name:        "embedurl",
-		Description: "Get or set the Embed URL (for URL Embeds)",
-		Arguments:   "<get/set> [url]",
-		Flags:       []router.CommandFlag{router.CmdFlagDangerous},
-		Handler:     c.embedurl,
-	})
-
-	router.RegisterCmd(&dgc.Command{
-		Name:        "forcesubscribedservers",
-		Description: "Get, add, remove or clear force subscribed servers",
-		Arguments:   "<get/add/rm/clear> [server id]",
-		Flags:       []router.CommandFlag{router.CmdFlagDangerous},
-		Handler:     c.forcesubscribedservers,
-	})
-
-	router.RegisterCmd(&dgc.Command{
-		Name:        "aliases",
-		Description: "Get, add, remove or clear command aliases",
-		Arguments:   "<get/add/rm/clear> [alias] [command]",
-		Flags:       []router.CommandFlag{router.CmdFlagDangerous},
-		Handler:     c.aliases,
-	})
-
-	router.RegisterCmd(&dgc.Command{
-		Name:        "notifications",
-		Description: "Get, set, toggle, or get an example of toast notifications",
-		Arguments:   "<get/set/toggle/example> [on/off]",
-		Flags:       []router.CommandFlag{router.CmdFlagDangerous},
-		Handler:     c.notifications,
-	})
-
-	router.RegisterCmd(&dgc.Command{
-		Name:        "nitrosniper",
-		Description: "Get, set or toggle the Nitro Sniper",
-		Arguments:   "<get/set/toggle> [on/off]",
-		Flags:       []router.CommandFlag{router.CmdFlagDangerous},
-		Handler:     c.nitrosniper,
-	})
-
-	router.RegisterCmd(&dgc.Command{
-		Name:        "giveawaysniper",
-		Description: "Get, set or toggle the Giveaway Sniper",
-		Arguments:   "<get/set/toggle> [on/off]",
-		Flags:       []router.CommandFlag{router.CmdFlagDangerous},
-		Handler:     c.giveawaysniper,
-	})
-
-	router.RegisterCmd(&dgc.Command{
-		Name:        "giveawaysnipersleep",
-		Description: "Get or set the Giveaway Sniper sleep delay",
-		Arguments:   "<get/set> [value]",
-		Flags:       []router.CommandFlag{router.CmdFlagDangerous},
-		Handler:     c.giveawaysnipersleep,
-	})
-
-	router.RegisterCmd(&dgc.Command{
-		Name:        "customgiveawaybots",
-		Description: "Get, add, remove or clear custom giveaway bots",
-		Arguments:   "<get/add/rm/clear> [bot]",
-		Flags:       []router.CommandFlag{router.CmdFlagDangerous},
-		Handler:     c.customgiveawaybots,
-	})
-
-	router.RegisterCmd(&dgc.Command{
-		Name:        "sniperblacklist",
-		Description: "Get, add, remove or clear the sniper blacklist",
-		Arguments:   "<get/add/rm/clear> [value]",
-		Flags:       []router.CommandFlag{router.CmdFlagDangerous},
-		Handler:     c.sniperblacklist,
-	})
-
-	router.RegisterCmd(&dgc.Command{
-		Name:        "sniperserverblacklist",
-		Description: "Get, add, remove or clear the sniper server blacklist",
-		Arguments:   "<get/add/rm/clear> [server id]",
-		Flags:       []router.CommandFlag{router.CmdFlagDangerous},
-		Handler:     c.sniperserverblacklist,
-	})
-
-	router.RegisterCmd(&dgc.Command{
-		Name:        "multitokensniper",
-		Description: "Get, set or toggle the Multi Token Sniper",
-		Arguments:   "<get/set/toggle> [on/off]",
-		Flags:       []router.CommandFlag{router.CmdFlagDangerous},
-		Handler:     c.multitokensniper,
-	})
-
-	router.RegisterCmd(&dgc.Command{
-		Name:        "snipertokens",
-		Description: "Get, add, remove or clear Multi Token Sniper tokens",
-		Arguments:   "<get/add/rm/clear> [value]",
-		Flags:       []router.CommandFlag{router.CmdFlagDangerous},
-		Handler:     c.snipertokens,
-	})
-
-	router.RegisterCmd(&dgc.Command{
-		Name:        "privnotesniper",
-		Description: "Get, set or toggle the Privnote Sniper",
-		Arguments:   "<get/set/toggle> [on/off]",
-		Flags:       []router.CommandFlag{router.CmdFlagDangerous},
-		Handler:     c.privnotesniper,
-	})
-
-	router.RegisterCmd(&dgc.Command{
-		Name:        "poketwosniper",
-		Description: "Get, set or toggle the PokéTwo Sniper",
-		Arguments:   "<get/set/toggle> [on/off]",
-		Flags:       []router.CommandFlag{router.CmdFlagDangerous},
-		Handler:     c.poketwosniper,
-	})
-
-	router.RegisterCmd(&dgc.Command{
-		Name:        "poketwosleep",
-		Description: "Get or set the PokéTwo Sniper catch delay",
-		Arguments:   "<get/set> [value]",
-		Flags:       []router.CommandFlag{router.CmdFlagDangerous},
-		Handler:     c.poketwosleep,
-	})
-
-	router.RegisterCmd(&dgc.Command{
-		Name:        "poketworandomsleep",
-		Description: "Get, set or toggle the PokéTwo Sniper random sleep",
-		Arguments:   "<get/set/toggle> [on/off]",
-		Flags:       []router.CommandFlag{router.CmdFlagDangerous},
-		Handler:     c.poketworandomsleep,
-	})
-
-	router.RegisterCmd(&dgc.Command{
-		Name:        "poketwotimeout",
-		Description: "Get or set the PokéTwo Sniper timeout",
-		Arguments:   "<get/set> [value]",
-		Flags:       []router.CommandFlag{router.CmdFlagDangerous},
-		Handler:     c.poketwotimeout,
-	})
-
-	router.RegisterCmd(&dgc.Command{
-		Name:        "poketwotyping",
-		Description: "Get, set or toggle the PokéTwo typing",
-		Arguments:   "<get/set/toggle> [on/off]",
-		Flags:       []router.CommandFlag{router.CmdFlagDangerous},
-		Handler:     c.poketwotyping,
-	})
-
-	router.RegisterCmd(&dgc.Command{
-		Name:        "poketwocatchrate",
-		Description: "Get or set the PokéTwo catch rate",
-		Arguments:   "<get/set> [percentage]",
-		Flags:       []router.CommandFlag{router.CmdFlagDangerous},
-		Handler:     c.poketwocatchrate,
-	})
-
-	router.RegisterCmd(&dgc.Command{
-		Name:        "poketwofakeactivity",
-		Description: "Get, set or toggle the PokéTwo fake activity",
-		Arguments:   "<get/set/toggle> [on/off]",
-		Flags:       []router.CommandFlag{router.CmdFlagDangerous},
-		Handler:     c.poketwofakeactivity,
-	})
-
-	router.RegisterCmd(&dgc.Command{
-		Name:        "poketwochannels",
-		Description: "Get, add, remove or clear PokéTwo channels",
-		Arguments:   "<get/add/rm/clear> [channel]",
-		Flags:       []router.CommandFlag{router.CmdFlagDangerous},
-		Handler:     c.poketwochannels,
-	})
-
-	router.RegisterCmd(&dgc.Command{
-		Name:        "poketwolanguage",
-		Description: "Get or set the PokéTwo Sniper catch language",
-		Arguments:   "<get/set/values> [language]",
-		Flags:       []router.CommandFlag{router.CmdFlagDangerous},
-		Handler:     c.poketwolanguage,
-	})
-
-	router.RegisterCmd(&dgc.Command{
-		Name:        "setupwebhooks",
-		Description: "Automatically set up all webhooks",
-		Arguments:   "[server id]",
-		Flags:       []router.CommandFlag{router.CmdFlagDangerous},
-		Handler:     c.setupwebhooks,
-	})
-
-	router.RegisterCmd(&dgc.Command{
-		Name:        "wall",
-		Description: "Set all webhooks at once",
-		Arguments:   "[webhook url]",
-		Flags:       []router.CommandFlag{router.CmdFlagDangerous},
-		Handler:     c.wall,
-	})
-
-	router.RegisterCmd(&dgc.Command{
-		Name:        "wnitrosniper",
-		Description: "Get or set the Nitro Sniper webhook",
-		Arguments:   "<get/set> [webhook url]",
-		Flags:       []router.CommandFlag{router.CmdFlagDangerous},
-		Handler:     c.wnitrosniper,
-	})
-
-	router.RegisterCmd(&dgc.Command{
-		Name:        "wgiveawaysniper",
-		Description: "Get or set the Giveaway Sniper webhook",
-		Arguments:   "<get/set> [webhook url]",
-		Flags:       []router.CommandFlag{router.CmdFlagDangerous},
-		Handler:     c.wgiveawaysniper,
-	})
-
-	router.RegisterCmd(&dgc.Command{
-		Name:        "wselfbotdetection",
-		Description: "Get or set the Selfbot Detection webhook",
-		Arguments:   "<get/set> [webhook url]",
-		Flags:       []router.CommandFlag{router.CmdFlagDangerous},
-		Handler:     c.wselfbotdetection,
-	})
-
-	router.RegisterCmd(&dgc.Command{
-		Name:        "wstaffdetection",
-		Description: "Get or set the Staff Detection webhook",
-		Arguments:   "<get/set> [webhook url]",
-		Flags:       []router.CommandFlag{router.CmdFlagDangerous},
-		Handler:     c.wstaffdetection,
-	})
-
-	router.RegisterCmd(&dgc.Command{
-		Name:        "wnotifiers",
-		Description: "Get or set the Notifiers webhook",
-		Arguments:   "<get/set> [webhook url]",
-		Flags:       []router.CommandFlag{router.CmdFlagDangerous},
-		Handler:     c.wnotifiers,
-	})
-
-	router.RegisterCmd(&dgc.Command{
-		Name:        "wpingdetection",
-		Description: "Get or set the Ping Detection webhook",
-		Arguments:   "<get/set> [webhook url]",
-		Flags:       []router.CommandFlag{router.CmdFlagDangerous},
-		Handler:     c.wpingdetection,
-	})
-
-	router.RegisterCmd(&dgc.Command{
-		Name:        "wmisc",
-		Description: "Get or set the Miscellaneous webhook",
-		Arguments:   "<get/set> [webhook url]",
-		Flags:       []router.CommandFlag{router.CmdFlagDangerous},
-		Handler:     c.wmisc,
-	})
-
-	router.RegisterCmd(&dgc.Command{
-		Name:        "wsessions",
-		Description: "Get or set the Sessions webhook",
-		Arguments:   "<get/set> [webhook url]",
-		Flags:       []router.CommandFlag{router.CmdFlagDangerous},
-		Handler:     c.wsessions,
-	})
-
-	router.RegisterCmd(&dgc.Command{
-		Name:        "wpingself",
-		Description: "Get, set or toggle Ping Self for webhooks",
-		Arguments:   "<get/set/values> [value]",
-		Flags:       []router.CommandFlag{router.CmdFlagDangerous},
-		Handler:     c.wpingself,
-	})
-
-	router.RegisterCmd(&dgc.Command{
-		Name:        "wpingeveryone",
-		Description: "Get, set or toggle Ping Everyone for webhooks",
-		Arguments:   "<get/set/values> [value]",
-		Flags:       []router.CommandFlag{router.CmdFlagDangerous},
-		Handler:     c.wpingeveryone,
-	})
-
-	router.RegisterCmd(&dgc.Command{
-		Name:        "bannotifier",
-		Description: "Get, set or toggle the Ban Notifier",
-		Arguments:   "<get/set/toggle> [on/off]",
-		Flags:       []router.CommandFlag{router.CmdFlagDangerous},
-		Handler:     c.bannotifier,
-	})
-
-	router.RegisterCmd(&dgc.Command{
-		Name:        "staffdetection",
-		Description: "Get, set or toggle the Staff Detection",
-		Arguments:   "<get/set/toggle> [on/off]",
-		Flags:       []router.CommandFlag{router.CmdFlagDangerous},
-		Handler:     c.staffdetection,
-	})
-
-	router.RegisterCmd(&dgc.Command{
-		Name:        "pingdetection",
-		Description: "Get, set or toggle the Ping Detection",
-		Arguments:   "<get/set/toggle> [on/off]",
-		Flags:       []router.CommandFlag{router.CmdFlagDangerous},
-		Handler:     c.pingdetection,
-	})
-
-	router.RegisterCmd(&dgc.Command{
-		Name:        "ticketnotifier",
-		Description: "Get, set or toggle the Ticket Notifier",
-		Arguments:   "<get/set/toggle> [on/off]",
-		Flags:       []router.CommandFlag{router.CmdFlagDangerous},
-		Handler:     c.ticketnotifier,
-	})
-
-	router.RegisterCmd(&dgc.Command{
-		Name:        "sessionconnected",
-		Description: "Get, set or toggle the Session Connected Notifier",
-		Arguments:   "<get/set/toggle> [on/off]",
-		Flags:       []router.CommandFlag{router.CmdFlagDangerous},
-		Handler:     c.sessionconnected,
-	})
-
-	router.RegisterCmd(&dgc.Command{
-		Name:        "sessiondisconnected",
-		Description: "Get, set or toggle the Session Disconnected Notifier",
-		Arguments:   "<get/set/toggle> [on/off]",
-		Flags:       []router.CommandFlag{router.CmdFlagDangerous},
-		Handler:     c.sessiondisconnected,
-	})
-
-	router.RegisterCmd(&dgc.Command{
-		Name:        "selfbotdetection",
-		Description: "Get, set or toggle the Selfbot Detection",
-		Arguments:   "<get/set/toggle> [on/off]",
-		Flags:       []router.CommandFlag{router.CmdFlagDangerous},
-		Handler:     c.selfbotdetection,
-	})
-
-	router.RegisterCmd(&dgc.Command{
-		Name:        "dmtypingnotifier",
-		Description: "Get, set or toggle the DM Typing Notifier",
-		Arguments:   "<get/set/toggle> [on/off]",
-		Flags:       []router.CommandFlag{router.CmdFlagDangerous},
-		Handler:     c.dmtypingnotifier,
-	})
-
-	router.RegisterCmd(&dgc.Command{
-		Name:        "dmnotifier",
-		Description: "Get, set or toggle the DM Notifier",
-		Arguments:   "<get/set/toggle> [on/off]",
-		Flags:       []router.CommandFlag{router.CmdFlagDangerous},
-		Handler:     c.dmnotifier,
-	})
-
-	router.RegisterCmd(&dgc.Command{
-		Name:        "dmeditnotifier",
-		Description: "Get, set or toggle the DM Edit Notifier",
-		Arguments:   "<get/set/toggle> [on/off]",
-		Flags:       []router.CommandFlag{router.CmdFlagDangerous},
-		Handler:     c.dmeditnotifier,
-	})
-
-	router.RegisterCmd(&dgc.Command{
-		Name:        "dmdeletenotifier",
-		Description: "Get, set or toggle the DM Delete Notifier",
-		Arguments:   "<get/set/toggle> [on/off]",
-		Flags:       []router.CommandFlag{router.CmdFlagDangerous},
-		Handler:     c.dmdeletenotifier,
-	})
-
-	router.RegisterCmd(&dgc.Command{
-		Name:        "messagedeletenotifier",
-		Description: "Get, set or toggle the Message Delete Notifier",
-		Arguments:   "<get/set/toggle> [on/off]",
-		Flags:       []router.CommandFlag{router.CmdFlagDangerous},
-		Handler:     c.messagedeletenotifier,
-	})
-
-	router.RegisterCmd(&dgc.Command{
-		Name:        "uitheme",
-		Description: "Get or set the UI theme",
-		Arguments:   "<get/set/values> [value]",
-		Flags:       []router.CommandFlag{router.CmdFlagDangerous},
-		Handler:     c.uitheme,
-	})
-
-	router.RegisterCmd(&dgc.Command{
-		Name:        "hidetosystray",
-		Description: "Get, set or toggle Hide UI To Systray",
-		Arguments:   "<get/set/toggle> [on/off]",
-		Flags:       []router.CommandFlag{router.CmdFlagDangerous},
-		Handler:     c.hidetosystray,
-	})
-
-	router.RegisterCmd(&dgc.Command{
-		Name:        "runuionstartup",
-		Description: "Get, set or toggle Run UI on Startup",
-		Arguments:   "<get/set/toggle> [on/off]",
-		Flags:       []router.CommandFlag{router.CmdFlagDangerous},
-		Handler:     c.runuionstartup,
-	})
-
-	router.RegisterCmd(&dgc.Command{
-		Name:        "runbotonstartup",
-		Description: "Get, set or toggle Run Selfbot on Startup",
-		Arguments:   "<get/set/toggle> [on/off]",
-		Flags:       []router.CommandFlag{router.CmdFlagDangerous},
-		Handler:     c.runbotonstartup,
-	})
 }
 
 func (c *ConfigCommands) commandprefix(ctx *router.Ctx) {
@@ -2864,14 +2819,4 @@ func (c *ConfigCommands) runbotonstartup(ctx *router.Ctx) {
 	default:
 		ctx.RespondText("Invalid <get/set/toggle> argument. Use `get` or `set` or `toggle`.")
 	}
-}
-
-type ConfigCommands struct{ services *services.Services }
-
-func NewConfigCommands(s *services.Services) *ConfigCommands {
-	return &ConfigCommands{services: s}
-}
-func (c *ConfigCommands) Register() {
-	cmdRouter := c.services.Discord.GetRouter()
-
 }

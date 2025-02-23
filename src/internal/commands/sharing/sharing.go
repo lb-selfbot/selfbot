@@ -61,7 +61,7 @@ func (c *SharingCommands) Register() {
 	})
 }
 
-func (*SharingCommands) sharedusers(ctx *router.Ctx) {
+func (c *SharingCommands) sharedusers(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
 		ctx.RespondText("Error getting config")
@@ -142,7 +142,7 @@ func (*SharingCommands) sharedusers(ctx *router.Ctx) {
 	}
 }
 
-func (*SharingCommands) sharedcategories(ctx *router.Ctx) {
+func (c *SharingCommands) sharedcategories(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
 		ctx.RespondText("Error getting config.")
@@ -236,7 +236,7 @@ func (*SharingCommands) sharedcategories(ctx *router.Ctx) {
 	}
 }
 
-func (*SharingCommands) sharedcommands(ctx *router.Ctx) {
+func (c *SharingCommands) sharedcommands(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
 		ctx.RespondText("Error getting config.")
@@ -324,7 +324,7 @@ func (*SharingCommands) sharedcommands(ctx *router.Ctx) {
 	}
 }
 
-func (*SharingCommands) shareall(ctx *router.Ctx) {
+func (c *SharingCommands) shareall(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
 		ctx.RespondText("Error getting config")
@@ -361,7 +361,7 @@ func (*SharingCommands) shareall(ctx *router.Ctx) {
 	}
 }
 
-func (*SharingCommands) blockdangerous(ctx *router.Ctx) {
+func (c *SharingCommands) blockdangerous(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
 		ctx.RespondText("Error getting config")

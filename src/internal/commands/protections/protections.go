@@ -14,91 +14,99 @@ import (
 	"github.com/LightningDev1/dgc"
 )
 
-func (p ProtectionsCommands) RegisterCommands(router *dgc.Router) {
-	router.StartCategory("Protections", "Protection commands")
+type ProtectionsCommands struct{ services *services.Services }
 
-	router.RegisterCmd(&dgc.Command{
-		Name:        "antiphishing",
-		Description: "Get, set or toggle Anti Phishing",
-		Arguments:   "<get/set/toggle> [on/off]",
-		Flags:       []router.CommandFlag{router.CmdFlagDangerous},
-		Handler:     p.antiphishing,
+func NewProtectionsCommands(s *services.Services) *ProtectionsCommands {
+	return &ProtectionsCommands{services: s}
+}
+func (c *ProtectionsCommands) Register() {
+	cmdRouter := c.services.Discord.GetRouter()
+
+	cmdRouter.RegisterCategory(&router.Category{
+		Name:        "Protections",
+		Description: "Protect your account",
+	}, []*router.Command{
+		{
+			Name:        "antiphishing",
+			Description: "Get, set or toggle Anti Phishing",
+			Arguments:   "<get/set/toggle> [on/off]",
+			Flags:       []router.CommandFlag{router.CmdFlagDangerous},
+			Handler:     c.antiphishing,
+		},
+		{
+			Name:        "antifriendrequest",
+			Description: "Get, set or toggle Anti Friend Request Spam",
+			Arguments:   "<get/set/toggle> [on/off]",
+			Flags:       []router.CommandFlag{router.CmdFlagDangerous},
+			Handler:     c.antifriendrequest,
+		},
+		{
+			Name:        "antimassdm",
+			Description: "Get, set or toggle Anti Mass DM / DM Spam",
+			Arguments:   "<get/set/toggle> [on/off]",
+			Flags:       []router.CommandFlag{router.CmdFlagDangerous},
+			Handler:     c.antimassdm,
+		},
+		{
+			Name:        "protectedservers",
+			Description: "Get, add, remove or clear the protected servers list",
+			Arguments:   "<get/add/rm/clear> [server id]",
+			Flags:       []router.CommandFlag{router.CmdFlagDangerous},
+			Handler:     c.protectedservers,
+		},
+		{
+			Name:        "antiinvite",
+			Description: "Get, set or toggle Anti Invite (Server Protections)",
+			Arguments:   "<get/set/toggle> [on/off]",
+			Flags:       []router.CommandFlag{router.CmdFlagDangerous},
+			Handler:     c.antiinvite,
+		},
+		{
+			Name:        "antispam",
+			Description: "Get, set or toggle Anti Spam (Server Protections)",
+			Arguments:   "<get/set/toggle> [on/off]",
+			Flags:       []router.CommandFlag{router.CmdFlagDangerous},
+			Handler:     c.antispam,
+		},
+		{
+			Name:        "antiupper",
+			Description: "Get, set or toggle Anti Upper (Server Protections)",
+			Arguments:   "<get/set/toggle> [on/off]",
+			Flags:       []router.CommandFlag{router.CmdFlagDangerous},
+			Handler:     c.antiupper,
+		},
+		{
+			Name:        "antidelete",
+			Description: "Get, set or toggle Anti Delete (Server Protections)",
+			Arguments:   "<get/set/toggle> [on/off]",
+			Flags:       []router.CommandFlag{router.CmdFlagDangerous},
+			Handler:     c.antidelete,
+		},
+		{
+			Name:        "dm",
+			Description: "Open or close DM's from everyone",
+			Arguments:   "<open/close>",
+			Flags:       []router.CommandFlag{router.CmdFlagDangerous},
+			Handler:     c.dm,
+		},
+		{
+			Name:        "friendrequests",
+			Description: "Allow or deny new friend requests",
+			Arguments:   "<allow/deny>",
+			Flags:       []router.CommandFlag{router.CmdFlagDangerous},
+			Handler:     c.friendrequests,
+		},
 	})
 
-	router.RegisterCmd(&dgc.Command{
-		Name:        "antifriendrequest",
-		Description: "Get, set or toggle Anti Friend Request Spam",
-		Arguments:   "<get/set/toggle> [on/off]",
-		Flags:       []router.CommandFlag{router.CmdFlagDangerous},
-		Handler:     p.antifriendrequest,
-	})
-
-	router.RegisterCmd(&dgc.Command{
-		Name:        "antimassdm",
-		Description: "Get, set or toggle Anti Mass DM / DM Spam",
-		Arguments:   "<get/set/toggle> [on/off]",
-		Flags:       []router.CommandFlag{router.CmdFlagDangerous},
-		Handler:     p.antimassdm,
-	})
-
-	router.RegisterCmd(&dgc.Command{
-		Name:        "protectedservers",
-		Description: "Get, add, remove or clear the protected servers list",
-		Arguments:   "<get/add/rm/clear> [server id]",
-		Flags:       []router.CommandFlag{router.CmdFlagDangerous},
-		Handler:     p.protectedservers,
-	})
-
-	router.RegisterCmd(&dgc.Command{
-		Name:        "antiinvite",
-		Description: "Get, set or toggle Anti Invite (Server Protections)",
-		Arguments:   "<get/set/toggle> [on/off]",
-		Flags:       []router.CommandFlag{router.CmdFlagDangerous},
-		Handler:     p.antiinvite,
-	})
-
-	router.RegisterCmd(&dgc.Command{
-		Name:        "antispam",
-		Description: "Get, set or toggle Anti Spam (Server Protections)",
-		Arguments:   "<get/set/toggle> [on/off]",
-		Flags:       []router.CommandFlag{router.CmdFlagDangerous},
-		Handler:     p.antispam,
-	})
-
-	router.RegisterCmd(&dgc.Command{
-		Name:        "antiupper",
-		Description: "Get, set or toggle Anti Upper (Server Protections)",
-		Arguments:   "<get/set/toggle> [on/off]",
-		Flags:       []router.CommandFlag{router.CmdFlagDangerous},
-		Handler:     p.antiupper,
-	})
-
-	router.RegisterCmd(&dgc.Command{
-		Name:        "antidelete",
-		Description: "Get, set or toggle Anti Delete (Server Protections)",
-		Arguments:   "<get/set/toggle> [on/off]",
-		Flags:       []router.CommandFlag{router.CmdFlagDangerous},
-		Handler:     p.antidelete,
-	})
-
-	router.RegisterCmd(&dgc.Command{
-		Name:        "dm",
-		Description: "Open or close DM's from everyone",
-		Arguments:   "<open/close>",
-		Flags:       []router.CommandFlag{router.CmdFlagDangerous},
-		Handler:     p.dm,
-	})
-
-	router.RegisterCmd(&dgc.Command{
-		Name:        "friendrequests",
-		Description: "Allow or deny new friend requests",
-		Arguments:   "<allow/deny>",
-		Flags:       []router.CommandFlag{router.CmdFlagDangerous},
-		Handler:     p.friendrequests,
-	})
 }
 
-func (p ProtectionsCommands) antiphishing(ctx *router.Ctx) {
+func (c *ProtectionsCommands) RegisterCommands(router *dgc.Router) {
+	router.StartCategory("Protections", "Protection commands")
+
+	
+}
+
+func (c *ProtectionsCommands) antiphishing(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
 		ctx.RespondText("Error getting config")
@@ -135,7 +143,7 @@ func (p ProtectionsCommands) antiphishing(ctx *router.Ctx) {
 	}
 }
 
-func (p ProtectionsCommands) antifriendrequest(ctx *router.Ctx) {
+func (c *ProtectionsCommands) antifriendrequest(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
 		ctx.RespondText("Error getting config")
@@ -172,7 +180,7 @@ func (p ProtectionsCommands) antifriendrequest(ctx *router.Ctx) {
 	}
 }
 
-func (p ProtectionsCommands) antimassdm(ctx *router.Ctx) {
+func (c *ProtectionsCommands) antimassdm(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
 		ctx.RespondText("Error getting config")
@@ -281,7 +289,7 @@ func (c *ProtectionsCommands) protectedservers(ctx *router.Ctx) {
 	}
 }
 
-func (p ProtectionsCommands) antiinvite(ctx *router.Ctx) {
+func (c *ProtectionsCommands) antiinvite(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
 		ctx.RespondText("Error getting config")
@@ -318,7 +326,7 @@ func (p ProtectionsCommands) antiinvite(ctx *router.Ctx) {
 	}
 }
 
-func (p ProtectionsCommands) antispam(ctx *router.Ctx) {
+func (c *ProtectionsCommands) antispam(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
 		ctx.RespondText("Error getting config")
@@ -355,7 +363,7 @@ func (p ProtectionsCommands) antispam(ctx *router.Ctx) {
 	}
 }
 
-func (p ProtectionsCommands) antiupper(ctx *router.Ctx) {
+func (c *ProtectionsCommands) antiupper(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
 		ctx.RespondText("Error getting config")
@@ -392,7 +400,7 @@ func (p ProtectionsCommands) antiupper(ctx *router.Ctx) {
 	}
 }
 
-func (p ProtectionsCommands) antidelete(ctx *router.Ctx) {
+func (c *ProtectionsCommands) antidelete(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
 		ctx.RespondText("Error getting config")
@@ -490,14 +498,4 @@ func (c *ProtectionsCommands) friendrequests(ctx *router.Ctx) {
 	c.services.Embed.NewEmbed().
 		SetDescription(action + " friend requests from everyone!").
 		Send(ctx)
-}
-
-type ProtectionsCommands struct{ services *services.Services }
-
-func NewProtectionsCommands(s *services.Services) *ProtectionsCommands {
-	return &ProtectionsCommands{services: s}
-}
-func (c *ProtectionsCommands) Register() {
-	cmdRouter := c.services.Discord.GetRouter()
-
 }

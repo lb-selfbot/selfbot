@@ -7,76 +7,78 @@ import (
 
 	"github.com/LightningDev1/LB-Selfbot/internal/config"
 	"github.com/LightningDev1/LB-Selfbot/internal/constants"
+	"github.com/LightningDev1/LB-Selfbot/internal/embed"
 	"github.com/LightningDev1/LB-Selfbot/internal/router"
 	"github.com/LightningDev1/LB-Selfbot/internal/services"
 	"github.com/LightningDev1/LB-Selfbot/internal/utils"
-	"github.com/LightningDev1/LB-Selfbot/selfbot/embed"
-
-	"github.com/LightningDev1/dgc"
-	"github.com/LightningDev1/discordgo"
+	"github.com/LightningDev1/LB-Selfbot/internal/utils2"
 )
 
-type HelpCommand struct{}
+type HelpCommands struct{ services *services.Services }
+
+func NewHelpCommands(s *services.Services) *HelpCommands {
+	return &HelpCommands{services: s}
+}
+func (c *HelpCommands) Register() {
+	cmdRouter := c.services.Discord.GetRouter()
+
+	cmds := []router.Command{
+		{
+			Name:    "help",
+			Handler: c.generalHelpCommand,
+		},
+		{
+			Name:        "search",
+			Description: "Search for a command",
+			Arguments:   "<query>",
+			Handler:     c.search,
+		},
+		{
+			Name:        "repeat",
+			Description: "Repeat the last used command",
+			Handler:     c.repeat,
+		},
+	}
+
+	for _, category := range cmdRouter.GetCategories() {
+		name := strings.ReplaceAll(strings.ToLower(category.Name), " ", "")
+
+		cmds = append(cmds, router.Command{
+			Name:        name,
+			Description: fmt.Sprintf("Get help for the %s category", category.Name),
+			Handler:     c.generateCategoryHelpFunc(category, name),
+		})
+	}
+
+}
 
 type HelpMessage struct {
 	Page     int
-	Category *dgc.Category
-	Command  *dgc.Command
+	Category *router.Category
+	Command  *router.Command
 }
 
-// RegisterHelpCommand registers the help command to the router
-func (c *HelpCommand) RegisterHelpCommand(router *dgc.Router, session *discordgo.Session) {
-	// Register the default help command
-	router.StopCategory()
-	router.RegisterCmd(&dgc.Command{
-		Name:    "help",
-		Handler: generalHelpCommand,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "search",
-		Arguments:   "<query>",
-		Description: "Search for a command",
-		Handler:     c.search,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "repeat",
-		Description: "Repeat the last used command",
-		Handler:     c.repeat,
-	})
-
-	for _, category := range router.Categories {
-		name := strings.ReplaceAll(strings.ToLower(category.Name), " ", "")
-
-		router.RegisterCmd(&dgc.Command{
-			Name:        name,
-			Usage:       "[p]" + name,
-			Description: fmt.Sprintf("Get help for the %s category", category.Name),
-			Handler:     generateCategoryHelpFunc(category, name),
-		})
-	}
-}
-
-func generateCategoryHelpFunc(category *dgc.Category, name string) dgc.ExecutionHandler {
+func (c *HelpCommands) generateCategoryHelpFunc(category *router.Category, name string) router.ExecutionHandler {
 	return func(ctx *router.Ctx) {
 		page, _ := ctx.Arguments.Get(0).Int()
 
-		renderCategoryHelp(ctx.Router, category, name, page).Send(ctx)
+		c.renderCategoryHelp(ctx.Router, category, name, page).Send(ctx)
 	}
 }
 
 // generalHelpCommand handles the general help command
-func generalHelpCommand(ctx *router.Ctx) {
+func (c *HelpCommands) generalHelpCommand(ctx *router.Ctx) {
 	// Check if the user provided an argument
 	if ctx.Arguments.Amount() > 0 {
-		specificHelpCommand(ctx)
+		c.specificHelpCommand(ctx)
 		return
 	}
 
 	// Send the general help embed
-	renderDefaultGeneralHelpEmbed(ctx.Router).Send(ctx)
+	c.renderDefaultGeneralHelpEmbed(ctx.Router).Send(ctx)
 }
 
-func getNameFromArgument(arg string) string {
+func (c *HelpCommands) getNameFromArgument(arg string) string {
 	arg = strings.ReplaceAll(arg, "eventreactions", "EventReactions")
 	arg = strings.ReplaceAll(arg, "eventreaction", "EventReactions")
 
@@ -99,36 +101,36 @@ func getNameFromArgument(arg string) string {
 }
 
 // specificHelpCommand handles the specific help command
-func specificHelpCommand(ctx *router.Ctx) {
+func (c *HelpCommands) specificHelpCommand(ctx *router.Ctx) {
 	oldName := strings.ToLower(ctx.Arguments.Get(0).Raw())
-	name := getNameFromArgument(oldName)
+	name := c.getNameFromArgument(oldName)
 	page, _ := ctx.Arguments.Get(1).Int()
-	prefix := ctx.Router.GetPrefixes()[0]
+	prefix := ctx.Router.GetConfig().PrefixFunc()[0]
 
 	if category := ctx.Router.GetCategory(utils.String.Capitalize(name)); category != nil {
-		renderCategoryHelp(ctx.Router, category, oldName, page).Send(ctx)
+		c.renderCategoryHelp(ctx.Router, category, oldName, page).Send(ctx)
 		return
 	}
 
 	if command := ctx.Router.GetCmd(name); command != nil {
-		renderCommandHelp(ctx.Router, command).Send(ctx)
+		c.renderCommandHelp(ctx.Router, command).Send(ctx)
 		return
 	}
 
 	// get close commands and categories
 	var closeCommands []string
-	for _, command := range ctx.Router.Commands {
+	for _, command := range ctx.Router.GetCmds() {
 		if len(closeCommands) >= 5 {
 			break
 		}
 		distance := utils.Misc.GetDistance(command.Name, name)
 		if distance < 2 || strings.Contains(command.Name, name) {
-			closeCommands = append(closeCommands, strings.ReplaceAll(command.Usage, "[p]", prefix)+" - "+command.Description)
+			closeCommands = append(closeCommands, prefix+command.Name+" "+command.Arguments+" - "+command.Description)
 		}
 	}
 
 	var closeCategories []string
-	for _, category := range ctx.Router.Categories {
+	for _, category := range ctx.Router.GetCategories() {
 		if len(closeCategories) >= 5 {
 			break
 		}
@@ -149,47 +151,35 @@ func specificHelpCommand(ctx *router.Ctx) {
 	c.services.Embed.NewEmbed().SetDescription(description).Send(ctx)
 }
 
-func renderCommandHelp(router *dgc.Router, command *dgc.Command) *embed.Embed {
-	categoryName := ""
-	// Try to get the category the command belongs in
-	for _, category := range router.Categories {
-		category = router.GetCategory(category.Name)
-		for _, cmd := range category.Commands {
-			if cmd.Name != command.Name {
-				continue
-			}
-
-			categoryName = category.Name
-			break
-		}
-	}
+func (c *HelpCommands) renderCommandHelp(cmdRouter router.Router, command *router.Command) *embed.Embed {
 	return c.services.Embed.NewEmbed().
 		SetDescription("Command Help: "+command.Name).
 		AddField("Command Name", command.Name).
-		AddField("Usage", "<> is required, [] is optional\n\n"+strings.ReplaceAll(command.Usage, "[p]", router.GetPrefixes()[0])).
+		AddField("Usage", "<> is required, [] is optional\n\n"+cmdRouter.GetConfig().PrefixFunc()[0]+command.Name+" "+command.Arguments).
 		AddField("Description", command.Description).
-		AddField("Category", categoryName)
+		AddField("Category", command.Category.Name)
 }
 
-func renderCategoryHelp(router *dgc.Router, category *dgc.Category, rawArgument string, page int) *embed.Embed {
+func (c *HelpCommands) renderCategoryHelp(cmdRouter router.Router, category *router.Category, rawArgument string, page int) *embed.Embed {
 	helpPages := map[int]string{}
 	currentPage := 0
-	for _, command := range category.Commands {
-		splitUsage := strings.SplitN(command.Usage, " ", 2)
-		usage := ""
-		if len(splitUsage) > 1 {
-			usage = " " + splitUsage[1]
-		}
-		helpText := fmt.Sprintf("%s%s%s - %s\n", router.GetPrefixes()[0], command.Name, usage, command.Description)
+
+	cmds := utils2.Filter(cmdRouter.GetCmds(), func(cmd *router.Command) bool {
+		return cmd.Category == category
+	})
+
+	for _, command := range cmds {
+		helpText := fmt.Sprintf("%s%s %s - %s\n", cmdRouter.GetConfig().PrefixFunc()[0], command.Name, command.Arguments, command.Description)
 		if len(helpPages[currentPage])+len(helpText) > 1650 {
 			currentPage++
 		}
 		helpPages[currentPage] += helpText
 	}
+
 	page = int(math.Max(0, float64(page-1)))
 
 	emb := c.services.Embed.NewEmbed().
-		SetDescription("<> is required, [] is optional\n\nAmount of %s commands: %d", category.Name, len(category.Commands)).
+		SetDescription("<> is required, [] is optional\n\nAmount of %s commands: %d", category.Name, len(cmds)).
 		SetSubtext(fmt.Sprintf("Page: %d/%d", page+1, len(helpPages)))
 
 	cfg, _ := config.GetConfig()
@@ -205,29 +195,29 @@ func renderCategoryHelp(router *dgc.Router, category *dgc.Category, rawArgument 
 	}
 	if len(helpPages) > 1 {
 		if cfg.Selfbot.CommandMode == "WebhookEmbed" {
-			emb.SetSubtext(fmt.Sprintf("Page: %d/%d\n\nUse %shelp %s <page> to go to the next page", page+1, len(helpPages), router.GetPrefixes()[0], rawArgument))
+			emb.SetSubtext(fmt.Sprintf("Page: %d/%d\n\nUse %shelp %s <page> to go to the next page", page+1, len(helpPages), cmdRouter.GetConfig().PrefixFunc()[0], rawArgument))
 		} else {
-			emb.SetSubtext(fmt.Sprintf("Page: %d/%d\n\nUse \x1b[34;1m%shelp %s <page>\x1b[0m to go to the next page", page+1, len(helpPages), router.GetPrefixes()[0], rawArgument))
+			emb.SetSubtext(fmt.Sprintf("Page: %d/%d\n\nUse \x1b[34;1m%shelp %s <page>\x1b[0m to go to the next page", page+1, len(helpPages), cmdRouter.GetConfig().PrefixFunc()[0], rawArgument))
 		}
 	}
 	return emb
 }
 
 // renderDefaultGeneralHelpEmbed renders the general help embed on the given page
-func renderDefaultGeneralHelpEmbed(router *dgc.Router) *embed.Embed {
+func (c *HelpCommands) renderDefaultGeneralHelpEmbed(cmdRouter router.Router) *embed.Embed {
 	cfg, _ := config.GetConfig()
 	categoriesString := ""
 
-	for _, category := range router.Categories {
+	for _, category := range cmdRouter.GetCategories() {
 		// Get the commands in the category, will be empty otherwise
-		category = router.GetCategory(category.Name)
+		category = cmdRouter.GetCategory(category.Name)
 		categoriesString += fmt.Sprintf("%s - %s\n", category.Name+strings.Repeat(" ", 14-len(category.Name)), category.Description)
 	}
 
-	prefix := router.GetPrefixes()[0]
+	prefix := cmdRouter.GetConfig().PrefixFunc()[0]
 
 	emb := c.services.Embed.NewEmbed().
-		SetDescription("LightningBot %s Help\nAmount of Commands: %d, <> is required, [] is optional\n", constants.VERSION, len(router.Commands))
+		SetDescription("LightningBot %s Help\nAmount of Commands: %d, <> is required, [] is optional\n", constants.VERSION, len(cmdRouter.GetCmds()))
 
 	if cfg.Selfbot.CommandMode == "WebhookEmbed" {
 		emb.Description += "\n\n**Categories**\n" + categoriesString
@@ -248,36 +238,37 @@ func renderDefaultGeneralHelpEmbed(router *dgc.Router) *embed.Embed {
 	return emb
 }
 
-func (c *HelpCommand) search(ctx *router.Ctx) {
-	query := utils.Arguments["<query>"]
-	prefix := ctx.Router.GetPrefixes()[0]
+func (c *HelpCommands) search(ctx *router.Ctx) {
+	query := ctx.Arguments.Get(0).Raw()
+	prefix := ctx.Router.GetConfig().PrefixFunc()[0]
+
 	var closeCommands []string
-	for _, command := range ctx.Router.Commands {
+	for _, command := range ctx.Router.GetCmds() {
 		if len(closeCommands) >= 10 {
 			break
 		}
 		distance := utils.Misc.GetDistance(command.Name, query)
 		if distance < 2 || strings.Contains(command.Name, query) {
-			closeCommands = append(closeCommands, strings.ReplaceAll(command.Usage, "[p]", prefix)+" - "+command.Description)
+			closeCommands = append(closeCommands, prefix+command.Name+" "+command.Arguments+" - "+command.Description)
 		}
 	}
+
 	if len(closeCommands) == 0 {
 		c.services.Embed.NewEmbed().
 			SetDescription("No commands found for query `%s`", query).
 			Send(ctx)
 		return
 	}
+
 	c.services.Embed.NewEmbed().
 		SetDescription("Found %d commands for query `%s`", len(closeCommands), query).
 		AddField("Commands", strings.Join(closeCommands, "\n"), true, true).
 		Send(ctx)
 }
 
-func (c *HelpCommand) repeat(ctx *router.Ctx) {
-	eventreactions.UsedCommands.Mutex.Lock()
-	defer eventreactions.UsedCommands.Mutex.Unlock()
+func (c *HelpCommands) repeat(ctx *router.Ctx) {
+	usedCommands := c.services.EventReactions.GetUsedCommands()
 
-	usedCommands := eventreactions.UsedCommands.Items
 	if len(usedCommands) < 2 {
 		c.services.Embed.NewEmbed().
 			SetDescription("No commands have been used yet").
@@ -287,31 +278,13 @@ func (c *HelpCommand) repeat(ctx *router.Ctx) {
 
 	lastCommand := usedCommands[len(usedCommands)-2]
 
-	// Restore arguments
-	arguments, ok := utils.Discord.GetArguments(lastCommand)
-	if !ok {
+	channel, err := ctx.Session.State.Channel(ctx.Message.ChannelID)
+	if err != nil {
+		c.services.Embed.NewEmbed().
+			SetDescription("Failed to get channel: %s", err.Error()).
+			Send(ctx)
 		return
 	}
 
-	utils.Arguments = arguments
-
-	// Invoke the last command
-	go lastCommand.Command.Handler(&router.Ctx{
-		Session:       ctx.Session,
-		Event:         ctx.Message,
-		Arguments:     lastCommand.Arguments,
-		CustomObjects: lastCommand.CustomObjects,
-		Router:        ctx.Router,
-		Command:       lastCommand.Command,
-	})
-}
-
-type HelpCommands struct{ services *services.Services }
-
-func NewHelpCommands(s *services.Services) *HelpCommands {
-	return &HelpCommands{services: s}
-}
-func (c *HelpCommands) Register() {
-	cmdRouter := c.services.Discord.GetRouter()
-
+	ctx.Router.InvokeRemoteCmd(ctx.Session, channel, ctx.Message.Author, lastCommand.Command, lastCommand.Arguments.Raw())
 }
