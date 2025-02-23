@@ -10,6 +10,7 @@ import (
 
 	"github.com/LightningDev1/LB-Selfbot/internal/constants"
 	"github.com/LightningDev1/LB-Selfbot/internal/router"
+	"github.com/LightningDev1/LB-Selfbot/internal/system"
 
 	"github.com/LightningDev1/LB-Selfbot/internal/config"
 	"github.com/LightningDev1/LB-Selfbot/internal/services/interfaces"
@@ -231,7 +232,7 @@ func (d *DiscordServiceImpl) Open() error {
 			os.Exit(1)
 		}
 
-		_ = utils.System.Restart()
+		_ = system.RestartExecution()
 
 		return err
 	}

@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/LightningDev1/LB-Selfbot/internal/services/interfaces"
+	"github.com/LightningDev1/LB-Selfbot/internal/system"
 	"github.com/LightningDev1/LB-Selfbot/internal/utils"
 	"github.com/LightningDev1/discordgo"
 	"github.com/LightningDev1/discordgo/protos"
@@ -141,7 +142,7 @@ func (b *BackupServiceImpl) SaveBackup(bType, bName string, data any) error {
 		return err
 	}
 
-	return utils.System.OpenURL(filePath)
+	return system.OpenURL(filePath)
 }
 
 // LoadBackup restores a backup from a file.

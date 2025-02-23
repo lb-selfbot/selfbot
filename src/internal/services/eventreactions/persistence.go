@@ -29,7 +29,7 @@ func (e *EventReactionsServiceImpl) startLoading() {
 			e.uiSvc.LogError("Failed to load event reactions:", err)
 		}
 
-		if err := e.loadCmdAliases(); err != nil {
+		if err := e.LoadCmdAliases(); err != nil {
 			e.uiSvc.LogError("Failed to load command aliases:", err)
 		}
 
@@ -105,6 +105,7 @@ func (e *EventReactionsServiceImpl) constructDefaultReactions() []interfaces.Eve
 func (e *EventReactionsServiceImpl) constructReaction(reactionCfg eventReactionConfig) (interfaces.EventReaction, error) {
 	session := e.discordSvc.GetSession()
 
+	// TODO: Constructors
 	switch reactionCfg.Type {
 	// Default reactions
 	case interfaces.EventReactionSnipers:
@@ -142,7 +143,7 @@ func (e *EventReactionsServiceImpl) saveEventReactions() error {
 	return cfg.Save()
 }
 
-func (e *EventReactionsServiceImpl) loadCmdAliases() error {
+func (e *EventReactionsServiceImpl) LoadCmdAliases() error {
 	cfg, err := config.GetConfig()
 	if err != nil {
 		return err

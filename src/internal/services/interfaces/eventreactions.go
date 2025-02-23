@@ -114,8 +114,11 @@ type EventReactionsService interface {
 	IsReactionMessage(message *discordgo.Message) bool
 	HandleReactionMessage(message *discordgo.Message, err error)
 
+	LoadCmdAliases() error
+
 	GetPinSpamMessages() []*discordgo.Message
 	AddPinSpamMessage(message *discordgo.Message)
+	RemovePinSpamMessages()
 
 	GetEditedMessages(channelID string) []*discordgo.MessageUpdate
 	GetDeletedMessages(channelID string) []*discordgo.Message

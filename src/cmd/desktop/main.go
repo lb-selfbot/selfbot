@@ -26,6 +26,7 @@ import (
 	"github.com/LightningDev1/LB-Selfbot/internal/services/interfaces"
 	"github.com/LightningDev1/LB-Selfbot/internal/services/ui"
 	"github.com/LightningDev1/LB-Selfbot/internal/setup"
+	"github.com/LightningDev1/LB-Selfbot/internal/system"
 	"github.com/LightningDev1/LB-Selfbot/internal/utils"
 	"github.com/LightningDev1/discordgo"
 )
@@ -82,7 +83,7 @@ func checkForUpdates(services *services.Services) {
 
 	time.Sleep(3 * time.Second)
 
-	_ = utils.System.OpenURL(downloadUrl)
+	_ = system.OpenURL(downloadUrl)
 
 	// Wait for user to press enter
 	_, _ = fmt.Scanln()
@@ -187,7 +188,7 @@ func main() {
 		return
 
 	case *openFolder:
-		_ = utils.System.OpenURL(utils.IO.GetMainFolder())
+		_ = system.OpenURL(utils.IO.GetMainFolder())
 		return
 
 	case *runWebLogin:

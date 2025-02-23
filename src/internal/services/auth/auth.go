@@ -16,7 +16,7 @@ import (
 	"github.com/LightningDev1/LB-Selfbot/internal/random"
 	"github.com/LightningDev1/LB-Selfbot/internal/services/interfaces"
 	"github.com/LightningDev1/LB-Selfbot/internal/setup"
-	"github.com/LightningDev1/LB-Selfbot/internal/utils"
+	"github.com/LightningDev1/LB-Selfbot/internal/system"
 	"github.com/gorilla/websocket"
 )
 
@@ -286,7 +286,7 @@ func (a *AuthServiceImpl) logError(err error, code int) {
 			os.Exit(1)
 		}
 
-		_ = utils.System.Restart()
+		_ = system.RestartExecution()
 	case 3011:
 		a.uiSvc.LogError("Your free trial has expired! Please purchase a license key to continue using LightningBot.")
 	case 3003:

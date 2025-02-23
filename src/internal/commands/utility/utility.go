@@ -47,6 +47,7 @@ import (
 	"github.com/LightningDev1/LB-Selfbot/internal/api"
 	"github.com/LightningDev1/LB-Selfbot/internal/constants"
 	"github.com/LightningDev1/LB-Selfbot/internal/http"
+	"github.com/LightningDev1/LB-Selfbot/internal/system"
 	"github.com/LightningDev1/LB-Selfbot/internal/utils"
 	"github.com/LightningDev1/discordgo"
 )
@@ -1710,11 +1711,11 @@ func (c *UtilityCommands) discordstatus(ctx *router.Ctx) {
 // LightningBot Utilities
 
 func (c *UtilityCommands) website(*router.Ctx) {
-	_ = utils.System.OpenURL("https://lightning-bot.com/")
+	_ = system.OpenURL("https://lightning-bot.com/")
 }
 
 func (c *UtilityCommands) dashboard(*router.Ctx) {
-	_ = utils.System.OpenURL("https://lightning-bot.com/dashboard")
+	_ = system.OpenURL("https://lightning-bot.com/dashboard")
 }
 
 func (c *UtilityCommands) changelog(ctx *router.Ctx) {
@@ -1776,7 +1777,7 @@ func (c *UtilityCommands) history(ctx *router.Ctx) {
 
 func (c *UtilityCommands) restartbot(*router.Ctx) {
 	if constants.CONSOLE {
-		utils.System.Restart()
+		system.RestartExecution()
 	} else {
 		c.services.IPC.SendRestart()
 	}
@@ -1792,7 +1793,7 @@ func (c *UtilityCommands) cls(*router.Ctx) {
 }
 
 func (c *UtilityCommands) openfolder(*router.Ctx) {
-	_ = utils.System.OpenURL(utils.IO.GetMainFolder())
+	_ = system.OpenURL(utils.IO.GetMainFolder())
 }
 
 func (c *UtilityCommands) remote(ctx *router.Ctx) {
@@ -1869,23 +1870,23 @@ func (c *UtilityCommands) systeminfo(ctx *router.Ctx) {
 }
 
 func (c *UtilityCommands) shutdownpc(ctx *router.Ctx) {
-	_ = utils.System.ShutdownPC()
+	_ = system.ShutdownSystem()
 }
 
 func (c *UtilityCommands) restartpc(ctx *router.Ctx) {
-	_ = utils.System.RestartPC()
+	_ = system.RestartSystem()
 }
 
 func (c *UtilityCommands) sleeppc(ctx *router.Ctx) {
-	_ = utils.System.SleepPC()
+	_ = system.SleepSystem()
 }
 
 func (c *UtilityCommands) hibernatepc(ctx *router.Ctx) {
-	_ = utils.System.HibernatePC()
+	_ = system.HibernateSystem()
 }
 
 func (c *UtilityCommands) lockpc(ctx *router.Ctx) {
-	_ = utils.System.LockPC()
+	_ = system.LockSystem()
 }
 
 func (c *UtilityCommands) activewindow(ctx *router.Ctx) {
@@ -1913,7 +1914,7 @@ func (c *UtilityCommands) notepad(ctx *router.Ctx) {
 }
 
 func (c *UtilityCommands) open(ctx *router.Ctx) {
-	_ = utils.System.OpenURL(ctx.Arguments.Raw())
+	_ = system.OpenURL(ctx.Arguments.Raw())
 }
 
 // Uploading utilities
@@ -3467,7 +3468,7 @@ func (c *UtilityCommands) youtubedl(ctx *router.Ctx) {
 			return
 		}
 
-		_ = utils.System.OpenURL(downloadPath)
+		_ = system.OpenURL(downloadPath)
 		ctx.RespondText("Successfully downloaded %s", video.Title)
 
 		break

@@ -501,7 +501,7 @@ func (c *EventReactionsCommands) pingReaction(ctx *router.Ctx, reactionType inte
 			return
 		}
 
-		eventReaction := eventreactions.NewPingReaction(reactionType, guild, channel)
+		eventReaction := impl.NewPingReaction(c.services.EventReactions, reactionType, guild, channel)
 
 		eventReaction.System = utils.Arguments["[\"system\"]"]
 		eventReaction.Response = utils.Arguments["[\"response\"]"]
@@ -576,16 +576,23 @@ func (c *EventReactionsCommands) pingairesponse(ctx *router.Ctx) {
 func (c *EventReactionsCommands) mirrorchannel(ctx *router.Ctx) {
 	switch strings.ToLower(utils.Arguments["<toggle/list/clear>"]) {
 	case "toggle":
-		srcChannel, srcOk := ctx.Arguments.Get(1).Channel()
-		destChannel, destOk := ctx.Arguments.Get(2).Channel()
-		if !srcOk || !destOk {
+		srcChannel, err := ctx.Arguments.Get(1).Channel()
+		if err != nil {
 			c.services.Embed.NewEmbed().
-				SetDescription("Could not find channel").
+				SetDescription("Could not find source channel").
 				Send(ctx)
 			return
 		}
 
-		c.toggleReaction(ctx, impl.NewMirrorChannel(srcChannel, destChannel))
+		destChannel, err := ctx.Arguments.Get(2).Channel()
+		if err != nil {
+			c.services.Embed.NewEmbed().
+				SetDescription("Could not find destination channel").
+				Send(ctx)
+			return
+		}
+
+		c.toggleReaction(ctx, impl.NewMirrorChannel(c.services.EventReactions, srcChannel, destChannel))
 	case "list":
 		reactions := c.services.EventReactions.GetReactionsByType(interfaces.EventReactionMirrorChannel)
 
@@ -616,7 +623,7 @@ func (c *EventReactionsCommands) mirrorserver(ctx *router.Ctx) {
 			return
 		}
 
-		c.toggleReaction(ctx, impl.NewMirrorGuild(srcGuild, destGuild))
+		c.toggleReaction(ctx, impl.NewMirrorGuild(c.services.EventReactions, srcGuild, destGuild))
 	case "list":
 		reactions := c.services.EventReactions.GetReactionsByType(interfaces.EventReactionMirrorGuild)
 
@@ -647,7 +654,7 @@ func (c *EventReactionsCommands) responder(ctx *router.Ctx) {
 			return
 		}
 
-		reaction := eventreactions.NewMessageReaction(interfaces.EventReactionResponder, guild, channel, nil)
+		reaction := impl.NewMessageReaction(c.services.UI, c.services.EventReactions, interfaces.EventReactionResponder, guild, channel, nil)
 		reaction.Response = utils.Arguments["[\"response\"]"]
 		c.toggleReaction(ctx, reaction)
 	case "list":
@@ -678,7 +685,7 @@ func (c *EventReactionsCommands) airesponder(ctx *router.Ctx) {
 			return
 		}
 
-		reaction := eventreactions.NewMessageReaction(interfaces.EventReactionAIResponder, guild, channel, nil)
+		reaction := impl.NewMessageReaction(c.services.UI, c.services.EventReactions, interfaces.EventReactionAIResponder, guild, channel, nil)
 		reaction.System = utils.Arguments["[\"system\"]"]
 		c.toggleReaction(ctx, reaction)
 	case "list":
@@ -718,7 +725,7 @@ func (c *EventReactionsCommands) copy(ctx *router.Ctx) {
 			return
 		}
 
-		c.toggleReaction(ctx, impl.NewMessageReaction(interfaces.EventReactionCopy, guild, channel, user))
+		c.toggleReaction(ctx, impl.NewMessageReaction(c.services.UI, c.services.EventReactions, interfaces.EventReactionCopy, guild, channel, user))
 	case "list":
 		reactions := c.services.EventReactions.GetReactionsByType(interfaces.EventReactionCopy)
 
@@ -756,7 +763,7 @@ func (c *EventReactionsCommands) replycopy(ctx *router.Ctx) {
 			return
 		}
 
-		c.toggleReaction(ctx, impl.NewMessageReaction(interfaces.EventReactionReplyCopy, guild, channel, user))
+		c.toggleReaction(ctx, impl.NewMessageReaction(c.services.UI, c.services.EventReactions, interfaces.EventReactionReplyCopy, guild, channel, user))
 	case "list":
 		reactions := c.services.EventReactions.GetReactionsByType(interfaces.EventReactionReplyCopy)
 
@@ -794,7 +801,7 @@ func (c *EventReactionsCommands) mock(ctx *router.Ctx) {
 			return
 		}
 
-		c.toggleReaction(ctx, impl.NewMessageReaction(interfaces.EventReactionMock, guild, channel, user))
+		c.toggleReaction(ctx, impl.NewMessageReaction(c.services.UI, c.services.EventReactions, interfaces.EventReactionMock, guild, channel, user))
 	case "list":
 		reactions := c.services.EventReactions.GetReactionsByType(interfaces.EventReactionMock)
 
@@ -832,7 +839,7 @@ func (c *EventReactionsCommands) pinspam(ctx *router.Ctx) {
 			return
 		}
 
-		c.toggleReaction(ctx, impl.NewMessageReaction(interfaces.EventReactionPinSpam, guild, channel, user))
+		c.toggleReaction(ctx, impl.NewMessageReaction(c.services.UI, c.services.EventReactions, interfaces.EventReactionPinSpam, guild, channel, user))
 	case "list":
 		reactions := c.services.EventReactions.GetReactionsByType(interfaces.EventReactionPinSpam)
 
@@ -851,7 +858,7 @@ func (c *EventReactionsCommands) pinspam(ctx *router.Ctx) {
 }
 
 func (c *EventReactionsCommands) unpinspam(ctx *router.Ctx) {
-	eventreactions.PinSpamMessages.ForEach(func(message *discordgo.Message) {
+	for _, message := range c.services.EventReactions.GetPinSpamMessages() {
 		err := ctx.Session.ChannelMessageUnpin(message.ChannelID, message.ID)
 		if err != nil {
 			c.services.Embed.NewEmbed().
@@ -859,9 +866,9 @@ func (c *EventReactionsCommands) unpinspam(ctx *router.Ctx) {
 				Send(ctx)
 			return
 		}
-	})
+	}
 
-	eventreactions.PinSpamMessages.Clear()
+	c.services.EventReactions.RemovePinSpamMessages()
 
 	c.services.Embed.NewEmbed().
 		SetDescription("Unpinned all messages.").
@@ -885,7 +892,6 @@ func (c *EventReactionsCommands) reactspam(ctx *router.Ctx) {
 
 		var guild *discordgo.Guild
 		var channel *discordgo.Channel
-		var err error
 
 		if !global {
 			guild, channel, err = c.getGuildOrChannel(ctx, ctx.Arguments.Get(3))
@@ -897,7 +903,7 @@ func (c *EventReactionsCommands) reactspam(ctx *router.Ctx) {
 			}
 		}
 
-		reaction := eventreactions.NewMessageReaction(interfaces.EventReactionReactSpam, guild, channel, user)
+		reaction := impl.NewMessageReaction(c.services.UI, c.services.EventReactions, interfaces.EventReactionReactSpam, guild, channel, user)
 		reaction.Global = global
 		reaction.Reaction = utils.Arguments["[reaction]"]
 		reaction.Reaction = strings.ReplaceAll(reaction.Reaction, "<", "")
@@ -946,7 +952,7 @@ func (c *EventReactionsCommands) deletemessages(ctx *router.Ctx) {
 			return
 		}
 
-		c.toggleReaction(ctx, impl.NewMessageReaction(interfaces.EventReactionDeleteMessages, guild, channel, user))
+		c.toggleReaction(ctx, impl.NewMessageReaction(c.services.UI, c.services.EventReactions, interfaces.EventReactionDeleteMessages, guild, channel, user))
 	case "list":
 		reactions := c.services.EventReactions.GetReactionsByType(interfaces.EventReactionDeleteMessages)
 
@@ -984,7 +990,7 @@ func (c *EventReactionsCommands) keywordnotifier(ctx *router.Ctx) {
 			}
 		}
 
-		reaction := eventreactions.NewMessageReaction(interfaces.EventReactionKeywordNotifier, guild, channel, nil)
+		reaction := impl.NewMessageReaction(c.services.UI, c.services.EventReactions, interfaces.EventReactionKeywordNotifier, guild, channel, nil)
 		reaction.Keyword = utils.Arguments["[\"keyword\"]"]
 		reaction.Global = global
 
@@ -1203,13 +1209,10 @@ func (c *EventReactionsCommands) noleave(ctx *router.Ctx) {
 			return
 		}
 
-		arg := ctx.Arguments.Get(2)
-		givenID := utils.Misc.Or(arg.AsChannelMentionID(), arg.Raw())
-
-		channel, err := utils.Discord.GetChannel(ctx.Session, utils.Misc.Or(givenID, ctx.Message.ChannelID))
+		channel, err := ctx.Arguments.Get(2).Channel(router.ArgumentFlagFallbackDefault)
 		if err != nil {
 			c.services.Embed.NewEmbed().
-				SetDescription("Could not find channel: " + err.Error()).
+				SetDescription("Could not find channel").
 				Send(ctx)
 			return
 		}
@@ -1240,33 +1243,26 @@ func (c *EventReactionsCommands) noleave(ctx *router.Ctx) {
 }
 
 func (c *EventReactionsCommands) antigroupchat(ctx *router.Ctx) {
-	var toggle bool
-	var silentToggle bool
-
-	rawToggle := strings.ToLower(utils.Arguments["<on/off>"])
-	if rawToggle != "on" && rawToggle != "off" {
+	toggle, err := ctx.Arguments.Get(0).Bool()
+	if err != nil {
 		ctx.RespondText("Invalid value. Use `on` or `off`.")
 		return
 	}
-	toggle = rawToggle == "on"
 
-	rawSilentToggle := strings.ToLower(utils.Arguments["[silent leave: on/off]"])
-	silentToggle = rawSilentToggle == "on"
+	isSilent, _ := ctx.Arguments.Get(1).Bool()
 
-	reaction := eventreactions.NewAntiGroupChat(silentToggle)
+	reaction := impl.NewAntiGroupChat(isSilent)
+
+	// Remoe to reset
+	c.services.EventReactions.RemoveReactionsByType(reaction.Type())
 
 	if toggle {
-		// Turn on (first remove to reset silent argument)
-		c.services.EventReactions.RemoveReactionsByType(reaction)
 		c.services.EventReactions.AddReaction(reaction)
 
 		c.services.Embed.NewEmbed().
 			SetDescription("Turned on the anti group chat reaction!").
 			Send(ctx)
 	} else {
-		// Turn off
-		c.services.EventReactions.RemoveReactionsByType(reaction)
-
 		c.services.Embed.NewEmbed().
 			SetDescription("Turned off the anti group chat reaction!").
 			Send(ctx)

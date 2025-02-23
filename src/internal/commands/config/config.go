@@ -977,7 +977,7 @@ func (c *ConfigCommands) aliases(ctx *router.Ctx) {
 		cfg.Selfbot.CommandAliases[alias] = cmd
 		_ = cfg.Save()
 
-		_ = eventreactions.LoadAliases(ctx.Router)
+		c.services.EventReactions.LoadCmdAliases()
 
 		c.services.Embed.NewEmbed().
 			SetDescription("Added alias `%s` for command `%s`.", alias, cmd).
@@ -994,7 +994,7 @@ func (c *ConfigCommands) aliases(ctx *router.Ctx) {
 		delete(cfg.Selfbot.CommandAliases, alias)
 		_ = cfg.Save()
 
-		_ = eventreactions.LoadAliases(ctx.Router)
+		c.services.EventReactions.LoadCmdAliases()
 
 		c.services.Embed.NewEmbed().
 			SetDescription("Removed alias `%s` for command `%s`.", alias, cmd).
@@ -1003,7 +1003,7 @@ func (c *ConfigCommands) aliases(ctx *router.Ctx) {
 		cfg.Selfbot.CommandAliases = make(map[string]string)
 		_ = cfg.Save()
 
-		_ = eventreactions.LoadAliases(ctx.Router)
+		c.services.EventReactions.LoadCmdAliases()
 
 		c.services.Embed.NewEmbed().
 			SetDescription("Cleared all aliases.").
@@ -1046,7 +1046,7 @@ func (c *ConfigCommands) notifications(ctx *router.Ctx) {
 			SetDescription("Turned " + utils.Misc.FormatBoolOnOff(cfg.Notifications.Enabled) + " notifications").
 			Send(ctx)
 	case "example":
-		logging.UI.Notification("This is an example notification.")
+		c.services.UI.ShowNotification("This is an example notification.")
 
 		c.services.Embed.NewEmbed().
 			SetDescription("Sent an example notification.").

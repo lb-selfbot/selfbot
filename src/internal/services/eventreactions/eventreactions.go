@@ -141,6 +141,8 @@ func (e *EventReactionsServiceImpl) AddReaction(r interfaces.EventReaction) {
 	defer e.reactionsMu.Unlock()
 
 	e.reactions = append(e.reactions, r)
+
+	_ = e.saveEventReactions()
 }
 
 func (e *EventReactionsServiceImpl) RemoveReaction(r interfaces.EventReaction) {
@@ -150,6 +152,8 @@ func (e *EventReactionsServiceImpl) RemoveReaction(r interfaces.EventReaction) {
 	e.reactions = utils.Filter(e.reactions, func(rr interfaces.EventReaction) bool {
 		return !rr.Equals(r)
 	})
+
+	_ = e.saveEventReactions()
 }
 
 func (e *EventReactionsServiceImpl) RemoveAllReactions() {
@@ -157,6 +161,8 @@ func (e *EventReactionsServiceImpl) RemoveAllReactions() {
 	defer e.reactionsMu.Unlock()
 
 	e.reactions = e.constructDefaultReactions()
+
+	_ = e.saveEventReactions()
 }
 
 func (e *EventReactionsServiceImpl) RemoveReactionsByType(t interfaces.EventReactionType) {
@@ -166,6 +172,8 @@ func (e *EventReactionsServiceImpl) RemoveReactionsByType(t interfaces.EventReac
 	e.reactions = utils.Filter(e.reactions, func(r interfaces.EventReaction) bool {
 		return r.Type() != t
 	})
+
+	_ = e.saveEventReactions()
 }
 
 func (e *EventReactionsServiceImpl) IsReactionMessage(message *discordgo.Message) bool {
@@ -201,6 +209,13 @@ func (e *EventReactionsServiceImpl) AddPinSpamMessage(message *discordgo.Message
 	defer e.pinSpamMsgsMu.Unlock()
 
 	e.pinSpamMsgs = append(e.pinSpamMsgs, message)
+}
+
+func (e *EventReactionsServiceImpl) RemovePinSpamMessages() {
+	e.pinSpamMsgsMu.Lock()
+	defer e.pinSpamMsgsMu.Unlock()
+
+	e.pinSpamMsgs = []*discordgo.Message{}
 }
 
 func (e *EventReactionsServiceImpl) GetEditedMessages(channelID string) []*discordgo.MessageUpdate {
