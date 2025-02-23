@@ -24,7 +24,6 @@ import (
 	"github.com/LightningDev1/LB-Selfbot/internal/savedtokens"
 	"github.com/LightningDev1/LB-Selfbot/internal/services"
 	"github.com/LightningDev1/LB-Selfbot/internal/services/interfaces"
-	"github.com/LightningDev1/LB-Selfbot/internal/services/ui"
 	"github.com/LightningDev1/LB-Selfbot/internal/setup"
 	"github.com/LightningDev1/LB-Selfbot/internal/system"
 	"github.com/LightningDev1/LB-Selfbot/internal/utils"
@@ -91,7 +90,7 @@ func checkForUpdates(services *services.Services) {
 	os.Exit(0)
 }
 
-func checkFirstLaunch(servies *services.Services) {
+func checkFirstLaunch(services *services.Services) {
 	if !utils.IO.IsFirstLaunch() {
 		return
 	}
@@ -100,8 +99,8 @@ func checkFirstLaunch(servies *services.Services) {
 
 	username, password := setup.GetLogin()
 
-	servies.UI.ClearConsole()
-	servies.UI.ShowBanner(ui.BannerConsole)
+	services.UI.ClearConsole()
+	services.UI.ShowBanner()
 
 	token := setup.GetToken()
 
@@ -244,7 +243,7 @@ func main() {
 
 	if constants.CONSOLE {
 		_ = services.UI.ClearConsole()
-		_ = services.UI.ShowBanner(ui.BannerConsole)
+		services.UI.ShowBanner()
 
 		checkForUpdates(services)
 		checkFirstLaunch(services)

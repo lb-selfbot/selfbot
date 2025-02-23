@@ -385,22 +385,22 @@ type configCommandData struct {
 	ValuesFunc func() []any
 }
 
-type configCommandDataList struct {
-	Name         string
-	ReadableName string
+// type configCommandDataList struct {
+// 	Name         string
+// 	ReadableName string
 
-	GetDesc string
-	GetFunc func(ctx *router.Ctx) ([]any, error)
+// 	GetDesc string
+// 	GetFunc func(ctx *router.Ctx) ([]any, error)
 
-	AddDesc string
-	AddFunc func(ctx *router.Ctx, value any) error
+// 	AddDesc string
+// 	AddFunc func(ctx *router.Ctx, value any) error
 
-	RmDesc string
-	RmFunc func(ctx *router.Ctx, value any) error
+// 	RmDesc string
+// 	RmFunc func(ctx *router.Ctx, value any) error
 
-	ClearDesc string
-	ClearFunc func(ctx *router.Ctx) error
-}
+// 	ClearDesc string
+// 	ClearFunc func(ctx *router.Ctx) error
+// }
 
 func (c *ConfigCommands) createConfigActionCommand(data configCommandData) *router.Command {
 	subCommands := []*router.Command{}
@@ -419,7 +419,7 @@ func (c *ConfigCommands) createConfigActionCommand(data configCommandData) *rout
 				value := data.GetFunc(&cfg)
 
 				c.services.Embed.NewEmbed().
-					SetDescription("%s is currently set to: %v", data.Name, value).
+					SetDescription("%s is currently set to: %v", data.ReadableName, value).
 					Send(ctx)
 			},
 		})
@@ -458,7 +458,7 @@ func (c *ConfigCommands) createConfigActionCommand(data configCommandData) *rout
 				}
 
 				c.services.Embed.NewEmbed().
-					SetDescription("%s set to %v", data.Name, value).
+					SetDescription("%s set to %v", data.ReadableName, value).
 					Send(ctx)
 			},
 		})
@@ -483,7 +483,7 @@ func (c *ConfigCommands) createConfigActionCommand(data configCommandData) *rout
 				}
 
 				c.services.Embed.NewEmbed().
-					SetDescription("%s toggled", data.Name).
+					SetDescription("%s toggled", data.ReadableName).
 					Send(ctx)
 			},
 		})

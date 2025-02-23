@@ -137,18 +137,20 @@ func (d *DiscordServiceImpl) Init(token string, verbose bool) error {
 			}
 
 			if cfg.Selfbot.DeleteCommands && ctx.Message.ID != "0" {
-				go ctx.Session.ChannelMessageDelete(ctx.Message.ChannelID, ctx.Message.ID)
+				go func() {
+					ctx.Session.ChannelMessageDelete(ctx.Message.ChannelID, ctx.Message.ID)
+				}()
 			}
+
+			d.authSvc.CheckNonce()
+
+			following(ctx)
 
 			if ctx.Command.Name != "repeat" {
 				d.eventReactionsSvc.AddUsedCommand(ctx)
 			}
 
 			d.uiSvc.LogCmdUsed(ctx.Command.Name)
-
-			d.authSvc.CheckNonce()
-
-			following(ctx)
 		}
 	})
 

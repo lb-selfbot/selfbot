@@ -19,7 +19,7 @@ const (
 type IPCServiceImpl struct {
 	upgrader *websocket.Upgrader
 	conn     *websocket.Conn
-	mu       sync.RWMutex
+	mu       sync.Mutex
 
 	connectChan chan struct{}
 
@@ -34,7 +34,9 @@ func (i *IPCServiceImpl) Serve() error {
 
 	mux := http.NewServeMux()
 	mux.HandleFunc("/", i.handleRequest)
-	go log.Fatal(http.ListenAndServe(defaultIPCAddr, mux))
+	go func() {
+		log.Fatal(http.ListenAndServe(defaultIPCAddr, mux))
+	}()
 
 	return nil
 }
@@ -57,12 +59,14 @@ func (i *IPCServiceImpl) handleRequest(w http.ResponseWriter, r *http.Request) {
 
 	i.connectChan <- struct{}{}
 
+	if err := i.write(&WSMessage{Op: OpCodeConnected}); err != nil {
+		return
+	}
+
 	for {
 		message := &WSMessage{}
 
-		i.mu.RLock()
 		err = i.conn.ReadJSON(message)
-		i.mu.RUnlock()
 
 		if err != nil {
 			break

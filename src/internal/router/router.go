@@ -4,6 +4,7 @@ import (
 	"regexp"
 	"strings"
 
+	"github.com/LightningDev1/LB-Selfbot/internal/utils2"
 	"github.com/LightningDev1/discordgo"
 )
 
@@ -186,12 +187,21 @@ func (r *router) triggerCommand(ctx *Ctx) {
 		return
 	}
 
-	nextHandler := ctx.Command.Handler
-	for _, middleware := range r.middlewares {
-		nextHandler = middleware(nextHandler)
+	handler := ctx.Command.Handler
+	if handler == nil {
+		subCmdsReadable := utils2.Map(ctx.Command.SubCommands, func(subCmd *Command) string {
+			return subCmd.Name
+		})
+
+		ctx.RespondText("You must provide a subcommand for [p]%s! The available subcommands are: %s", ctx.Command.Name, strings.Join(subCmdsReadable, ", "))
+		return
 	}
 
-	nextHandler(ctx)
+	for _, middleware := range r.middlewares {
+		handler = middleware(handler)
+	}
+
+	handler(ctx)
 }
 
 func (r *router) triggerSubCommand(ctx *Ctx) bool {

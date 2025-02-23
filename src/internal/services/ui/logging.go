@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/LightningDev1/LB-Selfbot/internal/config"
+	"github.com/LightningDev1/LB-Selfbot/internal/constants"
 	"github.com/LightningDev1/LB-Selfbot/internal/utils"
 	"github.com/LightningDev1/discordgo"
 )
@@ -35,11 +36,18 @@ func (ui *UIServiceImpl) LogReady(event *discordgo.Ready, numCmds int) {
 
 	userText := event.User.DisplayName + " | " + event.User.Username
 
-	bannerTextUpper := fmt.Sprintf("LightningBot %s | %s | Prefix: %s", "VERSION", userText, cfg.Selfbot.CommandPrefix)
+	bannerTextUpper := fmt.Sprintf("LightningBot %s | %s | Prefix: %s", constants.VERSION, userText, cfg.Selfbot.CommandPrefix)
 	bannerTextLower := fmt.Sprintf("%d Commands | %d Servers | %d Friends", numCmds, len(event.Guilds), len(friends))
 
 	upper := ui.ANSIColored(bannerTextUpper, 0, 203, 255, false)
 	lower := ui.ANSIColored(bannerTextLower, 0, 203, 255, false)
+
+	if constants.CONSOLE {
+		upper := ui.ANSIColored(utils.String.Center(bannerTextUpper), 0, 203, 255, false)
+		lower := ui.ANSIColored(utils.String.Center(bannerTextLower), 0, 203, 255, false)
+
+		fmt.Println(upper + "\n" + lower + "\n")
+	}
 
 	ui.SetConsole("ALIGN_CENTER" + upper + "\nALIGN_CENTER" + lower + "\n")
 }

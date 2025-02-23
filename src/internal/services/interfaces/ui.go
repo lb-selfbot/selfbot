@@ -70,7 +70,7 @@ type UIService interface {
 	Inject(authSvc AuthService, ipcSvc IPCService, discordSvc DiscordService, embedSvc EmbedService)
 
 	ANSIColored(text string, r, g, b int, bold bool) string
-	ShowBanner(flags int) error
+	ShowBanner()
 	ShowNotification(format string, e ...any) error
 
 	LogError(format string, e ...any)

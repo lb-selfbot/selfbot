@@ -2,9 +2,7 @@ package tui
 
 import (
 	"os"
-	"time"
 
-	"github.com/LightningDev1/LB-Selfbot/internal/logging"
 	"github.com/charmbracelet/lipgloss"
 	"golang.org/x/term"
 )
@@ -47,7 +45,8 @@ func IsSupported() bool {
 }
 
 func reset() {
-	time.Sleep(time.Millisecond * 500)
-	logging.Console.Clear()
-	logging.Console.PrintBanner()
+	// TODO: Reset the terminal
+	// time.Sleep(time.Millisecond * 500)
+	// logging.Console.Clear()
+	// logging.Console.PrintBanner()
 }

@@ -6,7 +6,6 @@ toolchain go1.23.3
 
 require (
 	github.com/LightningDev1/beeep v0.1.0
-	github.com/LightningDev1/chromiumdp v0.0.0-20231128154929-66ef7c9d7fb7
 	github.com/LightningDev1/discordgo v0.26.6-0.20241102192552-62b3fe3be1f7
 	github.com/LightningDev1/go-foreground v0.0.0-20240212172534-661cc0000e42
 	github.com/LightningDev1/go-privnote v0.1.1

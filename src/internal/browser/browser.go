@@ -3,7 +3,7 @@ package browser
 import (
 	"context"
 
-	chromedp "github.com/LightningDev1/chromiumdp"
+	"github.com/chromedp/chromedp"
 )
 
 // Browser is used to interact with a browser

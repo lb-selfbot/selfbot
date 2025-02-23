@@ -53,7 +53,7 @@ func (s *Services) register() {
 	s.O11y = &o11y.O11yServiceImpl{}
 	s.Discord = &discord.DiscordServiceImpl{}
 	s.Embed = &embed.EmbedServiceImpl{}
-	s.EventReactions = &eventreactions.EventReactionsServiceImpl{}
+	s.EventReactions = eventreactions.NewEventReactionsServiceImpl()
 	s.Extensions = &extensions.ExtensionsServiceImpl{}
 	s.Backup = &backup.BackupServiceImpl{}
 	s.MultiTokenSniper = &multitokensniper.MultiTokenSniperServiceImpl{}

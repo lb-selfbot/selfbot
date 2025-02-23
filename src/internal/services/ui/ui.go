@@ -37,21 +37,12 @@ func (*UIServiceImpl) ANSIColored(text string, r, g, b int, bold bool) string {
 	return fmt.Sprintf("\033[38;2;%d;%d;%d%sm%s\033[0m", r, g, b, boldArg, text)
 }
 
-func (ui *UIServiceImpl) ShowBanner(flags int) error {
-	if flags&BannerConsole != 0 {
-		ascii := figure.NewFigure("LightningBot", "stop", true).Slicify()
-		centered := utils.String.CenterSlices(ascii)
-		colored := ui.ANSIColored(centered, 0, 203, 255, true) + "\n\n"
+func (ui *UIServiceImpl) ShowBanner() {
+	ascii := figure.NewFigure("LightningBot", "stop", true).Slicify()
+	centered := utils.String.CenterSlices(ascii)
+	colored := ui.ANSIColored(centered, 0, 203, 255, true) + "\n\n"
 
-		fmt.Println(colored)
-	}
-
-	if flags&BannerUI != 0 {
-		banner := `<image Source="assets/Banner.png" Width="650" Height="150" Centered />`
-		return ui.SetConsole(banner)
-	}
-
-	return nil
+	fmt.Println(colored)
 }
 
 func (ui *UIServiceImpl) ShowNotification(format string, e ...any) error {
@@ -126,6 +117,10 @@ func (ui *UIServiceImpl) AppendConsole(ansi string) error {
 }
 
 func (ui *UIServiceImpl) ClearConsole() error {
+	if constants.CONSOLE {
+		fmt.Print("\033[H\033[2J")
+	}
+
 	if err := ui.ipcSvc.ClearConsole(); err != nil {
 		return err
 	}

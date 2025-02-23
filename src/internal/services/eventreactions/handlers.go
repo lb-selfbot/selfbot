@@ -7,7 +7,6 @@ import (
 	"time"
 
 	"github.com/LightningDev1/LB-Selfbot/internal/config"
-	"github.com/LightningDev1/LB-Selfbot/internal/services/ui"
 	"github.com/LightningDev1/LB-Selfbot/internal/utils"
 	"github.com/LightningDev1/discordgo"
 )
@@ -57,9 +56,12 @@ func (e *EventReactionsServiceImpl) onReady(s *discordgo.Session, r *discordgo.R
 		ticker := time.NewTicker(24 * time.Hour)
 		for range ticker.C {
 			_ = e.uiSvc.ClearConsole()
-			_ = e.uiSvc.ShowBanner(ui.BannerUI)
+			e.uiSvc.ShowBanner()
 		}
 	}()
+
+	router := e.discordSvc.GetRouter()
+	e.uiSvc.LogReady(r, len(router.GetCmds()))
 }
 
 func (e *EventReactionsServiceImpl) onMessageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {

@@ -447,7 +447,7 @@ func (DiscordUtils) MuteUser(session *discordgo.Session, member *discordgo.Membe
 }
 
 func (DiscordUtils) SleepWithTyping(session *discordgo.Session, channelID string, duration time.Duration) {
-	for range int(duration.Seconds()/5) {
+	for range int(duration.Seconds() / 5) {
 		time.Sleep(5 * time.Second)
 		_ = session.ChannelTyping(channelID)
 	}
@@ -455,7 +455,7 @@ func (DiscordUtils) SleepWithTyping(session *discordgo.Session, channelID string
 }
 
 func (DiscordUtils) SleepWithTypingFix(session *discordgo.Session, channelID string, duration time.Duration) {
-	for range int(duration.Seconds()/5) {
+	for range int(duration.Seconds() / 5) {
 		_ = session.ChannelTyping(channelID)
 		time.Sleep(5 * time.Second)
 	}

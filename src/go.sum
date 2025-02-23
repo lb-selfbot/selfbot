@@ -2,8 +2,6 @@ github.com/BurntSushi/xgb v0.0.0-20210121224620-deaf085860bc h1:7D+Bh06CRPCJO3gr
 github.com/BurntSushi/xgb v0.0.0-20210121224620-deaf085860bc/go.mod h1:IVnqGOEym/WlBOVXweHU+Q+/VP0lqqI8lqeDx9IjBqo=
 github.com/LightningDev1/beeep v0.1.0 h1:1IEV1ydGFb+yvBcwkuCPClL8GP/d0BMTJUKLg9vyL/w=
 github.com/LightningDev1/beeep v0.1.0/go.mod h1:EA+kLCP2cK7DHMJpiFXshjYfYCdGvS+OfhcAOA8fuOw=
-github.com/LightningDev1/chromiumdp v0.0.0-20231128154929-66ef7c9d7fb7 h1:gXDRV/LJhn/l03B9GDC1kV+4/+8cSf0QUbrM5I2aN8s=
-github.com/LightningDev1/chromiumdp v0.0.0-20231128154929-66ef7c9d7fb7/go.mod h1:VopOVlKh0+ycTQ7ZnDV3XKkkPCIs5wlWpMx2yJCwuPo=
 github.com/LightningDev1/discordgo v0.26.6-0.20241102192552-62b3fe3be1f7 h1:ovX48TRq9a/9PfNCOWmtlxCtgbJ3ePHI+bQOM1zHCTg=
 github.com/LightningDev1/discordgo v0.26.6-0.20241102192552-62b3fe3be1f7/go.mod h1:PCJMYDd2i60iTRsEYcfftPwsSAlb4If6RhvLTdI3xVU=
 github.com/LightningDev1/go-foreground v0.0.0-20240212172534-661cc0000e42 h1:3nkZh2ygGSuK/+CT0O9IG4Yho7WIO6QgzMwxEcn9xyc=

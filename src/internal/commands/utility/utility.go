@@ -29,7 +29,6 @@ import (
 	"github.com/LightningDev1/LB-Selfbot/internal/random"
 	"github.com/LightningDev1/LB-Selfbot/internal/router"
 	"github.com/LightningDev1/LB-Selfbot/internal/services"
-	"github.com/LightningDev1/LB-Selfbot/internal/services/ui"
 	"github.com/LightningDev1/LB-Selfbot/internal/utils2"
 
 	"github.com/LightningDev1/LB-Selfbot/internal/uploaders/destinations"
@@ -1795,7 +1794,7 @@ func (c *UtilityCommands) stopbot(*router.Ctx) {
 
 func (c *UtilityCommands) cls(*router.Ctx) {
 	c.services.UI.ClearConsole()
-	c.services.UI.ShowBanner(ui.BannerConsole | ui.BannerUI)
+	c.services.UI.ShowBanner()
 }
 
 func (c *UtilityCommands) openfolder(*router.Ctx) {

@@ -51,6 +51,8 @@ var (
 
 // Arguments represents command arguments.
 type Arguments struct {
+	ctx *Ctx
+
 	raw       string
 	arguments []*Argument
 }
@@ -82,6 +84,7 @@ func ParseArguments(ctx *Ctx, raw string) *Arguments {
 	}
 
 	return &Arguments{
+		ctx:       ctx,
 		raw:       raw,
 		arguments: arguments,
 	}
@@ -117,7 +120,7 @@ func (a *Arguments) Amount() int {
 // Get returns the argument at the given index.
 func (a *Arguments) Get(index int) *Argument {
 	if a.Amount() <= index {
-		return nil
+		return &Argument{ctx: a.ctx, raw: ""}
 	}
 	return a.arguments[index]
 }

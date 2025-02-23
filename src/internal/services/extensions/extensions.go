@@ -12,7 +12,6 @@ import (
 	"github.com/LightningDev1/LB-Selfbot/internal/constants"
 	"github.com/LightningDev1/LB-Selfbot/internal/router"
 	"github.com/LightningDev1/LB-Selfbot/internal/services/interfaces"
-	"github.com/LightningDev1/LB-Selfbot/internal/services/ui"
 	"github.com/LightningDev1/LB-Selfbot/internal/utils"
 	"github.com/LightningDev1/discordgo"
 	"github.com/traefik/yaegi/interp"
@@ -35,7 +34,7 @@ func (e *ExtensionsServiceImpl) Inject(uiSvc interfaces.UIService, discordSvc in
 
 func (e *ExtensionsServiceImpl) clearConsole() {
 	e.uiSvc.ClearConsole()
-	e.uiSvc.ShowBanner(ui.BannerUI & ui.BannerConsole)
+	e.uiSvc.ShowBanner()
 }
 
 func (e *ExtensionsServiceImpl) notification(message string) {

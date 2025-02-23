@@ -23,7 +23,7 @@ func NewHelpCommands(s *services.Services) *HelpCommands {
 func (c *HelpCommands) Register() {
 	cmdRouter := c.services.Discord.GetRouter()
 
-	cmds := []router.Command{
+	cmds := []*router.Command{
 		{
 			Name:    "help",
 			Handler: c.generalHelpCommand,
@@ -44,12 +44,17 @@ func (c *HelpCommands) Register() {
 	for _, category := range cmdRouter.GetCategories() {
 		name := strings.ReplaceAll(strings.ToLower(category.Name), " ", "")
 
-		cmds = append(cmds, router.Command{
+		cmds = append(cmds, &router.Command{
 			Name:        name,
 			Description: fmt.Sprintf("Get help for the %s category", category.Name),
 			Handler:     c.generateCategoryHelpFunc(category, name),
 		})
 	}
+
+	cmdRouter.RegisterCategory(&router.Category{
+		Name:        "Help",
+		Description: "Get help for commands",
+	}, cmds)
 
 }
 
@@ -270,14 +275,14 @@ func (c *HelpCommands) search(ctx *router.Ctx) {
 func (c *HelpCommands) repeat(ctx *router.Ctx) {
 	usedCommands := c.services.EventReactions.GetUsedCommands()
 
-	if len(usedCommands) < 2 {
+	if len(usedCommands) < 1 {
 		c.services.Embed.NewEmbed().
 			SetDescription("No commands have been used yet").
 			Send(ctx)
 		return
 	}
 
-	lastCommand := usedCommands[len(usedCommands)-2]
+	lastCommand := usedCommands[len(usedCommands)-1]
 
 	channel, err := ctx.Session.State.Channel(ctx.Message.ChannelID)
 	if err != nil {
