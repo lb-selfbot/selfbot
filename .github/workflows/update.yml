@@ -28,7 +28,6 @@ jobs:
 
           go get -u
           go get github.com/LightningDev1/discordgo@master
-          go get github.com/LightningDev1/dgc@master
           go mod tidy
 
       - name: Push changes

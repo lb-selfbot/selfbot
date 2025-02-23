@@ -158,7 +158,7 @@ func (c *SharingCommands) sharedcategories(ctx *router.Ctx) {
 		entry := utils.Arguments["[category]"]
 
 		var found bool
-		for _, category := range ctx.Router.Categories {
+		for _, category := range ctx.Router.GetCategories() {
 			if !strings.EqualFold(category.Name, entry) {
 				continue
 			}
@@ -188,7 +188,7 @@ func (c *SharingCommands) sharedcategories(ctx *router.Ctx) {
 		entry := utils.Arguments["[category]"]
 
 		var found bool
-		for _, category := range ctx.Router.Categories {
+		for _, category := range ctx.Router.GetCategories() {
 			if !strings.EqualFold(category.Name, entry) {
 				continue
 			}
@@ -224,7 +224,7 @@ func (c *SharingCommands) sharedcategories(ctx *router.Ctx) {
 	case "values":
 		var categories []string
 
-		for _, category := range ctx.Router.Categories {
+		for _, category := range ctx.Router.GetCategories() {
 			categories = append(categories, category.Name)
 		}
 
@@ -282,7 +282,7 @@ func (c *SharingCommands) sharedcommands(ctx *router.Ctx) {
 		entry := utils.Arguments["[command]"]
 
 		var found bool
-		for _, command := range ctx.Router.Commands {
+		for _, command := range ctx.Router.GetCmds() {
 			if !strings.EqualFold(entry, command.Name) {
 				continue
 			}

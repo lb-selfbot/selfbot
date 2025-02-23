@@ -12,7 +12,6 @@ import (
 	"github.com/LightningDev1/LB-Selfbot/internal/services"
 
 	"github.com/LightningDev1/LB-Selfbot/internal/utils"
-	"github.com/LightningDev1/dgc"
 	"github.com/LightningDev1/discordgo"
 )
 
@@ -456,11 +455,6 @@ func (c *ConfigCommands) Register() {
 			Handler:     c.runbotonstartup,
 		},
 	})
-}
-
-func (c *ConfigCommands) RegisterCommands(router *dgc.Router) {
-	router.StartCategory("Config", "Modify the bot's configuration")
-
 }
 
 func (c *ConfigCommands) commandprefix(ctx *router.Ctx) {

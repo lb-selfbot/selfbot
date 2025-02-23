@@ -9,10 +9,10 @@ import (
 	"github.com/LightningDev1/LB-Selfbot/internal/config"
 	"github.com/LightningDev1/LB-Selfbot/internal/router"
 	"github.com/LightningDev1/LB-Selfbot/internal/services"
+	"github.com/LightningDev1/LB-Selfbot/internal/services/eventreactions/impl"
 	"github.com/LightningDev1/LB-Selfbot/internal/services/interfaces"
 	"github.com/LightningDev1/LB-Selfbot/internal/utils"
 
-	"github.com/LightningDev1/dgc"
 	"github.com/LightningDev1/discordgo"
 )
 
@@ -380,8 +380,8 @@ func (c *EventReactionsCommands) mapReactions(ctx *router.Ctx, reactions []inter
 		Send(ctx)
 }
 
-func (c *EventReactionsCommands) getGuildOrChannel(ctx *router.Ctx, arg *dgc.Argument) (guild *discordgo.Guild, channel *discordgo.Channel, err error) {
-	givenID := utils.Misc.Or(arg.AsChannelMentionID(), arg.Raw())
+func (c *EventReactionsCommands) getGuildOrChannel(ctx *router.Ctx, arg *router.Argument) (guild *discordgo.Guild, channel *discordgo.Channel, err error) {
+	givenID := utils.Misc.Or(arg.ChannelMentionID(), arg.Raw())
 
 	if givenID == "" {
 		// Use the current server/channel
@@ -437,13 +437,13 @@ func (c *EventReactionsCommands) ignoreuser(ctx *router.Ctx) {
 			return
 		}
 
-		e.toggleReaction(ctx, eventreactions.NewIgnoreUser(user))
+		c.toggleReaction(ctx, impl.NewIgnoreUser(user))
 	case "list":
-		reactions := eventreactions.GetAll(eventreactions.IGNORE_USER)
+		reactions := c.services.EventReactions.GetReactionsByType(interfaces.EventReactionIgnoreUser)
 
-		e.mapReactions(ctx, reactions, "There are no ignored users.", "Ignored users")
+		c.mapReactions(ctx, reactions, "There are no ignored users.", "Ignored users")
 	case "clear":
-		c.services.EventReactions.RemoveReactionsByTypeAll(eventreactions.IGNORE_USER)
+		c.services.EventReactions.RemoveReactionsByType(interfaces.EventReactionIgnoreUser)
 
 		c.services.Embed.NewEmbed().
 			SetDescription("Cleared all ignored users.").
@@ -470,13 +470,13 @@ func (c *EventReactionsCommands) ignoreserver(ctx *router.Ctx) {
 			return
 		}
 
-		e.toggleReaction(ctx, eventreactions.NewIgnoreGuild(guild))
+		c.toggleReaction(ctx, impl.NewIgnoreGuild(guild))
 	case "list":
-		reactions := eventreactions.GetAll(eventreactions.IGNORE_GUILD)
+		reactions := c.services.EventReactions.GetReactionsByType(interfaces.EventReactionIgnoreGuild)
 
-		e.mapReactions(ctx, reactions, "There are no ignored servers.", "Ignored servers")
+		c.mapReactions(ctx, reactions, "There are no ignored servers.", "Ignored servers")
 	case "clear":
-		c.services.EventReactions.RemoveReactionsByTypeAll(eventreactions.IGNORE_GUILD)
+		c.services.EventReactions.RemoveReactionsByType(interfaces.EventReactionIgnoreGuild)
 
 		c.services.Embed.NewEmbed().
 			SetDescription("Cleared all ignored servers.").
@@ -493,7 +493,7 @@ func (c *EventReactionsCommands) ignoreserver(ctx *router.Ctx) {
 func (c *EventReactionsCommands) pingReaction(ctx *router.Ctx, reactionType interfaces.EventReactionType, reaction string, i int) {
 	switch strings.ToLower(utils.Arguments["<toggle/list/clear>"]) {
 	case "toggle":
-		guild, channel, err := e.getGuildOrChannel(ctx, ctx.Arguments.Get(i))
+		guild, channel, err := c.getGuildOrChannel(ctx, ctx.Arguments.Get(i))
 		if err != nil {
 			c.services.Embed.NewEmbed().
 				SetDescription("Could not find server/channel: " + err.Error()).
@@ -510,20 +510,20 @@ func (c *EventReactionsCommands) pingReaction(ctx *router.Ctx, reactionType inte
 		eventReaction.Reaction = strings.ReplaceAll(eventReaction.Reaction, "<", "")
 		eventReaction.Reaction = strings.ReplaceAll(eventReaction.Reaction, ">", "")
 
-		if eventReaction.Reaction == "" && reactionType == eventreactions.PING_REACT {
+		if eventReaction.Reaction == "" && reactionType == interfaces.EventReactionPingReact {
 			c.services.Embed.NewEmbed().
 				SetDescription("Reaction cannot be empty!").
 				Send(ctx)
 			return
 		}
 
-		e.toggleReaction(ctx, eventReaction)
+		c.toggleReaction(ctx, eventReaction)
 	case "list":
-		reactions := eventreactions.GetAll(reactionType)
+		reactions := c.services.EventReactions.GetReactionsByType(reactionType)
 
-		e.mapReactions(ctx, reactions, fmt.Sprintf("There are no ping --> %s reactions.", reaction), fmt.Sprintf("Ping --> %s reactions", reaction))
+		c.mapReactions(ctx, reactions, fmt.Sprintf("There are no ping --> %s reactions.", reaction), fmt.Sprintf("Ping --> %s reactions", reaction))
 	case "clear":
-		c.services.EventReactions.RemoveReactionsByTypeAll(reactionType)
+		c.services.EventReactions.RemoveReactionsByType(reactionType)
 
 		c.services.Embed.NewEmbed().
 			SetDescription("Cleared all ping --> %s reactions.", reaction).
@@ -536,39 +536,39 @@ func (c *EventReactionsCommands) pingReaction(ctx *router.Ctx, reactionType inte
 }
 
 func (c *EventReactionsCommands) pingping(ctx *router.Ctx) {
-	e.pingReaction(ctx, eventreactions.PING_PING, "ping", 1)
+	c.pingReaction(ctx, interfaces.EventReactionPingPing, "ping", 1)
 }
 
 func (c *EventReactionsCommands) pingkick(ctx *router.Ctx) {
-	e.pingReaction(ctx, eventreactions.PING_KICK, "kick", 1)
+	c.pingReaction(ctx, interfaces.EventReactionPingKick, "kick", 1)
 }
 
 func (c *EventReactionsCommands) pingban(ctx *router.Ctx) {
-	e.pingReaction(ctx, eventreactions.PING_BAN, "ban", 1)
+	c.pingReaction(ctx, interfaces.EventReactionPingBan, "ban", 1)
 }
 
 func (c *EventReactionsCommands) pingmute(ctx *router.Ctx) {
-	e.pingReaction(ctx, eventreactions.PING_MUTE, "mute", 1)
+	c.pingReaction(ctx, interfaces.EventReactionPingMute, "mute", 1)
 }
 
 func (c *EventReactionsCommands) pingtimeout(ctx *router.Ctx) {
-	e.pingReaction(ctx, eventreactions.PING_TIMEOUT, "timeout", 1)
+	c.pingReaction(ctx, interfaces.EventReactionPingTimeout, "timeout", 1)
 }
 
 func (c *EventReactionsCommands) pinginsult(ctx *router.Ctx) {
-	e.pingReaction(ctx, eventreactions.PING_INSULT, "insult", 1)
+	c.pingReaction(ctx, interfaces.EventReactionPingInsult, "insult", 1)
 }
 
 func (c *EventReactionsCommands) pingreact(ctx *router.Ctx) {
-	e.pingReaction(ctx, eventreactions.PING_REACT, "react", 2)
+	c.pingReaction(ctx, interfaces.EventReactionPingReact, "react", 2)
 }
 
 func (c *EventReactionsCommands) pingresponse(ctx *router.Ctx) {
-	e.pingReaction(ctx, eventreactions.PING_RESPONSE, "response", 2)
+	c.pingReaction(ctx, interfaces.EventReactionPingResponse, "response", 2)
 }
 
 func (c *EventReactionsCommands) pingairesponse(ctx *router.Ctx) {
-	e.pingReaction(ctx, eventreactions.PING_AI_RESPONSE, "AI response", 2)
+	c.pingReaction(ctx, interfaces.EventReactionPingAIResponse, "AI response", 2)
 }
 
 // Mirror channel/server
@@ -585,13 +585,13 @@ func (c *EventReactionsCommands) mirrorchannel(ctx *router.Ctx) {
 			return
 		}
 
-		e.toggleReaction(ctx, eventreactions.NewMirrorChannel(srcChannel, destChannel))
+		c.toggleReaction(ctx, impl.NewMirrorChannel(srcChannel, destChannel))
 	case "list":
-		reactions := eventreactions.GetAll(eventreactions.MIRROR_CHANNEL)
+		reactions := c.services.EventReactions.GetReactionsByType(interfaces.EventReactionMirrorChannel)
 
-		e.mapReactions(ctx, reactions, "There are no mirrored channels.", "Mirrored channels")
+		c.mapReactions(ctx, reactions, "There are no mirrored channels.", "Mirrored channels")
 	case "clear":
-		c.services.EventReactions.RemoveReactionsByTypeAll(eventreactions.MIRROR_CHANNEL)
+		c.services.EventReactions.RemoveReactionsByType(interfaces.EventReactionMirrorChannel)
 
 		c.services.Embed.NewEmbed().
 			SetDescription("Cleared all mirrored channels.").
@@ -616,13 +616,13 @@ func (c *EventReactionsCommands) mirrorserver(ctx *router.Ctx) {
 			return
 		}
 
-		e.toggleReaction(ctx, eventreactions.NewMirrorGuild(srcGuild, destGuild))
+		c.toggleReaction(ctx, impl.NewMirrorGuild(srcGuild, destGuild))
 	case "list":
-		reactions := eventreactions.GetAll(eventreactions.MIRROR_CHANNEL)
+		reactions := c.services.EventReactions.GetReactionsByType(interfaces.EventReactionMirrorGuild)
 
-		e.mapReactions(ctx, reactions, "There are no mirrored servers.", "Mirrored servers")
+		c.mapReactions(ctx, reactions, "There are no mirrored servers.", "Mirrored servers")
 	case "clear":
-		c.services.EventReactions.RemoveReactionsByTypeAll(eventreactions.MIRROR_CHANNEL)
+		c.services.EventReactions.RemoveReactionsByType(interfaces.EventReactionMirrorGuild)
 
 		c.services.Embed.NewEmbed().
 			SetDescription("Cleared all mirrored servers.").
@@ -639,7 +639,7 @@ func (c *EventReactionsCommands) mirrorserver(ctx *router.Ctx) {
 func (c *EventReactionsCommands) responder(ctx *router.Ctx) {
 	switch strings.ToLower(utils.Arguments["<toggle/list/clear>"]) {
 	case "toggle":
-		guild, channel, err := e.getGuildOrChannel(ctx, ctx.Arguments.Get(2))
+		guild, channel, err := c.getGuildOrChannel(ctx, ctx.Arguments.Get(2))
 		if err != nil {
 			c.services.Embed.NewEmbed().
 				SetDescription("Could not find server/channel: " + err.Error()).
@@ -647,15 +647,15 @@ func (c *EventReactionsCommands) responder(ctx *router.Ctx) {
 			return
 		}
 
-		reaction := eventreactions.NewMessageReaction(eventreactions.RESPONDER, guild, channel, nil)
+		reaction := eventreactions.NewMessageReaction(interfaces.EventReactionResponder, guild, channel, nil)
 		reaction.Response = utils.Arguments["[\"response\"]"]
-		e.toggleReaction(ctx, reaction)
+		c.toggleReaction(ctx, reaction)
 	case "list":
-		reactions := eventreactions.GetAll(eventreactions.RESPONDER)
+		reactions := c.services.EventReactions.GetReactionsByType(interfaces.EventReactionResponder)
 
-		e.mapReactions(ctx, reactions, "There are no active responders.", "Responders")
+		c.mapReactions(ctx, reactions, "There are no active responders.", "Responders")
 	case "clear":
-		c.services.EventReactions.RemoveReactionsByTypeAll(eventreactions.RESPONDER)
+		c.services.EventReactions.RemoveReactionsByType(interfaces.EventReactionResponder)
 
 		c.services.Embed.NewEmbed().
 			SetDescription("Cleared all responders.").
@@ -670,7 +670,7 @@ func (c *EventReactionsCommands) responder(ctx *router.Ctx) {
 func (c *EventReactionsCommands) airesponder(ctx *router.Ctx) {
 	switch strings.ToLower(utils.Arguments["<toggle/list/clear>"]) {
 	case "toggle":
-		guild, channel, err := e.getGuildOrChannel(ctx, ctx.Arguments.Get(2))
+		guild, channel, err := c.getGuildOrChannel(ctx, ctx.Arguments.Get(2))
 		if err != nil {
 			c.services.Embed.NewEmbed().
 				SetDescription("Could not find server/channel: " + err.Error()).
@@ -678,15 +678,15 @@ func (c *EventReactionsCommands) airesponder(ctx *router.Ctx) {
 			return
 		}
 
-		reaction := eventreactions.NewMessageReaction(eventreactions.AI_RESPONDER, guild, channel, nil)
+		reaction := eventreactions.NewMessageReaction(interfaces.EventReactionAIResponder, guild, channel, nil)
 		reaction.System = utils.Arguments["[\"system\"]"]
-		e.toggleReaction(ctx, reaction)
+		c.toggleReaction(ctx, reaction)
 	case "list":
-		reactions := eventreactions.GetAll(eventreactions.AI_RESPONDER)
+		reactions := c.services.EventReactions.GetReactionsByType(interfaces.EventReactionAIResponder)
 
-		e.mapReactions(ctx, reactions, "There are no active AI responders.", "AI Responders")
+		c.mapReactions(ctx, reactions, "There are no active AI responders.", "AI Responders")
 	case "clear":
-		c.services.EventReactions.RemoveReactionsByTypeAll(eventreactions.AI_RESPONDER)
+		c.services.EventReactions.RemoveReactionsByType(interfaces.EventReactionAIResponder)
 
 		c.services.Embed.NewEmbed().
 			SetDescription("Cleared all AI responders.").
@@ -710,7 +710,7 @@ func (c *EventReactionsCommands) copy(ctx *router.Ctx) {
 
 		}
 
-		guild, channel, err := e.getGuildOrChannel(ctx, ctx.Arguments.Get(2))
+		guild, channel, err := c.getGuildOrChannel(ctx, ctx.Arguments.Get(2))
 		if err != nil {
 			c.services.Embed.NewEmbed().
 				SetDescription("Could not find server/channel: " + err.Error()).
@@ -718,13 +718,13 @@ func (c *EventReactionsCommands) copy(ctx *router.Ctx) {
 			return
 		}
 
-		e.toggleReaction(ctx, eventreactions.NewMessageReaction(eventreactions.COPY, guild, channel, user))
+		c.toggleReaction(ctx, impl.NewMessageReaction(interfaces.EventReactionCopy, guild, channel, user))
 	case "list":
-		reactions := eventreactions.GetAll(eventreactions.COPY)
+		reactions := c.services.EventReactions.GetReactionsByType(interfaces.EventReactionCopy)
 
-		e.mapReactions(ctx, reactions, "There are no copied users.", "Copied users")
+		c.mapReactions(ctx, reactions, "There are no copied users.", "Copied users")
 	case "clear":
-		c.services.EventReactions.RemoveReactionsByTypeAll(eventreactions.COPY)
+		c.services.EventReactions.RemoveReactionsByType(interfaces.EventReactionCopy)
 
 		c.services.Embed.NewEmbed().
 			SetDescription("Cleared all copied users.").
@@ -748,7 +748,7 @@ func (c *EventReactionsCommands) replycopy(ctx *router.Ctx) {
 
 		}
 
-		guild, channel, err := e.getGuildOrChannel(ctx, ctx.Arguments.Get(2))
+		guild, channel, err := c.getGuildOrChannel(ctx, ctx.Arguments.Get(2))
 		if err != nil {
 			c.services.Embed.NewEmbed().
 				SetDescription("Could not find server/channel: " + err.Error()).
@@ -756,13 +756,13 @@ func (c *EventReactionsCommands) replycopy(ctx *router.Ctx) {
 			return
 		}
 
-		e.toggleReaction(ctx, eventreactions.NewMessageReaction(eventreactions.REPLY_COPY, guild, channel, user))
+		c.toggleReaction(ctx, impl.NewMessageReaction(interfaces.EventReactionReplyCopy, guild, channel, user))
 	case "list":
-		reactions := eventreactions.GetAll(eventreactions.REPLY_COPY)
+		reactions := c.services.EventReactions.GetReactionsByType(interfaces.EventReactionReplyCopy)
 
-		e.mapReactions(ctx, reactions, "There are no replycopied users.", "Replycopied users")
+		c.mapReactions(ctx, reactions, "There are no replycopied users.", "Replycopied users")
 	case "clear":
-		c.services.EventReactions.RemoveReactionsByTypeAll(eventreactions.REPLY_COPY)
+		c.services.EventReactions.RemoveReactionsByType(interfaces.EventReactionReplyCopy)
 
 		c.services.Embed.NewEmbed().
 			SetDescription("Cleared all replycopied users.").
@@ -786,7 +786,7 @@ func (c *EventReactionsCommands) mock(ctx *router.Ctx) {
 
 		}
 
-		guild, channel, err := e.getGuildOrChannel(ctx, ctx.Arguments.Get(2))
+		guild, channel, err := c.getGuildOrChannel(ctx, ctx.Arguments.Get(2))
 		if err != nil {
 			c.services.Embed.NewEmbed().
 				SetDescription("Could not find server/channel: " + err.Error()).
@@ -794,13 +794,13 @@ func (c *EventReactionsCommands) mock(ctx *router.Ctx) {
 			return
 		}
 
-		e.toggleReaction(ctx, eventreactions.NewMessageReaction(eventreactions.MOCK, guild, channel, user))
+		c.toggleReaction(ctx, impl.NewMessageReaction(interfaces.EventReactionMock, guild, channel, user))
 	case "list":
-		reactions := eventreactions.GetAll(eventreactions.MOCK)
+		reactions := c.services.EventReactions.GetReactionsByType(interfaces.EventReactionMock)
 
-		e.mapReactions(ctx, reactions, "There are no mocked users.", "Mocked users")
+		c.mapReactions(ctx, reactions, "There are no mocked users.", "Mocked users")
 	case "clear":
-		c.services.EventReactions.RemoveReactionsByTypeAll(eventreactions.MOCK)
+		c.services.EventReactions.RemoveReactionsByType(interfaces.EventReactionMock)
 
 		c.services.Embed.NewEmbed().
 			SetDescription("Cleared all mocked users.").
@@ -824,7 +824,7 @@ func (c *EventReactionsCommands) pinspam(ctx *router.Ctx) {
 
 		}
 
-		guild, channel, err := e.getGuildOrChannel(ctx, ctx.Arguments.Get(2))
+		guild, channel, err := c.getGuildOrChannel(ctx, ctx.Arguments.Get(2))
 		if err != nil {
 			c.services.Embed.NewEmbed().
 				SetDescription("Could not find server/channel: " + err.Error()).
@@ -832,13 +832,13 @@ func (c *EventReactionsCommands) pinspam(ctx *router.Ctx) {
 			return
 		}
 
-		e.toggleReaction(ctx, eventreactions.NewMessageReaction(eventreactions.PIN_SPAM, guild, channel, user))
+		c.toggleReaction(ctx, impl.NewMessageReaction(interfaces.EventReactionPinSpam, guild, channel, user))
 	case "list":
-		reactions := eventreactions.GetAll(eventreactions.PIN_SPAM)
+		reactions := c.services.EventReactions.GetReactionsByType(interfaces.EventReactionPinSpam)
 
-		e.mapReactions(ctx, reactions, "There are no pinspammed users.", "Pinspammed users")
+		c.mapReactions(ctx, reactions, "There are no pinspammed users.", "Pinspammed users")
 	case "clear":
-		c.services.EventReactions.RemoveReactionsByTypeAll(eventreactions.PIN_SPAM)
+		c.services.EventReactions.RemoveReactionsByType(interfaces.EventReactionPinSpam)
 
 		c.services.Embed.NewEmbed().
 			SetDescription("Cleared all pinspammed users.").
@@ -888,7 +888,7 @@ func (c *EventReactionsCommands) reactspam(ctx *router.Ctx) {
 		var err error
 
 		if !global {
-			guild, channel, err = e.getGuildOrChannel(ctx, ctx.Arguments.Get(3))
+			guild, channel, err = c.getGuildOrChannel(ctx, ctx.Arguments.Get(3))
 			if err != nil {
 				c.services.Embed.NewEmbed().
 					SetDescription("Could not find server/channel: " + err.Error()).
@@ -897,7 +897,7 @@ func (c *EventReactionsCommands) reactspam(ctx *router.Ctx) {
 			}
 		}
 
-		reaction := eventreactions.NewMessageReaction(eventreactions.REACT_SPAM, guild, channel, user)
+		reaction := eventreactions.NewMessageReaction(interfaces.EventReactionReactSpam, guild, channel, user)
 		reaction.Global = global
 		reaction.Reaction = utils.Arguments["[reaction]"]
 		reaction.Reaction = strings.ReplaceAll(reaction.Reaction, "<", "")
@@ -908,13 +908,13 @@ func (c *EventReactionsCommands) reactspam(ctx *router.Ctx) {
 			return
 		}
 
-		e.toggleReaction(ctx, reaction)
+		c.toggleReaction(ctx, reaction)
 	case "list":
-		reactions := eventreactions.GetAll(eventreactions.REACT_SPAM)
+		reactions := c.services.EventReactions.GetReactionsByType(interfaces.EventReactionReactSpam)
 
-		e.mapReactions(ctx, reactions, "There are no reactspammed users.", "Reactspammed users")
+		c.mapReactions(ctx, reactions, "There are no reactspammed users.", "Reactspammed users")
 	case "clear":
-		c.services.EventReactions.RemoveReactionsByTypeAll(eventreactions.REACT_SPAM)
+		c.services.EventReactions.RemoveReactionsByType(interfaces.EventReactionReactSpam)
 
 		c.services.Embed.NewEmbed().
 			SetDescription("Cleared all reactspammed users.").
@@ -938,7 +938,7 @@ func (c *EventReactionsCommands) deletemessages(ctx *router.Ctx) {
 
 		}
 
-		guild, channel, err := e.getGuildOrChannel(ctx, ctx.Arguments.Get(2))
+		guild, channel, err := c.getGuildOrChannel(ctx, ctx.Arguments.Get(2))
 		if err != nil {
 			c.services.Embed.NewEmbed().
 				SetDescription("Could not find server/channel: " + err.Error()).
@@ -946,13 +946,13 @@ func (c *EventReactionsCommands) deletemessages(ctx *router.Ctx) {
 			return
 		}
 
-		e.toggleReaction(ctx, eventreactions.NewMessageReaction(eventreactions.DELETE_MESSAGES, guild, channel, user))
+		c.toggleReaction(ctx, impl.NewMessageReaction(interfaces.EventReactionDeleteMessages, guild, channel, user))
 	case "list":
-		reactions := eventreactions.GetAll(eventreactions.DELETE_MESSAGES)
+		reactions := c.services.EventReactions.GetReactionsByType(interfaces.EventReactionDeleteMessages)
 
-		e.mapReactions(ctx, reactions, "There are no deletemessage reactions.", "Deletemessage reactions")
+		c.mapReactions(ctx, reactions, "There are no deletemessage reactions.", "Deletemessage reactions")
 	case "clear":
-		c.services.EventReactions.RemoveReactionsByTypeAll(eventreactions.DELETE_MESSAGES)
+		c.services.EventReactions.RemoveReactionsByType(interfaces.EventReactionDeleteMessages)
 
 		c.services.Embed.NewEmbed().
 			SetDescription("Cleared all deletemessage reactions.").
@@ -975,7 +975,7 @@ func (c *EventReactionsCommands) keywordnotifier(ctx *router.Ctx) {
 		var err error
 
 		if !global {
-			guild, channel, err = e.getGuildOrChannel(ctx, ctx.Arguments.Get(2))
+			guild, channel, err = c.getGuildOrChannel(ctx, ctx.Arguments.Get(2))
 			if err != nil {
 				c.services.Embed.NewEmbed().
 					SetDescription("Could not find server/channel: " + err.Error()).
@@ -984,17 +984,17 @@ func (c *EventReactionsCommands) keywordnotifier(ctx *router.Ctx) {
 			}
 		}
 
-		reaction := eventreactions.NewMessageReaction(eventreactions.KEYWORD_NOTIFIER, guild, channel, nil)
+		reaction := eventreactions.NewMessageReaction(interfaces.EventReactionKeywordNotifier, guild, channel, nil)
 		reaction.Keyword = utils.Arguments["[\"keyword\"]"]
 		reaction.Global = global
 
-		e.toggleReaction(ctx, reaction)
+		c.toggleReaction(ctx, reaction)
 	case "list":
-		reactions := eventreactions.GetAll(eventreactions.KEYWORD_NOTIFIER)
+		reactions := c.services.EventReactions.GetReactionsByType(interfaces.EventReactionKeywordNotifier)
 
-		e.mapReactions(ctx, reactions, "There are no keyword notifiers.", "Keyword notifiers")
+		c.mapReactions(ctx, reactions, "There are no keyword notifiers.", "Keyword notifiers")
 	case "clear":
-		c.services.EventReactions.RemoveReactionsByTypeAll(eventreactions.KEYWORD_NOTIFIER)
+		c.services.EventReactions.RemoveReactionsByType(interfaces.EventReactionKeywordNotifier)
 
 		c.services.Embed.NewEmbed().
 			SetDescription("Cleared all keyword notifiers.").
@@ -1018,7 +1018,7 @@ func (c *EventReactionsCommands) removereactions(ctx *router.Ctx) {
 
 		}
 
-		guild, channel, err := e.getGuildOrChannel(ctx, ctx.Arguments.Get(2))
+		guild, channel, err := c.getGuildOrChannel(ctx, ctx.Arguments.Get(2))
 		if err != nil {
 			c.services.Embed.NewEmbed().
 				SetDescription("Could not find server/channel: " + err.Error()).
@@ -1026,13 +1026,13 @@ func (c *EventReactionsCommands) removereactions(ctx *router.Ctx) {
 			return
 		}
 
-		e.toggleReaction(ctx, eventreactions.NewRemoveReactions(guild, channel, user))
+		c.toggleReaction(ctx, impl.NewRemoveReactions(guild, channel, user))
 	case "list":
-		reactions := eventreactions.GetAll(c.services.EventReactions.RemoveReactionsByType_REACTIONS)
+		reactions := c.services.EventReactions.GetReactionsByType(interfaces.EventReactionRemoveReactions)
 
-		e.mapReactions(ctx, reactions, "There are no users with removed reactions.", "Users with removed reactions")
+		c.mapReactions(ctx, reactions, "There are no users with removed reactions.", "Users with removed reactions")
 	case "clear":
-		c.services.EventReactions.RemoveReactionsByTypeAll(c.services.EventReactions.RemoveReactionsByType_REACTIONS)
+		c.services.EventReactions.RemoveReactionsByType(interfaces.EventReactionRemoveReactions)
 
 		c.services.Embed.NewEmbed().
 			SetDescription("Cleared all users with removed reactions.").
@@ -1056,7 +1056,7 @@ func (c *EventReactionsCommands) forcedisconnect(ctx *router.Ctx) {
 
 		}
 
-		guild, channel, err := e.getGuildOrChannel(ctx, ctx.Arguments.Get(2))
+		guild, channel, err := c.getGuildOrChannel(ctx, ctx.Arguments.Get(2))
 		if err != nil {
 			c.services.Embed.NewEmbed().
 				SetDescription("Could not find server/channel: " + err.Error()).
@@ -1064,13 +1064,13 @@ func (c *EventReactionsCommands) forcedisconnect(ctx *router.Ctx) {
 			return
 		}
 
-		e.toggleReaction(ctx, eventreactions.NewForceDisconnect(guild, channel, user))
+		c.toggleReaction(ctx, impl.NewForceDisconnect(guild, channel, user))
 	case "list":
-		reactions := eventreactions.GetAll(eventreactions.FORCE_DISCONNECT)
+		reactions := c.services.EventReactions.GetReactionsByType(interfaces.EventReactionForceDisconnect)
 
-		e.mapReactions(ctx, reactions, "There are no force disconnected users.", "Force disconnected users")
+		c.mapReactions(ctx, reactions, "There are no force disconnected users.", "Force disconnected users")
 	case "clear":
-		c.services.EventReactions.RemoveReactionsByTypeAll(eventreactions.FORCE_DISCONNECT)
+		c.services.EventReactions.RemoveReactionsByType(interfaces.EventReactionForceDisconnect)
 
 		c.services.Embed.NewEmbed().
 			SetDescription("Cleared all force disconnected users").
@@ -1114,13 +1114,13 @@ func (c *EventReactionsCommands) forcenick(ctx *router.Ctx) {
 			return
 		}
 
-		e.toggleReaction(ctx, eventreactions.NewForceNick(guild, user, nickname))
+		c.toggleReaction(ctx, impl.NewForceNick(guild, user, nickname))
 	case "list":
-		reactions := eventreactions.GetAll(eventreactions.FORCE_NICK)
+		reactions := c.services.EventReactions.GetReactionsByType(interfaces.EventReactionForceNick)
 
-		e.mapReactions(ctx, reactions, "There are no force nicked users.", "Force nicked users")
+		c.mapReactions(ctx, reactions, "There are no force nicked users.", "Force nicked users")
 	case "clear":
-		c.services.EventReactions.RemoveReactionsByTypeAll(eventreactions.FORCE_NICK)
+		c.services.EventReactions.RemoveReactionsByType(interfaces.EventReactionForceNick)
 
 		c.services.Embed.NewEmbed().
 			SetDescription("Cleared all force nicked users.").
@@ -1162,13 +1162,13 @@ func (c *EventReactionsCommands) forcekick(ctx *router.Ctx) {
 			return
 		}
 
-		e.toggleReaction(ctx, eventreactions.NewForceKick(guild, user))
+		c.toggleReaction(ctx, impl.NewForceKick(guild, user))
 	case "list":
-		reactions := eventreactions.GetAll(eventreactions.FORCE_KICK)
+		reactions := c.services.EventReactions.GetReactionsByType(interfaces.EventReactionForceKick)
 
-		e.mapReactions(ctx, reactions, "There are no force kicked users.", "Force kicked users")
+		c.mapReactions(ctx, reactions, "There are no force kicked users.", "Force kicked users")
 	case "clear":
-		c.services.EventReactions.RemoveReactionsByTypeAll(eventreactions.FORCE_KICK)
+		c.services.EventReactions.RemoveReactionsByType(interfaces.EventReactionForceKick)
 
 		c.services.Embed.NewEmbed().
 			SetDescription("Cleared all force kicked users.").
@@ -1221,13 +1221,13 @@ func (c *EventReactionsCommands) noleave(ctx *router.Ctx) {
 			return
 		}
 
-		e.toggleReaction(ctx, eventreactions.NewNoLeave(channel, user))
+		c.toggleReaction(ctx, impl.NewNoLeave(channel, user))
 	case "list":
-		reactions := eventreactions.GetAll(eventreactions.NO_LEAVE)
+		reactions := c.services.EventReactions.GetReactionsByType(interfaces.EventReactionNoLeave)
 
-		e.mapReactions(ctx, reactions, "There are no noleave users.", "Noleave users")
+		c.mapReactions(ctx, reactions, "There are no noleave users.", "Noleave users")
 	case "clear":
-		c.services.EventReactions.RemoveReactionsByTypeAll(eventreactions.NO_LEAVE)
+		c.services.EventReactions.RemoveReactionsByType(interfaces.EventReactionNoLeave)
 
 		c.services.Embed.NewEmbed().
 			SetDescription("Cleared all noleave users.").
@@ -1282,13 +1282,13 @@ func (c *EventReactionsCommands) antideletemessages(ctx *router.Ctx) {
 			return
 		}
 
-		e.toggleReaction(ctx, eventreactions.NewAntiDeleteMessages(channel))
+		c.toggleReaction(ctx, impl.NewAntiDeleteMessages(channel))
 	case "list":
-		reactions := eventreactions.GetAll(eventreactions.ANTI_DELETE_MESSAGES)
+		reactions := c.services.EventReactions.GetReactionsByType(interfaces.EventReactionAntiDeleteMessages)
 
-		e.mapReactions(ctx, reactions, "There are no anti delete messages.", "Anti Delete Messages")
+		c.mapReactions(ctx, reactions, "There are no anti delete messages.", "Anti Delete Messages")
 	case "clear":
-		c.services.EventReactions.RemoveReactionsByTypeAll(eventreactions.ANTI_DELETE_MESSAGES)
+		c.services.EventReactions.RemoveReactionsByType(interfaces.EventReactionAntiDeleteMessages)
 
 		c.services.Embed.NewEmbed().
 			SetDescription("Cleared all anti delete messages.").

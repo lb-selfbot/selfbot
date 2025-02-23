@@ -10,7 +10,6 @@ import (
 	"github.com/LightningDev1/LB-Selfbot/internal/router"
 	"github.com/LightningDev1/LB-Selfbot/internal/services"
 	"github.com/LightningDev1/LB-Selfbot/internal/utils"
-	"github.com/LightningDev1/dgc"
 )
 
 type ProtectionsCommands struct{ services *services.Services }
@@ -96,11 +95,6 @@ func (c *ProtectionsCommands) Register() {
 			Handler:     c.friendrequests,
 		},
 	})
-
-}
-
-func (c *ProtectionsCommands) RegisterCommands(router *dgc.Router) {
-	router.StartCategory("Protections", "Protection commands")
 
 }
 

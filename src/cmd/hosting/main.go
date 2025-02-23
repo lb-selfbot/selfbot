@@ -1,38 +1,61 @@
-//go:build hosting
-
 package hosting
 
 import (
 	"context"
-	"fmt"
+	"net"
 	_ "net/http/pprof"
 	"os"
 	"os/signal"
-	"slices"
-	"strings"
+	"path/filepath"
+	"runtime/debug"
 	"syscall"
 
+	"github.com/LightningDev1/LB-Selfbot/internal/assets"
 	"github.com/LightningDev1/LB-Selfbot/internal/constants"
+	"github.com/LightningDev1/LB-Selfbot/internal/logging"
+	"github.com/LightningDev1/LB-Selfbot/internal/services"
+	"github.com/LightningDev1/LB-Selfbot/internal/services/interfaces"
 
-	"github.com/LightningDev1/LB-Selfbot/internal/config"
-	"github.com/LightningDev1/LB-Selfbot/internal/startup"
-	"github.com/LightningDev1/LB-Selfbot/selfbot/commands"
-	"github.com/LightningDev1/LB-Selfbot/selfbot/errorhandler"
-	"github.com/LightningDev1/LB-Selfbot/selfbot/eventreactions"
-	"github.com/LightningDev1/LB-Selfbot/selfbot/extensions"
+	"github.com/LightningDev1/LB-Selfbot/internal/commands"
 
 	"github.com/LightningDev1/LB-Selfbot/internal/utils"
-	"github.com/LightningDev1/LB-Selfbot/selfbot/multitokensniper"
-	"github.com/LightningDev1/LB-Selfbot/selfbot/websocket"
-	"github.com/LightningDev1/dgc"
-	"github.com/LightningDev1/discordgo"
 )
 
-var session *discordgo.Session
-
-func Main(ctx context.Context) error {
+func main() {
 	constants.CONSOLE = true
 	constants.HOSTING = true
+
+	if constants.DEBUG {
+		logging.Warn("Debug mode is enabled")
+	}
+
+	// Use Cloudflare DNS for all DNS queries
+	net.DefaultResolver.Dial = func(ctx context.Context, network, address string) (net.Conn, error) {
+		return net.Dial("udp", "1.1.1.1:53")
+	}
+
+	// Set memory limit to 300MB
+	debug.SetMemoryLimit(300 * 1024 * 1024)
+
+	// Create services
+	services := services.NewServices()
+
+	if err := services.O11y.Init(); err != nil {
+		services.UI.LogError("O11y init error:", err)
+		os.Exit(1)
+	}
+
+	if err := utils.IO.CreateFolders(); err != nil {
+		services.UI.LogError("Error creating folders: " + err.Error())
+		return
+	}
+
+	// Initialize icon
+	err := assets.CopyFile(assets.AssetLogo, filepath.Join(utils.IO.GetMainFolder(), "Logo.png"))
+	if err != nil {
+		logging.Error("Error copying icon file:", err)
+		return
+	}
 
 	username := os.Getenv("USERNAME")
 	password := os.Getenv("PASSWORD")
@@ -40,206 +63,47 @@ func Main(ctx context.Context) error {
 	debug := os.Getenv("DEBUG") == "true"
 
 	if username == "" || password == "" || token == "" {
-		return fmt.Errorf("USERNAME, PASSWORD, and TOKEN environment variables are required")
-	}
-
-	if err := initialize(debug); err != nil {
-		return fmt.Errorf("initialize: %w", err)
-	}
-
-	if err := setupConnections(username, password, token, debug); err != nil {
-		return fmt.Errorf("setup connections: %w", err)
-	}
-
-	cfg, err := config.GetConfig()
-	if err != nil {
-		return fmt.Errorf("get config: %w", err)
-	}
-
-	multitokensniper.Init(session, cfg)
-
-	<-ctx.Done()
-	return nil
-}
-
-func initialize(debug bool) error {
-	startup.SetupLogging(debug)
-	return nil
-}
-
-func setupConnections(username, password, token string, debug bool) error {
-	if err := initWebsocket(username, password); err != nil {
-		return fmt.Errorf("init websocket: %w", err)
-	}
-
-	var err error
-	session, err = startup.CreateDiscordSession(token, debug)
-	if err != nil {
-		return fmt.Errorf("create discord session: %w", err)
-	}
-
-	if err := errorhandler.Init(); err != nil {
-		logging.UI.Error("Error initializing error handler: " + err.Error())
-	}
-
-	_ = setupRouter(session)
-
-	if err := session.Open(); err != nil {
-		return fmt.Errorf("open discord connection: %w", err)
-	}
-	defer session.Close()
-
-	return nil
-}
-
-func initWebsocket(username, password string) error {
-	websocket.Websocket.LogError = func(err error, closeCode int) {
-		switch closeCode {
-		case 3004, 3010:
-			logging.UI.Error("Your LightningBot credentials are invalid! Please re-enter them in the Config tab.")
-		case 3011:
-			logging.UI.Error("Your free trial has expired! Please purchase a license key to continue using LightningBot.")
-		case 3003:
-			logging.UI.Error("WS Error 3003: " + err.Error())
-		case 3006:
-			logging.UI.Error("Another selfbot has connected using your LightningBot account! This instance will now exit.")
-		default:
-			logging.UI.Error("An unexpected error has occurred while connecting to the websocket: " + err.Error())
-		}
+		services.UI.LogError("USERNAME, PASSWORD, and TOKEN environment variables are required")
 		os.Exit(1)
 	}
 
-	return websocket.Websocket.Init(username, password)
-}
+	creds := interfaces.AuthCredentials{
+		Username: username,
+		Password: password,
+	}
 
-func setupRouter(session *discordgo.Session) *dgc.Router {
-	router := dgc.Create(&dgc.Router{
-		PrefixFunc: func() []string {
-			cfg, err := config.GetConfig()
-			if err != nil {
-				return []string{"!"}
-			}
-			return []string{cfg.Selfbot.CommandPrefix}
-		},
-		IgnorePrefixCase: true,
-		IsUserAllowedFunc: func(ctx *dgc.Ctx) bool {
-			isAllowed := func() bool {
-				if ctx.Message.Author == nil {
-					return false
-				}
+	if err = services.Auth.Connect(context.Background(), creds); err != nil {
+		os.Exit(1)
+	}
 
-				if ctx.Message.Author.ID == session.State.User.ID {
-					return true
-				}
+	if err := services.Discord.Init(token, debug); err != nil {
+		logging.Error("Discord init error:", err)
+		os.Exit(1)
+	}
 
-				cfg, err := config.GetConfig()
-				if err != nil {
-					return false
-				}
+	cmdRegistry := commands.NewCmdRegistry()
+	cmdRegistry.Register(services)
 
-				if !slices.Contains(cfg.Sharing.SharedUsers, ctx.Message.Author.ID) &&
-					!slices.Contains(cfg.Sharing.SharedUsers, ctx.Message.Author.String()) {
-					return false
-				}
+	// Wait for auth to be ready
+	<-services.Auth.OnReady()
+	services.Auth.CheckNonce()
 
-				if slices.Contains(ctx.Command.Flags, commands.CmdFlagDangerous) && cfg.Sharing.BlockDangerousCommands {
-					logging.Logging.BlockedDangerousCommand(ctx.Message.Author, ctx.Command.Name)
-					return false
-				}
+	if err := services.Discord.Open(); err != nil {
+		logging.Error("Discord open error:", err)
+		os.Exit(1)
+	}
 
-				if cfg.Sharing.ShareAll || slices.Contains([]string{"help", "search", "repeat"}, ctx.Command.Name) {
-					return true
-				}
-
-				categoryName := ""
-				if ctx.Command.Category != nil {
-					categoryName = ctx.Command.Category.Name
-				}
-				for _, category := range cfg.Sharing.SharedCategories {
-					if strings.EqualFold(category, categoryName) {
-						return true
-					}
-				}
-				return slices.Contains(cfg.Sharing.SharedCommands, ctx.Command.Name)
-			}()
-
-			if !isAllowed {
-				return false
-			}
-
-			if slices.Contains(ctx.Command.Flags, commands.CmdFlagHostingDangerous) {
-				logging.Logging.BlockedHostingDangerousCommand(ctx.Command.Name)
-				return false
-			}
-
-			return true
-		},
-		Commands: []*dgc.Command{},
-		Middlewares: []dgc.Middleware{
-			func(following dgc.ExecutionHandler) dgc.ExecutionHandler {
-				return func(ctx *dgc.Ctx) {
-					arguments, success := utils.Discord.GetArguments(ctx)
-					if !success {
-						return
-					}
-
-					cfg, err := config.GetConfig()
-					if err != nil {
-						logging.UI.Error("Failed to get config")
-						return
-					}
-
-					if cfg.Selfbot.DeleteCommands && ctx.Message.ID != "0" {
-						go func() {
-							_ = ctx.Session.ChannelMessageDelete(ctx.Message.Message.ChannelID, ctx.Message.Message.ID)
-						}()
-					}
-
-					utils.Arguments = arguments
-
-					if ctx.Command.Name != "repeat" {
-						eventreactions.UsedCommands.Add(ctx)
-					}
-
-					data.UsedCommands++
-
-					logging.Logging.CommandUsed(ctx.Command.Name)
-
-					websocket.Websocket.CheckNonce()
-
-					following(ctx)
-				}
-			},
-		},
-	})
-
-	eventreactions.RegisterHandlers(session, router)
-	commands.Commands.RegisterCommands(session, router, false)
-	extensions.RegisterExtensions(session, router)
-	commands.Commands.HelpCommand.RegisterHelpCommand(router, session)
-
-	router.Initialize(session)
-
-	return router
-}
-
-func main() {
-	// Setup graceful shutdown
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
-
-	// Create shutdown channel
-	shutdown := make(chan os.Signal, 1)
-	signal.Notify(shutdown, syscall.SIGINT, syscall.SIGTERM)
+	services.Reminder.Start()
+	services.Variables.Init()
 
 	go func() {
-		<-shutdown
-		cancel()
+		err := services.MultiTokenSniper.Init(context.Background())
+		if err != nil {
+			services.UI.LogError("Error initializing multi-token sniper: " + err.Error())
+		}
 	}()
 
-	// Start hosting mode
-	if err := Main(ctx); err != nil {
-		logging.UI.Error("Error in hosting mode: " + err.Error())
-		os.Exit(1)
-	}
+	sc := make(chan os.Signal, 1)
+	signal.Notify(sc, syscall.SIGINT, syscall.SIGTERM)
+	<-sc
 }

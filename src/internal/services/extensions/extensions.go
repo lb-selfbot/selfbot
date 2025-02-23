@@ -14,7 +14,6 @@ import (
 	"github.com/LightningDev1/LB-Selfbot/internal/services/interfaces"
 	"github.com/LightningDev1/LB-Selfbot/internal/services/ui"
 	"github.com/LightningDev1/LB-Selfbot/internal/utils"
-	"github.com/LightningDev1/dgc"
 	"github.com/LightningDev1/discordgo"
 	"github.com/traefik/yaegi/interp"
 	"github.com/traefik/yaegi/stdlib"
@@ -70,7 +69,8 @@ func (e *ExtensionsServiceImpl) Register() {
 
 	_ = i.Use(stdlib.Symbols)
 	_ = i.Use(discordgo.Symbols)
-	_ = i.Use(dgc.Symbols)
+	// TODO: add router symbols
+	// _ = i.Use(router.Symbols)
 	_ = i.Use(exports)
 
 	handleError := func(err error) {

@@ -2676,7 +2676,7 @@ func (c *ImageCommands) icanmilkyou(ctx *router.Ctx) {
 		ctx.RespondText("Cannot find user")
 		return
 	}
-	ctx.RespondText("https://vacefron.nl/api/icanmilkyou?user1=%s&user2=%s", url.QueryEscape(user1.AvatarURL(""), url.QueryEscape(user2.AvatarURL(""))))
+	ctx.RespondText("https://vacefron.nl/api/icanmilkyou?user1=%s&user2=%s", url.QueryEscape(user1.AvatarURL("")), url.QueryEscape(user2.AvatarURL("")))
 }
 
 func (c *ImageCommands) heaven(ctx *router.Ctx) {
@@ -2689,7 +2689,7 @@ func (c *ImageCommands) heaven(ctx *router.Ctx) {
 }
 
 func (c *ImageCommands) npc(ctx *router.Ctx) {
-	ctx.RespondText("https://vacefron.nl/api/npc?text1=%s&text2=%s", url.QueryEscape(ctx.Arguments.Get(0).Raw(), url.QueryEscape(ctx.Arguments.Get(1).Raw())))
+	ctx.RespondText("https://vacefron.nl/api/npc?text1=%s&text2=%s", url.QueryEscape(ctx.Arguments.Get(0).Raw()), url.QueryEscape(ctx.Arguments.Get(1).Raw()))
 }
 
 func (c *ImageCommands) stonks(ctx *router.Ctx) {
@@ -2743,7 +2743,7 @@ func (c *ImageCommands) womanyellingatcat(ctx *router.Ctx) {
 		ctx.RespondText("Cannot find user")
 		return
 	}
-	ctx.RespondText("https://vacefron.nl/api/womanyellingatcat?woman=%s&cat=%s", url.QueryEscape(user1.AvatarURL(""), url.QueryEscape(user2.AvatarURL(""))))
+	ctx.RespondText("https://vacefron.nl/api/womanyellingatcat?woman=%s&cat=%s", url.QueryEscape(user1.AvatarURL("")), url.QueryEscape(user2.AvatarURL("")))
 }
 
 func (c *ImageCommands) pikachu(ctx *router.Ctx) {
