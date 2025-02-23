@@ -1,7 +1,6 @@
 package backup
 
 import (
-	"encoding/base64"
 	"fmt"
 	"slices"
 	"strings"
