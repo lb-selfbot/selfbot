@@ -136,6 +136,22 @@ func (e *EventReactionsServiceImpl) GetReactionsByType(t interfaces.EventReactio
 	})
 }
 
+func (e *EventReactionsServiceImpl) AddReaction(r interfaces.EventReaction) {
+	e.reactionsMu.Lock()
+	defer e.reactionsMu.Unlock()
+
+	e.reactions = append(e.reactions, r)
+}
+
+func (e *EventReactionsServiceImpl) RemoveReaction(r interfaces.EventReaction) {
+	e.reactionsMu.Lock()
+	defer e.reactionsMu.Unlock()
+
+	e.reactions = utils.Filter(e.reactions, func(rr interfaces.EventReaction) bool {
+		return !rr.Equals(r)
+	})
+}
+
 func (e *EventReactionsServiceImpl) RemoveAllReactions() {
 	e.reactionsMu.Lock()
 	defer e.reactionsMu.Unlock()

@@ -1048,7 +1048,7 @@ func (c *ImageCommands) ytcomment(ctx *router.Ctx) {
 }
 
 func (c *ImageCommands) pokemon(ctx *router.Ctx) {
-	ctx.RespondText(fmt.Sprintf("https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/%d.png", random.Int(1, 898)))
+	ctx.RespondText("https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/%d.png", random.Int(1, 898))
 }
 
 func (c *ImageCommands) wasted(ctx *router.Ctx) {
@@ -1057,7 +1057,7 @@ func (c *ImageCommands) wasted(ctx *router.Ctx) {
 		ctx.RespondText("Cannot find user")
 		return
 	}
-	ctx.RespondText(fmt.Sprintf("https://some-random-api.com/canvas/wasted?avatar=%s", url.QueryEscape(user.AvatarURL(""))))
+	ctx.RespondText("https://some-random-api.com/canvas/wasted?avatar=%s", url.QueryEscape(user.AvatarURL("")))
 }
 
 func (c *ImageCommands) triggered(ctx *router.Ctx) {
@@ -1066,7 +1066,7 @@ func (c *ImageCommands) triggered(ctx *router.Ctx) {
 		ctx.RespondText("Cannot find user")
 		return
 	}
-	ctx.RespondText(fmt.Sprintf("https://some-random-api.com/canvas/triggered?avatar=%s", url.QueryEscape(user.AvatarURL(""))))
+	ctx.RespondText("https://some-random-api.com/canvas/triggered?avatar=%s", url.QueryEscape(user.AvatarURL("")))
 }
 
 func (c *ImageCommands) glass(ctx *router.Ctx) {
@@ -1075,7 +1075,7 @@ func (c *ImageCommands) glass(ctx *router.Ctx) {
 		ctx.RespondText("Cannot find user")
 		return
 	}
-	ctx.RespondText(fmt.Sprintf("https://some-random-api.com/canvas/glass?avatar=%s", url.QueryEscape(user.AvatarURL(""))))
+	ctx.RespondText("https://some-random-api.com/canvas/glass?avatar=%s", url.QueryEscape(user.AvatarURL("")))
 }
 
 func (c *ImageCommands) greyscale(ctx *router.Ctx) {
@@ -1084,7 +1084,7 @@ func (c *ImageCommands) greyscale(ctx *router.Ctx) {
 		ctx.RespondText("Cannot find user")
 		return
 	}
-	ctx.RespondText(fmt.Sprintf("https://some-random-api.com/canvas/greyscale?avatar=%s", url.QueryEscape(user.AvatarURL(""))))
+	ctx.RespondText("https://some-random-api.com/canvas/greyscale?avatar=%s", url.QueryEscape(user.AvatarURL("")))
 }
 
 func (c *ImageCommands) invert(ctx *router.Ctx) {
@@ -1093,7 +1093,7 @@ func (c *ImageCommands) invert(ctx *router.Ctx) {
 		ctx.RespondText("Cannot find user")
 		return
 	}
-	ctx.RespondText(fmt.Sprintf("https://some-random-api.com/canvas/invert?avatar=%s", url.QueryEscape(user.AvatarURL(""))))
+	ctx.RespondText("https://some-random-api.com/canvas/invert?avatar=%s", url.QueryEscape(user.AvatarURL("")))
 }
 
 func (c *ImageCommands) invertgreyscale(ctx *router.Ctx) {
@@ -1102,7 +1102,7 @@ func (c *ImageCommands) invertgreyscale(ctx *router.Ctx) {
 		ctx.RespondText("Cannot find user")
 		return
 	}
-	ctx.RespondText(fmt.Sprintf("https://some-random-api.com/canvas/invertgreyscale?avatar=%s", url.QueryEscape(user.AvatarURL(""))))
+	ctx.RespondText("https://some-random-api.com/canvas/invertgreyscale?avatar=%s", url.QueryEscape(user.AvatarURL("")))
 }
 
 func (c *ImageCommands) brightness(ctx *router.Ctx) {
@@ -1111,7 +1111,7 @@ func (c *ImageCommands) brightness(ctx *router.Ctx) {
 		ctx.RespondText("Cannot find user")
 		return
 	}
-	ctx.RespondText(fmt.Sprintf("https://some-random-api.com/canvas/brightness?avatar=%s", url.QueryEscape(user.AvatarURL(""))))
+	ctx.RespondText("https://some-random-api.com/canvas/brightness?avatar=%s", url.QueryEscape(user.AvatarURL("")))
 }
 
 func (c *ImageCommands) red(ctx *router.Ctx) {
@@ -1120,7 +1120,7 @@ func (c *ImageCommands) red(ctx *router.Ctx) {
 		ctx.RespondText("Cannot find user")
 		return
 	}
-	ctx.RespondText(fmt.Sprintf("https://some-random-api.com/canvas/red?avatar=%s", url.QueryEscape(user.AvatarURL(""))))
+	ctx.RespondText("https://some-random-api.com/canvas/red?avatar=%s", url.QueryEscape(user.AvatarURL("")))
 }
 
 func (c *ImageCommands) green(ctx *router.Ctx) {
@@ -1129,7 +1129,7 @@ func (c *ImageCommands) green(ctx *router.Ctx) {
 		ctx.RespondText("Cannot find user")
 		return
 	}
-	ctx.RespondText(fmt.Sprintf("https://some-random-api.com/canvas/green?avatar=%s", url.QueryEscape(user.AvatarURL(""))))
+	ctx.RespondText("https://some-random-api.com/canvas/green?avatar=%s", url.QueryEscape(user.AvatarURL("")))
 }
 
 func (c *ImageCommands) blue(ctx *router.Ctx) {
@@ -1138,7 +1138,7 @@ func (c *ImageCommands) blue(ctx *router.Ctx) {
 		ctx.RespondText("Cannot find user")
 		return
 	}
-	ctx.RespondText(fmt.Sprintf("https://some-random-api.com/canvas/blue?avatar=%s", url.QueryEscape(user.AvatarURL(""))))
+	ctx.RespondText("https://some-random-api.com/canvas/blue?avatar=%s", url.QueryEscape(user.AvatarURL("")))
 }
 
 func (c *ImageCommands) pixelate(ctx *router.Ctx) {
@@ -1147,7 +1147,7 @@ func (c *ImageCommands) pixelate(ctx *router.Ctx) {
 		ctx.RespondText("Cannot find user")
 		return
 	}
-	ctx.RespondText(fmt.Sprintf("https://some-random-api.com/canvas/pixelate?avatar=%s", url.QueryEscape(user.AvatarURL(""))))
+	ctx.RespondText("https://some-random-api.com/canvas/pixelate?avatar=%s", url.QueryEscape(user.AvatarURL("")))
 }
 
 func (c *ImageCommands) comrade(ctx *router.Ctx) {
@@ -1156,7 +1156,7 @@ func (c *ImageCommands) comrade(ctx *router.Ctx) {
 		ctx.RespondText("Cannot find user")
 		return
 	}
-	ctx.RespondText(fmt.Sprintf("https://some-random-api.com/canvas/comrade?avatar=%s", url.QueryEscape(user.AvatarURL(""))))
+	ctx.RespondText("https://some-random-api.com/canvas/comrade?avatar=%s", url.QueryEscape(user.AvatarURL("")))
 }
 
 func (c *ImageCommands) missionpassed(ctx *router.Ctx) {
@@ -1165,7 +1165,7 @@ func (c *ImageCommands) missionpassed(ctx *router.Ctx) {
 		ctx.RespondText("Cannot find user")
 		return
 	}
-	ctx.RespondText(fmt.Sprintf("https://some-random-api.com/canvas/passed?avatar=%s", url.QueryEscape(user.AvatarURL(""))))
+	ctx.RespondText("https://some-random-api.com/canvas/passed?avatar=%s", url.QueryEscape(user.AvatarURL("")))
 }
 
 func (c *ImageCommands) jail(ctx *router.Ctx) {
@@ -1174,11 +1174,11 @@ func (c *ImageCommands) jail(ctx *router.Ctx) {
 		ctx.RespondText("Cannot find user")
 		return
 	}
-	ctx.RespondText(fmt.Sprintf("https://some-random-api.com/canvas/jail?avatar=%s", url.QueryEscape(user.AvatarURL(""))))
+	ctx.RespondText("https://some-random-api.com/canvas/jail?avatar=%s", url.QueryEscape(user.AvatarURL("")))
 }
 
 func (c *ImageCommands) nobitches(ctx *router.Ctx) {
-	ctx.RespondText(fmt.Sprintf("https://some-random-api.com/canvas/nobitches?no=%s", url.QueryEscape(ctx.Arguments.Raw())))
+	ctx.RespondText("https://some-random-api.com/canvas/nobitches?no=%s", url.QueryEscape(ctx.Arguments.Raw()))
 }
 
 func (c *ImageCommands) threshold(ctx *router.Ctx) {
@@ -1187,7 +1187,7 @@ func (c *ImageCommands) threshold(ctx *router.Ctx) {
 		ctx.RespondText("Cannot find user")
 		return
 	}
-	ctx.RespondText(fmt.Sprintf("https://some-random-api.com/canvas/threshold?avatar=%s", url.QueryEscape(user.AvatarURL(""))))
+	ctx.RespondText("https://some-random-api.com/canvas/threshold?avatar=%s", url.QueryEscape(user.AvatarURL("")))
 }
 
 func (c *ImageCommands) blurple(ctx *router.Ctx) {
@@ -1196,7 +1196,7 @@ func (c *ImageCommands) blurple(ctx *router.Ctx) {
 		ctx.RespondText("Cannot find user")
 		return
 	}
-	ctx.RespondText(fmt.Sprintf("https://some-random-api.com/canvas/blurple?avatar=%s", url.QueryEscape(user.AvatarURL(""))))
+	ctx.RespondText("https://some-random-api.com/canvas/blurple?avatar=%s", url.QueryEscape(user.AvatarURL("")))
 }
 
 func (c *ImageCommands) blurple2(ctx *router.Ctx) {
@@ -1205,7 +1205,7 @@ func (c *ImageCommands) blurple2(ctx *router.Ctx) {
 		ctx.RespondText("Cannot find user")
 		return
 	}
-	ctx.RespondText(fmt.Sprintf("https://some-random-api.com/canvas/blurple2?avatar=%s", url.QueryEscape(user.AvatarURL(""))))
+	ctx.RespondText("https://some-random-api.com/canvas/blurple2?avatar=%s", url.QueryEscape(user.AvatarURL("")))
 }
 
 func (c *ImageCommands) color(ctx *router.Ctx) {
@@ -1238,7 +1238,7 @@ func (c *ImageCommands) simpcard(ctx *router.Ctx) {
 		ctx.RespondText("Cannot find user")
 		return
 	}
-	ctx.RespondText(fmt.Sprintf("https://some-random-api.com/canvas/simpcard?avatar=%s", url.QueryEscape(user.AvatarURL(""))))
+	ctx.RespondText("https://some-random-api.com/canvas/simpcard?avatar=%s", url.QueryEscape(user.AvatarURL("")))
 }
 
 func (c *ImageCommands) horny(ctx *router.Ctx) {
@@ -1247,7 +1247,7 @@ func (c *ImageCommands) horny(ctx *router.Ctx) {
 		ctx.RespondText("Cannot find user")
 		return
 	}
-	ctx.RespondText(fmt.Sprintf("https://some-random-api.com/canvas/horny?avatar=%s", url.QueryEscape(user.AvatarURL(""))))
+	ctx.RespondText("https://some-random-api.com/canvas/horny?avatar=%s", url.QueryEscape(user.AvatarURL("")))
 }
 
 func (c *ImageCommands) lgbt(ctx *router.Ctx) {
@@ -1256,7 +1256,7 @@ func (c *ImageCommands) lgbt(ctx *router.Ctx) {
 		ctx.RespondText("Cannot find user")
 		return
 	}
-	ctx.RespondText(fmt.Sprintf("https://some-random-api.com/canvas/lgbt?avatar=%s", url.QueryEscape(user.AvatarURL(""))))
+	ctx.RespondText("https://some-random-api.com/canvas/lgbt?avatar=%s", url.QueryEscape(user.AvatarURL("")))
 }
 
 func (c *ImageCommands) pansexual(ctx *router.Ctx) {
@@ -1265,7 +1265,7 @@ func (c *ImageCommands) pansexual(ctx *router.Ctx) {
 		ctx.RespondText("Cannot find user")
 		return
 	}
-	ctx.RespondText(fmt.Sprintf("https://some-random-api.com/canvas/pansexual?avatar=%s", url.QueryEscape(user.AvatarURL(""))))
+	ctx.RespondText("https://some-random-api.com/canvas/pansexual?avatar=%s", url.QueryEscape(user.AvatarURL("")))
 }
 
 func (c *ImageCommands) nonbinary(ctx *router.Ctx) {
@@ -1274,7 +1274,7 @@ func (c *ImageCommands) nonbinary(ctx *router.Ctx) {
 		ctx.RespondText("Cannot find user")
 		return
 	}
-	ctx.RespondText(fmt.Sprintf("https://some-random-api.com/canvas/nonbinary?avatar=%s", url.QueryEscape(user.AvatarURL(""))))
+	ctx.RespondText("https://some-random-api.com/canvas/nonbinary?avatar=%s", url.QueryEscape(user.AvatarURL("")))
 }
 
 func (c *ImageCommands) lesbian(ctx *router.Ctx) {
@@ -1283,7 +1283,7 @@ func (c *ImageCommands) lesbian(ctx *router.Ctx) {
 		ctx.RespondText("Cannot find user")
 		return
 	}
-	ctx.RespondText(fmt.Sprintf("https://some-random-api.com/canvas/lesbian?avatar=%s", url.QueryEscape(user.AvatarURL(""))))
+	ctx.RespondText("https://some-random-api.com/canvas/lesbian?avatar=%s", url.QueryEscape(user.AvatarURL("")))
 }
 
 func (c *ImageCommands) bisexual(ctx *router.Ctx) {
@@ -1292,7 +1292,7 @@ func (c *ImageCommands) bisexual(ctx *router.Ctx) {
 		ctx.RespondText("Cannot find user")
 		return
 	}
-	ctx.RespondText(fmt.Sprintf("https://some-random-api.com/canvas/bisexual?avatar=%s", url.QueryEscape(user.AvatarURL(""))))
+	ctx.RespondText("https://some-random-api.com/canvas/bisexual?avatar=%s", url.QueryEscape(user.AvatarURL("")))
 }
 
 func (c *ImageCommands) trans(ctx *router.Ctx) {
@@ -1301,15 +1301,15 @@ func (c *ImageCommands) trans(ctx *router.Ctx) {
 		ctx.RespondText("Cannot find user")
 		return
 	}
-	ctx.RespondText(fmt.Sprintf("https://some-random-api.com/canvas/transgender?avatar=%s", url.QueryEscape(user.AvatarURL(""))))
+	ctx.RespondText("https://some-random-api.com/canvas/transgender?avatar=%s", url.QueryEscape(user.AvatarURL("")))
 }
 
 func (c *ImageCommands) oogway(ctx *router.Ctx) {
-	ctx.RespondText(fmt.Sprintf("https://some-random-api.com/canvas/oogway?quote=%s", url.QueryEscape(ctx.Arguments.Raw())))
+	ctx.RespondText("https://some-random-api.com/canvas/oogway?quote=%s", url.QueryEscape(ctx.Arguments.Raw()))
 }
 
 func (c *ImageCommands) oogway2(ctx *router.Ctx) {
-	ctx.RespondText(fmt.Sprintf("https://some-random-api.com/canvas/oogway2?quote=%s", url.QueryEscape(ctx.Arguments.Raw())))
+	ctx.RespondText("https://some-random-api.com/canvas/oogway2?quote=%s", url.QueryEscape(ctx.Arguments.Raw()))
 }
 
 func (c *ImageCommands) threat(ctx *router.Ctx) {
@@ -2363,7 +2363,7 @@ func (c *ImageCommands) rule34(ctx *router.Ctx) {
 }
 
 func (c *ImageCommands) achievement(ctx *router.Ctx) {
-	ctx.RespondText(fmt.Sprintf("https://api.lightning-bot.com/api/v3/imagegen/achievement?text=%s", url.QueryEscape(ctx.Arguments.Raw())))
+	ctx.RespondText("https://api.lightning-bot.com/api/v3/imagegen/achievement?text=%s", url.QueryEscape(ctx.Arguments.Raw()))
 }
 
 func (c *ImageCommands) amiajoke(ctx *router.Ctx) {
@@ -2372,7 +2372,7 @@ func (c *ImageCommands) amiajoke(ctx *router.Ctx) {
 		ctx.RespondText("Cannot find user")
 		return
 	}
-	ctx.RespondText(fmt.Sprintf("https://api.lightning-bot.com/api/v3/imagegen/amiajoke?url=%s", url.QueryEscape(user.AvatarURL(""))))
+	ctx.RespondText("https://api.lightning-bot.com/api/v3/imagegen/amiajoke?url=%s", url.QueryEscape(user.AvatarURL("")))
 }
 
 func (c *ImageCommands) bad(ctx *router.Ctx) {
@@ -2381,11 +2381,11 @@ func (c *ImageCommands) bad(ctx *router.Ctx) {
 		ctx.RespondText("Cannot find user")
 		return
 	}
-	ctx.RespondText(fmt.Sprintf("https://api.lightning-bot.com/api/v3/imagegen/bad?url=%s", url.QueryEscape(user.AvatarURL(""))))
+	ctx.RespondText("https://api.lightning-bot.com/api/v3/imagegen/bad?url=%s", url.QueryEscape(user.AvatarURL("")))
 }
 
 func (c *ImageCommands) calling(ctx *router.Ctx) {
-	ctx.RespondText(fmt.Sprintf("https://api.lightning-bot.com/api/v3/imagegen/calling?text=%s", url.QueryEscape(ctx.Arguments.Raw())))
+	ctx.RespondText("https://api.lightning-bot.com/api/v3/imagegen/calling?text=%s", url.QueryEscape(ctx.Arguments.Raw()))
 }
 
 func (c *ImageCommands) didyoumean(ctx *router.Ctx) {
@@ -2413,7 +2413,7 @@ func (c *ImageCommands) ayano(ctx *router.Ctx) {
 }
 
 func (c *ImageCommands) facts(ctx *router.Ctx) {
-	ctx.RespondText(fmt.Sprintf("https://api.lightning-bot.com/api/v3/imagegen/facts?text=%s", url.QueryEscape(ctx.Arguments.Raw())))
+	ctx.RespondText("https://api.lightning-bot.com/api/v3/imagegen/facts?text=%s", url.QueryEscape(ctx.Arguments.Raw()))
 }
 
 func (c *ImageCommands) blur(ctx *router.Ctx) {
@@ -2422,7 +2422,7 @@ func (c *ImageCommands) blur(ctx *router.Ctx) {
 		ctx.RespondText("Cannot find user")
 		return
 	}
-	ctx.RespondText(fmt.Sprintf("https://api.lightning-bot.com/api/v3/imagegen/filter?url=%s&filter=blur", url.QueryEscape(user.AvatarURL(""))))
+	ctx.RespondText("https://api.lightning-bot.com/api/v3/imagegen/filter?url=%s&filter=blur", url.QueryEscape(user.AvatarURL("")))
 }
 
 func (c *ImageCommands) flipav(ctx *router.Ctx) {
@@ -2431,7 +2431,7 @@ func (c *ImageCommands) flipav(ctx *router.Ctx) {
 		ctx.RespondText("Cannot find user")
 		return
 	}
-	ctx.RespondText(fmt.Sprintf("https://api.lightning-bot.com/api/v3/imagegen/filter?url=%s&filter=flip", url.QueryEscape(user.AvatarURL(""))))
+	ctx.RespondText("https://api.lightning-bot.com/api/v3/imagegen/filter?url=%s&filter=flip", url.QueryEscape(user.AvatarURL("")))
 }
 
 func (c *ImageCommands) mirror(ctx *router.Ctx) {
@@ -2440,7 +2440,7 @@ func (c *ImageCommands) mirror(ctx *router.Ctx) {
 		ctx.RespondText("Cannot find user")
 		return
 	}
-	ctx.RespondText(fmt.Sprintf("https://api.lightning-bot.com/api/v3/imagegen/filter?url=%s&filter=mirror", url.QueryEscape(user.AvatarURL(""))))
+	ctx.RespondText("https://api.lightning-bot.com/api/v3/imagegen/filter?url=%s&filter=mirror", url.QueryEscape(user.AvatarURL("")))
 }
 
 func (c *ImageCommands) wide(ctx *router.Ctx) {
@@ -2449,7 +2449,7 @@ func (c *ImageCommands) wide(ctx *router.Ctx) {
 		ctx.RespondText("Cannot find user")
 		return
 	}
-	ctx.RespondText(fmt.Sprintf("https://api.lightning-bot.com/api/v3/imagegen/filter?url=%s&filter=wide", url.QueryEscape(user.AvatarURL(""))))
+	ctx.RespondText("https://api.lightning-bot.com/api/v3/imagegen/filter?url=%s&filter=wide", url.QueryEscape(user.AvatarURL("")))
 }
 
 func (c *ImageCommands) sepia(ctx *router.Ctx) {
@@ -2458,11 +2458,11 @@ func (c *ImageCommands) sepia(ctx *router.Ctx) {
 		ctx.RespondText("Cannot find user")
 		return
 	}
-	ctx.RespondText(fmt.Sprintf("https://api.lightning-bot.com/api/v3/imagegen/filter?url=%s&filter=sepia", url.QueryEscape(user.AvatarURL(""))))
+	ctx.RespondText("https://api.lightning-bot.com/api/v3/imagegen/filter?url=%s&filter=sepia", url.QueryEscape(user.AvatarURL("")))
 }
 
 func (c *ImageCommands) recaptcha(ctx *router.Ctx) {
-	ctx.RespondText(fmt.Sprintf("https://api.lightning-bot.com/api/v3/imagegen/captcha?text=%s", url.QueryEscape(ctx.Arguments.Raw())))
+	ctx.RespondText("https://api.lightning-bot.com/api/v3/imagegen/captcha?text=%s", url.QueryEscape(ctx.Arguments.Raw()))
 }
 
 func (c *ImageCommands) gay(ctx *router.Ctx) {
@@ -2471,7 +2471,7 @@ func (c *ImageCommands) gay(ctx *router.Ctx) {
 		ctx.RespondText("Cannot find user")
 		return
 	}
-	ctx.RespondText(fmt.Sprintf("https://api.lightning-bot.com/api/v3/imagegen/filter?url=%s&filter=gay", url.QueryEscape(user.AvatarURL(""))))
+	ctx.RespondText("https://api.lightning-bot.com/api/v3/imagegen/filter?url=%s&filter=gay", url.QueryEscape(user.AvatarURL("")))
 }
 
 func (c *ImageCommands) communist(ctx *router.Ctx) {
@@ -2480,7 +2480,7 @@ func (c *ImageCommands) communist(ctx *router.Ctx) {
 		ctx.RespondText("Cannot find user")
 		return
 	}
-	ctx.RespondText(fmt.Sprintf("https://api.lightning-bot.com/api/v3/imagegen/filter?url=%s&filter=communist", url.QueryEscape(user.AvatarURL(""))))
+	ctx.RespondText("https://api.lightning-bot.com/api/v3/imagegen/filter?url=%s&filter=communist", url.QueryEscape(user.AvatarURL("")))
 }
 
 func (c *ImageCommands) snow(ctx *router.Ctx) {
@@ -2489,7 +2489,7 @@ func (c *ImageCommands) snow(ctx *router.Ctx) {
 		ctx.RespondText("Cannot find user")
 		return
 	}
-	ctx.RespondText(fmt.Sprintf("https://api.lightning-bot.com/api/v3/imagegen/filter?url=%s&filter=snow", url.QueryEscape(user.AvatarURL(""))))
+	ctx.RespondText("https://api.lightning-bot.com/api/v3/imagegen/filter?url=%s&filter=snow", url.QueryEscape(user.AvatarURL("")))
 }
 
 func (c *ImageCommands) hub(ctx *router.Ctx) {
@@ -2518,7 +2518,7 @@ func (c *ImageCommands) jokeoverhead(ctx *router.Ctx) {
 		ctx.RespondText("Cannot find user")
 		return
 	}
-	ctx.RespondText(fmt.Sprintf("https://api.lightning-bot.com/api/v3/imagegen/jokeoverhead?url=%s", url.QueryEscape(user.AvatarURL(""))))
+	ctx.RespondText("https://api.lightning-bot.com/api/v3/imagegen/jokeoverhead?url=%s", url.QueryEscape(user.AvatarURL("")))
 }
 
 func (c *ImageCommands) throwaway(ctx *router.Ctx) {
@@ -2539,11 +2539,11 @@ func (c *ImageCommands) salty(ctx *router.Ctx) {
 		ctx.RespondText("Cannot find user")
 		return
 	}
-	ctx.RespondText(fmt.Sprintf("https://api.lightning-bot.com/api/v3/imagegen/salty?url=%s", url.QueryEscape(user.AvatarURL(""))))
+	ctx.RespondText("https://api.lightning-bot.com/api/v3/imagegen/salty?url=%s", url.QueryEscape(user.AvatarURL("")))
 }
 
 func (c *ImageCommands) scroll(ctx *router.Ctx) {
-	ctx.RespondText(fmt.Sprintf("https://api.lightning-bot.com/api/v3/imagegen/scroll?text=%s", url.QueryEscape(ctx.Arguments.Raw())))
+	ctx.RespondText("https://api.lightning-bot.com/api/v3/imagegen/scroll?text=%s", url.QueryEscape(ctx.Arguments.Raw()))
 }
 
 func (c *ImageCommands) shame(ctx *router.Ctx) {
@@ -2552,7 +2552,7 @@ func (c *ImageCommands) shame(ctx *router.Ctx) {
 		ctx.RespondText("Cannot find user")
 		return
 	}
-	ctx.RespondText(fmt.Sprintf("https://api.lightning-bot.com/api/v3/imagegen/shame?url=%s", url.QueryEscape(user.AvatarURL(""))))
+	ctx.RespondText("https://api.lightning-bot.com/api/v3/imagegen/shame?url=%s", url.QueryEscape(user.AvatarURL("")))
 }
 
 func (c *ImageCommands) ship(ctx *router.Ctx) {
@@ -2579,7 +2579,7 @@ func (c *ImageCommands) what(ctx *router.Ctx) {
 		ctx.RespondText("Cannot find user")
 		return
 	}
-	ctx.RespondText(fmt.Sprintf("https://api.lightning-bot.com/api/v3/imagegen/what?url=%s", url.QueryEscape(user.AvatarURL(""))))
+	ctx.RespondText("https://api.lightning-bot.com/api/v3/imagegen/what?url=%s", url.QueryEscape(user.AvatarURL("")))
 }
 
 func (c *ImageCommands) adios(ctx *router.Ctx) {
@@ -2588,7 +2588,7 @@ func (c *ImageCommands) adios(ctx *router.Ctx) {
 		ctx.RespondText("Cannot find user")
 		return
 	}
-	ctx.RespondText(fmt.Sprintf("https://vacefron.nl/api/adios?user=%s", url.QueryEscape(user.AvatarURL(""))))
+	ctx.RespondText("https://vacefron.nl/api/adios?user=%s", url.QueryEscape(user.AvatarURL("")))
 }
 
 func (c *ImageCommands) batmanslap(ctx *router.Ctx) {
@@ -2612,7 +2612,7 @@ func (c *ImageCommands) batmanslap(ctx *router.Ctx) {
 }
 
 func (c *ImageCommands) carreverse(ctx *router.Ctx) {
-	ctx.RespondText(fmt.Sprintf("https://vacefron.nl/api/carreverse?text=%s", url.QueryEscape(ctx.Arguments.Raw())))
+	ctx.RespondText("https://vacefron.nl/api/carreverse?text=%s", url.QueryEscape(ctx.Arguments.Raw()))
 }
 
 func (c *ImageCommands) drip(ctx *router.Ctx) {
@@ -2621,21 +2621,21 @@ func (c *ImageCommands) drip(ctx *router.Ctx) {
 		ctx.RespondText("Cannot find user")
 		return
 	}
-	ctx.RespondText(fmt.Sprintf("https://vacefron.nl/api/drip?user=%s", url.QueryEscape(user.AvatarURL(""))))
+	ctx.RespondText("https://vacefron.nl/api/drip?user=%s", url.QueryEscape(user.AvatarURL("")))
 }
 
 func (c *ImageCommands) impostor(ctx *router.Ctx) {
 	crewmate := random.Choice([]string{"black", "blue", "brown", "cyan", "darkgreen", "lime", "orange", "pink", "purple", "red", "white", "yellow"})
-	ctx.RespondText(fmt.Sprintf("https://vacefron.nl/api/ejected?name=%s&impostor=true&crewmate=%s", ctx.Arguments.Raw(), crewmate))
+	ctx.RespondText("https://vacefron.nl/api/ejected?name=%s&impostor=true&crewmate=%s", ctx.Arguments.Raw(), crewmate)
 }
 
 func (c *ImageCommands) notimpostor(ctx *router.Ctx) {
 	crewmate := random.Choice([]string{"black", "blue", "brown", "cyan", "darkgreen", "lime", "orange", "pink", "purple", "red", "white", "yellow"})
-	ctx.RespondText(fmt.Sprintf("https://vacefron.nl/api/ejected?name=%s&impostor=false&crewmate=%s", ctx.Arguments.Raw(), crewmate))
+	ctx.RespondText("https://vacefron.nl/api/ejected?name=%s&impostor=false&crewmate=%s", ctx.Arguments.Raw(), crewmate)
 }
 
 func (c *ImageCommands) emergencymeeting(ctx *router.Ctx) {
-	ctx.RespondText(fmt.Sprintf("https://vacefron.nl/api/emergencymeeting?text=%s", url.QueryEscape(ctx.Arguments.Raw())))
+	ctx.RespondText("https://vacefron.nl/api/emergencymeeting?text=%s", url.QueryEscape(ctx.Arguments.Raw()))
 }
 
 func (c *ImageCommands) firsttime(ctx *router.Ctx) {
@@ -2644,7 +2644,7 @@ func (c *ImageCommands) firsttime(ctx *router.Ctx) {
 		ctx.RespondText("Cannot find user")
 		return
 	}
-	ctx.RespondText(fmt.Sprintf("https://vacefron.nl/api/firsttime?user=%s", url.QueryEscape(user.AvatarURL(""))))
+	ctx.RespondText("https://vacefron.nl/api/firsttime?user=%s", url.QueryEscape(user.AvatarURL("")))
 }
 
 func (c *ImageCommands) grave(ctx *router.Ctx) {
@@ -2653,7 +2653,7 @@ func (c *ImageCommands) grave(ctx *router.Ctx) {
 		ctx.RespondText("Cannot find user")
 		return
 	}
-	ctx.RespondText(fmt.Sprintf("https://vacefron.nl/api/grave?user=%s", url.QueryEscape(user.AvatarURL(""))))
+	ctx.RespondText("https://vacefron.nl/api/grave?user=%s", url.QueryEscape(user.AvatarURL("")))
 }
 
 func (c *ImageCommands) iamspeed(ctx *router.Ctx) {
@@ -2662,7 +2662,7 @@ func (c *ImageCommands) iamspeed(ctx *router.Ctx) {
 		ctx.RespondText("Cannot find user")
 		return
 	}
-	ctx.RespondText(fmt.Sprintf("https://vacefron.nl/api/iamspeed?user=%s", url.QueryEscape(user.AvatarURL(""))))
+	ctx.RespondText("https://vacefron.nl/api/iamspeed?user=%s", url.QueryEscape(user.AvatarURL("")))
 }
 
 func (c *ImageCommands) icanmilkyou(ctx *router.Ctx) {
@@ -2676,7 +2676,7 @@ func (c *ImageCommands) icanmilkyou(ctx *router.Ctx) {
 		ctx.RespondText("Cannot find user")
 		return
 	}
-	ctx.RespondText(fmt.Sprintf("https://vacefron.nl/api/icanmilkyou?user1=%s&user2=%s", url.QueryEscape(user1.AvatarURL("")), url.QueryEscape(user2.AvatarURL(""))))
+	ctx.RespondText("https://vacefron.nl/api/icanmilkyou?user1=%s&user2=%s", url.QueryEscape(user1.AvatarURL(""), url.QueryEscape(user2.AvatarURL(""))))
 }
 
 func (c *ImageCommands) heaven(ctx *router.Ctx) {
@@ -2685,11 +2685,11 @@ func (c *ImageCommands) heaven(ctx *router.Ctx) {
 		ctx.RespondText("Cannot find user")
 		return
 	}
-	ctx.RespondText(fmt.Sprintf("https://vacefron.nl/api/heaven?user=%s", url.QueryEscape(user.AvatarURL(""))))
+	ctx.RespondText("https://vacefron.nl/api/heaven?user=%s", url.QueryEscape(user.AvatarURL("")))
 }
 
 func (c *ImageCommands) npc(ctx *router.Ctx) {
-	ctx.RespondText(fmt.Sprintf("https://vacefron.nl/api/npc?text1=%s&text2=%s", url.QueryEscape(ctx.Arguments.Get(0).Raw()), url.QueryEscape(ctx.Arguments.Get(1).Raw())))
+	ctx.RespondText("https://vacefron.nl/api/npc?text1=%s&text2=%s", url.QueryEscape(ctx.Arguments.Get(0).Raw(), url.QueryEscape(ctx.Arguments.Get(1).Raw())))
 }
 
 func (c *ImageCommands) stonks(ctx *router.Ctx) {
@@ -2698,7 +2698,7 @@ func (c *ImageCommands) stonks(ctx *router.Ctx) {
 		ctx.RespondText("Cannot find user")
 		return
 	}
-	ctx.RespondText(fmt.Sprintf("https://vacefron.nl/api/stonks?user=%s", url.QueryEscape(user.AvatarURL(""))))
+	ctx.RespondText("https://vacefron.nl/api/stonks?user=%s", url.QueryEscape(user.AvatarURL("")))
 }
 
 func (c *ImageCommands) notstonks(ctx *router.Ctx) {
@@ -2707,7 +2707,7 @@ func (c *ImageCommands) notstonks(ctx *router.Ctx) {
 		ctx.RespondText("Cannot find user")
 		return
 	}
-	ctx.RespondText(fmt.Sprintf("https://vacefron.nl/api/stonks?user=%s&notstonks=true", url.QueryEscape(user.AvatarURL(""))))
+	ctx.RespondText("https://vacefron.nl/api/stonks?user=%s&notstonks=true", url.QueryEscape(user.AvatarURL("")))
 }
 
 func (c *ImageCommands) fliptable(ctx *router.Ctx) {
@@ -2716,11 +2716,11 @@ func (c *ImageCommands) fliptable(ctx *router.Ctx) {
 		ctx.RespondText("Cannot find user")
 		return
 	}
-	ctx.RespondText(fmt.Sprintf("https://vacefron.nl/api/tableflip?user=%s", url.QueryEscape(user.AvatarURL(""))))
+	ctx.RespondText("https://vacefron.nl/api/tableflip?user=%s", url.QueryEscape(user.AvatarURL("")))
 }
 
 func (c *ImageCommands) water(ctx *router.Ctx) {
-	ctx.RespondText(fmt.Sprintf("https://vacefron.nl/api/water?text=%s", url.QueryEscape(ctx.Arguments.Raw())))
+	ctx.RespondText("https://vacefron.nl/api/water?text=%s", url.QueryEscape(ctx.Arguments.Raw()))
 }
 
 func (c *ImageCommands) wolverine(ctx *router.Ctx) {
@@ -2729,7 +2729,7 @@ func (c *ImageCommands) wolverine(ctx *router.Ctx) {
 		ctx.RespondText("Cannot find user")
 		return
 	}
-	ctx.RespondText(fmt.Sprintf("https://vacefron.nl/api/wolverine?user=%s", url.QueryEscape(user.AvatarURL(""))))
+	ctx.RespondText("https://vacefron.nl/api/wolverine?user=%s", url.QueryEscape(user.AvatarURL("")))
 }
 
 func (c *ImageCommands) womanyellingatcat(ctx *router.Ctx) {
@@ -2743,7 +2743,7 @@ func (c *ImageCommands) womanyellingatcat(ctx *router.Ctx) {
 		ctx.RespondText("Cannot find user")
 		return
 	}
-	ctx.RespondText(fmt.Sprintf("https://vacefron.nl/api/womanyellingatcat?woman=%s&cat=%s", url.QueryEscape(user1.AvatarURL("")), url.QueryEscape(user2.AvatarURL(""))))
+	ctx.RespondText("https://vacefron.nl/api/womanyellingatcat?woman=%s&cat=%s", url.QueryEscape(user1.AvatarURL(""), url.QueryEscape(user2.AvatarURL(""))))
 }
 
 func (c *ImageCommands) pikachu(ctx *router.Ctx) {

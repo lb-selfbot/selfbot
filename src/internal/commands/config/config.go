@@ -899,7 +899,7 @@ func (c *ConfigCommands) forcesubscribedservers(ctx *router.Ctx) {
 		}
 
 		if slices.Contains(cfg.Selfbot.ForceSubscribedServers, guild.ID) {
-			ctx.RespondText(fmt.Sprintf("Server %s is already force subscribed!", guild.Name))
+			ctx.RespondText("Server %s is already force subscribed!", guild.Name)
 			return
 		}
 
@@ -917,7 +917,7 @@ func (c *ConfigCommands) forcesubscribedservers(ctx *router.Ctx) {
 		}
 
 		if !slices.Contains(cfg.Selfbot.ForceSubscribedServers, guild.ID) {
-			ctx.RespondText(fmt.Sprintf("Server %s already isn't force subscribed!", guild.Name))
+			ctx.RespondText("Server %s already isn't force subscribed!", guild.Name)
 			return
 		}
 
@@ -1334,7 +1334,7 @@ func (c *ConfigCommands) sniperserverblacklist(ctx *router.Ctx) {
 		}
 
 		if slices.Contains(cfg.Snipers.ServerBlacklist, guild.ID) {
-			ctx.RespondText(fmt.Sprintf("Server %s is already in the blacklist!", guild.Name))
+			ctx.RespondText("Server %s is already in the blacklist!", guild.Name)
 			return
 		}
 
@@ -1352,7 +1352,7 @@ func (c *ConfigCommands) sniperserverblacklist(ctx *router.Ctx) {
 		}
 
 		if !slices.Contains(cfg.Snipers.ServerBlacklist, guild.ID) {
-			ctx.RespondText(fmt.Sprintf("Server %s already isn't in the blacklist!", guild.Name))
+			ctx.RespondText("Server %s already isn't in the blacklist!", guild.Name)
 			return
 		}
 

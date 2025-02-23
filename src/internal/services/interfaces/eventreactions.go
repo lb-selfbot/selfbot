@@ -106,6 +106,8 @@ type EventReactionsService interface {
 
 	GetAllReactions() []EventReaction
 	GetReactionsByType(t EventReactionType) []EventReaction
+	AddReaction(r EventReaction)
+	RemoveReaction(r EventReaction)
 	RemoveAllReactions()
 	RemoveReactionsByType(t EventReactionType)
 

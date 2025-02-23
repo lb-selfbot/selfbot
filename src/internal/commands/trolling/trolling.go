@@ -190,7 +190,7 @@ func (c *TrollingCommands) token(ctx *router.Ctx) {
 }
 
 func (c *TrollingCommands) trollnitro(ctx *router.Ctx) {
-	ctx.RespondText(fmt.Sprintf("discord\u2024gift/%s %s https://i.imgur.com/0WSpeC1.png", random.String(16), constants.INVISIBLE_TEXT))
+	ctx.RespondText("discord\u2024gift/%s %s https://i.imgur.com/0WSpeC1.png", random.String(16), constants.INVISIBLE_TEXT)
 }
 
 func (c *TrollingCommands) fakenitro(ctx *router.Ctx) {
@@ -241,11 +241,11 @@ func (c *TrollingCommands) hiddenroleping(ctx *router.Ctx) {
 }
 
 func (c *TrollingCommands) hiddeneveryone(ctx *router.Ctx) {
-	ctx.RespondText(fmt.Sprintf("%s %s @everyone", ctx.Arguments.Raw(), constants.INVISIBLE_TEXT))
+	ctx.RespondText("%s %s @everyone", ctx.Arguments.Raw(), constants.INVISIBLE_TEXT)
 }
 
 func (c *TrollingCommands) hiddenhere(ctx *router.Ctx) {
-	ctx.RespondText(fmt.Sprintf("%s %s @here", ctx.Arguments.Raw(), constants.INVISIBLE_TEXT))
+	ctx.RespondText("%s %s @here", ctx.Arguments.Raw(), constants.INVISIBLE_TEXT)
 }
 
 func (c *TrollingCommands) voicemove(ctx *router.Ctx) {

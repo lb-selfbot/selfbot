@@ -148,7 +148,7 @@ func (c *SpotifyCommands) checkResponse(ctx *router.Ctx, httpResponse *http.Http
 	errorReason = strings.ReplaceAll(errorReason, "NO_ACTIVE_DEVICE", "No active device found")
 
 	if errorReason != "" {
-		ctx.RespondText(fmt.Sprintf("A Spotify error occurred: `%s`", errorReason))
+		ctx.RespondText("A Spotify error occurred: `%s`", errorReason)
 		return false
 	}
 

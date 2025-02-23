@@ -1,7 +1,6 @@
 package protections
 
 import (
-	"fmt"
 	"slices"
 	"strconv"
 	"strings"
@@ -103,7 +102,6 @@ func (c *ProtectionsCommands) Register() {
 func (c *ProtectionsCommands) RegisterCommands(router *dgc.Router) {
 	router.StartCategory("Protections", "Protection commands")
 
-	
 }
 
 func (c *ProtectionsCommands) antiphishing(ctx *router.Ctx) {
@@ -249,7 +247,7 @@ func (c *ProtectionsCommands) protectedservers(ctx *router.Ctx) {
 		}
 
 		if slices.Contains(cfg.Protections.ServerProtections.ProtectedServers, guild.ID) {
-			ctx.RespondText(fmt.Sprintf("Server %s is already in the Protected Servers List!", guild.Name))
+			ctx.RespondText("Server %s is already in the Protected Servers List!", guild.Name)
 			return
 		}
 
@@ -267,7 +265,7 @@ func (c *ProtectionsCommands) protectedservers(ctx *router.Ctx) {
 		}
 
 		if !slices.Contains(cfg.Protections.ServerProtections.ProtectedServers, guild.ID) {
-			ctx.RespondText(fmt.Sprintf("Server %s already isn't in the Protected Servers List!", guild.Name))
+			ctx.RespondText("Server %s already isn't in the Protected Servers List!", guild.Name)
 			return
 		}
 

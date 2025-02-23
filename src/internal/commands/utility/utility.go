@@ -3437,7 +3437,7 @@ func (c *UtilityCommands) youtubedl(ctx *router.Ctx) {
 			return
 		}
 
-		ctx.RespondText(fmt.Sprintf("Downloading %s...", video.Title))
+		ctx.RespondText("Downloading %s...", video.Title)
 
 		formats := video.Formats.WithAudioChannels()
 
@@ -3468,7 +3468,7 @@ func (c *UtilityCommands) youtubedl(ctx *router.Ctx) {
 		}
 
 		_ = utils.System.OpenURL(downloadPath)
-		ctx.RespondText(fmt.Sprintf("Successfully downloaded %s", video.Title))
+		ctx.RespondText("Successfully downloaded %s", video.Title)
 
 		break
 	}
@@ -3706,6 +3706,6 @@ func (c *UtilityCommands) timestampCommand(flags string) func(ctx *router.Ctx) {
 			return
 		}
 
-		ctx.RespondText(fmt.Sprintf("<t:%d%s>", time.Unix(), flags))
+		ctx.RespondText("<t:%d%s>", time.Unix(), flags)
 	}
 }
