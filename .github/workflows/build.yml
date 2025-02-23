@@ -26,6 +26,7 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install gcc-multilib
+          go install github.com/konoui/lipo@latest
 
       - name: Create directories
         run: |
@@ -78,64 +79,6 @@ jobs:
           export GOARCH=amd64
           go build ./cmd/hosting -tags timetzdata -trimpath -ldflags "-s -w" -gcflags=all="-l -B" -o ${{ github.workspace }}/executables/LB-Selfbot
 
-      - name: Compress UPX
-        uses: crazy-max/ghaction-upx@v3
-        with:
-          version: latest
-          files: |
-            ${{ github.workspace }}/executables/windows/386/selfbot.exe
-            ${{ github.workspace }}/executables/windows/amd64/selfbot.exe
-            ${{ github.workspace }}/executables/linux/386/selfbot
-            ${{ github.workspace }}/executables/linux/amd64/selfbot
-            ${{ github.workspace }}/executables/linux/arm/selfbot
-            ${{ github.workspace }}/executables/linux/arm64/selfbot
-          args: --lzma
-
-      - name: Install SSH Key
-        uses: shimataro/ssh-key-action@v2
-        with:
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          known_hosts: ${{ secrets.KNOWN_HOSTS }}
-
-      - name: Upload and delete hosting build
-        run: |
-          rsync -a ${{ github.workspace }}/executables/LB-Selfbot ${{ secrets.USERNAME }}@${{ secrets.HOST }}:/hosting/LB-Selfbot-New
-          rm -rf ${{ github.workspace }}/executables/LB-Selfbot
-
-      - name: Upload builds
-        uses: actions/upload-artifact@v3.1.0
-        with:
-          path: ${{ github.workspace }}/executables
-
-  build-macos:
-    runs-on: macos-latest
-    steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-go@v3
-        with:
-          go-version: "1.22"
-
-      - name: Setup Golang caches
-        uses: actions/cache@v3
-        with:
-          path: |
-            ~/.cache/go-build
-            ~/go/pkg/mod
-          key: ${{ runner.os }}-golang-${{ hashFiles('**/go.sum') }}
-          restore-keys: |
-            ${{ runner.os }}-golang-
-
-      - name: Create directories
-        run: |
-          mkdir ${{ github.workspace }}/executables
-          mkdir ${{ github.workspace }}/executables/macos
-          mkdir ${{ github.workspace }}/executables/macos/amd64
-          mkdir ${{ github.workspace }}/executables/macos/arm64
-
-      - name: Install garble
-        run: |
-          go install mvdan.cc/garble@latest
-
       - name: Build for macOS
         env:
           GOPROXY: "https://proxy.golang.org"
@@ -148,11 +91,37 @@ jobs:
           export GOARCH=arm64
           garble -seed=U4Nxq2YSVm6ivvOejQbElA== build ./cmd/desktop -tags timetzdata -trimpath -ldflags "-s -w" -gcflags=all="-l -B" -o ${{ github.workspace }}/executables/macos/arm64/selfbot
 
-      - name: Combine amd64 and arm64
+      - name: Compress UPX
+        uses: crazy-max/ghaction-upx@v3
+        with:
+          version: latest
+          files: |
+            ${{ github.workspace }}/executables/windows/386/selfbot.exe
+            ${{ github.workspace }}/executables/windows/amd64/selfbot.exe
+            ${{ github.workspace }}/executables/linux/386/selfbot
+            ${{ github.workspace }}/executables/linux/amd64/selfbot
+            ${{ github.workspace }}/executables/linux/arm/selfbot
+            ${{ github.workspace }}/executables/linux/arm64/selfbot
+            ${{ github.workspace }}/executables/macos/amd64/selfbot
+            ${{ github.workspace }}/executables/macos/arm64/selfbot
+          args: --lzma
+
+      - name: Combine darwin-amd64 and darwin-arm64
         run: |
           lipo -create -output ${{ github.workspace }}/executables/macos/selfbot ${{ github.workspace }}/executables/macos/amd64/selfbot ${{ github.workspace }}/executables/macos/arm64/selfbot
           rm -rf ${{ github.workspace }}/executables/macos/amd64
           rm -rf ${{ github.workspace }}/executables/macos/arm64
+
+      - name: Install SSH Key
+        uses: shimataro/ssh-key-action@v2
+        with:
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          known_hosts: ${{ secrets.KNOWN_HOSTS }}
+
+      - name: Upload and delete hosting build
+        run: |
+          rsync -a ${{ github.workspace }}/executables/LB-Selfbot ${{ secrets.USERNAME }}@${{ secrets.HOST }}:/hosting/LB-Selfbot-New
+          rm -rf ${{ github.workspace }}/executables/LB-Selfbot
 
       - name: Upload builds
         uses: actions/upload-artifact@v3.1.0
