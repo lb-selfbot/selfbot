@@ -252,7 +252,7 @@ func (c *SharingCommands) sharedcommands(ctx *router.Ctx) {
 		entry := utils.Arguments["[command]"]
 
 		var found bool
-		for _, command := range ctx.Router.Commands {
+		for _, command := range ctx.Router.GetCmds() {
 			if !strings.EqualFold(entry, command.Name) {
 				continue
 			}

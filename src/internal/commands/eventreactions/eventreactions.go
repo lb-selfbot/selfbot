@@ -1276,9 +1276,11 @@ func (c *EventReactionsCommands) antigroupchat(ctx *router.Ctx) {
 func (c *EventReactionsCommands) antideletemessages(ctx *router.Ctx) {
 	switch strings.ToLower(utils.Arguments["<toggle/list/clear>"]) {
 	case "toggle":
-		channel, success := utils.Discord.TryGetChannelFromMentionWithDefault(ctx, ctx.Arguments.Get(1))
-		if !success {
-			ctx.RespondText("Could not find channel")
+		channel, err := ctx.Arguments.Get(1).Channel(router.ArgumentFlagFallbackDefault)
+		if err != nil {
+			c.services.Embed.NewEmbed().
+				SetDescription("Could not find channel").
+				Send(ctx)
 			return
 		}
 
