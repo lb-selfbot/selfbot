@@ -9,6 +9,7 @@ import (
 	"github.com/LightningDev1/LB-Selfbot/internal/config"
 	"github.com/LightningDev1/LB-Selfbot/internal/router"
 	"github.com/LightningDev1/LB-Selfbot/internal/services"
+	"github.com/LightningDev1/LB-Selfbot/internal/utils2"
 
 	"github.com/LightningDev1/LB-Selfbot/internal/utils"
 )
@@ -24,267 +25,161 @@ func (c *ConfigCommands) Register() {
 
 	cmdRouter.RegisterCategory(&router.Category{
 		Name:        "Config",
-		Description: "Change bot configuration",
+		Description: "Change the bot's settings",
 	}, []*router.Command{
-		{
-			Name:        "commandprefix",
-			Description: "Command prefix commands",
-			Flags:       []router.CommandFlag{router.CmdFlagDangerous},
-			SubCommands: []*router.Command{
-				{
-					Name:        "get",
-					Description: "Get the current command prefix",
-					Handler:     c.getCommandPrefix,
-				},
-				{
-					Name:        "set",
-					Description: "Set the command prefix",
-					Arguments:   "<prefix>",
-					Handler:     c.setCommandPrefix,
-				},
+		c.createConfigActionCommand(configCommandData{
+			Name:         "commandprefix",
+			ReadableName: "Command Prefix",
+			ValueType:    configCommandValueTypeString,
+			GetDesc:      "Get the current command prefix",
+			GetFunc:      func(cfg *config.Config) any { return cfg.Selfbot.CommandPrefix },
+			SetDesc:      "Set the command prefix",
+			SetFunc:      func(cfg *config.Config, value any) { cfg.Selfbot.CommandPrefix = value.(string) },
+		}),
+		c.createConfigActionCommand(configCommandData{
+			Name:         "commandmode",
+			ReadableName: "Command Mode",
+			ValueType:    configCommandValueTypeString,
+			GetDesc:      "Get the current command mode",
+			GetFunc:      func(cfg *config.Config) any { return cfg.Selfbot.CommandMode },
+			SetDesc:      "Set the command mode",
+			SetFunc:      func(cfg *config.Config, value any) { cfg.Selfbot.CommandMode = value.(string) },
+			ValuesDesc:   "List available command modes",
+			ValuesFunc:   func() []any { return []any{"Codeblock", "Text", "Indent", "WebhookEmbed", "URLEmbed"} },
+		}),
+		c.createConfigActionCommand(configCommandData{
+			Name:         "title",
+			ReadableName: "Embed Title",
+			ValueType:    configCommandValueTypeString,
+			GetDesc:      "Get the current embed title",
+			GetFunc:      func(cfg *config.Config) any { return cfg.Selfbot.Title },
+			SetDesc:      "Set the embed title",
+			SetFunc:      func(cfg *config.Config, value any) { cfg.Selfbot.Title = value.(string) },
+		}),
+
+		c.createConfigActionCommand(configCommandData{
+			Name:         "footer",
+			ReadableName: "Embed Footer",
+			ValueType:    configCommandValueTypeString,
+			GetDesc:      "Get the current embed footer",
+			GetFunc:      func(cfg *config.Config) any { return cfg.Selfbot.Footer },
+			SetDesc:      "Set the embed footer",
+			SetFunc:      func(cfg *config.Config, value any) { cfg.Selfbot.Footer = value.(string) },
+		}),
+		c.createConfigActionCommand(configCommandData{
+			Name:         "delresponses",
+			ReadableName: "Delete Responses",
+			ValueType:    configCommandValueTypeBool,
+			GetDesc:      "Get delete responses status",
+			GetFunc:      func(cfg *config.Config) any { return cfg.Selfbot.DeleteResponses },
+			SetDesc:      "Set delete responses status",
+			SetFunc:      func(cfg *config.Config, value any) { cfg.Selfbot.DeleteResponses = value.(bool) },
+			ToggleDesc:   "Toggle delete responses",
+			ToggleFunc:   func(cfg *config.Config) { cfg.Selfbot.DeleteResponses = !cfg.Selfbot.DeleteResponses },
+		}),
+		c.createConfigActionCommand(configCommandData{
+			Name:         "delresponsesdelay",
+			ReadableName: "Delete Responses Delay",
+			ValueType:    configCommandValueTypeInt,
+			GetDesc:      "Get delete responses delay",
+			GetFunc:      func(cfg *config.Config) any { return cfg.Selfbot.DeleteResponsesDelay },
+			SetDesc:      "Set delete responses delay",
+			SetFunc:      func(cfg *config.Config, value any) { cfg.Selfbot.DeleteResponsesDelay = value.(int) },
+		}),
+		c.createConfigActionCommand(configCommandData{
+			Name:         "delcommands",
+			ReadableName: "Delete Commands",
+			ValueType:    configCommandValueTypeBool,
+			GetDesc:      "Get delete commands status",
+			GetFunc:      func(cfg *config.Config) any { return cfg.Selfbot.DeleteCommands },
+			SetDesc:      "Set delete commands status",
+			SetFunc:      func(cfg *config.Config, value any) { cfg.Selfbot.DeleteCommands = value.(bool) },
+			ToggleDesc:   "Toggle delete commands",
+			ToggleFunc:   func(cfg *config.Config) { cfg.Selfbot.DeleteCommands = !cfg.Selfbot.DeleteCommands },
+		}),
+		c.createConfigActionCommand(configCommandData{
+			Name:         "clientspoof",
+			ReadableName: "Client Spoof",
+			ValueType:    configCommandValueTypeString,
+			GetDesc:      "Get current client spoof setting",
+			GetFunc:      func(cfg *config.Config) any { return cfg.Selfbot.Client },
+			SetDesc:      "Set client spoof setting",
+			SetFunc:      func(cfg *config.Config, value any) { cfg.Selfbot.Client = utils.String.Capitalize(value.(string)) },
+			ValuesDesc:   "List available clients",
+			ValuesFunc:   func() []any { return []any{"Mobile", "Web", "Desktop", "Console"} },
+		}),
+		c.createConfigActionCommand(configCommandData{
+			Name:         "timezone",
+			ReadableName: "Timezone",
+			ValueType:    configCommandValueTypeString,
+			GetDesc:      "Get current timezone",
+			GetFunc:      func(cfg *config.Config) any { return cfg.Selfbot.Timezone },
+			SetDesc:      "Set timezone",
+			SetFunc: func(cfg *config.Config, value any) {
+				timezone := value.(string)
+				if _, err := time.LoadLocation(timezone); err == nil {
+					cfg.Selfbot.Timezone = timezone
+				}
 			},
-		},
-		{
-			Name:        "commandmode",
-			Description: "Command mode commands",
-			Flags:       []router.CommandFlag{router.CmdFlagDangerous},
-			SubCommands: []*router.Command{
-				{
-					Name:        "get",
-					Description: "Get the current command mode",
-					Handler:     c.getCommandMode,
-				},
-				{
-					Name:        "set",
-					Description: "Set the command mode",
-					Arguments:   "<mode>",
-					Handler:     c.setCommandMode,
-				},
-				{
-					Name:        "values",
-					Description: "List available command modes",
-					Handler:     c.listCommandModes,
-				},
+		}),
+		c.createConfigActionCommand(configCommandData{
+			Name:         "embedcolor",
+			ReadableName: "Embed Color",
+			ValueType:    configCommandValueTypeString,
+			GetDesc:      "Get current embed color",
+			GetFunc:      func(cfg *config.Config) any { return cfg.Selfbot.EmbedColor },
+			SetDesc:      "Set embed color",
+			SetFunc:      func(cfg *config.Config, value any) { cfg.Selfbot.EmbedColor = value.(string) },
+		}),
+		c.createConfigActionCommand(configCommandData{
+			Name:         "embedimage",
+			ReadableName: "Embed Image",
+			ValueType:    configCommandValueTypeString,
+			GetDesc:      "Get current embed image",
+			GetFunc:      func(cfg *config.Config) any { return cfg.Selfbot.EmbedImage },
+			SetDesc:      "Set embed image",
+			SetFunc:      func(cfg *config.Config, value any) { cfg.Selfbot.EmbedImage = value.(string) },
+		}),
+		c.createConfigActionCommand(configCommandData{
+			Name:         "embedurl",
+			ReadableName: "Embed URL",
+			ValueType:    configCommandValueTypeString,
+			GetDesc:      "Get current embed URL",
+			GetFunc:      func(cfg *config.Config) any { return cfg.Selfbot.EmbedURL },
+			SetDesc:      "Set embed URL",
+			SetFunc:      func(cfg *config.Config, value any) { cfg.Selfbot.EmbedURL = value.(string) },
+		}),
+		c.createConfigActionCommand(configCommandData{
+			Name:         "forcesubscribedservers",
+			ReadableName: "Force Subscribed Servers",
+			ValueType:    configCommandValueTypeBool,
+			GetDesc:      "Get force subscribed servers status",
+			GetFunc:      func(cfg *config.Config) any { return len(cfg.Selfbot.ForceSubscribedServers) > 0 },
+			SetDesc:      "Set force subscribed servers status",
+			SetFunc: func(cfg *config.Config, value any) {
+				if value.(bool) {
+					guildIDs := make([]string, 0)
+					for _, guild := range c.services.Discord.GetState().Guilds {
+						guildIDs = append(guildIDs, guild.ID)
+					}
+					cfg.Selfbot.ForceSubscribedServers = guildIDs
+				} else {
+					cfg.Selfbot.ForceSubscribedServers = []string{}
+				}
 			},
-		},
-		{
-			Name:        "title",
-			Description: "Embed title commands",
-			Flags:       []router.CommandFlag{router.CmdFlagDangerous},
-			SubCommands: []*router.Command{
-				{
-					Name:        "get",
-					Description: "Get the current embed title",
-					Handler:     c.getTitle,
-				},
-				{
-					Name:        "set",
-					Description: "Set the embed title",
-					Arguments:   "<title>",
-					Handler:     c.setTitle,
-				},
+			ToggleDesc: "Toggle force subscribed servers",
+			ToggleFunc: func(cfg *config.Config) {
+				if len(cfg.Selfbot.ForceSubscribedServers) > 0 {
+					cfg.Selfbot.ForceSubscribedServers = []string{}
+				} else {
+					guildIDs := make([]string, 0)
+					for _, guild := range c.services.Discord.GetState().Guilds {
+						guildIDs = append(guildIDs, guild.ID)
+					}
+					cfg.Selfbot.ForceSubscribedServers = guildIDs
+				}
 			},
-		},
-		{
-			Name:        "footer",
-			Description: "Embed footer commands",
-			Flags:       []router.CommandFlag{router.CmdFlagDangerous},
-			SubCommands: []*router.Command{
-				{
-					Name:        "get",
-					Description: "Get the current embed footer",
-					Handler:     c.getFooter,
-				},
-				{
-					Name:        "set",
-					Description: "Set the embed footer",
-					Arguments:   "<footer>",
-					Handler:     c.setFooter,
-				},
-			},
-		},
-		{
-			Name:        "delresponses",
-			Description: "Delete responses commands",
-			Flags:       []router.CommandFlag{router.CmdFlagDangerous},
-			SubCommands: []*router.Command{
-				{
-					Name:        "get",
-					Description: "Get delete responses status",
-					Handler:     c.getDelResponses,
-				},
-				{
-					Name:        "set",
-					Description: "Set delete responses status",
-					Arguments:   "<on/off>",
-					Handler:     c.setDelResponses,
-				},
-				{
-					Name:        "toggle",
-					Description: "Toggle delete responses",
-					Handler:     c.toggleDelResponses,
-				},
-			},
-		},
-		{
-			Name:        "delresponsesdelay",
-			Description: "Delete responses delay commands",
-			Flags:       []router.CommandFlag{router.CmdFlagDangerous},
-			SubCommands: []*router.Command{
-				{
-					Name:        "get",
-					Description: "Get delete responses delay",
-					Handler:     c.getDelResponsesDelay,
-				},
-				{
-					Name:        "set",
-					Description: "Set delete responses delay",
-					Arguments:   "<seconds>",
-					Handler:     c.setDelResponsesDelay,
-				},
-			},
-		},
-		{
-			Name:        "delcommands",
-			Description: "Delete commands commands",
-			Flags:       []router.CommandFlag{router.CmdFlagDangerous},
-			SubCommands: []*router.Command{
-				{
-					Name:        "get",
-					Description: "Get delete commands status",
-					Handler:     c.getDelCommands,
-				},
-				{
-					Name:        "set",
-					Description: "Set delete commands status",
-					Arguments:   "<on/off>",
-					Handler:     c.setDelCommands,
-				},
-				{
-					Name:        "toggle",
-					Description: "Toggle delete commands",
-					Handler:     c.toggleDelCommands,
-				},
-			},
-		},
-		{
-			Name:        "clientspoof",
-			Description: "Client spoof commands",
-			Flags:       []router.CommandFlag{router.CmdFlagDangerous},
-			SubCommands: []*router.Command{
-				{
-					Name:        "get",
-					Description: "Get client spoof status",
-					Handler:     c.getClientSpoof,
-				},
-				{
-					Name:        "set",
-					Description: "Set client spoof",
-					Arguments:   "<on/off>",
-					Handler:     c.setClientSpoof,
-				},
-				{
-					Name:        "toggle",
-					Description: "Toggle client spoof",
-					Handler:     c.toggleClientSpoof,
-				},
-			},
-		},
-		{
-			Name:        "timezone",
-			Description: "Timezone commands",
-			Flags:       []router.CommandFlag{router.CmdFlagDangerous},
-			SubCommands: []*router.Command{
-				{
-					Name:        "get",
-					Description: "Get current timezone",
-					Handler:     c.getTimezone,
-				},
-				{
-					Name:        "set",
-					Description: "Set timezone",
-					Arguments:   "<timezone>",
-					Handler:     c.setTimezone,
-				},
-			},
-		},
-		{
-			Name:        "embedcolor",
-			Description: "Embed color commands",
-			Flags:       []router.CommandFlag{router.CmdFlagDangerous},
-			SubCommands: []*router.Command{
-				{
-					Name:        "get",
-					Description: "Get current embed color",
-					Handler:     c.getEmbedColor,
-				},
-				{
-					Name:        "set",
-					Description: "Set embed color",
-					Arguments:   "<color>",
-					Handler:     c.setEmbedColor,
-				},
-			},
-		},
-		{
-			Name:        "embedimage",
-			Description: "Embed image commands",
-			Flags:       []router.CommandFlag{router.CmdFlagDangerous},
-			SubCommands: []*router.Command{
-				{
-					Name:        "get",
-					Description: "Get current embed image",
-					Handler:     c.getEmbedImage,
-				},
-				{
-					Name:        "set",
-					Description: "Set embed image",
-					Arguments:   "<url>",
-					Handler:     c.setEmbedImage,
-				},
-			},
-		},
-		{
-			Name:        "embedurl",
-			Description: "Embed URL commands",
-			Flags:       []router.CommandFlag{router.CmdFlagDangerous},
-			SubCommands: []*router.Command{
-				{
-					Name:        "get",
-					Description: "Get current embed URL",
-					Handler:     c.getEmbedURL,
-				},
-				{
-					Name:        "set",
-					Description: "Set embed URL",
-					Arguments:   "<url>",
-					Handler:     c.setEmbedURL,
-				},
-			},
-		},
-		{
-			Name:        "forcesubscribedservers",
-			Description: "Force subscribed servers commands",
-			Flags:       []router.CommandFlag{router.CmdFlagDangerous},
-			SubCommands: []*router.Command{
-				{
-					Name:        "get",
-					Description: "Get force subscribed servers status",
-					Handler:     c.getForceSubscribedServers,
-				},
-				{
-					Name:        "set",
-					Description: "Set force subscribed servers",
-					Arguments:   "<on/off>",
-					Handler:     c.setForceSubscribedServers,
-				},
-				{
-					Name:        "toggle",
-					Description: "Toggle force subscribed servers",
-					Handler:     c.toggleForceSubscribedServers,
-				},
-			},
-		},
+		}),
 		{
 			Name:        "aliases",
 			Description: "Command aliases commands",
@@ -320,93 +215,48 @@ func (c *ConfigCommands) Register() {
 				},
 			},
 		},
-		{
-			Name:        "notifications",
-			Description: "Notification settings commands",
-			Flags:       []router.CommandFlag{router.CmdFlagDangerous},
-			SubCommands: []*router.Command{
-				{
-					Name:        "get",
-					Description: "Get notifications status",
-					Handler:     c.getNotifications,
-				},
-				{
-					Name:        "set",
-					Description: "Set notifications status",
-					Arguments:   "<on/off>",
-					Handler:     c.setNotifications,
-				},
-				{
-					Name:        "toggle",
-					Description: "Toggle notifications",
-					Handler:     c.toggleNotifications,
-				},
-			},
-		},
-		{
-			Name:        "nitrosniper",
-			Description: "Nitro sniper commands",
-			Flags:       []router.CommandFlag{router.CmdFlagDangerous},
-			SubCommands: []*router.Command{
-				{
-					Name:        "get",
-					Description: "Get nitro sniper status",
-					Handler:     c.getNitroSniper,
-				},
-				{
-					Name:        "set",
-					Description: "Set nitro sniper status",
-					Arguments:   "<on/off>",
-					Handler:     c.setNitroSniper,
-				},
-				{
-					Name:        "toggle",
-					Description: "Toggle nitro sniper",
-					Handler:     c.toggleNitroSniper,
-				},
-			},
-		},
-		{
-			Name:        "giveawaysniper",
-			Description: "Giveaway sniper commands",
-			Flags:       []router.CommandFlag{router.CmdFlagDangerous},
-			SubCommands: []*router.Command{
-				{
-					Name:        "get",
-					Description: "Get giveaway sniper status",
-					Handler:     c.getGiveawaySniper,
-				},
-				{
-					Name:        "set",
-					Description: "Set giveaway sniper status",
-					Arguments:   "<on/off>",
-					Handler:     c.setGiveawaySniper,
-				},
-				{
-					Name:        "toggle",
-					Description: "Toggle giveaway sniper",
-					Handler:     c.toggleGiveawaySniper,
-				},
-			},
-		},
-		{
-			Name:        "giveawaysnipersleep",
-			Description: "Giveaway sniper sleep commands",
-			Flags:       []router.CommandFlag{router.CmdFlagDangerous},
-			SubCommands: []*router.Command{
-				{
-					Name:        "get",
-					Description: "Get giveaway sniper sleep duration",
-					Handler:     c.getGiveawaySnipeDelay,
-				},
-				{
-					Name:        "set",
-					Description: "Set giveaway sniper sleep duration",
-					Arguments:   "<seconds>",
-					Handler:     c.setGiveawaySnipeDelay,
-				},
-			},
-		},
+		c.createConfigActionCommand(configCommandData{
+			Name:         "notifications",
+			ReadableName: "Notifications",
+			ValueType:    configCommandValueTypeBool,
+			GetDesc:      "Get notifications status",
+			GetFunc:      func(cfg *config.Config) any { return cfg.Notifications.Enabled },
+			SetDesc:      "Set notifications status",
+			SetFunc:      func(cfg *config.Config, value any) { cfg.Notifications.Enabled = value.(bool) },
+			ToggleDesc:   "Toggle notifications",
+			ToggleFunc:   func(cfg *config.Config) { cfg.Notifications.Enabled = !cfg.Notifications.Enabled },
+		}),
+		c.createConfigActionCommand(configCommandData{
+			Name:         "nitrosniper",
+			ReadableName: "Nitro Sniper",
+			ValueType:    configCommandValueTypeBool,
+			GetDesc:      "Get nitro sniper status",
+			GetFunc:      func(cfg *config.Config) any { return cfg.Snipers.NitroSniper },
+			SetDesc:      "Set nitro sniper status",
+			SetFunc:      func(cfg *config.Config, value any) { cfg.Snipers.NitroSniper = value.(bool) },
+			ToggleDesc:   "Toggle nitro sniper",
+			ToggleFunc:   func(cfg *config.Config) { cfg.Snipers.NitroSniper = !cfg.Snipers.NitroSniper },
+		}),
+		c.createConfigActionCommand(configCommandData{
+			Name:         "giveawaysniper",
+			ReadableName: "Giveaway Sniper",
+			ValueType:    configCommandValueTypeBool,
+			GetDesc:      "Get giveaway sniper status",
+			GetFunc:      func(cfg *config.Config) any { return cfg.Snipers.GiveawaySniper.Enabled },
+			SetDesc:      "Set giveaway sniper status",
+			SetFunc:      func(cfg *config.Config, value any) { cfg.Snipers.GiveawaySniper.Enabled = value.(bool) },
+			ToggleDesc:   "Toggle giveaway sniper",
+			ToggleFunc:   func(cfg *config.Config) { cfg.Snipers.GiveawaySniper.Enabled = !cfg.Snipers.GiveawaySniper.Enabled },
+		}),
+		c.createConfigActionCommand(configCommandData{
+			Name:         "giveawaysnipersleep",
+			ReadableName: "Giveaway Sniper Sleep",
+			ValueType:    configCommandValueTypeInt,
+			GetDesc:      "Get giveaway sniper sleep duration",
+			GetFunc:      func(cfg *config.Config) any { return cfg.Snipers.GiveawaySniper.Sleep },
+			SetDesc:      "Set giveaway sniper sleep duration",
+			SetFunc:      func(cfg *config.Config, value any) { cfg.Snipers.GiveawaySniper.Sleep = value.(int) },
+		}),
 		{
 			Name:        "customgiveawaybots",
 			Description: "Custom giveaway bots commands",
@@ -494,59 +344,181 @@ func (c *ConfigCommands) Register() {
 				},
 			},
 		},
-		{
-			Name:        "privnotesniper",
-			Description: "Private note sniper commands",
-			Flags:       []router.CommandFlag{router.CmdFlagDangerous},
-			SubCommands: []*router.Command{
-				{
-					Name:        "get",
-					Description: "Get private note sniper status",
-					Handler:     c.getPrivnoteSniper,
-				},
-				{
-					Name:        "set",
-					Description: "Set private note sniper status",
-					Arguments:   "<on/off>",
-					Handler:     c.setPrivnoteSniper,
-				},
-				{
-					Name:        "toggle",
-					Description: "Toggle private note sniper",
-					Handler:     c.togglePrivnoteSniper,
-				},
-			},
-		},
+		c.createConfigActionCommand(configCommandData{
+			Name:         "privnotesniper",
+			ReadableName: "Private Note Sniper",
+			ValueType:    configCommandValueTypeBool,
+			GetDesc:      "Get private note sniper status",
+			GetFunc:      func(cfg *config.Config) any { return cfg.Snipers.PrivnoteSniper },
+			SetDesc:      "Set private note sniper status",
+			SetFunc:      func(cfg *config.Config, value any) { cfg.Snipers.PrivnoteSniper = value.(bool) },
+			ToggleDesc:   "Toggle private note sniper",
+			ToggleFunc:   func(cfg *config.Config) { cfg.Snipers.PrivnoteSniper = !cfg.Snipers.PrivnoteSniper },
+		}),
 	})
 }
 
-func (c *ConfigCommands) getCommandPrefix(ctx *router.Ctx) {
-	cfg, err := config.GetConfig()
-	if err != nil {
-		ctx.RespondText("Error getting config")
-		return
-	}
+type configCommandValueType int
 
-	c.services.Embed.NewEmbed().
-		AddField("Command Prefix", cfg.Selfbot.CommandPrefix).
-		Send(ctx)
+const (
+	configCommandValueTypeString configCommandValueType = iota
+	configCommandValueTypeInt
+	configCommandValueTypeBool
+	configCommandValueTypeDuration
+)
+
+type configCommandData struct {
+	Name         string
+	ReadableName string
+	ValueType    configCommandValueType
+
+	GetDesc string
+	GetFunc func(cfg *config.Config) any
+
+	SetDesc string
+	SetFunc func(cfg *config.Config, value any)
+
+	ToggleDesc string
+	ToggleFunc func(cfg *config.Config)
+
+	ValuesDesc string
+	ValuesFunc func() []any
 }
 
-func (c *ConfigCommands) setCommandPrefix(ctx *router.Ctx) {
-	cfg, err := config.GetConfig()
-	if err != nil {
-		ctx.RespondText("Error getting config")
-		return
+type configCommandDataList struct {
+	Name         string
+	ReadableName string
+
+	GetDesc string
+	GetFunc func(ctx *router.Ctx) ([]any, error)
+
+	AddDesc string
+	AddFunc func(ctx *router.Ctx, value any) error
+
+	RmDesc string
+	RmFunc func(ctx *router.Ctx, value any) error
+
+	ClearDesc string
+	ClearFunc func(ctx *router.Ctx) error
+}
+
+func (c *ConfigCommands) createConfigActionCommand(data configCommandData) *router.Command {
+	subCommands := []*router.Command{}
+
+	if data.GetFunc != nil {
+		subCommands = append(subCommands, &router.Command{
+			Name:        "get",
+			Description: data.GetDesc,
+			Handler: func(ctx *router.Ctx) {
+				cfg, err := config.GetConfig()
+				if err != nil {
+					ctx.RespondText("Error getting config")
+					return
+				}
+
+				value := data.GetFunc(&cfg)
+
+				c.services.Embed.NewEmbed().
+					SetDescription("%s is currently set to: %v", data.Name, value).
+					Send(ctx)
+			},
+		})
 	}
 
-	prefix := ctx.Arguments.Raw()
+	if data.SetFunc != nil {
+		subCommands = append(subCommands, &router.Command{
+			Name:        "set",
+			Description: data.SetDesc,
+			Arguments:   "[value]",
+			Handler: func(ctx *router.Ctx) {
+				var value any
 
-	cfg.Selfbot.CommandPrefix = prefix
-	_ = cfg.Save()
+				switch data.ValueType {
+				case configCommandValueTypeString:
+					value = ctx.Arguments.Raw()
+				case configCommandValueTypeInt:
+					value, _ = ctx.Arguments.Get(0).Int()
+				case configCommandValueTypeBool:
+					value, _ = ctx.Arguments.Get(0).Bool()
+				case configCommandValueTypeDuration:
+					value, _ = ctx.Arguments.Get(0).Duration()
+				}
 
-	c.services.Embed.NewEmbed().
-		SetDescription("Command prefix set to `%s`", prefix).
-		Send(ctx)
+				cfg, err := config.GetConfig()
+				if err != nil {
+					ctx.RespondText("Error getting config")
+					return
+				}
+
+				data.SetFunc(&cfg, value)
+
+				if err := cfg.Save(); err != nil {
+					ctx.RespondText("Error saving config")
+					return
+				}
+
+				c.services.Embed.NewEmbed().
+					SetDescription("%s set to %v", data.Name, value).
+					Send(ctx)
+			},
+		})
+	}
+
+	if data.ToggleFunc != nil {
+		subCommands = append(subCommands, &router.Command{
+			Name:        "toggle",
+			Description: data.ToggleDesc,
+			Handler: func(ctx *router.Ctx) {
+				cfg, err := config.GetConfig()
+				if err != nil {
+					ctx.RespondText("Error getting config")
+					return
+				}
+
+				if err := data.ToggleFunc(&cfg); err != nil {
+					ctx.RespondText("Error toggling config")
+					return
+				}
+
+				if err := cfg.Save(); err != nil {
+					ctx.RespondText("Error saving config")
+					return
+				}
+
+				c.services.Embed.NewEmbed().
+					SetDescription("%s toggled", data.Name).
+					Send(ctx)
+			},
+		})
+	}
+
+	if data.ValuesFunc != nil {
+		subCommands = append(subCommands, &router.Command{
+			Name:        "values",
+			Description: data.ValuesDesc,
+			Handler: func(ctx *router.Ctx) {
+				values, err := data.ValuesFunc()
+				if err != nil {
+					ctx.RespondText("Error getting values")
+					return
+				}
+
+				stringValues := utils2.Map(values, func(value any) string {
+					return fmt.Sprint(value)
+				})
+
+				c.services.Embed.NewEmbed().
+					AddField(data.ReadableName, strings.Join(stringValues, "\n")).
+					Send(ctx)
+			},
+		})
+	}
+
+	return &router.Command{
+		Name:        data.Name,
+		Flags:       []router.CommandFlag{router.CmdFlagDangerous},
+		SubCommands: subCommands,
+	}
 }
 
 func (c *ConfigCommands) getAlias(ctx *router.Ctx) {
@@ -644,183 +616,6 @@ func (c *ConfigCommands) clearAliases(ctx *router.Ctx) {
 
 	c.services.Embed.NewEmbed().
 		SetDescription("Cleared all aliases").
-		Send(ctx)
-}
-
-func (c *ConfigCommands) getNotifications(ctx *router.Ctx) {
-	cfg, err := config.GetConfig()
-	if err != nil {
-		ctx.RespondText("Error getting config")
-		return
-	}
-
-	c.services.Embed.NewEmbed().
-		AddField("Notifications", utils.Misc.FormatBoolOnOff(cfg.Notifications.Enabled)).
-		Send(ctx)
-}
-
-func (c *ConfigCommands) setNotifications(ctx *router.Ctx) {
-	cfg, err := config.GetConfig()
-	if err != nil {
-		ctx.RespondText("Error getting config")
-		return
-	}
-
-	toggle, err := ctx.Arguments.Get(0).Bool()
-	if err != nil {
-		ctx.RespondText("Invalid value. Use `on` or `off`.")
-		return
-	}
-
-	cfg.Notifications.Enabled = toggle
-	_ = cfg.Save()
-
-	c.services.Embed.NewEmbed().
-		SetDescription("Turned " + utils.Misc.FormatBoolOnOff(toggle) + " notifications").
-		Send(ctx)
-}
-
-func (c *ConfigCommands) toggleNotifications(ctx *router.Ctx) {
-	cfg, err := config.GetConfig()
-	if err != nil {
-		ctx.RespondText("Error getting config")
-		return
-	}
-
-	cfg.Notifications.Enabled = !cfg.Notifications.Enabled
-	_ = cfg.Save()
-
-	c.services.Embed.NewEmbed().
-		SetDescription("Turned " + utils.Misc.FormatBoolOnOff(cfg.Notifications.Enabled) + " notifications").
-		Send(ctx)
-}
-
-func (c *ConfigCommands) getNitroSniper(ctx *router.Ctx) {
-	cfg, err := config.GetConfig()
-	if err != nil {
-		ctx.RespondText("Error getting config")
-		return
-	}
-
-	c.services.Embed.NewEmbed().
-		AddField("Nitro Sniper", utils.Misc.FormatBoolOnOff(cfg.Snipers.NitroSniper)).
-		Send(ctx)
-}
-
-func (c *ConfigCommands) setNitroSniper(ctx *router.Ctx) {
-	cfg, err := config.GetConfig()
-	if err != nil {
-		ctx.RespondText("Error getting config")
-		return
-	}
-
-	toggle, err := ctx.Arguments.Get(0).Bool()
-	if err != nil {
-		ctx.RespondText("Invalid value. Use `on` or `off`.")
-		return
-	}
-
-	cfg.Snipers.NitroSniper = toggle
-	_ = cfg.Save()
-
-	c.services.Embed.NewEmbed().
-		SetDescription("Turned " + utils.Misc.FormatBoolOnOff(toggle) + " nitro sniper").
-		Send(ctx)
-}
-
-func (c *ConfigCommands) toggleNitroSniper(ctx *router.Ctx) {
-	cfg, err := config.GetConfig()
-	if err != nil {
-		ctx.RespondText("Error getting config")
-		return
-	}
-
-	cfg.Snipers.NitroSniper = !cfg.Snipers.NitroSniper
-	_ = cfg.Save()
-
-	c.services.Embed.NewEmbed().
-		SetDescription("Turned " + utils.Misc.FormatBoolOnOff(cfg.Snipers.NitroSniper) + " nitro sniper").
-		Send(ctx)
-}
-
-func (c *ConfigCommands) getGiveawaySniper(ctx *router.Ctx) {
-	cfg, err := config.GetConfig()
-	if err != nil {
-		ctx.RespondText("Error getting config")
-		return
-	}
-
-	c.services.Embed.NewEmbed().
-		AddField("Giveaway Sniper", utils.Misc.FormatBoolOnOff(cfg.Snipers.GiveawaySniper.Enabled)).
-		Send(ctx)
-}
-
-func (c *ConfigCommands) setGiveawaySniper(ctx *router.Ctx) {
-	cfg, err := config.GetConfig()
-	if err != nil {
-		ctx.RespondText("Error getting config")
-		return
-	}
-
-	toggle, err := ctx.Arguments.Get(0).Bool()
-	if err != nil {
-		ctx.RespondText("Invalid value. Use `on` or `off`.")
-		return
-	}
-
-	cfg.Snipers.GiveawaySniper.Enabled = toggle
-	_ = cfg.Save()
-
-	c.services.Embed.NewEmbed().
-		SetDescription("Turned " + utils.Misc.FormatBoolOnOff(toggle) + " giveaway sniper").
-		Send(ctx)
-}
-
-func (c *ConfigCommands) toggleGiveawaySniper(ctx *router.Ctx) {
-	cfg, err := config.GetConfig()
-	if err != nil {
-		ctx.RespondText("Error getting config")
-		return
-	}
-
-	cfg.Snipers.GiveawaySniper.Enabled = !cfg.Snipers.GiveawaySniper.Enabled
-	_ = cfg.Save()
-
-	c.services.Embed.NewEmbed().
-		SetDescription("Turned " + utils.Misc.FormatBoolOnOff(cfg.Snipers.GiveawaySniper.Enabled) + " giveaway sniper").
-		Send(ctx)
-}
-
-func (c *ConfigCommands) getGiveawaySnipeDelay(ctx *router.Ctx) {
-	cfg, err := config.GetConfig()
-	if err != nil {
-		ctx.RespondText("Error getting config")
-		return
-	}
-
-	c.services.Embed.NewEmbed().
-		AddField("Giveaway Sniper Sleep", fmt.Sprintf("%d seconds", cfg.Snipers.GiveawaySniper.Sleep)).
-		Send(ctx)
-}
-
-func (c *ConfigCommands) setGiveawaySnipeDelay(ctx *router.Ctx) {
-	cfg, err := config.GetConfig()
-	if err != nil {
-		ctx.RespondText("Error getting config")
-		return
-	}
-
-	delay, err := ctx.Arguments.Get(0).Int()
-	if err != nil {
-		ctx.RespondText("Invalid delay value. Must be a number in seconds.")
-		return
-	}
-
-	cfg.Snipers.GiveawaySniper.Sleep = delay
-	_ = cfg.Save()
-
-	c.services.Embed.NewEmbed().
-		SetDescription("Set giveaway sniper sleep to %d seconds", delay).
 		Send(ctx)
 }
 
@@ -1103,521 +898,5 @@ func (c *ConfigCommands) clearSniperServerBlacklist(ctx *router.Ctx) {
 
 	c.services.Embed.NewEmbed().
 		SetDescription("Cleared sniper server blacklist").
-		Send(ctx)
-}
-
-func (c *ConfigCommands) getPrivnoteSniper(ctx *router.Ctx) {
-	cfg, err := config.GetConfig()
-	if err != nil {
-		ctx.RespondText("Error getting config")
-		return
-	}
-
-	c.services.Embed.NewEmbed().
-		AddField("Private Note Sniper", utils.Misc.FormatBoolOnOff(cfg.Snipers.PrivnoteSniper)).
-		Send(ctx)
-}
-
-func (c *ConfigCommands) setPrivnoteSniper(ctx *router.Ctx) {
-	cfg, err := config.GetConfig()
-	if err != nil {
-		ctx.RespondText("Error getting config")
-		return
-	}
-
-	toggle, err := ctx.Arguments.Get(0).Bool()
-	if err != nil {
-		ctx.RespondText("Invalid value. Use `on` or `off`.")
-		return
-	}
-
-	cfg.Snipers.PrivnoteSniper = toggle
-	_ = cfg.Save()
-
-	c.services.Embed.NewEmbed().
-		SetDescription("Turned " + utils.Misc.FormatBoolOnOff(toggle) + " private note sniper").
-		Send(ctx)
-}
-
-func (c *ConfigCommands) togglePrivnoteSniper(ctx *router.Ctx) {
-	cfg, err := config.GetConfig()
-	if err != nil {
-		ctx.RespondText("Error getting config")
-		return
-	}
-
-	cfg.Snipers.PrivnoteSniper = !cfg.Snipers.PrivnoteSniper
-	_ = cfg.Save()
-
-	c.services.Embed.NewEmbed().
-		SetDescription("Turned " + utils.Misc.FormatBoolOnOff(cfg.Snipers.PrivnoteSniper) + " private note sniper").
-		Send(ctx)
-}
-
-func (c *ConfigCommands) getCommandMode(ctx *router.Ctx) {
-	cfg, err := config.GetConfig()
-	if err != nil {
-		ctx.RespondText("Error getting config")
-		return
-	}
-
-	c.services.Embed.NewEmbed().
-		AddField("Command Mode", cfg.Selfbot.CommandMode).
-		Send(ctx)
-}
-
-func (c *ConfigCommands) setCommandMode(ctx *router.Ctx) {
-	cfg, err := config.GetConfig()
-	if err != nil {
-		ctx.RespondText("Error getting config")
-		return
-	}
-
-	mode := ctx.Arguments.Raw()
-	if mode != "prefix" && mode != "mention" {
-		ctx.RespondText("Invalid mode. Use `prefix` or `mention`.")
-		return
-	}
-
-	cfg.Selfbot.CommandMode = mode
-	_ = cfg.Save()
-
-	c.services.Embed.NewEmbed().
-		SetDescription("Command mode set to `%s`", mode).
-		Send(ctx)
-}
-
-func (c *ConfigCommands) listCommandModes(ctx *router.Ctx) {
-	c.services.Embed.NewEmbed().
-		SetDescription("Available command modes: `prefix`, `mention`").
-		Send(ctx)
-}
-
-func (c *ConfigCommands) getTitle(ctx *router.Ctx) {
-	cfg, err := config.GetConfig()
-	if err != nil {
-		ctx.RespondText("Error getting config")
-		return
-	}
-
-	c.services.Embed.NewEmbed().
-		AddField("Title", cfg.Selfbot.Title).
-		Send(ctx)
-}
-
-func (c *ConfigCommands) setTitle(ctx *router.Ctx) {
-	cfg, err := config.GetConfig()
-	if err != nil {
-		ctx.RespondText("Error getting config")
-		return
-	}
-
-	title := ctx.Arguments.Raw()
-	cfg.Selfbot.Title = title
-	_ = cfg.Save()
-
-	c.services.Embed.NewEmbed().
-		SetDescription("Title set to `%s`", title).
-		Send(ctx)
-}
-
-func (c *ConfigCommands) getFooter(ctx *router.Ctx) {
-	cfg, err := config.GetConfig()
-	if err != nil {
-		ctx.RespondText("Error getting config")
-		return
-	}
-
-	c.services.Embed.NewEmbed().
-		AddField("Footer", cfg.Selfbot.Footer).
-		Send(ctx)
-}
-
-func (c *ConfigCommands) setFooter(ctx *router.Ctx) {
-	cfg, err := config.GetConfig()
-	if err != nil {
-		ctx.RespondText("Error getting config")
-		return
-	}
-
-	footer := ctx.Arguments.Raw()
-	cfg.Selfbot.Footer = footer
-	_ = cfg.Save()
-
-	c.services.Embed.NewEmbed().
-		SetDescription("Footer set to `%s`", footer).
-		Send(ctx)
-}
-
-func (c *ConfigCommands) getDelResponses(ctx *router.Ctx) {
-	cfg, err := config.GetConfig()
-	if err != nil {
-		ctx.RespondText("Error getting config")
-		return
-	}
-
-	c.services.Embed.NewEmbed().
-		AddField("Delete Responses", utils.Misc.FormatBoolOnOff(cfg.Selfbot.DeleteResponses)).
-		Send(ctx)
-}
-
-func (c *ConfigCommands) setDelResponses(ctx *router.Ctx) {
-	cfg, err := config.GetConfig()
-	if err != nil {
-		ctx.RespondText("Error getting config")
-		return
-	}
-
-	toggle, err := ctx.Arguments.Get(0).Bool()
-	if err != nil {
-		ctx.RespondText("Invalid value. Use `on` or `off`.")
-		return
-	}
-
-	cfg.Selfbot.DeleteResponses = toggle
-	_ = cfg.Save()
-
-	c.services.Embed.NewEmbed().
-		SetDescription("Turned " + utils.Misc.FormatBoolOnOff(toggle) + " delete responses").
-		Send(ctx)
-}
-
-func (c *ConfigCommands) toggleDelResponses(ctx *router.Ctx) {
-	cfg, err := config.GetConfig()
-	if err != nil {
-		ctx.RespondText("Error getting config")
-		return
-	}
-
-	cfg.Selfbot.DeleteResponses = !cfg.Selfbot.DeleteResponses
-	_ = cfg.Save()
-
-	c.services.Embed.NewEmbed().
-		SetDescription("Turned " + utils.Misc.FormatBoolOnOff(cfg.Selfbot.DeleteResponses) + " delete responses").
-		Send(ctx)
-}
-
-func (c *ConfigCommands) getDelResponsesDelay(ctx *router.Ctx) {
-	cfg, err := config.GetConfig()
-	if err != nil {
-		ctx.RespondText("Error getting config")
-		return
-	}
-
-	c.services.Embed.NewEmbed().
-		AddField("Delete Responses Delay", fmt.Sprintf("%d seconds", cfg.Selfbot.DeleteResponsesDelay)).
-		Send(ctx)
-}
-
-func (c *ConfigCommands) setDelResponsesDelay(ctx *router.Ctx) {
-	cfg, err := config.GetConfig()
-	if err != nil {
-		ctx.RespondText("Error getting config")
-		return
-	}
-
-	delay, err := ctx.Arguments.Get(0).Int()
-	if err != nil {
-		ctx.RespondText("Invalid delay value. Must be a number in seconds.")
-		return
-	}
-
-	cfg.Selfbot.DeleteResponsesDelay = delay
-	_ = cfg.Save()
-
-	c.services.Embed.NewEmbed().
-		SetDescription("Set delete responses delay to %d seconds", delay).
-		Send(ctx)
-}
-
-func (c *ConfigCommands) getDelCommands(ctx *router.Ctx) {
-	cfg, err := config.GetConfig()
-	if err != nil {
-		ctx.RespondText("Error getting config")
-		return
-	}
-
-	c.services.Embed.NewEmbed().
-		AddField("Delete Commands", utils.Misc.FormatBoolOnOff(cfg.Selfbot.DeleteCommands)).
-		Send(ctx)
-}
-
-func (c *ConfigCommands) setDelCommands(ctx *router.Ctx) {
-	cfg, err := config.GetConfig()
-	if err != nil {
-		ctx.RespondText("Error getting config")
-		return
-	}
-
-	toggle, err := ctx.Arguments.Get(0).Bool()
-	if err != nil {
-		ctx.RespondText("Invalid value. Use `on` or `off`.")
-		return
-	}
-
-	cfg.Selfbot.DeleteCommands = toggle
-	_ = cfg.Save()
-
-	c.services.Embed.NewEmbed().
-		SetDescription("Turned " + utils.Misc.FormatBoolOnOff(toggle) + " delete commands").
-		Send(ctx)
-}
-
-func (c *ConfigCommands) toggleDelCommands(ctx *router.Ctx) {
-	cfg, err := config.GetConfig()
-	if err != nil {
-		ctx.RespondText("Error getting config")
-		return
-	}
-
-	cfg.Selfbot.DeleteCommands = !cfg.Selfbot.DeleteCommands
-	_ = cfg.Save()
-
-	c.services.Embed.NewEmbed().
-		SetDescription("Turned " + utils.Misc.FormatBoolOnOff(cfg.Selfbot.DeleteCommands) + " delete commands").
-		Send(ctx)
-}
-
-func (c *ConfigCommands) getClientSpoof(ctx *router.Ctx) {
-	cfg, err := config.GetConfig()
-	if err != nil {
-		ctx.RespondText("Error getting config")
-		return
-	}
-
-	c.services.Embed.NewEmbed().
-		AddField("Client", cfg.Selfbot.Client).
-		Send(ctx)
-}
-
-func (c *ConfigCommands) setClientSpoof(ctx *router.Ctx) {
-	cfg, err := config.GetConfig()
-	if err != nil {
-		ctx.RespondText("Error getting config")
-		return
-	}
-
-	client := strings.Title(strings.ToLower(ctx.Arguments.Raw()))
-	switch client {
-	case "Mobile", "Web", "Desktop", "Console":
-		cfg.Selfbot.Client = client
-	default:
-		ctx.RespondText("Invalid client. Use `Mobile`, `Web`, `Desktop` or `Console`.")
-		return
-	}
-
-	_ = cfg.Save()
-
-	c.services.Embed.NewEmbed().
-		SetDescription("Client set to `%s`", client).
-		Send(ctx)
-}
-
-func (c *ConfigCommands) toggleClientSpoof(ctx *router.Ctx) {
-	cfg, err := config.GetConfig()
-	if err != nil {
-		ctx.RespondText("Error getting config")
-		return
-	}
-
-	switch cfg.Selfbot.Client {
-	case "Mobile":
-		cfg.Selfbot.Client = "Web"
-	case "Web":
-		cfg.Selfbot.Client = "Desktop"
-	case "Desktop":
-		cfg.Selfbot.Client = "Console"
-	case "Console", "":
-		cfg.Selfbot.Client = "Mobile"
-	}
-
-	_ = cfg.Save()
-
-	c.services.Embed.NewEmbed().
-		SetDescription("Client set to `%s`", cfg.Selfbot.Client).
-		Send(ctx)
-}
-
-func (c *ConfigCommands) getTimezone(ctx *router.Ctx) {
-	cfg, err := config.GetConfig()
-	if err != nil {
-		ctx.RespondText("Error getting config")
-		return
-	}
-
-	c.services.Embed.NewEmbed().
-		AddField("Timezone", cfg.Selfbot.Timezone).
-		Send(ctx)
-}
-
-func (c *ConfigCommands) setTimezone(ctx *router.Ctx) {
-	cfg, err := config.GetConfig()
-	if err != nil {
-		ctx.RespondText("Error getting config")
-		return
-	}
-
-	timezone := ctx.Arguments.Raw()
-	_, err = time.LoadLocation(timezone)
-	if err != nil {
-		ctx.RespondText("Invalid timezone. Use a valid IANA time zone name.")
-		return
-	}
-
-	cfg.Selfbot.Timezone = timezone
-	_ = cfg.Save()
-
-	c.services.Embed.NewEmbed().
-		SetDescription("Timezone set to `%s`", timezone).
-		Send(ctx)
-}
-
-func (c *ConfigCommands) getEmbedColor(ctx *router.Ctx) {
-	cfg, err := config.GetConfig()
-	if err != nil {
-		ctx.RespondText("Error getting config")
-		return
-	}
-
-	c.services.Embed.NewEmbed().
-		AddField("Embed Color", cfg.Selfbot.EmbedColor).
-		Send(ctx)
-}
-
-func (c *ConfigCommands) setEmbedColor(ctx *router.Ctx) {
-	cfg, err := config.GetConfig()
-	if err != nil {
-		ctx.RespondText("Error getting config")
-		return
-	}
-
-	color := ctx.Arguments.Raw()
-	cfg.Selfbot.EmbedColor = color
-	_ = cfg.Save()
-
-	c.services.Embed.NewEmbed().
-		SetDescription("Embed color set to `%s`", color).
-		Send(ctx)
-}
-
-func (c *ConfigCommands) getEmbedImage(ctx *router.Ctx) {
-	cfg, err := config.GetConfig()
-	if err != nil {
-		ctx.RespondText("Error getting config")
-		return
-	}
-
-	c.services.Embed.NewEmbed().
-		AddField("Embed Image", cfg.Selfbot.EmbedImage).
-		Send(ctx)
-}
-
-func (c *ConfigCommands) setEmbedImage(ctx *router.Ctx) {
-	cfg, err := config.GetConfig()
-	if err != nil {
-		ctx.RespondText("Error getting config")
-		return
-	}
-
-	url := ctx.Arguments.Raw()
-	cfg.Selfbot.EmbedImage = url
-	_ = cfg.Save()
-
-	c.services.Embed.NewEmbed().
-		SetDescription("Embed image set to `%s`", url).
-		Send(ctx)
-}
-
-func (c *ConfigCommands) getEmbedURL(ctx *router.Ctx) {
-	cfg, err := config.GetConfig()
-	if err != nil {
-		ctx.RespondText("Error getting config")
-		return
-	}
-
-	c.services.Embed.NewEmbed().
-		AddField("Embed URL", cfg.Selfbot.EmbedURL).
-		Send(ctx)
-}
-
-func (c *ConfigCommands) setEmbedURL(ctx *router.Ctx) {
-	cfg, err := config.GetConfig()
-	if err != nil {
-		ctx.RespondText("Error getting config")
-		return
-	}
-
-	url := ctx.Arguments.Raw()
-	cfg.Selfbot.EmbedURL = url
-	_ = cfg.Save()
-
-	c.services.Embed.NewEmbed().
-		SetDescription("Embed URL set to `%s`", url).
-		Send(ctx)
-}
-
-func (c *ConfigCommands) getForceSubscribedServers(ctx *router.Ctx) {
-	cfg, err := config.GetConfig()
-	if err != nil {
-		ctx.RespondText("Error getting config")
-		return
-	}
-
-	c.services.Embed.NewEmbed().
-		AddField("Force Subscribed Servers", utils.Misc.FormatBoolOnOff(len(cfg.Selfbot.ForceSubscribedServers) > 0)).
-		Send(ctx)
-}
-
-func (c *ConfigCommands) setForceSubscribedServers(ctx *router.Ctx) {
-	cfg, err := config.GetConfig()
-	if err != nil {
-		ctx.RespondText("Error getting config")
-		return
-	}
-
-	toggle, err := ctx.Arguments.Get(0).Bool()
-	if err != nil {
-		ctx.RespondText("Invalid value. Use `on` or `off`.")
-		return
-	}
-
-	if toggle {
-		guildIDs := make([]string, 0)
-		for _, guild := range ctx.Session.State.Guilds {
-			guildIDs = append(guildIDs, guild.ID)
-		}
-		cfg.Selfbot.ForceSubscribedServers = guildIDs
-	} else {
-		cfg.Selfbot.ForceSubscribedServers = []string{}
-	}
-
-	_ = cfg.Save()
-
-	c.services.Embed.NewEmbed().
-		SetDescription("Turned " + utils.Misc.FormatBoolOnOff(toggle) + " force subscribed servers").
-		Send(ctx)
-}
-
-func (c *ConfigCommands) toggleForceSubscribedServers(ctx *router.Ctx) {
-	cfg, err := config.GetConfig()
-	if err != nil {
-		ctx.RespondText("Error getting config")
-		return
-	}
-
-	if len(cfg.Selfbot.ForceSubscribedServers) > 0 {
-		cfg.Selfbot.ForceSubscribedServers = []string{}
-	} else {
-		guildIDs := make([]string, 0)
-		for _, guild := range ctx.Session.State.Guilds {
-			guildIDs = append(guildIDs, guild.ID)
-		}
-		cfg.Selfbot.ForceSubscribedServers = guildIDs
-	}
-
-	_ = cfg.Save()
-
-	c.services.Embed.NewEmbed().
-		SetDescription("Turned " + utils.Misc.FormatBoolOnOff(len(cfg.Selfbot.ForceSubscribedServers) > 0) + " force subscribed servers").
 		Send(ctx)
 }
