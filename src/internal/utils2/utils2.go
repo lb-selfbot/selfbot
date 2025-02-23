@@ -99,3 +99,11 @@ func Unique[T comparable](slice []T) []T {
 	}
 	return result
 }
+
+// Ternary provides a conditional operator that returns trueVal if condition is true, falseVal otherwise
+func Ternary[T any](condition bool, trueVal, falseVal T) T {
+	if condition {
+		return trueVal
+	}
+	return falseVal
+}

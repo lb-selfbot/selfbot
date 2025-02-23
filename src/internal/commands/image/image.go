@@ -11,992 +11,1004 @@ import (
 	"github.com/LightningDev1/LB-Selfbot/internal/router"
 	"github.com/LightningDev1/LB-Selfbot/internal/services"
 	"github.com/LightningDev1/LB-Selfbot/internal/utils"
-	"github.com/LightningDev1/dgc"
+	"github.com/LightningDev1/LB-Selfbot/internal/utils2"
 )
 
-func (c *ImageCommands) RegisterCommands(router *dgc.Router) {
-	router.StartCategory("Image", "Image commands")
-	router.RegisterCmd(&dgc.Command{
-		Name:        "tweet",
-		Description: "Tweet a message",
-		Arguments:   "<username> <text>",
-		Handler:     c.tweet,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "meme",
-		Description: "Send a random meme",
-		Handler:     c.meme,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "ytcomment",
-		Description: "Make a fake YouTube comment",
-		Arguments:   "<user> <text>",
-		Handler:     c.ytcomment,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "pokemon",
-		Description: "Send a random Pokémon image",
-		Handler:     c.pokemon,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "wasted",
-		Description: "Add a wasted overlay on the users avatar",
-		Arguments:   "[user]",
-		Handler:     c.wasted,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "triggered",
-		Description: "Add a triggered overlay on the users avatar",
-		Arguments:   "[user]",
-		Handler:     c.triggered,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "glass",
-		Description: "Add a glass overlay on the users avatar",
-		Arguments:   "[user]",
-		Handler:     c.glass,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "greyscale",
-		Description: "Add a greyscale overlay on the users avatar",
-		Arguments:   "[user]",
-		Handler:     c.greyscale,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "invert",
-		Description: "Invert the users avatar",
-		Arguments:   "[user]",
-		Handler:     c.invert,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "invertgreyscale",
-		Description: "Invert and greyscale the users avatar",
-		Arguments:   "[user]",
-		Handler:     c.invertgreyscale,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "brightness",
-		Description: "Make the users avatar brighter",
-		Arguments:   "[user]",
-		Handler:     c.brightness,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "red",
-		Description: "Make the users avatar red",
-		Arguments:   "[user]",
-		Handler:     c.red,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "green",
-		Description: "Make the users avatar green",
-		Arguments:   "[user]",
-		Handler:     c.green,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "blue",
-		Description: "Make the users avatar blue",
-		Arguments:   "[user]",
-		Handler:     c.blue,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "pixelate",
-		Description: "Pixelate the users avatar",
-		Arguments:   "[user]",
-		Handler:     c.pixelate,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "comrade",
-		Description: "Add comrade overlay on users avatar",
-		Arguments:   "[user]",
-		Handler:     c.comrade,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "missionpassed",
-		Description: "Add Mission Passed overlay on users avatar",
-		Arguments:   "[user]",
-		Handler:     c.missionpassed,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "jail",
-		Description: "Add jail overlay on users avatar",
-		Arguments:   "[user]",
-		Handler:     c.jail,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "nobitches",
-		Description: "Make a no bitches meme",
-		Arguments:   "<text>",
-		Handler:     c.nobitches,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "threat",
-		Description: "Make biggest threats meme",
-		Arguments:   "[user]",
-		Handler:     c.threat,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "threshold",
-		Description: "Add a threshold filter to a users avatar",
-		Arguments:   "<user>",
-		Handler:     c.threshold,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "blurple",
-		Description: "Make the users avatar blurple",
-		Handler:     c.blurple,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "blurple2",
-		Description: "Make the users avatar new blurple",
-		Handler:     c.blurple2,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "color",
-		Description: "Make the users avatar a custom color",
-		Arguments:   "<user> <color>",
-		Handler:     c.color,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "sostupid",
-		Description: "Make an it's so stupid meme",
-		Arguments:   "<user> <text>",
-		Handler:     c.sostupid,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "simpcard",
-		Description: "Make a simp card for a user",
-		Arguments:   "<user>",
-		Handler:     c.simpcard,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "horny",
-		Description: "Make a horny card for a user",
-		Arguments:   "<user>",
-		Handler:     c.horny,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "lgbt",
-		Description: "Add an lgbt border to the user",
-		Arguments:   "<user>",
-		Handler:     c.lgbt,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "pansexual",
-		Description: "Add a pansexual border to the user",
-		Arguments:   "<user>",
-		Handler:     c.pansexual,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "nonbinary",
-		Description: "Add a nonbinary border to the user",
-		Arguments:   "<user>",
-		Handler:     c.nonbinary,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "lesbian2",
-		Description: "Add a lesbian border to the user",
-		Arguments:   "<user>",
-		Handler:     c.lesbian,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "bisexual",
-		Description: "Add a bisexual border to the user",
-		Arguments:   "<user>",
-		Handler:     c.bisexual,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "trans",
-		Description: "Add a trans border to the user",
-		Arguments:   "<user>",
-		Handler:     c.trans,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "oogway",
-		Description: "Make a master oogway meme",
-		Arguments:   "<text>",
-		Handler:     c.oogway,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "oogway2",
-		Description: "Make a master oogway meme",
-		Arguments:   "<text>",
-		Handler:     c.oogway2,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "clyde",
-		Description: "Make Clyde say something",
-		Arguments:   "<text>",
-		Handler:     c.clyde,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "gay",
-		Description: "Add a rainbow overlay on the users avatar",
-		Arguments:   "<user>",
-		Handler:     c.gay,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "distractedbf",
-		Description: "Make a distracted boyfriend meme with the users",
-		Arguments:   "<user1> <user2>",
-		Handler:     c.distractedbf,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "captcha",
-		Description: "Make a captcha meme",
-		Arguments:   "<user> <text>",
-		Handler:     c.captcha,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "whowouldwin",
-		Description: "Make a who would win meme",
-		Arguments:   "<user1> <user2>",
-		Handler:     c.whowouldwin,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "jpeg",
-		Description: "JPEG a users avatar",
-		Arguments:   "<user>",
-		Handler:     c.jpeg,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "lolice",
-		Description: "Make a lolice meme",
-		Arguments:   "<user>",
-		Handler:     c.lolice,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "kannagen",
-		Description: "Make a kannagen meme",
-		Arguments:   "<user1> <user2>",
-		Handler:     c.kannagen,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "iphonex",
-		Description: "Put users profile picture on an iPhone X",
-		Arguments:   "<user1> <user2>",
-		Handler:     c.iphonex,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "awooify",
-		Description: "Awooify the user",
-		Arguments:   "<user1> <user2>",
-		Handler:     c.awooify,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "trap",
-		Description: "Make a trap card",
-		Arguments:   "<user>",
-		Handler:     c.trap,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "trumptweet",
-		Description: "Make a fake Trump tweet",
-		Arguments:   "<text>",
-		Handler:     c.trumptweet,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "deepfry",
-		Description: "Deepfry the users avatar",
-		Arguments:   "<text>",
-		Handler:     c.deepfry,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "blurpify",
-		Description: "Blurpify the users avatar",
-		Arguments:   "<text>",
-		Handler:     c.blurpify,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "phcomment",
-		Description: "Make the user comment something on PornHub",
-		Arguments:   "<user> <text>",
-		Handler:     c.phcomment,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "fact",
-		Description: "Make a fact meme",
-		Arguments:   "<user>",
-		Handler:     c.fact,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "trash",
-		Description: "Make a trash meme",
-		Arguments:   "<user>",
-		Handler:     c.trash,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "stickbug",
-		Description: "Make a stickbug meme",
-		Arguments:   "<user>",
-		Handler:     c.stickbug,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "magik",
-		Description: "Make a users avatar magik",
-		Arguments:   "<user>",
-		Handler:     c.magik,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "randomgif",
-		Description: "Send a random GIF from Giphy",
-		Handler:     c.randomgif,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "searchgif",
-		Description: "Search GIFs on Giphy",
-		Arguments:   "<query>",
-		Handler:     c.searchgif,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "communist",
-		Description: "Make the user a communist",
-		Arguments:   "<user>",
-		Handler:     c.communist,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "snow",
-		Description: "Add a snow overlay the the users avatar",
-		Arguments:   "<user>",
-		Handler:     c.snow,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "hub",
-		Description: "Make a PornHub logo with custom text",
-		Arguments:   "<\"text1\"> <\"text2\">",
-		Handler:     c.hub,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "floor",
-		Description: "Make a floor meme",
-		Arguments:   "<user> <text>",
-		Handler:     c.floor,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "jokeoverhead",
-		Description: "When someone doesn't understand a joke",
-		Arguments:   "<user>",
-		Handler:     c.jokeoverhead,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "throwaway",
-		Description: "Throw a user away",
-		Arguments:   "<user>",
-		Handler:     c.throwaway,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "salty",
-		Description: "Make a user salty",
-		Arguments:   "<user>",
-		Handler:     c.salty,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "scroll",
-		Description: "Make a scroll meme",
-		Arguments:   "<text>",
-		Handler:     c.scroll,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "shame",
-		Description: "Shame a user",
-		Arguments:   "<user>",
-		Handler:     c.shame,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "ship",
-		Description: "Ship users",
-		Arguments:   "<user1> <user2>",
-		Handler:     c.ship,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "what",
-		Description: "Make a what meme",
-		Arguments:   "<user>",
-		Handler:     c.what,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "sadcat",
-		Description: "Send an image of a sad cat",
-		Handler:     c.sadcat,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "bird",
-		Description: "Send an image of a bird",
-		Handler:     c.bird,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "cat",
-		Description: "Send an image of a cat",
-		Handler:     c.cat,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "catgif",
-		Description: "Send a GIF of a cat",
-		Handler:     c.catgif,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "catsays",
-		Description: "Make a cat say something",
-		Arguments:   "<text>",
-		Handler:     c.catsays,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "dog",
-		Description: "Send an image of a dog",
-		Handler:     c.dog,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "panda",
-		Description: "Send an image of a panda",
-		Handler:     c.panda,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "redpanda",
-		Description: "Send an image of a red panda",
-		Handler:     c.redpanda,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "koala",
-		Description: "Send an image of a koala",
-		Handler:     c.koala,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "raccoon",
-		Description: "Send an image of a raccoon",
-		Handler:     c.raccoon,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "fox",
-		Description: "Send an image of a fox",
-		Handler:     c.fox,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "shibe",
-		Description: "Send an image of a shiba inu/shibe/doge",
-		Handler:     c.shibe,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "whale",
-		Description: "Send an image of a whale",
-		Handler:     c.whale,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "kangaroo",
-		Description: "Send an image of a kangaroo",
-		Handler:     c.kangaroo,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "bunny",
-		Description: "Send an image of a bunny",
-		Handler:     c.bunny,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "lion",
-		Description: "Send an image of a lion",
-		Handler:     c.lion,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "frog",
-		Description: "Send an image of a frog",
-		Handler:     c.frog,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "duck",
-		Description: "Send an image of a duck",
-		Handler:     c.duck,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "penguin",
-		Description: "Send an image of a penguin",
-		Handler:     c.penguin,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "dolphin",
-		Description: "Send an image of a dolphin",
-		Handler:     c.dolphin,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "bear",
-		Description: "Send an image of a bear",
-		Handler:     c.bear,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "axolotl",
-		Description: "Send an image of an axolotl",
-		Handler:     c.axolotl,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "capybara",
-		Description: "Send an image of a capybara",
-		Handler:     c.capybara,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "balloon",
-		Description: "Make a balloon meme",
-		Arguments:   "<\"text1\"> <\"text2\">",
-		Handler:     c.balloon,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "abandon",
-		Description: "Make an abandon meme",
-		Arguments:   "<text>",
-		Handler:     c.abandon,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "aborted",
-		Description: "Make an aborted meme",
-		Arguments:   "<user>",
-		Handler:     c.aborted,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "affect",
-		Description: "Make an affect meme",
-		Arguments:   "<user>",
-		Handler:     c.affect,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "airpods",
-		Description: "Add AirPods to the users avatar",
-		Arguments:   "<user>",
-		Handler:     c.airpods,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "america",
-		Description: "Patriotize the user",
-		Arguments:   "<user>",
-		Handler:     c.america,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "armor",
-		Description: "Make an armor meme",
-		Arguments:   "<text>",
-		Handler:     c.armor,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "bed",
-		Description: "Make a bed meme",
-		Arguments:   "<user1> <user2>",
-		Handler:     c.bed,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "bongocat",
-		Description: "Make a bongocat meme",
-		Arguments:   "<user>",
-		Handler:     c.bongocat,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "boo",
-		Description: "Make a boo meme",
-		Arguments:   "<\"text1\"> <\"text2\">",
-		Handler:     c.boo,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "bigbrain",
-		Description: "Make a big brain meme",
-		Arguments:   "<\"item 1\"> <\"item 2\"> <\"item 3\"> <\"item 4\">",
-		Handler:     c.bigbrain,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "brazzers",
-		Description: "Make a brazzers meme",
-		Arguments:   "<user>",
-		Handler:     c.brazzers,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "byemom",
-		Description: "Make a byemom meme",
-		Arguments:   "<user> <text>",
-		Handler:     c.byemom,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "cancer",
-		Description: "Make a Squidward cancer meme",
-		Arguments:   "<user>",
-		Handler:     c.cancer,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "changemymind",
-		Description: "Make a change my mind meme",
-		Arguments:   "<text>",
-		Handler:     c.changemymind,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "cheating",
-		Description: "Make a cheating meme",
-		Arguments:   "<\"text1\"> <\"text2\">",
-		Handler:     c.cheating,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "citation",
-		Description: "Make a citation meme",
-		Arguments:   "<\"text1\"> <\"text2\"> <\"text3\">",
-		Handler:     c.citation,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "communism",
-		Description: "Make the user a communist",
-		Arguments:   "<user>",
-		Handler:     c.communism,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "confusedcat",
-		Description: "Make a confused cat meme",
-		Arguments:   "<\"text1\"> <\"text2\">",
-		Handler:     c.confusedcat,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "corporate",
-		Description: "Make a corporate meme",
-		Arguments:   "<user>",
-		Handler:     c.corporate,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "cry",
-		Description: "Make a cry meme",
-		Arguments:   "<text>",
-		Handler:     c.cry,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "dab",
-		Description: "Make a dab meme",
-		Arguments:   "<user>",
-		Handler:     c.dab,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "dank",
-		Description: "Make a dank meme",
-		Arguments:   "<user>",
-		Handler:     c.dank,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "delete",
-		Description: "Make a delete meme",
-		Arguments:   "<user>",
-		Handler:     c.delete,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "disability",
-		Description: "Make a disability meme",
-		Arguments:   "<user>",
-		Handler:     c.disability,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "doglemon",
-		Description: "Make a dog lemon meme",
-		Arguments:   "<\"text1\"> <\"text2\">",
-		Handler:     c.doglemon,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "door",
-		Description: "Make a door meme",
-		Arguments:   "<user>",
-		Handler:     c.door,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "egg",
-		Description: "Make a egg meme",
-		Arguments:   "<user>",
-		Handler:     c.egg,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "excuseme",
-		Description: "Make an excuse me meme",
-		Arguments:   "<text>",
-		Handler:     c.excuseme,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "expanddong",
-		Description: "Make an expand dong meme",
-		Arguments:   "<text>",
-		Handler:     c.expanddong,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "expandingwwe",
-		Description: "Make an expanding WWE meme",
-		Arguments:   "<\"item 1\"> <\"item 2\"> <\"item 3\"> <\"item 4\"> <\"item 5\">",
-		Handler:     c.expandingwwe,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "recaptcha",
-		Description: "Make a recaptcha",
-		Arguments:   "<text>",
-		Handler:     c.recaptcha,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "qrcode",
-		Description: "Make a QR Code",
-		Arguments:   "<text>",
-		Handler:     c.qrcode,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "darkqrcode",
-		Description: "Make a dark QR Code",
-		Arguments:   "<text>",
-		Handler:     c.darkqrcode,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "rule34",
-		Description: "Random rule 34 image",
-		Handler:     c.rule34,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "achievement",
-		Description: "Make a minecraft achievement",
-		Arguments:   "<text>",
-		Handler:     c.achievement,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "amiajoke",
-		Description: "Make an am I a joke meme",
-		Arguments:   "<user>",
-		Handler:     c.amiajoke,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "bad",
-		Description: "Make a bad meme",
-		Arguments:   "<user>",
-		Handler:     c.bad,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "calling",
-		Description: "Make a calling meme",
-		Arguments:   "<text>",
-		Handler:     c.calling,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "didyoumean",
-		Description: "Make a did you mean meme",
-		Arguments:   "<\"top\"> <\"bottom\">",
-		Handler:     c.didyoumean,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "drake",
-		Description: "Make a drake meme",
-		Arguments:   "<\"top\"> <\"bottom\">",
-		Handler:     c.drake,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "ayano",
-		Description: "Make an ayano meme",
-		Arguments:   "<\"top\"> <\"bottom\">",
-		Handler:     c.ayano,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "facts",
-		Description: "Make a facts meme",
-		Arguments:   "<text>",
-		Handler:     c.facts,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "blur",
-		Description: "Blur the user's avatar",
-		Arguments:   "<user>",
-		Handler:     c.blur,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "flipav",
-		Description: "Flip the user's avatar",
-		Arguments:   "<user>",
-		Handler:     c.flipav,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "mirror",
-		Description: "Mirror the user's avatar",
-		Arguments:   "<user>",
-		Handler:     c.mirror,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "wide",
-		Description: "Make the user's avatar wide",
-		Arguments:   "<user>",
-		Handler:     c.wide,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "sepia",
-		Description: "Make the user's avatar sepia",
-		Arguments:   "<user>",
-		Handler:     c.sepia,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "adios",
-		Description: "Make an adios meme",
-		Arguments:   "<user>",
-		Handler:     c.adios,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "batmanslap",
-		Description: "Make a batmanslap meme",
-		Arguments:   "<user1> <user2> <\"text1\"> <\"text2\">",
-		Handler:     c.batmanslap,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "carreverse",
-		Description: "Make a car reverse meme",
-		Arguments:   "<text>",
-		Handler:     c.carreverse,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "drip",
-		Description: "Give the user some drip",
-		Arguments:   "<user>",
-		Handler:     c.drip,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "impostor",
-		Description: "Make an Among Us impostor meme",
-		Arguments:   "<text>",
-		Handler:     c.impostor,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "notimpostor",
-		Description: "Make an Among Us not impostor meme",
-		Arguments:   "<text>",
-		Handler:     c.notimpostor,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "emergencymeeting",
-		Description: "Make an Among Us emergency meeting meme",
-		Arguments:   "<text>",
-		Handler:     c.emergencymeeting,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "firsttime",
-		Description: "Make a first time meme",
-		Arguments:   "<user>",
-		Handler:     c.firsttime,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "grave",
-		Description: "Make a grave meme",
-		Arguments:   "<user>",
-		Handler:     c.grave,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "iamspeed",
-		Description: "Make an i am speed meme",
-		Arguments:   "<user>",
-		Handler:     c.iamspeed,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "icanmilkyou",
-		Description: "Make an i can milk you meme",
-		Arguments:   "<user1> <user2>",
-		Handler:     c.icanmilkyou,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "heaven",
-		Description: "Make a heaven meme",
-		Arguments:   "<user>",
-		Handler:     c.heaven,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "npc",
-		Description: "Make an npc meme",
-		Arguments:   "<\"text1\"> <\"text2\">",
-		Handler:     c.npc,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "stonks",
-		Description: "Make a stonks meme",
-		Arguments:   "<user>",
-		Handler:     c.stonks,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "notstonks",
-		Description: "Make a not stonks meme",
-		Arguments:   "<user>",
-		Handler:     c.notstonks,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "fliptable",
-		Description: "Make the user flip a table",
-		Arguments:   "<user>",
-		Handler:     c.fliptable,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "water",
-		Description: "Make a water meme",
-		Arguments:   "<text>",
-		Handler:     c.water,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "wolverine",
-		Description: "Make a wolverine meme",
-		Arguments:   "<user>",
-		Handler:     c.wolverine,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "womanyellingatcat",
-		Description: "Make a woman yelling at cat meme",
-		Arguments:   "<user1> <user2>",
-		Handler:     c.womanyellingatcat,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "pikachu",
-		Description: "Send a random Pikachu image",
-		Handler:     c.pikachu,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "speechbubble",
-		Description: "Add a speech bubble to an image",
-		Arguments:   "[force GIF: on/off] [link/attachment]",
-		Handler:     c.speechbubble,
+type ImageCommands struct{ services *services.Services }
+
+func NewImageCommands(s *services.Services) *ImageCommands {
+	return &ImageCommands{services: s}
+}
+func (c *ImageCommands) Register() {
+	cmdRouter := c.services.Discord.GetRouter()
+
+	cmdRouter.RegisterCategory(&router.Category{
+		Name:        "Image",
+		Description: "Image commands",
+	}, []*router.Command{
+		{
+			Name:        "tweet",
+			Description: "Tweet a message",
+			Arguments:   "<username> <text>",
+			Handler:     c.tweet,
+		},
+		{
+			Name:        "meme",
+			Description: "Send a random meme",
+			Handler:     c.meme,
+		},
+		{
+			Name:        "ytcomment",
+			Description: "Make a fake YouTube comment",
+			Arguments:   "<user> <text>",
+			Handler:     c.ytcomment,
+		},
+		{
+			Name:        "pokemon",
+			Description: "Send a random Pokémon image",
+			Handler:     c.pokemon,
+		},
+		{
+			Name:        "wasted",
+			Description: "Add a wasted overlay on the users avatar",
+			Arguments:   "[user]",
+			Handler:     c.wasted,
+		},
+		{
+			Name:        "triggered",
+			Description: "Add a triggered overlay on the users avatar",
+			Arguments:   "[user]",
+			Handler:     c.triggered,
+		},
+		{
+			Name:        "glass",
+			Description: "Add a glass overlay on the users avatar",
+			Arguments:   "[user]",
+			Handler:     c.glass,
+		},
+		{
+			Name:        "greyscale",
+			Description: "Add a greyscale overlay on the users avatar",
+			Arguments:   "[user]",
+			Handler:     c.greyscale,
+		},
+		{
+			Name:        "invert",
+			Description: "Invert the users avatar",
+			Arguments:   "[user]",
+			Handler:     c.invert,
+		},
+		{
+			Name:        "invertgreyscale",
+			Description: "Invert and greyscale the users avatar",
+			Arguments:   "[user]",
+			Handler:     c.invertgreyscale,
+		},
+		{
+			Name:        "brightness",
+			Description: "Make the users avatar brighter",
+			Arguments:   "[user]",
+			Handler:     c.brightness,
+		},
+		{
+			Name:        "red",
+			Description: "Make the users avatar red",
+			Arguments:   "[user]",
+			Handler:     c.red,
+		},
+		{
+			Name:        "green",
+			Description: "Make the users avatar green",
+			Arguments:   "[user]",
+			Handler:     c.green,
+		},
+		{
+			Name:        "blue",
+			Description: "Make the users avatar blue",
+			Arguments:   "[user]",
+			Handler:     c.blue,
+		},
+		{
+			Name:        "pixelate",
+			Description: "Pixelate the users avatar",
+			Arguments:   "[user]",
+			Handler:     c.pixelate,
+		},
+		{
+			Name:        "comrade",
+			Description: "Add comrade overlay on users avatar",
+			Arguments:   "[user]",
+			Handler:     c.comrade,
+		},
+		{
+			Name:        "missionpassed",
+			Description: "Add Mission Passed overlay on users avatar",
+			Arguments:   "[user]",
+			Handler:     c.missionpassed,
+		},
+		{
+			Name:        "jail",
+			Description: "Add jail overlay on users avatar",
+			Arguments:   "[user]",
+			Handler:     c.jail,
+		},
+		{
+			Name:        "nobitches",
+			Description: "Make a no bitches meme",
+			Arguments:   "<text>",
+			Handler:     c.nobitches,
+		},
+		{
+			Name:        "threat",
+			Description: "Make biggest threats meme",
+			Arguments:   "[user]",
+			Handler:     c.threat,
+		},
+		{
+			Name:        "threshold",
+			Description: "Add a threshold filter to a users avatar",
+			Arguments:   "<user>",
+			Handler:     c.threshold,
+		},
+		{
+			Name:        "blurple",
+			Description: "Make the users avatar blurple",
+			Handler:     c.blurple,
+		},
+		{
+			Name:        "blurple2",
+			Description: "Make the users avatar new blurple",
+			Handler:     c.blurple2,
+		},
+		{
+			Name:        "color",
+			Description: "Make the users avatar a custom color",
+			Arguments:   "<user> <color>",
+			Handler:     c.color,
+		},
+		{
+			Name:        "sostupid",
+			Description: "Make an it's so stupid meme",
+			Arguments:   "<user> <text>",
+			Handler:     c.sostupid,
+		},
+		{
+			Name:        "simpcard",
+			Description: "Make a simp card for a user",
+			Arguments:   "<user>",
+			Handler:     c.simpcard,
+		},
+		{
+			Name:        "horny",
+			Description: "Make a horny card for a user",
+			Arguments:   "<user>",
+			Handler:     c.horny,
+		},
+		{
+			Name:        "lgbt",
+			Description: "Add an lgbt border to the user",
+			Arguments:   "<user>",
+			Handler:     c.lgbt,
+		},
+		{
+			Name:        "pansexual",
+			Description: "Add a pansexual border to the user",
+			Arguments:   "<user>",
+			Handler:     c.pansexual,
+		},
+		{
+			Name:        "nonbinary",
+			Description: "Add a nonbinary border to the user",
+			Arguments:   "<user>",
+			Handler:     c.nonbinary,
+		},
+		{
+			Name:        "lesbian2",
+			Description: "Add a lesbian border to the user",
+			Arguments:   "<user>",
+			Handler:     c.lesbian,
+		},
+		{
+			Name:        "bisexual",
+			Description: "Add a bisexual border to the user",
+			Arguments:   "<user>",
+			Handler:     c.bisexual,
+		},
+		{
+			Name:        "trans",
+			Description: "Add a trans border to the user",
+			Arguments:   "<user>",
+			Handler:     c.trans,
+		},
+		{
+			Name:        "oogway",
+			Description: "Make a master oogway meme",
+			Arguments:   "<text>",
+			Handler:     c.oogway,
+		},
+		{
+			Name:        "oogway2",
+			Description: "Make a master oogway meme",
+			Arguments:   "<text>",
+			Handler:     c.oogway2,
+		},
+		{
+			Name:        "clyde",
+			Description: "Make Clyde say something",
+			Arguments:   "<text>",
+			Handler:     c.clyde,
+		},
+		{
+			Name:        "gay",
+			Description: "Add a rainbow overlay on the users avatar",
+			Arguments:   "<user>",
+			Handler:     c.gay,
+		},
+		{
+			Name:        "distractedbf",
+			Description: "Make a distracted boyfriend meme with the users",
+			Arguments:   "<user1> <user2>",
+			Handler:     c.distractedbf,
+		},
+		{
+			Name:        "captcha",
+			Description: "Make a captcha meme",
+			Arguments:   "<user> <text>",
+			Handler:     c.captcha,
+		},
+		{
+			Name:        "whowouldwin",
+			Description: "Make a who would win meme",
+			Arguments:   "<user1> <user2>",
+			Handler:     c.whowouldwin,
+		},
+		{
+			Name:        "jpeg",
+			Description: "JPEG a users avatar",
+			Arguments:   "<user>",
+			Handler:     c.jpeg,
+		},
+		{
+			Name:        "lolice",
+			Description: "Make a lolice meme",
+			Arguments:   "<user>",
+			Handler:     c.lolice,
+		},
+		{
+			Name:        "kannagen",
+			Description: "Make a kannagen meme",
+			Arguments:   "<user1> <user2>",
+			Handler:     c.kannagen,
+		},
+		{
+			Name:        "iphonex",
+			Description: "Put users profile picture on an iPhone X",
+			Arguments:   "<user1> <user2>",
+			Handler:     c.iphonex,
+		},
+		{
+			Name:        "awooify",
+			Description: "Awooify the user",
+			Arguments:   "<user1> <user2>",
+			Handler:     c.awooify,
+		},
+		{
+			Name:        "trap",
+			Description: "Make a trap card",
+			Arguments:   "<user>",
+			Handler:     c.trap,
+		},
+		{
+			Name:        "trumptweet",
+			Description: "Make a fake Trump tweet",
+			Arguments:   "<text>",
+			Handler:     c.trumptweet,
+		},
+		{
+			Name:        "deepfry",
+			Description: "Deepfry the users avatar",
+			Arguments:   "<text>",
+			Handler:     c.deepfry,
+		},
+		{
+			Name:        "blurpify",
+			Description: "Blurpify the users avatar",
+			Arguments:   "<text>",
+			Handler:     c.blurpify,
+		},
+		{
+			Name:        "phcomment",
+			Description: "Make the user comment something on PornHub",
+			Arguments:   "<user> <text>",
+			Handler:     c.phcomment,
+		},
+		{
+			Name:        "fact",
+			Description: "Make a fact meme",
+			Arguments:   "<user>",
+			Handler:     c.fact,
+		},
+		{
+			Name:        "trash",
+			Description: "Make a trash meme",
+			Arguments:   "<user>",
+			Handler:     c.trash,
+		},
+		{
+			Name:        "stickbug",
+			Description: "Make a stickbug meme",
+			Arguments:   "<user>",
+			Handler:     c.stickbug,
+		},
+		{
+			Name:        "magik",
+			Description: "Make a users avatar magik",
+			Arguments:   "<user>",
+			Handler:     c.magik,
+		},
+		{
+			Name:        "randomgif",
+			Description: "Send a random GIF from Giphy",
+			Handler:     c.randomgif,
+		},
+		{
+			Name:        "searchgif",
+			Description: "Search GIFs on Giphy",
+			Arguments:   "<query>",
+			Handler:     c.searchgif,
+		},
+		{
+			Name:        "communist",
+			Description: "Make the user a communist",
+			Arguments:   "<user>",
+			Handler:     c.communist,
+		},
+		{
+			Name:        "snow",
+			Description: "Add a snow overlay the the users avatar",
+			Arguments:   "<user>",
+			Handler:     c.snow,
+		},
+		{
+			Name:        "hub",
+			Description: "Make a PornHub logo with custom text",
+			Arguments:   "<\"text1\"> <\"text2\">",
+			Handler:     c.hub,
+		},
+		{
+			Name:        "floor",
+			Description: "Make a floor meme",
+			Arguments:   "<user> <text>",
+			Handler:     c.floor,
+		},
+		{
+			Name:        "jokeoverhead",
+			Description: "When someone doesn't understand a joke",
+			Arguments:   "<user>",
+			Handler:     c.jokeoverhead,
+		},
+		{
+			Name:        "throwaway",
+			Description: "Throw a user away",
+			Arguments:   "<user>",
+			Handler:     c.throwaway,
+		},
+		{
+			Name:        "salty",
+			Description: "Make a user salty",
+			Arguments:   "<user>",
+			Handler:     c.salty,
+		},
+		{
+			Name:        "scroll",
+			Description: "Make a scroll meme",
+			Arguments:   "<text>",
+			Handler:     c.scroll,
+		},
+		{
+			Name:        "shame",
+			Description: "Shame a user",
+			Arguments:   "<user>",
+			Handler:     c.shame,
+		},
+		{
+			Name:        "ship",
+			Description: "Ship users",
+			Arguments:   "<user1> <user2>",
+			Handler:     c.ship,
+		},
+		{
+			Name:        "what",
+			Description: "Make a what meme",
+			Arguments:   "<user>",
+			Handler:     c.what,
+		},
+		{
+			Name:        "sadcat",
+			Description: "Send an image of a sad cat",
+			Handler:     c.sadcat,
+		},
+		{
+			Name:        "bird",
+			Description: "Send an image of a bird",
+			Handler:     c.bird,
+		},
+		{
+			Name:        "cat",
+			Description: "Send an image of a cat",
+			Handler:     c.cat,
+		},
+		{
+			Name:        "catgif",
+			Description: "Send a GIF of a cat",
+			Handler:     c.catgif,
+		},
+		{
+			Name:        "catsays",
+			Description: "Make a cat say something",
+			Arguments:   "<text>",
+			Handler:     c.catsays,
+		},
+		{
+			Name:        "dog",
+			Description: "Send an image of a dog",
+			Handler:     c.dog,
+		},
+		{
+			Name:        "panda",
+			Description: "Send an image of a panda",
+			Handler:     c.panda,
+		},
+		{
+			Name:        "redpanda",
+			Description: "Send an image of a red panda",
+			Handler:     c.redpanda,
+		},
+		{
+			Name:        "koala",
+			Description: "Send an image of a koala",
+			Handler:     c.koala,
+		},
+		{
+			Name:        "raccoon",
+			Description: "Send an image of a raccoon",
+			Handler:     c.raccoon,
+		},
+		{
+			Name:        "fox",
+			Description: "Send an image of a fox",
+			Handler:     c.fox,
+		},
+		{
+			Name:        "shibe",
+			Description: "Send an image of a shiba inu/shibe/doge",
+			Handler:     c.shibe,
+		},
+		{
+			Name:        "whale",
+			Description: "Send an image of a whale",
+			Handler:     c.whale,
+		},
+		{
+			Name:        "kangaroo",
+			Description: "Send an image of a kangaroo",
+			Handler:     c.kangaroo,
+		},
+		{
+			Name:        "bunny",
+			Description: "Send an image of a bunny",
+			Handler:     c.bunny,
+		},
+		{
+			Name:        "lion",
+			Description: "Send an image of a lion",
+			Handler:     c.lion,
+		},
+		{
+			Name:        "frog",
+			Description: "Send an image of a frog",
+			Handler:     c.frog,
+		},
+		{
+			Name:        "duck",
+			Description: "Send an image of a duck",
+			Handler:     c.duck,
+		},
+		{
+			Name:        "penguin",
+			Description: "Send an image of a penguin",
+			Handler:     c.penguin,
+		},
+		{
+			Name:        "dolphin",
+			Description: "Send an image of a dolphin",
+			Handler:     c.dolphin,
+		},
+		{
+			Name:        "bear",
+			Description: "Send an image of a bear",
+			Handler:     c.bear,
+		},
+		{
+			Name:        "axolotl",
+			Description: "Send an image of an axolotl",
+			Handler:     c.axolotl,
+		},
+		{
+			Name:        "capybara",
+			Description: "Send an image of a capybara",
+			Handler:     c.capybara,
+		},
+		{
+			Name:        "balloon",
+			Description: "Make a balloon meme",
+			Arguments:   "<\"text1\"> <\"text2\">",
+			Handler:     c.balloon,
+		},
+		{
+			Name:        "abandon",
+			Description: "Make an abandon meme",
+			Arguments:   "<text>",
+			Handler:     c.abandon,
+		},
+		{
+			Name:        "aborted",
+			Description: "Make an aborted meme",
+			Arguments:   "<user>",
+			Handler:     c.aborted,
+		},
+		{
+			Name:        "affect",
+			Description: "Make an affect meme",
+			Arguments:   "<user>",
+			Handler:     c.affect,
+		},
+		{
+			Name:        "airpods",
+			Description: "Add AirPods to the users avatar",
+			Arguments:   "<user>",
+			Handler:     c.airpods,
+		},
+		{
+			Name:        "america",
+			Description: "Patriotize the user",
+			Arguments:   "<user>",
+			Handler:     c.america,
+		},
+		{
+			Name:        "armor",
+			Description: "Make an armor meme",
+			Arguments:   "<text>",
+			Handler:     c.armor,
+		},
+		{
+			Name:        "bed",
+			Description: "Make a bed meme",
+			Arguments:   "<user1> <user2>",
+			Handler:     c.bed,
+		},
+		{
+			Name:        "bongocat",
+			Description: "Make a bongocat meme",
+			Arguments:   "<user>",
+			Handler:     c.bongocat,
+		},
+		{
+			Name:        "boo",
+			Description: "Make a boo meme",
+			Arguments:   "<\"text1\"> <\"text2\">",
+			Handler:     c.boo,
+		},
+		{
+			Name:        "bigbrain",
+			Description: "Make a big brain meme",
+			Arguments:   "<\"item 1\"> <\"item 2\"> <\"item 3\"> <\"item 4\">",
+			Handler:     c.bigbrain,
+		},
+		{
+			Name:        "brazzers",
+			Description: "Make a brazzers meme",
+			Arguments:   "<user>",
+			Handler:     c.brazzers,
+		},
+		{
+			Name:        "byemom",
+			Description: "Make a byemom meme",
+			Arguments:   "<user> <text>",
+			Handler:     c.byemom,
+		},
+		{
+			Name:        "cancer",
+			Description: "Make a Squidward cancer meme",
+			Arguments:   "<user>",
+			Handler:     c.cancer,
+		},
+		{
+			Name:        "changemymind",
+			Description: "Make a change my mind meme",
+			Arguments:   "<text>",
+			Handler:     c.changemymind,
+		},
+		{
+			Name:        "cheating",
+			Description: "Make a cheating meme",
+			Arguments:   "<\"text1\"> <\"text2\">",
+			Handler:     c.cheating,
+		},
+		{
+			Name:        "citation",
+			Description: "Make a citation meme",
+			Arguments:   "<\"text1\"> <\"text2\"> <\"text3\">",
+			Handler:     c.citation,
+		},
+		{
+			Name:        "communism",
+			Description: "Make the user a communist",
+			Arguments:   "<user>",
+			Handler:     c.communism,
+		},
+		{
+			Name:        "confusedcat",
+			Description: "Make a confused cat meme",
+			Arguments:   "<\"text1\"> <\"text2\">",
+			Handler:     c.confusedcat,
+		},
+		{
+			Name:        "corporate",
+			Description: "Make a corporate meme",
+			Arguments:   "<user>",
+			Handler:     c.corporate,
+		},
+		{
+			Name:        "cry",
+			Description: "Make a cry meme",
+			Arguments:   "<text>",
+			Handler:     c.cry,
+		},
+		{
+			Name:        "dab",
+			Description: "Make a dab meme",
+			Arguments:   "<user>",
+			Handler:     c.dab,
+		},
+		{
+			Name:        "dank",
+			Description: "Make a dank meme",
+			Arguments:   "<user>",
+			Handler:     c.dank,
+		},
+		{
+			Name:        "delete",
+			Description: "Make a delete meme",
+			Arguments:   "<user>",
+			Handler:     c.delete,
+		},
+		{
+			Name:        "disability",
+			Description: "Make a disability meme",
+			Arguments:   "<user>",
+			Handler:     c.disability,
+		},
+		{
+			Name:        "doglemon",
+			Description: "Make a dog lemon meme",
+			Arguments:   "<\"text1\"> <\"text2\">",
+			Handler:     c.doglemon,
+		},
+		{
+			Name:        "door",
+			Description: "Make a door meme",
+			Arguments:   "<user>",
+			Handler:     c.door,
+		},
+		{
+			Name:        "egg",
+			Description: "Make a egg meme",
+			Arguments:   "<user>",
+			Handler:     c.egg,
+		},
+		{
+			Name:        "excuseme",
+			Description: "Make an excuse me meme",
+			Arguments:   "<text>",
+			Handler:     c.excuseme,
+		},
+		{
+			Name:        "expanddong",
+			Description: "Make an expand dong meme",
+			Arguments:   "<text>",
+			Handler:     c.expanddong,
+		},
+		{
+			Name:        "expandingwwe",
+			Description: "Make an expanding WWE meme",
+			Arguments:   "<\"item 1\"> <\"item 2\"> <\"item 3\"> <\"item 4\"> <\"item 5\">",
+			Handler:     c.expandingwwe,
+		},
+		{
+			Name:        "recaptcha",
+			Description: "Make a recaptcha",
+			Arguments:   "<text>",
+			Handler:     c.recaptcha,
+		},
+		{
+			Name:        "qrcode",
+			Description: "Make a QR Code",
+			Arguments:   "<text>",
+			Handler:     c.qrcode,
+		},
+		{
+			Name:        "darkqrcode",
+			Description: "Make a dark QR Code",
+			Arguments:   "<text>",
+			Handler:     c.darkqrcode,
+		},
+		{
+			Name:        "rule34",
+			Description: "Random rule 34 image",
+			Handler:     c.rule34,
+		},
+		{
+			Name:        "achievement",
+			Description: "Make a minecraft achievement",
+			Arguments:   "<text>",
+			Handler:     c.achievement,
+		},
+		{
+			Name:        "amiajoke",
+			Description: "Make an am I a joke meme",
+			Arguments:   "<user>",
+			Handler:     c.amiajoke,
+		},
+		{
+			Name:        "bad",
+			Description: "Make a bad meme",
+			Arguments:   "<user>",
+			Handler:     c.bad,
+		},
+		{
+			Name:        "calling",
+			Description: "Make a calling meme",
+			Arguments:   "<text>",
+			Handler:     c.calling,
+		},
+		{
+			Name:        "didyoumean",
+			Description: "Make a did you mean meme",
+			Arguments:   "<\"top\"> <\"bottom\">",
+			Handler:     c.didyoumean,
+		},
+		{
+			Name:        "drake",
+			Description: "Make a drake meme",
+			Arguments:   "<\"top\"> <\"bottom\">",
+			Handler:     c.drake,
+		},
+		{
+			Name:        "ayano",
+			Description: "Make an ayano meme",
+			Arguments:   "<\"top\"> <\"bottom\">",
+			Handler:     c.ayano,
+		},
+		{
+			Name:        "facts",
+			Description: "Make a facts meme",
+			Arguments:   "<text>",
+			Handler:     c.facts,
+		},
+		{
+			Name:        "blur",
+			Description: "Blur the user's avatar",
+			Arguments:   "<user>",
+			Handler:     c.blur,
+		},
+		{
+			Name:        "flipav",
+			Description: "Flip the user's avatar",
+			Arguments:   "<user>",
+			Handler:     c.flipav,
+		},
+		{
+			Name:        "mirror",
+			Description: "Mirror the user's avatar",
+			Arguments:   "<user>",
+			Handler:     c.mirror,
+		},
+		{
+			Name:        "wide",
+			Description: "Make the user's avatar wide",
+			Arguments:   "<user>",
+			Handler:     c.wide,
+		},
+		{
+			Name:        "sepia",
+			Description: "Make the user's avatar sepia",
+			Arguments:   "<user>",
+			Handler:     c.sepia,
+		},
+		{
+			Name:        "adios",
+			Description: "Make an adios meme",
+			Arguments:   "<user>",
+			Handler:     c.adios,
+		},
+		{
+			Name:        "batmanslap",
+			Description: "Make a batmanslap meme",
+			Arguments:   "<user1> <user2> <\"text1\"> <\"text2\">",
+			Handler:     c.batmanslap,
+		},
+		{
+			Name:        "carreverse",
+			Description: "Make a car reverse meme",
+			Arguments:   "<text>",
+			Handler:     c.carreverse,
+		},
+		{
+			Name:        "drip",
+			Description: "Give the user some drip",
+			Arguments:   "<user>",
+			Handler:     c.drip,
+		},
+		{
+			Name:        "impostor",
+			Description: "Make an Among Us impostor meme",
+			Arguments:   "<text>",
+			Handler:     c.impostor,
+		},
+		{
+			Name:        "notimpostor",
+			Description: "Make an Among Us not impostor meme",
+			Arguments:   "<text>",
+			Handler:     c.notimpostor,
+		},
+		{
+			Name:        "emergencymeeting",
+			Description: "Make an Among Us emergency meeting meme",
+			Arguments:   "<text>",
+			Handler:     c.emergencymeeting,
+		},
+		{
+			Name:        "firsttime",
+			Description: "Make a first time meme",
+			Arguments:   "<user>",
+			Handler:     c.firsttime,
+		},
+		{
+			Name:        "grave",
+			Description: "Make a grave meme",
+			Arguments:   "<user>",
+			Handler:     c.grave,
+		},
+		{
+			Name:        "iamspeed",
+			Description: "Make an i am speed meme",
+			Arguments:   "<user>",
+			Handler:     c.iamspeed,
+		},
+		{
+			Name:        "icanmilkyou",
+			Description: "Make an i can milk you meme",
+			Arguments:   "<user1> <user2>",
+			Handler:     c.icanmilkyou,
+		},
+		{
+			Name:        "heaven",
+			Description: "Make a heaven meme",
+			Arguments:   "<user>",
+			Handler:     c.heaven,
+		},
+		{
+			Name:        "npc",
+			Description: "Make an npc meme",
+			Arguments:   "<\"text1\"> <\"text2\">",
+			Handler:     c.npc,
+		},
+		{
+			Name:        "stonks",
+			Description: "Make a stonks meme",
+			Arguments:   "<user>",
+			Handler:     c.stonks,
+		},
+		{
+			Name:        "notstonks",
+			Description: "Make a not stonks meme",
+			Arguments:   "<user>",
+			Handler:     c.notstonks,
+		},
+		{
+			Name:        "fliptable",
+			Description: "Make the user flip a table",
+			Arguments:   "<user>",
+			Handler:     c.fliptable,
+		},
+		{
+			Name:        "water",
+			Description: "Make a water meme",
+			Arguments:   "<text>",
+			Handler:     c.water,
+		},
+		{
+			Name:        "wolverine",
+			Description: "Make a wolverine meme",
+			Arguments:   "<user>",
+			Handler:     c.wolverine,
+		},
+		{
+			Name:        "womanyellingatcat",
+			Description: "Make a woman yelling at cat meme",
+			Arguments:   "<user1> <user2>",
+			Handler:     c.womanyellingatcat,
+		},
+		{
+			Name:        "pikachu",
+			Description: "Send a random Pikachu image",
+			Handler:     c.pikachu,
+		},
+		{
+			Name:        "speechbubble",
+			Description: "Add a speech bubble to an image",
+			Arguments:   "[force GIF: on/off] [link/attachment]",
+			Handler:     c.speechbubble,
+		},
+
+		{
+			Name:        "quotereply",
+			Description: "Quote the message you replied to",
+			Arguments:   "[background url]",
+			Handler:     c.quotereply,
+		},
+		{
+			Name:        "quotemessage",
+			Description: "Quote a message",
+			Arguments:   "<message id> [channel id] [background url]",
+			Handler:     c.quotemessage,
+		},
+		{
+			Name:        "quoteuser",
+			Description: "Quote a user",
+			Arguments:   "<@user> <\"text\"> [background url]",
+			Handler:     c.quoteuser,
+		},
+		{
+			Name:        "quotetext",
+			Description: "Quote using text",
+			Arguments:   "<\"author\"> <\"text\"> [background url]",
+			Handler:     c.quotetext,
+		},
+
+		{
+			Name:        "discordquotereply",
+			Description: "Quote the Discord message you replied to",
+			Handler:     c.discordquotereply,
+		},
+		{
+			Name:        "discordquotemessage",
+			Description: "Quote a Discord message",
+			Arguments:   "<message id> [channel id]",
+			Handler:     c.discordquotemessage,
+		},
+		{
+			Name:        "discordquoteuser",
+			Description: "Quote a user",
+			Arguments:   "<@user> <\"text\">",
+			Handler:     c.discordquoteuser,
+		},
+		{
+			Name:        "discordquotetext",
+			Description: "Quote a Discord message",
+			Arguments:   "<\"author\"> <\"text\"> <avatar url>",
+			Handler:     c.discordquotetext,
+		},
 	})
 
-	router.RegisterCmd(&dgc.Command{
-		Name:        "quotereply",
-		Description: "Quote the message you replied to",
-		Arguments:   "[background url]",
-		Handler:     c.quotereply,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "quotemessage",
-		Description: "Quote a message",
-		Arguments:   "<message id> [channel id]",
-		Handler:     c.quotemessage,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "quoteuser",
-		Description: "Quote a user",
-		Arguments:   "<@user> <\"text\"> [background url]",
-		Handler:     c.quoteuser,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "quotetext",
-		Description: "Quote using text",
-		Arguments:   "<\"author\"> <\"text\"> [background url]",
-		Handler:     c.quotetext,
-	})
-
-	router.RegisterCmd(&dgc.Command{
-		Name:        "discordquotereply",
-		Description: "Quote the Discord message you replied to",
-		Handler:     c.discordquotereply,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "discordquotemessage",
-		Description: "Quote a Discord message",
-		Arguments:   "<message id> [channel id]",
-		Handler:     c.discordquotemessage,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "discordquoteuser",
-		Description: "Quote a user",
-		Arguments:   "<@user> <\"text\">",
-		Handler:     c.discordquoteuser,
-	})
-	router.RegisterCmd(&dgc.Command{
-		Name:        "discordquotetext",
-		Description: "Quote a Discord message",
-		Arguments:   "<\"author\"> <\"text\"> <avatar url>",
-		Handler:     c.discordquotetext,
-	})
 }
 
 func (c *ImageCommands) tweet(ctx *router.Ctx) {
 	jsonResult, err := http.GetJson(fmt.Sprintf(
 		"https://nekobot.xyz/api/imagegen?type=tweet&text=%s&username=%s",
 		url.QueryEscape(ctx.Arguments.RawFrom(1)),
-		url.QueryEscape(utils.Arguments["<username>"]),
+		url.QueryEscape(ctx.Arguments.Get(0).Raw()),
 	))
 	if err != nil {
 		ctx.RespondText("An error has occurred: " + err.Error())
@@ -1204,7 +1216,7 @@ func (c *ImageCommands) color(ctx *router.Ctx) {
 	}
 	ctx.RespondText(fmt.Sprintf("https://some-random-api.com/canvas/color?avatar=%s&color=%s",
 		url.QueryEscape(user.AvatarURL("")),
-		url.QueryEscape(strings.ReplaceAll(utils.Arguments["<color>"], "#", "")),
+		url.QueryEscape(strings.ReplaceAll(ctx.Arguments.Get(1).Raw(), "#", "")),
 	))
 }
 
@@ -1810,7 +1822,7 @@ func (c *ImageCommands) bed(ctx *router.Ctx) {
 		ctx.RespondText("Cannot find user")
 		return
 	}
-	err := utils.Discord.SendFileFromURL(
+	err = utils.Discord.SendFileFromURL(
 		ctx,
 		"https://imgen.lightning-bot.com/bed",
 		"bed.png",
@@ -1829,7 +1841,7 @@ func (c *ImageCommands) balloon(ctx *router.Ctx) {
 		"https://imgen.lightning-bot.com/balloon",
 		"balloon.png",
 		map[string]string{
-			"text": utils.Arguments["<\"text1\">"] + "," + utils.Arguments["<\"text2\">"],
+			"text": ctx.Arguments.Get(0).Raw() + "," + ctx.Arguments.Get(1).Raw(),
 		},
 	)
 	if err != nil {
@@ -1857,7 +1869,7 @@ func (c *ImageCommands) aborted(ctx *router.Ctx) {
 		ctx.RespondText("Cannot find user")
 		return
 	}
-	err := utils.Discord.SendFileFromURL(
+	err = utils.Discord.SendFileFromURL(
 		ctx,
 		"https://imgen.lightning-bot.com/aborted",
 		"aborted.png",
@@ -1876,7 +1888,7 @@ func (c *ImageCommands) affect(ctx *router.Ctx) {
 		ctx.RespondText("Cannot find user")
 		return
 	}
-	err := utils.Discord.SendFileFromURL(
+	err = utils.Discord.SendFileFromURL(
 		ctx,
 		"https://imgen.lightning-bot.com/affect",
 		"affect.png",
@@ -1895,7 +1907,7 @@ func (c *ImageCommands) airpods(ctx *router.Ctx) {
 		ctx.RespondText("Cannot find user")
 		return
 	}
-	err := utils.Discord.SendFileFromURL(
+	err = utils.Discord.SendFileFromURL(
 		ctx,
 		"https://imgen.lightning-bot.com/airpods",
 		"airpods.gif",
@@ -1914,7 +1926,7 @@ func (c *ImageCommands) america(ctx *router.Ctx) {
 		ctx.RespondText("Cannot find user")
 		return
 	}
-	err := utils.Discord.SendFileFromURL(
+	err = utils.Discord.SendFileFromURL(
 		ctx,
 		"https://imgen.lightning-bot.com/america",
 		"america.gif",
@@ -1947,7 +1959,7 @@ func (c *ImageCommands) bongocat(ctx *router.Ctx) {
 		ctx.RespondText("Cannot find user")
 		return
 	}
-	err := utils.Discord.SendFileFromURL(
+	err = utils.Discord.SendFileFromURL(
 		ctx,
 		"https://imgen.lightning-bot.com/bongocat",
 		"bongocat.png",
@@ -1966,7 +1978,7 @@ func (c *ImageCommands) boo(ctx *router.Ctx) {
 		"https://imgen.lightning-bot.com/boo",
 		"boo.png",
 		map[string]string{
-			"text": utils.Arguments["<\"text1\">"] + "," + utils.Arguments["<\"text2\">"],
+			"text": ctx.Arguments.Get(0).Raw() + "," + ctx.Arguments.Get(1).Raw(),
 		},
 	)
 	if err != nil {
@@ -1980,10 +1992,10 @@ func (c *ImageCommands) bigbrain(ctx *router.Ctx) {
 		"https://imgen.lightning-bot.com/brain",
 		"bigbrain.png",
 		map[string]string{
-			"text": utils.Arguments["<\"item 1\">"] +
-				"," + utils.Arguments["<\"item 2\">"] +
-				"," + utils.Arguments["<\"item 3\">"] +
-				"," + utils.Arguments["<\"item 4\">"],
+			"text": ctx.Arguments.Get(0).Raw() +
+				"," + ctx.Arguments.Get(1).Raw() +
+				"," + ctx.Arguments.Get(2).Raw() +
+				"," + ctx.Arguments.Get(3).Raw(),
 		},
 	)
 	if err != nil {
@@ -1997,7 +2009,7 @@ func (c *ImageCommands) brazzers(ctx *router.Ctx) {
 		ctx.RespondText("Cannot find user")
 		return
 	}
-	err := utils.Discord.SendFileFromURL(
+	err = utils.Discord.SendFileFromURL(
 		ctx,
 		"https://imgen.lightning-bot.com/brazzers",
 		"brazzers.png",
@@ -2017,7 +2029,7 @@ func (c *ImageCommands) byemom(ctx *router.Ctx) {
 		ctx.RespondText("Cannot find user")
 		return
 	}
-	err := utils.Discord.SendFileFromURL(
+	err = utils.Discord.SendFileFromURL(
 		ctx,
 		"https://imgen.lightning-bot.com/byemom",
 		"byemom.png",
@@ -2038,7 +2050,7 @@ func (c *ImageCommands) cancer(ctx *router.Ctx) {
 		ctx.RespondText("Cannot find user")
 		return
 	}
-	err := utils.Discord.SendFileFromURL(
+	err = utils.Discord.SendFileFromURL(
 		ctx,
 		"https://imgen.lightning-bot.com/cancer",
 		"cancer.png",
@@ -2057,7 +2069,7 @@ func (c *ImageCommands) cheating(ctx *router.Ctx) {
 		"https://imgen.lightning-bot.com/cheating",
 		"cheating.png",
 		map[string]string{
-			"text": utils.Arguments["<\"text1\">"] + "," + utils.Arguments["<\"text2\">"],
+			"text": ctx.Arguments.Get(0).Raw() + "," + ctx.Arguments.Get(1).Raw(),
 		},
 	)
 	if err != nil {
@@ -2071,7 +2083,7 @@ func (c *ImageCommands) citation(ctx *router.Ctx) {
 		"https://imgen.lightning-bot.com/citation",
 		"citation.png",
 		map[string]string{
-			"text": utils.Arguments["<\"text1\">"] + "," + utils.Arguments["<\"text2\">"] + "," + utils.Arguments["<\"text3\">"],
+			"text": ctx.Arguments.Get(0).Raw() + "," + ctx.Arguments.Get(1).Raw() + "," + ctx.Arguments.Get(2).Raw(),
 		},
 	)
 	if err != nil {
@@ -2085,7 +2097,7 @@ func (c *ImageCommands) communism(ctx *router.Ctx) {
 		ctx.RespondText("Cannot find user")
 		return
 	}
-	err := utils.Discord.SendFileFromURL(
+	err = utils.Discord.SendFileFromURL(
 		ctx,
 		"https://imgen.lightning-bot.com/communism",
 		"communism.gif",
@@ -2104,7 +2116,7 @@ func (c *ImageCommands) confusedcat(ctx *router.Ctx) {
 		"https://imgen.lightning-bot.com/confusedcat",
 		"confusedcat.png",
 		map[string]string{
-			"text": utils.Arguments["<\"text1\">"] + "," + utils.Arguments["<\"text2\">"],
+			"text": ctx.Arguments.Get(0).Raw() + "," + ctx.Arguments.Get(1).Raw(),
 		},
 	)
 	if err != nil {
@@ -2118,7 +2130,7 @@ func (c *ImageCommands) corporate(ctx *router.Ctx) {
 		ctx.RespondText("Cannot find user")
 		return
 	}
-	err := utils.Discord.SendFileFromURL(
+	err = utils.Discord.SendFileFromURL(
 		ctx,
 		"https://imgen.lightning-bot.com/corporate",
 		"corporate.png",
@@ -2151,7 +2163,7 @@ func (c *ImageCommands) dab(ctx *router.Ctx) {
 		ctx.RespondText("Cannot find user")
 		return
 	}
-	err := utils.Discord.SendFileFromURL(
+	err = utils.Discord.SendFileFromURL(
 		ctx,
 		"https://imgen.lightning-bot.com/dab",
 		"dab.png",
@@ -2170,7 +2182,7 @@ func (c *ImageCommands) dank(ctx *router.Ctx) {
 		ctx.RespondText("Cannot find user")
 		return
 	}
-	err := utils.Discord.SendFileFromURL(
+	err = utils.Discord.SendFileFromURL(
 		ctx,
 		"https://imgen.lightning-bot.com/dank",
 		"dank.gif",
@@ -2189,7 +2201,7 @@ func (c *ImageCommands) delete(ctx *router.Ctx) {
 		ctx.RespondText("Cannot find user")
 		return
 	}
-	err := utils.Discord.SendFileFromURL(
+	err = utils.Discord.SendFileFromURL(
 		ctx,
 		"https://imgen.lightning-bot.com/delete",
 		"delete.png",
@@ -2208,7 +2220,7 @@ func (c *ImageCommands) disability(ctx *router.Ctx) {
 		ctx.RespondText("Cannot find user")
 		return
 	}
-	err := utils.Discord.SendFileFromURL(
+	err = utils.Discord.SendFileFromURL(
 		ctx,
 		"https://imgen.lightning-bot.com/disability",
 		"disability.png",
@@ -2227,7 +2239,7 @@ func (c *ImageCommands) doglemon(ctx *router.Ctx) {
 		"https://imgen.lightning-bot.com/doglemon",
 		"doglemon.png",
 		map[string]string{
-			"text": utils.Arguments["<\"text1\">"] + "," + utils.Arguments["<\"text2\">"],
+			"text": ctx.Arguments.Get(0).Raw() + "," + ctx.Arguments.Get(1).Raw(),
 		},
 	)
 	if err != nil {
@@ -2241,7 +2253,7 @@ func (c *ImageCommands) door(ctx *router.Ctx) {
 		ctx.RespondText("Cannot find user")
 		return
 	}
-	err := utils.Discord.SendFileFromURL(
+	err = utils.Discord.SendFileFromURL(
 		ctx,
 		"https://imgen.lightning-bot.com/door",
 		"door.png",
@@ -2260,7 +2272,7 @@ func (c *ImageCommands) egg(ctx *router.Ctx) {
 		ctx.RespondText("Cannot find user")
 		return
 	}
-	err := utils.Discord.SendFileFromURL(
+	err = utils.Discord.SendFileFromURL(
 		ctx,
 		"https://imgen.lightning-bot.com/egg",
 		"egg.png",
@@ -2307,11 +2319,11 @@ func (c *ImageCommands) expandingwwe(ctx *router.Ctx) {
 		"https://imgen.lightning-bot.com/expandingwwe",
 		"expandingwwe.png",
 		map[string]string{
-			"text": utils.Arguments["<\"item 1\">"] +
-				"," + utils.Arguments["<\"item 2\">"] +
-				"," + utils.Arguments["<\"item 3\">"] +
-				"," + utils.Arguments["<\"item 4\">"] +
-				"," + utils.Arguments["<\"item 5\">"],
+			"text": ctx.Arguments.Get(0).Raw() +
+				"," + ctx.Arguments.Get(1).Raw() +
+				"," + ctx.Arguments.Get(2).Raw() +
+				"," + ctx.Arguments.Get(3).Raw() +
+				"," + ctx.Arguments.Get(4).Raw(),
 		},
 	)
 	if err != nil {
@@ -2379,24 +2391,24 @@ func (c *ImageCommands) calling(ctx *router.Ctx) {
 func (c *ImageCommands) didyoumean(ctx *router.Ctx) {
 	ctx.RespondText(fmt.Sprintf(
 		"https://api.lightning-bot.com/api/v3/imagegen/didyoumean?top=%s&bottom=%s",
-		url.QueryEscape(utils.Arguments["<\"top\">"]),
-		url.QueryEscape(utils.Arguments["<\"bottom\">"]),
+		url.QueryEscape(ctx.Arguments.Get(0).Raw()),
+		url.QueryEscape(ctx.Arguments.Get(1).Raw()),
 	))
 }
 
 func (c *ImageCommands) drake(ctx *router.Ctx) {
 	ctx.RespondText(fmt.Sprintf(
 		"https://api.lightning-bot.com/api/v3/imagegen/drake?top=%s&bottom=%s&ayano=false",
-		url.QueryEscape(utils.Arguments["<\"top\">"]),
-		url.QueryEscape(utils.Arguments["<\"bottom\">"]),
+		url.QueryEscape(ctx.Arguments.Get(0).Raw()),
+		url.QueryEscape(ctx.Arguments.Get(1).Raw()),
 	))
 }
 
 func (c *ImageCommands) ayano(ctx *router.Ctx) {
 	ctx.RespondText(fmt.Sprintf(
 		"https://api.lightning-bot.com/api/v3/imagegen/drake?top=%s&bottom=%s&ayano=true",
-		url.QueryEscape(utils.Arguments["<\"top\">"]),
-		url.QueryEscape(utils.Arguments["<\"bottom\">"]),
+		url.QueryEscape(ctx.Arguments.Get(0).Raw()),
+		url.QueryEscape(ctx.Arguments.Get(1).Raw()),
 	))
 }
 
@@ -2483,8 +2495,8 @@ func (c *ImageCommands) snow(ctx *router.Ctx) {
 func (c *ImageCommands) hub(ctx *router.Ctx) {
 	ctx.RespondText(fmt.Sprintf(
 		"https://api.lightning-bot.com/api/v3/imagegen/pornhub?text1=%s&text2=%s",
-		url.QueryEscape(utils.Arguments["<\"text1\">"]),
-		url.QueryEscape(utils.Arguments["<\"text2\">"]),
+		url.QueryEscape(ctx.Arguments.Get(0).Raw()),
+		url.QueryEscape(ctx.Arguments.Get(1).Raw()),
 	))
 }
 
@@ -2592,8 +2604,8 @@ func (c *ImageCommands) batmanslap(ctx *router.Ctx) {
 	}
 	ctx.RespondText(fmt.Sprintf(
 		"https://vacefron.nl/api/batmanslap?text1=%s&text2=%s&batman=%s&robin=%s",
-		url.QueryEscape(utils.Arguments["<\"text1\">"]),
-		url.QueryEscape(utils.Arguments["<\"text2\">"]),
+		url.QueryEscape(ctx.Arguments.Get(0).Raw()),
+		url.QueryEscape(ctx.Arguments.Get(1).Raw()),
 		url.QueryEscape(user.AvatarURL("")),
 		url.QueryEscape(user2.AvatarURL("")),
 	))
@@ -2677,7 +2689,7 @@ func (c *ImageCommands) heaven(ctx *router.Ctx) {
 }
 
 func (c *ImageCommands) npc(ctx *router.Ctx) {
-	ctx.RespondText(fmt.Sprintf("https://vacefron.nl/api/npc?text1=%s&text2=%s", url.QueryEscape(utils.Arguments["<\"text1\">"]), url.QueryEscape(utils.Arguments["<\"text2\">"])))
+	ctx.RespondText(fmt.Sprintf("https://vacefron.nl/api/npc?text1=%s&text2=%s", url.QueryEscape(ctx.Arguments.Get(0).Raw()), url.QueryEscape(ctx.Arguments.Get(1).Raw())))
 }
 
 func (c *ImageCommands) stonks(ctx *router.Ctx) {
@@ -2744,7 +2756,7 @@ func (c *ImageCommands) pikachu(ctx *router.Ctx) {
 }
 
 func (c *ImageCommands) speechbubble(ctx *router.Ctx) {
-	link := utils.Arguments["[link/attachment]"]
+	link := ctx.Arguments.Get(1).Raw()
 
 	attachments := ctx.Message.Attachments
 	if len(attachments) > 0 {
@@ -2756,18 +2768,13 @@ func (c *ImageCommands) speechbubble(ctx *router.Ctx) {
 		return
 	}
 
-	forceGIF := strings.ToLower(utils.Arguments["[force GIF: on/off]"])
-	if forceGIF != "" && forceGIF != "on" && forceGIF != "off" {
+	forceGIF, err := ctx.Arguments.Get(0).Bool()
+	if err != nil {
 		ctx.RespondText("Invalid force GIF value. Use `on` or `off`.")
 		return
 	}
 
-	format := "png"
-
-	if forceGIF == "on" {
-		format = "gif"
-	}
-
+	format := utils2.Ternary(forceGIF, "gif", "png")
 	url := fmt.Sprintf("https://api.lightning-bot.com/api/v3/imagegen/speechbubble?url=%s&format=%s", url.QueryEscape(link), format)
 
 	httpResponse := http.Get(url)
@@ -2793,7 +2800,7 @@ func (c *ImageCommands) quotereply(ctx *router.Ctx) {
 		"https://api.lightning-bot.com/api/v3/imagegen/quote?author=%s&text=%s&background=%s",
 		url.QueryEscape(utils.Misc.Or(m.Author.DisplayName, m.Author.Username)),
 		url.QueryEscape(ctx.Message.ReferencedMessage.ContentWithMentionsReplaced()),
-		url.QueryEscape(utils.Arguments["[background url]"]),
+		url.QueryEscape(ctx.Arguments.Get(0).Raw()),
 	))
 }
 
@@ -2806,7 +2813,7 @@ func (c *ImageCommands) quotemessage(ctx *router.Ctx) {
 		return
 	}
 
-	m, err := utils.Discord.GetChannelMessage(ctx.Session, channel.ID, utils.Arguments["<message id>"])
+	m, err := utils.Discord.GetChannelMessage(ctx.Session, channel.ID, ctx.Arguments.Get(0).Raw())
 	if err != nil {
 		c.services.Embed.NewEmbed().
 			SetDescription("Could not find message: " + err.Error()).
@@ -2818,7 +2825,7 @@ func (c *ImageCommands) quotemessage(ctx *router.Ctx) {
 		"https://api.lightning-bot.com/api/v3/imagegen/quote?author=%s&text=%s&background=%s",
 		url.QueryEscape(utils.Misc.Or(m.Author.DisplayName, m.Author.Username)),
 		url.QueryEscape(m.ContentWithMentionsReplaced()),
-		url.QueryEscape(utils.Arguments["[background url]"]),
+		url.QueryEscape(ctx.Arguments.Get(2).Raw()),
 	))
 }
 
@@ -2834,17 +2841,17 @@ func (c *ImageCommands) quoteuser(ctx *router.Ctx) {
 	ctx.RespondText(fmt.Sprintf(
 		"https://api.lightning-bot.com/api/v3/imagegen/quote?author=%s&text=%s&background=%s",
 		url.QueryEscape(utils.Misc.Or(user.DisplayName, user.Username)),
-		url.QueryEscape(utils.Arguments["<\"text\">"]),
-		url.QueryEscape(utils.Arguments["[background url]"]),
+		url.QueryEscape(ctx.Arguments.Get(1).Raw()),
+		url.QueryEscape(ctx.Arguments.Get(2).Raw()),
 	))
 }
 
 func (c *ImageCommands) quotetext(ctx *router.Ctx) {
 	ctx.RespondText(fmt.Sprintf(
 		"https://api.lightning-bot.com/api/v3/imagegen/quote?author=%s&text=%s&background=%s",
-		url.QueryEscape(utils.Arguments["<\"author\">"]),
-		url.QueryEscape(utils.Arguments["<\"text\">"]),
-		url.QueryEscape(utils.Arguments["[background url]"]),
+		url.QueryEscape(ctx.Arguments.Get(0).Raw()),
+		url.QueryEscape(ctx.Arguments.Get(1).Raw()),
+		url.QueryEscape(ctx.Arguments.Get(2).Raw()),
 	))
 }
 
@@ -2883,7 +2890,7 @@ func (c *ImageCommands) discordquotemessage(ctx *router.Ctx) {
 		return
 	}
 
-	m, err := utils.Discord.GetChannelMessage(ctx.Session, channel.ID, utils.Arguments["<message id>"])
+	m, err := utils.Discord.GetChannelMessage(ctx.Session, channel.ID, ctx.Arguments.Get(0).Raw())
 	if err != nil {
 		c.services.Embed.NewEmbed().
 			SetDescription("Could not find message: " + err.Error()).
@@ -2945,18 +2952,8 @@ func (c *ImageCommands) discordquoteuser(ctx *router.Ctx) {
 func (c *ImageCommands) discordquotetext(ctx *router.Ctx) {
 	ctx.RespondText(fmt.Sprintf(
 		"https://api.lightning-bot.com/api/v3/imagegen/discordquote?author=%s&author_url=%s&text=%s",
-		url.QueryEscape(utils.Arguments["<\"author\">"]),
-		url.QueryEscape(utils.Arguments["<avatar url>"]),
-		url.QueryEscape(utils.Arguments["<\"text\">"]),
+		url.QueryEscape(ctx.Arguments.Get(0).Raw()),
+		url.QueryEscape(ctx.Arguments.Get(2).Raw()),
+		url.QueryEscape(ctx.Arguments.Get(1).Raw()),
 	))
-}
-
-type ImageCommands struct{ services *services.Services }
-
-func NewImageCommands(s *services.Services) *ImageCommands {
-	return &ImageCommands{services: s}
-}
-func (c *ImageCommands) Register() {
-	cmdRouter := c.services.Discord.GetRouter()
-
 }
