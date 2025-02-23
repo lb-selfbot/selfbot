@@ -149,37 +149,37 @@ func (c *ConfigCommands) Register() {
 			SetDesc:      "Set embed URL",
 			SetFunc:      func(cfg *config.Config, value any) { cfg.Selfbot.EmbedURL = value.(string) },
 		}),
-		c.createConfigActionCommand(configCommandData{
-			Name:         "forcesubscribedservers",
-			ReadableName: "Force Subscribed Servers",
-			ValueType:    configCommandValueTypeBool,
-			GetDesc:      "Get force subscribed servers status",
-			GetFunc:      func(cfg *config.Config) any { return len(cfg.Selfbot.ForceSubscribedServers) > 0 },
-			SetDesc:      "Set force subscribed servers status",
-			SetFunc: func(cfg *config.Config, value any) {
-				if value.(bool) {
-					guildIDs := make([]string, 0)
-					for _, guild := range c.services.Discord.GetState().Guilds {
-						guildIDs = append(guildIDs, guild.ID)
-					}
-					cfg.Selfbot.ForceSubscribedServers = guildIDs
-				} else {
-					cfg.Selfbot.ForceSubscribedServers = []string{}
-				}
-			},
-			ToggleDesc: "Toggle force subscribed servers",
-			ToggleFunc: func(cfg *config.Config) {
-				if len(cfg.Selfbot.ForceSubscribedServers) > 0 {
-					cfg.Selfbot.ForceSubscribedServers = []string{}
-				} else {
-					guildIDs := make([]string, 0)
-					for _, guild := range c.services.Discord.GetState().Guilds {
-						guildIDs = append(guildIDs, guild.ID)
-					}
-					cfg.Selfbot.ForceSubscribedServers = guildIDs
-				}
-			},
-		}),
+		// c.createConfigActionCommand(configCommandData{
+		// 	Name:         "forcesubscribedservers",
+		// 	ReadableName: "Force Subscribed Servers",
+		// 	ValueType:    configCommandValueTypeBool,
+		// 	GetDesc:      "Get force subscribed servers status",
+		// 	GetFunc:      func(cfg *config.Config) any { return len(cfg.Selfbot.ForceSubscribedServers) > 0 },
+		// 	SetDesc:      "Set force subscribed servers status",
+		// 	SetFunc: func(cfg *config.Config, value any) {
+		// 		if value.(bool) {
+		// 			guildIDs := make([]string, 0)
+		// 			for _, guild := range c.services.Discord.GetState().Guilds {
+		// 				guildIDs = append(guildIDs, guild.ID)
+		// 			}
+		// 			cfg.Selfbot.ForceSubscribedServers = guildIDs
+		// 		} else {
+		// 			cfg.Selfbot.ForceSubscribedServers = []string{}
+		// 		}
+		// 	},
+		// 	ToggleDesc: "Toggle force subscribed servers",
+		// 	ToggleFunc: func(cfg *config.Config) {
+		// 		if len(cfg.Selfbot.ForceSubscribedServers) > 0 {
+		// 			cfg.Selfbot.ForceSubscribedServers = []string{}
+		// 		} else {
+		// 			guildIDs := make([]string, 0)
+		// 			for _, guild := range c.services.Discord.GetState().Guilds {
+		// 				guildIDs = append(guildIDs, guild.ID)
+		// 			}
+		// 			cfg.Selfbot.ForceSubscribedServers = guildIDs
+		// 		}
+		// 	},
+		// }),
 		{
 			Name:        "aliases",
 			Description: "Command aliases commands",
@@ -475,10 +475,7 @@ func (c *ConfigCommands) createConfigActionCommand(data configCommandData) *rout
 					return
 				}
 
-				if err := data.ToggleFunc(&cfg); err != nil {
-					ctx.RespondText("Error toggling config")
-					return
-				}
+				data.ToggleFunc(&cfg)
 
 				if err := cfg.Save(); err != nil {
 					ctx.RespondText("Error saving config")
@@ -497,12 +494,7 @@ func (c *ConfigCommands) createConfigActionCommand(data configCommandData) *rout
 			Name:        "values",
 			Description: data.ValuesDesc,
 			Handler: func(ctx *router.Ctx) {
-				values, err := data.ValuesFunc()
-				if err != nil {
-					ctx.RespondText("Error getting values")
-					return
-				}
-
+				values := data.ValuesFunc()
 				stringValues := utils2.Map(values, func(value any) string {
 					return fmt.Sprint(value)
 				})
