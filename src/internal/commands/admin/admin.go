@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"net/url"
 	"slices"
-	"sort"
 	"strconv"
 	"strings"
 	"time"
@@ -1924,16 +1923,20 @@ func (c *AdminCommands) bots(ctx *router.Ctx) {
 		ctx.RespondText("Error getting server: " + err.Error())
 		return
 	}
-	botString := ""
-	for _, member := range guild.Members {
-		if member.User.Bot {
-			botString += member.User.Mention() + "\n"
-		}
+
+	bots := utils2.Filter(guild.Members, func(member *discordgo.Member) bool { return member.User.Bot })
+	if len(bots) == 0 {
+		ctx.RespondText("No bots found!")
+		return
 	}
-	botString = utils.Misc.Or(botString, "No bots found!")
+
+	botsReadable := utils2.Map(bots, func(member *discordgo.Member) string {
+		return fmt.Sprintf("%s - %s", member.User.String(), member.User.ID)
+	})
+
 	c.services.Embed.NewEmbed().
 		SetDescription("Server Bots - %s", guild.Name).
-		AddField("Server Bots", botString).
+		AddField("Server Bots", strings.Join(botsReadable, "\n")).
 		Send(ctx)
 }
 
@@ -1943,21 +1946,28 @@ func (c *AdminCommands) admins(ctx *router.Ctx) {
 		ctx.RespondText("Error getting server: " + err.Error())
 		return
 	}
+
 	if len(guild.Channels) == 0 {
 		ctx.RespondText("Server has no channels!")
 		return
 	}
-	adminString := ""
-	for _, member := range guild.Members {
+
+	admins := utils2.Filter(guild.Members, func(member *discordgo.Member) bool {
 		permissions, _ := ctx.Session.UserChannelPermissions(member.User.ID, guild.Channels[0].ID)
-		if permissions&discordgo.PermissionAdministrator != 0 && !member.User.Bot {
-			adminString += fmt.Sprintf("%s - %s\n", member.User.String(), member.User.ID)
-		}
+		return permissions&discordgo.PermissionAdministrator != 0 && !member.User.Bot
+	})
+	if len(admins) == 0 {
+		ctx.RespondText("No admins found!")
+		return
 	}
-	adminString = utils.Misc.Or(adminString, "No admins found!")
+
+	adminsReadable := utils2.Map(admins, func(member *discordgo.Member) string {
+		return fmt.Sprintf("%s - %s", member.User.String(), member.User.ID)
+	})
+
 	c.services.Embed.NewEmbed().
 		SetDescription("Server Admins - %s", guild.Name).
-		AddField("Server Admins", adminString).
+		AddField("Server Admins", strings.Join(adminsReadable, "\n")).
 		Send(ctx)
 }
 
@@ -1967,21 +1977,18 @@ func (c *AdminCommands) roles(ctx *router.Ctx) {
 		ctx.RespondText("Error getting server: " + err.Error())
 		return
 	}
-	sort.Slice(guild.Roles, func(i, j int) bool {
-		return guild.Roles[i].Position < guild.Roles[j].Position
+
+	slices.SortFunc(guild.Roles, func(i, j *discordgo.Role) int {
+		return i.Position - j.Position
 	})
-	roleString := ""
-	for _, role := range guild.Roles {
-		if role.ID == guild.ID {
-			// Ignore @everyone role
-			continue
-		}
-		roleString += fmt.Sprintf("%s - %s\n", role.Name, role.ID)
-	}
-	roleString = utils.Misc.Or(roleString, "No roles found!")
+
+	rolesReadable := utils2.Map(guild.Roles, func(role *discordgo.Role) string {
+		return fmt.Sprintf("%s - %s", role.Name, role.ID)
+	})
+
 	c.services.Embed.NewEmbed().
 		SetDescription("Server Roles - %s", guild.Name).
-		AddField("Server Roles", roleString).
+		AddField("Server Roles", strings.Join(rolesReadable, "\n")).
 		Send(ctx)
 }
 

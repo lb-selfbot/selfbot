@@ -878,12 +878,12 @@ func (c *TextCommands) customanimation(ctx *router.Ctx) {
 		ctx.RespondText("Animation does not exist.")
 		return
 	}
-	rawAnimation, ok := utils.IO.Read(path)
-	if !ok {
+	anim, err := os.ReadFile(path)
+	if err != nil {
 		ctx.RespondText("Animation could not be read.")
 		return
 	}
-	animationFrames := strings.Split(rawAnimation, "\n")
+	animationFrames := strings.Split(string(anim), "\n")
 	message, err := ctx.Session.ChannelMessageSend(ctx.Message.ChannelID, animationFrames[0])
 	if err != nil {
 		return

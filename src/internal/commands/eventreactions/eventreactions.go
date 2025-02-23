@@ -380,34 +380,24 @@ func (c *EventReactionsCommands) mapReactions(ctx *router.Ctx, reactions []inter
 		Send(ctx)
 }
 
-func (c *EventReactionsCommands) getGuildOrChannel(ctx *router.Ctx, arg *router.Argument) (guild *discordgo.Guild, channel *discordgo.Channel, err error) {
-	givenID := utils.Misc.Or(arg.ChannelMentionID(), arg.Raw())
-
-	if givenID == "" {
-		// Use the current server/channel
-		if ctx.Message.GuildID != "" {
-			guild, err = utils.Discord.GetGuild(ctx.Session, ctx.Message.GuildID)
-			if err != nil {
-				return
-			}
-		} else {
-			channel, err = utils.Discord.GetChannel(ctx.Session, ctx.Message.ChannelID)
-			if err != nil {
-				return
-			}
-		}
-	} else {
-		// Use the given server/channel
-		guild, err = utils.Discord.GetGuild(ctx.Session, givenID)
-		if err != nil {
-			channel, err = utils.Discord.GetChannel(ctx.Session, givenID)
-			if err != nil {
-				return
-			}
-		}
+func (c *EventReactionsCommands) getGuildOrChannel(ctx *router.Ctx, arg *router.Argument) (*discordgo.Guild, *discordgo.Channel, error) {
+	guild, err := arg.Guild()
+	if err == nil {
+		return guild, nil, nil
 	}
 
-	return
+	channel, err := arg.Channel()
+	if err == nil {
+		return nil, channel, nil
+	}
+
+	if ctx.Message.GuildID != "" {
+		guild, err = utils.Discord.GetGuild(ctx.Session, ctx.Message.GuildID)
+		return guild, nil, err
+	}
+
+	channel, err = utils.Discord.GetChannel(ctx.Session, ctx.Message.ChannelID)
+	return nil, channel, err
 }
 
 // Commands

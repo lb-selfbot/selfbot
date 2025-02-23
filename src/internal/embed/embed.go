@@ -518,11 +518,7 @@ func (e *Embed) ToURLEmbed() []string {
 	batchSize := 5
 
 	for i := 0; i < len(urls); i += batchSize {
-		end := i + batchSize
-		if end > len(urls) {
-			end = len(urls)
-		}
-		batch := urls[i:end]
+		batch := urls[i:min(i+batchSize, len(urls))]
 		batches = append(batches, batch)
 	}
 
@@ -564,16 +560,13 @@ func (e *Embed) ToString(commandMode string) []string {
 func (e *Embed) Send(ctx *router.Ctx) []*discordgo.Message {
 	cfg, _ := config.GetConfig()
 
-	commandMode := utils.Misc.Or(cfg.Selfbot.CommandMode, "Codeblock")
+	commandMode := cfg.Selfbot.CommandMode
 
 	if commandMode == "WebhookEmbed" {
 		err := e.sendWebhookEmbed(ctx)
 		if err == nil {
 			return nil
 		}
-
-		// If the webhook embed fails, fallback to the default embed
-		commandMode = "Codeblock"
 	}
 
 	messages := []*discordgo.Message{}

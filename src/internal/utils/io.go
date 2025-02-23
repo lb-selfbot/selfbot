@@ -11,9 +11,7 @@ import (
 	"golang.org/x/text/unicode/norm"
 )
 
-type IOUtils struct {
-	MainFolderOverride string
-}
+type IOUtils struct{}
 
 func (*IOUtils) SanitizeFilename(filename string) string {
 	blacklist := []string{"\\", "/", ":", "*", "?", "\"", "<", ">", "|", "\x00"}
@@ -47,37 +45,11 @@ func (*IOUtils) SanitizeFilename(filename string) string {
 	if len(filename) > 255 {
 		filename = filename[:255]
 	}
+	filepath.Join()
 	return filename
 }
 
-func (*IOUtils) Read(file string) (string, bool) {
-	fileContents, err := os.ReadFile(filepath.FromSlash(file))
-	if err != nil {
-		return "", false
-	}
-	return string(fileContents), true
-}
-
-func (*IOUtils) WriteBytes(filePath string, data []byte) error {
-	file, err := os.Create(filepath.FromSlash(filePath))
-	if err != nil {
-		return err
-	}
-	defer file.Close()
-
-	_, err = file.Write(data)
-	return err
-}
-
-func (i *IOUtils) Write(filePath, content string) error {
-	return i.WriteBytes(filePath, []byte(content))
-}
-
 func (*IOUtils) GetMainFolder() string {
-	if IO.MainFolderOverride != "" {
-		return IO.MainFolderOverride
-	}
-
 	var mainPath string
 	var err error
 
@@ -130,20 +102,8 @@ func (*IOUtils) CreateFolders() error {
 	return nil
 }
 
-func (*IOUtils) Exists(path string) bool {
-	// Check if file exists
-	_, err := os.Stat(filepath.FromSlash(path))
-
-	return !os.IsNotExist(err)
-}
-
 func (*IOUtils) IsFirstLaunch() bool {
 	configPath := filepath.Join(IO.GetMainFolder(), "Config", "config.json")
-
-	// Check if config file exists
-	if !IO.Exists(configPath) {
-		return true
-	}
 
 	data, err := os.ReadFile(filepath.FromSlash(configPath))
 	if err != nil {

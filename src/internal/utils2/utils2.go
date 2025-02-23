@@ -1,6 +1,7 @@
 package utils2
 
 import (
+	"math/rand"
 	"slices"
 
 	"golang.org/x/exp/constraints"
@@ -23,8 +24,17 @@ func Limit[T any](slice []T, n int) []T {
 	return slice[:min(len(slice), n)]
 }
 
-// Map applies a transformation function to each element in a slice and returns a new slice
+// Map performs an in-place transformation of the slice if the input and output types are the same
 func Map[T, R any](slice []T, f func(T) R) []R {
+	if result, ok := any(slice).([]R); ok {
+		// If types match, transform in-place
+		for i, v := range slice {
+			result[i] = f(v)
+		}
+		return result
+	}
+
+	// Otherwise allocate new slice
 	result := make([]R, len(slice))
 	for i, v := range slice {
 		result[i] = f(v)
@@ -32,8 +42,16 @@ func Map[T, R any](slice []T, f func(T) R) []R {
 	return result
 }
 
-// MapIndexed applies a transformation function that takes both the index and value
+// MapIndexed performs an in-place transformation if possible
 func MapIndexed[T, R any](slice []T, f func(int, T) R) []R {
+	if result, ok := any(slice).([]R); ok {
+		// If types match, transform in-place
+		for i, v := range slice {
+			result[i] = f(i, v)
+		}
+		return result
+	}
+	// Otherwise allocate new slice
 	result := make([]R, len(slice))
 	for i, v := range slice {
 		result[i] = f(i, v)
@@ -44,19 +62,19 @@ func MapIndexed[T, R any](slice []T, f func(int, T) R) []R {
 // Filter returns a new slice containing only the elements that satisfy the predicate
 func Filter[T any](slice []T, pred func(T) bool) []T {
 	result := make([]T, 0, len(slice))
-	for _, v := range slice {
-		if pred(v) {
-			result = append(result, v)
+	for _, x := range slice {
+		if pred(x) {
+			result = append(result, x)
 		}
 	}
 	return result
 }
 
-// Reduce reduces a slice to a single value using an accumulator function
+// Reduce uses a more efficient single-pass reduction
 func Reduce[T, R any](slice []T, initial R, f func(R, T) R) R {
 	result := initial
-	for _, v := range slice {
-		result = f(result, v)
+	for i := range slice {
+		result = f(result, slice[i])
 	}
 	return result
 }
@@ -76,28 +94,32 @@ func All[T any](slice []T, pred func(T) bool) bool {
 	return true
 }
 
-// Contains checks if an element exists in a slice
+// Contains uses slices.Contains for better performance
 func Contains[T comparable](slice []T, element T) bool {
-	for _, v := range slice {
-		if v == element {
-			return true
-		}
-	}
-	return false
+	return slices.Contains(slice, element)
 }
 
-// Unique returns a new slice with duplicate elements removed
+// Unique modifies the slice in-place to remove duplicates
 func Unique[T comparable](slice []T) []T {
-	seen := make(map[T]struct{}, len(slice))
-	result := make([]T, 0, len(slice))
+	if len(slice) <= 1 {
+		return slice
+	}
 
-	for _, v := range slice {
-		if _, ok := seen[v]; !ok {
-			seen[v] = struct{}{}
-			result = append(result, v)
+	n := 1
+	for i := 1; i < len(slice); i++ {
+		isDuplicate := false
+		for j := range n {
+			if slice[i] == slice[j] {
+				isDuplicate = true
+				break
+			}
+		}
+		if !isDuplicate {
+			slice[n] = slice[i]
+			n++
 		}
 	}
-	return result
+	return slice[:n]
 }
 
 // Ternary provides a conditional operator that returns trueVal if condition is true, falseVal otherwise
@@ -106,4 +128,47 @@ func Ternary[T any](condition bool, trueVal, falseVal T) T {
 		return trueVal
 	}
 	return falseVal
+}
+
+// FilterInPlace filters a slice in-place without allocation, modifying and returning the original slice
+func FilterInPlace[T any](a []T, f func(T) bool) []T {
+	b := a[:0]
+	for _, x := range a {
+		if f(x) {
+			b = append(b, x)
+		}
+	}
+	// Clear remaining elements for garbage collection
+	var zero T
+	for i := len(b); i < len(a); i++ {
+		a[i] = zero
+	}
+	return b
+}
+
+// Reverse reverses the elements of a slice in-place
+func Reverse[T any](a []T) {
+	for left, right := 0, len(a)-1; left < right; left, right = left+1, right-1 {
+		a[left], a[right] = a[right], a[left]
+	}
+}
+
+// Shuffle randomly reorders the elements in a slice using Fisher-Yates algorithm
+func Shuffle[T any](a []T) {
+	for i := len(a) - 1; i > 0; i-- {
+		j := rand.Intn(i + 1)
+		a[i], a[j] = a[j], a[i]
+	}
+}
+
+// Batch splits a slice into batches of specified size with minimal allocation
+func Batch[T any](slice []T, batchSize int) [][]T {
+	var batches [][]T
+	for batchSize < len(slice) {
+		slice, batches = slice[batchSize:], append(batches, slice[0:batchSize:batchSize])
+	}
+	if len(slice) > 0 {
+		batches = append(batches, slice)
+	}
+	return batches
 }

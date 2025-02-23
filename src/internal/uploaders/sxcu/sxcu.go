@@ -57,12 +57,12 @@ func (SXCU) SupportsAllFiles() bool {
 func (SXCU) getSXCU() (data *sxcuData, err error) {
 	filePath := path.Join(utils.IO.GetMainFolder(), "uploader.sxcu")
 
-	if !utils.IO.Exists(filePath) {
-		return nil, ErrSXCUFileDoesNotExist
-	}
-
 	f, err := os.Open(filePath)
 	if err != nil {
+		if os.IsNotExist(err) {
+			return nil, ErrSXCUFileDoesNotExist
+		}
+
 		return nil, err
 	}
 

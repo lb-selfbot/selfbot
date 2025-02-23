@@ -14,7 +14,6 @@ import (
 
 	"github.com/LightningDev1/LB-Selfbot/internal/config"
 	"github.com/LightningDev1/LB-Selfbot/internal/random"
-	"github.com/LightningDev1/LB-Selfbot/internal/utils"
 	"github.com/LightningDev1/discordgo"
 	"google.golang.org/protobuf/types/known/wrapperspb"
 
@@ -174,8 +173,11 @@ func GetImageFromSubreddit(subreddit string) (*RedditPost, bool) {
 
 func GetPublicIP() string {
 	resp := http.Get("https://api.ipify.org")
+	if resp.Error != nil {
+		return "Error"
+	}
 
-	return utils.Misc.Or(string(resp.Body), "Error")
+	return string(resp.Body)
 }
 
 func GetLocalIP() string {

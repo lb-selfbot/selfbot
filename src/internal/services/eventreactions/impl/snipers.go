@@ -6,6 +6,7 @@ import (
 	"go/token"
 	"go/types"
 	"math/rand"
+	"os"
 	"path/filepath"
 	"regexp"
 	"slices"
@@ -232,7 +233,10 @@ func (s *Snipers) CheckNitroSniper(session *discordgo.Session, m *discordgo.Mess
 			json = simplejson.New()
 		}
 
-		status := utils.Misc.Or(json.Get("message").MustString(), "Unknown Status")
+		status := json.Get("message").MustString()
+		if status == "" {
+			status = "Unknown"
+		}
 
 		s.uiSvc.LogNitroSniper(m, elapsed, status, code, s.Account)
 	}
@@ -277,7 +281,7 @@ func (s *Snipers) CheckPrivnoteSniper(session *discordgo.Session, m *discordgo.M
 		fileName := utils.IO.SanitizeFilename("privnote-" + code + ".txt")
 		filePath := filepath.Join(utils.IO.GetMainFolder(), "Downloads", fileName)
 
-		err = utils.IO.Write(filePath, note)
+		err = os.WriteFile(filePath, []byte(note), os.ModePerm)
 		if err != nil {
 			utils.Logging.Debug("Snipers.CheckPrivnoteSniper: Error writing note: ", err)
 			continue

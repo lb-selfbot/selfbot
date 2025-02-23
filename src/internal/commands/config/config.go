@@ -886,7 +886,7 @@ func (c *ConfigCommands) forcesubscribedservers(ctx *router.Ctx) {
 			AddField("Force Subscribed Servers", strings.Join(servers, ", ")).
 			Send(ctx)
 	case "add":
-		guild, err := utils.Discord.GetGuild(ctx.Session, utils.Misc.Or(utils.Arguments["[server id]"], ctx.Message.GuildID))
+		guild, err := ctx.Arguments.Get(0).Guild(router.ArgumentFlagFallbackDefault)
 		if err != nil {
 			ctx.RespondText("Could not find server.")
 			return
@@ -904,7 +904,7 @@ func (c *ConfigCommands) forcesubscribedservers(ctx *router.Ctx) {
 			SetDescription("Added %s to the force subscribed servers list.", guild.Name).
 			Send(ctx)
 	case "rm":
-		guild, err := utils.Discord.GetGuild(ctx.Session, utils.Misc.Or(utils.Arguments["[server id]"], ctx.Message.GuildID))
+		guild, err := ctx.Arguments.Get(0).Guild(router.ArgumentFlagFallbackDefault)
 		if err != nil {
 			ctx.RespondText("Could not find server.")
 			return
@@ -1321,7 +1321,7 @@ func (c *ConfigCommands) sniperserverblacklist(ctx *router.Ctx) {
 			AddField("Sniper Server Blacklist", strings.Join(servers, ", ")).
 			Send(ctx)
 	case "add":
-		guild, err := utils.Discord.GetGuild(ctx.Session, utils.Misc.Or(utils.Arguments["[server id]"], ctx.Message.GuildID))
+		guild, err := ctx.Arguments.Get(0).Guild(router.ArgumentFlagFallbackDefault)
 		if err != nil {
 			ctx.RespondText("Could not find server.")
 			return
@@ -1339,7 +1339,7 @@ func (c *ConfigCommands) sniperserverblacklist(ctx *router.Ctx) {
 			SetDescription("Added %s to the sniper server blacklist.", guild.Name).
 			Send(ctx)
 	case "rm":
-		guild, err := utils.Discord.GetGuild(ctx.Session, utils.Misc.Or(utils.Arguments["[server id]"], ctx.Message.GuildID))
+		guild, err := ctx.Arguments.Get(0).Guild(router.ArgumentFlagFallbackDefault)
 		if err != nil {
 			ctx.RespondText("Could not find server.")
 			return

@@ -112,12 +112,16 @@ func (s *SelfbotDetection) ensureUserEntry(userID string) *DetectionScore {
 	return rawScore.(*DetectionScore)
 }
 
-func (s *SelfbotDetection) logDetection(score *DetectionScore, session *discordgo.Session, message *discordgo.Message) {
+func (s *SelfbotDetection) logDetection(score *DetectionScore, message *discordgo.Message) {
 	if score.Score < 15 || score.Logged {
 		return
 	}
 
-	selfbot := utils.Misc.Or(score.Selfbot, "Unknown")
+	selfbot := score.Selfbot
+	if selfbot == "" {
+		selfbot = "Unknown"
+	}
+
 	s.uiSvc.LogSelfbotDetection(message, selfbot)
 	score.Logged = true
 }
@@ -164,9 +168,11 @@ func (s *SelfbotDetection) CreateHandler(session *discordgo.Session, message *di
 			Event:   "detectable",
 			Message: message.Message,
 		})
-		score.Selfbot = utils.Misc.Or(detectable.Selfbot, score.Selfbot)
+		if detectable.Selfbot != "" {
+			score.Selfbot = detectable.Selfbot
+		}
 
-		s.logDetection(score, session, message.Message)
+		s.logDetection(score, message.Message)
 	}
 
 	s.DetectionScores.Store(message.Author.ID, score)
@@ -186,7 +192,7 @@ func (s *SelfbotDetection) DeleteHandler(session *discordgo.Session, message *di
 		})
 		score.Score += 0.5
 
-		s.logDetection(score, session, message.Message)
+		s.logDetection(score, message.Message)
 	}
 
 	s.DetectionScores.Store(message.Author.ID, score)

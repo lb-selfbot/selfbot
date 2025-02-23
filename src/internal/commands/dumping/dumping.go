@@ -20,6 +20,7 @@ type DumpingCommands struct{ services *services.Services }
 func NewDumpingCommands(s *services.Services) *DumpingCommands {
 	return &DumpingCommands{services: s}
 }
+
 func (c *DumpingCommands) Register() {
 	cmdRouter := c.services.Discord.GetRouter()
 
@@ -108,236 +109,207 @@ func (c *DumpingCommands) Register() {
 	})
 }
 
-func (c *DumpingCommands) dumpall(ctx *router.Ctx) {
-	channel, err := ctx.Arguments.Get(0).Channel(router.ArgumentFlagFallbackDefault)
+// Helper: create folder relative to main folder, make dirs and open URL
+func (c *DumpingCommands) createAndOpenFolder(pathElements ...string) string {
+	parts := append([]string{utils.IO.GetMainFolder()}, pathElements...)
+	folder := filepath.Join(parts...)
+	_ = os.MkdirAll(folder, os.ModePerm)
+	_ = system.OpenURL(folder)
+	return folder
+}
+
+// Helper: Process attachments in messages with a filter function
+func (c *DumpingCommands) processAttachments(messages []*discordgo.Message, folder string, filter func(att *discordgo.MessageAttachment) bool) int {
+	count := 0
+	for _, message := range messages {
+		for _, att := range message.Attachments {
+			if !filter(att) {
+				continue
+			}
+			fileName := utils.IO.SanitizeFilename(att.ID + "_" + att.Filename)
+			filePath := filepath.Join(folder, fileName)
+			httpResponse := http.Get(utils.Misc.Or(att.URL, att.ProxyURL))
+			if httpResponse.Error != nil {
+				continue
+			}
+			_ = os.WriteFile(filePath, httpResponse.Body, os.ModePerm)
+			count++
+		}
+	}
+	return count
+}
+
+// Helper: Retrieve channel from context arguments
+func (c *DumpingCommands) getChannel(ctx *router.Ctx, index int) (*discordgo.Channel, bool) {
+	channel, err := ctx.Arguments.Get(index).Channel(router.ArgumentFlagFallbackDefault)
 	if err != nil {
 		ctx.RespondText("Error getting channel")
+		return nil, false
+	}
+	return channel, true
+}
+
+// Helper: Retrieve guild from context arguments
+func (c *DumpingCommands) getGuild(ctx *router.Ctx, index int) (*discordgo.Guild, bool) {
+	guild, err := ctx.Arguments.Get(index).Guild()
+	if err != nil {
+		ctx.RespondText("Error getting server: " + err.Error())
+		return nil, false
+	}
+	return guild, true
+}
+
+func (c *DumpingCommands) dumpall(ctx *router.Ctx) {
+	channel, ok := c.getChannel(ctx, 0)
+	if !ok {
 		return
 	}
+
 	server, _ := ctx.Session.State.Guild(channel.GuildID)
 	serverName := "Error"
 	if server != nil {
 		serverName = server.Name
 	}
+
 	messages, err := utils.Discord.GetChannelMessages(ctx.Session, channel.ID, 1000)
 	if err != nil {
 		ctx.RespondText("Error getting messages")
 		return
 	}
-	logString := fmt.Sprintf(
-		"Channel Dump\n\nChannel: %s (ID: %s)\nServer: %s (ID: %s)\nType: Dump All\n\n",
+
+	logString := fmt.Sprintf("Channel Dump\n\nChannel: %s (ID: %s)\nServer: %s (ID: %s)\nType: Dump All\n\n",
 		channel.Name,
 		channel.ID,
 		serverName,
 		channel.GuildID,
 	)
-	// Iterate through messages in reverse order
+	// Iterate in reverse order
 	for i := len(messages) - 1; i >= 0; i-- {
 		message := messages[i]
-		logString += fmt.Sprintf(
-			"[%s] Author: %s (ID: %s)\n%s\n\n",
+		logString += fmt.Sprintf("[%s] Author: %s (ID: %s)\n%s\n\n",
 			message.Timestamp.Local().Format("2006-01-02 15:04:05"),
 			message.Author.String(),
 			message.Author.ID,
 			message.Content,
 		)
 	}
+
 	folder := filepath.Join(utils.IO.GetMainFolder(), "Dumping", "All")
 	_ = os.MkdirAll(folder, os.ModePerm)
 	filePath := filepath.Join(folder, utils.IO.SanitizeFilename(channel.ID+"_"+channel.Name+".txt"))
-	_ = utils.IO.Write(filePath, logString)
+	_ = os.WriteFile(filePath, []byte(logString), os.ModePerm)
 	_ = system.OpenURL(filePath)
+
 	c.services.Embed.NewEmbed().
 		SetDescription("Dumped %d messages from %s", len(messages), channel.Name).
 		Send(ctx)
 }
 
 func (c *DumpingCommands) dumpimages(ctx *router.Ctx) {
-	channel, err := ctx.Arguments.Get(0).Channel(router.ArgumentFlagFallbackDefault)
-	if err != nil {
-		ctx.RespondText("Error getting channel")
+	channel, ok := c.getChannel(ctx, 0)
+	if !ok {
 		return
 	}
+
 	messages, err := utils.Discord.GetChannelMessages(ctx.Session, channel.ID, 1000)
 	if err != nil {
 		ctx.RespondText("Error getting messages")
 		return
 	}
-	folder := filepath.Join(utils.IO.GetMainFolder(), "Dumping", "Images", utils.IO.SanitizeFilename(channel.Name))
-	_ = os.MkdirAll(folder, os.ModePerm)
-	_ = system.OpenURL(folder)
-	images := 0
-	for _, message := range messages {
-		for _, attachment := range message.Attachments {
-			if !strings.HasPrefix(attachment.ContentType, "image/") {
-				continue
-			}
 
-			fileName := utils.IO.SanitizeFilename(attachment.ID + "_" + attachment.Filename)
-			filePath := filepath.Join(folder, utils.IO.SanitizeFilename(fileName))
+	folder := c.createAndOpenFolder("Dumping", "Images", utils.IO.SanitizeFilename(channel.Name))
+	images := c.processAttachments(messages, folder, func(att *discordgo.MessageAttachment) bool {
+		return strings.HasPrefix(att.ContentType, "image/")
+	})
 
-			httpResponse := http.Get(utils.Misc.Or(attachment.URL, attachment.ProxyURL))
-			if httpResponse.Error != nil {
-				continue
-			}
-
-			_ = utils.IO.WriteBytes(filePath, httpResponse.Body)
-
-			images++
-		}
-	}
 	c.services.Embed.NewEmbed().
 		SetDescription("Dumped %d images from %s", images, channel.Name).
 		Send(ctx)
 }
 
 func (c *DumpingCommands) dumpvideos(ctx *router.Ctx) {
-	channel, err := ctx.Arguments.Get(0).Channel(router.ArgumentFlagFallbackDefault)
-	if err != nil {
-		ctx.RespondText("Error getting channel")
+	channel, ok := c.getChannel(ctx, 0)
+	if !ok {
 		return
 	}
+
 	messages, err := utils.Discord.GetChannelMessages(ctx.Session, channel.ID, 1000)
 	if err != nil {
 		ctx.RespondText("Error getting messages")
 		return
 	}
-	folder := filepath.Join(utils.IO.GetMainFolder(), "Dumping", "Videos", utils.IO.SanitizeFilename(channel.Name))
-	_ = os.MkdirAll(folder, os.ModePerm)
-	_ = system.OpenURL(folder)
-	videos := 0
-	for _, message := range messages {
-		for _, attachment := range message.Attachments {
-			if !strings.HasPrefix(attachment.ContentType, "video/") {
-				continue
-			}
 
-			fileName := utils.IO.SanitizeFilename(attachment.ID + "_" + attachment.Filename)
-			filePath := filepath.Join(folder, utils.IO.SanitizeFilename(fileName))
+	folder := c.createAndOpenFolder("Dumping", "Videos", utils.IO.SanitizeFilename(channel.Name))
+	videos := c.processAttachments(messages, folder, func(att *discordgo.MessageAttachment) bool {
+		return strings.HasPrefix(att.ContentType, "video/")
+	})
 
-			httpResponse := http.Get(utils.Misc.Or(attachment.URL, attachment.ProxyURL))
-			if httpResponse.Error != nil {
-				continue
-			}
-
-			_ = utils.IO.WriteBytes(filePath, httpResponse.Body)
-
-			videos++
-		}
-	}
 	c.services.Embed.NewEmbed().
 		SetDescription("Dumped %d videos from %s", videos, channel.Name).
 		Send(ctx)
 }
 
 func (c *DumpingCommands) dumpaudio(ctx *router.Ctx) {
-	channel, err := ctx.Arguments.Get(0).Channel(router.ArgumentFlagFallbackDefault)
-	if err != nil {
-		ctx.RespondText("Error getting channel")
+	channel, ok := c.getChannel(ctx, 0)
+	if !ok {
 		return
 	}
+
 	messages, err := utils.Discord.GetChannelMessages(ctx.Session, channel.ID, 1000)
 	if err != nil {
 		ctx.RespondText("Error getting messages")
 		return
 	}
-	folder := filepath.Join(utils.IO.GetMainFolder(), "Dumping", "Audio", utils.IO.SanitizeFilename(channel.Name))
-	_ = os.MkdirAll(folder, os.ModePerm)
-	_ = system.OpenURL(folder)
-	audios := 0
-	for _, message := range messages {
-		for _, attachment := range message.Attachments {
-			if !strings.HasPrefix(attachment.ContentType, "audio/") {
-				continue
-			}
 
-			fileName := utils.IO.SanitizeFilename(attachment.ID + "_" + attachment.Filename)
-			filePath := filepath.Join(folder, utils.IO.SanitizeFilename(fileName))
+	folder := c.createAndOpenFolder("Dumping", "Audio", utils.IO.SanitizeFilename(channel.Name))
+	audios := c.processAttachments(messages, folder, func(att *discordgo.MessageAttachment) bool {
+		return strings.HasPrefix(att.ContentType, "audio/")
+	})
 
-			httpResponse := http.Get(utils.Misc.Or(attachment.URL, attachment.ProxyURL))
-			if httpResponse.Error != nil {
-				continue
-			}
-
-			_ = utils.IO.WriteBytes(filePath, httpResponse.Body)
-
-			audios++
-		}
-	}
 	c.services.Embed.NewEmbed().
 		SetDescription("Dumped %d audios from %s", audios, channel.Name).
 		Send(ctx)
 }
 
 func (c *DumpingCommands) dumptext(ctx *router.Ctx) {
-	channel, err := ctx.Arguments.Get(0).Channel(router.ArgumentFlagFallbackDefault)
-	if err != nil {
-		ctx.RespondText("Error getting channel")
+	channel, ok := c.getChannel(ctx, 0)
+	if !ok {
 		return
 	}
+
 	messages, err := utils.Discord.GetChannelMessages(ctx.Session, channel.ID, 1000)
 	if err != nil {
 		ctx.RespondText("Error getting messages")
 		return
 	}
-	folder := filepath.Join(utils.IO.GetMainFolder(), "Dumping", "Text", utils.IO.SanitizeFilename(channel.Name))
-	_ = os.MkdirAll(folder, os.ModePerm)
-	_ = system.OpenURL(folder)
-	texts := 0
-	for _, message := range messages {
-		for _, attachment := range message.Attachments {
-			if !strings.HasPrefix(attachment.ContentType, "text/") {
-				continue
-			}
 
-			fileName := utils.IO.SanitizeFilename(attachment.ID + "_" + attachment.Filename)
-			filePath := filepath.Join(folder, utils.IO.SanitizeFilename(fileName))
+	folder := c.createAndOpenFolder("Dumping", "Text", utils.IO.SanitizeFilename(channel.Name))
+	texts := c.processAttachments(messages, folder, func(att *discordgo.MessageAttachment) bool {
+		return strings.HasPrefix(att.ContentType, "text/")
+	})
 
-			httpResponse := http.Get(utils.Misc.Or(attachment.URL, attachment.ProxyURL))
-			if httpResponse.Error != nil {
-				continue
-			}
-
-			_ = utils.IO.WriteBytes(filePath, httpResponse.Body)
-
-			texts++
-		}
-	}
 	c.services.Embed.NewEmbed().
 		SetDescription("Dumped %d texts from %s", texts, channel.Name).
 		Send(ctx)
 }
 
 func (c *DumpingCommands) dumpattachments(ctx *router.Ctx) {
-	channel, err := ctx.Arguments.Get(0).Channel(router.ArgumentFlagFallbackDefault)
-	if err != nil {
-		ctx.RespondText("Error getting channel")
+	channel, ok := c.getChannel(ctx, 0)
+	if !ok {
 		return
 	}
+
 	messages, err := utils.Discord.GetChannelMessages(ctx.Session, channel.ID, 1000)
 	if err != nil {
 		ctx.RespondText("Error getting messages")
 		return
 	}
-	folder := filepath.Join(utils.IO.GetMainFolder(), "Dumping", "Attachments", utils.IO.SanitizeFilename(channel.Name))
-	_ = os.MkdirAll(folder, os.ModePerm)
-	_ = system.OpenURL(folder)
-	attachments := 0
-	for _, message := range messages {
-		for _, attachment := range message.Attachments {
-			fileName := utils.IO.SanitizeFilename(attachment.ID + "_" + attachment.Filename)
-			filePath := filepath.Join(folder, utils.IO.SanitizeFilename(fileName))
 
-			httpResponse := http.Get(utils.Misc.Or(attachment.URL, attachment.ProxyURL))
-			if httpResponse.Error != nil {
-				continue
-			}
+	folder := c.createAndOpenFolder("Dumping", "Attachments", utils.IO.SanitizeFilename(channel.Name))
+	attachments := c.processAttachments(messages, folder, func(att *discordgo.MessageAttachment) bool {
+		return true
+	})
 
-			_ = utils.IO.WriteBytes(filePath, httpResponse.Body)
-
-			attachments++
-		}
-	}
 	c.services.Embed.NewEmbed().
 		SetDescription("Dumped %d attachments from %s", attachments, channel.Name).
 		Send(ctx)
@@ -345,133 +317,92 @@ func (c *DumpingCommands) dumpattachments(ctx *router.Ctx) {
 
 func (c *DumpingCommands) dumpfiletype(ctx *router.Ctx) {
 	extension := strings.ReplaceAll(ctx.Arguments.Get(0).Raw(), ".", "")
-	channel, err := ctx.Arguments.Get(1).Channel(router.ArgumentFlagFallbackDefault)
-	if err != nil {
-		ctx.RespondText("Error getting channel")
+	channel, ok := c.getChannel(ctx, 1)
+	if !ok {
 		return
 	}
+
 	messages, err := utils.Discord.GetChannelMessages(ctx.Session, channel.ID, 1000)
 	if err != nil {
 		ctx.RespondText("Error getting messages")
 		return
 	}
-	folder := filepath.Join(utils.IO.GetMainFolder(), "Dumping", utils.IO.SanitizeFilename("FileType-"+extension), utils.IO.SanitizeFilename(channel.Name))
-	_ = os.MkdirAll(folder, os.ModePerm)
-	_ = system.OpenURL(folder)
-	attachments := 0
-	for _, message := range messages {
-		for _, attachment := range message.Attachments {
-			if !strings.HasSuffix(attachment.Filename, extension) {
-				continue
-			}
 
-			fileName := utils.IO.SanitizeFilename(attachment.ID + "_" + attachment.Filename)
-			filePath := filepath.Join(folder, utils.IO.SanitizeFilename(fileName))
+	folder := c.createAndOpenFolder("Dumping", utils.IO.SanitizeFilename("FileType-"+extension), utils.IO.SanitizeFilename(channel.Name))
+	count := c.processAttachments(messages, folder, func(att *discordgo.MessageAttachment) bool {
+		return strings.HasSuffix(att.Filename, extension)
+	})
 
-			httpResponse := http.Get(utils.Misc.Or(attachment.URL, attachment.ProxyURL))
-			if httpResponse.Error != nil {
-				continue
-			}
-
-			_ = utils.IO.WriteBytes(filePath, httpResponse.Body)
-
-			attachments++
-		}
-	}
 	c.services.Embed.NewEmbed().
-		SetDescription("Dumped %d attachments from %s", attachments, channel.Name).
+		SetDescription("Dumped %d attachments from %s", count, channel.Name).
 		Send(ctx)
 }
 
 func (c *DumpingCommands) dumpcontenttype(ctx *router.Ctx) {
 	contentType := strings.ToLower(ctx.Arguments.Get(0).Raw())
-	channel, err := ctx.Arguments.Get(1).Channel(router.ArgumentFlagFallbackDefault)
-	if err != nil {
-		ctx.RespondText("Error getting channel")
+	channel, ok := c.getChannel(ctx, 1)
+	if !ok {
 		return
 	}
+
 	messages, err := utils.Discord.GetChannelMessages(ctx.Session, channel.ID, 1000)
 	if err != nil {
 		ctx.RespondText("Error getting messages")
 		return
 	}
-	folder := filepath.Join(utils.IO.GetMainFolder(), "Dumping", utils.IO.SanitizeFilename("ContentType-"+contentType), utils.IO.SanitizeFilename(channel.Name))
-	_ = os.MkdirAll(folder, os.ModePerm)
-	_ = system.OpenURL(folder)
-	attachments := 0
-	for _, message := range messages {
-		for _, attachment := range message.Attachments {
-			if !strings.Contains(attachment.ContentType, contentType) {
-				continue
-			}
 
-			fileName := utils.IO.SanitizeFilename(attachment.ID + "_" + attachment.Filename)
-			filePath := filepath.Join(folder, utils.IO.SanitizeFilename(fileName))
+	folder := c.createAndOpenFolder("Dumping", utils.IO.SanitizeFilename("ContentType-"+contentType), utils.IO.SanitizeFilename(channel.Name))
+	count := c.processAttachments(messages, folder, func(att *discordgo.MessageAttachment) bool {
+		return strings.Contains(att.ContentType, contentType)
+	})
 
-			httpResponse := http.Get(utils.Misc.Or(attachment.URL, attachment.ProxyURL))
-			if httpResponse.Error != nil {
-				continue
-			}
-
-			_ = utils.IO.WriteBytes(filePath, httpResponse.Body)
-
-			attachments++
-		}
-	}
 	c.services.Embed.NewEmbed().
-		SetDescription("Dumped %d attachments from %s", attachments, channel.Name).
+		SetDescription("Dumped %d attachments from %s", count, channel.Name).
 		Send(ctx)
 }
 
 func (c *DumpingCommands) dumpemojis(ctx *router.Ctx) {
-	guild, err := ctx.Arguments.Get(0).Guild()
-	if err != nil {
-		ctx.RespondText("Error getting server: " + err.Error())
+	guild, ok := c.getGuild(ctx, 0)
+	if !ok {
 		return
 	}
+
 	emojis, err := ctx.Session.GuildEmojis(guild.ID)
 	if err != nil {
 		ctx.RespondText("Error getting emojis: " + err.Error())
 		return
 	}
-	folder := filepath.Join(utils.IO.GetMainFolder(), "Dumping", "Emojis", utils.IO.SanitizeFilename(guild.Name))
-	_ = os.MkdirAll(folder, os.ModePerm)
-	_ = system.OpenURL(folder)
+
+	folder := c.createAndOpenFolder("Dumping", "Emojis", utils.IO.SanitizeFilename(guild.Name))
 	for _, emoji := range emojis {
 		name := emoji.ID + "_" + emoji.Name
-
 		if emoji.Animated {
 			name += ".gif"
 		} else {
 			name += ".png"
 		}
-
 		filePath := filepath.Join(folder, utils.IO.SanitizeFilename(name))
-
 		httpResponse := http.Get(emoji.URL())
 		if httpResponse.Error != nil {
 			continue
 		}
-
-		_ = utils.IO.WriteBytes(filePath, httpResponse.Body)
+		_ = os.WriteFile(filePath, httpResponse.Body, os.ModePerm)
 	}
+
 	c.services.Embed.NewEmbed().
 		SetDescription("Dumped %d emojis from %s", len(emojis), guild.Name).
 		Send(ctx)
 }
 
 func (c *DumpingCommands) dumpstickers(ctx *router.Ctx) {
-	guild, err := ctx.Arguments.Get(0).Guild()
-	if err != nil {
-		ctx.RespondText("Error getting server: " + err.Error())
+	guild, ok := c.getGuild(ctx, 0)
+	if !ok {
 		return
 	}
-	folder := filepath.Join(utils.IO.GetMainFolder(), "Dumping", "Stickers", utils.IO.SanitizeFilename(guild.Name))
-	_ = os.MkdirAll(folder, os.ModePerm)
-	_ = system.OpenURL(folder)
+
+	folder := c.createAndOpenFolder("Dumping", "Stickers", utils.IO.SanitizeFilename(guild.Name))
 	for _, sticker := range guild.Stickers {
 		var format string
-
 		switch sticker.FormatType {
 		case discordgo.StickerFormatTypePNG:
 			format = ".png"
@@ -482,64 +413,54 @@ func (c *DumpingCommands) dumpstickers(ctx *router.Ctx) {
 		case discordgo.StickerFormatTypeGIF:
 			format = ".gif"
 		}
-
 		fileName := fmt.Sprintf("%s_%s%s", sticker.ID, sticker.Name, format)
-
 		filePath := filepath.Join(folder, utils.IO.SanitizeFilename(fileName))
-
 		httpResponse := http.Get(fmt.Sprintf("https://media.discordapp.net/stickers/%s%s", sticker.ID, format))
 		if httpResponse.Error != nil {
 			continue
 		}
-
-		_ = utils.IO.WriteBytes(filePath, httpResponse.Body)
+		_ = os.WriteFile(filePath, httpResponse.Body, os.ModePerm)
 	}
+
 	c.services.Embed.NewEmbed().
 		SetDescription("Dumped %d stickers from %s", len(guild.Stickers), guild.Name).
 		Send(ctx)
 }
 
 func (c *DumpingCommands) dumpavatars(ctx *router.Ctx) {
-	guild, err := ctx.Arguments.Get(0).Guild()
-	if err != nil {
-		ctx.RespondText("Error getting server: " + err.Error())
+	guild, ok := c.getGuild(ctx, 0)
+	if !ok {
 		return
 	}
 
 	ctx.Session.FetchGuildMembers(discordgo.NewFetchGuildMembersParams(guild.ID))
-
-	folder := filepath.Join(utils.IO.GetMainFolder(), "Dumping", "Avatars", utils.IO.SanitizeFilename(guild.Name))
-	_ = os.MkdirAll(folder, os.ModePerm)
-	_ = system.OpenURL(folder)
+	folder := c.createAndOpenFolder("Dumping", "Avatars", utils.IO.SanitizeFilename(guild.Name))
 	for _, member := range guild.Members {
 		name := member.User.ID + "_" + member.User.String()
-
 		if strings.HasPrefix(member.Avatar, "a_") {
 			name += ".gif"
 		} else {
 			name += ".png"
 		}
-
 		filePath := filepath.Join(folder, utils.IO.SanitizeFilename(name))
-
 		httpResponse := http.Get(member.AvatarURL(""))
 		if httpResponse.Error != nil {
 			continue
 		}
-
-		_ = utils.IO.WriteBytes(filePath, httpResponse.Body)
+		_ = os.WriteFile(filePath, httpResponse.Body, os.ModePerm)
 	}
+
 	c.services.Embed.NewEmbed().
 		SetDescription("Dumped %d avatars from %s", len(guild.Members), guild.Name).
 		Send(ctx)
 }
 
 func (c *DumpingCommands) dumpchannels(ctx *router.Ctx) {
-	guild, err := ctx.Arguments.Get(0).Guild()
-	if err != nil {
-		ctx.RespondText("Error getting server: " + err.Error())
+	guild, ok := c.getGuild(ctx, 0)
+	if !ok {
 		return
 	}
+
 	categories, categoryChannels, looseChannels := utils.Discord.MapCategories(guild.Channels)
 	logString := ""
 
@@ -557,17 +478,17 @@ func (c *DumpingCommands) dumpchannels(ctx *router.Ctx) {
 	folder := filepath.Join(utils.IO.GetMainFolder(), "Dumping", "Channels")
 	_ = os.MkdirAll(folder, os.ModePerm)
 	filePath := filepath.Join(folder, utils.IO.SanitizeFilename(guild.ID+"_"+guild.Name+".txt"))
-	_ = utils.IO.Write(filePath, logString)
+	_ = os.WriteFile(filePath, []byte(logString), os.ModePerm)
 	_ = system.OpenURL(filePath)
+
 	c.services.Embed.NewEmbed().
 		SetDescription("Dumped %d channels from %s", len(guild.Channels), guild.Name).
 		Send(ctx)
 }
 
 func (c *DumpingCommands) dumpmembers(ctx *router.Ctx) {
-	guild, err := ctx.Arguments.Get(0).Guild()
-	if err != nil {
-		ctx.RespondText("Error getting server: " + err.Error())
+	guild, ok := c.getGuild(ctx, 0)
+	if !ok {
 		return
 	}
 
@@ -579,10 +500,10 @@ func (c *DumpingCommands) dumpmembers(ctx *router.Ctx) {
 	for _, member := range guild.Members {
 		logString += fmt.Sprintf("%s - %s\n", member.User.String(), member.User.ID)
 	}
-	folder := filepath.Join(utils.IO.GetMainFolder(), "Dumping", "Members")
-	_ = os.MkdirAll(folder, os.ModePerm)
+
+	folder := c.createAndOpenFolder("Dumping", "Members")
 	filePath := filepath.Join(folder, utils.IO.SanitizeFilename(guild.ID+"_"+guild.Name+".txt"))
-	_ = utils.IO.Write(filePath, logString)
+	_ = os.WriteFile(filePath, []byte(logString), os.ModePerm)
 	_ = system.OpenURL(filePath)
 
 	runtime.GC()

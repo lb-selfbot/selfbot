@@ -1041,11 +1041,16 @@ func (c *UtilityCommands) copychannel(ctx *router.Ctx) {
 		return
 	}
 
-	sort.Slice(messages, func(i, j int) bool {
-		timeI := utils.Discord.SnowflakeToTime(messages[i].ID)
-		timeJ := utils.Discord.SnowflakeToTime(messages[j].ID)
+	slices.SortFunc(messages, func(i, j *discordgo.Message) int {
+		timeI := utils.Discord.SnowflakeToTime(i.ID)
+		timeJ := utils.Discord.SnowflakeToTime(j.ID)
 
-		return timeI.Before(timeJ)
+		if timeI.Before(timeJ) {
+			return -1
+		} else if timeI.After(timeJ) {
+			return 1
+		}
+		return 0
 	})
 
 	ctx.RespondText(fmt.Sprintf(
@@ -2097,13 +2102,13 @@ func (c *UtilityCommands) pastebin(ctx *router.Ctx) {
 
 func (c *UtilityCommands) pastefile(ctx *router.Ctx) {
 	filePath := ctx.Arguments.Get(0).Raw()
-	content, ok := utils.IO.Read(filePath)
-	if !ok {
-		ctx.RespondText("That file does not exist.")
+	content, err := os.ReadFile(filePath)
+	if err != nil {
+		ctx.RespondText("An error has occurred.")
 		return
 	}
 
-	paste, err := api.CreatePaste(content)
+	paste, err := api.CreatePaste(string(content))
 	if err != nil {
 		ctx.RespondText("An error has occurred.")
 		return

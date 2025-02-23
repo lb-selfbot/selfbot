@@ -42,6 +42,7 @@ func (MiscUtils) IsPortOpen(hostname string, port int) bool {
 }
 
 func (MiscUtils) FormatBoolYesNo(b bool) string {
+
 	if b {
 		return "Yes"
 	}
@@ -126,15 +127,11 @@ func (MiscUtils) GetDistance(str1, str2 string) int {
 				incr = 1
 			}
 
-			column[y] = Misc.Minimum(column[y]+1, column[y-1]+1, lastKey+incr)
+			column[y] = min(column[y]+1, column[y-1]+1, lastKey+incr)
 			lastKey = oldKey
 		}
 	}
 	return column[s1len]
-}
-
-func (MiscUtils) Minimum(a, b, c int) int {
-	return min(a, min(b, c))
 }
 
 func (MiscUtils) HexToRGB(hex string) (int, int, int, error) {
