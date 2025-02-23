@@ -24,6 +24,7 @@ type ActivityCommands struct{ services *services.Services }
 func NewActivityCommands(s *services.Services) *ActivityCommands {
 	return &ActivityCommands{services: s}
 }
+
 func (c *ActivityCommands) Register() {
 	cmdRouter := c.services.Discord.GetRouter()
 

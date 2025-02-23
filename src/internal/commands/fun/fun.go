@@ -24,6 +24,7 @@ type FunCommands struct{ services *services.Services }
 func NewFunCommands(s *services.Services) *FunCommands {
 	return &FunCommands{services: s}
 }
+
 func (c *FunCommands) Register() {
 	cmdRouter := c.services.Discord.GetRouter()
 

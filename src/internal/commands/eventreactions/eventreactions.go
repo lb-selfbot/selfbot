@@ -21,6 +21,7 @@ type EventReactionsCommands struct{ services *services.Services }
 func NewEventReactionsCommands(s *services.Services) *EventReactionsCommands {
 	return &EventReactionsCommands{services: s}
 }
+
 func (c *EventReactionsCommands) Register() {
 	cmdRouter := c.services.Discord.GetRouter()
 

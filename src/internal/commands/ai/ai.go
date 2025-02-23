@@ -14,6 +14,7 @@ type AICommands struct{ services *services.Services }
 func NewAICommands(s *services.Services) *AICommands {
 	return &AICommands{services: s}
 }
+
 func (c *AICommands) Register() {
 	cmdRouter := c.services.Discord.GetRouter()
 

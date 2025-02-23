@@ -20,6 +20,7 @@ type GameCommands struct{ services *services.Services }
 func NewGameCommands(s *services.Services) *GameCommands {
 	return &GameCommands{services: s}
 }
+
 func (c *GameCommands) Register() {
 	cmdRouter := c.services.Discord.GetRouter()
 

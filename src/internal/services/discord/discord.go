@@ -198,7 +198,8 @@ func (d *DiscordServiceImpl) isUserAllowed(ctx *router.Ctx) bool {
 }
 
 func (d *DiscordServiceImpl) GetSession() *discordgo.Session { return d.session }
-func (d *DiscordServiceImpl) GetRouter() router.Router       { return d.router }
+
+func (d *DiscordServiceImpl) GetRouter() router.Router { return d.router }
 
 func (d *DiscordServiceImpl) Open() error {
 	err := d.session.Open()

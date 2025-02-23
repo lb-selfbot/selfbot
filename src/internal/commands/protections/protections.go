@@ -17,6 +17,7 @@ type ProtectionsCommands struct{ services *services.Services }
 func NewProtectionsCommands(s *services.Services) *ProtectionsCommands {
 	return &ProtectionsCommands{services: s}
 }
+
 func (c *ProtectionsCommands) Register() {
 	cmdRouter := c.services.Discord.GetRouter()
 

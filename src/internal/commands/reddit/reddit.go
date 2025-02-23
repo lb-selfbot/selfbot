@@ -11,6 +11,7 @@ type RedditCommands struct{ services *services.Services }
 func NewRedditCommands(s *services.Services) *RedditCommands {
 	return &RedditCommands{services: s}
 }
+
 func (c *RedditCommands) Register() {
 	cmdRouter := c.services.Discord.GetRouter()
 

@@ -44,7 +44,8 @@ func (i *IPCServiceImpl) OnConnect() <-chan struct{} {
 }
 
 func (i *IPCServiceImpl) GetHTMLConsole() string { return i.htmlConsole }
-func (i *IPCServiceImpl) GetRawConsole() string  { return i.rawConsole }
+
+func (i *IPCServiceImpl) GetRawConsole() string { return i.rawConsole }
 
 func (i *IPCServiceImpl) handleRequest(w http.ResponseWriter, r *http.Request) {
 	var err error

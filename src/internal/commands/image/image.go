@@ -19,6 +19,7 @@ type ImageCommands struct{ services *services.Services }
 func NewImageCommands(s *services.Services) *ImageCommands {
 	return &ImageCommands{services: s}
 }
+
 func (c *ImageCommands) Register() {
 	cmdRouter := c.services.Discord.GetRouter()
 

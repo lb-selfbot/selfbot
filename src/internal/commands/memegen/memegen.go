@@ -15,6 +15,7 @@ type MemeGenCommands struct{ services *services.Services }
 func NewMemeGenCommands(s *services.Services) *MemeGenCommands {
 	return &MemeGenCommands{services: s}
 }
+
 func (c *MemeGenCommands) Register() {
 	cmdRouter := c.services.Discord.GetRouter()
 

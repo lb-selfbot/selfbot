@@ -18,6 +18,7 @@ type ConfigCommands struct{ services *services.Services }
 func NewConfigCommands(s *services.Services) *ConfigCommands {
 	return &ConfigCommands{services: s}
 }
+
 func (c *ConfigCommands) Register() {
 	cmdRouter := c.services.Discord.GetRouter()
 

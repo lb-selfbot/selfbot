@@ -18,6 +18,7 @@ type CurrencyCommands struct{ services *services.Services }
 func NewCurrencyCommands(s *services.Services) *CurrencyCommands {
 	return &CurrencyCommands{services: s}
 }
+
 func (c *CurrencyCommands) Register() {
 	cmdRouter := c.services.Discord.GetRouter()
 

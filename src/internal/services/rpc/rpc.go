@@ -305,6 +305,7 @@ func (r *RPCServiceImpl) getParty(cfg *config.Config) *client.Party {
 		MaxPlayers: 69,
 	}
 }
+
 func (r *RPCServiceImpl) getSecrets(cfg *config.Config) *client.Secrets {
 	if !cfg.Activity.Invitable {
 		return nil

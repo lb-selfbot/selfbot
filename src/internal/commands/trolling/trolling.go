@@ -22,6 +22,7 @@ type TrollingCommands struct{ services *services.Services }
 func NewTrollingCommands(s *services.Services) *TrollingCommands {
 	return &TrollingCommands{services: s}
 }
+
 func (c *TrollingCommands) Register() {
 	cmdRouter := c.services.Discord.GetRouter()
 

@@ -20,6 +20,7 @@ type BackupCommands struct{ services *services.Services }
 func NewBackupCommands(s *services.Services) *BackupCommands {
 	return &BackupCommands{services: s}
 }
+
 func (c *BackupCommands) Register() {
 	cmdRouter := c.services.Discord.GetRouter()
 

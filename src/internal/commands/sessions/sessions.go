@@ -13,6 +13,7 @@ type SessionsCommands struct{ services *services.Services }
 func NewSessionsCommands(s *services.Services) *SessionsCommands {
 	return &SessionsCommands{services: s}
 }
+
 func (c *SessionsCommands) Register() {
 	cmdRouter := c.services.Discord.GetRouter()
 

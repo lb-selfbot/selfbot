@@ -16,6 +16,7 @@ type SharingCommands struct{ services *services.Services }
 func NewSharingCommands(s *services.Services) *SharingCommands {
 	return &SharingCommands{services: s}
 }
+
 func (c *SharingCommands) Register() {
 	cmdRouter := c.services.Discord.GetRouter()
 

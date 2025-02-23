@@ -15,6 +15,7 @@ type NSFWCommands struct{ services *services.Services }
 func NewNSFWCommands(s *services.Services) *NSFWCommands {
 	return &NSFWCommands{services: s}
 }
+
 func (c *NSFWCommands) Register() {
 	cmdRouter := c.services.Discord.GetRouter()
 

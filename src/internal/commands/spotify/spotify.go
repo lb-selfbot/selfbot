@@ -20,6 +20,7 @@ type SpotifyCommands struct{ services *services.Services }
 func NewSpotifyCommands(s *services.Services) *SpotifyCommands {
 	return &SpotifyCommands{services: s}
 }
+
 func (c *SpotifyCommands) Register() {
 	cmdRouter := c.services.Discord.GetRouter()
 

@@ -57,6 +57,7 @@ type UtilityCommands struct{ services *services.Services }
 func NewUtilityCommands(s *services.Services) *UtilityCommands {
 	return &UtilityCommands{services: s}
 }
+
 func (c *UtilityCommands) Register() {
 	cmdRouter := c.services.Discord.GetRouter()
 

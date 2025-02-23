@@ -19,6 +19,7 @@ type HelpCommands struct{ services *services.Services }
 func NewHelpCommands(s *services.Services) *HelpCommands {
 	return &HelpCommands{services: s}
 }
+
 func (c *HelpCommands) Register() {
 	cmdRouter := c.services.Discord.GetRouter()
 
