@@ -376,7 +376,7 @@ func (c *SpotifyCommands) sshuffle(ctx *router.Ctx) {
 		map[string]string{"Authorization": bearerToken},
 	)
 
-	c.HandleRequest(ctx, httpResponse, fmt.Sprintf("Successfully turned shuffle %s.", toggle))
+	c.HandleRequest(ctx, httpResponse, fmt.Sprintf("Successfully turned shuffle %s.", utils.Misc.FormatBoolOnOff(toggle)))
 }
 
 func (c *SpotifyCommands) srepeat(ctx *router.Ctx) {
