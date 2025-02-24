@@ -853,7 +853,6 @@ func (c *UtilityCommands) Register() {
 			Handler:     c.timestampCommand(":R"),
 		},
 	})
-
 }
 
 // Discord utilities
@@ -873,13 +872,13 @@ func (c *UtilityCommands) copyserver(ctx *router.Ctx) {
 
 	guild, err := ctx.Arguments.Get(0).Guild()
 	if err != nil {
-		ctx.RespondText("Error getting server: " + err.Error())
+		ctx.RespondText("Error getting server: %v", err)
 		return
 	}
 
 	newGuild, err := ctx.Session.GuildCreate(fmt.Sprintf("[COPY] %.90s", guild.Name))
 	if err != nil {
-		ctx.RespondText("Error copying server: " + err.Error())
+		ctx.RespondText("Error copying server: %v", err)
 		return
 	}
 
@@ -913,7 +912,7 @@ func (c *UtilityCommands) copyserver(ctx *router.Ctx) {
 			Mentionable: &role.Mentionable,
 		})
 		if err != nil {
-			ctx.RespondText("Error copying server: " + err.Error())
+			ctx.RespondText("Error copying server: %v", err)
 			return
 		}
 
@@ -924,7 +923,7 @@ func (c *UtilityCommands) copyserver(ctx *router.Ctx) {
 
 	newChannels, err := ctx.Session.GuildChannels(newGuild.ID)
 	if err != nil {
-		ctx.RespondText("Error copying server: " + err.Error())
+		ctx.RespondText("Error copying server: %v", err)
 		return
 	}
 
@@ -933,7 +932,7 @@ func (c *UtilityCommands) copyserver(ctx *router.Ctx) {
 	for _, channel := range newChannels {
 		_, err := ctx.Session.ChannelDelete(channel.ID)
 		if err != nil {
-			ctx.RespondText("Error copying server: " + err.Error())
+			ctx.RespondText("Error copying server: %v", err)
 			return
 		}
 
@@ -942,7 +941,7 @@ func (c *UtilityCommands) copyserver(ctx *router.Ctx) {
 
 	channels, err := ctx.Session.GuildChannels(guild.ID)
 	if err != nil {
-		ctx.RespondText("Error copying server: " + err.Error())
+		ctx.RespondText("Error copying server: %v", err)
 		return
 	}
 
@@ -965,7 +964,7 @@ func (c *UtilityCommands) copyserver(ctx *router.Ctx) {
 			NSFW:                 channel.NSFW,
 		})
 		if err != nil {
-			ctx.RespondText("Error copying server: " + err.Error())
+			ctx.RespondText("Error copying server: %v", err)
 			return
 		}
 
@@ -982,7 +981,7 @@ func (c *UtilityCommands) copyserver(ctx *router.Ctx) {
 			PermissionOverwrites: overwrites,
 		})
 		if err != nil {
-			ctx.RespondText("Error copying server: " + err.Error())
+			ctx.RespondText("Error copying server: %v", err)
 			return
 		}
 
@@ -1002,7 +1001,7 @@ func (c *UtilityCommands) copyserver(ctx *router.Ctx) {
 				NSFW:                 channel.NSFW,
 			})
 			if err != nil {
-				ctx.RespondText("Error copying server: " + err.Error())
+				ctx.RespondText("Error copying server: %v", err)
 				return
 			}
 
@@ -1037,7 +1036,7 @@ func (c *UtilityCommands) copychannel(ctx *router.Ctx) {
 
 	messages, err := utils.Discord.GetChannelMessages(ctx.Session, sourceChannel.ID, limit)
 	if err != nil {
-		ctx.RespondText("Error getting source messages: " + err.Error())
+		ctx.RespondText("Error getting source messages: %v", err)
 		return
 	}
 
@@ -1053,15 +1052,15 @@ func (c *UtilityCommands) copychannel(ctx *router.Ctx) {
 		return 0
 	})
 
-	ctx.RespondText(fmt.Sprintf(
+	ctx.RespondText(
 		"Copying %d messages...\n\nEstimated time required: %s",
 		len(messages),
 		time.Duration(len(messages)*2)*time.Second,
-	))
+	)
 
 	webhook, err := ctx.Session.WebhookCreate(destChannel.ID, "LightningBot - Copy Channel", "")
 	if err != nil {
-		ctx.RespondText("Error creating destination webhook: " + err.Error())
+		ctx.RespondText("Error creating destination webhook: %v", err)
 		return
 	}
 
@@ -1092,7 +1091,7 @@ func (c *UtilityCommands) copychannel(ctx *router.Ctx) {
 			Embeds:     message.Embeds,
 		})
 		if err != nil {
-			ctx.RespondText("Error sending message: " + err.Error())
+			ctx.RespondText("Error sending message: %v", err)
 		}
 
 		time.Sleep(750 * time.Millisecond)
@@ -1114,7 +1113,7 @@ func (c *UtilityCommands) leavegroups(ctx *router.Ctx) {
 		if channel.Type == discordgo.ChannelTypeGroupDM {
 			_, err := ctx.Session.ChannelDelete(channel.ID, isSilent)
 			if err != nil {
-				ctx.RespondText("Error leaving group: " + err.Error())
+				ctx.RespondText("Error leaving group: %v", err)
 			}
 
 			time.Sleep(2 * time.Second)
@@ -1294,7 +1293,7 @@ func (c *UtilityCommands) hypesquad(ctx *router.Ctx) {
 
 	err := api.SetHypesquad(ctx.Session, house)
 	if err != nil {
-		ctx.RespondText("Error setting hypesquad: " + err.Error())
+		ctx.RespondText("Error setting hypesquad: %v", err)
 	}
 
 	c.services.Embed.NewEmbed().
@@ -1305,7 +1304,7 @@ func (c *UtilityCommands) hypesquad(ctx *router.Ctx) {
 func (c *UtilityCommands) leavehypesquad(ctx *router.Ctx) {
 	err := api.LeaveHypesquad(ctx.Session)
 	if err != nil {
-		ctx.RespondText("Error leaving hypesquad: " + err.Error())
+		ctx.RespondText("Error leaving hypesquad: %v", err)
 	}
 
 	c.services.Embed.NewEmbed().
@@ -1329,7 +1328,7 @@ func (c *UtilityCommands) theme(ctx *router.Ctx) {
 	ctx.Session.State.UserSettings.Appearance.Theme = theme
 	err := ctx.Session.UserSettingsUpdate(ctx.Session.State.UserSettings, true)
 	if err != nil {
-		ctx.RespondText("Error setting theme: " + err.Error())
+		ctx.RespondText("Error setting theme: %v", err)
 		return
 	}
 
@@ -1341,14 +1340,14 @@ func (c *UtilityCommands) theme(ctx *router.Ctx) {
 func (c *UtilityCommands) compact(ctx *router.Ctx) {
 	toggle, err := ctx.Arguments.Get(0).Bool()
 	if err != nil {
-		ctx.RespondText("Error parsing argument: " + err.Error())
+		ctx.RespondText("Error parsing argument: %v", err)
 		return
 	}
 
 	ctx.Session.State.UserSettings.TextAndImages.MessageDisplayCompact = wrapperspb.Bool(toggle)
 	err = ctx.Session.UserSettingsUpdate(ctx.Session.State.UserSettings, true)
 	if err != nil {
-		ctx.RespondText("Error setting theme: " + err.Error())
+		ctx.RespondText("Error setting theme: %v", err)
 		return
 	}
 
@@ -1360,14 +1359,14 @@ func (c *UtilityCommands) compact(ctx *router.Ctx) {
 func (c *UtilityCommands) devmode(ctx *router.Ctx) {
 	toggle, err := ctx.Arguments.Get(0).Bool()
 	if err != nil {
-		ctx.RespondText("Error parsing argument: " + err.Error())
+		ctx.RespondText("Error parsing argument: %v", err)
 		return
 	}
 
 	ctx.Session.State.UserSettings.Appearance.DeveloperMode = toggle
 	err = ctx.Session.UserSettingsUpdate(ctx.Session.State.UserSettings, true)
 	if err != nil {
-		ctx.RespondText("Error setting theme: " + err.Error())
+		ctx.RespondText("Error setting theme: %v", err)
 		return
 	}
 
@@ -1390,7 +1389,7 @@ func (c *UtilityCommands) aboutme(ctx *router.Ctx) {
 
 	err := api.ChangeSettings(ctx.Session, "/profile", map[string]any{"bio": bio})
 	if err != nil {
-		ctx.RespondText("Error setting bio: " + err.Error())
+		ctx.RespondText("Error setting bio: %v", err)
 		return
 	}
 
@@ -1407,7 +1406,7 @@ func (c *UtilityCommands) displayname(ctx *router.Ctx) {
 
 	err := api.ChangeSettings(ctx.Session, "", map[string]any{"global_name": globalName})
 	if err != nil {
-		ctx.RespondText("Error setting display name: " + err.Error())
+		ctx.RespondText("Error setting display name: %v", err)
 		return
 	}
 
@@ -1419,7 +1418,7 @@ func (c *UtilityCommands) displayname(ctx *router.Ctx) {
 func (c *UtilityCommands) pronouns(ctx *router.Ctx) {
 	err := api.ChangeSettings(ctx.Session, "/profile", map[string]any{"pronouns": ctx.Arguments.Raw()})
 	if err != nil {
-		ctx.RespondText("Error setting pronouns: " + err.Error())
+		ctx.RespondText("Error setting pronouns: %v", err)
 		return
 	}
 
@@ -1457,7 +1456,7 @@ func (c *UtilityCommands) getmessagejson(ctx *router.Ctx) {
 
 	messages, err := ctx.Session.ChannelMessages(channel.ID, 1, "", "", ctx.Arguments.Get(1).Raw())
 	if err != nil {
-		ctx.RespondText("Could not get message: " + err.Error())
+		ctx.RespondText("Could not get message: %v", err)
 		return
 	}
 
@@ -1489,7 +1488,7 @@ func (c *UtilityCommands) getembedjson(ctx *router.Ctx) {
 
 	messages, err := ctx.Session.ChannelMessages(channel.ID, 1, "", "", ctx.Arguments.Get(1).Raw())
 	if err != nil {
-		ctx.RespondText("Could not get message: " + err.Error())
+		ctx.RespondText("Could not get message: %v", err)
 		return
 	}
 
@@ -1524,13 +1523,13 @@ func (c *UtilityCommands) sendmessagejson(ctx *router.Ctx) {
 	var data *discordgo.MessageSend
 	err = json.Unmarshal([]byte(rawData), &data)
 	if err != nil {
-		ctx.RespondText("Error unmarshaling JSON: " + err.Error())
+		ctx.RespondText("Error unmarshaling JSON: %v", err)
 		return
 	}
 
 	_, err = ctx.Session.ChannelMessageSendComplex(channel.ID, data)
 	if err != nil {
-		ctx.RespondText("Error sending message: " + err.Error())
+		ctx.RespondText("Error sending message: %v", err)
 		return
 	}
 }
@@ -1538,13 +1537,13 @@ func (c *UtilityCommands) sendmessagejson(ctx *router.Ctx) {
 func (c *UtilityCommands) sendinterval(ctx *router.Ctx) {
 	interval, err := ctx.Arguments.Get(0).Duration()
 	if err != nil {
-		ctx.RespondText("Error parsing interval: " + err.Error())
+		ctx.RespondText("Error parsing interval: %v", err)
 		return
 	}
 
 	amount, err := ctx.Arguments.Get(1).Int()
 	if err != nil {
-		ctx.RespondText("Error parsing amount: " + err.Error())
+		ctx.RespondText("Error parsing amount: %v", err)
 		return
 	}
 
@@ -1591,7 +1590,7 @@ func (c *UtilityCommands) optionpoll(ctx *router.Ctx) {
 func (c *UtilityCommands) discordpoll(ctx *router.Ctx) {
 	duration, err := ctx.Arguments.Get(0).Duration()
 	if err != nil {
-		ctx.RespondText("Error parsing duration: " + err.Error())
+		ctx.RespondText("Error parsing duration: %v", err)
 		return
 	}
 
@@ -1646,7 +1645,7 @@ func (c *UtilityCommands) discordpoll(ctx *router.Ctx) {
 		},
 	})
 	if err != nil {
-		ctx.RespondText("Error sending poll: " + err.Error())
+		ctx.RespondText("Error sending poll: %v", err)
 	}
 }
 
@@ -1656,7 +1655,7 @@ func (c *UtilityCommands) checktoken(ctx *router.Ctx) {
 	response, err := api.GetTokenData(ctx.Session, token)
 	if err != nil {
 		if !bytes.Contains(response, []byte("401: Unauthorized")) {
-			ctx.RespondText("An error has occurred: " + err.Error())
+			ctx.RespondText("An error has occurred: %v", err)
 			return
 		}
 
@@ -1668,7 +1667,7 @@ func (c *UtilityCommands) checktoken(ctx *router.Ctx) {
 
 	tokenData, err := simplejson.NewJson(response)
 	if err != nil {
-		ctx.RespondText("An error has occurred: " + err.Error())
+		ctx.RespondText("An error has occurred: %v", err)
 		return
 	}
 
@@ -1729,7 +1728,7 @@ func (c *UtilityCommands) changelog(ctx *router.Ctx) {
 		map[string]string{"branch": "selfbot", "version": ""},
 	)
 	if err != nil {
-		ctx.RespondText("An error has occurred: " + err.Error())
+		ctx.RespondText("An error has occurred: %v", err)
 		return
 	}
 
@@ -1745,7 +1744,7 @@ func (c *UtilityCommands) version(ctx *router.Ctx) {
 		map[string]string{"branch": "selfbot", "version": ""},
 	)
 	if err != nil {
-		ctx.RespondText("An error has occurred: " + err.Error())
+		ctx.RespondText("An error has occurred: %v", err)
 		return
 	}
 
@@ -1821,7 +1820,6 @@ func (c *UtilityCommands) remote(ctx *router.Ctx) {
 	}
 
 	ctx.Router.InvokeRemoteCmd(ctx.Session, channel, ctx.Message.Author, cmds[0], args)
-
 }
 
 // System Utilities
@@ -1834,13 +1832,13 @@ func (c *UtilityCommands) systeminfo(ctx *router.Ctx) {
 
 	hostStat, err := host.Info()
 	if err != nil {
-		ctx.RespondText("Error getting host info: " + err.Error())
+		ctx.RespondText("Error getting host info: %v", err)
 		return
 	}
 
 	cpuStat, err := cpu.Info()
 	if err != nil {
-		ctx.RespondText("Error getting cpu info: " + err.Error())
+		ctx.RespondText("Error getting cpu info: %v", err)
 		return
 	}
 
@@ -1853,13 +1851,13 @@ func (c *UtilityCommands) systeminfo(ctx *router.Ctx) {
 
 	vmStat, err := mem.VirtualMemory()
 	if err != nil {
-		ctx.RespondText("Error getting memory info: " + err.Error())
+		ctx.RespondText("Error getting memory info: %v", err)
 		return
 	}
 
 	diskStat, err := disk.Usage(path)
 	if err != nil {
-		ctx.RespondText("Error getting disk info: " + err.Error())
+		ctx.RespondText("Error getting disk info: %v", err)
 		return
 	}
 
@@ -1930,7 +1928,7 @@ func (c *UtilityCommands) screenshot(ctx *router.Ctx) {
 
 	img, err := screenshot.CaptureDisplay(0)
 	if err != nil {
-		ctx.RespondText("Error capturing screenshot: " + err.Error())
+		ctx.RespondText("Error capturing screenshot: %v", err)
 		return
 	}
 
@@ -1938,7 +1936,7 @@ func (c *UtilityCommands) screenshot(ctx *router.Ctx) {
 
 	err = png.Encode(buf, img)
 	if err != nil {
-		ctx.RespondText("Error encoding image: " + err.Error())
+		ctx.RespondText("Error encoding image: %v", err)
 		return
 	}
 
@@ -1974,7 +1972,7 @@ func (c *UtilityCommands) uploadss(ctx *router.Ctx) {
 
 	img, err := screenshot.CaptureDisplay(0)
 	if err != nil {
-		ctx.RespondText("Error capturing screenshot: " + err.Error())
+		ctx.RespondText("Error capturing screenshot: %v", err)
 		return
 	}
 
@@ -1982,13 +1980,13 @@ func (c *UtilityCommands) uploadss(ctx *router.Ctx) {
 
 	err = png.Encode(buf, img)
 	if err != nil {
-		ctx.RespondText("Error encoding image: " + err.Error())
+		ctx.RespondText("Error encoding image: %v", err)
 		return
 	}
 
 	result, err := dest.Upload(buf, "screenshot.png")
 	if err != nil {
-		ctx.RespondText("Error uploading screenshot: " + err.Error())
+		ctx.RespondText("Error uploading screenshot: %v", err)
 		return
 	}
 
@@ -2016,7 +2014,7 @@ func (c *UtilityCommands) uploadfile(ctx *router.Ctx) {
 
 	resp, err := nethttp.Get(attachments[0].URL)
 	if err != nil {
-		ctx.RespondText("Error downloading file: " + err.Error())
+		ctx.RespondText("Error downloading file: %v", err)
 		return
 	}
 	defer resp.Body.Close()
@@ -2025,13 +2023,13 @@ func (c *UtilityCommands) uploadfile(ctx *router.Ctx) {
 
 	_, err = buf.ReadFrom(resp.Body)
 	if err != nil {
-		ctx.RespondText("Error reading file body: " + err.Error())
+		ctx.RespondText("Error reading file body: %v", err)
 		return
 	}
 
 	result, err := dest.Upload(buf, attachments[0].Filename)
 	if err != nil {
-		ctx.RespondText("Error uploading file: " + err.Error())
+		ctx.RespondText("Error uploading file: %v", err)
 		return
 	}
 
@@ -2053,7 +2051,7 @@ func (c *UtilityCommands) uploadlink(ctx *router.Ctx) {
 	link := ctx.Arguments.Get(1).Raw()
 	parsedURL, err := url.ParseRequestURI(link)
 	if err != nil {
-		ctx.RespondText("Error: invalid link: " + err.Error())
+		ctx.RespondText("Error: invalid link: %v", err)
 		return
 	}
 
@@ -2061,7 +2059,7 @@ func (c *UtilityCommands) uploadlink(ctx *router.Ctx) {
 
 	resp, err := nethttp.Get(link)
 	if err != nil {
-		ctx.RespondText("Error downloading file: " + err.Error())
+		ctx.RespondText("Error downloading file: %v", err)
 		return
 	}
 	defer resp.Body.Close()
@@ -2070,13 +2068,13 @@ func (c *UtilityCommands) uploadlink(ctx *router.Ctx) {
 
 	_, err = buf.ReadFrom(resp.Body)
 	if err != nil {
-		ctx.RespondText("Error reading file body: " + err.Error())
+		ctx.RespondText("Error reading file body: %v", err)
 		return
 	}
 
 	result, err := dest.Upload(buf, fileName)
 	if err != nil {
-		ctx.RespondText("Error uploading file: " + err.Error())
+		ctx.RespondText("Error uploading file: %v", err)
 		return
 	}
 
@@ -2244,7 +2242,7 @@ func (c *UtilityCommands) addreview(ctx *router.Ctx) {
 func (c *UtilityCommands) getTags(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
-		ctx.RespondText("Error getting config: " + err.Error())
+		ctx.RespondText("Error getting config: %v", err)
 		return
 	}
 
@@ -2269,7 +2267,7 @@ func (c *UtilityCommands) getTags(ctx *router.Ctx) {
 func (c *UtilityCommands) addTag(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
-		ctx.RespondText("Error getting config: " + err.Error())
+		ctx.RespondText("Error getting config: %v", err)
 		return
 	}
 
@@ -2284,7 +2282,7 @@ func (c *UtilityCommands) addTag(ctx *router.Ctx) {
 
 	err = cfg.Save()
 	if err != nil {
-		ctx.RespondText("Error saving tags: " + err.Error())
+		ctx.RespondText("Error saving tags: %v", err)
 		return
 	}
 
@@ -2296,7 +2294,7 @@ func (c *UtilityCommands) addTag(ctx *router.Ctx) {
 func (c *UtilityCommands) removeTag(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
-		ctx.RespondText("Error getting config: " + err.Error())
+		ctx.RespondText("Error getting config: %v", err)
 		return
 	}
 
@@ -2306,7 +2304,7 @@ func (c *UtilityCommands) removeTag(ctx *router.Ctx) {
 
 	err = cfg.Save()
 	if err != nil {
-		ctx.RespondText("Error saving tags: " + err.Error())
+		ctx.RespondText("Error saving tags: %v", err)
 		return
 	}
 
@@ -2318,7 +2316,7 @@ func (c *UtilityCommands) removeTag(ctx *router.Ctx) {
 func (c *UtilityCommands) clearTags(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
-		ctx.RespondText("Error getting config: " + err.Error())
+		ctx.RespondText("Error getting config: %v", err)
 		return
 	}
 
@@ -2326,7 +2324,7 @@ func (c *UtilityCommands) clearTags(ctx *router.Ctx) {
 
 	err = cfg.Save()
 	if err != nil {
-		ctx.RespondText("Error saving tags: " + err.Error())
+		ctx.RespondText("Error saving tags: %v", err)
 		return
 	}
 
@@ -2612,7 +2610,7 @@ func (c *UtilityCommands) getPoketwoMessage(ctx *router.Ctx) (*discordgo.Message
 
 	messages, err := utils.Discord.GetChannelMessages(ctx.Session, channel.ID, 100)
 	if err != nil {
-		ctx.RespondText("Error getting messages: " + err.Error())
+		ctx.RespondText("Error getting messages: %v", err)
 		return nil, err
 	}
 
@@ -2650,7 +2648,7 @@ func (c *UtilityCommands) snipepokemon(ctx *router.Ctx) {
 
 	cfg, err := config.GetConfig()
 	if err != nil {
-		ctx.RespondText("Error getting config: " + err.Error())
+		ctx.RespondText("Error getting config: %v", err)
 		return
 	}
 
@@ -2681,7 +2679,7 @@ func (c *UtilityCommands) snipepokemon(ctx *router.Ctx) {
 
 	_, err = ctx.Session.ChannelMessageSend(message.ChannelID, "<@716390085896962058> c "+strings.ToLower(label))
 	if err != nil {
-		ctx.RespondText("Error catching Pokémon: " + err.Error())
+		ctx.RespondText("Error catching Pokémon: %v", err)
 		return
 	}
 
@@ -2710,7 +2708,7 @@ func (c *UtilityCommands) detectpokemon(ctx *router.Ctx) {
 
 	cfg, err := config.GetConfig()
 	if err != nil {
-		ctx.RespondText("Error getting config: " + err.Error())
+		ctx.RespondText("Error getting config: %v", err)
 		return
 	}
 
@@ -2809,7 +2807,7 @@ func (c *UtilityCommands) addReminder(ctx *router.Ctx) {
 
 	err = cfg.Save()
 	if err != nil {
-		ctx.RespondText("Error saving config: " + err.Error())
+		ctx.RespondText("Error saving config: %v", err)
 		return
 	}
 
@@ -2833,7 +2831,7 @@ func (c *UtilityCommands) removeReminder(ctx *router.Ctx) {
 
 	err = cfg.Save()
 	if err != nil {
-		ctx.RespondText("Error saving config: " + err.Error())
+		ctx.RespondText("Error saving config: %v", err)
 		return
 	}
 
@@ -2853,7 +2851,7 @@ func (c *UtilityCommands) clearReminders(ctx *router.Ctx) {
 
 	err = cfg.Save()
 	if err != nil {
-		ctx.RespondText("Error saving config: " + err.Error())
+		ctx.RespondText("Error saving config: %v", err)
 		return
 	}
 
@@ -2894,7 +2892,7 @@ func (c *UtilityCommands) convertvelocity(ctx *router.Ctx) {
 
 	result, err := conversion.ConvertSpeed(sourceUnit, destinationUnit, value)
 	if err != nil {
-		ctx.RespondText("Error converting value: " + err.Error())
+		ctx.RespondText("Error converting value: %v", err)
 	}
 
 	c.services.Embed.NewEmbed().
@@ -2919,7 +2917,7 @@ func (c *UtilityCommands) convertarea(ctx *router.Ctx) {
 
 	result, err := conversion.ConvertArea(sourceUnit, destinationUnit, value)
 	if err != nil {
-		ctx.RespondText("Error converting value: " + err.Error())
+		ctx.RespondText("Error converting value: %v", err)
 	}
 
 	c.services.Embed.NewEmbed().
@@ -2944,7 +2942,7 @@ func (c *UtilityCommands) convertlength(ctx *router.Ctx) {
 
 	result, err := conversion.ConvertLength(sourceUnit, destinationUnit, value)
 	if err != nil {
-		ctx.RespondText("Error converting value: " + err.Error())
+		ctx.RespondText("Error converting value: %v", err)
 	}
 
 	c.services.Embed.NewEmbed().
@@ -2969,7 +2967,7 @@ func (c *UtilityCommands) converttemperature(ctx *router.Ctx) {
 
 	result, err := conversion.ConvertTemperature(sourceUnit, destinationUnit, value)
 	if err != nil {
-		ctx.RespondText("Error converting value: " + err.Error())
+		ctx.RespondText("Error converting value: %v", err)
 	}
 
 	c.services.Embed.NewEmbed().
@@ -2994,7 +2992,7 @@ func (c *UtilityCommands) converttime(ctx *router.Ctx) {
 
 	result, err := conversion.ConvertTime(sourceUnit, destinationUnit, value)
 	if err != nil {
-		ctx.RespondText("Error converting value: " + err.Error())
+		ctx.RespondText("Error converting value: %v", err)
 	}
 
 	c.services.Embed.NewEmbed().
@@ -3019,7 +3017,7 @@ func (c *UtilityCommands) convertvolume(ctx *router.Ctx) {
 
 	result, err := conversion.ConvertVolume(sourceUnit, destinationUnit, value)
 	if err != nil {
-		ctx.RespondText("Error converting value: " + err.Error())
+		ctx.RespondText("Error converting value: %v", err)
 	}
 
 	c.services.Embed.NewEmbed().
@@ -3044,7 +3042,7 @@ func (c *UtilityCommands) convertmass(ctx *router.Ctx) {
 
 	result, err := conversion.ConvertMass(sourceUnit, destinationUnit, value)
 	if err != nil {
-		ctx.RespondText("Error converting value: " + err.Error())
+		ctx.RespondText("Error converting value: %v", err)
 	}
 
 	c.services.Embed.NewEmbed().
@@ -3210,7 +3208,7 @@ func (c *UtilityCommands) wikipedia(ctx *router.Ctx) {
 func (c *UtilityCommands) weather(ctx *router.Ctx) {
 	weather, err := api.GetWeather(ctx.Arguments.Raw())
 	if err != nil {
-		ctx.RespondText("An error has occurred: " + err.Error())
+		ctx.RespondText("An error has occurred: %v", err)
 		return
 	}
 
@@ -3233,7 +3231,7 @@ func (c *UtilityCommands) weather(ctx *router.Ctx) {
 func (c *UtilityCommands) lvbypass(ctx *router.Ctx) {
 	resp, err := http.GetJson("https://bypass.pm/bypass2?url=" + ctx.Arguments.Raw())
 	if err != nil {
-		ctx.RespondText("An error has occurred: " + err.Error())
+		ctx.RespondText("An error has occurred: %v", err)
 		return
 	}
 
@@ -3374,7 +3372,7 @@ func (c *UtilityCommands) calculate(ctx *router.Ctx) {
 
 	tv, err := types.Eval(token.NewFileSet(), nil, token.NoPos, expression)
 	if err != nil {
-		ctx.RespondText("Error evaluating expression: " + err.Error())
+		ctx.RespondText("Error evaluating expression: %v", err)
 		return
 	}
 
@@ -3424,7 +3422,7 @@ func (c *UtilityCommands) youtubesearch(ctx *router.Ctx) {
 func (c *UtilityCommands) youtubedl(ctx *router.Ctx) {
 	results, err := api.GoogleSearch(ctx.Arguments.Raw() + " site:youtube.com")
 	if err != nil {
-		ctx.RespondText("An error has occurred: " + err.Error())
+		ctx.RespondText("An error has occurred: %v", err)
 		return
 	}
 	for i := 0; i < len(results.MustArray()); i++ {
@@ -3439,7 +3437,7 @@ func (c *UtilityCommands) youtubedl(ctx *router.Ctx) {
 
 		video, err := client.GetVideo(resultUrl)
 		if err != nil {
-			ctx.RespondText("An error has occurred: " + err.Error())
+			ctx.RespondText("An error has occurred: %v", err)
 			return
 		}
 
@@ -3449,7 +3447,7 @@ func (c *UtilityCommands) youtubedl(ctx *router.Ctx) {
 
 		stream, _, err := client.GetStream(video, &formats[0])
 		if err != nil {
-			ctx.RespondText("An error has occurred: " + err.Error())
+			ctx.RespondText("An error has occurred: %v", err)
 			return
 		}
 
@@ -3461,14 +3459,14 @@ func (c *UtilityCommands) youtubedl(ctx *router.Ctx) {
 
 		file, err := os.Create(downloadPath)
 		if err != nil {
-			ctx.RespondText("An error has occurred: " + err.Error())
+			ctx.RespondText("An error has occurred: %v", err)
 			return
 		}
 		defer file.Close()
 
 		_, err = io.Copy(file, stream)
 		if err != nil {
-			ctx.RespondText("An error has occurred: " + err.Error())
+			ctx.RespondText("An error has occurred: %v", err)
 			_ = file.Close()
 			return
 		}

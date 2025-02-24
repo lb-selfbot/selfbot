@@ -55,7 +55,6 @@ func (c *HelpCommands) Register() {
 		Name:        "Help",
 		Description: "Get help for commands",
 	}, cmds)
-
 }
 
 type HelpMessage struct {
@@ -146,20 +145,23 @@ func (c *HelpCommands) specificHelpCommand(ctx *router.Ctx) {
 		}
 	}
 
-	description := fmt.Sprintf("`%s` is not a command or category!", name)
+	var suggestions string
+
 	if len(closeCommands) > 0 {
-		description += "\n\nDid you mean one of these commands?\n\n" + strings.Join(closeCommands, "\n")
+		suggestions += "\n\nDid you mean one of these commands?\n\n" + strings.Join(closeCommands, "\n")
 	}
 	if len(closeCategories) > 0 {
-		description += "\n\nDid you mean one of these categories?\n\n" + strings.Join(closeCategories, "\n")
+		suggestions += "\n\nDid you mean one of these categories?\n\n" + strings.Join(closeCategories, "\n")
 	}
 
-	c.services.Embed.NewEmbed().SetDescription(description).Send(ctx)
+	c.services.Embed.NewEmbed().
+		SetDescription("`%s` is not a command or category!\n%s", name, suggestions).
+		Send(ctx)
 }
 
 func (c *HelpCommands) renderCommandHelp(cmdRouter router.Router, command *router.Command) *embed.Embed {
 	return c.services.Embed.NewEmbed().
-		SetDescription("Command Help: "+command.Name).
+		SetDescription("Command Help: %s", command.Name).
 		AddField("Command Name", command.Name).
 		AddField("Usage", "<> is required, [] is optional\n\n"+cmdRouter.GetConfig().PrefixFunc()[0]+command.Name+" "+command.Arguments).
 		AddField("Description", command.Description).
@@ -186,7 +188,7 @@ func (c *HelpCommands) renderCategoryHelp(cmdRouter router.Router, category *rou
 
 	emb := c.services.Embed.NewEmbed().
 		SetDescription("<> is required, [] is optional\n\nAmount of %s commands: %d", category.Name, len(cmds)).
-		SetSubtext(fmt.Sprintf("Page: %d/%d", page+1, len(helpPages)))
+		SetSubtext("Page: %d/%d", page+1, len(helpPages))
 
 	cfg, _ := config.GetConfig()
 
@@ -201,9 +203,9 @@ func (c *HelpCommands) renderCategoryHelp(cmdRouter router.Router, category *rou
 	}
 	if len(helpPages) > 1 {
 		if cfg.Selfbot.CommandMode == "WebhookEmbed" {
-			emb.SetSubtext(fmt.Sprintf("Page: %d/%d\n\nUse %shelp %s <page> to go to the next page", page+1, len(helpPages), cmdRouter.GetConfig().PrefixFunc()[0], rawArgument))
+			emb.SetSubtext("Page: %d/%d\n\nUse %shelp %s <page> to go to the next page", page+1, len(helpPages), cmdRouter.GetConfig().PrefixFunc()[0], rawArgument)
 		} else {
-			emb.SetSubtext(fmt.Sprintf("Page: %d/%d\n\nUse \x1b[34;1m%shelp %s <page>\x1b[0m to go to the next page", page+1, len(helpPages), cmdRouter.GetConfig().PrefixFunc()[0], rawArgument))
+			emb.SetSubtext("Page: %d/%d\n\nUse \x1b[34;1m%shelp %s <page>\x1b[0m to go to the next page", page+1, len(helpPages), cmdRouter.GetConfig().PrefixFunc()[0], rawArgument)
 		}
 	}
 	return emb
@@ -227,18 +229,10 @@ func (c *HelpCommands) renderDefaultGeneralHelpEmbed(cmdRouter router.Router) *e
 
 	if cfg.Selfbot.CommandMode == "WebhookEmbed" {
 		emb.Description += "\n\n**Categories**\n" + categoriesString
-		emb.SetSubtext(strings.ReplaceAll(
-			"Use [p]help <category name> or [p]help <command name> to get more info.\nUse [p]search <query> to search commands.\nUse [p]repeat to repeat the last command.",
-			"[p]",
-			prefix,
-		))
+		emb.SetSubtext("Use the %[1]shelp <category name> or %[1]shelp <command name> to get more info.\nUse %[1]ssearch <query> to search commands.\nUse %[1]srepeat to repeat the last command.", prefix)
 	} else {
 		emb.AddField("Categories", categoriesString, true, true)
-		emb.SetSubtext(strings.ReplaceAll(
-			"Use \x1b[34;1m[p]help <category name>\x1b[0m or \x1b[34;1m[p]help <command name>\x1b[0m to get more info.\nUse \x1b[34;1m[p]search <query>\x1b[0m to search commands.\nUse \x1b[34;1m[p]repeat\x1b[0m to repeat the last command.",
-			"[p]",
-			prefix,
-		))
+		emb.SetSubtext("Use \x1b[34;1m%[1]shelp <category name>\x1b[0m or \x1b[34;1m%[1]shelp <command name>\x1b[0m to get more info.\nUse \x1b[34;1m%[1]ssearch <query>\x1b[0m to search commands.\nUse \x1b[34;1m%[1]srepeat\x1b[0m to repeat the last command.", prefix)
 	}
 
 	return emb

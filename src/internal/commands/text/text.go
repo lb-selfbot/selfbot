@@ -410,7 +410,7 @@ func (c *TextCommands) edit(ctx *router.Ctx) {
 	currentText := string(fullText[0])
 	message, err := ctx.Session.ChannelMessageSend(ctx.Message.ChannelID, currentText)
 	if err != nil {
-		ctx.RespondText("An error has occurred: " + err.Error())
+		ctx.RespondText("An error has occurred: %v", err)
 		return
 	}
 	for i := 1; i < len(fullText); i++ {
@@ -920,7 +920,7 @@ func (c *TextCommands) encode(ctx *router.Ctx) {
 
 	encoded, err := encoding.Encode(text)
 	if err != nil {
-		ctx.RespondText("An error has occurred: " + err.Error())
+		ctx.RespondText("An error has occurred: %v", err)
 		return
 	}
 
@@ -946,7 +946,7 @@ func (c *TextCommands) decode(ctx *router.Ctx) {
 
 	decoded, err := encoding.Decode(text)
 	if err != nil {
-		ctx.RespondText("An error has occurred: " + err.Error())
+		ctx.RespondText("An error has occurred: %v", err)
 		return
 	}
 
@@ -1007,7 +1007,7 @@ func (c *TextCommands) encrypt(ctx *router.Ctx) {
 
 	encrypted, err := encryption.Encrypt(text, key)
 	if err != nil {
-		ctx.RespondText("An error has occurred: " + err.Error())
+		ctx.RespondText("An error has occurred: %v", err)
 		return
 	}
 
@@ -1028,7 +1028,7 @@ func (c *TextCommands) decrypt(ctx *router.Ctx) {
 
 	encrypted, err := encryption.Decrypt(text, key)
 	if err != nil {
-		ctx.RespondText("An error has occurred: " + err.Error())
+		ctx.RespondText("An error has occurred: %v", err)
 		return
 	}
 

@@ -1408,7 +1408,7 @@ func (c *EventReactionsCommands) Register() {
 // 	case "set":
 // 		delay, err := utils.Misc.ParseDuration(utils.Arguments["[value]"])
 // 		if err != nil {
-// 			ctx.RespondText("Invalid duration: " + err.Error())
+// 			ctx.RespondText("Invalid duration: %v", err)
 // 			return
 // 		}
 
@@ -1516,7 +1516,7 @@ func (c *EventReactionsCommands) Register() {
 // 	case "set":
 // 		delay, err := utils.Misc.ParseDuration(utils.Arguments["[value]"])
 // 		if err != nil {
-// 			ctx.RespondText("Invalid duration: " + err.Error())
+// 			ctx.RespondText("Invalid duration: %v", err)
 // 			return
 // 		}
 

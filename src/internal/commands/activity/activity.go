@@ -594,7 +594,7 @@ func (c *ActivityCommands) status(ctx *router.Ctx) {
 	case "online", "dnd", "idle", "invisible":
 		err := c.setStatus(ctx.Session, status)
 		if err != nil {
-			ctx.RespondText("An error occurred while changing your status: " + err.Error())
+			ctx.RespondText("An error occurred while changing your status: %v", err)
 			return
 		}
 
@@ -609,7 +609,7 @@ func (c *ActivityCommands) status(ctx *router.Ctx) {
 func (c *ActivityCommands) customstatus(ctx *router.Ctx) {
 	err := c.setCustomStatus(ctx.Session, ctx.Arguments.Raw())
 	if err != nil {
-		ctx.RespondText("An error occurred while changing your custom status: " + err.Error())
+		ctx.RespondText("An error occurred while changing your custom status: %v", err)
 		return
 	}
 
@@ -621,14 +621,14 @@ func (c *ActivityCommands) customstatus(ctx *router.Ctx) {
 func (c *ActivityCommands) clearactivity(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
-		ctx.RespondText("Error getting config: " + err.Error())
+		ctx.RespondText("Error getting config: %v", err)
 		return
 	}
 
 	cfg.Activity.Enabled = false
 	err = cfg.Save()
 	if err != nil {
-		ctx.RespondText("Error saving config: " + err.Error())
+		ctx.RespondText("Error saving config: %v", err)
 		return
 	}
 
@@ -639,7 +639,7 @@ func (c *ActivityCommands) clearactivity(ctx *router.Ctx) {
 		Status:     c.services.Sessions.GetStatus(),
 	})
 	if err != nil {
-		ctx.RespondText("An error occurred while clearing your activity: " + err.Error())
+		ctx.RespondText("An error occurred while clearing your activity: %v", err)
 		return
 	}
 
@@ -792,7 +792,7 @@ func (c *ActivityCommands) setactivityjson(ctx *router.Ctx) {
 	var activity *discordgo.Activity
 	err := json.Unmarshal([]byte(rawJson), &activity)
 	if err != nil {
-		ctx.RespondText("Invalid activity JSON! " + err.Error())
+		ctx.RespondText("Invalid activity JSON! %v", err)
 		return
 	}
 
@@ -1643,7 +1643,7 @@ func (c *ActivityCommands) clearCAPresets(ctx *router.Ctx) {
 func (c *ActivityCommands) setActivityPreset(ctx *router.Ctx) {
 	cfg, err := config.GetConfig()
 	if err != nil {
-		ctx.RespondText("Error getting config: " + err.Error())
+		ctx.RespondText("Error getting config: %v", err)
 		return
 	}
 
@@ -1941,7 +1941,7 @@ func (c *ActivityCommands) activitypresets(ctx *router.Ctx) {
 	case "set":
 		cfg, err := config.GetConfig()
 		if err != nil {
-			ctx.RespondText("Error getting config: " + err.Error())
+			ctx.RespondText("Error getting config: %v", err)
 			return
 		}
 

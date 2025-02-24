@@ -126,7 +126,6 @@ func (c *SpotifyCommands) Register() {
 			Handler:     c.slistenalong,
 		},
 	})
-
 }
 
 func (c *SpotifyCommands) GetBearerToken(ctx *router.Ctx) (string, bool) {
@@ -141,7 +140,7 @@ func (c *SpotifyCommands) GetBearerToken(ctx *router.Ctx) (string, bool) {
 
 func (c *SpotifyCommands) checkResponse(ctx *router.Ctx, httpResponse *http.HttpResponse) bool {
 	if httpResponse.Error != nil {
-		ctx.RespondText("An error has occurred: " + httpResponse.Error.Error())
+		ctx.RespondText("An error has occurred: %v", httpResponse.Error)
 		return false
 	}
 
@@ -158,7 +157,7 @@ func (c *SpotifyCommands) checkResponse(ctx *router.Ctx, httpResponse *http.Http
 
 func (c *SpotifyCommands) HandleRequest(ctx *router.Ctx, httpResponse *http.HttpResponse, onSuccess string) {
 	if httpResponse.Error != nil {
-		ctx.RespondText("An error has occurred: " + httpResponse.Error.Error())
+		ctx.RespondText("An error has occurred: %v", httpResponse.Error)
 		return
 	}
 
@@ -518,7 +517,7 @@ func (c *SpotifyCommands) slistenalong(ctx *router.Ctx) {
 		Flags: 0,
 	})
 	if err != nil {
-		ctx.RespondText("An error has occurred while sending the invite: " + err.Error())
+		ctx.RespondText("An error has occurred while sending the invite: %v", err)
 		return
 	}
 }

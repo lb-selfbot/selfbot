@@ -37,7 +37,6 @@ func (e *EventReactionsServiceImpl) startLoading() {
 			isFirstIteration = false
 		}
 	}
-
 }
 
 func (e *EventReactionsServiceImpl) loadEventReactions(isFirstLoad bool) error {

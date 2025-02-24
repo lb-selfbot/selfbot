@@ -118,7 +118,7 @@ func (c *SlashCommands) searchslash(ctx *router.Ctx) {
 
 	commands, applications, err := ctx.Session.GuildApplicationCommandIndex(guild.ID)
 	if err != nil {
-		ctx.RespondText("An error occurred while getting commands: " + err.Error())
+		ctx.RespondText("An error occurred while getting commands: %v", err)
 		return
 	}
 
@@ -171,7 +171,7 @@ func (c *SlashCommands) executeslash(ctx *router.Ctx) {
 
 	commands, applications, err := ctx.Session.GuildApplicationCommandIndex(channel.GuildID)
 	if err != nil {
-		ctx.RespondText("An error occurred while getting commands: " + err.Error())
+		ctx.RespondText("An error occurred while getting commands: %v", err)
 		return
 	}
 
@@ -195,7 +195,7 @@ func (c *SlashCommands) executeslash(ctx *router.Ctx) {
 
 	opts, err := scjobs.ArgumentsToCommandOptions(cmd.Options, ctx.Arguments, 3)
 	if err != nil {
-		ctx.RespondText("An error occurred while parsing your arguments to command options: " + err.Error())
+		ctx.RespondText("An error occurred while parsing your arguments to command options: %v", err)
 		return
 	}
 
@@ -215,7 +215,7 @@ func (c *SlashCommands) executeslash(ctx *router.Ctx) {
 		ApplicationID: cmd.ApplicationID,
 	})
 	if err != nil {
-		ctx.RespondText("An error occurred while executing the command: " + err.Error())
+		ctx.RespondText("An error occurred while executing the command: %v", err)
 		return
 	}
 }
@@ -328,7 +328,7 @@ func (c *SlashCommands) createscjob(ctx *router.Ctx) {
 
 	guild, err := utils.Discord.GetGuild(ctx.Session, channel.GuildID)
 	if err != nil {
-		ctx.RespondText("Could not find server: " + err.Error())
+		ctx.RespondText("Could not find server: %v", err)
 		return
 	}
 
@@ -346,7 +346,7 @@ func (c *SlashCommands) createscjob(ctx *router.Ctx) {
 
 	commands, applications, err := ctx.Session.GuildApplicationCommandIndex(channel.GuildID)
 	if err != nil {
-		ctx.RespondText("An error occurred while getting commands: " + err.Error())
+		ctx.RespondText("An error occurred while getting commands: %v", err)
 		return
 	}
 
@@ -370,7 +370,7 @@ func (c *SlashCommands) createscjob(ctx *router.Ctx) {
 
 	_, err = scjobs.ArgumentsToCommandOptions(command.Options, ctx.Arguments, 5)
 	if err != nil {
-		ctx.RespondText("An error occurred while parsing your arguments to command options: " + err.Error())
+		ctx.RespondText("An error occurred while parsing your arguments to command options: %v", err)
 		return
 	}
 
@@ -401,7 +401,7 @@ func (c *SlashCommands) createscjob(ctx *router.Ctx) {
 
 	err = c.services.SCJobs.AddJob(job)
 	if err != nil {
-		ctx.RespondText("An error occurred while adding the job: " + err.Error())
+		ctx.RespondText("An error occurred while adding the job: %v", err)
 		return
 	}
 
@@ -422,7 +422,7 @@ func (c *SlashCommands) deletescjob(ctx *router.Ctx) {
 
 	err := c.services.SCJobs.RemoveJob(job)
 	if err != nil {
-		ctx.RespondText("An error occurred while removing the job: " + err.Error())
+		ctx.RespondText("An error occurred while removing the job: %v", err)
 		return
 	}
 
@@ -449,7 +449,7 @@ func (c *SlashCommands) setscjobcommand(ctx *router.Ctx) {
 
 	commands, applications, err := ctx.Session.GuildApplicationCommandIndex(job.GuildObject.ID)
 	if err != nil {
-		ctx.RespondText("An error occurred while getting commands: " + err.Error())
+		ctx.RespondText("An error occurred while getting commands: %v", err)
 		return
 	}
 
@@ -473,7 +473,7 @@ func (c *SlashCommands) setscjobcommand(ctx *router.Ctx) {
 
 	_, err = scjobs.ArgumentsToCommandOptions(command.Options, ctx.Arguments, 4)
 	if err != nil {
-		ctx.RespondText("An error occurred while parsing your arguments to command options: " + err.Error())
+		ctx.RespondText("An error occurred while parsing your arguments to command options: %v", err)
 		return
 	}
 
@@ -493,7 +493,7 @@ func (c *SlashCommands) setscjobcommand(ctx *router.Ctx) {
 
 	err = c.services.SCJobs.SaveJobs()
 	if err != nil {
-		ctx.RespondText("An error occurred while saving the jobs: " + err.Error())
+		ctx.RespondText("An error occurred while saving the jobs: %v", err)
 		return
 	}
 
@@ -526,7 +526,7 @@ func (c *SlashCommands) setscjobchannel(ctx *router.Ctx) {
 
 	guild, err := utils.Discord.GetGuild(ctx.Session, channel.GuildID)
 	if err != nil {
-		ctx.RespondText("Could not find server: " + err.Error())
+		ctx.RespondText("Could not find server: %v", err)
 		return
 	}
 
@@ -542,7 +542,7 @@ func (c *SlashCommands) setscjobchannel(ctx *router.Ctx) {
 
 	err = c.services.SCJobs.SaveJobs()
 	if err != nil {
-		ctx.RespondText("An error occurred while saving the jobs: " + err.Error())
+		ctx.RespondText("An error occurred while saving the jobs: %v", err)
 		return
 	}
 
@@ -572,7 +572,7 @@ func (c *SlashCommands) setscjobinterval(ctx *router.Ctx) {
 
 	err = c.services.SCJobs.SaveJobs()
 	if err != nil {
-		ctx.RespondText("An error occurred while saving the jobs: " + err.Error())
+		ctx.RespondText("An error occurred while saving the jobs: %v", err)
 		return
 	}
 
@@ -601,7 +601,7 @@ func (c *SlashCommands) setscjobpaused(ctx *router.Ctx) {
 
 	err = c.services.SCJobs.SaveJobs()
 	if err != nil {
-		ctx.RespondText("An error occurred while saving the jobs: " + err.Error())
+		ctx.RespondText("An error occurred while saving the jobs: %v", err)
 		return
 	}
 

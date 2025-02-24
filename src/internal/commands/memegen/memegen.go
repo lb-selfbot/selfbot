@@ -154,7 +154,7 @@ func (c *MemeGenCommands) randommeme(ctx *router.Ctx) {
 
 	image, err := api.CreateMeme(templateID, top, bottom)
 	if err != nil {
-		ctx.RespondText("An error has occurred: " + err.Error())
+		ctx.RespondText("An error has occurred: %v", err)
 		return
 	}
 
@@ -168,7 +168,7 @@ func (c *MemeGenCommands) custommeme(ctx *router.Ctx) {
 	templateID, top, bottom := ctx.Arguments.Get(0).Raw(), ctx.Arguments.Get(1).Raw(), ctx.Arguments.Get(2).Raw()
 	image, err := api.CreateMeme(templateID, top, bottom)
 	if err != nil {
-		ctx.RespondText("An error has occurred: " + err.Error())
+		ctx.RespondText("An error has occurred: %v", err)
 		return
 	}
 
@@ -184,7 +184,7 @@ func (c *MemeGenCommands) generateFunc(templateID string) func(ctx *router.Ctx) 
 		top, bottom := ctx.Arguments.Get(0).Raw(), ctx.Arguments.Get(1).Raw()
 		image, err := api.CreateMeme(templateID, top, bottom)
 		if err != nil {
-			ctx.RespondText("An error has occurred: " + err.Error())
+			ctx.RespondText("An error has occurred: %v", err)
 			return
 		}
 

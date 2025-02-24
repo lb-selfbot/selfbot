@@ -503,7 +503,7 @@ func (c *GameCommands) hltbsearch(ctx *router.Ctx) {
 		HLTBHeaders,
 	)
 	if err != nil {
-		ctx.RespondText("An error has occurred: " + err.Error())
+		ctx.RespondText("An error has occurred: %v", err)
 		return
 	}
 
@@ -541,7 +541,7 @@ func (c *GameCommands) hltbinfo(ctx *router.Ctx) {
 		HLTBHeaders,
 	)
 	if httpResponse.Error != nil {
-		ctx.RespondText("An error has occurred: " + httpResponse.Error.Error())
+		ctx.RespondText("An error has occurred: %v", httpResponse.Error)
 		return
 	}
 
@@ -553,7 +553,7 @@ func (c *GameCommands) hltbinfo(ctx *router.Ctx) {
 
 	json, err := simplejson.NewJson([]byte(dataMatches[1]))
 	if err != nil {
-		ctx.RespondText("An error has occurred: " + err.Error())
+		ctx.RespondText("An error has occurred: %v", err)
 		return
 	}
 

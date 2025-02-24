@@ -189,7 +189,7 @@ func (c *CurrencyCommands) priceinfo(ctx *router.Ctx) {
 
 	httpResponse := http.Get(fmt.Sprintf("https://min-api.cryptocompare.com/data/pricemultifull?fsyms=%s&tsyms=%s", from, to))
 	if httpResponse.Error != nil {
-		ctx.RespondText("An error has occurred: " + httpResponse.Error.Error())
+		ctx.RespondText("An error has occurred: %v", httpResponse.Error)
 		return
 	}
 

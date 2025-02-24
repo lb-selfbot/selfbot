@@ -89,7 +89,6 @@ func (c *ProtectionsCommands) Register() {
 		// 	Handler:     c.friendrequests,
 		// },
 	})
-
 }
 
 // func (c *ProtectionsCommands) antiphishing(ctx *router.Ctx) {
@@ -451,7 +450,7 @@ func (c *ProtectionsCommands) Register() {
 // 	}
 
 // 	if err != nil {
-// 		ctx.RespondText("Error changing settings: " + err.Error())
+// 		ctx.RespondText("Error changing settings: %v", err)
 // 		return
 // 	}
 
@@ -477,7 +476,7 @@ func (c *ProtectionsCommands) Register() {
 // 	}
 
 // 	if err != nil {
-// 		ctx.RespondText("Error changing settings: " + err.Error())
+// 		ctx.RespondText("Error changing settings: %v", err)
 // 		return
 // 	}
 

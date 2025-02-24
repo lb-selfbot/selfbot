@@ -122,7 +122,6 @@ func (p *Ping) Equals(other interfaces.EventReaction) bool {
 		p.Guild == otherPing.Guild &&
 		p.Channel == otherPing.Channel &&
 		p.Reaction == otherPing.Reaction
-
 }
 
 func (p *Ping) Data() map[string]any {

@@ -153,7 +153,7 @@ func (c *DumpingCommands) getChannel(ctx *router.Ctx, index int) (*discordgo.Cha
 func (c *DumpingCommands) getGuild(ctx *router.Ctx, index int) (*discordgo.Guild, bool) {
 	guild, err := ctx.Arguments.Get(index).Guild()
 	if err != nil {
-		ctx.RespondText("Error getting server: " + err.Error())
+		ctx.RespondText("Error getting server: %v", err)
 		return nil, false
 	}
 	return guild, true
@@ -369,7 +369,7 @@ func (c *DumpingCommands) dumpemojis(ctx *router.Ctx) {
 
 	emojis, err := ctx.Session.GuildEmojis(guild.ID)
 	if err != nil {
-		ctx.RespondText("Error getting emojis: " + err.Error())
+		ctx.RespondText("Error getting emojis: %v", err)
 		return
 	}
 

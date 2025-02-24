@@ -92,7 +92,6 @@ func (e *EventReactionsServiceImpl) Register() {
 	session.AddHandler(e.onVoiceStateUpdate)
 	session.AddHandler(e.onChannelCreate)
 	session.AddHandler(e.onChannelRecipientRemove)
-
 }
 
 func (e *EventReactionsServiceImpl) handleEvent(s *discordgo.Session, event any) {
