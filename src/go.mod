@@ -1,8 +1,8 @@
 module github.com/LightningDev1/LB-Selfbot
 
-go 1.23.0
+go 1.24.0
 
-toolchain go1.23.3
+toolchain go1.24.0
 
 require (
 	github.com/LightningDev1/beeep v0.1.0
