@@ -77,7 +77,7 @@ func (i *IPCServiceImpl) SendRestart() error {
 }
 
 func (i *IPCServiceImpl) SendConfigUpdate(cfg *config.Config) error {
-	// TODO: callbacks
+	i.authSvc.SendConfigUpdate()
 
 	return i.write(&WSMessage{
 		Op:   OpCodeConfigUpdate,

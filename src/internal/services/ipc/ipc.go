@@ -8,6 +8,7 @@ import (
 	"sync"
 
 	"github.com/LightningDev1/LB-Selfbot/internal/constants"
+	"github.com/LightningDev1/LB-Selfbot/internal/services/interfaces"
 	"github.com/gorilla/websocket"
 )
 
@@ -17,6 +18,8 @@ const (
 )
 
 type IPCServiceImpl struct {
+	authSvc interfaces.AuthService
+
 	upgrader *websocket.Upgrader
 	conn     *websocket.Conn
 	mu       sync.Mutex
@@ -26,6 +29,10 @@ type IPCServiceImpl struct {
 	htmlConsole    string
 	rawConsole     string
 	sentRawConsole bool
+}
+
+func (i *IPCServiceImpl) Inject(authSvc interfaces.AuthService) {
+	i.authSvc = authSvc
 }
 
 func (i *IPCServiceImpl) Serve() error {

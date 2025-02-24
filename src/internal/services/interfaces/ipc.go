@@ -3,6 +3,8 @@ package interfaces
 import "github.com/LightningDev1/LB-Selfbot/internal/config"
 
 type IPCService interface {
+	Inject(authSvc AuthService)
+
 	Serve() error
 	OnConnect() <-chan struct{}
 

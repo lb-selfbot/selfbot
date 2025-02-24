@@ -17,8 +17,8 @@ func (i *IPCServiceImpl) onMessage(msg *WSMessage) error {
 		return nil
 
 	case OpCodeConfigUpdate:
+		i.authSvc.SendConfigUpdate()
 		config.SaveConfigFromUI(msg.Data.Config)
-		// TODO: config callbacks
 		return nil
 
 	default:

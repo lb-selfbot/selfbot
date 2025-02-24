@@ -115,9 +115,6 @@ func (a *AuthServiceImpl) connectWS(context context.Context) error {
 		return err
 	}
 
-	// TODO: can this be removevd?
-	time.Sleep(handshakeDelay)
-
 	// Get hostname
 	hostname := "unknown"
 	if constants.HOSTING {
