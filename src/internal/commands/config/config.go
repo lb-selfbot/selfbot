@@ -2,7 +2,6 @@ package config
 
 import (
 	"fmt"
-	"slices"
 	"strings"
 	"time"
 
@@ -80,7 +79,7 @@ func (c *ConfigCommands) Register() {
 		c.createConfigActionCommand(configCommandData{
 			Name:         "delresponsesdelay",
 			ReadableName: "Delete Responses Delay",
-			ValueType:    configCommandValueTypeInt,
+			ValueType:    configCommandValueTypeDuration,
 			GetDesc:      "Get delete responses delay",
 			GetFunc:      func(cfg *config.Config) any { return cfg.Selfbot.DeleteResponsesDelay },
 			SetDesc:      "Set delete responses delay",
@@ -180,41 +179,41 @@ func (c *ConfigCommands) Register() {
 		// 		}
 		// 	},
 		// }),
-		{
-			Name:        "aliases",
-			Description: "Command aliases commands",
-			Flags:       []router.CommandFlag{router.CmdFlagDangerous},
-			SubCommands: []*router.Command{
-				{
-					Name:        "get",
-					Description: "Get a command alias",
-					Arguments:   "<alias>",
-					Handler:     c.getAlias,
-				},
-				{
-					Name:        "set",
-					Description: "Set a command alias",
-					Arguments:   "<alias> <command>",
-					Handler:     c.setAlias,
-				},
-				{
-					Name:        "rm",
-					Description: "Remove a command alias",
-					Arguments:   "<alias>",
-					Handler:     c.removeAlias,
-				},
-				{
-					Name:        "list",
-					Description: "List all command aliases",
-					Handler:     c.listAliases,
-				},
-				{
-					Name:        "clear",
-					Description: "Clear all command aliases",
-					Handler:     c.clearAliases,
-				},
-			},
-		},
+		// {
+		// 	Name:        "aliases",
+		// 	Description: "Command aliases commands",
+		// 	Flags:       []router.CommandFlag{router.CmdFlagDangerous},
+		// 	SubCommands: []*router.Command{
+		// 		{
+		// 			Name:        "get",
+		// 			Description: "Get a command alias",
+		// 			Arguments:   "<alias>",
+		// 			Handler:     c.getAlias,
+		// 		},
+		// 		{
+		// 			Name:        "set",
+		// 			Description: "Set a command alias",
+		// 			Arguments:   "<alias> <command>",
+		// 			Handler:     c.setAlias,
+		// 		},
+		// 		{
+		// 			Name:        "rm",
+		// 			Description: "Remove a command alias",
+		// 			Arguments:   "<alias>",
+		// 			Handler:     c.removeAlias,
+		// 		},
+		// 		{
+		// 			Name:        "list",
+		// 			Description: "List all command aliases",
+		// 			Handler:     c.listAliases,
+		// 		},
+		// 		{
+		// 			Name:        "clear",
+		// 			Description: "Clear all command aliases",
+		// 			Handler:     c.clearAliases,
+		// 		},
+		// 	},
+		// },
 		c.createConfigActionCommand(configCommandData{
 			Name:         "notifications",
 			ReadableName: "Notifications",
@@ -225,6 +224,10 @@ func (c *ConfigCommands) Register() {
 			SetFunc:      func(cfg *config.Config, value any) { cfg.Notifications.Enabled = value.(bool) },
 			ToggleDesc:   "Toggle notifications",
 			ToggleFunc:   func(cfg *config.Config) { cfg.Notifications.Enabled = !cfg.Notifications.Enabled },
+			ExampleDesc:  "Show an example of a notification",
+			ExampleFunc: func() {
+				c.services.UI.ShowNotification("This is an example notification.")
+			},
 		}),
 		c.createConfigActionCommand(configCommandData{
 			Name:         "nitrosniper",
@@ -251,99 +254,111 @@ func (c *ConfigCommands) Register() {
 		c.createConfigActionCommand(configCommandData{
 			Name:         "giveawaysnipersleep",
 			ReadableName: "Giveaway Sniper Sleep",
-			ValueType:    configCommandValueTypeInt,
+			ValueType:    configCommandValueTypeDuration,
 			GetDesc:      "Get giveaway sniper sleep duration",
 			GetFunc:      func(cfg *config.Config) any { return cfg.Snipers.GiveawaySniper.Sleep },
 			SetDesc:      "Set giveaway sniper sleep duration",
 			SetFunc:      func(cfg *config.Config, value any) { cfg.Snipers.GiveawaySniper.Sleep = value.(int) },
 		}),
-		{
-			Name:        "customgiveawaybots",
-			Description: "Custom giveaway bots commands",
-			Flags:       []router.CommandFlag{router.CmdFlagDangerous},
-			SubCommands: []*router.Command{
-				{
-					Name:        "add",
-					Description: "Add a custom giveaway bot",
-					Arguments:   "<bot id>",
-					Handler:     c.addCustomGiveawayBot,
-				},
-				{
-					Name:        "rm",
-					Description: "Remove a custom giveaway bot",
-					Arguments:   "<bot id>",
-					Handler:     c.removeCustomGiveawayBot,
-				},
-				{
-					Name:        "list",
-					Description: "List custom giveaway bots",
-					Handler:     c.listCustomGiveawayBots,
-				},
-				{
-					Name:        "clear",
-					Description: "Clear all custom giveaway bots",
-					Handler:     c.clearCustomGiveawayBots,
-				},
-			},
-		},
-		{
-			Name:        "sniperblacklist",
-			Description: "Sniper blacklist commands",
-			Flags:       []router.CommandFlag{router.CmdFlagDangerous},
-			SubCommands: []*router.Command{
-				{
-					Name:        "add",
-					Description: "Add a user to sniper blacklist",
-					Arguments:   "<user>",
-					Handler:     c.addSniperBlacklist,
-				},
-				{
-					Name:        "rm",
-					Description: "Remove a user from sniper blacklist",
-					Arguments:   "<user>",
-					Handler:     c.removeSniperBlacklist,
-				},
-				{
-					Name:        "list",
-					Description: "List sniper blacklist",
-					Handler:     c.listSniperBlacklist,
-				},
-				{
-					Name:        "clear",
-					Description: "Clear sniper blacklist",
-					Handler:     c.clearSniperBlacklist,
-				},
-			},
-		},
-		{
-			Name:        "sniperserverblacklist",
-			Description: "Sniper server blacklist commands",
-			Flags:       []router.CommandFlag{router.CmdFlagDangerous},
-			SubCommands: []*router.Command{
-				{
-					Name:        "add",
-					Description: "Add a server to sniper blacklist",
-					Arguments:   "<server>",
-					Handler:     c.addSniperServerBlacklist,
-				},
-				{
-					Name:        "rm",
-					Description: "Remove a server from sniper blacklist",
-					Arguments:   "<server>",
-					Handler:     c.removeSniperServerBlacklist,
-				},
-				{
-					Name:        "list",
-					Description: "List sniper server blacklist",
-					Handler:     c.listSniperServerBlacklist,
-				},
-				{
-					Name:        "clear",
-					Description: "Clear sniper server blacklist",
-					Handler:     c.clearSniperServerBlacklist,
-				},
-			},
-		},
+		// {
+		// 	Name:        "customgiveawaybots",
+		// 	Description: "Custom giveaway bots commands",
+		// 	Flags:       []router.CommandFlag{router.CmdFlagDangerous},
+		// 	SubCommands: []*router.Command{
+		// 		{
+		// 			Name:        "add",
+		// 			Description: "Add a custom giveaway bot",
+		// 			Arguments:   "<bot id>",
+		// 			Handler:     c.addCustomGiveawayBot,
+		// 		},
+		// 		{
+		// 			Name:        "rm",
+		// 			Description: "Remove a custom giveaway bot",
+		// 			Arguments:   "<bot id>",
+		// 			Handler:     c.removeCustomGiveawayBot,
+		// 		},
+		// 		{
+		// 			Name:        "list",
+		// 			Description: "List custom giveaway bots",
+		// 			Handler:     c.listCustomGiveawayBots,
+		// 		},
+		// 		{
+		// 			Name:        "clear",
+		// 			Description: "Clear all custom giveaway bots",
+		// 			Handler:     c.clearCustomGiveawayBots,
+		// 		},
+		// 	},
+		// },
+		// {
+		// 	Name:        "sniperblacklist",
+		// 	Description: "Sniper blacklist commands",
+		// 	Flags:       []router.CommandFlag{router.CmdFlagDangerous},
+		// 	SubCommands: []*router.Command{
+		// 		{
+		// 			Name:        "add",
+		// 			Description: "Add a user to sniper blacklist",
+		// 			Arguments:   "<user>",
+		// 			Handler:     c.addSniperBlacklist,
+		// 		},
+		// 		{
+		// 			Name:        "rm",
+		// 			Description: "Remove a user from sniper blacklist",
+		// 			Arguments:   "<user>",
+		// 			Handler:     c.removeSniperBlacklist,
+		// 		},
+		// 		{
+		// 			Name:        "list",
+		// 			Description: "List sniper blacklist",
+		// 			Handler:     c.listSniperBlacklist,
+		// 		},
+		// 		{
+		// 			Name:        "clear",
+		// 			Description: "Clear sniper blacklist",
+		// 			Handler:     c.clearSniperBlacklist,
+		// 		},
+		// 	},
+		// },
+		// {
+		// 	Name:        "sniperserverblacklist",
+		// 	Description: "Sniper server blacklist commands",
+		// 	Flags:       []router.CommandFlag{router.CmdFlagDangerous},
+		// 	SubCommands: []*router.Command{
+		// 		{
+		// 			Name:        "add",
+		// 			Description: "Add a server to sniper blacklist",
+		// 			Arguments:   "<server>",
+		// 			Handler:     c.addSniperServerBlacklist,
+		// 		},
+		// 		{
+		// 			Name:        "rm",
+		// 			Description: "Remove a server from sniper blacklist",
+		// 			Arguments:   "<server>",
+		// 			Handler:     c.removeSniperServerBlacklist,
+		// 		},
+		// 		{
+		// 			Name:        "list",
+		// 			Description: "List sniper server blacklist",
+		// 			Handler:     c.listSniperServerBlacklist,
+		// 		},
+		// 		{
+		// 			Name:        "clear",
+		// 			Description: "Clear sniper server blacklist",
+		// 			Handler:     c.clearSniperServerBlacklist,
+		// 		},
+		// 	},
+		// },
+		c.createConfigActionCommand(configCommandData{
+			Name:         "multitokensniper",
+			ReadableName: "Multi-Token Sniper",
+			ValueType:    configCommandValueTypeBool,
+			GetDesc:      "Get multi-token sniper status",
+			GetFunc:      func(cfg *config.Config) any { return cfg.Snipers.MultiTokenSniper },
+			SetDesc:      "Set multi-token sniper status",
+			SetFunc:      func(cfg *config.Config, value any) { cfg.Snipers.MultiTokenSniper = value.(bool) },
+			ToggleDesc:   "Toggle multi-token sniper",
+			ToggleFunc:   func(cfg *config.Config) { cfg.Snipers.MultiTokenSniper = !cfg.Snipers.MultiTokenSniper },
+		}),
+		// snipertokens
 		c.createConfigActionCommand(configCommandData{
 			Name:         "privnotesniper",
 			ReadableName: "Private Note Sniper",
@@ -355,6 +370,365 @@ func (c *ConfigCommands) Register() {
 			ToggleDesc:   "Toggle private note sniper",
 			ToggleFunc:   func(cfg *config.Config) { cfg.Snipers.PrivnoteSniper = !cfg.Snipers.PrivnoteSniper },
 		}),
+		c.createConfigActionCommand(configCommandData{
+			Name:         "poketwosniper",
+			ReadableName: "Poketwo Sniper",
+			ValueType:    configCommandValueTypeBool,
+			GetDesc:      "Get poketwo sniper status",
+			GetFunc:      func(cfg *config.Config) any { return cfg.Snipers.PokeTwoSniper.Enabled },
+			SetDesc:      "Set poketwo sniper status",
+			SetFunc:      func(cfg *config.Config, value any) { cfg.Snipers.PokeTwoSniper.Enabled = value.(bool) },
+			ToggleDesc:   "Toggle poketwo sniper",
+			ToggleFunc:   func(cfg *config.Config) { cfg.Snipers.PokeTwoSniper.Enabled = !cfg.Snipers.PokeTwoSniper.Enabled },
+		}),
+		c.createConfigActionCommand(configCommandData{
+			Name:         "poketwosleep",
+			ReadableName: "Poketwo Sniper Sleep",
+			ValueType:    configCommandValueTypeDuration,
+			GetDesc:      "Get poketwo sniper sleep duration",
+			GetFunc:      func(cfg *config.Config) any { return cfg.Snipers.PokeTwoSniper.Sleep },
+			SetDesc:      "Set poketwo sniper sleep duration",
+			SetFunc:      func(cfg *config.Config, value any) { cfg.Snipers.PokeTwoSniper.Sleep = value.(int) },
+		}),
+		c.createConfigActionCommand(configCommandData{
+			Name:         "poketworandomsleep",
+			ReadableName: "Poketwo Sniper Random Sleep",
+			ValueType:    configCommandValueTypeBool,
+			GetDesc:      "Get poketwo sniper random sleep status",
+			GetFunc:      func(cfg *config.Config) any { return cfg.Snipers.PokeTwoSniper.RandomSleep },
+			SetDesc:      "Set poketwo sniper random sleep status",
+			SetFunc:      func(cfg *config.Config, value any) { cfg.Snipers.PokeTwoSniper.RandomSleep = value.(bool) },
+			ToggleDesc:   "Toggle poketwo sniper random sleep",
+			ToggleFunc: func(cfg *config.Config) {
+				cfg.Snipers.PokeTwoSniper.RandomSleep = !cfg.Snipers.PokeTwoSniper.RandomSleep
+			},
+		}),
+		c.createConfigActionCommand(configCommandData{
+			Name:         "poketwotimeout",
+			ReadableName: "Poketwo Sniper Timeout",
+			ValueType:    configCommandValueTypeDuration,
+			GetDesc:      "Get poketwo sniper timeout duration",
+			GetFunc:      func(cfg *config.Config) any { return cfg.Snipers.PokeTwoSniper.Timeout },
+			SetDesc:      "Set poketwo sniper timeout duration",
+			SetFunc:      func(cfg *config.Config, value any) { cfg.Snipers.PokeTwoSniper.Timeout = value.(int) },
+		}),
+		c.createConfigActionCommand(configCommandData{
+			Name:         "poketwotyping",
+			ReadableName: "Poketwo Sniper Typing",
+			ValueType:    configCommandValueTypeBool,
+			GetDesc:      "Get poketwo sniper typing status",
+			GetFunc:      func(cfg *config.Config) any { return cfg.Snipers.PokeTwoSniper.Typing },
+			SetDesc:      "Set poketwo sniper typing status",
+			SetFunc:      func(cfg *config.Config, value any) { cfg.Snipers.PokeTwoSniper.Typing = value.(bool) },
+			ToggleDesc:   "Toggle poketwo sniper typing",
+			ToggleFunc:   func(cfg *config.Config) { cfg.Snipers.PokeTwoSniper.Typing = !cfg.Snipers.PokeTwoSniper.Typing },
+		}),
+		c.createConfigActionCommand(configCommandData{
+			Name:         "poketwocatchrate",
+			ReadableName: "Poketwo Sniper Catch Rate",
+			ValueType:    configCommandValueTypePercentage,
+			GetDesc:      "Get poketwo sniper catch rate",
+			GetFunc:      func(cfg *config.Config) any { return cfg.Snipers.PokeTwoSniper.CatchRate },
+			SetDesc:      "Set poketwo sniper catch rate",
+			SetFunc:      func(cfg *config.Config, value any) { cfg.Snipers.PokeTwoSniper.CatchRate = value.(int) },
+		}),
+		c.createConfigActionCommand(configCommandData{
+			Name:         "poketwofakeactivity",
+			ReadableName: "Poketwo Sniper Fake Activity",
+			ValueType:    configCommandValueTypeBool,
+			GetDesc:      "Get poketwo sniper fake activity status",
+			GetFunc:      func(cfg *config.Config) any { return cfg.Snipers.PokeTwoSniper.FakeActivity },
+			SetDesc:      "Set poketwo sniper fake activity status",
+			SetFunc:      func(cfg *config.Config, value any) { cfg.Snipers.PokeTwoSniper.FakeActivity = value.(bool) },
+			ToggleDesc:   "Toggle poketwo sniper fake activity",
+			ToggleFunc: func(cfg *config.Config) {
+				cfg.Snipers.PokeTwoSniper.FakeActivity = !cfg.Snipers.PokeTwoSniper.FakeActivity
+			},
+		}),
+		// poketwochannels
+		c.createConfigActionCommand(configCommandData{
+			Name:         "poketwolanguage",
+			ReadableName: "Poketwo Sniper Language",
+			ValueType:    configCommandValueTypeString,
+			GetDesc:      "Get poketwo sniper language",
+			GetFunc:      func(cfg *config.Config) any { return cfg.Snipers.PokeTwoSniper.CatchLanguage },
+			SetDesc:      "Set poketwo sniper language",
+			SetFunc:      func(cfg *config.Config, value any) { cfg.Snipers.PokeTwoSniper.CatchLanguage = value.(string) },
+			ValuesDesc:   "List available languages",
+			ValuesFunc:   func() []any { return []any{"en", "ja", "ja_t", "fr", "de"} },
+		}),
+		// setupwebhooks
+		// wall
+		c.createConfigActionCommand(configCommandData{
+			Name:         "wnitro",
+			ReadableName: "Nitro Sniper Webhook",
+			ValueType:    configCommandValueTypeString,
+			GetDesc:      "Get nitro sniper webhook",
+			GetFunc:      func(cfg *config.Config) any { return cfg.Webhooks.NitroSniper },
+			SetDesc:      "Set nitro sniper webhook",
+			SetFunc:      func(cfg *config.Config, value any) { cfg.Webhooks.NitroSniper = value.(string) },
+		}),
+		c.createConfigActionCommand(configCommandData{
+			Name:         "wgiveawaysniper",
+			ReadableName: "Giveaway Sniper Webhook",
+			ValueType:    configCommandValueTypeString,
+			GetDesc:      "Get giveaway sniper webhook",
+			GetFunc:      func(cfg *config.Config) any { return cfg.Webhooks.GiveawaySniper },
+			SetDesc:      "Set giveaway sniper webhook",
+			SetFunc:      func(cfg *config.Config, value any) { cfg.Webhooks.GiveawaySniper = value.(string) },
+		}),
+		c.createConfigActionCommand(configCommandData{
+			Name:         "wselfbotdetection",
+			ReadableName: "Selfbot Detection Webhook",
+			ValueType:    configCommandValueTypeString,
+			GetDesc:      "Get selfbot detection webhook",
+			GetFunc:      func(cfg *config.Config) any { return cfg.Webhooks.SelfbotDetection },
+			SetDesc:      "Set selfbot detection webhook",
+			SetFunc:      func(cfg *config.Config, value any) { cfg.Webhooks.SelfbotDetection = value.(string) },
+		}),
+		c.createConfigActionCommand(configCommandData{
+			Name:         "wstaffdetection",
+			ReadableName: "Staff Detection Webhook",
+			ValueType:    configCommandValueTypeString,
+			GetDesc:      "Get staff detection webhook",
+			GetFunc:      func(cfg *config.Config) any { return cfg.Webhooks.StaffDetection },
+			SetDesc:      "Set staff detection webhook",
+			SetFunc:      func(cfg *config.Config, value any) { cfg.Webhooks.StaffDetection = value.(string) },
+		}),
+		c.createConfigActionCommand(configCommandData{
+			Name:         "wnotifiers",
+			ReadableName: "Notifiers Webhook",
+			ValueType:    configCommandValueTypeString,
+			GetDesc:      "Get notifiers webhook",
+			GetFunc:      func(cfg *config.Config) any { return cfg.Webhooks.Notifiers },
+			SetDesc:      "Set notifiers webhook",
+			SetFunc:      func(cfg *config.Config, value any) { cfg.Webhooks.Notifiers = value.(string) },
+		}),
+		c.createConfigActionCommand(configCommandData{
+			Name:         "wpingdetection",
+			ReadableName: "Ping Detection Webhook",
+			ValueType:    configCommandValueTypeString,
+			GetDesc:      "Get ping detection webhook",
+			GetFunc:      func(cfg *config.Config) any { return cfg.Webhooks.PingDetection },
+			SetDesc:      "Set ping detection webhook",
+			SetFunc:      func(cfg *config.Config, value any) { cfg.Webhooks.PingDetection = value.(string) },
+		}),
+		c.createConfigActionCommand(configCommandData{
+			Name:         "wmisc",
+			ReadableName: "Misc Webhook",
+			ValueType:    configCommandValueTypeString,
+			GetDesc:      "Get misc webhook",
+			GetFunc:      func(cfg *config.Config) any { return cfg.Webhooks.Misc },
+			SetDesc:      "Set misc webhook",
+			SetFunc:      func(cfg *config.Config, value any) { cfg.Webhooks.Misc = value.(string) },
+		}),
+		c.createConfigActionCommand(configCommandData{
+			Name:         "wsessions",
+			ReadableName: "Sessions Webhook",
+			ValueType:    configCommandValueTypeString,
+			GetDesc:      "Get sessions webhook",
+			GetFunc:      func(cfg *config.Config) any { return cfg.Webhooks.Sessions },
+			SetDesc:      "Set sessions webhook",
+			SetFunc:      func(cfg *config.Config, value any) { cfg.Webhooks.Sessions = value.(string) },
+		}),
+		c.createConfigActionCommand(configCommandData{
+			Name:         "wpingself",
+			ReadableName: "Ping Self Webhook",
+			ValueType:    configCommandValueTypeString,
+			GetDesc:      "Get ping self webhook status",
+			GetFunc:      func(cfg *config.Config) any { return cfg.Webhooks.PingSelfMode },
+			SetDesc:      "Set ping self webhook status",
+			SetFunc:      func(cfg *config.Config, value any) { cfg.Webhooks.PingSelfMode = value.(string) },
+			ValuesDesc:   "List available ping self webhook modes",
+			ValuesFunc:   func() []any { return []any{"Disabled, Always, Important"} },
+		}),
+		c.createConfigActionCommand(configCommandData{
+			Name:         "wpingeveryone",
+			ReadableName: "Ping Everyone Webhook",
+			ValueType:    configCommandValueTypeString,
+			GetDesc:      "Get ping everyone webhook status",
+			GetFunc:      func(cfg *config.Config) any { return cfg.Webhooks.PingEveryoneMode },
+			SetDesc:      "Set ping everyone webhook status",
+			SetFunc:      func(cfg *config.Config, value any) { cfg.Webhooks.PingEveryoneMode = value.(string) },
+			ValuesDesc:   "List available ping everyone webhook modes",
+			ValuesFunc:   func() []any { return []any{"Disabled, Always, Important"} },
+		}),
+		c.createConfigActionCommand(configCommandData{
+			Name:         "bannotifier",
+			ReadableName: "Ban Notifier",
+			ValueType:    configCommandValueTypeBool,
+			GetDesc:      "Get ban notifier status",
+			GetFunc:      func(cfg *config.Config) any { return cfg.Events.BanNotifier },
+			SetDesc:      "Set ban notifier status",
+			SetFunc:      func(cfg *config.Config, value any) { cfg.Events.BanNotifier = value.(bool) },
+			ToggleDesc:   "Toggle ban notifier",
+			ToggleFunc:   func(cfg *config.Config) { cfg.Events.BanNotifier = !cfg.Events.BanNotifier },
+		}),
+		c.createConfigActionCommand(configCommandData{
+			Name:         "staffdetection",
+			ReadableName: "Staff Detection",
+			ValueType:    configCommandValueTypeBool,
+			GetDesc:      "Get staff detection status",
+			GetFunc:      func(cfg *config.Config) any { return cfg.Events.DiscordStaffDetection },
+			SetDesc:      "Set staff detection status",
+			SetFunc:      func(cfg *config.Config, value any) { cfg.Events.DiscordStaffDetection = value.(bool) },
+			ToggleDesc:   "Toggle staff detection",
+			ToggleFunc:   func(cfg *config.Config) { cfg.Events.DiscordStaffDetection = !cfg.Events.DiscordStaffDetection },
+		}),
+		c.createConfigActionCommand(configCommandData{
+			Name:         "pingdetection",
+			ReadableName: "Ping Detection",
+			ValueType:    configCommandValueTypeBool,
+			GetDesc:      "Get ping detection status",
+			GetFunc:      func(cfg *config.Config) any { return cfg.Events.GhostPingDetection },
+			SetDesc:      "Set ping detection status",
+			SetFunc:      func(cfg *config.Config, value any) { cfg.Events.GhostPingDetection = value.(bool) },
+			ToggleDesc:   "Toggle ping detection",
+			ToggleFunc:   func(cfg *config.Config) { cfg.Events.GhostPingDetection = !cfg.Events.GhostPingDetection },
+		}),
+		c.createConfigActionCommand(configCommandData{
+			Name:         "ticketnotifier",
+			ReadableName: "Ticket Notifier",
+			ValueType:    configCommandValueTypeBool,
+			GetDesc:      "Get ticket notifier status",
+			GetFunc:      func(cfg *config.Config) any { return cfg.Events.TicketNotifier },
+			SetDesc:      "Set ticket notifier status",
+			SetFunc:      func(cfg *config.Config, value any) { cfg.Events.TicketNotifier = value.(bool) },
+			ToggleDesc:   "Toggle ticket notifier",
+			ToggleFunc:   func(cfg *config.Config) { cfg.Events.TicketNotifier = !cfg.Events.TicketNotifier },
+		}),
+		c.createConfigActionCommand(configCommandData{
+			Name:         "sessionconnected",
+			ReadableName: "Session Connected",
+			ValueType:    configCommandValueTypeBool,
+			GetDesc:      "Get session connected status",
+			GetFunc:      func(cfg *config.Config) any { return cfg.Events.SessionConnected },
+			SetDesc:      "Set session connected status",
+			SetFunc:      func(cfg *config.Config, value any) { cfg.Events.SessionConnected = value.(bool) },
+			ToggleDesc:   "Toggle session connected",
+			ToggleFunc:   func(cfg *config.Config) { cfg.Events.SessionConnected = !cfg.Events.SessionConnected },
+		}),
+		c.createConfigActionCommand(configCommandData{
+			Name:         "sessiondisconnected",
+			ReadableName: "Session Disconnected",
+			ValueType:    configCommandValueTypeBool,
+			GetDesc:      "Get session disconnected status",
+			GetFunc:      func(cfg *config.Config) any { return cfg.Events.SessionDisconnected },
+			SetDesc:      "Set session disconnected status",
+			SetFunc:      func(cfg *config.Config, value any) { cfg.Events.SessionDisconnected = value.(bool) },
+			ToggleDesc:   "Toggle session disconnected",
+			ToggleFunc:   func(cfg *config.Config) { cfg.Events.SessionDisconnected = !cfg.Events.SessionDisconnected },
+		}),
+		c.createConfigActionCommand(configCommandData{
+			Name:         "selfbotdetection",
+			ReadableName: "Selfbot Detection",
+			ValueType:    configCommandValueTypeBool,
+			GetDesc:      "Get selfbot detection status",
+			GetFunc:      func(cfg *config.Config) any { return cfg.Events.SelfbotDetection },
+			SetDesc:      "Set selfbot detection status",
+			SetFunc:      func(cfg *config.Config, value any) { cfg.Events.SelfbotDetection = value.(bool) },
+			ToggleDesc:   "Toggle selfbot detection",
+			ToggleFunc:   func(cfg *config.Config) { cfg.Events.SelfbotDetection = !cfg.Events.SelfbotDetection },
+		}),
+		c.createConfigActionCommand(configCommandData{
+			Name:         "dmtypingnotifier",
+			ReadableName: "DM Typing Notifier",
+			ValueType:    configCommandValueTypeBool,
+			GetDesc:      "Get DM typing notifier status",
+			GetFunc:      func(cfg *config.Config) any { return cfg.Events.DMTypingNotifier },
+			SetDesc:      "Set DM typing notifier status",
+			SetFunc:      func(cfg *config.Config, value any) { cfg.Events.DMTypingNotifier = value.(bool) },
+			ToggleDesc:   "Toggle DM typing notifier",
+			ToggleFunc:   func(cfg *config.Config) { cfg.Events.DMTypingNotifier = !cfg.Events.DMTypingNotifier },
+		}),
+		c.createConfigActionCommand(configCommandData{
+			Name:         "dmnotifier",
+			ReadableName: "DM Notifier",
+			ValueType:    configCommandValueTypeBool,
+			GetDesc:      "Get DM notifier status",
+			GetFunc:      func(cfg *config.Config) any { return cfg.Events.DMNotifier },
+			SetDesc:      "Set DM notifier status",
+			SetFunc:      func(cfg *config.Config, value any) { cfg.Events.DMNotifier = value.(bool) },
+			ToggleDesc:   "Toggle DM notifier",
+			ToggleFunc:   func(cfg *config.Config) { cfg.Events.DMNotifier = !cfg.Events.DMNotifier },
+		}),
+		c.createConfigActionCommand(configCommandData{
+			Name:         "dmeditnotifier",
+			ReadableName: "DM Edit Notifier",
+			ValueType:    configCommandValueTypeBool,
+			GetDesc:      "Get DM edit notifier status",
+			GetFunc:      func(cfg *config.Config) any { return cfg.Events.DMEditNotifier },
+			SetDesc:      "Set DM edit notifier status",
+			SetFunc:      func(cfg *config.Config, value any) { cfg.Events.DMEditNotifier = value.(bool) },
+			ToggleDesc:   "Toggle DM edit notifier",
+			ToggleFunc:   func(cfg *config.Config) { cfg.Events.DMEditNotifier = !cfg.Events.DMEditNotifier },
+		}),
+		c.createConfigActionCommand(configCommandData{
+			Name:         "dmdeletenotifier",
+			ReadableName: "DM Delete Notifier",
+			ValueType:    configCommandValueTypeBool,
+			GetDesc:      "Get DM delete notifier status",
+			GetFunc:      func(cfg *config.Config) any { return cfg.Events.DMDeleteNotifier },
+			SetDesc:      "Set DM delete notifier status",
+			SetFunc:      func(cfg *config.Config, value any) { cfg.Events.DMDeleteNotifier = value.(bool) },
+			ToggleDesc:   "Toggle DM delete notifier",
+			ToggleFunc:   func(cfg *config.Config) { cfg.Events.DMDeleteNotifier = !cfg.Events.DMDeleteNotifier },
+		}),
+		c.createConfigActionCommand(configCommandData{
+			Name:         "messagedeletenotifier",
+			ReadableName: "Message Delete Notifier",
+			ValueType:    configCommandValueTypeBool,
+			GetDesc:      "Get message delete notifier status",
+			GetFunc:      func(cfg *config.Config) any { return cfg.Events.MessageDeleteNotifier },
+			SetDesc:      "Set message delete notifier status",
+			SetFunc:      func(cfg *config.Config, value any) { cfg.Events.MessageDeleteNotifier = value.(bool) },
+			ToggleDesc:   "Toggle message delete notifier",
+			ToggleFunc:   func(cfg *config.Config) { cfg.Events.MessageDeleteNotifier = !cfg.Events.MessageDeleteNotifier },
+		}),
+		c.createConfigActionCommand(configCommandData{
+			Name:         "uitheme",
+			ReadableName: "UI Theme",
+			ValueType:    configCommandValueTypeString,
+			GetDesc:      "Get UI theme",
+			GetFunc:      func(cfg *config.Config) any { return cfg.UI.Theme },
+			SetDesc:      "Set UI theme",
+			SetFunc:      func(cfg *config.Config, value any) { cfg.UI.Theme = value.(string) },
+			ValuesDesc:   "List available UI themes",
+			ValuesFunc:   func() []any { return []any{"Dark", "Light"} },
+		}),
+		c.createConfigActionCommand(configCommandData{
+			Name:         "hidetosystray",
+			ReadableName: "Hide to System Tray",
+			ValueType:    configCommandValueTypeBool,
+			GetDesc:      "Get hide to system tray status",
+			GetFunc:      func(cfg *config.Config) any { return cfg.UI.HideToSystemTray },
+			SetDesc:      "Set hide to system tray status",
+			SetFunc:      func(cfg *config.Config, value any) { cfg.UI.HideToSystemTray = value.(bool) },
+			ToggleDesc:   "Toggle hide to system tray",
+			ToggleFunc:   func(cfg *config.Config) { cfg.UI.HideToSystemTray = !cfg.UI.HideToSystemTray },
+		}),
+		c.createConfigActionCommand(configCommandData{
+			Name:         "runuionstartup",
+			ReadableName: "Run UI on Startup",
+			ValueType:    configCommandValueTypeBool,
+			GetDesc:      "Get run UI on startup status",
+			GetFunc:      func(cfg *config.Config) any { return cfg.UI.RunOnStartup },
+			SetDesc:      "Set run UI on startup status",
+			SetFunc:      func(cfg *config.Config, value any) { cfg.UI.RunOnStartup = value.(bool) },
+			ToggleDesc:   "Toggle run UI on startup",
+			ToggleFunc:   func(cfg *config.Config) { cfg.UI.RunOnStartup = !cfg.UI.RunOnStartup },
+		}),
+		c.createConfigActionCommand(configCommandData{
+			Name:         "runbotonstartup",
+			ReadableName: "Run Bot on Startup",
+			ValueType:    configCommandValueTypeBool,
+			GetDesc:      "Get run bot on startup status",
+			GetFunc:      func(cfg *config.Config) any { return cfg.UI.RunOnStartup },
+			SetDesc:      "Set run bot on startup status",
+			SetFunc:      func(cfg *config.Config, value any) { cfg.UI.RunOnStartup = value.(bool) },
+			ToggleDesc:   "Toggle run bot on startup",
+			ToggleFunc:   func(cfg *config.Config) { cfg.UI.RunOnStartup = !cfg.UI.RunOnStartup },
+		}),
 	})
 }
 
@@ -363,6 +737,7 @@ type configCommandValueType int
 const (
 	configCommandValueTypeString configCommandValueType = iota
 	configCommandValueTypeInt
+	configCommandValueTypePercentage
 	configCommandValueTypeBool
 	configCommandValueTypeDuration
 )
@@ -383,6 +758,9 @@ type configCommandData struct {
 
 	ValuesDesc string
 	ValuesFunc func() []any
+
+	ExampleDesc string
+	ExampleFunc func()
 }
 
 // type configCommandDataList struct {
@@ -432,16 +810,26 @@ func (c *ConfigCommands) createConfigActionCommand(data configCommandData) *rout
 			Arguments:   "[value]",
 			Handler: func(ctx *router.Ctx) {
 				var value any
+				var err error
 
 				switch data.ValueType {
 				case configCommandValueTypeString:
 					value = ctx.Arguments.Raw()
 				case configCommandValueTypeInt:
-					value, _ = ctx.Arguments.Get(0).Int()
+					value, err = ctx.Arguments.Get(0).Int()
+				case configCommandValueTypePercentage:
+					value, err = ctx.Arguments.Get(0).Int()
+					value = utils2.Clamp(value.(int), 0, 100)
 				case configCommandValueTypeBool:
-					value, _ = ctx.Arguments.Get(0).Bool()
+					value, err = ctx.Arguments.Get(0).Bool()
 				case configCommandValueTypeDuration:
-					value, _ = ctx.Arguments.Get(0).Duration()
+					value, err = ctx.Arguments.Get(0).Duration()
+					value = int(value.(time.Duration).Seconds())
+				}
+
+				if err != nil {
+					ctx.RespondText("Error parsing value")
+					return
 				}
 
 				cfg, err := config.GetConfig()
@@ -511,384 +899,4 @@ func (c *ConfigCommands) createConfigActionCommand(data configCommandData) *rout
 		Flags:       []router.CommandFlag{router.CmdFlagDangerous},
 		SubCommands: subCommands,
 	}
-}
-
-func (c *ConfigCommands) getAlias(ctx *router.Ctx) {
-	cfg, err := config.GetConfig()
-	if err != nil {
-		ctx.RespondText("Error getting config")
-		return
-	}
-
-	alias := ctx.Arguments.Raw()
-	if command, ok := cfg.Selfbot.CommandAliases[alias]; ok {
-		c.services.Embed.NewEmbed().
-			AddField("Alias", fmt.Sprintf("%s -> %s", alias, command)).
-			Send(ctx)
-	} else {
-		ctx.RespondText("Alias not found")
-	}
-}
-
-func (c *ConfigCommands) setAlias(ctx *router.Ctx) {
-	cfg, err := config.GetConfig()
-	if err != nil {
-		ctx.RespondText("Error getting config")
-		return
-	}
-
-	alias := ctx.Arguments.Get(0).Raw()
-	command := ctx.Arguments.RawFrom(1)
-
-	if cfg.Selfbot.CommandAliases == nil {
-		cfg.Selfbot.CommandAliases = make(map[string]string)
-	}
-
-	cfg.Selfbot.CommandAliases[alias] = command
-	_ = cfg.Save()
-
-	c.services.Embed.NewEmbed().
-		SetDescription("Set alias `%s` -> `%s`", alias, command).
-		Send(ctx)
-}
-
-func (c *ConfigCommands) removeAlias(ctx *router.Ctx) {
-	cfg, err := config.GetConfig()
-	if err != nil {
-		ctx.RespondText("Error getting config")
-		return
-	}
-
-	alias := ctx.Arguments.Raw()
-
-	if _, ok := cfg.Selfbot.CommandAliases[alias]; !ok {
-		ctx.RespondText("Alias not found")
-		return
-	}
-
-	delete(cfg.Selfbot.CommandAliases, alias)
-	_ = cfg.Save()
-
-	c.services.Embed.NewEmbed().
-		SetDescription("Removed alias `%s`", alias).
-		Send(ctx)
-}
-
-func (c *ConfigCommands) listAliases(ctx *router.Ctx) {
-	cfg, err := config.GetConfig()
-	if err != nil {
-		ctx.RespondText("Error getting config")
-		return
-	}
-
-	if len(cfg.Selfbot.CommandAliases) == 0 {
-		ctx.RespondText("No aliases set")
-		return
-	}
-
-	var aliases []string
-	for k, v := range cfg.Selfbot.CommandAliases {
-		aliases = append(aliases, fmt.Sprintf("%s -> %s", k, v))
-	}
-
-	c.services.Embed.NewEmbed().
-		AddField("Aliases", strings.Join(aliases, "\n")).
-		Send(ctx)
-}
-
-func (c *ConfigCommands) clearAliases(ctx *router.Ctx) {
-	cfg, err := config.GetConfig()
-	if err != nil {
-		ctx.RespondText("Error getting config")
-		return
-	}
-
-	cfg.Selfbot.CommandAliases = make(map[string]string)
-	_ = cfg.Save()
-
-	c.services.Embed.NewEmbed().
-		SetDescription("Cleared all aliases").
-		Send(ctx)
-}
-
-func (c *ConfigCommands) addCustomGiveawayBot(ctx *router.Ctx) {
-	cfg, err := config.GetConfig()
-	if err != nil {
-		ctx.RespondText("Error getting config")
-		return
-	}
-
-	botID := ctx.Arguments.Get(0).Raw()
-	if botID == "" {
-		ctx.RespondText("You must provide a bot ID!")
-		return
-	}
-
-	if cfg.Snipers.GiveawaySniper.CustomBots == nil {
-		cfg.Snipers.GiveawaySniper.CustomBots = []string{}
-	}
-
-	if slices.Contains(cfg.Snipers.GiveawaySniper.CustomBots, botID) {
-		ctx.RespondText("Bot already in list!")
-		return
-	}
-
-	cfg.Snipers.GiveawaySniper.CustomBots = append(cfg.Snipers.GiveawaySniper.CustomBots, botID)
-	_ = cfg.Save()
-
-	c.services.Embed.NewEmbed().
-		SetDescription("Added bot to custom giveaway bots").
-		Send(ctx)
-}
-
-func (c *ConfigCommands) removeCustomGiveawayBot(ctx *router.Ctx) {
-	cfg, err := config.GetConfig()
-	if err != nil {
-		ctx.RespondText("Error getting config")
-		return
-	}
-
-	botID := ctx.Arguments.Get(0).Raw()
-	if botID == "" {
-		ctx.RespondText("You must provide a bot ID!")
-		return
-	}
-
-	index := slices.Index(cfg.Snipers.GiveawaySniper.CustomBots, botID)
-	if index == -1 {
-		ctx.RespondText("Bot not in list!")
-		return
-	}
-
-	cfg.Snipers.GiveawaySniper.CustomBots = slices.Delete(cfg.Snipers.GiveawaySniper.CustomBots, index, index+1)
-	_ = cfg.Save()
-
-	c.services.Embed.NewEmbed().
-		SetDescription("Removed bot from custom giveaway bots").
-		Send(ctx)
-}
-
-func (c *ConfigCommands) listCustomGiveawayBots(ctx *router.Ctx) {
-	cfg, err := config.GetConfig()
-	if err != nil {
-		ctx.RespondText("Error getting config")
-		return
-	}
-
-	if len(cfg.Snipers.GiveawaySniper.CustomBots) == 0 {
-		ctx.RespondText("No custom giveaway bots")
-		return
-	}
-
-	c.services.Embed.NewEmbed().
-		AddField("Custom Giveaway Bots", strings.Join(cfg.Snipers.GiveawaySniper.CustomBots, "\n")).
-		Send(ctx)
-}
-
-func (c *ConfigCommands) clearCustomGiveawayBots(ctx *router.Ctx) {
-	cfg, err := config.GetConfig()
-	if err != nil {
-		ctx.RespondText("Error getting config")
-		return
-	}
-
-	cfg.Snipers.GiveawaySniper.CustomBots = []string{}
-	_ = cfg.Save()
-
-	c.services.Embed.NewEmbed().
-		SetDescription("Cleared custom giveaway bots").
-		Send(ctx)
-}
-
-func (c *ConfigCommands) addSniperBlacklist(ctx *router.Ctx) {
-	cfg, err := config.GetConfig()
-	if err != nil {
-		ctx.RespondText("Error getting config")
-		return
-	}
-
-	user, err := ctx.Arguments.Get(0).User()
-	if err != nil {
-		ctx.RespondText("Could not find user")
-		return
-	}
-
-	if cfg.Snipers.Blacklist == nil {
-		cfg.Snipers.Blacklist = []string{}
-	}
-
-	if slices.Contains(cfg.Snipers.Blacklist, user.ID) {
-		ctx.RespondText("User already in blacklist!")
-		return
-	}
-
-	cfg.Snipers.Blacklist = append(cfg.Snipers.Blacklist, user.ID)
-	_ = cfg.Save()
-
-	c.services.Embed.NewEmbed().
-		SetDescription("Added user to sniper blacklist").
-		Send(ctx)
-}
-
-func (c *ConfigCommands) removeSniperBlacklist(ctx *router.Ctx) {
-	cfg, err := config.GetConfig()
-	if err != nil {
-		ctx.RespondText("Error getting config")
-		return
-	}
-
-	user, err := ctx.Arguments.Get(0).User()
-	if err != nil {
-		ctx.RespondText("Could not find user")
-		return
-	}
-
-	index := slices.Index(cfg.Snipers.Blacklist, user.ID)
-	if index == -1 {
-		ctx.RespondText("User not in blacklist!")
-		return
-	}
-
-	cfg.Snipers.Blacklist = slices.Delete(cfg.Snipers.Blacklist, index, index+1)
-	_ = cfg.Save()
-
-	c.services.Embed.NewEmbed().
-		SetDescription("Removed user from sniper blacklist").
-		Send(ctx)
-}
-
-func (c *ConfigCommands) listSniperBlacklist(ctx *router.Ctx) {
-	cfg, err := config.GetConfig()
-	if err != nil {
-		ctx.RespondText("Error getting config")
-		return
-	}
-
-	if len(cfg.Snipers.Blacklist) == 0 {
-		ctx.RespondText("No users in sniper blacklist")
-		return
-	}
-
-	var users []string
-	for _, id := range cfg.Snipers.Blacklist {
-		users = append(users, fmt.Sprintf("<@%s>", id))
-	}
-
-	c.services.Embed.NewEmbed().
-		AddField("Sniper Blacklist", strings.Join(users, "\n")).
-		Send(ctx)
-}
-
-func (c *ConfigCommands) clearSniperBlacklist(ctx *router.Ctx) {
-	cfg, err := config.GetConfig()
-	if err != nil {
-		ctx.RespondText("Error getting config")
-		return
-	}
-
-	cfg.Snipers.Blacklist = []string{}
-	_ = cfg.Save()
-
-	c.services.Embed.NewEmbed().
-		SetDescription("Cleared sniper blacklist").
-		Send(ctx)
-}
-
-func (c *ConfigCommands) addSniperServerBlacklist(ctx *router.Ctx) {
-	cfg, err := config.GetConfig()
-	if err != nil {
-		ctx.RespondText("Error getting config")
-		return
-	}
-
-	guild, err := ctx.Arguments.Get(0).Guild()
-	if err != nil {
-		ctx.RespondText("Could not find server")
-		return
-	}
-
-	if cfg.Snipers.ServerBlacklist == nil {
-		cfg.Snipers.ServerBlacklist = []string{}
-	}
-
-	if slices.Contains(cfg.Snipers.ServerBlacklist, guild.ID) {
-		ctx.RespondText("Server already in blacklist!")
-		return
-	}
-
-	cfg.Snipers.ServerBlacklist = append(cfg.Snipers.ServerBlacklist, guild.ID)
-	_ = cfg.Save()
-
-	c.services.Embed.NewEmbed().
-		SetDescription("Added server to sniper blacklist").
-		Send(ctx)
-}
-
-func (c *ConfigCommands) removeSniperServerBlacklist(ctx *router.Ctx) {
-	cfg, err := config.GetConfig()
-	if err != nil {
-		ctx.RespondText("Error getting config")
-		return
-	}
-
-	guild, err := ctx.Arguments.Get(0).Guild()
-	if err != nil {
-		ctx.RespondText("Could not find server")
-		return
-	}
-
-	index := slices.Index(cfg.Snipers.ServerBlacklist, guild.ID)
-	if index == -1 {
-		ctx.RespondText("Server not in blacklist!")
-		return
-	}
-
-	cfg.Snipers.ServerBlacklist = slices.Delete(cfg.Snipers.ServerBlacklist, index, index+1)
-	_ = cfg.Save()
-
-	c.services.Embed.NewEmbed().
-		SetDescription("Removed server from sniper blacklist").
-		Send(ctx)
-}
-
-func (c *ConfigCommands) listSniperServerBlacklist(ctx *router.Ctx) {
-	cfg, err := config.GetConfig()
-	if err != nil {
-		ctx.RespondText("Error getting config")
-		return
-	}
-
-	if len(cfg.Snipers.ServerBlacklist) == 0 {
-		ctx.RespondText("No servers in sniper blacklist")
-		return
-	}
-
-	var servers []string
-	for _, id := range cfg.Snipers.ServerBlacklist {
-		guild, err := ctx.Session.State.Guild(id)
-		if err != nil {
-			servers = append(servers, id)
-		} else {
-			servers = append(servers, guild.Name)
-		}
-	}
-
-	c.services.Embed.NewEmbed().
-		AddField("Sniper Server Blacklist", strings.Join(servers, "\n")).
-		Send(ctx)
-}
-
-func (c *ConfigCommands) clearSniperServerBlacklist(ctx *router.Ctx) {
-	cfg, err := config.GetConfig()
-	if err != nil {
-		ctx.RespondText("Error getting config")
-		return
-	}
-
-	cfg.Snipers.ServerBlacklist = []string{}
-	_ = cfg.Save()
-
-	c.services.Embed.NewEmbed().
-		SetDescription("Cleared sniper server blacklist").
-		Send(ctx)
 }
