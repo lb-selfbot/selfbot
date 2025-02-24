@@ -13,7 +13,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-go@v5
         with:
-          go-version-file: 'src/go.mod'
+          go-version-file: "src/go.mod"
           check-latest: true
           cache-dependency-path: src/go.sum
 
@@ -63,7 +63,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-go@v5
         with:
-          go-version-file: 'src/go.mod'
+          go-version-file: "src/go.mod"
           check-latest: true
           cache-dependency-path: src/go.sum
 
@@ -101,7 +101,7 @@ jobs:
 
           # Hosting build
           export GOARCH=amd64
-          go build ./cmd/hosting -tags timetzdata -trimpath -ldflags "-s -w" -gcflags=all="-l -B" -o ${{ github.workspace }}/executables/LB-Selfbot
+          go build -tags timetzdata -trimpath -ldflags "-s -w" -gcflags=all="-l -B" -o ${{ github.workspace }}/executables/LB-Selfbot ./cmd/hosting
 
       - name: Compress UPX
         uses: crazy-max/ghaction-upx@v3
@@ -136,7 +136,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-go@v5
         with:
-          go-version-file: 'src/go.mod'
+          go-version-file: "src/go.mod"
           check-latest: true
           cache-dependency-path: src/go.sum
 
