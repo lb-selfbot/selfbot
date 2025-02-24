@@ -22,14 +22,12 @@ jobs:
           sudo apt-get update
           sudo apt-get install gcc-multilib
 
+          go install mvdan.cc/garble@latest
+
       - name: Create directories
         run: |
           mkdir -p ${{ github.workspace }}/executables/windows/386
           mkdir -p ${{ github.workspace }}/executables/windows/amd64
-
-      - name: Install garble
-        run: |
-          go install mvdan.cc/garble@latest
 
       - name: Build for Windows
         env:
@@ -72,16 +70,14 @@ jobs:
           sudo apt-get update
           sudo apt-get install gcc-multilib
 
+          go install mvdan.cc/garble@latest
+
       - name: Create directories
         run: |
           mkdir -p ${{ github.workspace }}/executables/linux/386
           mkdir -p ${{ github.workspace }}/executables/linux/amd64
           mkdir -p ${{ github.workspace }}/executables/linux/arm
           mkdir -p ${{ github.workspace }}/executables/linux/arm64
-
-      - name: Install garble
-        run: |
-          go install mvdan.cc/garble@latest
 
       - name: Build for Linux
         env:
@@ -144,16 +140,14 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install gcc-multilib
+
           go install github.com/konoui/lipo@latest
+          go install mvdan.cc/garble@latest
 
       - name: Create directories
         run: |
           mkdir -p ${{ github.workspace }}/executables/macos/amd64
           mkdir -p ${{ github.workspace }}/executables/macos/arm64
-
-      - name: Install garble
-        run: |
-          go install mvdan.cc/garble@latest
 
       - name: Build for macOS
         env:

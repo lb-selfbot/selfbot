@@ -13,7 +13,7 @@ done
 echo "$stacktrace" > stack.txt
 
 # Run garble command
-garble -seed=U4Nxq2YSVm6ivvOejQbElA== reverse -tags desktop github.com/LightningDev1/LB-Selfbot stack.txt
+garble -seed=U4Nxq2YSVm6ivvOejQbElA== reverse ./cmd/desktop stack.txt
 
 # Cleanup stack.txt
 rm stack.txt
