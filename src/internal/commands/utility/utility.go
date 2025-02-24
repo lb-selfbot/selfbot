@@ -2034,7 +2034,7 @@ func (c *UtilityCommands) uploadfile(ctx *router.Ctx) {
 	}
 
 	c.services.Embed.NewEmbed().
-		SetDescription("Uploaded file: "+attachments[0].Filename).
+		SetDescription("Uploaded file: %s", attachments[0].Filename).
 		AddField("URL", result.URL).
 		AddField("Direct URL", result.DirectURL).
 		Send(ctx)
@@ -2079,7 +2079,7 @@ func (c *UtilityCommands) uploadlink(ctx *router.Ctx) {
 	}
 
 	c.services.Embed.NewEmbed().
-		SetDescription("Uploaded file: "+fileName).
+		SetDescription("Uploaded file: %s", fileName).
 		AddField("URL", result.URL).
 		AddField("Direct URL", result.DirectURL).
 		Send(ctx)
@@ -2140,7 +2140,7 @@ func (c *UtilityCommands) obfuscateFunc(lang, ext string) func(ctx *router.Ctx) 
 		if script == "" && len(attachments) > 0 {
 			httpResponse := http.Get(attachments[0].URL)
 			if httpResponse.Error != nil {
-				ctx.RespondText("Error getting script: " + httpResponse.Error.Error())
+				ctx.RespondText("Error getting script: %v", httpResponse.Error)
 				return
 			}
 
@@ -2177,7 +2177,7 @@ func (c *UtilityCommands) reviewdbtoken(ctx *router.Ctx) {
 	token, err := api.GetReviewDBToken(ctx.Session)
 	if err != nil {
 		c.services.Embed.NewEmbed().
-			SetDescription("Error getting token: " + err.Error()).
+			SetDescription("Error getting token: %v", err).
 			Send(ctx)
 		return
 	}
@@ -2199,7 +2199,7 @@ func (c *UtilityCommands) getreviews(ctx *router.Ctx) {
 	reviews, err := api.GetReviewDBReviews(user.ID)
 	if err != nil {
 		c.services.Embed.NewEmbed().
-			SetDescription("Error getting reviews: " + err.Error()).
+			SetDescription("Error getting reviews: %v", err).
 			Send(ctx)
 		return
 	}
@@ -2227,13 +2227,13 @@ func (c *UtilityCommands) addreview(ctx *router.Ctx) {
 	err = api.AddReviewDBReview(ctx.Session, user.ID, ctx.Arguments.RawFrom(1))
 	if err != nil {
 		c.services.Embed.NewEmbed().
-			SetDescription("Error adding review: " + err.Error()).
+			SetDescription("Error adding review: %v", err).
 			Send(ctx)
 		return
 	}
 
 	c.services.Embed.NewEmbed().
-		SetDescription("Successfully added review to " + user.Username + "!").
+		SetDescription("Successfully added review to %s!", user.Username).
 		Send(ctx)
 }
 
@@ -2640,7 +2640,7 @@ func (c *UtilityCommands) snipepokemon(ctx *router.Ctx) {
 	// Download the Pokémon image
 	resp := http.Get(emb.Image.URL)
 	if resp.Error != nil {
-		ctx.RespondText("Error downloading image: " + resp.Error.Error())
+		ctx.RespondText("Error downloading image: %v", resp.Error)
 		return
 	}
 
@@ -2700,7 +2700,7 @@ func (c *UtilityCommands) detectpokemon(ctx *router.Ctx) {
 	// Download the Pokémon image
 	resp := http.Get(emb.Image.URL)
 	if resp.Error != nil {
-		ctx.RespondText("Error downloading image: " + resp.Error.Error())
+		ctx.RespondText("Error downloading image: %v", resp.Error)
 		return
 	}
 
@@ -3075,7 +3075,7 @@ func (c *UtilityCommands) tts(ctx *router.Ctx) {
 func (c *UtilityCommands) translate(ctx *router.Ctx) {
 	translateResult := api.Translate(ctx.Arguments.RawFrom(1), ctx.Arguments.Get(0).Raw())
 	if translateResult.Error != nil {
-		ctx.RespondText("An error has occurred: " + translateResult.Error.Error())
+		ctx.RespondText("An error has occurred: %v", translateResult.Error)
 		return
 	}
 	c.services.Embed.NewEmbed().
@@ -3089,7 +3089,7 @@ func (c *UtilityCommands) translate(ctx *router.Ctx) {
 func (c *UtilityCommands) detectlang(ctx *router.Ctx) {
 	translateResult := api.Translate(ctx.Arguments.Raw(), "en")
 	if translateResult.Error != nil {
-		ctx.RespondText("An error has occurred: " + translateResult.Error.Error())
+		ctx.RespondText("An error has occurred: %v", translateResult.Error)
 		return
 	}
 	c.services.Embed.NewEmbed().
@@ -3102,7 +3102,7 @@ func (c *UtilityCommands) detectlang(ctx *router.Ctx) {
 func (c *UtilityCommands) english(ctx *router.Ctx) {
 	translateResult := api.Translate(ctx.Arguments.Raw(), "en")
 	if translateResult.Error != nil {
-		ctx.RespondText("An error has occurred: " + translateResult.Error.Error())
+		ctx.RespondText("An error has occurred: %v", translateResult.Error)
 		return
 	}
 	c.services.Embed.NewEmbed().
@@ -3295,7 +3295,7 @@ func (c *UtilityCommands) passgen(ctx *router.Ctx) {
 func (c *UtilityCommands) tokengen(ctx *router.Ctx) {
 	httpResponse := http.Get("https://some-random-api.com/bottoken")
 	if httpResponse.Error != nil {
-		ctx.RespondText("Error: " + httpResponse.Error.Error())
+		ctx.RespondText("Error: %v", httpResponse.Error)
 		return
 	}
 
@@ -3328,14 +3328,14 @@ func (c *UtilityCommands) timezones(ctx *router.Ctx) {
 	continent := ctx.Arguments.Get(0).Raw()
 	httpResponse := http.Get("http://worldtimeapi.org/api/timezone/" + url.PathEscape(continent))
 	if httpResponse.Error != nil {
-		ctx.RespondText("Error getting timezones: " + httpResponse.Error.Error())
+		ctx.RespondText("Error getting timezones: %v", httpResponse.Error)
 		return
 	}
 
 	json := httpResponse.Json()
 
 	if err := json.Get("error").MustString(); err != "" {
-		ctx.RespondText("Error getting timezones: " + err)
+		ctx.RespondText("Error getting timezones: %v", err)
 		return
 	}
 
@@ -3348,14 +3348,14 @@ func (c *UtilityCommands) timezones(ctx *router.Ctx) {
 func (c *UtilityCommands) timezoneinfo(ctx *router.Ctx) {
 	httpResponse := http.Get("http://worldtimeapi.org/api/timezone/" + ctx.Arguments.Get(0).Raw())
 	if httpResponse.Error != nil {
-		ctx.RespondText("Error getting timezones: " + httpResponse.Error.Error())
+		ctx.RespondText("Error getting timezones: %v", httpResponse.Error)
 		return
 	}
 
 	json := httpResponse.Json()
 
 	if err := json.Get("error").MustString(); err != "" {
-		ctx.RespondText("Error getting timezones: " + err)
+		ctx.RespondText("Error getting timezones: %v", err)
 		return
 	}
 

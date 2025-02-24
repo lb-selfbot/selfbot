@@ -242,7 +242,7 @@ func (c *CurrencyCommands) searchsymbol(ctx *router.Ctx) {
 
 	httpResponse := http.Get(uri)
 	if httpResponse.Error != nil {
-		ctx.RespondText("An error occurred: " + httpResponse.Error.Error())
+		ctx.RespondText("An error occurred: %v", httpResponse.Error)
 		return
 	}
 
@@ -280,7 +280,7 @@ func (c *CurrencyCommands) symbolinfo(ctx *router.Ctx) {
 
 	httpResponse := http.Get(uri)
 	if httpResponse.Error != nil {
-		ctx.RespondText("An error occurred: " + httpResponse.Error.Error())
+		ctx.RespondText("An error occurred: %v", httpResponse.Error)
 		return
 	}
 
