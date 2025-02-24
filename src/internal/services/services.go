@@ -71,7 +71,7 @@ func (s *Services) register() {
 	s.O11y.Inject(s.UI)
 	s.Discord.Inject(s.Auth, s.UI, s.O11y, s.EventReactions, s.Extensions)
 	s.Embed.Inject(s.Variables)
-	s.EventReactions.Inject(s.Auth, s.UI, s.Discord, s.Sessions, s.SCJobs, s.RPC)
+	s.EventReactions.Inject(s.Auth, s.UI, s.Discord, s.Embed, s.Sessions, s.SCJobs, s.RPC, s.Variables)
 	s.Extensions.Inject(s.UI, s.Discord, s.Embed)
 	s.Backup.Inject(s.Discord)
 	s.MultiTokenSniper.Inject(s.UI, s.O11y, s.Discord, s.EventReactions)

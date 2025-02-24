@@ -104,15 +104,53 @@ func (e *EventReactionsServiceImpl) constructDefaultReactions() []interfaces.Eve
 func (e *EventReactionsServiceImpl) constructReaction(reactionCfg eventReactionConfig) (interfaces.EventReaction, error) {
 	session := e.discordSvc.GetSession()
 
-	// TODO: Constructors
+	var r interfaces.EventReaction
+	var err error
+
 	switch reactionCfg.Type {
 	// Default reactions
 	case interfaces.EventReactionSnipers:
-		return impl.NewSnipers(e.uiSvc, e, session, ""), nil
-		// return NewSnipers(e.discordSvc, reactionCfg.Data), nil
+		r = impl.NewSnipers(e.uiSvc, e, session, "")
+	case interfaces.EventReactionAFKResponder:
+		r = impl.NewAFK(e.uiSvc, e, e.variablesSvc)
+	case interfaces.EventReactionAntiPhishing:
+		r = impl.NewPhishing(e.uiSvc)
+	case interfaces.EventReactionNotifiers:
+		r = impl.NewNotifiers(e.uiSvc)
+	case interfaces.EventReactionProtections:
+		r = impl.NewProtections(e.uiSvc, e.embedSvc)
+	case interfaces.EventReactionSelfbotDetection:
+		r = impl.NewSelfbotDetection(e.uiSvc, e)
+
+	// Custom reactions
+	case interfaces.EventReactionIgnoreUser, interfaces.EventReactionIgnoreGuild:
+		r, err = impl.NewIgnoreFromData(session, reactionCfg.Data)
+	case interfaces.EventReactionPingPing, interfaces.EventReactionPingKick, interfaces.EventReactionPingBan, interfaces.EventReactionPingMute, interfaces.EventReactionPingTimeout, interfaces.EventReactionPingInsult, interfaces.EventReactionPingReact, interfaces.EventReactionPingResponse, interfaces.EventReactionPingAIResponse:
+		r, err = impl.NewPingFromData(e, session, reactionCfg.Type, reactionCfg.Data)
+	case interfaces.EventReactionMirrorGuild, interfaces.EventReactionMirrorChannel:
+		r, err = impl.NewMirrorFromData(e, session, reactionCfg.Data)
+	case interfaces.EventReactionResponder, interfaces.EventReactionAIResponder, interfaces.EventReactionCopy, interfaces.EventReactionReplyCopy, interfaces.EventReactionMock, interfaces.EventReactionPinSpam, interfaces.EventReactionReactSpam, interfaces.EventReactionDeleteMessages, interfaces.EventReactionKeywordNotifier:
+		r, err = impl.NewMessageReactionFromData(session, reactionCfg.Type, reactionCfg.Data)
+	case interfaces.EventReactionRemoveReactions:
+		r, err = impl.NewRemoveReactionsFromData(session, reactionCfg.Data)
+	case interfaces.EventReactionForceDisconnect:
+		r, err = impl.NewForceDisconnectFromData(session, reactionCfg.Data)
+	case interfaces.EventReactionForceNick:
+		r, err = impl.NewForceNickFromData(session, reactionCfg.Data)
+	case interfaces.EventReactionForceKick:
+		r, err = impl.NewForceKickFromData(session, reactionCfg.Data)
+	case interfaces.EventReactionNoLeave:
+		r, err = impl.NewNoLeaveFromData(session, reactionCfg.Data)
+	case interfaces.EventReactionAntiGroupChat:
+		r, err = impl.NewAntiGroupChatFromData(session, reactionCfg.Data)
+	case interfaces.EventReactionAntiDeleteMessages:
+		r, err = impl.NewAntiDeleteMessagesFromData(session, reactionCfg.Data)
+
+	default:
+		return nil, ErrInvalidReactionType
 	}
 
-	return nil, ErrInvalidReactionType
+	return r, err
 }
 
 func (e *EventReactionsServiceImpl) saveEventReactions() error {

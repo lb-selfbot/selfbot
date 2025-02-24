@@ -100,7 +100,7 @@ type EventReaction interface {
 }
 
 type EventReactionsService interface {
-	Inject(authSvc AuthService, uiSvc UIService, discordSvc DiscordService, sessionsSvc SessionsService, scJobsSvc SCJobsService, rpcSvc RPCService)
+	Inject(authSvc AuthService, uiSvc UIService, discordSvc DiscordService, embedSvc EmbedService, sessionsSvc SessionsService, scJobsSvc SCJobsService, rpcSvc RPCService, variablesSvc VariablesService)
 
 	Register()
 

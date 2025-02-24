@@ -11,12 +11,14 @@ import (
 )
 
 type EventReactionsServiceImpl struct {
-	authSvc     interfaces.AuthService
-	uiSvc       interfaces.UIService
-	discordSvc  interfaces.DiscordService
-	sessionsSvc interfaces.SessionsService
-	scJobsSvc   interfaces.SCJobsService
-	rpcSvc      interfaces.RPCService
+	authSvc      interfaces.AuthService
+	uiSvc        interfaces.UIService
+	discordSvc   interfaces.DiscordService
+	embedSvc     interfaces.EmbedService
+	sessionsSvc  interfaces.SessionsService
+	scJobsSvc    interfaces.SCJobsService
+	rpcSvc       interfaces.RPCService
+	variablesSvc interfaces.VariablesService
 
 	reactions   []interfaces.EventReaction
 	reactionsMu sync.Mutex
@@ -62,16 +64,20 @@ func (e *EventReactionsServiceImpl) Inject(
 	authSvc interfaces.AuthService,
 	uiSvc interfaces.UIService,
 	discordSvc interfaces.DiscordService,
+	embedSvc interfaces.EmbedService,
 	sessionsSvc interfaces.SessionsService,
 	scJobsSvc interfaces.SCJobsService,
 	rpcSvc interfaces.RPCService,
+	variablesSvc interfaces.VariablesService,
 ) {
 	e.authSvc = authSvc
 	e.uiSvc = uiSvc
 	e.discordSvc = discordSvc
+	e.embedSvc = embedSvc
 	e.sessionsSvc = sessionsSvc
 	e.scJobsSvc = scJobsSvc
 	e.rpcSvc = rpcSvc
+	e.variablesSvc = variablesSvc
 }
 
 func (e *EventReactionsServiceImpl) Register() {
