@@ -197,8 +197,8 @@ func (c *TrollingCommands) fakenitro(ctx *router.Ctx) {
 	amount, _ := ctx.Arguments.Get(0).Int()
 	amount = utils2.Clamp(amount, 1, 100)
 
-	for i := 0; i < amount; i++ {
-		ctx.RespondText("https://discord.gift/" + random.String(16))
+	for range amount {
+		ctx.RespondText("https://discord.gift/%s", random.String(16))
 	}
 }
 
