@@ -13,6 +13,7 @@ jobs:
         with:
           go-version-file: "src/go.mod"
           check-latest: true
+          cache-dependency-path: src/go.sum
 
       - name: Run gofmt
         run: diff <(gofmt -d .) <(echo -n)
