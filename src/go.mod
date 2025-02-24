@@ -2,8 +2,6 @@ module github.com/LightningDev1/LB-Selfbot
 
 go 1.24.0
 
-toolchain go1.24.0
-
 require (
 	github.com/LightningDev1/beeep v0.1.0
 	github.com/LightningDev1/discordgo v0.26.6-0.20241102192552-62b3fe3be1f7
@@ -16,6 +14,7 @@ require (
 	github.com/charmbracelet/bubbles v0.20.0
 	github.com/charmbracelet/bubbletea v1.3.3
 	github.com/charmbracelet/lipgloss v1.0.0
+	github.com/chromedp/chromedp v0.13.0
 	github.com/common-nighthawk/go-figure v0.0.0-20210622060536-734e95fb86be
 	github.com/darkwyrm/b85 v0.0.0-20210908110113-bdd55eedeb3c
 	github.com/deadshot465/owoify-go v1.0.1
@@ -46,7 +45,6 @@ require (
 	github.com/charmbracelet/x/ansi v0.8.0 // indirect
 	github.com/charmbracelet/x/term v0.2.1 // indirect
 	github.com/chromedp/cdproto v0.0.0-20250222051814-50c6cb17f10a // indirect
-	github.com/chromedp/chromedp v0.13.0 // indirect
 	github.com/chromedp/sysutil v1.1.0 // indirect
 	github.com/cloudflare/circl v1.6.0 // indirect
 	github.com/dlclark/regexp2 v1.11.5 // indirect
@@ -64,12 +62,10 @@ require (
 	github.com/godbus/dbus/v5 v5.1.0 // indirect
 	github.com/google/pprof v0.0.0-20250208200701-d0013a598941 // indirect
 	github.com/jezek/xgb v1.1.1 // indirect
-	github.com/josharian/intern v1.0.0 // indirect
 	github.com/klauspost/compress v1.18.0 // indirect
 	github.com/lucasb-eyer/go-colorful v1.2.0 // indirect
 	github.com/lufia/plan9stats v0.0.0-20240909124753-873cd0166683 // indirect
 	github.com/lxn/win v0.0.0-20210218163916-a377121e959e // indirect
-	github.com/mailru/easyjson v0.9.0 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
 	github.com/mattn/go-localereader v0.0.1 // indirect
 	github.com/mattn/go-runewidth v0.0.16 // indirect
