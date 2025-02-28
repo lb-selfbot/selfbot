@@ -4,6 +4,7 @@ import (
 	"regexp"
 	"strings"
 
+	"github.com/LightningDev1/LB-Selfbot/internal/services/interfaces"
 	"github.com/LightningDev1/LB-Selfbot/internal/utils2"
 	"github.com/LightningDev1/discordgo"
 )
@@ -47,11 +48,13 @@ type Router interface {
 	)
 }
 
-func NewRouter(cfg *RouterConfig) Router {
-	return &router{cfg: cfg}
+func NewRouter(embedSvc interfaces.EmbedService, cfg *RouterConfig) Router {
+	return &router{embedSvc: embedSvc, cfg: cfg}
 }
 
 type router struct {
+	embedSvc interfaces.EmbedService
+
 	cfg *RouterConfig
 
 	categories  []*Category

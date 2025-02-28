@@ -2,14 +2,11 @@ package config
 
 import (
 	"fmt"
-	"strings"
 	"time"
 
 	"github.com/LightningDev1/LB-Selfbot/internal/config"
 	"github.com/LightningDev1/LB-Selfbot/internal/router"
 	"github.com/LightningDev1/LB-Selfbot/internal/services"
-	"github.com/LightningDev1/LB-Selfbot/internal/utils2"
-
 	"github.com/LightningDev1/LB-Selfbot/internal/utils"
 )
 
@@ -22,881 +19,1235 @@ func NewConfigCommands(s *services.Services) *ConfigCommands {
 func (c *ConfigCommands) Register() {
 	cmdRouter := c.services.Discord.GetRouter()
 
+	commands := make([]*router.Command, 0)
+
+	// Command Prefix
+	commands = append(commands, router.NewActionCommandBuilder("commandprefix", "Command Prefix").
+		WithGetter("Get the current command prefix", func(ctx *router.Ctx) (any, error) {
+			cfg, err := config.GetConfig()
+			if err != nil {
+				return nil, err
+			}
+			return cfg.Selfbot.CommandPrefix, nil
+		}).
+		WithSetter("Set the command prefix", router.ValueTypeString, func(ctx *router.Ctx, value any) error {
+			cfg, err := config.GetConfig()
+			if err != nil {
+				return err
+			}
+			cfg.Selfbot.CommandPrefix = value.(string)
+			return cfg.Save()
+		}).
+		Build())
+
+	// Command Mode
+	commands = append(commands, router.NewActionCommandBuilder("commandmode", "Command Mode").
+		WithGetter("Get the current command mode", func(ctx *router.Ctx) (any, error) {
+			cfg, err := config.GetConfig()
+			if err != nil {
+				return nil, err
+			}
+			return cfg.Selfbot.CommandMode, nil
+		}).
+		WithSetter("Set the command mode", router.ValueTypeString, func(ctx *router.Ctx, value any) error {
+			cfg, err := config.GetConfig()
+			if err != nil {
+				return err
+			}
+			cfg.Selfbot.CommandMode = value.(string)
+			return cfg.Save()
+		}).
+		WithValues("List available command modes", func() []any {
+			return []any{"Codeblock", "Text", "Indent", "WebhookEmbed", "URLEmbed"}
+		}).
+		Build())
+
+	// Embed Title
+	commands = append(commands, router.NewActionCommandBuilder("title", "Embed Title").
+		WithGetter("Get the current embed title", func(ctx *router.Ctx) (any, error) {
+			cfg, err := config.GetConfig()
+			if err != nil {
+				return nil, err
+			}
+			return cfg.Selfbot.Title, nil
+		}).
+		WithSetter("Set the embed title", router.ValueTypeString, func(ctx *router.Ctx, value any) error {
+			cfg, err := config.GetConfig()
+			if err != nil {
+				return err
+			}
+			cfg.Selfbot.Title = value.(string)
+			return cfg.Save()
+		}).
+		Build())
+
+	// Embed Footer
+	commands = append(commands, router.NewActionCommandBuilder("footer", "Embed Footer").
+		WithGetter("Get the current embed footer", func(ctx *router.Ctx) (any, error) {
+			cfg, err := config.GetConfig()
+			if err != nil {
+				return nil, err
+			}
+			return cfg.Selfbot.Footer, nil
+		}).
+		WithSetter("Set the embed footer", router.ValueTypeString, func(ctx *router.Ctx, value any) error {
+			cfg, err := config.GetConfig()
+			if err != nil {
+				return err
+			}
+			cfg.Selfbot.Footer = value.(string)
+			return cfg.Save()
+		}).
+		Build())
+
+	// Delete Responses
+	commands = append(commands, router.NewActionCommandBuilder("delresponses", "Delete Responses").
+		WithGetter("Get delete responses status", func(ctx *router.Ctx) (any, error) {
+			cfg, err := config.GetConfig()
+			if err != nil {
+				return nil, err
+			}
+			return cfg.Selfbot.DeleteResponses, nil
+		}).
+		WithSetter("Set delete responses status", router.ValueTypeBool, func(ctx *router.Ctx, value any) error {
+			cfg, err := config.GetConfig()
+			if err != nil {
+				return err
+			}
+			cfg.Selfbot.DeleteResponses = value.(bool)
+			return cfg.Save()
+		}).
+		WithToggler("Toggle delete responses", func(ctx *router.Ctx) error {
+			cfg, err := config.GetConfig()
+			if err != nil {
+				return err
+			}
+			cfg.Selfbot.DeleteResponses = !cfg.Selfbot.DeleteResponses
+			return cfg.Save()
+		}).
+		Build())
+
+	// Delete Responses Delay
+	commands = append(commands, router.NewActionCommandBuilder("delresponsesdelay", "Delete Responses Delay").
+		WithGetter("Get delete responses delay", func(ctx *router.Ctx) (any, error) {
+			cfg, err := config.GetConfig()
+			if err != nil {
+				return nil, err
+			}
+			return cfg.Selfbot.DeleteResponsesDelay, nil
+		}).
+		WithSetter("Set delete responses delay", router.ValueTypeDuration, func(ctx *router.Ctx, value any) error {
+			cfg, err := config.GetConfig()
+			if err != nil {
+				return err
+			}
+			cfg.Selfbot.DeleteResponsesDelay = value.(int)
+			return cfg.Save()
+		}).
+		Build())
+
+	// Delete Commands
+	commands = append(commands, router.NewActionCommandBuilder("delcommands", "Delete Commands").
+		WithGetter("Get delete commands status", func(ctx *router.Ctx) (any, error) {
+			cfg, err := config.GetConfig()
+			if err != nil {
+				return nil, err
+			}
+			return cfg.Selfbot.DeleteCommands, nil
+		}).
+		WithSetter("Set delete commands status", router.ValueTypeBool, func(ctx *router.Ctx, value any) error {
+			cfg, err := config.GetConfig()
+			if err != nil {
+				return err
+			}
+			cfg.Selfbot.DeleteCommands = value.(bool)
+			return cfg.Save()
+		}).
+		WithToggler("Toggle delete commands", func(ctx *router.Ctx) error {
+			cfg, err := config.GetConfig()
+			if err != nil {
+				return err
+			}
+			cfg.Selfbot.DeleteCommands = !cfg.Selfbot.DeleteCommands
+			return cfg.Save()
+		}).
+		Build())
+
+	// Client Spoof
+	commands = append(commands, router.NewActionCommandBuilder("clientspoof", "Client Spoof").
+		WithGetter("Get current client spoof setting", func(ctx *router.Ctx) (any, error) {
+			cfg, err := config.GetConfig()
+			if err != nil {
+				return nil, err
+			}
+			return cfg.Selfbot.Client, nil
+		}).
+		WithSetter("Set client spoof setting", router.ValueTypeString, func(ctx *router.Ctx, value any) error {
+			cfg, err := config.GetConfig()
+			if err != nil {
+				return err
+			}
+			cfg.Selfbot.Client = utils.String.Capitalize(value.(string))
+			return cfg.Save()
+		}).
+		WithValues("List available clients", func() []any {
+			return []any{"Mobile", "Web", "Desktop", "Console"}
+		}).
+		Build())
+
+	// Timezone
+	commands = append(commands, router.NewActionCommandBuilder("timezone", "Timezone").
+		WithGetter("Get current timezone", func(ctx *router.Ctx) (any, error) {
+			cfg, err := config.GetConfig()
+			if err != nil {
+				return nil, err
+			}
+			return cfg.Selfbot.Timezone, nil
+		}).
+		WithSetter("Set timezone", router.ValueTypeString, func(ctx *router.Ctx, value any) error {
+			timezone := value.(string)
+			if _, err := time.LoadLocation(timezone); err != nil {
+				return fmt.Errorf("invalid timezone: %v", err)
+			}
+
+			cfg, err := config.GetConfig()
+			if err != nil {
+				return err
+			}
+			cfg.Selfbot.Timezone = timezone
+			return cfg.Save()
+		}).
+		Build())
+
+	// Embed Color
+	commands = append(commands, router.NewActionCommandBuilder("embedcolor", "Embed Color").
+		WithGetter("Get current embed color", func(ctx *router.Ctx) (any, error) {
+			cfg, err := config.GetConfig()
+			if err != nil {
+				return nil, err
+			}
+			return cfg.Selfbot.EmbedColor, nil
+		}).
+		WithSetter("Set embed color", router.ValueTypeString, func(ctx *router.Ctx, value any) error {
+			cfg, err := config.GetConfig()
+			if err != nil {
+				return err
+			}
+			cfg.Selfbot.EmbedColor = value.(string)
+			return cfg.Save()
+		}).
+		Build())
+
+	// Embed Image
+	commands = append(commands, router.NewActionCommandBuilder("embedimage", "Embed Image").
+		WithGetter("Get current embed image", func(ctx *router.Ctx) (any, error) {
+			cfg, err := config.GetConfig()
+			if err != nil {
+				return nil, err
+			}
+			return cfg.Selfbot.EmbedImage, nil
+		}).
+		WithSetter("Set embed image", router.ValueTypeString, func(ctx *router.Ctx, value any) error {
+			cfg, err := config.GetConfig()
+			if err != nil {
+				return err
+			}
+			cfg.Selfbot.EmbedImage = value.(string)
+			return cfg.Save()
+		}).
+		Build())
+
+	// Embed URL
+	commands = append(commands, router.NewActionCommandBuilder("embedurl", "Embed URL").
+		WithGetter("Get current embed URL", func(ctx *router.Ctx) (any, error) {
+			cfg, err := config.GetConfig()
+			if err != nil {
+				return nil, err
+			}
+			return cfg.Selfbot.EmbedURL, nil
+		}).
+		WithSetter("Set embed URL", router.ValueTypeString, func(ctx *router.Ctx, value any) error {
+			cfg, err := config.GetConfig()
+			if err != nil {
+				return err
+			}
+			cfg.Selfbot.EmbedURL = value.(string)
+			return cfg.Save()
+		}).
+		Build())
+
+	// Notifications
+	commands = append(commands, router.NewActionCommandBuilder("notifications", "Notifications").
+		WithGetter("Get notifications status", func(ctx *router.Ctx) (any, error) {
+			cfg, err := config.GetConfig()
+			if err != nil {
+				return nil, err
+			}
+			return cfg.Notifications.Enabled, nil
+		}).
+		WithSetter("Set notifications status", router.ValueTypeBool, func(ctx *router.Ctx, value any) error {
+			cfg, err := config.GetConfig()
+			if err != nil {
+				return err
+			}
+			cfg.Notifications.Enabled = value.(bool)
+			return cfg.Save()
+		}).
+		WithToggler("Toggle notifications", func(ctx *router.Ctx) error {
+			cfg, err := config.GetConfig()
+			if err != nil {
+				return err
+			}
+			cfg.Notifications.Enabled = !cfg.Notifications.Enabled
+			return cfg.Save()
+		}).
+		WithExample("Show an example of a notification", func(ctx *router.Ctx) error {
+			c.services.UI.ShowNotification("This is an example notification.")
+			return nil
+		}).
+		Build())
+
+	// Nitro Sniper
+	commands = append(commands, router.NewActionCommandBuilder("nitrosniper", "Nitro Sniper").
+		WithGetter("Get nitro sniper status", func(ctx *router.Ctx) (any, error) {
+			cfg, err := config.GetConfig()
+			if err != nil {
+				return nil, err
+			}
+			return cfg.Snipers.NitroSniper, nil
+		}).
+		WithSetter("Set nitro sniper status", router.ValueTypeBool, func(ctx *router.Ctx, value any) error {
+			cfg, err := config.GetConfig()
+			if err != nil {
+				return err
+			}
+			cfg.Snipers.NitroSniper = value.(bool)
+			return cfg.Save()
+		}).
+		WithToggler("Toggle nitro sniper", func(ctx *router.Ctx) error {
+			cfg, err := config.GetConfig()
+			if err != nil {
+				return err
+			}
+			cfg.Snipers.NitroSniper = !cfg.Snipers.NitroSniper
+			return cfg.Save()
+		}).
+		Build())
+
+	// Giveaway Sniper
+	commands = append(commands, router.NewActionCommandBuilder("giveawaysniper", "Giveaway Sniper").
+		WithGetter("Get giveaway sniper status", func(ctx *router.Ctx) (any, error) {
+			cfg, err := config.GetConfig()
+			if err != nil {
+				return nil, err
+			}
+			return cfg.Snipers.GiveawaySniper.Enabled, nil
+		}).
+		WithSetter("Set giveaway sniper status", router.ValueTypeBool, func(ctx *router.Ctx, value any) error {
+			cfg, err := config.GetConfig()
+			if err != nil {
+				return err
+			}
+			cfg.Snipers.GiveawaySniper.Enabled = value.(bool)
+			return cfg.Save()
+		}).
+		WithToggler("Toggle giveaway sniper", func(ctx *router.Ctx) error {
+			cfg, err := config.GetConfig()
+			if err != nil {
+				return err
+			}
+			cfg.Snipers.GiveawaySniper.Enabled = !cfg.Snipers.GiveawaySniper.Enabled
+			return cfg.Save()
+		}).
+		Build())
+
+	// Giveaway Sniper Sleep
+	commands = append(commands, router.NewActionCommandBuilder("giveawaysnipersleep", "Giveaway Sniper Sleep").
+		WithGetter("Get giveaway sniper sleep duration", func(ctx *router.Ctx) (any, error) {
+			cfg, err := config.GetConfig()
+			if err != nil {
+				return nil, err
+			}
+			return cfg.Snipers.GiveawaySniper.Sleep, nil
+		}).
+		WithSetter("Set giveaway sniper sleep duration", router.ValueTypeDuration, func(ctx *router.Ctx, value any) error {
+			cfg, err := config.GetConfig()
+			if err != nil {
+				return err
+			}
+			cfg.Snipers.GiveawaySniper.Sleep = value.(int)
+			return cfg.Save()
+		}).
+		Build())
+
+	// Multi-Token Sniper
+	commands = append(commands, router.NewActionCommandBuilder("multitokensniper", "Multi-Token Sniper").
+		WithGetter("Get multi-token sniper status", func(ctx *router.Ctx) (any, error) {
+			cfg, err := config.GetConfig()
+			if err != nil {
+				return nil, err
+			}
+			return cfg.Snipers.MultiTokenSniper, nil
+		}).
+		WithSetter("Set multi-token sniper status", router.ValueTypeBool, func(ctx *router.Ctx, value any) error {
+			cfg, err := config.GetConfig()
+			if err != nil {
+				return err
+			}
+			cfg.Snipers.MultiTokenSniper = value.(bool)
+			return cfg.Save()
+		}).
+		WithToggler("Toggle multi-token sniper", func(ctx *router.Ctx) error {
+			cfg, err := config.GetConfig()
+			if err != nil {
+				return err
+			}
+			cfg.Snipers.MultiTokenSniper = !cfg.Snipers.MultiTokenSniper
+			return cfg.Save()
+		}).
+		Build())
+
+	// Privnote Sniper
+	commands = append(commands, router.NewActionCommandBuilder("privnotesniper", "Privnote Sniper").
+		WithGetter("Get privnote sniper status", func(ctx *router.Ctx) (any, error) {
+			cfg, err := config.GetConfig()
+			if err != nil {
+				return nil, err
+			}
+			return cfg.Snipers.PrivnoteSniper, nil
+		}).
+		WithSetter("Set privnote sniper status", router.ValueTypeBool, func(ctx *router.Ctx, value any) error {
+			cfg, err := config.GetConfig()
+			if err != nil {
+				return err
+			}
+			cfg.Snipers.PrivnoteSniper = value.(bool)
+			return cfg.Save()
+		}).
+		WithToggler("Toggle privnote sniper", func(ctx *router.Ctx) error {
+			cfg, err := config.GetConfig()
+			if err != nil {
+				return err
+			}
+			cfg.Snipers.PrivnoteSniper = !cfg.Snipers.PrivnoteSniper
+			return cfg.Save()
+		}).
+		Build())
+
+	// Poketwo Sniper
+	commands = append(commands, router.NewActionCommandBuilder("poketwosniper", "Poketwo Sniper").
+		WithGetter("Get poketwo sniper status", func(ctx *router.Ctx) (any, error) {
+			cfg, err := config.GetConfig()
+			if err != nil {
+				return nil, err
+			}
+			return cfg.Snipers.PokeTwoSniper.Enabled, nil
+		}).
+		WithSetter("Set poketwo sniper status", router.ValueTypeBool, func(ctx *router.Ctx, value any) error {
+			cfg, err := config.GetConfig()
+			if err != nil {
+				return err
+			}
+			cfg.Snipers.PokeTwoSniper.Enabled = value.(bool)
+			return cfg.Save()
+		}).
+		WithToggler("Toggle poketwo sniper", func(ctx *router.Ctx) error {
+			cfg, err := config.GetConfig()
+			if err != nil {
+				return err
+			}
+			cfg.Snipers.PokeTwoSniper.Enabled = !cfg.Snipers.PokeTwoSniper.Enabled
+			return cfg.Save()
+		}).
+		Build())
+
+	// Poketwo Sniper Sleep
+	commands = append(commands, router.NewActionCommandBuilder("poketwosleep", "Poketwo Sniper Sleep").
+		WithGetter("Get poketwo sniper sleep duration", func(ctx *router.Ctx) (any, error) {
+			cfg, err := config.GetConfig()
+			if err != nil {
+				return nil, err
+			}
+			return cfg.Snipers.PokeTwoSniper.Sleep, nil
+		}).
+		WithSetter("Set poketwo sniper sleep duration", router.ValueTypeDuration, func(ctx *router.Ctx, value any) error {
+			cfg, err := config.GetConfig()
+			if err != nil {
+				return err
+			}
+			cfg.Snipers.PokeTwoSniper.Sleep = value.(int)
+			return cfg.Save()
+		}).
+		Build())
+
+	// Poketwo Sniper Random Sleep
+	commands = append(commands, router.NewActionCommandBuilder("poketworandomsleep", "Poketwo Sniper Random Sleep").
+		WithGetter("Get poketwo sniper random sleep status", func(ctx *router.Ctx) (any, error) {
+			cfg, err := config.GetConfig()
+			if err != nil {
+				return nil, err
+			}
+			return cfg.Snipers.PokeTwoSniper.RandomSleep, nil
+		}).
+		WithSetter("Set poketwo sniper random sleep status", router.ValueTypeBool, func(ctx *router.Ctx, value any) error {
+			cfg, err := config.GetConfig()
+			if err != nil {
+				return err
+			}
+			cfg.Snipers.PokeTwoSniper.RandomSleep = value.(bool)
+			return cfg.Save()
+		}).
+		WithToggler("Toggle poketwo sniper random sleep", func(ctx *router.Ctx) error {
+			cfg, err := config.GetConfig()
+			if err != nil {
+				return err
+			}
+			cfg.Snipers.PokeTwoSniper.RandomSleep = !cfg.Snipers.PokeTwoSniper.RandomSleep
+			return cfg.Save()
+		}).
+		Build())
+
+	// Poketwo Sniper Timeout
+	commands = append(commands, router.NewActionCommandBuilder("poketwotimeout", "Poketwo Sniper Timeout").
+		WithGetter("Get poketwo sniper timeout duration", func(ctx *router.Ctx) (any, error) {
+			cfg, err := config.GetConfig()
+			if err != nil {
+				return nil, err
+			}
+			return cfg.Snipers.PokeTwoSniper.Timeout, nil
+		}).
+		WithSetter("Set poketwo sniper timeout duration", router.ValueTypeDuration, func(ctx *router.Ctx, value any) error {
+			cfg, err := config.GetConfig()
+			if err != nil {
+				return err
+			}
+			cfg.Snipers.PokeTwoSniper.Timeout = value.(int)
+			return cfg.Save()
+		}).
+		Build())
+
+	// Poketwo Sniper Typing
+	commands = append(commands, router.NewActionCommandBuilder("poketwotyping", "Poketwo Sniper Typing").
+		WithGetter("Get poketwo sniper typing status", func(ctx *router.Ctx) (any, error) {
+			cfg, err := config.GetConfig()
+			if err != nil {
+				return nil, err
+			}
+			return cfg.Snipers.PokeTwoSniper.Typing, nil
+		}).
+		WithSetter("Set poketwo sniper typing status", router.ValueTypeBool, func(ctx *router.Ctx, value any) error {
+			cfg, err := config.GetConfig()
+			if err != nil {
+				return err
+			}
+			cfg.Snipers.PokeTwoSniper.Typing = value.(bool)
+			return cfg.Save()
+		}).
+		WithToggler("Toggle poketwo sniper typing", func(ctx *router.Ctx) error {
+			cfg, err := config.GetConfig()
+			if err != nil {
+				return err
+			}
+			cfg.Snipers.PokeTwoSniper.Typing = !cfg.Snipers.PokeTwoSniper.Typing
+			return cfg.Save()
+		}).
+		Build())
+
+	// Poketwo Sniper Catch Rate
+	commands = append(commands, router.NewActionCommandBuilder("poketwocatchrate", "Poketwo Sniper Catch Rate").
+		WithGetter("Get poketwo sniper catch rate", func(ctx *router.Ctx) (any, error) {
+			cfg, err := config.GetConfig()
+			if err != nil {
+				return nil, err
+			}
+			return cfg.Snipers.PokeTwoSniper.CatchRate, nil
+		}).
+		WithSetter("Set poketwo sniper catch rate", router.ValueTypeInt, func(ctx *router.Ctx, value any) error {
+			cfg, err := config.GetConfig()
+			if err != nil {
+				return err
+			}
+			cfg.Snipers.PokeTwoSniper.CatchRate = value.(int)
+			return cfg.Save()
+		}).
+		Build())
+
+	// Poketwo Sniper Fake Activity
+	commands = append(commands, router.NewActionCommandBuilder("poketwofakeactivity", "Poketwo Sniper Fake Activity").
+		WithGetter("Get poketwo sniper fake activity status", func(ctx *router.Ctx) (any, error) {
+			cfg, err := config.GetConfig()
+			if err != nil {
+				return nil, err
+			}
+			return cfg.Snipers.PokeTwoSniper.FakeActivity, nil
+		}).
+		WithSetter("Set poketwo sniper fake activity status", router.ValueTypeBool, func(ctx *router.Ctx, value any) error {
+			cfg, err := config.GetConfig()
+			if err != nil {
+				return err
+			}
+			cfg.Snipers.PokeTwoSniper.FakeActivity = value.(bool)
+			return cfg.Save()
+		}).
+		WithToggler("Toggle poketwo sniper fake activity", func(ctx *router.Ctx) error {
+			cfg, err := config.GetConfig()
+			if err != nil {
+				return err
+			}
+			cfg.Snipers.PokeTwoSniper.FakeActivity = !cfg.Snipers.PokeTwoSniper.FakeActivity
+			return cfg.Save()
+		}).
+		Build())
+
+	// Poketwo Sniper Language
+	commands = append(commands, router.NewActionCommandBuilder("poketwolanguage", "Poketwo Sniper Language").
+		WithGetter("Get poketwo sniper language", func(ctx *router.Ctx) (any, error) {
+			cfg, err := config.GetConfig()
+			if err != nil {
+				return nil, err
+			}
+			return cfg.Snipers.PokeTwoSniper.CatchLanguage, nil
+		}).
+		WithSetter("Set poketwo sniper language", router.ValueTypeString, func(ctx *router.Ctx, value any) error {
+			cfg, err := config.GetConfig()
+			if err != nil {
+				return err
+			}
+			cfg.Snipers.PokeTwoSniper.CatchLanguage = value.(string)
+			return cfg.Save()
+		}).
+		WithValues("List available languages", func() []any {
+			return []any{"en", "ja", "ja_t", "fr", "de"}
+		}).
+		Build())
+
+	// Webhook settings
+	// Nitro Sniper Webhook
+	commands = append(commands, router.NewActionCommandBuilder("wnitro", "Nitro Sniper Webhook").
+		WithGetter("Get nitro sniper webhook", func(ctx *router.Ctx) (any, error) {
+			cfg, err := config.GetConfig()
+			if err != nil {
+				return nil, err
+			}
+			return cfg.Webhooks.NitroSniper, nil
+		}).
+		WithSetter("Set nitro sniper webhook", router.ValueTypeString, func(ctx *router.Ctx, value any) error {
+			cfg, err := config.GetConfig()
+			if err != nil {
+				return err
+			}
+			cfg.Webhooks.NitroSniper = value.(string)
+			return cfg.Save()
+		}).
+		Build())
+
+	// Giveaway Sniper Webhook
+	commands = append(commands, router.NewActionCommandBuilder("wgiveawaysniper", "Giveaway Sniper Webhook").
+		WithGetter("Get giveaway sniper webhook", func(ctx *router.Ctx) (any, error) {
+			cfg, err := config.GetConfig()
+			if err != nil {
+				return nil, err
+			}
+			return cfg.Webhooks.GiveawaySniper, nil
+		}).
+		WithSetter("Set giveaway sniper webhook", router.ValueTypeString, func(ctx *router.Ctx, value any) error {
+			cfg, err := config.GetConfig()
+			if err != nil {
+				return err
+			}
+			cfg.Webhooks.GiveawaySniper = value.(string)
+			return cfg.Save()
+		}).
+		Build())
+
+	// Selfbot Detection Webhook
+	commands = append(commands, router.NewActionCommandBuilder("wselfbotdetection", "Selfbot Detection Webhook").
+		WithGetter("Get selfbot detection webhook", func(ctx *router.Ctx) (any, error) {
+			cfg, err := config.GetConfig()
+			if err != nil {
+				return nil, err
+			}
+			return cfg.Webhooks.SelfbotDetection, nil
+		}).
+		WithSetter("Set selfbot detection webhook", router.ValueTypeString, func(ctx *router.Ctx, value any) error {
+			cfg, err := config.GetConfig()
+			if err != nil {
+				return err
+			}
+			cfg.Webhooks.SelfbotDetection = value.(string)
+			return cfg.Save()
+		}).
+		Build())
+
+	// Staff Detection Webhook
+	commands = append(commands, router.NewActionCommandBuilder("wstaffdetection", "Staff Detection Webhook").
+		WithGetter("Get staff detection webhook", func(ctx *router.Ctx) (any, error) {
+			cfg, err := config.GetConfig()
+			if err != nil {
+				return nil, err
+			}
+			return cfg.Webhooks.StaffDetection, nil
+		}).
+		WithSetter("Set staff detection webhook", router.ValueTypeString, func(ctx *router.Ctx, value any) error {
+			cfg, err := config.GetConfig()
+			if err != nil {
+				return err
+			}
+			cfg.Webhooks.StaffDetection = value.(string)
+			return cfg.Save()
+		}).
+		Build())
+
+	// Notifiers Webhook
+	commands = append(commands, router.NewActionCommandBuilder("wnotifiers", "Notifiers Webhook").
+		WithGetter("Get notifiers webhook", func(ctx *router.Ctx) (any, error) {
+			cfg, err := config.GetConfig()
+			if err != nil {
+				return nil, err
+			}
+			return cfg.Webhooks.Notifiers, nil
+		}).
+		WithSetter("Set notifiers webhook", router.ValueTypeString, func(ctx *router.Ctx, value any) error {
+			cfg, err := config.GetConfig()
+			if err != nil {
+				return err
+			}
+			cfg.Webhooks.Notifiers = value.(string)
+			return cfg.Save()
+		}).
+		Build())
+
+	// Ping Detection Webhook
+	commands = append(commands, router.NewActionCommandBuilder("wpingdetection", "Ping Detection Webhook").
+		WithGetter("Get ping detection webhook", func(ctx *router.Ctx) (any, error) {
+			cfg, err := config.GetConfig()
+			if err != nil {
+				return nil, err
+			}
+			return cfg.Webhooks.PingDetection, nil
+		}).
+		WithSetter("Set ping detection webhook", router.ValueTypeString, func(ctx *router.Ctx, value any) error {
+			cfg, err := config.GetConfig()
+			if err != nil {
+				return err
+			}
+			cfg.Webhooks.PingDetection = value.(string)
+			return cfg.Save()
+		}).
+		Build())
+
+	// Misc Webhook
+	commands = append(commands, router.NewActionCommandBuilder("wmisc", "Misc Webhook").
+		WithGetter("Get misc webhook", func(ctx *router.Ctx) (any, error) {
+			cfg, err := config.GetConfig()
+			if err != nil {
+				return nil, err
+			}
+			return cfg.Webhooks.Misc, nil
+		}).
+		WithSetter("Set misc webhook", router.ValueTypeString, func(ctx *router.Ctx, value any) error {
+			cfg, err := config.GetConfig()
+			if err != nil {
+				return err
+			}
+			cfg.Webhooks.Misc = value.(string)
+			return cfg.Save()
+		}).
+		Build())
+
+	// Sessions Webhook
+	commands = append(commands, router.NewActionCommandBuilder("wsessions", "Sessions Webhook").
+		WithGetter("Get sessions webhook", func(ctx *router.Ctx) (any, error) {
+			cfg, err := config.GetConfig()
+			if err != nil {
+				return nil, err
+			}
+			return cfg.Webhooks.Sessions, nil
+		}).
+		WithSetter("Set sessions webhook", router.ValueTypeString, func(ctx *router.Ctx, value any) error {
+			cfg, err := config.GetConfig()
+			if err != nil {
+				return err
+			}
+			cfg.Webhooks.Sessions = value.(string)
+			return cfg.Save()
+		}).
+		Build())
+
+	// Ping Self Webhook Mode
+	commands = append(commands, router.NewActionCommandBuilder("wpingself", "Ping Self Webhook").
+		WithGetter("Get ping self webhook mode", func(ctx *router.Ctx) (any, error) {
+			cfg, err := config.GetConfig()
+			if err != nil {
+				return nil, err
+			}
+			return cfg.Webhooks.PingSelfMode, nil
+		}).
+		WithSetter("Set ping self webhook mode", router.ValueTypeString, func(ctx *router.Ctx, value any) error {
+			cfg, err := config.GetConfig()
+			if err != nil {
+				return err
+			}
+			cfg.Webhooks.PingSelfMode = value.(string)
+			return cfg.Save()
+		}).
+		WithValues("List available ping self webhook modes", func() []any {
+			return []any{"Disabled", "Always", "Important"}
+		}).
+		Build())
+
+	// Ping Everyone Webhook Mode
+	commands = append(commands, router.NewActionCommandBuilder("wpingeveryone", "Ping Everyone Webhook").
+		WithGetter("Get ping everyone webhook mode", func(ctx *router.Ctx) (any, error) {
+			cfg, err := config.GetConfig()
+			if err != nil {
+				return nil, err
+			}
+			return cfg.Webhooks.PingEveryoneMode, nil
+		}).
+		WithSetter("Set ping everyone webhook mode", router.ValueTypeString, func(ctx *router.Ctx, value any) error {
+			cfg, err := config.GetConfig()
+			if err != nil {
+				return err
+			}
+			cfg.Webhooks.PingEveryoneMode = value.(string)
+			return cfg.Save()
+		}).
+		WithValues("List available ping everyone webhook modes", func() []any {
+			return []any{"Disabled", "Always", "Important"}
+		}).
+		Build())
+
+	// Event settings
+	// Ban Notifier
+	commands = append(commands, router.NewActionCommandBuilder("bannotifier", "Ban Notifier").
+		WithGetter("Get ban notifier status", func(ctx *router.Ctx) (any, error) {
+			cfg, err := config.GetConfig()
+			if err != nil {
+				return nil, err
+			}
+			return cfg.Events.BanNotifier, nil
+		}).
+		WithSetter("Set ban notifier status", router.ValueTypeBool, func(ctx *router.Ctx, value any) error {
+			cfg, err := config.GetConfig()
+			if err != nil {
+				return err
+			}
+			cfg.Events.BanNotifier = value.(bool)
+			return cfg.Save()
+		}).
+		WithToggler("Toggle ban notifier", func(ctx *router.Ctx) error {
+			cfg, err := config.GetConfig()
+			if err != nil {
+				return err
+			}
+			cfg.Events.BanNotifier = !cfg.Events.BanNotifier
+			return cfg.Save()
+		}).
+		Build())
+
+	// Staff Detection
+	commands = append(commands, router.NewActionCommandBuilder("staffdetection", "Staff Detection").
+		WithGetter("Get staff detection status", func(ctx *router.Ctx) (any, error) {
+			cfg, err := config.GetConfig()
+			if err != nil {
+				return nil, err
+			}
+			return cfg.Events.DiscordStaffDetection, nil
+		}).
+		WithSetter("Set staff detection status", router.ValueTypeBool, func(ctx *router.Ctx, value any) error {
+			cfg, err := config.GetConfig()
+			if err != nil {
+				return err
+			}
+			cfg.Events.DiscordStaffDetection = value.(bool)
+			return cfg.Save()
+		}).
+		WithToggler("Toggle staff detection", func(ctx *router.Ctx) error {
+			cfg, err := config.GetConfig()
+			if err != nil {
+				return err
+			}
+			cfg.Events.DiscordStaffDetection = !cfg.Events.DiscordStaffDetection
+			return cfg.Save()
+		}).
+		Build())
+
+	// Ping Detection
+	commands = append(commands, router.NewActionCommandBuilder("pingdetection", "Ping Detection").
+		WithGetter("Get ping detection status", func(ctx *router.Ctx) (any, error) {
+			cfg, err := config.GetConfig()
+			if err != nil {
+				return nil, err
+			}
+			return cfg.Events.GhostPingDetection, nil
+		}).
+		WithSetter("Set ping detection status", router.ValueTypeBool, func(ctx *router.Ctx, value any) error {
+			cfg, err := config.GetConfig()
+			if err != nil {
+				return err
+			}
+			cfg.Events.GhostPingDetection = value.(bool)
+			return cfg.Save()
+		}).
+		WithToggler("Toggle ping detection", func(ctx *router.Ctx) error {
+			cfg, err := config.GetConfig()
+			if err != nil {
+				return err
+			}
+			cfg.Events.GhostPingDetection = !cfg.Events.GhostPingDetection
+			return cfg.Save()
+		}).
+		Build())
+
+	// Ticket Notifier
+	commands = append(commands, router.NewActionCommandBuilder("ticketnotifier", "Ticket Notifier").
+		WithGetter("Get ticket notifier status", func(ctx *router.Ctx) (any, error) {
+			cfg, err := config.GetConfig()
+			if err != nil {
+				return nil, err
+			}
+			return cfg.Events.TicketNotifier, nil
+		}).
+		WithSetter("Set ticket notifier status", router.ValueTypeBool, func(ctx *router.Ctx, value any) error {
+			cfg, err := config.GetConfig()
+			if err != nil {
+				return err
+			}
+			cfg.Events.TicketNotifier = value.(bool)
+			return cfg.Save()
+		}).
+		WithToggler("Toggle ticket notifier", func(ctx *router.Ctx) error {
+			cfg, err := config.GetConfig()
+			if err != nil {
+				return err
+			}
+			cfg.Events.TicketNotifier = !cfg.Events.TicketNotifier
+			return cfg.Save()
+		}).
+		Build())
+
+	// Session Connected
+	commands = append(commands, router.NewActionCommandBuilder("sessionconnected", "Session Connected").
+		WithGetter("Get session connected status", func(ctx *router.Ctx) (any, error) {
+			cfg, err := config.GetConfig()
+			if err != nil {
+				return nil, err
+			}
+			return cfg.Events.SessionConnected, nil
+		}).
+		WithSetter("Set session connected status", router.ValueTypeBool, func(ctx *router.Ctx, value any) error {
+			cfg, err := config.GetConfig()
+			if err != nil {
+				return err
+			}
+			cfg.Events.SessionConnected = value.(bool)
+			return cfg.Save()
+		}).
+		WithToggler("Toggle session connected", func(ctx *router.Ctx) error {
+			cfg, err := config.GetConfig()
+			if err != nil {
+				return err
+			}
+			cfg.Events.SessionConnected = !cfg.Events.SessionConnected
+			return cfg.Save()
+		}).
+		Build())
+
+	// Session Disconnected
+	commands = append(commands, router.NewActionCommandBuilder("sessiondisconnected", "Session Disconnected").
+		WithGetter("Get session disconnected status", func(ctx *router.Ctx) (any, error) {
+			cfg, err := config.GetConfig()
+			if err != nil {
+				return nil, err
+			}
+			return cfg.Events.SessionDisconnected, nil
+		}).
+		WithSetter("Set session disconnected status", router.ValueTypeBool, func(ctx *router.Ctx, value any) error {
+			cfg, err := config.GetConfig()
+			if err != nil {
+				return err
+			}
+			cfg.Events.SessionDisconnected = value.(bool)
+			return cfg.Save()
+		}).
+		WithToggler("Toggle session disconnected", func(ctx *router.Ctx) error {
+			cfg, err := config.GetConfig()
+			if err != nil {
+				return err
+			}
+			cfg.Events.SessionDisconnected = !cfg.Events.SessionDisconnected
+			return cfg.Save()
+		}).
+		Build())
+
+	// Selfbot Detection
+	commands = append(commands, router.NewActionCommandBuilder("selfbotdetection", "Selfbot Detection").
+		WithGetter("Get selfbot detection status", func(ctx *router.Ctx) (any, error) {
+			cfg, err := config.GetConfig()
+			if err != nil {
+				return nil, err
+			}
+			return cfg.Events.SelfbotDetection, nil
+		}).
+		WithSetter("Set selfbot detection status", router.ValueTypeBool, func(ctx *router.Ctx, value any) error {
+			cfg, err := config.GetConfig()
+			if err != nil {
+				return err
+			}
+			cfg.Events.SelfbotDetection = value.(bool)
+			return cfg.Save()
+		}).
+		WithToggler("Toggle selfbot detection", func(ctx *router.Ctx) error {
+			cfg, err := config.GetConfig()
+			if err != nil {
+				return err
+			}
+			cfg.Events.SelfbotDetection = !cfg.Events.SelfbotDetection
+			return cfg.Save()
+		}).
+		Build())
+
+	// DM Typing Notifier
+	commands = append(commands, router.NewActionCommandBuilder("dmtypingnotifier", "DM Typing Notifier").
+		WithGetter("Get DM typing notifier status", func(ctx *router.Ctx) (any, error) {
+			cfg, err := config.GetConfig()
+			if err != nil {
+				return nil, err
+			}
+			return cfg.Events.DMTypingNotifier, nil
+		}).
+		WithSetter("Set DM typing notifier status", router.ValueTypeBool, func(ctx *router.Ctx, value any) error {
+			cfg, err := config.GetConfig()
+			if err != nil {
+				return err
+			}
+			cfg.Events.DMTypingNotifier = value.(bool)
+			return cfg.Save()
+		}).
+		WithToggler("Toggle DM typing notifier", func(ctx *router.Ctx) error {
+			cfg, err := config.GetConfig()
+			if err != nil {
+				return err
+			}
+			cfg.Events.DMTypingNotifier = !cfg.Events.DMTypingNotifier
+			return cfg.Save()
+		}).
+		Build())
+
+	// DM Notifier
+	commands = append(commands, router.NewActionCommandBuilder("dmnotifier", "DM Notifier").
+		WithGetter("Get DM notifier status", func(ctx *router.Ctx) (any, error) {
+			cfg, err := config.GetConfig()
+			if err != nil {
+				return nil, err
+			}
+			return cfg.Events.DMNotifier, nil
+		}).
+		WithSetter("Set DM notifier status", router.ValueTypeBool, func(ctx *router.Ctx, value any) error {
+			cfg, err := config.GetConfig()
+			if err != nil {
+				return err
+			}
+			cfg.Events.DMNotifier = value.(bool)
+			return cfg.Save()
+		}).
+		WithToggler("Toggle DM notifier", func(ctx *router.Ctx) error {
+			cfg, err := config.GetConfig()
+			if err != nil {
+				return err
+			}
+			cfg.Events.DMNotifier = !cfg.Events.DMNotifier
+			return cfg.Save()
+		}).
+		Build())
+
+	// DM Edit Notifier
+	commands = append(commands, router.NewActionCommandBuilder("dmeditnotifier", "DM Edit Notifier").
+		WithGetter("Get DM edit notifier status", func(ctx *router.Ctx) (any, error) {
+			cfg, err := config.GetConfig()
+			if err != nil {
+				return nil, err
+			}
+			return cfg.Events.DMEditNotifier, nil
+		}).
+		WithSetter("Set DM edit notifier status", router.ValueTypeBool, func(ctx *router.Ctx, value any) error {
+			cfg, err := config.GetConfig()
+			if err != nil {
+				return err
+			}
+			cfg.Events.DMEditNotifier = value.(bool)
+			return cfg.Save()
+		}).
+		WithToggler("Toggle DM edit notifier", func(ctx *router.Ctx) error {
+			cfg, err := config.GetConfig()
+			if err != nil {
+				return err
+			}
+			cfg.Events.DMEditNotifier = !cfg.Events.DMEditNotifier
+			return cfg.Save()
+		}).
+		Build())
+
+	// DM Delete Notifier
+	commands = append(commands, router.NewActionCommandBuilder("dmdeletenotifier", "DM Delete Notifier").
+		WithGetter("Get DM delete notifier status", func(ctx *router.Ctx) (any, error) {
+			cfg, err := config.GetConfig()
+			if err != nil {
+				return nil, err
+			}
+			return cfg.Events.DMDeleteNotifier, nil
+		}).
+		WithSetter("Set DM delete notifier status", router.ValueTypeBool, func(ctx *router.Ctx, value any) error {
+			cfg, err := config.GetConfig()
+			if err != nil {
+				return err
+			}
+			cfg.Events.DMDeleteNotifier = value.(bool)
+			return cfg.Save()
+		}).
+		WithToggler("Toggle DM delete notifier", func(ctx *router.Ctx) error {
+			cfg, err := config.GetConfig()
+			if err != nil {
+				return err
+			}
+			cfg.Events.DMDeleteNotifier = !cfg.Events.DMDeleteNotifier
+			return cfg.Save()
+		}).
+		Build())
+
+	// Message Delete Notifier
+	commands = append(commands, router.NewActionCommandBuilder("messagedeletenotifier", "Message Delete Notifier").
+		WithGetter("Get message delete notifier status", func(ctx *router.Ctx) (any, error) {
+			cfg, err := config.GetConfig()
+			if err != nil {
+				return nil, err
+			}
+			return cfg.Events.MessageDeleteNotifier, nil
+		}).
+		WithSetter("Set message delete notifier status", router.ValueTypeBool, func(ctx *router.Ctx, value any) error {
+			cfg, err := config.GetConfig()
+			if err != nil {
+				return err
+			}
+			cfg.Events.MessageDeleteNotifier = value.(bool)
+			return cfg.Save()
+		}).
+		WithToggler("Toggle message delete notifier", func(ctx *router.Ctx) error {
+			cfg, err := config.GetConfig()
+			if err != nil {
+				return err
+			}
+			cfg.Events.MessageDeleteNotifier = !cfg.Events.MessageDeleteNotifier
+			return cfg.Save()
+		}).
+		Build())
+
+	// UI Theme
+	commands = append(commands, router.NewActionCommandBuilder("uitheme", "UI Theme").
+		WithGetter("Get UI theme", func(ctx *router.Ctx) (any, error) {
+			cfg, err := config.GetConfig()
+			if err != nil {
+				return nil, err
+			}
+			return cfg.UI.Theme, nil
+		}).
+		WithSetter("Set UI theme", router.ValueTypeString, func(ctx *router.Ctx, value any) error {
+			cfg, err := config.GetConfig()
+			if err != nil {
+				return err
+			}
+			cfg.UI.Theme = value.(string)
+			return cfg.Save()
+		}).
+		WithValues("List available UI themes", func() []any {
+			return []any{"Dark", "Light"}
+		}).
+		Build())
+
+	// Hide to System Tray
+	commands = append(commands, router.NewActionCommandBuilder("hidesystemtray", "Hide to System Tray").
+		WithGetter("Get hide to system tray status", func(ctx *router.Ctx) (any, error) {
+			cfg, err := config.GetConfig()
+			if err != nil {
+				return nil, err
+			}
+			return cfg.UI.HideToSystemTray, nil
+		}).
+		WithSetter("Set hide to system tray status", router.ValueTypeBool, func(ctx *router.Ctx, value any) error {
+			cfg, err := config.GetConfig()
+			if err != nil {
+				return err
+			}
+			cfg.UI.HideToSystemTray = value.(bool)
+			return cfg.Save()
+		}).
+		WithToggler("Toggle hide to system tray", func(ctx *router.Ctx) error {
+			cfg, err := config.GetConfig()
+			if err != nil {
+				return err
+			}
+			cfg.UI.HideToSystemTray = !cfg.UI.HideToSystemTray
+			return cfg.Save()
+		}).
+		Build())
+
+	// Run UI on Startup
+	commands = append(commands, router.NewActionCommandBuilder("runuionstartup", "Run UI on Startup").
+		WithGetter("Get run UI on startup status", func(ctx *router.Ctx) (any, error) {
+			cfg, err := config.GetConfig()
+			if err != nil {
+				return nil, err
+			}
+			return cfg.UI.RunOnStartup, nil
+		}).
+		WithSetter("Set run UI on startup status", router.ValueTypeBool, func(ctx *router.Ctx, value any) error {
+			cfg, err := config.GetConfig()
+			if err != nil {
+				return err
+			}
+			cfg.UI.RunOnStartup = value.(bool)
+			return cfg.Save()
+		}).
+		WithToggler("Toggle run UI on startup", func(ctx *router.Ctx) error {
+			cfg, err := config.GetConfig()
+			if err != nil {
+				return err
+			}
+			cfg.UI.RunOnStartup = !cfg.UI.RunOnStartup
+			return cfg.Save()
+		}).
+		Build())
+
+	// Run Bot on Startup
+	commands = append(commands, router.NewActionCommandBuilder("runbotonstartup", "Run Bot on Startup").
+		WithGetter("Get run bot on startup status", func(ctx *router.Ctx) (any, error) {
+			cfg, err := config.GetConfig()
+			if err != nil {
+				return nil, err
+			}
+			return cfg.UI.RunOnStartup, nil
+		}).
+		WithSetter("Set run bot on startup status", router.ValueTypeBool, func(ctx *router.Ctx, value any) error {
+			cfg, err := config.GetConfig()
+			if err != nil {
+				return err
+			}
+			cfg.UI.RunOnStartup = value.(bool)
+			return cfg.Save()
+		}).
+		WithToggler("Toggle run bot on startup", func(ctx *router.Ctx) error {
+			cfg, err := config.GetConfig()
+			if err != nil {
+				return err
+			}
+			cfg.UI.RunOnStartup = !cfg.UI.RunOnStartup
+			return cfg.Save()
+		}).
+		Build())
+
 	cmdRouter.RegisterCategory(&router.Category{
 		Name:        "Config",
 		Description: "Change the bot's settings",
-	}, []*router.Command{
-		c.createConfigActionCommand(configCommandData{
-			Name:         "commandprefix",
-			ReadableName: "Command Prefix",
-			ValueType:    configCommandValueTypeString,
-			GetDesc:      "Get the current command prefix",
-			GetFunc:      func(cfg *config.Config) any { return cfg.Selfbot.CommandPrefix },
-			SetDesc:      "Set the command prefix",
-			SetFunc:      func(cfg *config.Config, value any) { cfg.Selfbot.CommandPrefix = value.(string) },
-		}),
-		c.createConfigActionCommand(configCommandData{
-			Name:         "commandmode",
-			ReadableName: "Command Mode",
-			ValueType:    configCommandValueTypeString,
-			GetDesc:      "Get the current command mode",
-			GetFunc:      func(cfg *config.Config) any { return cfg.Selfbot.CommandMode },
-			SetDesc:      "Set the command mode",
-			SetFunc:      func(cfg *config.Config, value any) { cfg.Selfbot.CommandMode = value.(string) },
-			ValuesDesc:   "List available command modes",
-			ValuesFunc:   func() []any { return []any{"Codeblock", "Text", "Indent", "WebhookEmbed", "URLEmbed"} },
-		}),
-		c.createConfigActionCommand(configCommandData{
-			Name:         "title",
-			ReadableName: "Embed Title",
-			ValueType:    configCommandValueTypeString,
-			GetDesc:      "Get the current embed title",
-			GetFunc:      func(cfg *config.Config) any { return cfg.Selfbot.Title },
-			SetDesc:      "Set the embed title",
-			SetFunc:      func(cfg *config.Config, value any) { cfg.Selfbot.Title = value.(string) },
-		}),
-
-		c.createConfigActionCommand(configCommandData{
-			Name:         "footer",
-			ReadableName: "Embed Footer",
-			ValueType:    configCommandValueTypeString,
-			GetDesc:      "Get the current embed footer",
-			GetFunc:      func(cfg *config.Config) any { return cfg.Selfbot.Footer },
-			SetDesc:      "Set the embed footer",
-			SetFunc:      func(cfg *config.Config, value any) { cfg.Selfbot.Footer = value.(string) },
-		}),
-		c.createConfigActionCommand(configCommandData{
-			Name:         "delresponses",
-			ReadableName: "Delete Responses",
-			ValueType:    configCommandValueTypeBool,
-			GetDesc:      "Get delete responses status",
-			GetFunc:      func(cfg *config.Config) any { return cfg.Selfbot.DeleteResponses },
-			SetDesc:      "Set delete responses status",
-			SetFunc:      func(cfg *config.Config, value any) { cfg.Selfbot.DeleteResponses = value.(bool) },
-			ToggleDesc:   "Toggle delete responses",
-			ToggleFunc:   func(cfg *config.Config) { cfg.Selfbot.DeleteResponses = !cfg.Selfbot.DeleteResponses },
-		}),
-		c.createConfigActionCommand(configCommandData{
-			Name:         "delresponsesdelay",
-			ReadableName: "Delete Responses Delay",
-			ValueType:    configCommandValueTypeDuration,
-			GetDesc:      "Get delete responses delay",
-			GetFunc:      func(cfg *config.Config) any { return cfg.Selfbot.DeleteResponsesDelay },
-			SetDesc:      "Set delete responses delay",
-			SetFunc:      func(cfg *config.Config, value any) { cfg.Selfbot.DeleteResponsesDelay = value.(int) },
-		}),
-		c.createConfigActionCommand(configCommandData{
-			Name:         "delcommands",
-			ReadableName: "Delete Commands",
-			ValueType:    configCommandValueTypeBool,
-			GetDesc:      "Get delete commands status",
-			GetFunc:      func(cfg *config.Config) any { return cfg.Selfbot.DeleteCommands },
-			SetDesc:      "Set delete commands status",
-			SetFunc:      func(cfg *config.Config, value any) { cfg.Selfbot.DeleteCommands = value.(bool) },
-			ToggleDesc:   "Toggle delete commands",
-			ToggleFunc:   func(cfg *config.Config) { cfg.Selfbot.DeleteCommands = !cfg.Selfbot.DeleteCommands },
-		}),
-		c.createConfigActionCommand(configCommandData{
-			Name:         "clientspoof",
-			ReadableName: "Client Spoof",
-			ValueType:    configCommandValueTypeString,
-			GetDesc:      "Get current client spoof setting",
-			GetFunc:      func(cfg *config.Config) any { return cfg.Selfbot.Client },
-			SetDesc:      "Set client spoof setting",
-			SetFunc:      func(cfg *config.Config, value any) { cfg.Selfbot.Client = utils.String.Capitalize(value.(string)) },
-			ValuesDesc:   "List available clients",
-			ValuesFunc:   func() []any { return []any{"Mobile", "Web", "Desktop", "Console"} },
-		}),
-		c.createConfigActionCommand(configCommandData{
-			Name:         "timezone",
-			ReadableName: "Timezone",
-			ValueType:    configCommandValueTypeString,
-			GetDesc:      "Get current timezone",
-			GetFunc:      func(cfg *config.Config) any { return cfg.Selfbot.Timezone },
-			SetDesc:      "Set timezone",
-			SetFunc: func(cfg *config.Config, value any) {
-				timezone := value.(string)
-				if _, err := time.LoadLocation(timezone); err == nil {
-					cfg.Selfbot.Timezone = timezone
-				}
-			},
-		}),
-		c.createConfigActionCommand(configCommandData{
-			Name:         "embedcolor",
-			ReadableName: "Embed Color",
-			ValueType:    configCommandValueTypeString,
-			GetDesc:      "Get current embed color",
-			GetFunc:      func(cfg *config.Config) any { return cfg.Selfbot.EmbedColor },
-			SetDesc:      "Set embed color",
-			SetFunc:      func(cfg *config.Config, value any) { cfg.Selfbot.EmbedColor = value.(string) },
-		}),
-		c.createConfigActionCommand(configCommandData{
-			Name:         "embedimage",
-			ReadableName: "Embed Image",
-			ValueType:    configCommandValueTypeString,
-			GetDesc:      "Get current embed image",
-			GetFunc:      func(cfg *config.Config) any { return cfg.Selfbot.EmbedImage },
-			SetDesc:      "Set embed image",
-			SetFunc:      func(cfg *config.Config, value any) { cfg.Selfbot.EmbedImage = value.(string) },
-		}),
-		c.createConfigActionCommand(configCommandData{
-			Name:         "embedurl",
-			ReadableName: "Embed URL",
-			ValueType:    configCommandValueTypeString,
-			GetDesc:      "Get current embed URL",
-			GetFunc:      func(cfg *config.Config) any { return cfg.Selfbot.EmbedURL },
-			SetDesc:      "Set embed URL",
-			SetFunc:      func(cfg *config.Config, value any) { cfg.Selfbot.EmbedURL = value.(string) },
-		}),
-		// c.createConfigActionCommand(configCommandData{
-		// 	Name:         "forcesubscribedservers",
-		// 	ReadableName: "Force Subscribed Servers",
-		// 	ValueType:    configCommandValueTypeBool,
-		// 	GetDesc:      "Get force subscribed servers status",
-		// 	GetFunc:      func(cfg *config.Config) any { return len(cfg.Selfbot.ForceSubscribedServers) > 0 },
-		// 	SetDesc:      "Set force subscribed servers status",
-		// 	SetFunc: func(cfg *config.Config, value any) {
-		// 		if value.(bool) {
-		// 			guildIDs := make([]string, 0)
-		// 			for _, guild := range c.services.Discord.GetState().Guilds {
-		// 				guildIDs = append(guildIDs, guild.ID)
-		// 			}
-		// 			cfg.Selfbot.ForceSubscribedServers = guildIDs
-		// 		} else {
-		// 			cfg.Selfbot.ForceSubscribedServers = []string{}
-		// 		}
-		// 	},
-		// 	ToggleDesc: "Toggle force subscribed servers",
-		// 	ToggleFunc: func(cfg *config.Config) {
-		// 		if len(cfg.Selfbot.ForceSubscribedServers) > 0 {
-		// 			cfg.Selfbot.ForceSubscribedServers = []string{}
-		// 		} else {
-		// 			guildIDs := make([]string, 0)
-		// 			for _, guild := range c.services.Discord.GetState().Guilds {
-		// 				guildIDs = append(guildIDs, guild.ID)
-		// 			}
-		// 			cfg.Selfbot.ForceSubscribedServers = guildIDs
-		// 		}
-		// 	},
-		// }),
-		// {
-		// 	Name:        "aliases",
-		// 	Description: "Command aliases commands",
-		// 	Flags:       []router.CommandFlag{router.CmdFlagDangerous},
-		// 	SubCommands: []*router.Command{
-		// 		{
-		// 			Name:        "get",
-		// 			Description: "Get a command alias",
-		// 			Arguments:   "<alias>",
-		// 			Handler:     c.getAlias,
-		// 		},
-		// 		{
-		// 			Name:        "set",
-		// 			Description: "Set a command alias",
-		// 			Arguments:   "<alias> <command>",
-		// 			Handler:     c.setAlias,
-		// 		},
-		// 		{
-		// 			Name:        "rm",
-		// 			Description: "Remove a command alias",
-		// 			Arguments:   "<alias>",
-		// 			Handler:     c.removeAlias,
-		// 		},
-		// 		{
-		// 			Name:        "list",
-		// 			Description: "List all command aliases",
-		// 			Handler:     c.listAliases,
-		// 		},
-		// 		{
-		// 			Name:        "clear",
-		// 			Description: "Clear all command aliases",
-		// 			Handler:     c.clearAliases,
-		// 		},
-		// 	},
-		// },
-		c.createConfigActionCommand(configCommandData{
-			Name:         "notifications",
-			ReadableName: "Notifications",
-			ValueType:    configCommandValueTypeBool,
-			GetDesc:      "Get notifications status",
-			GetFunc:      func(cfg *config.Config) any { return cfg.Notifications.Enabled },
-			SetDesc:      "Set notifications status",
-			SetFunc:      func(cfg *config.Config, value any) { cfg.Notifications.Enabled = value.(bool) },
-			ToggleDesc:   "Toggle notifications",
-			ToggleFunc:   func(cfg *config.Config) { cfg.Notifications.Enabled = !cfg.Notifications.Enabled },
-			ExampleDesc:  "Show an example of a notification",
-			ExampleFunc: func() {
-				c.services.UI.ShowNotification("This is an example notification.")
-			},
-		}),
-		c.createConfigActionCommand(configCommandData{
-			Name:         "nitrosniper",
-			ReadableName: "Nitro Sniper",
-			ValueType:    configCommandValueTypeBool,
-			GetDesc:      "Get nitro sniper status",
-			GetFunc:      func(cfg *config.Config) any { return cfg.Snipers.NitroSniper },
-			SetDesc:      "Set nitro sniper status",
-			SetFunc:      func(cfg *config.Config, value any) { cfg.Snipers.NitroSniper = value.(bool) },
-			ToggleDesc:   "Toggle nitro sniper",
-			ToggleFunc:   func(cfg *config.Config) { cfg.Snipers.NitroSniper = !cfg.Snipers.NitroSniper },
-		}),
-		c.createConfigActionCommand(configCommandData{
-			Name:         "giveawaysniper",
-			ReadableName: "Giveaway Sniper",
-			ValueType:    configCommandValueTypeBool,
-			GetDesc:      "Get giveaway sniper status",
-			GetFunc:      func(cfg *config.Config) any { return cfg.Snipers.GiveawaySniper.Enabled },
-			SetDesc:      "Set giveaway sniper status",
-			SetFunc:      func(cfg *config.Config, value any) { cfg.Snipers.GiveawaySniper.Enabled = value.(bool) },
-			ToggleDesc:   "Toggle giveaway sniper",
-			ToggleFunc:   func(cfg *config.Config) { cfg.Snipers.GiveawaySniper.Enabled = !cfg.Snipers.GiveawaySniper.Enabled },
-		}),
-		c.createConfigActionCommand(configCommandData{
-			Name:         "giveawaysnipersleep",
-			ReadableName: "Giveaway Sniper Sleep",
-			ValueType:    configCommandValueTypeDuration,
-			GetDesc:      "Get giveaway sniper sleep duration",
-			GetFunc:      func(cfg *config.Config) any { return cfg.Snipers.GiveawaySniper.Sleep },
-			SetDesc:      "Set giveaway sniper sleep duration",
-			SetFunc:      func(cfg *config.Config, value any) { cfg.Snipers.GiveawaySniper.Sleep = value.(int) },
-		}),
-		// {
-		// 	Name:        "customgiveawaybots",
-		// 	Description: "Custom giveaway bots commands",
-		// 	Flags:       []router.CommandFlag{router.CmdFlagDangerous},
-		// 	SubCommands: []*router.Command{
-		// 		{
-		// 			Name:        "add",
-		// 			Description: "Add a custom giveaway bot",
-		// 			Arguments:   "<bot id>",
-		// 			Handler:     c.addCustomGiveawayBot,
-		// 		},
-		// 		{
-		// 			Name:        "rm",
-		// 			Description: "Remove a custom giveaway bot",
-		// 			Arguments:   "<bot id>",
-		// 			Handler:     c.removeCustomGiveawayBot,
-		// 		},
-		// 		{
-		// 			Name:        "list",
-		// 			Description: "List custom giveaway bots",
-		// 			Handler:     c.listCustomGiveawayBots,
-		// 		},
-		// 		{
-		// 			Name:        "clear",
-		// 			Description: "Clear all custom giveaway bots",
-		// 			Handler:     c.clearCustomGiveawayBots,
-		// 		},
-		// 	},
-		// },
-		// {
-		// 	Name:        "sniperblacklist",
-		// 	Description: "Sniper blacklist commands",
-		// 	Flags:       []router.CommandFlag{router.CmdFlagDangerous},
-		// 	SubCommands: []*router.Command{
-		// 		{
-		// 			Name:        "add",
-		// 			Description: "Add a user to sniper blacklist",
-		// 			Arguments:   "<user>",
-		// 			Handler:     c.addSniperBlacklist,
-		// 		},
-		// 		{
-		// 			Name:        "rm",
-		// 			Description: "Remove a user from sniper blacklist",
-		// 			Arguments:   "<user>",
-		// 			Handler:     c.removeSniperBlacklist,
-		// 		},
-		// 		{
-		// 			Name:        "list",
-		// 			Description: "List sniper blacklist",
-		// 			Handler:     c.listSniperBlacklist,
-		// 		},
-		// 		{
-		// 			Name:        "clear",
-		// 			Description: "Clear sniper blacklist",
-		// 			Handler:     c.clearSniperBlacklist,
-		// 		},
-		// 	},
-		// },
-		// {
-		// 	Name:        "sniperserverblacklist",
-		// 	Description: "Sniper server blacklist commands",
-		// 	Flags:       []router.CommandFlag{router.CmdFlagDangerous},
-		// 	SubCommands: []*router.Command{
-		// 		{
-		// 			Name:        "add",
-		// 			Description: "Add a server to sniper blacklist",
-		// 			Arguments:   "<server>",
-		// 			Handler:     c.addSniperServerBlacklist,
-		// 		},
-		// 		{
-		// 			Name:        "rm",
-		// 			Description: "Remove a server from sniper blacklist",
-		// 			Arguments:   "<server>",
-		// 			Handler:     c.removeSniperServerBlacklist,
-		// 		},
-		// 		{
-		// 			Name:        "list",
-		// 			Description: "List sniper server blacklist",
-		// 			Handler:     c.listSniperServerBlacklist,
-		// 		},
-		// 		{
-		// 			Name:        "clear",
-		// 			Description: "Clear sniper server blacklist",
-		// 			Handler:     c.clearSniperServerBlacklist,
-		// 		},
-		// 	},
-		// },
-		c.createConfigActionCommand(configCommandData{
-			Name:         "multitokensniper",
-			ReadableName: "Multi-Token Sniper",
-			ValueType:    configCommandValueTypeBool,
-			GetDesc:      "Get multi-token sniper status",
-			GetFunc:      func(cfg *config.Config) any { return cfg.Snipers.MultiTokenSniper },
-			SetDesc:      "Set multi-token sniper status",
-			SetFunc:      func(cfg *config.Config, value any) { cfg.Snipers.MultiTokenSniper = value.(bool) },
-			ToggleDesc:   "Toggle multi-token sniper",
-			ToggleFunc:   func(cfg *config.Config) { cfg.Snipers.MultiTokenSniper = !cfg.Snipers.MultiTokenSniper },
-		}),
-		// snipertokens
-		c.createConfigActionCommand(configCommandData{
-			Name:         "privnotesniper",
-			ReadableName: "Private Note Sniper",
-			ValueType:    configCommandValueTypeBool,
-			GetDesc:      "Get private note sniper status",
-			GetFunc:      func(cfg *config.Config) any { return cfg.Snipers.PrivnoteSniper },
-			SetDesc:      "Set private note sniper status",
-			SetFunc:      func(cfg *config.Config, value any) { cfg.Snipers.PrivnoteSniper = value.(bool) },
-			ToggleDesc:   "Toggle private note sniper",
-			ToggleFunc:   func(cfg *config.Config) { cfg.Snipers.PrivnoteSniper = !cfg.Snipers.PrivnoteSniper },
-		}),
-		c.createConfigActionCommand(configCommandData{
-			Name:         "poketwosniper",
-			ReadableName: "Poketwo Sniper",
-			ValueType:    configCommandValueTypeBool,
-			GetDesc:      "Get poketwo sniper status",
-			GetFunc:      func(cfg *config.Config) any { return cfg.Snipers.PokeTwoSniper.Enabled },
-			SetDesc:      "Set poketwo sniper status",
-			SetFunc:      func(cfg *config.Config, value any) { cfg.Snipers.PokeTwoSniper.Enabled = value.(bool) },
-			ToggleDesc:   "Toggle poketwo sniper",
-			ToggleFunc:   func(cfg *config.Config) { cfg.Snipers.PokeTwoSniper.Enabled = !cfg.Snipers.PokeTwoSniper.Enabled },
-		}),
-		c.createConfigActionCommand(configCommandData{
-			Name:         "poketwosleep",
-			ReadableName: "Poketwo Sniper Sleep",
-			ValueType:    configCommandValueTypeDuration,
-			GetDesc:      "Get poketwo sniper sleep duration",
-			GetFunc:      func(cfg *config.Config) any { return cfg.Snipers.PokeTwoSniper.Sleep },
-			SetDesc:      "Set poketwo sniper sleep duration",
-			SetFunc:      func(cfg *config.Config, value any) { cfg.Snipers.PokeTwoSniper.Sleep = value.(int) },
-		}),
-		c.createConfigActionCommand(configCommandData{
-			Name:         "poketworandomsleep",
-			ReadableName: "Poketwo Sniper Random Sleep",
-			ValueType:    configCommandValueTypeBool,
-			GetDesc:      "Get poketwo sniper random sleep status",
-			GetFunc:      func(cfg *config.Config) any { return cfg.Snipers.PokeTwoSniper.RandomSleep },
-			SetDesc:      "Set poketwo sniper random sleep status",
-			SetFunc:      func(cfg *config.Config, value any) { cfg.Snipers.PokeTwoSniper.RandomSleep = value.(bool) },
-			ToggleDesc:   "Toggle poketwo sniper random sleep",
-			ToggleFunc: func(cfg *config.Config) {
-				cfg.Snipers.PokeTwoSniper.RandomSleep = !cfg.Snipers.PokeTwoSniper.RandomSleep
-			},
-		}),
-		c.createConfigActionCommand(configCommandData{
-			Name:         "poketwotimeout",
-			ReadableName: "Poketwo Sniper Timeout",
-			ValueType:    configCommandValueTypeDuration,
-			GetDesc:      "Get poketwo sniper timeout duration",
-			GetFunc:      func(cfg *config.Config) any { return cfg.Snipers.PokeTwoSniper.Timeout },
-			SetDesc:      "Set poketwo sniper timeout duration",
-			SetFunc:      func(cfg *config.Config, value any) { cfg.Snipers.PokeTwoSniper.Timeout = value.(int) },
-		}),
-		c.createConfigActionCommand(configCommandData{
-			Name:         "poketwotyping",
-			ReadableName: "Poketwo Sniper Typing",
-			ValueType:    configCommandValueTypeBool,
-			GetDesc:      "Get poketwo sniper typing status",
-			GetFunc:      func(cfg *config.Config) any { return cfg.Snipers.PokeTwoSniper.Typing },
-			SetDesc:      "Set poketwo sniper typing status",
-			SetFunc:      func(cfg *config.Config, value any) { cfg.Snipers.PokeTwoSniper.Typing = value.(bool) },
-			ToggleDesc:   "Toggle poketwo sniper typing",
-			ToggleFunc:   func(cfg *config.Config) { cfg.Snipers.PokeTwoSniper.Typing = !cfg.Snipers.PokeTwoSniper.Typing },
-		}),
-		c.createConfigActionCommand(configCommandData{
-			Name:         "poketwocatchrate",
-			ReadableName: "Poketwo Sniper Catch Rate",
-			ValueType:    configCommandValueTypePercentage,
-			GetDesc:      "Get poketwo sniper catch rate",
-			GetFunc:      func(cfg *config.Config) any { return cfg.Snipers.PokeTwoSniper.CatchRate },
-			SetDesc:      "Set poketwo sniper catch rate",
-			SetFunc:      func(cfg *config.Config, value any) { cfg.Snipers.PokeTwoSniper.CatchRate = value.(int) },
-		}),
-		c.createConfigActionCommand(configCommandData{
-			Name:         "poketwofakeactivity",
-			ReadableName: "Poketwo Sniper Fake Activity",
-			ValueType:    configCommandValueTypeBool,
-			GetDesc:      "Get poketwo sniper fake activity status",
-			GetFunc:      func(cfg *config.Config) any { return cfg.Snipers.PokeTwoSniper.FakeActivity },
-			SetDesc:      "Set poketwo sniper fake activity status",
-			SetFunc:      func(cfg *config.Config, value any) { cfg.Snipers.PokeTwoSniper.FakeActivity = value.(bool) },
-			ToggleDesc:   "Toggle poketwo sniper fake activity",
-			ToggleFunc: func(cfg *config.Config) {
-				cfg.Snipers.PokeTwoSniper.FakeActivity = !cfg.Snipers.PokeTwoSniper.FakeActivity
-			},
-		}),
-		// poketwochannels
-		c.createConfigActionCommand(configCommandData{
-			Name:         "poketwolanguage",
-			ReadableName: "Poketwo Sniper Language",
-			ValueType:    configCommandValueTypeString,
-			GetDesc:      "Get poketwo sniper language",
-			GetFunc:      func(cfg *config.Config) any { return cfg.Snipers.PokeTwoSniper.CatchLanguage },
-			SetDesc:      "Set poketwo sniper language",
-			SetFunc:      func(cfg *config.Config, value any) { cfg.Snipers.PokeTwoSniper.CatchLanguage = value.(string) },
-			ValuesDesc:   "List available languages",
-			ValuesFunc:   func() []any { return []any{"en", "ja", "ja_t", "fr", "de"} },
-		}),
-		// setupwebhooks
-		// wall
-		c.createConfigActionCommand(configCommandData{
-			Name:         "wnitro",
-			ReadableName: "Nitro Sniper Webhook",
-			ValueType:    configCommandValueTypeString,
-			GetDesc:      "Get nitro sniper webhook",
-			GetFunc:      func(cfg *config.Config) any { return cfg.Webhooks.NitroSniper },
-			SetDesc:      "Set nitro sniper webhook",
-			SetFunc:      func(cfg *config.Config, value any) { cfg.Webhooks.NitroSniper = value.(string) },
-		}),
-		c.createConfigActionCommand(configCommandData{
-			Name:         "wgiveawaysniper",
-			ReadableName: "Giveaway Sniper Webhook",
-			ValueType:    configCommandValueTypeString,
-			GetDesc:      "Get giveaway sniper webhook",
-			GetFunc:      func(cfg *config.Config) any { return cfg.Webhooks.GiveawaySniper },
-			SetDesc:      "Set giveaway sniper webhook",
-			SetFunc:      func(cfg *config.Config, value any) { cfg.Webhooks.GiveawaySniper = value.(string) },
-		}),
-		c.createConfigActionCommand(configCommandData{
-			Name:         "wselfbotdetection",
-			ReadableName: "Selfbot Detection Webhook",
-			ValueType:    configCommandValueTypeString,
-			GetDesc:      "Get selfbot detection webhook",
-			GetFunc:      func(cfg *config.Config) any { return cfg.Webhooks.SelfbotDetection },
-			SetDesc:      "Set selfbot detection webhook",
-			SetFunc:      func(cfg *config.Config, value any) { cfg.Webhooks.SelfbotDetection = value.(string) },
-		}),
-		c.createConfigActionCommand(configCommandData{
-			Name:         "wstaffdetection",
-			ReadableName: "Staff Detection Webhook",
-			ValueType:    configCommandValueTypeString,
-			GetDesc:      "Get staff detection webhook",
-			GetFunc:      func(cfg *config.Config) any { return cfg.Webhooks.StaffDetection },
-			SetDesc:      "Set staff detection webhook",
-			SetFunc:      func(cfg *config.Config, value any) { cfg.Webhooks.StaffDetection = value.(string) },
-		}),
-		c.createConfigActionCommand(configCommandData{
-			Name:         "wnotifiers",
-			ReadableName: "Notifiers Webhook",
-			ValueType:    configCommandValueTypeString,
-			GetDesc:      "Get notifiers webhook",
-			GetFunc:      func(cfg *config.Config) any { return cfg.Webhooks.Notifiers },
-			SetDesc:      "Set notifiers webhook",
-			SetFunc:      func(cfg *config.Config, value any) { cfg.Webhooks.Notifiers = value.(string) },
-		}),
-		c.createConfigActionCommand(configCommandData{
-			Name:         "wpingdetection",
-			ReadableName: "Ping Detection Webhook",
-			ValueType:    configCommandValueTypeString,
-			GetDesc:      "Get ping detection webhook",
-			GetFunc:      func(cfg *config.Config) any { return cfg.Webhooks.PingDetection },
-			SetDesc:      "Set ping detection webhook",
-			SetFunc:      func(cfg *config.Config, value any) { cfg.Webhooks.PingDetection = value.(string) },
-		}),
-		c.createConfigActionCommand(configCommandData{
-			Name:         "wmisc",
-			ReadableName: "Misc Webhook",
-			ValueType:    configCommandValueTypeString,
-			GetDesc:      "Get misc webhook",
-			GetFunc:      func(cfg *config.Config) any { return cfg.Webhooks.Misc },
-			SetDesc:      "Set misc webhook",
-			SetFunc:      func(cfg *config.Config, value any) { cfg.Webhooks.Misc = value.(string) },
-		}),
-		c.createConfigActionCommand(configCommandData{
-			Name:         "wsessions",
-			ReadableName: "Sessions Webhook",
-			ValueType:    configCommandValueTypeString,
-			GetDesc:      "Get sessions webhook",
-			GetFunc:      func(cfg *config.Config) any { return cfg.Webhooks.Sessions },
-			SetDesc:      "Set sessions webhook",
-			SetFunc:      func(cfg *config.Config, value any) { cfg.Webhooks.Sessions = value.(string) },
-		}),
-		c.createConfigActionCommand(configCommandData{
-			Name:         "wpingself",
-			ReadableName: "Ping Self Webhook",
-			ValueType:    configCommandValueTypeString,
-			GetDesc:      "Get ping self webhook status",
-			GetFunc:      func(cfg *config.Config) any { return cfg.Webhooks.PingSelfMode },
-			SetDesc:      "Set ping self webhook status",
-			SetFunc:      func(cfg *config.Config, value any) { cfg.Webhooks.PingSelfMode = value.(string) },
-			ValuesDesc:   "List available ping self webhook modes",
-			ValuesFunc:   func() []any { return []any{"Disabled, Always, Important"} },
-		}),
-		c.createConfigActionCommand(configCommandData{
-			Name:         "wpingeveryone",
-			ReadableName: "Ping Everyone Webhook",
-			ValueType:    configCommandValueTypeString,
-			GetDesc:      "Get ping everyone webhook status",
-			GetFunc:      func(cfg *config.Config) any { return cfg.Webhooks.PingEveryoneMode },
-			SetDesc:      "Set ping everyone webhook status",
-			SetFunc:      func(cfg *config.Config, value any) { cfg.Webhooks.PingEveryoneMode = value.(string) },
-			ValuesDesc:   "List available ping everyone webhook modes",
-			ValuesFunc:   func() []any { return []any{"Disabled, Always, Important"} },
-		}),
-		c.createConfigActionCommand(configCommandData{
-			Name:         "bannotifier",
-			ReadableName: "Ban Notifier",
-			ValueType:    configCommandValueTypeBool,
-			GetDesc:      "Get ban notifier status",
-			GetFunc:      func(cfg *config.Config) any { return cfg.Events.BanNotifier },
-			SetDesc:      "Set ban notifier status",
-			SetFunc:      func(cfg *config.Config, value any) { cfg.Events.BanNotifier = value.(bool) },
-			ToggleDesc:   "Toggle ban notifier",
-			ToggleFunc:   func(cfg *config.Config) { cfg.Events.BanNotifier = !cfg.Events.BanNotifier },
-		}),
-		c.createConfigActionCommand(configCommandData{
-			Name:         "staffdetection",
-			ReadableName: "Staff Detection",
-			ValueType:    configCommandValueTypeBool,
-			GetDesc:      "Get staff detection status",
-			GetFunc:      func(cfg *config.Config) any { return cfg.Events.DiscordStaffDetection },
-			SetDesc:      "Set staff detection status",
-			SetFunc:      func(cfg *config.Config, value any) { cfg.Events.DiscordStaffDetection = value.(bool) },
-			ToggleDesc:   "Toggle staff detection",
-			ToggleFunc:   func(cfg *config.Config) { cfg.Events.DiscordStaffDetection = !cfg.Events.DiscordStaffDetection },
-		}),
-		c.createConfigActionCommand(configCommandData{
-			Name:         "pingdetection",
-			ReadableName: "Ping Detection",
-			ValueType:    configCommandValueTypeBool,
-			GetDesc:      "Get ping detection status",
-			GetFunc:      func(cfg *config.Config) any { return cfg.Events.GhostPingDetection },
-			SetDesc:      "Set ping detection status",
-			SetFunc:      func(cfg *config.Config, value any) { cfg.Events.GhostPingDetection = value.(bool) },
-			ToggleDesc:   "Toggle ping detection",
-			ToggleFunc:   func(cfg *config.Config) { cfg.Events.GhostPingDetection = !cfg.Events.GhostPingDetection },
-		}),
-		c.createConfigActionCommand(configCommandData{
-			Name:         "ticketnotifier",
-			ReadableName: "Ticket Notifier",
-			ValueType:    configCommandValueTypeBool,
-			GetDesc:      "Get ticket notifier status",
-			GetFunc:      func(cfg *config.Config) any { return cfg.Events.TicketNotifier },
-			SetDesc:      "Set ticket notifier status",
-			SetFunc:      func(cfg *config.Config, value any) { cfg.Events.TicketNotifier = value.(bool) },
-			ToggleDesc:   "Toggle ticket notifier",
-			ToggleFunc:   func(cfg *config.Config) { cfg.Events.TicketNotifier = !cfg.Events.TicketNotifier },
-		}),
-		c.createConfigActionCommand(configCommandData{
-			Name:         "sessionconnected",
-			ReadableName: "Session Connected",
-			ValueType:    configCommandValueTypeBool,
-			GetDesc:      "Get session connected status",
-			GetFunc:      func(cfg *config.Config) any { return cfg.Events.SessionConnected },
-			SetDesc:      "Set session connected status",
-			SetFunc:      func(cfg *config.Config, value any) { cfg.Events.SessionConnected = value.(bool) },
-			ToggleDesc:   "Toggle session connected",
-			ToggleFunc:   func(cfg *config.Config) { cfg.Events.SessionConnected = !cfg.Events.SessionConnected },
-		}),
-		c.createConfigActionCommand(configCommandData{
-			Name:         "sessiondisconnected",
-			ReadableName: "Session Disconnected",
-			ValueType:    configCommandValueTypeBool,
-			GetDesc:      "Get session disconnected status",
-			GetFunc:      func(cfg *config.Config) any { return cfg.Events.SessionDisconnected },
-			SetDesc:      "Set session disconnected status",
-			SetFunc:      func(cfg *config.Config, value any) { cfg.Events.SessionDisconnected = value.(bool) },
-			ToggleDesc:   "Toggle session disconnected",
-			ToggleFunc:   func(cfg *config.Config) { cfg.Events.SessionDisconnected = !cfg.Events.SessionDisconnected },
-		}),
-		c.createConfigActionCommand(configCommandData{
-			Name:         "selfbotdetection",
-			ReadableName: "Selfbot Detection",
-			ValueType:    configCommandValueTypeBool,
-			GetDesc:      "Get selfbot detection status",
-			GetFunc:      func(cfg *config.Config) any { return cfg.Events.SelfbotDetection },
-			SetDesc:      "Set selfbot detection status",
-			SetFunc:      func(cfg *config.Config, value any) { cfg.Events.SelfbotDetection = value.(bool) },
-			ToggleDesc:   "Toggle selfbot detection",
-			ToggleFunc:   func(cfg *config.Config) { cfg.Events.SelfbotDetection = !cfg.Events.SelfbotDetection },
-		}),
-		c.createConfigActionCommand(configCommandData{
-			Name:         "dmtypingnotifier",
-			ReadableName: "DM Typing Notifier",
-			ValueType:    configCommandValueTypeBool,
-			GetDesc:      "Get DM typing notifier status",
-			GetFunc:      func(cfg *config.Config) any { return cfg.Events.DMTypingNotifier },
-			SetDesc:      "Set DM typing notifier status",
-			SetFunc:      func(cfg *config.Config, value any) { cfg.Events.DMTypingNotifier = value.(bool) },
-			ToggleDesc:   "Toggle DM typing notifier",
-			ToggleFunc:   func(cfg *config.Config) { cfg.Events.DMTypingNotifier = !cfg.Events.DMTypingNotifier },
-		}),
-		c.createConfigActionCommand(configCommandData{
-			Name:         "dmnotifier",
-			ReadableName: "DM Notifier",
-			ValueType:    configCommandValueTypeBool,
-			GetDesc:      "Get DM notifier status",
-			GetFunc:      func(cfg *config.Config) any { return cfg.Events.DMNotifier },
-			SetDesc:      "Set DM notifier status",
-			SetFunc:      func(cfg *config.Config, value any) { cfg.Events.DMNotifier = value.(bool) },
-			ToggleDesc:   "Toggle DM notifier",
-			ToggleFunc:   func(cfg *config.Config) { cfg.Events.DMNotifier = !cfg.Events.DMNotifier },
-		}),
-		c.createConfigActionCommand(configCommandData{
-			Name:         "dmeditnotifier",
-			ReadableName: "DM Edit Notifier",
-			ValueType:    configCommandValueTypeBool,
-			GetDesc:      "Get DM edit notifier status",
-			GetFunc:      func(cfg *config.Config) any { return cfg.Events.DMEditNotifier },
-			SetDesc:      "Set DM edit notifier status",
-			SetFunc:      func(cfg *config.Config, value any) { cfg.Events.DMEditNotifier = value.(bool) },
-			ToggleDesc:   "Toggle DM edit notifier",
-			ToggleFunc:   func(cfg *config.Config) { cfg.Events.DMEditNotifier = !cfg.Events.DMEditNotifier },
-		}),
-		c.createConfigActionCommand(configCommandData{
-			Name:         "dmdeletenotifier",
-			ReadableName: "DM Delete Notifier",
-			ValueType:    configCommandValueTypeBool,
-			GetDesc:      "Get DM delete notifier status",
-			GetFunc:      func(cfg *config.Config) any { return cfg.Events.DMDeleteNotifier },
-			SetDesc:      "Set DM delete notifier status",
-			SetFunc:      func(cfg *config.Config, value any) { cfg.Events.DMDeleteNotifier = value.(bool) },
-			ToggleDesc:   "Toggle DM delete notifier",
-			ToggleFunc:   func(cfg *config.Config) { cfg.Events.DMDeleteNotifier = !cfg.Events.DMDeleteNotifier },
-		}),
-		c.createConfigActionCommand(configCommandData{
-			Name:         "messagedeletenotifier",
-			ReadableName: "Message Delete Notifier",
-			ValueType:    configCommandValueTypeBool,
-			GetDesc:      "Get message delete notifier status",
-			GetFunc:      func(cfg *config.Config) any { return cfg.Events.MessageDeleteNotifier },
-			SetDesc:      "Set message delete notifier status",
-			SetFunc:      func(cfg *config.Config, value any) { cfg.Events.MessageDeleteNotifier = value.(bool) },
-			ToggleDesc:   "Toggle message delete notifier",
-			ToggleFunc:   func(cfg *config.Config) { cfg.Events.MessageDeleteNotifier = !cfg.Events.MessageDeleteNotifier },
-		}),
-		c.createConfigActionCommand(configCommandData{
-			Name:         "uitheme",
-			ReadableName: "UI Theme",
-			ValueType:    configCommandValueTypeString,
-			GetDesc:      "Get UI theme",
-			GetFunc:      func(cfg *config.Config) any { return cfg.UI.Theme },
-			SetDesc:      "Set UI theme",
-			SetFunc:      func(cfg *config.Config, value any) { cfg.UI.Theme = value.(string) },
-			ValuesDesc:   "List available UI themes",
-			ValuesFunc:   func() []any { return []any{"Dark", "Light"} },
-		}),
-		c.createConfigActionCommand(configCommandData{
-			Name:         "hidetosystray",
-			ReadableName: "Hide to System Tray",
-			ValueType:    configCommandValueTypeBool,
-			GetDesc:      "Get hide to system tray status",
-			GetFunc:      func(cfg *config.Config) any { return cfg.UI.HideToSystemTray },
-			SetDesc:      "Set hide to system tray status",
-			SetFunc:      func(cfg *config.Config, value any) { cfg.UI.HideToSystemTray = value.(bool) },
-			ToggleDesc:   "Toggle hide to system tray",
-			ToggleFunc:   func(cfg *config.Config) { cfg.UI.HideToSystemTray = !cfg.UI.HideToSystemTray },
-		}),
-		c.createConfigActionCommand(configCommandData{
-			Name:         "runuionstartup",
-			ReadableName: "Run UI on Startup",
-			ValueType:    configCommandValueTypeBool,
-			GetDesc:      "Get run UI on startup status",
-			GetFunc:      func(cfg *config.Config) any { return cfg.UI.RunOnStartup },
-			SetDesc:      "Set run UI on startup status",
-			SetFunc:      func(cfg *config.Config, value any) { cfg.UI.RunOnStartup = value.(bool) },
-			ToggleDesc:   "Toggle run UI on startup",
-			ToggleFunc:   func(cfg *config.Config) { cfg.UI.RunOnStartup = !cfg.UI.RunOnStartup },
-		}),
-		c.createConfigActionCommand(configCommandData{
-			Name:         "runbotonstartup",
-			ReadableName: "Run Bot on Startup",
-			ValueType:    configCommandValueTypeBool,
-			GetDesc:      "Get run bot on startup status",
-			GetFunc:      func(cfg *config.Config) any { return cfg.UI.RunOnStartup },
-			SetDesc:      "Set run bot on startup status",
-			SetFunc:      func(cfg *config.Config, value any) { cfg.UI.RunOnStartup = value.(bool) },
-			ToggleDesc:   "Toggle run bot on startup",
-			ToggleFunc:   func(cfg *config.Config) { cfg.UI.RunOnStartup = !cfg.UI.RunOnStartup },
-		}),
-	})
-}
-
-type configCommandValueType int
-
-const (
-	configCommandValueTypeString configCommandValueType = iota
-	configCommandValueTypeInt
-	configCommandValueTypePercentage
-	configCommandValueTypeBool
-	configCommandValueTypeDuration
-)
-
-type configCommandData struct {
-	Name         string
-	ReadableName string
-	ValueType    configCommandValueType
-
-	GetDesc string
-	GetFunc func(cfg *config.Config) any
-
-	SetDesc string
-	SetFunc func(cfg *config.Config, value any)
-
-	ToggleDesc string
-	ToggleFunc func(cfg *config.Config)
-
-	ValuesDesc string
-	ValuesFunc func() []any
-
-	ExampleDesc string
-	ExampleFunc func()
-}
-
-// type configCommandDataList struct {
-// 	Name         string
-// 	ReadableName string
-
-// 	GetDesc string
-// 	GetFunc func(ctx *router.Ctx) ([]any, error)
-
-// 	AddDesc string
-// 	AddFunc func(ctx *router.Ctx, value any) error
-
-// 	RmDesc string
-// 	RmFunc func(ctx *router.Ctx, value any) error
-
-// 	ClearDesc string
-// 	ClearFunc func(ctx *router.Ctx) error
-// }
-
-func (c *ConfigCommands) createConfigActionCommand(data configCommandData) *router.Command {
-	subCommands := []*router.Command{}
-
-	if data.GetFunc != nil {
-		subCommands = append(subCommands, &router.Command{
-			Name:        "get",
-			Description: data.GetDesc,
-			Handler: func(ctx *router.Ctx) {
-				cfg, err := config.GetConfig()
-				if err != nil {
-					ctx.RespondText("Error getting config")
-					return
-				}
-
-				value := data.GetFunc(&cfg)
-
-				c.services.Embed.NewEmbed().
-					SetDescription("%s is currently set to: %v", data.ReadableName, value).
-					Send(ctx)
-			},
-		})
-	}
-
-	if data.SetFunc != nil {
-		subCommands = append(subCommands, &router.Command{
-			Name:        "set",
-			Description: data.SetDesc,
-			Arguments:   "[value]",
-			Handler: func(ctx *router.Ctx) {
-				var value any
-				var err error
-
-				switch data.ValueType {
-				case configCommandValueTypeString:
-					value = ctx.Arguments.Raw()
-				case configCommandValueTypeInt:
-					value, err = ctx.Arguments.Get(0).Int()
-				case configCommandValueTypePercentage:
-					value, err = ctx.Arguments.Get(0).Int()
-					value = utils2.Clamp(value.(int), 0, 100)
-				case configCommandValueTypeBool:
-					value, err = ctx.Arguments.Get(0).Bool()
-				case configCommandValueTypeDuration:
-					value, err = ctx.Arguments.Get(0).Duration()
-					value = int(value.(time.Duration).Seconds())
-				}
-
-				if err != nil {
-					ctx.RespondText("Error parsing value")
-					return
-				}
-
-				cfg, err := config.GetConfig()
-				if err != nil {
-					ctx.RespondText("Error getting config")
-					return
-				}
-
-				data.SetFunc(&cfg, value)
-
-				if err := cfg.Save(); err != nil {
-					ctx.RespondText("Error saving config")
-					return
-				}
-
-				c.services.Embed.NewEmbed().
-					SetDescription("%s set to %v", data.ReadableName, value).
-					Send(ctx)
-			},
-		})
-	}
-
-	if data.ToggleFunc != nil {
-		subCommands = append(subCommands, &router.Command{
-			Name:        "toggle",
-			Description: data.ToggleDesc,
-			Handler: func(ctx *router.Ctx) {
-				cfg, err := config.GetConfig()
-				if err != nil {
-					ctx.RespondText("Error getting config")
-					return
-				}
-
-				data.ToggleFunc(&cfg)
-
-				if err := cfg.Save(); err != nil {
-					ctx.RespondText("Error saving config")
-					return
-				}
-
-				c.services.Embed.NewEmbed().
-					SetDescription("%s toggled", data.ReadableName).
-					Send(ctx)
-			},
-		})
-	}
-
-	if data.ValuesFunc != nil {
-		subCommands = append(subCommands, &router.Command{
-			Name:        "values",
-			Description: data.ValuesDesc,
-			Handler: func(ctx *router.Ctx) {
-				values := data.ValuesFunc()
-				stringValues := utils2.Map(values, func(value any) string {
-					return fmt.Sprint(value)
-				})
-
-				c.services.Embed.NewEmbed().
-					AddField(data.ReadableName, strings.Join(stringValues, "\n")).
-					Send(ctx)
-			},
-		})
-	}
-
-	return &router.Command{
-		Name:        data.Name,
-		Flags:       []router.CommandFlag{router.CmdFlagDangerous},
-		SubCommands: subCommands,
-	}
+	}, commands)
 }
