@@ -62,7 +62,6 @@ require (
 	github.com/godbus/dbus/v5 v5.1.0 // indirect
 	github.com/google/pprof v0.0.0-20250208200701-d0013a598941 // indirect
 	github.com/google/subcommands v1.2.0 // indirect
-	github.com/google/wire v0.6.0 // indirect
 	github.com/jezek/xgb v1.1.1 // indirect
 	github.com/klauspost/compress v1.18.0 // indirect
 	github.com/lucasb-eyer/go-colorful v1.2.0 // indirect
