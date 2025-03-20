@@ -5,8 +5,10 @@ import (
 	"sync"
 	"time"
 
-	"github.com/LightningDev1/LB-Selfbot/internal/config"
-	"github.com/LightningDev1/LB-Selfbot/internal/services/interfaces"
+	"github.com/LightningDev1/LB-Selfbot/internal/services/config"
+	"github.com/LightningDev1/LB-Selfbot/internal/services/eventbroker"
+	"github.com/LightningDev1/LB-Selfbot/internal/services/eventreactions/types"
+	"github.com/LightningDev1/LB-Selfbot/internal/services/ui/featurelogs"
 
 	"github.com/LightningDev1/LB-Selfbot/internal/utils"
 	"github.com/LightningDev1/discordgo"
@@ -75,29 +77,26 @@ type DetectionScore struct {
 }
 
 type SelfbotDetection struct {
-	uiSvc             interfaces.UIService
-	eventReactionsSvc interfaces.EventReactionsService
+	eventBroker eventbroker.Service
+	configSvc   config.Service
 
-	DetectionScores sync.Map
+	detectionScores sync.Map
+	timeDiff        time.Duration
 }
 
-func NewSelfbotDetection(uiSvc interfaces.UIService, eventReactionsSvc interfaces.EventReactionsService) *SelfbotDetection {
-	return &SelfbotDetection{
-		uiSvc:             uiSvc,
-		eventReactionsSvc: eventReactionsSvc,
-		DetectionScores:   sync.Map{},
-	}
+func NewSelfbotDetection(eventBroker eventbroker.Service, configSvc config.Service) *SelfbotDetection {
+	return &SelfbotDetection{eventBroker: eventBroker, configSvc: configSvc}
 }
 
-func (s *SelfbotDetection) Type() interfaces.EventReactionType {
-	return interfaces.EventReactionSelfbotDetection
+func (s *SelfbotDetection) Type() types.EventReactionType {
+	return types.SelfbotDetection
 }
 
 func (s *SelfbotDetection) Description() string {
 	return "Selfbot Detection (default)"
 }
 
-func (s *SelfbotDetection) Equals(other interfaces.EventReaction) bool {
+func (s *SelfbotDetection) Equals(other types.EventReaction) bool {
 	_, ok := other.(*SelfbotDetection)
 
 	return ok
@@ -108,7 +107,7 @@ func (s *SelfbotDetection) Data() map[string]any {
 }
 
 func (s *SelfbotDetection) ensureUserEntry(userID string) *DetectionScore {
-	rawScore, _ := s.DetectionScores.LoadOrStore(userID, &DetectionScore{UserID: userID, Score: 0})
+	rawScore, _ := s.detectionScores.LoadOrStore(userID, &DetectionScore{UserID: userID, Score: 0})
 	return rawScore.(*DetectionScore)
 }
 
@@ -122,41 +121,43 @@ func (s *SelfbotDetection) logDetection(score *DetectionScore, message *discordg
 		selfbot = "Unknown"
 	}
 
-	s.uiSvc.LogSelfbotDetection(message, selfbot)
+	s.eventBroker.Publish(eventbroker.EventLogFeature, &featurelogs.SelfbotDetection{
+		Message: message,
+		Selfbot: selfbot,
+	})
+
 	score.Logged = true
 }
 
 func (s *SelfbotDetection) Handler(session *discordgo.Session, event any) {
-	cfg, err := config.GetConfig()
-	if err != nil {
-		utils.Logging.Debug("SelfbotDetection.Handler: Error getting config: " + err.Error())
-		return
-	}
+	cfg := s.configSvc.GetConfig()
 
 	if message, ok := event.(*discordgo.MessageCreate); ok {
 		if !cfg.Events.SelfbotDetection || message.Author.Bot || message.Author.ID == session.State.User.ID {
 			return
 		}
 
-		s.CreateHandler(session, message, &cfg)
+		s.CreateHandler(session, message, cfg)
 	} else if message, ok := event.(*discordgo.MessageUpdate); ok {
 		if !cfg.Events.SelfbotDetection || message.Author.Bot || message.Author.ID == session.State.User.ID {
 			return
 		}
 
-		s.UpdateHandler(session, message, &cfg)
+		s.UpdateHandler(session, message, cfg)
 	} else if message, ok := event.(*discordgo.MessageDelete); ok {
 		if !cfg.Events.SelfbotDetection || message.Author.Bot || message.Author.ID == session.State.User.ID {
 			return
 		}
 
-		s.DeleteHandler(session, message, &cfg)
+		s.DeleteHandler(session, message, cfg)
 	} else {
 		utils.Logging.Debug("SelfbotDetection.Handler: Event is not a message create or delete event")
 	}
 }
 
 func (s *SelfbotDetection) CreateHandler(session *discordgo.Session, message *discordgo.MessageCreate, cfg *config.Config) {
+	s.timeDiff = time.Since(utils.Discord.SnowflakeToTime(message.ID))
+
 	score := s.ensureUserEntry(message.Author.ID)
 	for _, detectable := range detectables {
 		if !strings.Contains(strings.ToLower(message.Content), detectable.String) {
@@ -175,7 +176,7 @@ func (s *SelfbotDetection) CreateHandler(session *discordgo.Session, message *di
 		s.logDetection(score, message.Message)
 	}
 
-	s.DetectionScores.Store(message.Author.ID, score)
+	s.detectionScores.Store(message.Author.ID, score)
 }
 
 func (s *SelfbotDetection) UpdateHandler(session *discordgo.Session, message *discordgo.MessageUpdate, cfg *config.Config) {
@@ -184,7 +185,7 @@ func (s *SelfbotDetection) UpdateHandler(session *discordgo.Session, message *di
 
 func (s *SelfbotDetection) DeleteHandler(session *discordgo.Session, message *discordgo.MessageDelete, cfg *config.Config) {
 	score := s.ensureUserEntry(message.Author.ID)
-	timeDiff := time.Since(utils.Discord.SnowflakeToTime(message.ID)) - s.eventReactionsSvc.GetTimeDifference()
+	timeDiff := time.Since(utils.Discord.SnowflakeToTime(message.ID)) - s.timeDiff
 	if timeDiff < time.Second*1 {
 		score.Events = append(score.Events, DetectionEvent{
 			Event:   "fast_delete",
@@ -195,5 +196,5 @@ func (s *SelfbotDetection) DeleteHandler(session *discordgo.Session, message *di
 		s.logDetection(score, message.Message)
 	}
 
-	s.DetectionScores.Store(message.Author.ID, score)
+	s.detectionScores.Store(message.Author.ID, score)
 }

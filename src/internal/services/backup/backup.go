@@ -8,7 +8,6 @@ import (
 	"path/filepath"
 	"time"
 
-	"github.com/LightningDev1/LB-Selfbot/internal/services/interfaces"
 	"github.com/LightningDev1/LB-Selfbot/internal/system"
 	"github.com/LightningDev1/LB-Selfbot/internal/utils"
 	"github.com/LightningDev1/discordgo"
@@ -64,17 +63,31 @@ type GIFs struct {
 	Settings *protos.FrecencyUserSettings `json:"settings"`
 }
 
-type BackupServiceImpl struct {
-	discordSvc interfaces.DiscordService
+// BackupService handles Discord account backup and restore operations.
+type BackupService interface {
+	// CheckEligibility checks if the account is eligible for backup/restore.
+	CheckEligibility(session *discordgo.Session) error
+
+	// FindInvitableChannel finds an invitable channel in a guild.
+	FindInvitableChannel(session *discordgo.Session, guild *discordgo.Guild) (*discordgo.Channel, error)
+
+	// SaveBackup saves a backup to a file.
+	SaveBackup(bType, bName string, data any) error
+
+	// LoadBackup restores a backup from a file.
+	LoadBackup(bType, bName string, data any) error
 }
 
-func (b *BackupServiceImpl) Inject(discordSvc interfaces.DiscordService) {
-	b.discordSvc = discordSvc
+type backupService struct{}
+
+// NewBackupService creates a new BackupService instance.
+func NewBackupService() BackupService {
+	return &backupService{}
 }
 
 // CheckEligibility checks if the account is eligible for backup/restore.
-func (b *BackupServiceImpl) CheckEligibility() error {
-	user, err := b.discordSvc.GetSession().User("@me")
+func (b *backupService) CheckEligibility(session *discordgo.Session) error {
+	user, err := session.User("@me")
 	if err != nil {
 		return err
 	}
@@ -91,9 +104,7 @@ func (b *BackupServiceImpl) CheckEligibility() error {
 }
 
 // FindInvitableChannel finds an invitable channel in a guild.
-func (b *BackupServiceImpl) FindInvitableChannel(guild *discordgo.Guild) (*discordgo.Channel, error) {
-	session := b.discordSvc.GetSession()
-
+func (b *backupService) FindInvitableChannel(session *discordgo.Session, guild *discordgo.Guild) (*discordgo.Channel, error) {
 	for _, channel := range guild.Channels {
 		validChannel := channel.Type == discordgo.ChannelTypeGuildText ||
 			channel.Type == discordgo.ChannelTypeGuildVoice
@@ -119,7 +130,7 @@ func (b *BackupServiceImpl) FindInvitableChannel(guild *discordgo.Guild) (*disco
 }
 
 // SaveBackup saves a backup to a file.
-func (b *BackupServiceImpl) SaveBackup(bType, bName string, data any) error {
+func (b *backupService) SaveBackup(bType, bName string, data any) error {
 	if bName != "" {
 		bName = "-" + bName
 	}
@@ -146,7 +157,7 @@ func (b *BackupServiceImpl) SaveBackup(bType, bName string, data any) error {
 }
 
 // LoadBackup restores a backup from a file.
-func (b *BackupServiceImpl) LoadBackup(bType, bName string, data any) error {
+func (b *backupService) LoadBackup(bType, bName string, data any) error {
 	if bName != "" {
 		bName = "-" + bName
 	}

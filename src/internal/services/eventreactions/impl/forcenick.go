@@ -3,7 +3,7 @@ package impl
 import (
 	"fmt"
 
-	"github.com/LightningDev1/LB-Selfbot/internal/services/interfaces"
+	"github.com/LightningDev1/LB-Selfbot/internal/services/eventreactions/types"
 	"github.com/LightningDev1/LB-Selfbot/internal/utils"
 	"github.com/LightningDev1/discordgo"
 )
@@ -49,8 +49,8 @@ func NewForceNickFromData(session *discordgo.Session, data map[string]any) (*For
 	return NewForceNick(guild, user, nickname), nil
 }
 
-func (f *ForceNick) Type() interfaces.EventReactionType {
-	return interfaces.EventReactionForceNick
+func (f *ForceNick) Type() types.EventReactionType {
+	return types.ForceNick
 }
 
 func (f *ForceNick) Description() string {
@@ -63,7 +63,7 @@ func (f *ForceNick) Description() string {
 	return "Force Nickname (" + location + ")"
 }
 
-func (f *ForceNick) Equals(other interfaces.EventReaction) bool {
+func (f *ForceNick) Equals(other types.EventReaction) bool {
 	otherForceNick, ok := other.(*ForceNick)
 	if !ok {
 		utils.Logging.Debug("ForceNick.Equals: Other is not a ForceNick")

@@ -2,29 +2,18 @@ package embed
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 	"strings"
-	"time"
 
 	"github.com/LightningDev1/LB-Selfbot/internal/constants"
-	"github.com/LightningDev1/LB-Selfbot/internal/router"
-
-	"github.com/LightningDev1/LB-Selfbot/internal/api"
-	"github.com/LightningDev1/LB-Selfbot/internal/config"
 	"github.com/LightningDev1/LB-Selfbot/internal/http"
 	"github.com/LightningDev1/LB-Selfbot/internal/utils"
+
+	"github.com/LightningDev1/LB-Selfbot/internal/api"
 	"github.com/LightningDev1/discordgo"
 )
 
 // https://github.com/Clinet/discordgo-embed
-
-// Embed ...
-type Embed struct {
-	*discordgo.MessageEmbed
-	FooterStr string
-	Subtext   string
-}
 
 var (
 	LimitTitle       = 256
@@ -34,6 +23,19 @@ var (
 	LimitField       = 25
 	LimitFooter      = 2048
 )
+
+// Embed ...
+type Embed struct {
+	*discordgo.MessageEmbed
+	FooterStr string
+	Subtext   string
+
+	sendCallback func(*Embed) []*discordgo.Message
+}
+
+func NewEmbed(sendCallback func(*Embed) []*discordgo.Message) *Embed {
+	return &Embed{sendCallback: sendCallback}
+}
 
 // SetTitle ...
 func (e *Embed) SetTitle(format string, args ...any) *Embed {
@@ -557,80 +559,8 @@ func (e *Embed) ToString(commandMode string) []string {
 	}
 }
 
-func (e *Embed) Send(ctx *router.Ctx) []*discordgo.Message {
-	cfg, _ := config.GetConfig()
-
-	commandMode := cfg.Selfbot.CommandMode
-
-	if commandMode == "WebhookEmbed" {
-		err := e.sendWebhookEmbed(ctx)
-		if err == nil {
-			return nil
-		}
-	}
-
-	messages := []*discordgo.Message{}
-
-	for _, text := range e.ToString(commandMode) {
-		message, err := ctx.Session.ChannelMessageSend(ctx.Message.ChannelID, text)
-		if err != nil {
-			continue
-		}
-
-		messages = append(messages, message)
-	}
-
-	if e.Image != nil && e.Image.URL != "" {
-		message, err := ctx.Session.ChannelMessageSend(ctx.Message.ChannelID, e.Image.URL)
-		if err == nil {
-			messages = append(messages, message)
-		}
-	}
-
-	if cfg.Selfbot.DeleteResponses {
-		go deleteMessagesAfter(ctx.Session, messages, cfg.Selfbot.DeleteResponsesDelay)
-	}
-
-	return messages
-}
-
-func (e *Embed) sendWebhookEmbed(ctx *router.Ctx) error {
-	if ctx.Message.GuildID == "" {
-		return errors.New("cannot send webhook embed in DMs")
-	}
-
-	webhooks, err := ctx.Session.ChannelWebhooks(ctx.Message.ChannelID)
-	if err != nil {
-		return err
-	}
-
-	var webhook *discordgo.Webhook
-
-	for _, wh := range webhooks {
-		if wh.Name != "LightningBot" {
-			continue
-		}
-
-		webhook = wh
-		break
-	}
-
-	if webhook == nil {
-		webhook, err = ctx.Session.WebhookCreate(ctx.Message.ChannelID, "LightningBot", "https://lightning-bot.com/logo.png")
-		if err != nil {
-			return err
-		}
-	}
-
-	_, err = ctx.Session.WebhookExecute(webhook.ID, webhook.Token, true, &discordgo.WebhookParams{
-		Username:  "LightningBot",
-		AvatarURL: "https://lightning-bot.com/logo.png",
-		Embeds: []*discordgo.MessageEmbed{
-			e.ToEmbed(),
-		},
-	})
-
-	return err
+func (e *Embed) Send() []*discordgo.Message {
+	return e.sendCallback(e)
 }
 
 func (e *Embed) SendWebhook(userID, webhookURL string, important bool) *http.HttpResponse {
@@ -675,12 +605,4 @@ func (e *Embed) SendWebhook(userID, webhookURL string, important bool) *http.Htt
 		"username":   "LightningBot Webhook Notifications",
 		"avatar_url": "https://lightning-bot.com/logo.png",
 	})
-}
-
-func deleteMessagesAfter(session *discordgo.Session, messages []*discordgo.Message, delay int) {
-	time.Sleep(time.Duration(delay) * time.Second)
-
-	for _, message := range messages {
-		_ = session.ChannelMessageDelete(message.ChannelID, message.ID)
-	}
 }

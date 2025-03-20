@@ -145,27 +145,37 @@ func (a AES) Encrypt(text string, keyLen int) (string, error) {
 		return "", err
 	}
 
-	byteMsg := []byte(text)
-
-	cipherText := make([]byte, aes.BlockSize+len(byteMsg))
-	iv := cipherText[:aes.BlockSize]
-	if _, err = io.ReadFull(rand.Reader, iv); err != nil {
+	// Create a new GCM cipher
+	gcm, err := cipher.NewGCM(block)
+	if err != nil {
 		return "", err
 	}
 
-	stream := cipher.NewCFBEncrypter(block, iv)
-	stream.XORKeyStream(cipherText[aes.BlockSize:], byteMsg)
+	// Generate a nonce (number used once)
+	nonce := make([]byte, gcm.NonceSize())
+	if _, err = io.ReadFull(rand.Reader, nonce); err != nil {
+		return "", err
+	}
 
+	// Encrypt and seal the data
+	cipherText := gcm.Seal(nonce, nonce, []byte(text), nil)
+
+	// Return the salt and encrypted data
 	return base64.StdEncoding.EncodeToString(salt) + "." + base64.StdEncoding.EncodeToString(cipherText), nil
 }
 
 func (a AES) Decrypt(text string, keyLen int) (string, error) {
 	split := strings.Split(text, ".")
+	if len(split) != 2 {
+		return "", fmt.Errorf("invalid ciphertext format")
+	}
+
 	salt, err := base64.StdEncoding.DecodeString(split[0])
 	if err != nil {
 		return "", err
 	}
-	byteMsg, err := base64.StdEncoding.DecodeString(split[1])
+
+	cipherText, err := base64.StdEncoding.DecodeString(split[1])
 	if err != nil {
 		return "", err
 	}
@@ -177,15 +187,28 @@ func (a AES) Decrypt(text string, keyLen int) (string, error) {
 		return "", err
 	}
 
-	if len(byteMsg) < aes.BlockSize {
+	// Create a new GCM cipher
+	gcm, err := cipher.NewGCM(block)
+	if err != nil {
+		return "", err
+	}
+
+	// Get the nonce size
+	nonceSize := gcm.NonceSize()
+
+	// Make sure the ciphertext is long enough
+	if len(cipherText) < nonceSize {
 		return "", fmt.Errorf("ciphertext too short")
 	}
 
-	iv := byteMsg[:aes.BlockSize]
-	byteMsg = byteMsg[aes.BlockSize:]
+	// Extract the nonce from the ciphertext
+	nonce, cipherText := cipherText[:nonceSize], cipherText[nonceSize:]
 
-	stream := cipher.NewCFBDecrypter(block, iv)
-	stream.XORKeyStream(byteMsg, byteMsg)
+	// Decrypt the data
+	plainText, err := gcm.Open(nil, nonce, cipherText, nil)
+	if err != nil {
+		return "", err
+	}
 
-	return string(byteMsg), nil
+	return string(plainText), nil
 }

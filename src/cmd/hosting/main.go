@@ -13,8 +13,6 @@ import (
 	"github.com/LightningDev1/LB-Selfbot/internal/assets"
 	"github.com/LightningDev1/LB-Selfbot/internal/constants"
 	"github.com/LightningDev1/LB-Selfbot/internal/logging"
-	"github.com/LightningDev1/LB-Selfbot/internal/services"
-	"github.com/LightningDev1/LB-Selfbot/internal/services/interfaces"
 
 	"github.com/LightningDev1/LB-Selfbot/internal/commands"
 

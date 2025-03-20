@@ -1,26 +1,91 @@
 package eventreactions
 
 import (
+	"slices"
 	"sync"
 	"time"
 
-	"github.com/LightningDev1/LB-Selfbot/internal/router"
-	"github.com/LightningDev1/LB-Selfbot/internal/services/interfaces"
+	"github.com/LightningDev1/LB-Selfbot/internal/services/config"
+	"github.com/LightningDev1/LB-Selfbot/internal/services/eventbroker"
+	"github.com/LightningDev1/LB-Selfbot/internal/services/eventreactions/types"
+	"github.com/LightningDev1/LB-Selfbot/internal/services/router"
 	"github.com/LightningDev1/LB-Selfbot/internal/utils"
+	"github.com/LightningDev1/LB-Selfbot/internal/utils2"
 	"github.com/LightningDev1/discordgo"
 )
 
-type EventReactionsServiceImpl struct {
-	authSvc      interfaces.AuthService
-	uiSvc        interfaces.UIService
-	discordSvc   interfaces.DiscordService
-	embedSvc     interfaces.EmbedService
-	sessionsSvc  interfaces.SessionsService
-	scJobsSvc    interfaces.SCJobsService
-	rpcSvc       interfaces.RPCService
-	variablesSvc interfaces.VariablesService
+// Service handles event reactions.
+type Service interface {
+	// Register registers the event handlers.
+	Register()
 
-	reactions   []interfaces.EventReaction
+	// GetAllReactions returns all event reactions.
+	GetAllReactions() []types.EventReaction
+
+	// GetReactionsByType returns event reactions by type.
+	GetReactionsByType(t types.EventReactionType) []types.EventReaction
+
+	// AddReaction adds a new event reaction.
+	AddReaction(r types.EventReaction)
+
+	// RemoveReaction removes an event reaction.
+	RemoveReaction(r types.EventReaction)
+
+	// RemoveAllReactions removes all event reactions.
+	RemoveAllReactions()
+
+	// RemoveReactionsByType removes event reactions by type.
+	RemoveReactionsByType(t types.EventReactionType)
+
+	// IsReactionMessage checks if a message is a reaction message.
+	IsReactionMessage(message *discordgo.Message) bool
+
+	// HandleReactionMessage handles a reaction message.
+	HandleReactionMessage(message *discordgo.Message, err error)
+
+	// LoadCmdAliases loads command aliases.
+	LoadCmdAliases() error
+
+	// GetPinSpamMessages returns pin spam messages.
+	GetPinSpamMessages() []*discordgo.Message
+
+	// AddPinSpamMessage adds a pin spam message.
+	AddPinSpamMessage(message *discordgo.Message)
+
+	// ClearPinSpamMessages removes pin spam messages.
+	ClearPinSpamMessages()
+
+	// GetEditedMessages returns edited messages by channel ID.
+	GetEditedMessages(channelID string) []*discordgo.MessageUpdate
+
+	// GetDeletedMessages returns deleted messages by channel ID.
+	GetDeletedMessages(channelID string) []*discordgo.Message
+
+	// GetUsedCommands returns used commands.
+	GetUsedCommands() []*router.Ctx
+
+	// AddUsedCommand adds a used command.
+	AddUsedCommand(ctx *router.Ctx)
+
+	// GetLastActivity returns the last activity time.
+	GetLastActivity() time.Time
+
+	// SetLastActivity sets the last activity time.
+	SetLastActivity()
+
+	// GetPaymentSrcID returns the payment source ID.
+	GetPaymentSrcID() string
+
+	// GetCountryCode returns the country code.
+	GetCountryCode() string
+}
+
+type eventReactionsService struct {
+	eventBroker eventbroker.Service
+	configSvc   config.Service
+	routerSvc   router.RouterService
+
+	reactions   []types.EventReaction
 	reactionsMu sync.Mutex
 
 	pinSpamMsgs   []*discordgo.Message
@@ -43,13 +108,14 @@ type EventReactionsServiceImpl struct {
 
 	paymentSrcID string
 	countryCode  string
-
-	timeDiff time.Duration
 }
 
-func NewEventReactionsServiceImpl() *EventReactionsServiceImpl {
-	return &EventReactionsServiceImpl{
-		reactions:          make([]interfaces.EventReaction, 0),
+func NewService(eventBroker eventbroker.Service, configService config.Service, routerSvc router.RouterService) *eventReactionsService {
+	svc := &eventReactionsService{
+		eventBroker:        eventBroker,
+		configSvc:          configService,
+		routerSvc:          routerSvc,
+		reactions:          make([]types.EventReaction, 0),
 		pinSpamMsgs:        make([]*discordgo.Message, 0),
 		eventReactionsMsgs: make([]*discordgo.Message, 0),
 		editedMsgs:         make(map[string][]*discordgo.MessageUpdate),
@@ -58,32 +124,43 @@ func NewEventReactionsServiceImpl() *EventReactionsServiceImpl {
 		lastActivity:       time.Now(),
 		lastAFKMsg:         time.Now(),
 	}
+	svc.subscribe()
+	return svc
 }
 
-func (e *EventReactionsServiceImpl) Inject(
-	authSvc interfaces.AuthService,
-	uiSvc interfaces.UIService,
-	discordSvc interfaces.DiscordService,
-	embedSvc interfaces.EmbedService,
-	sessionsSvc interfaces.SessionsService,
-	scJobsSvc interfaces.SCJobsService,
-	rpcSvc interfaces.RPCService,
-	variablesSvc interfaces.VariablesService,
-) {
-	e.authSvc = authSvc
-	e.uiSvc = uiSvc
-	e.discordSvc = discordSvc
-	e.embedSvc = embedSvc
-	e.sessionsSvc = sessionsSvc
-	e.scJobsSvc = scJobsSvc
-	e.rpcSvc = rpcSvc
-	e.variablesSvc = variablesSvc
+func (e *eventReactionsService) subscribe() {
+	e.eventBroker.Subscribe(eventbroker.EventSessionReady, func(payload any) {
+		session, ok := payload.(*discordgo.Session)
+		if !ok {
+			return
+		}
+
+		e.register(session)
+	})
+
+	e.eventBroker.Subscribe(eventbroker.EventHandleReactionMessage, func(payload any) {
+		msg, ok := payload.(*discordgo.Message)
+		if !ok {
+			return
+		}
+
+		e.HandleReactionMessage(msg)
+	})
+
+	e.eventBroker.Subscribe(eventbroker.EventHandlePinSpamMessage, func(payload any) {
+		msg, ok := payload.(*discordgo.Message)
+		if !ok {
+			return
+		}
+
+		e.AddPinSpamMessage(msg)
+	})
 }
 
-func (e *EventReactionsServiceImpl) Register() {
-	session := e.discordSvc.GetSession()
-
-	session.AddHandler(func(_ *discordgo.Session, _ any) { e.authSvc.CheckNonce() })
+func (e *eventReactionsService) register(session *discordgo.Session) {
+	session.AddHandler(func(_ *discordgo.Session, _ any) {
+		e.eventBroker.Publish(eventbroker.EventCheckNonce, nil)
+	})
 
 	session.AddHandler(e.onReady)
 	session.AddHandler(e.onMessageCreate)
@@ -100,7 +177,7 @@ func (e *EventReactionsServiceImpl) Register() {
 	session.AddHandler(e.onChannelRecipientRemove)
 }
 
-func (e *EventReactionsServiceImpl) handleEvent(s *discordgo.Session, event any) {
+func (e *eventReactionsService) handleEvent(s *discordgo.Session, event any) {
 	e.reactionsMu.Lock()
 	defer e.reactionsMu.Unlock()
 
@@ -109,7 +186,7 @@ func (e *EventReactionsServiceImpl) handleEvent(s *discordgo.Session, event any)
 	}
 }
 
-func (e *EventReactionsServiceImpl) addEditedMessage(message *discordgo.MessageUpdate) {
+func (e *eventReactionsService) addEditedMessage(message *discordgo.MessageUpdate) {
 	e.editedMsgsMu.Lock()
 	defer e.editedMsgsMu.Unlock()
 
@@ -120,7 +197,7 @@ func (e *EventReactionsServiceImpl) addEditedMessage(message *discordgo.MessageU
 	e.editedMsgs[message.ChannelID] = append(messages, message)
 }
 
-func (e *EventReactionsServiceImpl) addDeletedMessage(message *discordgo.Message) {
+func (e *eventReactionsService) addDeletedMessage(message *discordgo.Message) {
 	e.deletedMsgsMu.Lock()
 	defer e.deletedMsgsMu.Unlock()
 
@@ -131,17 +208,17 @@ func (e *EventReactionsServiceImpl) addDeletedMessage(message *discordgo.Message
 	e.deletedMsgs[message.ChannelID] = append(messages, message)
 }
 
-func (e *EventReactionsServiceImpl) GetAllReactions() []interfaces.EventReaction {
+func (e *eventReactionsService) GetAllReactions() []types.EventReaction {
 	return e.reactions
 }
 
-func (e *EventReactionsServiceImpl) GetReactionsByType(t interfaces.EventReactionType) []interfaces.EventReaction {
-	return utils.Filter(e.reactions, func(r interfaces.EventReaction) bool {
+func (e *eventReactionsService) GetReactionsByType(t types.EventReactionType) []types.EventReaction {
+	return utils.Filter(e.reactions, func(r types.EventReaction) bool {
 		return r.Type() == t
 	})
 }
 
-func (e *EventReactionsServiceImpl) AddReaction(r interfaces.EventReaction) {
+func (e *eventReactionsService) AddReaction(r types.EventReaction) {
 	e.reactionsMu.Lock()
 	defer e.reactionsMu.Unlock()
 
@@ -150,38 +227,40 @@ func (e *EventReactionsServiceImpl) AddReaction(r interfaces.EventReaction) {
 	_ = e.saveEventReactions()
 }
 
-func (e *EventReactionsServiceImpl) RemoveReaction(r interfaces.EventReaction) {
+func (e *eventReactionsService) RemoveReaction(r types.EventReaction) {
 	e.reactionsMu.Lock()
 	defer e.reactionsMu.Unlock()
 
-	e.reactions = utils.Filter(e.reactions, func(rr interfaces.EventReaction) bool {
+	e.reactions = utils.Filter(e.reactions, func(rr types.EventReaction) bool {
 		return !rr.Equals(r)
 	})
 
 	_ = e.saveEventReactions()
 }
 
-func (e *EventReactionsServiceImpl) RemoveAllReactions() {
+func (e *eventReactionsService) RemoveAllReactions() {
 	e.reactionsMu.Lock()
 	defer e.reactionsMu.Unlock()
 
-	e.reactions = e.constructDefaultReactions()
+	e.reactions = utils2.Filter(e.reactions, func(r types.EventReaction) bool {
+		return !slices.Contains(types.DefaultReactions, r.Type())
+	})
 
 	_ = e.saveEventReactions()
 }
 
-func (e *EventReactionsServiceImpl) RemoveReactionsByType(t interfaces.EventReactionType) {
+func (e *eventReactionsService) RemoveReactionsByType(t types.EventReactionType) {
 	e.reactionsMu.Lock()
 	defer e.reactionsMu.Unlock()
 
-	e.reactions = utils.Filter(e.reactions, func(r interfaces.EventReaction) bool {
+	e.reactions = utils.Filter(e.reactions, func(r types.EventReaction) bool {
 		return r.Type() != t
 	})
 
 	_ = e.saveEventReactions()
 }
 
-func (e *EventReactionsServiceImpl) IsReactionMessage(message *discordgo.Message) bool {
+func (e *eventReactionsService) IsReactionMessage(message *discordgo.Message) bool {
 	for _, m := range e.eventReactionsMsgs {
 		if m.ID == message.ID {
 			return true
@@ -191,8 +270,8 @@ func (e *EventReactionsServiceImpl) IsReactionMessage(message *discordgo.Message
 	return false
 }
 
-func (e *EventReactionsServiceImpl) HandleReactionMessage(message *discordgo.Message, err error) {
-	if err != nil {
+func (e *eventReactionsService) HandleReactionMessage(message *discordgo.Message) {
+	if message == nil {
 		return
 	}
 
@@ -202,68 +281,51 @@ func (e *EventReactionsServiceImpl) HandleReactionMessage(message *discordgo.Mes
 	e.eventReactionsMsgs = append(e.eventReactionsMsgs, message)
 }
 
-func (e *EventReactionsServiceImpl) GetPinSpamMessages() []*discordgo.Message {
+func (e *eventReactionsService) GetPinSpamMessages() []*discordgo.Message {
 	e.pinSpamMsgsMu.Lock()
 	defer e.pinSpamMsgsMu.Unlock()
 
 	return e.pinSpamMsgs
 }
 
-func (e *EventReactionsServiceImpl) AddPinSpamMessage(message *discordgo.Message) {
+func (e *eventReactionsService) AddPinSpamMessage(message *discordgo.Message) {
 	e.pinSpamMsgsMu.Lock()
 	defer e.pinSpamMsgsMu.Unlock()
 
 	e.pinSpamMsgs = append(e.pinSpamMsgs, message)
 }
 
-func (e *EventReactionsServiceImpl) RemovePinSpamMessages() {
+func (e *eventReactionsService) ClearPinSpamMessages() {
 	e.pinSpamMsgsMu.Lock()
 	defer e.pinSpamMsgsMu.Unlock()
 
 	e.pinSpamMsgs = []*discordgo.Message{}
 }
 
-func (e *EventReactionsServiceImpl) GetEditedMessages(channelID string) []*discordgo.MessageUpdate {
+func (e *eventReactionsService) GetEditedMessages(channelID string) []*discordgo.MessageUpdate {
 	e.editedMsgsMu.Lock()
 	defer e.editedMsgsMu.Unlock()
 
 	return e.editedMsgs[channelID]
 }
 
-func (e *EventReactionsServiceImpl) GetDeletedMessages(channelID string) []*discordgo.Message {
+func (e *eventReactionsService) GetDeletedMessages(channelID string) []*discordgo.Message {
 	e.deletedMsgsMu.Lock()
 	defer e.deletedMsgsMu.Unlock()
 
 	return e.deletedMsgs[channelID]
 }
 
-func (e *EventReactionsServiceImpl) GetUsedCommands() []*router.Ctx {
-	return e.usedCmds
-}
-
-func (e *EventReactionsServiceImpl) AddUsedCommand(ctx *router.Ctx) {
+func (e *eventReactionsService) GetUsedCommands() []*router.Ctx { return e.usedCmds }
+func (e *eventReactionsService) AddUsedCommand(ctx *router.Ctx) {
 	e.usedCmdsMu.Lock()
 	defer e.usedCmdsMu.Unlock()
 
 	e.usedCmds = append(e.usedCmds, ctx)
 }
 
-func (e *EventReactionsServiceImpl) GetLastActivity() time.Time {
-	return e.lastActivity
-}
+func (e *eventReactionsService) GetLastActivity() time.Time { return e.lastActivity }
+func (e *eventReactionsService) SetLastActivity()           { e.lastActivity = time.Now() }
 
-func (e *EventReactionsServiceImpl) SetLastActivity() {
-	e.lastActivity = time.Now()
-}
-
-func (e *EventReactionsServiceImpl) GetPaymentSrcID() string {
-	return e.paymentSrcID
-}
-
-func (e *EventReactionsServiceImpl) GetCountryCode() string {
-	return e.countryCode
-}
-
-func (e *EventReactionsServiceImpl) GetTimeDifference() time.Duration {
-	return e.timeDiff
-}
+func (e *eventReactionsService) GetPaymentSrcID() string { return e.paymentSrcID }
+func (e *eventReactionsService) GetCountryCode() string  { return e.countryCode }

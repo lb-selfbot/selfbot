@@ -15,7 +15,6 @@ import (
 
 	"github.com/LightningDev1/LB-Selfbot/internal/constants"
 	"github.com/LightningDev1/LB-Selfbot/internal/http"
-	"github.com/LightningDev1/LB-Selfbot/internal/router"
 	"github.com/LightningDev1/discordgo"
 )
 
@@ -332,14 +331,14 @@ Permission: View Guild Insights      | Value: %s`,
 	return permissionsString
 }
 
-func (DiscordUtils) SendFileFromURL(ctx *router.Ctx, url string, fileName string, headers ...map[string]string) error {
+func (DiscordUtils) SendFileFromURL(session *discordgo.Session, channelID, url, fileName string, headers ...map[string]string) error {
 	httpResponse := http.Get(url, headers...)
 	if httpResponse.Error != nil {
 		return httpResponse.Error
 	}
 
-	_, err := ctx.Session.ChannelFileSend(
-		ctx.Message.ChannelID,
+	_, err := session.ChannelFileSend(
+		channelID,
 		fileName,
 		bytes.NewReader(httpResponse.Body),
 	)

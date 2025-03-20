@@ -6,10 +6,12 @@ import (
 	"unicode"
 
 	"github.com/LightningDev1/LB-Selfbot/internal/api"
-	"github.com/LightningDev1/LB-Selfbot/internal/config"
+
 	"github.com/LightningDev1/LB-Selfbot/internal/constants"
-	"github.com/LightningDev1/LB-Selfbot/internal/router"
-	"github.com/LightningDev1/LB-Selfbot/internal/services/interfaces"
+	"github.com/LightningDev1/LB-Selfbot/internal/services/config"
+	"github.com/LightningDev1/LB-Selfbot/internal/services/eventbroker"
+	"github.com/LightningDev1/LB-Selfbot/internal/services/eventreactions/types"
+	"github.com/LightningDev1/LB-Selfbot/internal/services/ui/featurelogs"
 
 	"github.com/LightningDev1/LB-Selfbot/internal/utils"
 	"github.com/LightningDev1/discordgo"
@@ -22,30 +24,27 @@ type friendRequest struct {
 }
 
 type Protections struct {
-	uiSvc    interfaces.UIService
-	embedSvc interfaces.EmbedService
+	eventBroker eventbroker.Service
+	configSvc   config.Service
 
 	NewDMs         []*discordgo.Message
 	FriendRequests []*friendRequest
 	LastBlock      time.Time
 }
 
-func NewProtections(uiSvc interfaces.UIService, embedSvc interfaces.EmbedService) *Protections {
-	return &Protections{
-		uiSvc:    uiSvc,
-		embedSvc: embedSvc,
-	}
+func NewProtections(eventBroker eventbroker.Service, configSvc config.Service) *Protections {
+	return &Protections{eventBroker: eventBroker, configSvc: configSvc}
 }
 
-func (p *Protections) Type() interfaces.EventReactionType {
-	return interfaces.EventReactionProtections
+func (p *Protections) Type() types.EventReactionType {
+	return types.Protections
 }
 
 func (p *Protections) Description() string {
 	return "Protections (default)"
 }
 
-func (p *Protections) Equals(other interfaces.EventReaction) bool {
+func (p *Protections) Equals(other types.EventReaction) bool {
 	_, ok := other.(*Protections)
 
 	return ok
@@ -56,19 +55,15 @@ func (p *Protections) Data() map[string]any {
 }
 
 func (p *Protections) Handler(session *discordgo.Session, event any) {
-	cfg, err := config.GetConfig()
-	if err != nil {
-		utils.Logging.Debug("Protections.Handler: Error getting config: " + err.Error())
-		return
-	}
+	cfg := p.configSvc.GetConfig()
 
 	switch event := event.(type) {
 	case *discordgo.MessageCreate:
-		p.MessageCreateHandler(session, event, &cfg)
+		p.MessageCreateHandler(session, event, cfg)
 	case *discordgo.MessageDelete:
-		p.MessageDeleteHandler(session, event, &cfg)
+		p.MessageDeleteHandler(session, event, cfg)
 	case *discordgo.RelationshipAdd:
-		p.RelationshipAddHandler(session, event, &cfg)
+		p.RelationshipAddHandler(session, event, cfg)
 	default:
 		utils.Logging.Debug("Protections.Handler: Event is not a protections event")
 	}
@@ -120,7 +115,7 @@ func (p *Protections) MessageCreateHandler(session *discordgo.Session, message *
 
 		p.LastBlock = time.Now()
 
-		p.uiSvc.LogMassDMBlocked()
+		p.eventBroker.Publish(eventbroker.EventLogFeature, &featurelogs.MassDMBlocked{})
 
 		go func() {
 			// Enable DMs after 5 minutes
@@ -150,20 +145,18 @@ func (p *Protections) MessageCreateHandler(session *discordgo.Session, message *
 			return
 		}
 
-		ctx := &router.Ctx{
-			Session: session,
-			Message: message.Message,
-		}
-
 		if cfg.Protections.ServerProtections.AntiInvite && constants.INVITE_REGEX.MatchString(message.Content) {
 			err := session.ChannelMessageDelete(message.ChannelID, message.ID)
 			if err != nil {
 				return
 			}
 
-			p.embedSvc.NewEmbed().
-				SetDescription("Invites are not allowed in this server.").
-				Send(ctx)
+			msg, err := session.ChannelMessageSend(message.ChannelID, "Invites are not allowed in this server.")
+			if err != nil {
+				return
+			}
+
+			p.eventBroker.Publish(eventbroker.EventHandleReactionMessage, msg)
 		}
 
 		if cfg.Protections.ServerProtections.AntiSpam {
@@ -179,9 +172,12 @@ func (p *Protections) MessageCreateHandler(session *discordgo.Session, message *
 					return
 				}
 
-				p.embedSvc.NewEmbed().
-					SetDescription("Spamming is not allowed in this server.").
-					Send(ctx)
+				msg, err := session.ChannelMessageSend(message.ChannelID, "Spamming is not allowed in this server.")
+				if err != nil {
+					return
+				}
+
+				p.eventBroker.Publish(eventbroker.EventHandleReactionMessage, msg)
 			}
 		}
 
@@ -200,9 +196,12 @@ func (p *Protections) MessageCreateHandler(session *discordgo.Session, message *
 					return
 				}
 
-				p.embedSvc.NewEmbed().
-					SetDescription("Uppercase spam is not allowed in this server.").
-					Send(ctx)
+				msg, err := session.ChannelMessageSend(message.ChannelID, "Uppercase spam is not allowed in this server.")
+				if err != nil {
+					return
+				}
+
+				p.eventBroker.Publish(eventbroker.EventHandleReactionMessage, msg)
 			}
 		}
 	}
@@ -229,7 +228,9 @@ func (p *Protections) MessageDeleteHandler(session *discordgo.Session, message *
 			return
 		}
 
-		p.uiSvc.LogAntiDelete(message.Message)
+		p.eventBroker.Publish(eventbroker.EventLogFeature, &featurelogs.AntiDelete{
+			Message: message.Message,
+		})
 	}
 }
 
@@ -260,7 +261,7 @@ func (p *Protections) RelationshipAddHandler(session *discordgo.Session, relatio
 		_ = session.UserRelationshipDelete(relationship.User.ID)
 		_ = api.AllowFriendRequests(session, false)
 
-		p.uiSvc.LogFriendRequestSpamBlocked()
+		p.eventBroker.Publish(eventbroker.EventLogFeature, &featurelogs.FriendRequestSpamBlocked{})
 
 		go func() {
 			time.Sleep(5 * time.Minute)

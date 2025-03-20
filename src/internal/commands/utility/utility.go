@@ -24,7 +24,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/LightningDev1/LB-Selfbot/internal/config"
 	"github.com/LightningDev1/LB-Selfbot/internal/conversion"
 	"github.com/LightningDev1/LB-Selfbot/internal/random"
 	"github.com/LightningDev1/LB-Selfbot/internal/router"

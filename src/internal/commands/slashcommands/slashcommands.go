@@ -5,8 +5,7 @@ import (
 	"time"
 
 	"github.com/LightningDev1/LB-Selfbot/internal/router"
-	"github.com/LightningDev1/LB-Selfbot/internal/services"
-	"github.com/LightningDev1/LB-Selfbot/internal/services/interfaces"
+
 	"github.com/LightningDev1/LB-Selfbot/internal/services/scjobs"
 	"github.com/LightningDev1/LB-Selfbot/internal/utils"
 	"github.com/LightningDev1/discordgo"

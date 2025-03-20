@@ -3,12 +3,15 @@ package eventreactions
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"slices"
 	"time"
 
-	"github.com/LightningDev1/LB-Selfbot/internal/config"
+	"github.com/LightningDev1/LB-Selfbot/internal/services/eventbroker"
 	"github.com/LightningDev1/LB-Selfbot/internal/services/eventreactions/impl"
-	"github.com/LightningDev1/LB-Selfbot/internal/services/interfaces"
+	"github.com/LightningDev1/LB-Selfbot/internal/services/eventreactions/types"
+	"github.com/LightningDev1/LB-Selfbot/internal/services/ui/featurelogs"
+	"github.com/LightningDev1/discordgo"
 )
 
 var (
@@ -16,21 +19,21 @@ var (
 )
 
 type eventReactionConfig struct {
-	Type interfaces.EventReactionType `json:"Type"`
-	Data map[string]any               `json:"Data"`
+	Type types.EventReactionType `json:"Type"`
+	Data map[string]any          `json:"Data"`
 }
 
-func (e *EventReactionsServiceImpl) startLoading() {
+func (e *eventReactionsService) startLoading(session *discordgo.Session) {
 	timer := time.NewTimer(5 * time.Second)
 	isFirstIteration := true
 
 	for range timer.C {
-		if err := e.loadEventReactions(isFirstIteration); err != nil {
-			e.uiSvc.LogError("Failed to load event reactions:", err)
+		if err := e.loadEventReactions(session, isFirstIteration); err != nil {
+			e.eventBroker.Publish(eventbroker.EventLogError, fmt.Sprintf("Failed to load event reactions: %v", err))
 		}
 
 		if err := e.LoadCmdAliases(); err != nil {
-			e.uiSvc.LogError("Failed to load command aliases:", err)
+			e.eventBroker.Publish(eventbroker.EventLogError, fmt.Sprintf("Failed to load command aliases: %v", err))
 		}
 
 		if isFirstIteration {
@@ -39,58 +42,58 @@ func (e *EventReactionsServiceImpl) startLoading() {
 	}
 }
 
-func (e *EventReactionsServiceImpl) loadEventReactions(isFirstLoad bool) error {
+func (e *eventReactionsService) loadEventReactions(session *discordgo.Session, isFirstLoad bool) error {
 	e.reactionsMu.Lock()
 	defer e.reactionsMu.Unlock()
 
-	cfg, err := config.GetConfig()
-	if err != nil {
-		return err
-	}
+	cfg := e.configSvc.GetConfig()
 
 	defer func() {
 		if r := recover(); r == nil {
 			return
 		}
 
-		e.uiSvc.LogError("Failed to load event reactions. Event reactions have been reset.")
+		e.eventBroker.Publish(eventbroker.EventLogError, "Failed to load event reactions. Event reactions have been reset.")
 
 		cfg.EventReactions = []byte("[]")
-		_ = cfg.Save()
+		e.configSvc.GetConfig()
+		_ = e.configSvc.SaveConfig(cfg)
 	}()
 
 	// Load reaction data from config
 	var reactionCfgs []eventReactionConfig
-	if err = json.Unmarshal(cfg.EventReactions, &reactionCfgs); err != nil {
+	if err := json.Unmarshal(cfg.EventReactions, &reactionCfgs); err != nil {
 		panic(err)
 	}
 
 	// Add default reactions
-	for _, reactionType := range interfaces.DefaultEventReactions {
+	for _, reactionType := range types.DefaultReactions {
 		reactionCfgs = append(reactionCfgs, eventReactionConfig{Type: reactionType})
 	}
 
 	// Load custom reactions along with defaults
 	var numLoadedReactions int
 	for _, reactionCfg := range reactionCfgs {
-		if reaction, err := e.constructReaction(reactionCfg); err == nil {
+		if reaction, err := e.constructReaction(session, reactionCfg); err == nil {
 			e.reactions = append(e.reactions, reaction)
 		}
 	}
 
-	numCustomReactions := numLoadedReactions - len(interfaces.DefaultEventReactions)
+	numCustomReactions := numLoadedReactions - len(types.DefaultReactions)
 	if isFirstLoad && numCustomReactions > 0 {
-		e.uiSvc.LogEventReactions(numCustomReactions)
+		e.eventBroker.Publish(eventbroker.EventLogFeature, &featurelogs.EventReactions{
+			NumReactions: numCustomReactions,
+		})
 	}
 
 	return nil
 }
 
-func (e *EventReactionsServiceImpl) constructDefaultReactions() []interfaces.EventReaction {
-	reactions := make([]interfaces.EventReaction, 0, len(interfaces.DefaultEventReactions))
+func (e *eventReactionsService) constructDefaultReactions(session *discordgo.Session) []types.EventReaction {
+	reactions := make([]types.EventReaction, 0, len(types.DefaultReactions))
 
-	for _, reactionType := range interfaces.DefaultEventReactions {
-		reaction, err := e.constructReaction(eventReactionConfig{Type: reactionType})
+	for _, reactionType := range types.DefaultReactions {
+		reaction, err := e.constructReaction(session, eventReactionConfig{Type: reactionType})
 		if err != nil {
 			continue
 		}
@@ -101,50 +104,48 @@ func (e *EventReactionsServiceImpl) constructDefaultReactions() []interfaces.Eve
 	return reactions
 }
 
-func (e *EventReactionsServiceImpl) constructReaction(reactionCfg eventReactionConfig) (interfaces.EventReaction, error) {
-	session := e.discordSvc.GetSession()
-
-	var r interfaces.EventReaction
+func (e *eventReactionsService) constructReaction(session *discordgo.Session, reactionCfg eventReactionConfig) (types.EventReaction, error) {
+	var r types.EventReaction
 	var err error
 
 	switch reactionCfg.Type {
 	// Default reactions
-	case interfaces.EventReactionSnipers:
-		r = impl.NewSnipers(e.uiSvc, e, session, "")
-	case interfaces.EventReactionAFKResponder:
-		r = impl.NewAFK(e.uiSvc, e, e.variablesSvc)
-	case interfaces.EventReactionAntiPhishing:
-		r = impl.NewPhishing(e.uiSvc)
-	case interfaces.EventReactionNotifiers:
-		r = impl.NewNotifiers(e.uiSvc)
-	case interfaces.EventReactionProtections:
-		r = impl.NewProtections(e.uiSvc, e.embedSvc)
-	case interfaces.EventReactionSelfbotDetection:
-		r = impl.NewSelfbotDetection(e.uiSvc, e)
+	case types.Snipers:
+		r = impl.NewSnipers(e.eventBroker, e.configSvc, session, e.GetCountryCode, e.GetPaymentSrcID, "")
+	case types.AFKResponder:
+		r = impl.NewAFK(e.eventBroker, e.configSvc, e.IsReactionMessage)
+	case types.AntiPhishing:
+		r = impl.NewPhishing(e.eventBroker, e.configSvc)
+	case types.Notifiers:
+		r = impl.NewNotifiers(e.eventBroker, e.configSvc)
+	case types.Protections:
+		r = impl.NewProtections(e.eventBroker, e.configSvc)
+	case types.SelfbotDetection:
+		r = impl.NewSelfbotDetection(e.eventBroker, e.configSvc)
 
 	// Custom reactions
-	case interfaces.EventReactionIgnoreUser, interfaces.EventReactionIgnoreGuild:
+	case types.IgnoreUser, types.IgnoreGuild:
 		r, err = impl.NewIgnoreFromData(session, reactionCfg.Data)
-	case interfaces.EventReactionPingPing, interfaces.EventReactionPingKick, interfaces.EventReactionPingBan, interfaces.EventReactionPingMute, interfaces.EventReactionPingTimeout, interfaces.EventReactionPingInsult, interfaces.EventReactionPingReact, interfaces.EventReactionPingResponse, interfaces.EventReactionPingAIResponse:
-		r, err = impl.NewPingFromData(e, session, reactionCfg.Type, reactionCfg.Data)
-	case interfaces.EventReactionMirrorGuild, interfaces.EventReactionMirrorChannel:
-		r, err = impl.NewMirrorFromData(e, session, reactionCfg.Data)
-	case interfaces.EventReactionResponder, interfaces.EventReactionAIResponder, interfaces.EventReactionCopy, interfaces.EventReactionReplyCopy, interfaces.EventReactionMock, interfaces.EventReactionPinSpam, interfaces.EventReactionReactSpam, interfaces.EventReactionDeleteMessages, interfaces.EventReactionKeywordNotifier:
-		r, err = impl.NewMessageReactionFromData(session, reactionCfg.Type, reactionCfg.Data)
-	case interfaces.EventReactionRemoveReactions:
+	case types.PingPing, types.PingKick, types.PingBan, types.PingMute, types.PingTimeout, types.PingInsult, types.PingReact, types.PingResponse, types.PingAIResponse:
+		r, err = impl.NewPingFromData(e.eventBroker, session, reactionCfg.Type, reactionCfg.Data)
+	case types.MirrorGuild, types.MirrorChannel:
+		r, err = impl.NewMirrorFromData(e.eventBroker, session, reactionCfg.Data)
+	case types.Responder, types.AIResponder, types.Copy, types.ReplyCopy, types.Mock, types.PinSpam, types.ReactSpam, types.DeleteMessages, types.KeywordNotifier:
+		r, err = impl.NewMessageReactionFromData(e.eventBroker, session, reactionCfg.Type, reactionCfg.Data)
+	case types.RemoveReactions:
 		r, err = impl.NewRemoveReactionsFromData(session, reactionCfg.Data)
-	case interfaces.EventReactionForceDisconnect:
+	case types.ForceDisconnect:
 		r, err = impl.NewForceDisconnectFromData(session, reactionCfg.Data)
-	case interfaces.EventReactionForceNick:
+	case types.ForceNick:
 		r, err = impl.NewForceNickFromData(session, reactionCfg.Data)
-	case interfaces.EventReactionForceKick:
+	case types.ForceKick:
 		r, err = impl.NewForceKickFromData(session, reactionCfg.Data)
-	case interfaces.EventReactionNoLeave:
+	case types.NoLeave:
 		r, err = impl.NewNoLeaveFromData(session, reactionCfg.Data)
-	case interfaces.EventReactionAntiGroupChat:
+	case types.AntiGroupChat:
 		r, err = impl.NewAntiGroupChatFromData(session, reactionCfg.Data)
-	case interfaces.EventReactionAntiDeleteMessages:
-		r, err = impl.NewAntiDeleteMessagesFromData(session, reactionCfg.Data)
+	case types.AntiDeleteMessages:
+		r, err = impl.NewAntiDeleteMessagesFromData(e.configSvc, session, reactionCfg.Data)
 
 	default:
 		return nil, ErrInvalidReactionType
@@ -153,16 +154,11 @@ func (e *EventReactionsServiceImpl) constructReaction(reactionCfg eventReactionC
 	return r, err
 }
 
-func (e *EventReactionsServiceImpl) saveEventReactions() error {
-	cfg, err := config.GetConfig()
-	if err != nil {
-		return err
-	}
-
-	reactionCfgs := make([]eventReactionConfig, 0, len(e.reactions)-len(interfaces.DefaultEventReactions))
+func (e *eventReactionsService) saveEventReactions() error {
+	reactionCfgs := make([]eventReactionConfig, 0, len(e.reactions)-len(types.DefaultReactions))
 
 	for _, reaction := range e.reactions {
-		if slices.Contains(interfaces.DefaultEventReactions, reaction.Type()) {
+		if slices.Contains(types.DefaultReactions, reaction.Type()) {
 			continue
 		}
 
@@ -172,24 +168,22 @@ func (e *EventReactionsServiceImpl) saveEventReactions() error {
 		})
 	}
 
+	cfg := e.configSvc.GetConfig()
+
+	var err error
 	cfg.EventReactions, err = json.Marshal(reactionCfgs)
 	if err != nil {
 		return err
 	}
 
-	return cfg.Save()
+	return e.configSvc.SaveConfig(cfg)
 }
 
-func (e *EventReactionsServiceImpl) LoadCmdAliases() error {
-	cfg, err := config.GetConfig()
-	if err != nil {
-		return err
-	}
-
-	router := e.discordSvc.GetRouter()
+func (e *eventReactionsService) LoadCmdAliases() error {
+	cfg := e.configSvc.GetConfig()
 
 	for cmdName, alias := range cfg.Selfbot.CommandAliases {
-		cmd := router.GetCmd(cmdName)
+		cmd := e.routerSvc.GetCommand(cmdName)
 		if cmd == nil {
 			continue
 		}

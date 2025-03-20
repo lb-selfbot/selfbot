@@ -7,42 +7,43 @@ import (
 	"time"
 
 	"github.com/LightningDev1/LB-Selfbot/internal/api"
-	"github.com/LightningDev1/LB-Selfbot/internal/config"
-	"github.com/LightningDev1/LB-Selfbot/internal/services/interfaces"
+
+	"github.com/LightningDev1/LB-Selfbot/internal/services/config"
+	"github.com/LightningDev1/LB-Selfbot/internal/services/eventbroker"
+	"github.com/LightningDev1/LB-Selfbot/internal/services/eventreactions/types"
+	"github.com/LightningDev1/LB-Selfbot/internal/services/ui/featurelogs"
 
 	"github.com/LightningDev1/LB-Selfbot/internal/utils"
 	"github.com/LightningDev1/discordgo"
 )
 
 type AFK struct {
-	uiSvc             interfaces.UIService
-	eventReactionsSvc interfaces.EventReactionsService
-	variablesSvc      interfaces.VariablesService
+	eventBroker eventbroker.Service
+	configSvc   config.Service
+
+	isReactionMessage func(*discordgo.Message) bool
 
 	lastAFKMessage time.Time
+	lastActivity   time.Time
 }
 
-func NewAFK(
-	uiSvc interfaces.UIService,
-	eventReactionsSvc interfaces.EventReactionsService,
-	variablesSvc interfaces.VariablesService,
-) *AFK {
+func NewAFK(eventBroker eventbroker.Service, configSvc config.Service, isReactionMessage func(*discordgo.Message) bool) *AFK {
 	return &AFK{
-		uiSvc:             uiSvc,
-		eventReactionsSvc: eventReactionsSvc,
-		variablesSvc:      variablesSvc,
+		eventBroker:       eventBroker,
+		configSvc:         configSvc,
+		isReactionMessage: isReactionMessage,
 	}
 }
 
-func (a *AFK) Type() interfaces.EventReactionType {
-	return interfaces.EventReactionAFKResponder
+func (a *AFK) Type() types.EventReactionType {
+	return types.AFKResponder
 }
 
 func (a *AFK) Description() string {
 	return "AFK Responder (default)"
 }
 
-func (a *AFK) Equals(other interfaces.EventReaction) bool {
+func (a *AFK) Equals(other types.EventReaction) bool {
 	_, ok := other.(*AFK)
 
 	return ok
@@ -50,22 +51,23 @@ func (a *AFK) Equals(other interfaces.EventReaction) bool {
 
 func (a *AFK) HandleLastActivity(session *discordgo.Session, m *discordgo.Message) {
 	if m.Author.ID != session.State.User.ID ||
-		a.eventReactionsSvc.IsReactionMessage(m) ||
+		a.isReactionMessage(m) ||
 		time.Since(a.lastAFKMessage) < 5*time.Second {
 		return
 	}
 
-	a.eventReactionsSvc.SetLastActivity()
+	a.lastActivity = time.Now()
 }
 
-func (a *AFK) IsActive(cfg *config.Config) bool {
+func (a *AFK) IsActive() bool {
+	cfg := a.configSvc.GetConfig()
+
 	if !cfg.AFK.MustBeInactive {
 		return false
 	}
 
 	inactiveTimeout := time.Duration(cfg.AFK.InactiveTimeout) * time.Second
-
-	return time.Since(a.eventReactionsSvc.GetLastActivity()) < inactiveTimeout
+	return time.Since(a.lastActivity) < inactiveTimeout
 }
 
 func (a *AFK) Data() map[string]any {
@@ -78,7 +80,7 @@ func (a *AFK) GetAFKMessage(m *discordgo.Message, message string) string {
 	message = strings.ReplaceAll(message, "$MSGLINK", utils.Discord.GetMessageLink(m))
 	message = strings.ReplaceAll(message, "$MSGCONTENT", m.ContentWithMentionsReplaced())
 	message = strings.ReplaceAll(message, "$AFKSINCE",
-		fmt.Sprintf("<t:%d:R>", a.eventReactionsSvc.GetLastActivity().Unix()))
+		fmt.Sprintf("<t:%d:R>", a.lastActivity.Unix()))
 
 	message = a.variablesSvc.Parse(message)
 
@@ -94,11 +96,7 @@ func (a *AFK) Handler(session *discordgo.Session, event any) {
 
 	a.HandleLastActivity(session, message.Message)
 
-	cfg, err := config.GetConfig()
-	if err != nil {
-		utils.Logging.Debug("AFK.Handler: Error getting config: " + err.Error())
-		return
-	}
+	cfg := a.configSvc.GetConfig()
 
 	activatedOnPing := cfg.AFK.OnPing && utils.Discord.IsUserMentioned(message.Message, session.State.User.ID)
 	activatedOnDM := cfg.AFK.OnDM && utils.Discord.IsDM(session, message.Message)
@@ -121,7 +119,7 @@ func (a *AFK) Handler(session *discordgo.Session, event any) {
 		return
 	}
 
-	if a.IsActive(&cfg) {
+	if a.IsActive() {
 		return
 	}
 
@@ -143,7 +141,7 @@ func (a *AFK) Handler(session *discordgo.Session, event any) {
 
 	time.Sleep(2 * time.Second)
 
-	if a.IsActive(&cfg) || time.Since(a.lastAFKMessage) < 60*time.Second {
+	if a.IsActive() || time.Since(a.lastAFKMessage) < 60*time.Second {
 		return
 	}
 
@@ -155,6 +153,7 @@ func (a *AFK) Handler(session *discordgo.Session, event any) {
 
 		message.Content = strings.ReplaceAll(message.Content, session.State.User.Mention(), message.Author.Mention())
 
+		var err error
 		afkMessage, err = api.GPT(instructions, message.Content)
 		if err != nil {
 			utils.Logging.Error("AFK.Handler: Error getting AI response: " + err.Error())
@@ -162,19 +161,26 @@ func (a *AFK) Handler(session *discordgo.Session, event any) {
 		}
 	}
 
-	a.uiSvc.LogAFKMessage(message.Message, afkMessage)
+	a.eventBroker.Publish(eventbroker.EventLogFeature, &featurelogs.AFKMessage{
+		Message:  message.Message,
+		Response: afkMessage,
+	})
 
 	if cfg.AFK.Reply {
 		m, err := session.ChannelMessageSendReply(message.ChannelID, afkMessage, message.Reference())
 		if err == nil {
 			err = session.MessageUnack(message.ChannelID, message.ID, 1)
+			return
 		}
-		a.eventReactionsSvc.HandleReactionMessage(m, err)
+
+		a.eventBroker.Publish(eventbroker.EventHandleReactionMessage, m)
 	} else {
 		m, err := session.ChannelMessageSend(message.ChannelID, afkMessage)
 		if err == nil {
 			err = session.MessageUnack(message.ChannelID, message.ID, 1)
+			return
 		}
-		a.eventReactionsSvc.HandleReactionMessage(m, err)
+
+		a.eventBroker.Publish(eventbroker.EventHandleReactionMessage, m)
 	}
 }

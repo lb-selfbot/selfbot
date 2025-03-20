@@ -4,10 +4,10 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/LightningDev1/LB-Selfbot/internal/config"
+	"github.com/LightningDev1/LB-Selfbot/internal/services/eventbroker"
 )
 
-func (i *IPCServiceImpl) onMessage(msg *WSMessage) error {
+func (i *ipcService) handleMessage(msg *WSMessage) error {
 	switch msg.Op {
 	case OpCodeHello:
 		return nil
@@ -17,8 +17,8 @@ func (i *IPCServiceImpl) onMessage(msg *WSMessage) error {
 		return nil
 
 	case OpCodeConfigUpdate:
-		i.authSvc.SendConfigUpdate()
-		config.SaveConfigFromUI(msg.Data.Config)
+		i.eventBroker.Publish(eventbroker.EventSendConfigUpdateSync, msg.Data.Config)
+		i.configSvc.SetConfigFromUI(msg.Data.Config)
 		return nil
 
 	default:

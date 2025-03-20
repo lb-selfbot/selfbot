@@ -3,30 +3,33 @@ package impl
 import (
 	"strings"
 
-	"github.com/LightningDev1/LB-Selfbot/internal/config"
-	"github.com/LightningDev1/LB-Selfbot/internal/services/interfaces"
+	"github.com/LightningDev1/LB-Selfbot/internal/services/config"
+	"github.com/LightningDev1/LB-Selfbot/internal/services/eventbroker"
+	"github.com/LightningDev1/LB-Selfbot/internal/services/eventreactions/types"
+	"github.com/LightningDev1/LB-Selfbot/internal/services/ui/featurelogs"
 
 	"github.com/LightningDev1/LB-Selfbot/internal/utils"
 	"github.com/LightningDev1/discordgo"
 )
 
 type Notifiers struct {
-	uiSvc interfaces.UIService
+	eventBroker eventbroker.Service
+	configSvc   config.Service
 }
 
-func NewNotifiers(uiSvc interfaces.UIService) *Notifiers {
-	return &Notifiers{uiSvc: uiSvc}
+func NewNotifiers(eventBroker eventbroker.Service, configSvc config.Service) *Notifiers {
+	return &Notifiers{eventBroker: eventBroker, configSvc: configSvc}
 }
 
-func (n *Notifiers) Type() interfaces.EventReactionType {
-	return interfaces.EventReactionNotifiers
+func (n *Notifiers) Type() types.EventReactionType {
+	return types.Notifiers
 }
 
 func (n *Notifiers) Description() string {
 	return "Notifiers (default)"
 }
 
-func (n *Notifiers) Equals(other interfaces.EventReaction) bool {
+func (n *Notifiers) Equals(other types.EventReaction) bool {
 	_, ok := other.(*Notifiers)
 
 	return ok
@@ -37,25 +40,21 @@ func (n *Notifiers) Data() map[string]any {
 }
 
 func (n *Notifiers) Handler(session *discordgo.Session, event any) {
-	cfg, err := config.GetConfig()
-	if err != nil {
-		utils.Logging.Debug("Notifiers.Handler: Error getting config: " + err.Error())
-		return
-	}
+	cfg := n.configSvc.GetConfig()
 
 	switch event := event.(type) {
 	case *discordgo.MessageCreate:
-		n.MessageCreateHandler(session, event, &cfg)
+		n.MessageCreateHandler(session, event, cfg)
 	case *discordgo.MessageUpdate:
-		n.MessageUpdateHandler(session, event, &cfg)
+		n.MessageUpdateHandler(session, event, cfg)
 	case *discordgo.MessageDelete:
-		n.MessageDeleteHandler(session, event, &cfg)
+		n.MessageDeleteHandler(session, event, cfg)
 	case *discordgo.GuildBanAdd:
-		n.GuildBanHandler(session, event, &cfg)
+		n.GuildBanHandler(session, event, cfg)
 	case *discordgo.ChannelCreate:
-		n.ChannelCreateHandler(session, event, &cfg)
+		n.ChannelCreateHandler(session, event, cfg)
 	case *discordgo.TypingStart:
-		n.TypingStartHandler(session, event, &cfg)
+		n.TypingStartHandler(session, event, cfg)
 	default:
 		utils.Logging.Debug("Notifiers.Handler: Event is not a notifiers event")
 	}
@@ -71,14 +70,18 @@ func (n *Notifiers) MessageCreateHandler(session *discordgo.Session, message *di
 
 	// DM Notifier
 	if isDM && cfg.Events.DMNotifier {
-		n.uiSvc.LogDMNotifier(message.Message)
+		n.eventBroker.Publish(eventbroker.EventLogFeature, &featurelogs.DMNotifier{
+			Message: message.Message,
+		})
 	}
 
 	// Discord Staff Detection
 	authorIsEmployee := message.Author.PublicFlags&discordgo.UserFlagDiscordEmployee != 0
 
 	if authorIsEmployee && cfg.Events.DiscordStaffDetection {
-		n.uiSvc.LogDiscordStaffDetection(message.Message)
+		n.eventBroker.Publish(eventbroker.EventLogFeature, &featurelogs.DiscordStaffDetection{
+			Message: message.Message,
+		})
 	}
 }
 
@@ -93,7 +96,11 @@ func (n *Notifiers) MessageUpdateHandler(session *discordgo.Session, message *di
 
 	//  DM Edit Notifier
 	if isDM && !embedded && cfg.Events.DMEditNotifier {
-		n.uiSvc.LogDMEditNotifier(message.Message, message.BeforeUpdate.Content, message.Content)
+		n.eventBroker.Publish(eventbroker.EventLogFeature, &featurelogs.DMEditNotifier{
+			Message: message.Message,
+			Before:  message.BeforeUpdate.Content,
+			After:   message.Content,
+		})
 	}
 }
 
@@ -132,9 +139,15 @@ func (n *Notifiers) MessageDeleteHandler(session *discordgo.Session, message *di
 		}
 
 		if dmNotifier {
-			n.uiSvc.LogDMDeleteNotifier(message.Message, attachments)
+			n.eventBroker.Publish(eventbroker.EventLogFeature, &featurelogs.DMDeleteNotifier{
+				Message:     message.Message,
+				Attachments: attachments,
+			})
 		} else {
-			n.uiSvc.LogMessageDeleteNotifier(message.Message, attachments)
+			n.eventBroker.Publish(eventbroker.EventLogFeature, &featurelogs.MessageDeleteNotifier{
+				Message:     message.Message,
+				Attachments: attachments,
+			})
 		}
 	}()
 
@@ -142,7 +155,9 @@ func (n *Notifiers) MessageDeleteHandler(session *discordgo.Session, message *di
 	mentionsUser := strings.Contains(message.Content, session.State.User.Mention())
 
 	if mentionsUser && cfg.Events.GhostPingDetection {
-		n.uiSvc.LogGhostPingDetection(message.Message)
+		n.eventBroker.Publish(eventbroker.EventLogFeature, &featurelogs.GhostPingDetection{
+			Message: message.Message,
+		})
 	}
 }
 
@@ -158,7 +173,9 @@ func (n *Notifiers) GuildBanHandler(session *discordgo.Session, ban *discordgo.G
 
 	// Ban Notifier
 	if cfg.Events.BanNotifier {
-		n.uiSvc.LogBanNotifier(ban.GuildID)
+		n.eventBroker.Publish(eventbroker.EventLogFeature, &featurelogs.BanNotifier{
+			GuildID: ban.GuildID,
+		})
 	}
 }
 
@@ -175,7 +192,9 @@ func (n *Notifiers) ChannelCreateHandler(session *discordgo.Session, channel *di
 		canViewChannel := perms&discordgo.PermissionViewChannel != 0
 
 		if canSendMessages && canViewChannel {
-			n.uiSvc.LogTicketNotifier(channel.Channel)
+			n.eventBroker.Publish(eventbroker.EventLogFeature, &featurelogs.TicketNotifier{
+				Channel: channel.Channel,
+			})
 		}
 	}
 }
@@ -191,6 +210,8 @@ func (n *Notifiers) TypingStartHandler(session *discordgo.Session, event *discor
 			return
 		}
 
-		n.uiSvc.LogDMTypingNotifier(user.DisplayName)
+		n.eventBroker.Publish(eventbroker.EventLogFeature, &featurelogs.DMTypingNotifier{
+			Username: user.DisplayName,
+		})
 	}
 }

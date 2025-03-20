@@ -1,14 +1,14 @@
 package ipc
 
 import (
-	"fmt"
 	"log"
 	"net/http"
 	"os"
 	"sync"
 
 	"github.com/LightningDev1/LB-Selfbot/internal/constants"
-	"github.com/LightningDev1/LB-Selfbot/internal/services/interfaces"
+	"github.com/LightningDev1/LB-Selfbot/internal/services/config"
+	"github.com/LightningDev1/LB-Selfbot/internal/services/eventbroker"
 	"github.com/gorilla/websocket"
 )
 
@@ -17,27 +17,56 @@ const (
 	htmlCutOff     = 1e8
 )
 
-type IPCServiceImpl struct {
-	authSvc interfaces.AuthService
+// IPCService handles the IPC with the UI process.
+type IPCService interface {
+	// Connect establishes a connection with the IPC client.
+	Connect() error
+
+	// GetReadyChan returns a channel that signals when the connection is ready.
+	GetReadyChan() <-chan struct{}
+}
+
+type ipcService struct {
+	eventBroker eventbroker.Service
+	configSvc   config.Service
 
 	upgrader *websocket.Upgrader
 	conn     *websocket.Conn
 	mu       sync.Mutex
 
-	connectChan chan struct{}
-
-	htmlConsole    string
-	rawConsole     string
-	sentRawConsole bool
+	readyChan chan struct{}
 }
 
-func (i *IPCServiceImpl) Inject(authSvc interfaces.AuthService) {
-	i.authSvc = authSvc
+// NewIPCService creates a new IPCService instance.
+func NewIPCService(eventBroker eventbroker.Service, configSvc config.Service) IPCService {
+	svc := &ipcService{eventBroker: eventBroker, configSvc: configSvc}
+	svc.subscribe()
+	return svc
 }
 
-func (i *IPCServiceImpl) Serve() error {
+func (i *ipcService) subscribe() {
+	i.eventBroker.Subscribe(eventbroker.EventRestart, func(payload any) {
+		if i.conn != nil {
+			i.conn.WriteJSON(&WSMessage{Op: OpCodeRestart})
+		}
+	})
+
+	i.eventBroker.Subscribe(eventbroker.EventLogError, func(payload any) {
+		text, ok := payload.(string)
+		if !ok {
+			return
+		}
+
+		i.conn.WriteJSON(&WSMessage{Op: OpCodeError, Data: WSData{Text: text}})
+	})
+}
+
+func (i *ipcService) Connect() error {
+	i.mu.Lock()
+	defer i.mu.Unlock()
+
 	i.upgrader = &websocket.Upgrader{}
-	i.connectChan = make(chan struct{}, 1)
+	i.readyChan = make(chan struct{}, 1)
 
 	mux := http.NewServeMux()
 	mux.HandleFunc("/", i.handleRequest)
@@ -48,15 +77,16 @@ func (i *IPCServiceImpl) Serve() error {
 	return nil
 }
 
-func (i *IPCServiceImpl) OnConnect() <-chan struct{} {
-	return i.connectChan
+func (i *ipcService) GetReadyChan() <-chan struct{} {
+	return i.readyChan
 }
 
-func (i *IPCServiceImpl) GetHTMLConsole() string { return i.htmlConsole }
+func (i *ipcService) handleRequest(w http.ResponseWriter, r *http.Request) {
+	if i.conn != nil {
+		return
+	}
 
-func (i *IPCServiceImpl) GetRawConsole() string { return i.rawConsole }
-
-func (i *IPCServiceImpl) handleRequest(w http.ResponseWriter, r *http.Request) {
+	// Upgrade the HTTP connection to a WebSocket connection.
 	var err error
 	i.conn, err = i.upgrader.Upgrade(w, r, nil)
 	if err != nil {
@@ -64,9 +94,9 @@ func (i *IPCServiceImpl) handleRequest(w http.ResponseWriter, r *http.Request) {
 	}
 	defer i.conn.Close()
 
-	i.connectChan <- struct{}{}
+	i.readyChan <- struct{}{}
 
-	if err := i.write(&WSMessage{Op: OpCodeConnected}); err != nil {
+	if err := i.conn.WriteJSON(&WSMessage{Op: OpCodeConnected}); err != nil {
 		return
 	}
 
@@ -74,37 +104,20 @@ func (i *IPCServiceImpl) handleRequest(w http.ResponseWriter, r *http.Request) {
 		message := &WSMessage{}
 
 		err = i.conn.ReadJSON(message)
-
 		if err != nil {
 			break
 		}
 
-		if err = i.onMessage(message); err != nil {
+		if err = i.handleMessage(message); err != nil {
 			break
 		}
 	}
 
 	i.conn = nil
-	close(i.connectChan)
-	i.connectChan = make(chan struct{}, 1)
+	close(i.readyChan)
+	i.readyChan = make(chan struct{}, 1)
 
 	if !constants.DEBUG {
 		os.Exit(0)
 	}
-}
-
-func (i *IPCServiceImpl) write(data *WSMessage) error {
-	if i.conn == nil {
-		return fmt.Errorf("connection not initialized")
-	}
-
-	i.mu.Lock()
-	defer i.mu.Unlock()
-
-	err := i.conn.WriteJSON(data)
-	if err != nil {
-		return fmt.Errorf("failed to write message: %w", err)
-	}
-
-	return nil
 }

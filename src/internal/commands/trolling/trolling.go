@@ -7,7 +7,6 @@ import (
 
 	"github.com/LightningDev1/discordgo"
 
-	"github.com/LightningDev1/LB-Selfbot/internal/config"
 	"github.com/LightningDev1/LB-Selfbot/internal/constants"
 	"github.com/LightningDev1/LB-Selfbot/internal/random"
 	"github.com/LightningDev1/LB-Selfbot/internal/router"

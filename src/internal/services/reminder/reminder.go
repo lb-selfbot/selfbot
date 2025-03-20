@@ -3,32 +3,35 @@ package reminder
 import (
 	"time"
 
-	"github.com/LightningDev1/LB-Selfbot/internal/config"
-	"github.com/LightningDev1/LB-Selfbot/internal/services/interfaces"
+	"github.com/LightningDev1/LB-Selfbot/internal/services/config"
+	"github.com/LightningDev1/LB-Selfbot/internal/services/eventbroker"
+	"github.com/LightningDev1/LB-Selfbot/internal/services/ui/featurelogs"
 	"github.com/LightningDev1/LB-Selfbot/internal/utils"
 )
 
-type ReminderServiceImpl struct {
-	uiSvc interfaces.UIService
+// ReminderService handles reminders for the user.
+type ReminderService interface {
+	// Start initializes the reminder service.
+	Start()
 }
 
-func (r *ReminderServiceImpl) Inject(uiSvc interfaces.UIService) {
-	r.uiSvc = uiSvc
+type reminderService struct {
+	eventBroker eventbroker.Service
+	configSvc   config.Service
 }
 
-func (r *ReminderServiceImpl) Start() {
+// NewReminderService creates a new instance of ReminderService.
+func NewReminderService(eventBroker eventbroker.Service, configSvc config.Service) ReminderService {
+	return &reminderService{eventBroker: eventBroker, configSvc: configSvc}
+}
+
+func (r *reminderService) Start() {
 	go r.start()
 }
 
-func (r *ReminderServiceImpl) start() {
+func (r *reminderService) start() {
 	for {
-		cfg, err := config.GetConfig()
-		if err != nil {
-			r.uiSvc.LogError("Failed to get config: ", err)
-			time.Sleep(time.Second * 5)
-			continue
-		}
-
+		cfg := r.configSvc.GetConfig()
 		now := time.Now()
 
 		for _, reminder := range cfg.Reminders {
@@ -36,18 +39,19 @@ func (r *ReminderServiceImpl) start() {
 				continue
 			}
 
-			r.uiSvc.LogReminder(reminder)
+			r.eventBroker.Publish(eventbroker.EventLogFeature, &featurelogs.Reminder{
+				Reminder: reminder,
+			})
 
 			cfg.Reminders = utils.RemoveSliceItem(cfg.Reminders, reminder)
 
-			err = cfg.Save()
+			err := r.configSvc.SaveConfig(cfg)
 			if err != nil {
-				r.uiSvc.LogError("Failed to save config: ", err)
+				r.eventBroker.Publish(eventbroker.EventLogError, "Failed to save config: "+err.Error())
 				continue
 			}
 		}
 
 		time.Sleep(time.Second * 5)
-
 	}
 }

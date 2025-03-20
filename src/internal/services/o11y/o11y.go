@@ -2,28 +2,39 @@ package o11y
 
 import (
 	"fmt"
-	"runtime/debug"
 
-	"github.com/LightningDev1/LB-Selfbot/internal/config"
 	"github.com/LightningDev1/LB-Selfbot/internal/constants"
-	"github.com/LightningDev1/LB-Selfbot/internal/services/interfaces"
-	"github.com/LightningDev1/discordgo"
+	"github.com/LightningDev1/LB-Selfbot/internal/services/config"
+	"github.com/LightningDev1/LB-Selfbot/internal/services/eventbroker"
 	"github.com/getsentry/sentry-go"
 )
 
-type O11yServiceImpl struct {
-	uiSvc interfaces.UIService
+// O11yService handles observability and error tracking.
+type O11yService interface {
+	// Init initializes the observability service.
+	Init() error
+
+	// CaptureError reports an error to the observability service.
+	CaptureError(err any)
 }
 
-func (o *O11yServiceImpl) Inject(uiSvc interfaces.UIService) {
-	o.uiSvc = uiSvc
+type o11yService struct {
+	eventBroker eventbroker.Service
+	configSvc   config.Service
 }
 
-func (o *O11yServiceImpl) Init() error {
-	cfg, err := config.GetConfig()
-	if err != nil {
-		return err
-	}
+// NewO11yService creates a new instance of O11yService.
+func NewO11yService(eventBroker eventbroker.Service, configSvc config.Service) O11yService {
+	svc := &o11yService{eventBroker: eventBroker, configSvc: configSvc}
+	svc.subscribe()
+	return svc
+}
+
+func (s *o11yService) subscribe() {
+	s.eventBroker.Subscribe(eventbroker.EventCaptureError, s.CaptureError)
+}
+
+func (o *o11yService) Init() error {
 
 	var environment string
 
@@ -54,11 +65,13 @@ func (o *O11yServiceImpl) Init() error {
 		},
 	}
 
-	if err = sentry.Init(clientOptions); err != nil {
+	if err := sentry.Init(clientOptions); err != nil {
 		return err
 	}
 
 	sentry.CurrentHub().ConfigureScope(func(scope *sentry.Scope) {
+		cfg := o.configSvc.GetConfig()
+
 		scope.SetUser(sentry.User{
 			Username: cfg.Account.LightningBot.Username,
 		})
@@ -67,7 +80,7 @@ func (o *O11yServiceImpl) Init() error {
 	return nil
 }
 
-func (o *O11yServiceImpl) ReportError(err any) {
+func (o *o11yService) CaptureError(err any) {
 	switch err := err.(type) {
 	case error:
 		sentry.CaptureException(err)
@@ -78,9 +91,5 @@ func (o *O11yServiceImpl) ReportError(err any) {
 		})
 	}
 
-	o.uiSvc.LogError("An error has occurred: %v\n\nStacktrace: %s", err, debug.Stack())
-}
-
-func (o *O11yServiceImpl) DiscordErrorHandler(_ *discordgo.Session, err any) {
-	o.ReportError(err)
+	o.eventBroker.Publish(eventbroker.EventLogError, fmt.Sprintf("An error has occurred: %v", err))
 }

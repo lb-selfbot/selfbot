@@ -8,46 +8,46 @@ import (
 	"reflect"
 	"time"
 
-	"github.com/LightningDev1/LB-Selfbot/internal/config"
 	"github.com/LightningDev1/LB-Selfbot/internal/constants"
 	"github.com/LightningDev1/LB-Selfbot/internal/router"
-	"github.com/LightningDev1/LB-Selfbot/internal/services/interfaces"
+	"github.com/LightningDev1/LB-Selfbot/internal/services/eventbroker"
 	"github.com/LightningDev1/LB-Selfbot/internal/utils"
 	"github.com/LightningDev1/discordgo"
 	"github.com/traefik/yaegi/interp"
 	"github.com/traefik/yaegi/stdlib"
 )
 
-type ExtensionsServiceImpl struct {
-	uiSvc      interfaces.UIService
-	discordSvc interfaces.DiscordService
-	embedSvc   interfaces.EmbedService
-
-	loadedExtensions int
+// ExtensionsService handles the loading and interop of extensions.
+type ExtensionsService interface {
+	// GetNumExtensions returns the number of loaded extensions.
+	GetNumExtensions() int
 }
 
-func (e *ExtensionsServiceImpl) Inject(uiSvc interfaces.UIService, discordSvc interfaces.DiscordService, embedSvc interfaces.EmbedService) {
-	e.uiSvc = uiSvc
-	e.discordSvc = discordSvc
-	e.embedSvc = embedSvc
+type extensionsService struct {
+	eventBroker eventbroker.Service
+
+	numLoadedExtensions int
 }
 
-func (e *ExtensionsServiceImpl) clearConsole() {
-	e.uiSvc.ClearConsole()
-	e.uiSvc.ShowBanner()
+// NewExtensionsService creates a new instance of ExtensionsService.
+func NewExtensionsService(eventBroker eventbroker.Service) ExtensionsService {
+	svc := &extensionsService{eventBroker: eventBroker}
+	svc.subscribe()
+	return svc
 }
 
-func (e *ExtensionsServiceImpl) notification(message string) {
-	_ = e.uiSvc.ShowNotification(message)
+func (e *extensionsService) subscribe() {
+	e.eventBroker.Subscribe(eventbroker.EventSessionReady, func(payload any) {
+		session := payload.(*discordgo.Session)
+		if session.State.User.ID != session.State.User.ID {
+			return
+		}
+
+		e.load(session)
+	})
 }
 
-func (e *ExtensionsServiceImpl) logError(message string) {
-	e.uiSvc.LogError(message)
-}
-
-func (e *ExtensionsServiceImpl) Register() {
-	session, cmdRouter := e.discordSvc.GetSession(), e.discordSvc.GetRouter()
-
+func (e *extensionsService) load(session *discordgo.Session) {
 	exports := interp.Exports{
 		"github.com/LightningDev1/LB-Extensions/lightningbot": map[string]reflect.Value{
 			// function, constant and variable definitions
@@ -73,7 +73,7 @@ func (e *ExtensionsServiceImpl) Register() {
 	_ = i.Use(exports)
 
 	handleError := func(err error) {
-		e.uiSvc.LogError("An error has occurred while loading extensions: " + err.Error())
+		e.eventBroker.Publish(eventbroker.EventLogError, "An error has occurred while loading extensions: "+err.Error())
 		time.Sleep(5 * time.Second)
 	}
 
@@ -117,7 +117,7 @@ func (e *ExtensionsServiceImpl) Register() {
 
 		registerFunc(session, cmdRouter)
 
-		e.loadedExtensions++
+		e.numLoadedExtensions++
 
 		return nil
 	})
@@ -126,4 +126,6 @@ func (e *ExtensionsServiceImpl) Register() {
 	}
 }
 
-func (e *ExtensionsServiceImpl) GetLoadedExtensions() int { return e.loadedExtensions }
+func (e *extensionsService) GetNumExtensions() int {
+	return e.numLoadedExtensions
+}

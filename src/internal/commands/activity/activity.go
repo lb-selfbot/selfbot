@@ -9,7 +9,7 @@ import (
 	"strings"
 
 	"github.com/LightningDev1/LB-Selfbot/internal/api"
-	"github.com/LightningDev1/LB-Selfbot/internal/config"
+
 	"github.com/LightningDev1/LB-Selfbot/internal/http"
 	"github.com/LightningDev1/LB-Selfbot/internal/router"
 	"github.com/LightningDev1/LB-Selfbot/internal/services"

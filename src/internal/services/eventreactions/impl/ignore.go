@@ -3,7 +3,7 @@ package impl
 import (
 	"fmt"
 
-	"github.com/LightningDev1/LB-Selfbot/internal/services/interfaces"
+	"github.com/LightningDev1/LB-Selfbot/internal/services/eventreactions/types"
 	"github.com/LightningDev1/LB-Selfbot/internal/utils"
 	"github.com/LightningDev1/discordgo"
 )
@@ -47,11 +47,11 @@ func NewIgnoreFromData(session *discordgo.Session, data map[string]any) (*Ignore
 	return nil, fmt.Errorf("invalid reaction data")
 }
 
-func (i *Ignore) Type() interfaces.EventReactionType {
+func (i *Ignore) Type() types.EventReactionType {
 	if i.User != nil {
-		return interfaces.EventReactionIgnoreUser
+		return types.IgnoreUser
 	} else if i.Guild != nil {
-		return interfaces.EventReactionIgnoreGuild
+		return types.IgnoreGuild
 	} else {
 		utils.Logging.Debug("Ignore.Type: Invalid ignore type")
 		return -1
@@ -69,7 +69,7 @@ func (i *Ignore) Description() string {
 	}
 }
 
-func (i *Ignore) Equals(other interfaces.EventReaction) bool {
+func (i *Ignore) Equals(other types.EventReaction) bool {
 	otherIgnore, ok := other.(*Ignore)
 	if !ok {
 		utils.Logging.Debug("Ignore.Equals: Other is not an Ignore")

@@ -7,15 +7,17 @@ import (
 
 	"github.com/LightningDev1/LB-Selfbot/internal/api"
 	"github.com/LightningDev1/LB-Selfbot/internal/http"
-	"github.com/LightningDev1/LB-Selfbot/internal/services/interfaces"
+	"github.com/LightningDev1/LB-Selfbot/internal/services/eventbroker"
+	"github.com/LightningDev1/LB-Selfbot/internal/services/eventreactions/types"
+
 	"github.com/LightningDev1/LB-Selfbot/internal/utils"
 	"github.com/LightningDev1/discordgo"
 )
 
 type Ping struct {
-	eventReactionsSvc interfaces.EventReactionsService
+	eventBroker eventbroker.Service
 
-	ReactionType interfaces.EventReactionType
+	ReactionType types.EventReactionType
 	Guild        *discordgo.Guild
 	Channel      *discordgo.Channel
 	System       string
@@ -23,16 +25,16 @@ type Ping struct {
 	Reaction     string
 }
 
-func NewPingReaction(eventReactionsSvc interfaces.EventReactionsService, reactionType interfaces.EventReactionType, guild *discordgo.Guild, channel *discordgo.Channel) *Ping {
+func NewPingReaction(eventBroker eventbroker.Service, reactionType types.EventReactionType, guild *discordgo.Guild, channel *discordgo.Channel) *Ping {
 	return &Ping{
-		eventReactionsSvc: eventReactionsSvc,
-		ReactionType:      reactionType,
-		Guild:             guild,
-		Channel:           channel,
+		eventBroker:  eventBroker,
+		ReactionType: reactionType,
+		Guild:        guild,
+		Channel:      channel,
 	}
 }
 
-func NewPingFromData(eventReactionsSvc interfaces.EventReactionsService, session *discordgo.Session, reactionType interfaces.EventReactionType, data map[string]any) (*Ping, error) {
+func NewPingFromData(eventBroker eventbroker.Service, session *discordgo.Session, reactionType types.EventReactionType, data map[string]any) (*Ping, error) {
 	var guild *discordgo.Guild
 	var channel *discordgo.Channel
 
@@ -52,7 +54,7 @@ func NewPingFromData(eventReactionsSvc interfaces.EventReactionsService, session
 		return nil, fmt.Errorf("invalid ping data")
 	}
 
-	reaction := NewPingReaction(eventReactionsSvc, reactionType, guild, channel)
+	reaction := NewPingReaction(eventBroker, reactionType, guild, channel)
 
 	reaction.System, _ = data["system"].(string)
 	reaction.Response, _ = data["response"].(string)
@@ -61,7 +63,7 @@ func NewPingFromData(eventReactionsSvc interfaces.EventReactionsService, session
 	return reaction, nil
 }
 
-func (p *Ping) Type() interfaces.EventReactionType {
+func (p *Ping) Type() types.EventReactionType {
 	return p.ReactionType
 }
 
@@ -87,23 +89,23 @@ func (p *Ping) Description() string {
 	location := " (" + strings.Join(locations, " - ") + ")"
 
 	switch p.ReactionType {
-	case interfaces.EventReactionPingPing:
+	case types.PingPing:
 		return "Ping → Ping" + location
-	case interfaces.EventReactionPingKick:
+	case types.PingKick:
 		return "Ping → Kick" + location
-	case interfaces.EventReactionPingBan:
+	case types.PingBan:
 		return "Ping → Ban" + location
-	case interfaces.EventReactionPingMute:
+	case types.PingMute:
 		return "Ping → Mute" + location
-	case interfaces.EventReactionPingTimeout:
+	case types.PingTimeout:
 		return "Ping → Timeout" + location
-	case interfaces.EventReactionPingInsult:
+	case types.PingInsult:
 		return "Ping → Insult" + location
-	case interfaces.EventReactionPingReact:
+	case types.PingReact:
 		return "Ping → React" + location
-	case interfaces.EventReactionPingResponse:
+	case types.PingResponse:
 		return "Ping → Response" + location
-	case interfaces.EventReactionPingAIResponse:
+	case types.PingAIResponse:
 		return "Ping → AI Response" + location
 	default:
 		utils.Logging.Debug("Ping.Description: Unknown reaction type")
@@ -111,7 +113,7 @@ func (p *Ping) Description() string {
 	}
 }
 
-func (p *Ping) Equals(other interfaces.EventReaction) bool {
+func (p *Ping) Equals(other types.EventReaction) bool {
 	otherPing, ok := other.(*Ping)
 	if !ok {
 		utils.Logging.Debug("Ping.Equals: Other is not a Ping")
@@ -163,21 +165,25 @@ func (p *Ping) Handler(session *discordgo.Session, event any) {
 	}
 
 	switch p.ReactionType {
-	case interfaces.EventReactionPingPing:
+	case types.PingPing:
 		m, err := session.ChannelMessageSend(message.ChannelID, message.Author.Mention())
-		p.eventReactionsSvc.HandleReactionMessage(m, err)
-	case interfaces.EventReactionPingKick:
+		if err != nil {
+			break
+		}
+
+		p.eventBroker.Publish(eventbroker.EventHandleReactionMessage, m)
+	case types.PingKick:
 		_ = session.GuildMemberDeleteWithReason(message.GuildID, message.Author.ID, "Ping Kick Event Reaction")
-	case interfaces.EventReactionPingBan:
+	case types.PingBan:
 		_ = session.GuildBanCreateWithReason(message.GuildID, message.Author.ID, "Ping Ban Event Reaction", 0)
-	case interfaces.EventReactionPingMute:
+	case types.PingMute:
 		member, ok := utils.Discord.GetMember(session, message.GuildID, message.Author.ID)
 		if !ok {
 			return
 		}
 
 		_ = utils.Discord.MuteUser(session, member)
-	case interfaces.EventReactionPingTimeout:
+	case types.PingTimeout:
 		member, ok := utils.Discord.GetMember(session, message.GuildID, message.Author.ID)
 		if !ok {
 			return
@@ -185,18 +191,26 @@ func (p *Ping) Handler(session *discordgo.Session, event any) {
 
 		until := time.Now().Add(5 * time.Minute)
 		_ = session.GuildMemberTimeout(member.GuildID, member.User.ID, &until)
-	case interfaces.EventReactionPingInsult:
+	case types.PingInsult:
 		httpResponse := http.Get("https://evilinsult.com/generate_insult.php?lang=en")
 		insult := message.Author.Mention() + " " + string(httpResponse.Body)
 
 		m, err := session.ChannelMessageSend(message.ChannelID, insult)
-		p.eventReactionsSvc.HandleReactionMessage(m, err)
-	case interfaces.EventReactionPingReact:
+		if err != nil {
+			break
+		}
+
+		p.eventBroker.Publish(eventbroker.EventHandleReactionMessage, m)
+	case types.PingReact:
 		_ = session.MessageReactionAdd(message.ChannelID, message.ID, p.Reaction)
-	case interfaces.EventReactionPingResponse:
+	case types.PingResponse:
 		m, err := session.ChannelMessageSend(message.ChannelID, p.Response)
-		p.eventReactionsSvc.HandleReactionMessage(m, err)
-	case interfaces.EventReactionPingAIResponse:
+		if err != nil {
+			break
+		}
+
+		p.eventBroker.Publish(eventbroker.EventHandleReactionMessage, m)
+	case types.PingAIResponse:
 		system := utils.Misc.CreateAISystemPing(p.System, session, message.Message)
 		response, err := api.GPT(system, message.Content)
 		if err != nil {
@@ -205,6 +219,10 @@ func (p *Ping) Handler(session *discordgo.Session, event any) {
 		}
 
 		m, err := session.ChannelMessageSend(message.ChannelID, response)
-		p.eventReactionsSvc.HandleReactionMessage(m, err)
+		if err != nil {
+			break
+		}
+
+		p.eventBroker.Publish(eventbroker.EventHandleReactionMessage, m)
 	}
 }

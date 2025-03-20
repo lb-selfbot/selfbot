@@ -17,13 +17,12 @@ import (
 	"github.com/LightningDev1/LB-Selfbot/internal/assets"
 	"github.com/LightningDev1/LB-Selfbot/internal/browser"
 	"github.com/LightningDev1/LB-Selfbot/internal/commands"
-	"github.com/LightningDev1/LB-Selfbot/internal/config"
+
 	"github.com/LightningDev1/LB-Selfbot/internal/constants"
 	"github.com/LightningDev1/LB-Selfbot/internal/http"
 	"github.com/LightningDev1/LB-Selfbot/internal/logging"
 	"github.com/LightningDev1/LB-Selfbot/internal/savedtokens"
-	"github.com/LightningDev1/LB-Selfbot/internal/services"
-	"github.com/LightningDev1/LB-Selfbot/internal/services/interfaces"
+
 	"github.com/LightningDev1/LB-Selfbot/internal/setup"
 	"github.com/LightningDev1/LB-Selfbot/internal/system"
 	"github.com/LightningDev1/LB-Selfbot/internal/utils"

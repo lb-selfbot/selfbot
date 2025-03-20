@@ -4,21 +4,27 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/LightningDev1/LB-Selfbot/internal/config"
-	"github.com/LightningDev1/LB-Selfbot/internal/services/interfaces"
+	"github.com/LightningDev1/LB-Selfbot/internal/services/config"
+	"github.com/LightningDev1/LB-Selfbot/internal/services/eventreactions/types"
+
 	"github.com/LightningDev1/LB-Selfbot/internal/utils"
 	"github.com/LightningDev1/discordgo"
 )
 
 type AntiDeleteMessages struct {
+	configSvc config.Service
+
 	Channel *discordgo.Channel
 }
 
-func NewAntiDeleteMessages(channel *discordgo.Channel) *AntiDeleteMessages {
-	return &AntiDeleteMessages{Channel: channel}
+func NewAntiDeleteMessages(configSvc config.Service, channel *discordgo.Channel) *AntiDeleteMessages {
+	return &AntiDeleteMessages{
+		configSvc: configSvc,
+		Channel:   channel,
+	}
 }
 
-func NewAntiDeleteMessagesFromData(session *discordgo.Session, data map[string]any) (*AntiDeleteMessages, error) {
+func NewAntiDeleteMessagesFromData(configSvc config.Service, session *discordgo.Session, data map[string]any) (*AntiDeleteMessages, error) {
 	channelID, ok := data["channel"].(string)
 	if ok {
 		channel, err := utils.Discord.GetChannel(session, channelID)
@@ -26,15 +32,15 @@ func NewAntiDeleteMessagesFromData(session *discordgo.Session, data map[string]a
 			channel = &discordgo.Channel{ID: channelID}
 		}
 
-		return NewAntiDeleteMessages(channel), nil
+		return NewAntiDeleteMessages(configSvc, channel), nil
 	} else {
 		utils.Logging.Error("AntiDeleteMessages.NewAntiDeleteMessagesFromData: Invalid antideletemessages data")
 		return nil, fmt.Errorf("invalid antideletemessages data")
 	}
 }
 
-func (a *AntiDeleteMessages) Type() interfaces.EventReactionType {
-	return interfaces.EventReactionAntiDeleteMessages
+func (a *AntiDeleteMessages) Type() types.EventReactionType {
+	return types.AntiDeleteMessages
 }
 
 func (a *AntiDeleteMessages) Description() string {
@@ -45,7 +51,7 @@ func (a *AntiDeleteMessages) Description() string {
 	return fmt.Sprintf("Anti Delete Messages - %s", a.Channel.Name)
 }
 
-func (a *AntiDeleteMessages) Equals(other interfaces.EventReaction) bool {
+func (a *AntiDeleteMessages) Equals(other types.EventReaction) bool {
 	otherAntiDeleteMessages, ok := other.(*AntiDeleteMessages)
 	if !ok {
 		return false
@@ -70,11 +76,7 @@ func (a *AntiDeleteMessages) Handler(session *discordgo.Session, event any) {
 		return
 	}
 
-	cfg, err := config.GetConfig()
-	if err != nil {
-		utils.Logging.Debug("AntiDeleteMessages.Handler: Error getting config: " + err.Error())
-		return
-	}
+	cfg := a.configSvc.GetConfig()
 
 	// Don't resend messages with the command prefix.
 	if strings.HasPrefix(message.Content, cfg.Selfbot.CommandPrefix) {
@@ -83,7 +85,7 @@ func (a *AntiDeleteMessages) Handler(session *discordgo.Session, event any) {
 
 	// Message is not handled because we want messages sent by the handler to also be resent
 	// when they are deleted.
-	_, err = session.ChannelMessageSendComplex(message.ChannelID, &discordgo.MessageSend{
+	_, err := session.ChannelMessageSendComplex(message.ChannelID, &discordgo.MessageSend{
 		Content:  message.Content,
 		Activity: message.Activity,
 		TTS:      message.TTS,

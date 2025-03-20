@@ -3,13 +3,14 @@ package impl
 import (
 	"fmt"
 
-	"github.com/LightningDev1/LB-Selfbot/internal/services/interfaces"
+	"github.com/LightningDev1/LB-Selfbot/internal/services/eventbroker"
+	"github.com/LightningDev1/LB-Selfbot/internal/services/eventreactions/types"
 	"github.com/LightningDev1/LB-Selfbot/internal/utils"
 	"github.com/LightningDev1/discordgo"
 )
 
 type Mirror struct {
-	eventReactionsSvc interfaces.EventReactionsService
+	eventBroker eventbroker.Service
 
 	SourceGuild   *discordgo.Guild
 	DestGuild     *discordgo.Guild
@@ -17,15 +18,15 @@ type Mirror struct {
 	DestChannel   *discordgo.Channel
 }
 
-func NewMirrorGuild(eventReactionsSvc interfaces.EventReactionsService, source, dest *discordgo.Guild) *Mirror {
-	return &Mirror{eventReactionsSvc: eventReactionsSvc, SourceGuild: source, DestGuild: dest}
+func NewMirrorGuild(eventBroker eventbroker.Service, source, dest *discordgo.Guild) *Mirror {
+	return &Mirror{eventBroker: eventBroker, SourceGuild: source, DestGuild: dest}
 }
 
-func NewMirrorChannel(eventReactionsSvc interfaces.EventReactionsService, source, dest *discordgo.Channel) *Mirror {
-	return &Mirror{eventReactionsSvc: eventReactionsSvc, SourceChannel: source, DestChannel: dest}
+func NewMirrorChannel(eventBroker eventbroker.Service, source, dest *discordgo.Channel) *Mirror {
+	return &Mirror{eventBroker: eventBroker, SourceChannel: source, DestChannel: dest}
 }
 
-func NewMirrorFromData(eventReactionsSvc interfaces.EventReactionsService, session *discordgo.Session, data map[string]any) (*Mirror, error) {
+func NewMirrorFromData(eventBroker eventbroker.Service, session *discordgo.Session, data map[string]any) (*Mirror, error) {
 	sourceGuildID, ok := data["source_guild"].(string)
 	if ok {
 		sourceGuild, err := utils.Discord.GetGuild(session, sourceGuildID)
@@ -40,7 +41,7 @@ func NewMirrorFromData(eventReactionsSvc interfaces.EventReactionsService, sessi
 				destGuild = &discordgo.Guild{ID: destGuildID}
 			}
 
-			return NewMirrorGuild(eventReactionsSvc, sourceGuild, destGuild), nil
+			return NewMirrorGuild(eventBroker, sourceGuild, destGuild), nil
 		} else {
 			utils.Logging.Error("Mirror.NewMirrorFromData: Invalid mirror data")
 			return nil, fmt.Errorf("invalid mirror data")
@@ -61,7 +62,7 @@ func NewMirrorFromData(eventReactionsSvc interfaces.EventReactionsService, sessi
 				destChannel = &discordgo.Channel{ID: destChannelID}
 			}
 
-			return NewMirrorChannel(eventReactionsSvc, sourceChannel, destChannel), nil
+			return NewMirrorChannel(eventBroker, sourceChannel, destChannel), nil
 		} else {
 			utils.Logging.Error("Mirror.NewMirrorFromData: Invalid mirror data")
 			return nil, fmt.Errorf("invalid mirror data")
@@ -72,11 +73,11 @@ func NewMirrorFromData(eventReactionsSvc interfaces.EventReactionsService, sessi
 	return nil, fmt.Errorf("invalid mirror data")
 }
 
-func (m *Mirror) Type() interfaces.EventReactionType {
+func (m *Mirror) Type() types.EventReactionType {
 	if m.SourceGuild != nil {
-		return interfaces.EventReactionMirrorGuild
+		return types.MirrorGuild
 	} else if m.SourceChannel != nil {
-		return interfaces.EventReactionMirrorChannel
+		return types.MirrorChannel
 	} else {
 		utils.Logging.Debug("Mirror.Type: Invalid ignore type")
 		return -1
@@ -94,7 +95,7 @@ func (m *Mirror) Description() string {
 	}
 }
 
-func (m *Mirror) Equals(other interfaces.EventReaction) bool {
+func (m *Mirror) Equals(other types.EventReaction) bool {
 	otherMirror, ok := other.(*Mirror)
 	if !ok {
 		utils.Logging.Debug("Mirror.Equals: Other is not a Mirror")
@@ -139,7 +140,8 @@ func (m *Mirror) Handler(session *discordgo.Session, event any) {
 		return
 	}
 
-	if m.DestGuild != nil {
+	switch {
+	case m.DestGuild != nil:
 		ogChannel, err := session.State.Channel(message.ChannelID)
 		if err != nil {
 			utils.Logging.Debug("Mirror.Handler: Error getting channel: " + err.Error())
@@ -162,15 +164,21 @@ func (m *Mirror) Handler(session *discordgo.Session, event any) {
 		msg, err := utils.Discord.ImpersonateMessage(session, message.Author, message.Message, channel.ID)
 		if err != nil {
 			utils.Logging.Debug("Mirror.Handler: Error impersonating: " + err.Error())
+			return
 		}
-		m.eventReactionsSvc.HandleReactionMessage(msg, err)
-	} else if m.DestChannel != nil {
+
+		m.eventBroker.Publish(eventbroker.EventHandleReactionMessage, msg)
+
+	case m.DestChannel != nil:
 		msg, err := utils.Discord.ImpersonateMessage(session, message.Author, message.Message, m.DestChannel.ID)
 		if err != nil {
 			utils.Logging.Debug("Mirror.Handler: Error impersonating: " + err.Error())
+			return
 		}
-		m.eventReactionsSvc.HandleReactionMessage(msg, err)
-	} else {
+
+		m.eventBroker.Publish(eventbroker.EventHandleReactionMessage, msg)
+
+	default:
 		utils.Logging.Debug("Mirror.Handler: Invalid ignore type")
 		return
 	}

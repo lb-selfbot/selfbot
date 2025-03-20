@@ -6,17 +6,13 @@ import (
 	"strings"
 	"time"
 
-	"github.com/LightningDev1/LB-Selfbot/internal/config"
-	"github.com/LightningDev1/LB-Selfbot/internal/utils"
+	"github.com/LightningDev1/LB-Selfbot/internal/services/eventbroker"
+	"github.com/LightningDev1/LB-Selfbot/internal/services/ui/featurelogs"
 	"github.com/LightningDev1/discordgo"
 )
 
-func (e *EventReactionsServiceImpl) onReady(s *discordgo.Session, r *discordgo.Ready) {
-	e.sessionsSvc.Register()
-	e.scJobsSvc.Start()
-	e.rpcSvc.Start()
-
-	go e.startLoading()
+func (e *eventReactionsService) onReady(s *discordgo.Session, r *discordgo.Ready) {
+	go e.startLoading(s)
 
 	go func() {
 		resp, err := s.Request("GET", "https://discord.com/api/v9/users/@me/billing-payment-sources", nil)
@@ -55,16 +51,20 @@ func (e *EventReactionsServiceImpl) onReady(s *discordgo.Session, r *discordgo.R
 	go func() {
 		ticker := time.NewTicker(24 * time.Hour)
 		for range ticker.C {
-			_ = e.uiSvc.ClearConsole()
-			e.uiSvc.ShowBanner()
+			e.eventBroker.Publish(eventbroker.EventClearConsole, nil)
 		}
 	}()
 
-	router := e.discordSvc.GetRouter()
-	e.uiSvc.LogReady(r, len(router.GetCmds()))
+	e.eventBroker.Publish(eventbroker.EventSessionReady, s)
+
+	e.eventBroker.Publish(eventbroker.EventLogFeature, &featurelogs.Ready{
+		User:    r.User,
+		Guilds:  r.Guilds,
+		NumCmds: len(e.routerSvc.GetCommands()),
+	})
 }
 
-func (e *EventReactionsServiceImpl) onMessageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
+func (e *eventReactionsService) onMessageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 	if m.Message == nil || m.Author == nil {
 		return
 	}
@@ -72,11 +72,9 @@ func (e *EventReactionsServiceImpl) onMessageCreate(s *discordgo.Session, m *dis
 	_ = s.State.MessageAdd(m.Message)
 
 	e.handleEvent(s, m)
-
-	e.timeDiff = time.Since(utils.Discord.SnowflakeToTime(m.ID))
 }
 
-func (e *EventReactionsServiceImpl) onMessageUpdate(s *discordgo.Session, m *discordgo.MessageUpdate) {
+func (e *eventReactionsService) onMessageUpdate(s *discordgo.Session, m *discordgo.MessageUpdate) {
 	message, err := s.State.Message(m.Message.ChannelID, m.Message.ID)
 	if err == nil {
 		m.Message = message
@@ -96,17 +94,13 @@ func (e *EventReactionsServiceImpl) onMessageUpdate(s *discordgo.Session, m *dis
 		e.handleEvent(s, m)
 	}
 
-	cfg, err := config.GetConfig()
-	if err != nil {
-		return
-	}
-
-	if m.Author.ID != s.State.User.ID || !strings.HasPrefix(m.Message.Content, cfg.Selfbot.CommandPrefix) {
+	prefix := e.configSvc.GetConfig().Selfbot.CommandPrefix
+	if m.Author.ID != s.State.User.ID || !strings.HasPrefix(m.Message.Content, prefix) {
 		e.addEditedMessage(m)
 	}
 }
 
-func (e *EventReactionsServiceImpl) onMessageDelete(s *discordgo.Session, m *discordgo.MessageDelete) {
+func (e *eventReactionsService) onMessageDelete(s *discordgo.Session, m *discordgo.MessageDelete) {
 	if m.BeforeDelete == nil {
 		return
 	}
@@ -121,17 +115,13 @@ func (e *EventReactionsServiceImpl) onMessageDelete(s *discordgo.Session, m *dis
 		e.handleEvent(s, m)
 	}
 
-	cfg, err := config.GetConfig()
-	if err != nil {
-		return
-	}
-
-	if m.Author.ID != s.State.User.ID || !strings.HasPrefix(m.Message.Content, cfg.Selfbot.CommandPrefix) {
+	prefix := e.configSvc.GetConfig().Selfbot.CommandPrefix
+	if m.Author.ID != s.State.User.ID || !strings.HasPrefix(m.Message.Content, prefix) {
 		e.addDeletedMessage(m.BeforeDelete)
 	}
 }
 
-func (e *EventReactionsServiceImpl) onMessageReactionAdd(s *discordgo.Session, m *discordgo.MessageReactionAdd) {
+func (e *eventReactionsService) onMessageReactionAdd(s *discordgo.Session, m *discordgo.MessageReactionAdd) {
 	msg := &discordgo.Message{ID: m.MessageID}
 
 	if !e.IsReactionMessage(msg) {
@@ -139,34 +129,34 @@ func (e *EventReactionsServiceImpl) onMessageReactionAdd(s *discordgo.Session, m
 	}
 }
 
-func (e *EventReactionsServiceImpl) onTypingStart(s *discordgo.Session, t *discordgo.TypingStart) {
+func (e *eventReactionsService) onTypingStart(s *discordgo.Session, t *discordgo.TypingStart) {
 	e.handleEvent(s, t)
 }
 
-func (e *EventReactionsServiceImpl) onGuildBanAdd(s *discordgo.Session, g *discordgo.GuildBanAdd) {
+func (e *eventReactionsService) onGuildBanAdd(s *discordgo.Session, g *discordgo.GuildBanAdd) {
 	e.handleEvent(s, g)
 }
 
-func (e *EventReactionsServiceImpl) onGuildMemberAdd(s *discordgo.Session, g *discordgo.GuildMemberAdd) {
+func (e *eventReactionsService) onGuildMemberAdd(s *discordgo.Session, g *discordgo.GuildMemberAdd) {
 	e.handleEvent(s, g)
 }
 
-func (e *EventReactionsServiceImpl) onGuildMemberUpdate(s *discordgo.Session, g *discordgo.GuildMemberUpdate) {
+func (e *eventReactionsService) onGuildMemberUpdate(s *discordgo.Session, g *discordgo.GuildMemberUpdate) {
 	e.handleEvent(s, g)
 }
 
-func (e *EventReactionsServiceImpl) onRelationshipAdd(s *discordgo.Session, r *discordgo.RelationshipAdd) {
+func (e *eventReactionsService) onRelationshipAdd(s *discordgo.Session, r *discordgo.RelationshipAdd) {
 	e.handleEvent(s, r)
 }
 
-func (e *EventReactionsServiceImpl) onVoiceStateUpdate(s *discordgo.Session, r *discordgo.VoiceStateUpdate) {
+func (e *eventReactionsService) onVoiceStateUpdate(s *discordgo.Session, r *discordgo.VoiceStateUpdate) {
 	e.handleEvent(s, r)
 }
 
-func (e *EventReactionsServiceImpl) onChannelCreate(s *discordgo.Session, r *discordgo.ChannelCreate) {
+func (e *eventReactionsService) onChannelCreate(s *discordgo.Session, r *discordgo.ChannelCreate) {
 	e.handleEvent(s, r)
 }
 
-func (e *EventReactionsServiceImpl) onChannelRecipientRemove(s *discordgo.Session, r *discordgo.ChannelRecipientRemove) {
+func (e *eventReactionsService) onChannelRecipientRemove(s *discordgo.Session, r *discordgo.ChannelRecipientRemove) {
 	e.handleEvent(s, r)
 }

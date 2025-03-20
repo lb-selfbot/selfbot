@@ -1,7 +1,7 @@
 package impl
 
 import (
-	"github.com/LightningDev1/LB-Selfbot/internal/services/interfaces"
+	"github.com/LightningDev1/LB-Selfbot/internal/services/eventreactions/types"
 	"github.com/LightningDev1/LB-Selfbot/internal/utils"
 	"github.com/LightningDev1/discordgo"
 )
@@ -39,8 +39,8 @@ func NewNoLeaveFromData(session *discordgo.Session, data map[string]any) (*NoLea
 	return NewNoLeave(channel, user), nil
 }
 
-func (n *NoLeave) Type() interfaces.EventReactionType {
-	return interfaces.EventReactionNoLeave
+func (n *NoLeave) Type() types.EventReactionType {
+	return types.NoLeave
 }
 
 func (n *NoLeave) Description() string {
@@ -53,7 +53,7 @@ func (n *NoLeave) Description() string {
 	return "No Leave (" + location + ")"
 }
 
-func (n *NoLeave) Equals(other interfaces.EventReaction) bool {
+func (n *NoLeave) Equals(other types.EventReaction) bool {
 	otherNoLeave, ok := other.(*NoLeave)
 	if !ok {
 		utils.Logging.Debug("NoLeave.Equals: Other is not a NoLeave")

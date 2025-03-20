@@ -5,76 +5,75 @@ import (
 	"strings"
 	"time"
 
-	"github.com/LightningDev1/LB-Selfbot/internal/config"
 	"github.com/LightningDev1/LB-Selfbot/internal/constants"
-	"github.com/LightningDev1/LB-Selfbot/internal/services/interfaces"
+	"github.com/LightningDev1/LB-Selfbot/internal/services/config"
+	"github.com/LightningDev1/LB-Selfbot/internal/services/eventbroker"
+	"github.com/LightningDev1/LB-Selfbot/internal/services/sessions"
 	"github.com/LightningDev1/LB-Selfbot/internal/utils"
 	"github.com/LightningDev1/discordgo"
 	"github.com/hugolgst/rich-go/client"
 )
 
-type RPCServiceImpl struct {
-	uiSvc        interfaces.UIService
-	discordSvc   interfaces.DiscordService
-	sessionsSvc  interfaces.SessionsService
-	variablesSvc interfaces.VariablesService
+// RPCService handles Discord Rich Presence.
+type RPCService interface {
+}
+
+type rpcService struct {
+	eventBroker eventbroker.Service
+	configSvc   config.Service
+	sessionsSvc sessions.SessionsService
 
 	startTime time.Time
 }
 
-func (r *RPCServiceImpl) Inject(
-	uiSvc interfaces.UIService,
-	discordSvc interfaces.DiscordService,
-	sessionsSvc interfaces.SessionsService,
-	variablesSvc interfaces.VariablesService,
-) {
-	r.uiSvc = uiSvc
-	r.discordSvc = discordSvc
-	r.sessionsSvc = sessionsSvc
-	r.variablesSvc = variablesSvc
+// NewRPCService creates a new instance of RPCService.
+func NewRPCService(eventBroker eventbroker.Service, configSvc config.Service, sessionsSvc sessions.SessionsService) RPCService {
+	svc := &rpcService{eventBroker: eventBroker, configSvc: configSvc, sessionsSvc: sessionsSvc}
+	svc.subscribe()
+	return svc
 }
 
-func (r *RPCServiceImpl) Start() {
-	go r.start()
+func (r *rpcService) subscribe() {
+	r.eventBroker.Subscribe(eventbroker.EventSessionReady, func(payload any) {
+		session, ok := payload.(*discordgo.Session)
+		if !ok {
+			return
+		}
+
+		r.startTime = time.Now()
+		// NOTE: this is a blocking function, but we are already in a goroutine.
+		r.start(session)
+	})
 }
 
-func (r *RPCServiceImpl) start() {
-	r.startTime = time.Now()
-
+func (r *rpcService) start(session *discordgo.Session) {
 	timer := time.NewTimer(time.Second * 10)
 	defer timer.Stop()
 
 	for range timer.C {
-		cfg, err := config.GetConfig()
-		if err != nil {
-			r.uiSvc.LogError("Failed to get config: ", err)
-			continue
-		}
-
-		err = r.setRPC(&cfg)
-		if err != nil {
-			r.uiSvc.LogError("Failed to set RPC: ", err)
+		cfg := r.configSvc.GetConfig()
+		if err := r.setRPC(session, cfg); err != nil {
+			r.eventBroker.Publish(eventbroker.EventLogError, "Failed to set RPC: "+err.Error())
 			continue
 		}
 	}
 }
-
-func (r *RPCServiceImpl) setRPC(cfg *config.Config) error {
+func (r *rpcService) setRPC(session *discordgo.Session, cfg *config.Config) error {
 	if !cfg.Activity.Enabled {
 		client.Logout()
 		return nil
 	}
 
-	if cfg.Activity.PauseForOther && r.checkPauseForOther() {
+	if cfg.Activity.PauseForOther && r.checkPauseForOther(session) {
 		return nil
 	}
 
 	switch cfg.Activity.ActivityType {
 	case "RPC":
 		if constants.HOSTING {
-			r.uiSvc.LogError("RPC is not supported when hosting the bot. Please use Custom Activity instead.")
+			r.eventBroker.Publish(eventbroker.EventLogError, "RPC is not supported when hosting the bot. Please use Custom Activity instead.")
 			cfg.Activity.ActivityType = "CustomActivity"
-			return cfg.Save()
+			return r.configSvc.SaveConfig(cfg)
 		}
 
 		err := client.Login(cfg.Activity.ClientID)
@@ -99,7 +98,6 @@ func (r *RPCServiceImpl) setRPC(cfg *config.Config) error {
 		}
 	case "CustomActivity":
 		client.Logout()
-		session := r.discordSvc.GetSession()
 
 		buttons := []string{}
 		buttonUrls := []string{}
@@ -187,8 +185,7 @@ func (r *RPCServiceImpl) setRPC(cfg *config.Config) error {
 	return nil
 }
 
-func (r *RPCServiceImpl) checkPauseForOther() bool {
-	session := r.discordSvc.GetSession()
+func (r *rpcService) checkPauseForOther(session *discordgo.Session) bool {
 	var hasOther, selfHasActivity bool
 
 	for _, gSession := range r.sessionsSvc.GetGatewaySessions() {
@@ -222,7 +219,7 @@ func (r *RPCServiceImpl) checkPauseForOther() bool {
 	return true
 }
 
-func (r *RPCServiceImpl) getActivityType(activityType string) discordgo.ActivityType {
+func (r *rpcService) getActivityType(activityType string) discordgo.ActivityType {
 	switch activityType {
 	case "Playing":
 		return discordgo.ActivityTypeGame
@@ -239,7 +236,7 @@ func (r *RPCServiceImpl) getActivityType(activityType string) discordgo.Activity
 	}
 }
 
-func (r *RPCServiceImpl) getPlatform(activityType, platform string) (string, string) {
+func (r *rpcService) getPlatform(activityType, platform string) (string, string) {
 	if activityType != "Playing" {
 		return "", ""
 	}
@@ -258,7 +255,7 @@ func (r *RPCServiceImpl) getPlatform(activityType, platform string) (string, str
 	}
 }
 
-func (r *RPCServiceImpl) getButtons(cfg *config.Config) []*client.Button {
+func (r *rpcService) getButtons(cfg *config.Config) []*client.Button {
 	var buttons []*client.Button
 
 	if cfg.Activity.Button1Label != "" {
@@ -278,7 +275,7 @@ func (r *RPCServiceImpl) getButtons(cfg *config.Config) []*client.Button {
 	return buttons
 }
 
-func (r *RPCServiceImpl) getTimestamps(timeEnabled bool) *client.Timestamps {
+func (r *rpcService) getTimestamps(timeEnabled bool) *client.Timestamps {
 	if !timeEnabled {
 		return nil
 	}
@@ -286,7 +283,7 @@ func (r *RPCServiceImpl) getTimestamps(timeEnabled bool) *client.Timestamps {
 	return &client.Timestamps{Start: &r.startTime}
 }
 
-func (r *RPCServiceImpl) getDGTimestamps(timeEnabled bool) *discordgo.TimeStamps {
+func (r *rpcService) getDGTimestamps(timeEnabled bool) *discordgo.TimeStamps {
 	if !timeEnabled {
 		return nil
 	}
@@ -294,7 +291,7 @@ func (r *RPCServiceImpl) getDGTimestamps(timeEnabled bool) *discordgo.TimeStamps
 	return &discordgo.TimeStamps{StartTimestamp: r.startTime.UnixMilli()}
 }
 
-func (r *RPCServiceImpl) getParty(cfg *config.Config) *client.Party {
+func (r *rpcService) getParty(cfg *config.Config) *client.Party {
 	if !cfg.Activity.Invitable {
 		return nil
 	}
@@ -306,7 +303,7 @@ func (r *RPCServiceImpl) getParty(cfg *config.Config) *client.Party {
 	}
 }
 
-func (r *RPCServiceImpl) getSecrets(cfg *config.Config) *client.Secrets {
+func (r *rpcService) getSecrets(cfg *config.Config) *client.Secrets {
 	if !cfg.Activity.Invitable {
 		return nil
 	}

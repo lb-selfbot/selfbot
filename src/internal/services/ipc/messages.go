@@ -1,6 +1,6 @@
 package ipc
 
-import "github.com/LightningDev1/LB-Selfbot/internal/config"
+import "github.com/LightningDev1/LB-Selfbot/internal/services/config"
 
 // WSMessage represents a websocket message with an operation code and data payload
 type WSMessage struct {

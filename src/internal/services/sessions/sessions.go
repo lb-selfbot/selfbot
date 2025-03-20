@@ -3,14 +3,29 @@ package sessions
 import (
 	"time"
 
-	"github.com/LightningDev1/LB-Selfbot/internal/services/interfaces"
+	"github.com/LightningDev1/LB-Selfbot/internal/services/eventbroker"
+	"github.com/LightningDev1/LB-Selfbot/internal/services/ui/featurelogs"
 	"github.com/LightningDev1/LB-Selfbot/internal/utils"
 	"github.com/LightningDev1/discordgo"
 )
 
-type SessionsServiceImpl struct {
-	uiSvc      interfaces.UIService
-	discordSvc interfaces.DiscordService
+// SessionsService handles the fetching of Discord sessions.
+type SessionsService interface {
+	// GetGatewaySessions returns the list of gateway sessions.
+	GetGatewaySessions() []*discordgo.GatewaySession
+
+	// GetLoginSessions returns the list of login sessions.
+	GetLoginSessions() []*discordgo.LoginSession
+
+	// GetStatus returns the current status.
+	GetStatus() string
+
+	// SetStatus sets the current status.
+	SetStatus(status string)
+}
+
+type sessionsService struct {
+	eventBroker eventbroker.Service
 
 	gatewaySessions  []*discordgo.GatewaySession
 	loginSessions    []*discordgo.LoginSession
@@ -18,62 +33,74 @@ type SessionsServiceImpl struct {
 	status           string
 }
 
-func (s *SessionsServiceImpl) Inject(uiSvc interfaces.UIService, discordSvc interfaces.DiscordService) {
-	s.uiSvc = uiSvc
-	s.discordSvc = discordSvc
+// NewSessionsService creates a new instance of SessionsService.
+func NewSessionsService(eventBroker eventbroker.Service) SessionsService {
+	svc := &sessionsService{eventBroker: eventBroker}
+	svc.subscribe()
+	return svc
 }
 
-func (s *SessionsServiceImpl) Register() {
-	session := s.discordSvc.GetSession()
+func (s *sessionsService) subscribe() {
+	s.eventBroker.Subscribe(eventbroker.EventSessionReady, func(payload any) {
+		session, ok := payload.(*discordgo.Session)
+		if !ok {
+			return
+		}
+
+		s.register(session)
+	})
+}
+
+func (s *sessionsService) register(session *discordgo.Session) {
 
 	s.parseStatus(session, session.State.Sessions, false)
 	s.gatewaySessions = s.filterSessions(session.State.Sessions)
 
 	if err := s.refreshLoginSessions(session); err != nil {
-		s.uiSvc.LogError("Failed to refresh login sessions:", err)
+		s.eventBroker.Publish(eventbroker.EventLogError, "Failed to refresh login sessions: "+err.Error())
 	}
 
 	session.AddHandler(s.onSessionsReplace)
 }
 
-func (s *SessionsServiceImpl) GetGatewaySessions() []*discordgo.GatewaySession {
+func (s *sessionsService) GetGatewaySessions() []*discordgo.GatewaySession {
 	return s.gatewaySessions
 }
 
-func (s *SessionsServiceImpl) GetLoginSessions() []*discordgo.LoginSession {
+func (s *sessionsService) GetLoginSessions() []*discordgo.LoginSession {
 	return s.loginSessions
 }
 
-func (s *SessionsServiceImpl) GetStatus() string {
+func (s *sessionsService) GetStatus() string {
 	return s.status
 }
 
-func (s *SessionsServiceImpl) SetStatus(status string) {
+func (s *sessionsService) SetStatus(status string) {
 	s.status = status
 	s.lastStatusChange = time.Now()
 }
 
-func (s *SessionsServiceImpl) onSessionsReplace(session *discordgo.Session, e *discordgo.SessionsReplace) {
+func (s *sessionsService) onSessionsReplace(session *discordgo.Session, e *discordgo.SessionsReplace) {
 	s.parseStatus(session, e.Sessions, true)
 	newSessions := s.filterSessions(e.Sessions)
 
 	// Refresh login sessions if a new session is added
 	if len(newSessions) > len(s.gatewaySessions) {
 		if err := s.refreshLoginSessions(session); err != nil {
-			s.uiSvc.LogError("Failed to refresh login sessions:", err)
+			s.eventBroker.Publish(eventbroker.EventLogError, "Failed to refresh login sessions: "+err.Error())
 		}
 	}
 
 	s.gatewaySessions = newSessions
 }
 
-func (s *SessionsServiceImpl) filterSessions(sessions []*discordgo.GatewaySession) []*discordgo.GatewaySession {
+func (s *sessionsService) filterSessions(sessions []*discordgo.GatewaySession) []*discordgo.GatewaySession {
 	return utils.Filter(sessions, func(session *discordgo.GatewaySession) bool {
 		return session.SessionID != "all"
 	})
 }
 
-func (s *SessionsServiceImpl) parseStatus(session *discordgo.Session, sessions []*discordgo.GatewaySession, isReplace bool) {
+func (s *sessionsService) parseStatus(session *discordgo.Session, sessions []*discordgo.GatewaySession, isReplace bool) {
 	statuses := make(map[string]int)
 
 	for _, gatewaySession := range sessions {
@@ -101,7 +128,7 @@ func (s *SessionsServiceImpl) parseStatus(session *discordgo.Session, sessions [
 	s.setStatus(session, maxStatus, isReplace)
 }
 
-func (s *SessionsServiceImpl) getMostCommonStatus(statuses map[string]int) string {
+func (s *sessionsService) getMostCommonStatus(statuses map[string]int) string {
 	var maxStatus string
 	var maxCount int
 
@@ -114,7 +141,7 @@ func (s *SessionsServiceImpl) getMostCommonStatus(statuses map[string]int) strin
 	return maxStatus
 }
 
-func (s *SessionsServiceImpl) setStatus(session *discordgo.Session, status string, isReplace bool) {
+func (s *sessionsService) setStatus(session *discordgo.Session, status string, isReplace bool) {
 	if s.status == status {
 		return
 	}
@@ -130,11 +157,11 @@ func (s *SessionsServiceImpl) setStatus(session *discordgo.Session, status strin
 	}
 }
 
-func (s *SessionsServiceImpl) getFallbackStatus(session *discordgo.Session) string {
+func (s *sessionsService) getFallbackStatus(session *discordgo.Session) string {
 	return session.State.UserSettings.Status.Status.Value
 }
 
-func (s *SessionsServiceImpl) refreshLoginSessions(session *discordgo.Session) error {
+func (s *sessionsService) refreshLoginSessions(session *discordgo.Session) error {
 	sessions, err := session.LoginSessions()
 	if err != nil {
 		return err
@@ -150,7 +177,7 @@ func (s *SessionsServiceImpl) refreshLoginSessions(session *discordgo.Session) e
 	return nil
 }
 
-func (s *SessionsServiceImpl) findNewSessions(currentSessions []*discordgo.LoginSession) []*discordgo.LoginSession {
+func (s *sessionsService) findNewSessions(currentSessions []*discordgo.LoginSession) []*discordgo.LoginSession {
 	return utils.Filter(currentSessions, func(session *discordgo.LoginSession) bool {
 		for _, loginSession := range s.loginSessions {
 			if loginSession.IDHash == session.IDHash {
@@ -161,7 +188,7 @@ func (s *SessionsServiceImpl) findNewSessions(currentSessions []*discordgo.Login
 	})
 }
 
-func (s *SessionsServiceImpl) findRemovedSessions(currentSessions []*discordgo.LoginSession) []*discordgo.LoginSession {
+func (s *sessionsService) findRemovedSessions(currentSessions []*discordgo.LoginSession) []*discordgo.LoginSession {
 	return utils.Filter(s.loginSessions, func(session *discordgo.LoginSession) bool {
 		for _, loginSession := range currentSessions {
 			if loginSession.IDHash == session.IDHash {
@@ -172,12 +199,20 @@ func (s *SessionsServiceImpl) findRemovedSessions(currentSessions []*discordgo.L
 	})
 }
 
-func (s *SessionsServiceImpl) handleChangedSessions(newSessions, removedSessions []*discordgo.LoginSession) {
+func (s *sessionsService) handleChangedSessions(newSessions, removedSessions []*discordgo.LoginSession) {
 	for _, session := range newSessions {
-		s.uiSvc.LogSessionConnected(session.IDHash, session.ClientInfo.OS, session.ClientInfo.Platform)
+		s.eventBroker.Publish(eventbroker.EventLogFeature, &featurelogs.SessionConnected{
+			ID:     session.IDHash,
+			OS:     session.ClientInfo.OS,
+			Client: session.ClientInfo.Platform,
+		})
 	}
 
 	for _, session := range removedSessions {
-		s.uiSvc.LogSessionDisconnected(session.IDHash, session.ClientInfo.OS, session.ClientInfo.Platform)
+		s.eventBroker.Publish(eventbroker.EventLogFeature, &featurelogs.SessionDisconnected{
+			ID:     session.IDHash,
+			OS:     session.ClientInfo.OS,
+			Client: session.ClientInfo.Platform,
+		})
 	}
 }

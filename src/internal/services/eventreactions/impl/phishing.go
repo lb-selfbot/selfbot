@@ -5,42 +5,47 @@ import (
 	"slices"
 	"strings"
 
-	"github.com/LightningDev1/LB-Selfbot/internal/config"
 	"github.com/LightningDev1/LB-Selfbot/internal/http"
-	"github.com/LightningDev1/LB-Selfbot/internal/services/interfaces"
+	"github.com/LightningDev1/LB-Selfbot/internal/services/config"
+	"github.com/LightningDev1/LB-Selfbot/internal/services/eventbroker"
+	"github.com/LightningDev1/LB-Selfbot/internal/services/eventreactions/types"
+	"github.com/LightningDev1/LB-Selfbot/internal/services/ui/featurelogs"
 
 	"github.com/LightningDev1/LB-Selfbot/internal/utils"
 	"github.com/LightningDev1/discordgo"
 )
 
-var PhishingDomains []string
-var SuspiciousDomains []string
+const (
+	phishingDomainsURL   = "https://raw.githubusercontent.com/nikolaischunk/discord-phishing-links/main/domain-list.json"
+	suspiciousDomainsURL = "https://raw.githubusercontent.com/nikolaischunk/discord-phishing-links/main/suspicious-list.json"
+)
 
 type Phishing struct {
-	uiSvc interfaces.UIService
+	eventBroker eventbroker.Service
+	configSvc   config.Service
+
+	phishingDomains   []string
+	suspiciousDomains []string
 }
 
-func NewPhishing(uiSvc interfaces.UIService) *Phishing {
-	if len(PhishingDomains) == 0 || len(SuspiciousDomains) == 0 {
-		httpResult := http.Get("https://raw.githubusercontent.com/nikolaischunk/discord-phishing-links/main/domain-list.json")
-		PhishingDomains = httpResult.Json().Get("domains").MustStringArray()
-
-		httpResult = http.Get("https://raw.githubusercontent.com/nikolaischunk/discord-phishing-links/main/suspicious-list.json")
-		SuspiciousDomains = httpResult.Json().Get("domains").MustStringArray()
+func NewPhishing(eventBroker eventbroker.Service, configSvc config.Service) *Phishing {
+	return &Phishing{
+		eventBroker:       eventBroker,
+		configSvc:         configSvc,
+		phishingDomains:   http.Get(phishingDomainsURL).Json().Get("domains").MustStringArray(),
+		suspiciousDomains: http.Get(suspiciousDomainsURL).Json().Get("domains").MustStringArray(),
 	}
-
-	return &Phishing{uiSvc: uiSvc}
 }
 
-func (p *Phishing) Type() interfaces.EventReactionType {
-	return interfaces.EventReactionAntiPhishing
+func (p *Phishing) Type() types.EventReactionType {
+	return types.AntiPhishing
 }
 
 func (p *Phishing) Description() string {
 	return "Anti Phishing (default)"
 }
 
-func (p *Phishing) Equals(other interfaces.EventReaction) bool {
+func (p *Phishing) Equals(other types.EventReaction) bool {
 	_, ok := other.(*Phishing)
 
 	return ok
@@ -57,12 +62,7 @@ func (p *Phishing) Handler(session *discordgo.Session, event any) {
 		return
 	}
 
-	cfg, err := config.GetConfig()
-	if err != nil {
-		utils.Logging.Debug("Phishing.Handler: Error getting config: " + err.Error())
-		return
-	}
-
+	cfg := p.configSvc.GetConfig()
 	if !cfg.Protections.AntiPhishing {
 		return
 	}
@@ -75,13 +75,16 @@ func (p *Phishing) Handler(session *discordgo.Session, event any) {
 
 		hostname := link.Hostname()
 
-		isPhishing := slices.Contains(PhishingDomains, hostname)
-		isSuspicious := slices.Contains(SuspiciousDomains, hostname)
+		isPhishing := slices.Contains(p.phishingDomains, hostname)
+		isSuspicious := slices.Contains(p.suspiciousDomains, hostname)
 
 		if isPhishing || isSuspicious {
 			_ = session.MessageAck(message.ChannelID, message.ID)
 
-			p.uiSvc.LogPhishingDetection(message.Message, hostname)
+			p.eventBroker.Publish(eventbroker.EventLogFeature, &featurelogs.PhishingDetection{
+				Message: message.Message,
+				Domain:  hostname,
+			})
 		}
 	}
 }
