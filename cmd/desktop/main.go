@@ -116,6 +116,9 @@ func checkFirstLaunch(services *services.Services) {
 }
 
 func main() {
+	// LightningBot uses ANSI escape sequences which cmd.exe won't parse without enabling virtual terminal processing.
+	enableVirtualTerminalProcessing()
+
 	if constants.DEBUG {
 		logging.Warn("Debug mode is enabled")
 	}
