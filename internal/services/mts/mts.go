@@ -5,13 +5,13 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/LightningDev1/LB-Selfbot/internal/constants"
-	"github.com/LightningDev1/LB-Selfbot/internal/services/config"
-	"github.com/LightningDev1/LB-Selfbot/internal/services/eventbroker"
-	"github.com/LightningDev1/LB-Selfbot/internal/services/eventreactions"
-	"github.com/LightningDev1/LB-Selfbot/internal/services/eventreactions/impl"
-	"github.com/LightningDev1/LB-Selfbot/internal/services/ui/featurelogs"
-	"github.com/LightningDev1/discordgo"
+	"github.com/lb-selfbot/discordgo"
+	"github.com/lb-selfbot/selfbot/internal/constants"
+	"github.com/lb-selfbot/selfbot/internal/services/config"
+	"github.com/lb-selfbot/selfbot/internal/services/eventbroker"
+	"github.com/lb-selfbot/selfbot/internal/services/eventreactions"
+	"github.com/lb-selfbot/selfbot/internal/services/eventreactions/impl"
+	"github.com/lb-selfbot/selfbot/internal/services/ui/featurelogs"
 )
 
 type sniperState int

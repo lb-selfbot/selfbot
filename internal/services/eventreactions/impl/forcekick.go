@@ -1,9 +1,9 @@
 package impl
 
 import (
-	"github.com/LightningDev1/LB-Selfbot/internal/services/eventreactions/types"
-	"github.com/LightningDev1/LB-Selfbot/internal/utils"
-	"github.com/LightningDev1/discordgo"
+	"github.com/lb-selfbot/discordgo"
+	"github.com/lb-selfbot/selfbot/internal/services/eventreactions/types"
+	"github.com/lb-selfbot/selfbot/internal/utils"
 )
 
 type ForceKick struct {

@@ -8,9 +8,9 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/LightningDev1/LB-Selfbot/internal/uploaders"
-	"github.com/LightningDev1/LB-Selfbot/internal/uploaders/keys"
 	"github.com/bitly/go-simplejson"
+	"github.com/lb-selfbot/selfbot/internal/uploaders"
+	"github.com/lb-selfbot/selfbot/internal/uploaders/keys"
 )
 
 type ImgBB struct{}

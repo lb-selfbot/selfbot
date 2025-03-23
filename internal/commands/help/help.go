@@ -5,12 +5,12 @@ import (
 	"math"
 	"strings"
 
-	"github.com/LightningDev1/LB-Selfbot/internal/constants"
-	"github.com/LightningDev1/LB-Selfbot/internal/embed"
-	"github.com/LightningDev1/LB-Selfbot/internal/router"
-	"github.com/LightningDev1/LB-Selfbot/internal/services"
-	"github.com/LightningDev1/LB-Selfbot/internal/utils"
-	"github.com/LightningDev1/LB-Selfbot/internal/utils2"
+	"github.com/lb-selfbot/selfbot/internal/constants"
+	"github.com/lb-selfbot/selfbot/internal/embed"
+
+	"github.com/lb-selfbot/selfbot/internal/services"
+	"github.com/lb-selfbot/selfbot/internal/utils"
+	"github.com/lb-selfbot/selfbot/internal/utils2"
 )
 
 type HelpCommands struct{ services *services.Services }

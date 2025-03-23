@@ -5,13 +5,13 @@ import (
 	"strings"
 	"time"
 
-	"github.com/LightningDev1/LB-Selfbot/internal/api"
-	"github.com/LightningDev1/LB-Selfbot/internal/http"
-	"github.com/LightningDev1/LB-Selfbot/internal/services/eventbroker"
-	"github.com/LightningDev1/LB-Selfbot/internal/services/eventreactions/types"
+	"github.com/lb-selfbot/selfbot/internal/api"
+	"github.com/lb-selfbot/selfbot/internal/http"
+	"github.com/lb-selfbot/selfbot/internal/services/eventbroker"
+	"github.com/lb-selfbot/selfbot/internal/services/eventreactions/types"
 
-	"github.com/LightningDev1/LB-Selfbot/internal/utils"
-	"github.com/LightningDev1/discordgo"
+	"github.com/lb-selfbot/discordgo"
+	"github.com/lb-selfbot/selfbot/internal/utils"
 )
 
 type Ping struct {

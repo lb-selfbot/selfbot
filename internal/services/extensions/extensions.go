@@ -8,11 +8,11 @@ import (
 	"reflect"
 	"time"
 
-	"github.com/LightningDev1/LB-Selfbot/internal/constants"
-	"github.com/LightningDev1/LB-Selfbot/internal/router"
-	"github.com/LightningDev1/LB-Selfbot/internal/services/eventbroker"
-	"github.com/LightningDev1/LB-Selfbot/internal/utils"
-	"github.com/LightningDev1/discordgo"
+	"github.com/lb-selfbot/discordgo"
+	"github.com/lb-selfbot/selfbot/internal/constants"
+
+	"github.com/lb-selfbot/selfbot/internal/services/eventbroker"
+	"github.com/lb-selfbot/selfbot/internal/utils"
 	"github.com/traefik/yaegi/interp"
 	"github.com/traefik/yaegi/stdlib"
 )

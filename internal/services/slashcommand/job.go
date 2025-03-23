@@ -7,8 +7,8 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/LightningDev1/LB-Selfbot/internal/services/router"
-	"github.com/LightningDev1/discordgo"
+	"github.com/lb-selfbot/discordgo"
+	"github.com/lb-selfbot/selfbot/internal/services/router"
 )
 
 // DiscordObject represents a Discord object with a name and ID.

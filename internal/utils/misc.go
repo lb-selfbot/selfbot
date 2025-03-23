@@ -16,8 +16,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/LightningDev1/LB-Selfbot/internal/http"
-	"github.com/LightningDev1/discordgo"
+	"github.com/lb-selfbot/discordgo"
+	"github.com/lb-selfbot/selfbot/internal/http"
 )
 
 type MiscUtils struct{}

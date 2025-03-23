@@ -3,8 +3,8 @@ package browser
 import (
 	"context"
 
-	"github.com/LightningDev1/discordgo"
 	"github.com/chromedp/chromedp"
+	"github.com/lb-selfbot/discordgo"
 )
 
 var getTokenScript = `(webpackChunkdiscord_app.push([[''],{},e=>{m=[];for(let c in e.c)m.push(e.c[c])}]),m).find(m=>m?.exports?.default?.getToken!==void 0).exports.default.getToken()`

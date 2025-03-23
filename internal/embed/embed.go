@@ -5,12 +5,12 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/LightningDev1/LB-Selfbot/internal/constants"
-	"github.com/LightningDev1/LB-Selfbot/internal/http"
-	"github.com/LightningDev1/LB-Selfbot/internal/utils"
+	"github.com/lb-selfbot/selfbot/internal/constants"
+	"github.com/lb-selfbot/selfbot/internal/http"
+	"github.com/lb-selfbot/selfbot/internal/utils"
 
-	"github.com/LightningDev1/LB-Selfbot/internal/api"
-	"github.com/LightningDev1/discordgo"
+	"github.com/lb-selfbot/discordgo"
+	"github.com/lb-selfbot/selfbot/internal/api"
 )
 
 // https://github.com/Clinet/discordgo-embed

@@ -1,6 +1,6 @@
 package types
 
-import "github.com/LightningDev1/discordgo"
+import "github.com/lb-selfbot/discordgo"
 
 type EventReactionType int
 

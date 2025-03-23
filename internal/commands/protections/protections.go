@@ -1,8 +1,8 @@
 package protections
 
 import (
-	"github.com/LightningDev1/LB-Selfbot/internal/router"
-	"github.com/LightningDev1/LB-Selfbot/internal/services"
+	"github.com/lb-selfbot/selfbot/internal/services"
+	"github.com/lb-selfbot/selfbot/internal/services/router"
 )
 
 type ProtectionsCommands struct{ services *services.Services }

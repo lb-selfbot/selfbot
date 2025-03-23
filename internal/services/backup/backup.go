@@ -8,10 +8,10 @@ import (
 	"path/filepath"
 	"time"
 
-	"github.com/LightningDev1/LB-Selfbot/internal/system"
-	"github.com/LightningDev1/LB-Selfbot/internal/utils"
-	"github.com/LightningDev1/discordgo"
-	"github.com/LightningDev1/discordgo/protos"
+	"github.com/lb-selfbot/discordgo"
+	"github.com/lb-selfbot/discordgo/protos"
+	"github.com/lb-selfbot/selfbot/internal/system"
+	"github.com/lb-selfbot/selfbot/internal/utils"
 )
 
 var (

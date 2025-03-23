@@ -4,11 +4,10 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/LightningDev1/LB-Selfbot/internal/router"
-
-	"github.com/LightningDev1/LB-Selfbot/internal/services/scjobs"
-	"github.com/LightningDev1/LB-Selfbot/internal/utils"
-	"github.com/LightningDev1/discordgo"
+	"github.com/lb-selfbot/discordgo"
+	"github.com/lb-selfbot/selfbot/internal/services"
+	"github.com/lb-selfbot/selfbot/internal/services/router"
+	"github.com/lb-selfbot/selfbot/internal/utils"
 )
 
 type SlashCommands struct {

@@ -5,9 +5,9 @@ import (
 	"slices"
 	"strings"
 
-	"github.com/LightningDev1/LB-Selfbot/internal/constants"
-	"github.com/LightningDev1/LB-Selfbot/internal/utils2"
-	"github.com/LightningDev1/discordgo"
+	"github.com/lb-selfbot/discordgo"
+	"github.com/lb-selfbot/selfbot/internal/constants"
+	"github.com/lb-selfbot/selfbot/internal/utils2"
 )
 
 // regexSplitting represents the regex to split the arguments at.

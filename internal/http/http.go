@@ -6,11 +6,11 @@ import (
 	"io"
 	"strings"
 
-	"github.com/LightningDev1/discordgo"
 	"github.com/bitly/go-simplejson"
 	fhttp "github.com/bogdanfinn/fhttp"
 	tls_client "github.com/bogdanfinn/tls-client"
 	"github.com/bogdanfinn/tls-client/profiles"
+	"github.com/lb-selfbot/discordgo"
 )
 
 var tlsClientOptions = []tls_client.HttpClientOption{

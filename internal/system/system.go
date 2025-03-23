@@ -1,6 +1,6 @@
 package system
 
-import "github.com/LightningDev1/LB-Selfbot/internal/constants"
+import "github.com/lb-selfbot/selfbot/internal/constants"
 
 func OpenURL(url string) error {
 	if constants.HOSTING {

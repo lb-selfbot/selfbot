@@ -5,13 +5,13 @@ import (
 	"sync"
 	"time"
 
-	"github.com/LightningDev1/LB-Selfbot/internal/services/config"
-	"github.com/LightningDev1/LB-Selfbot/internal/services/eventbroker"
-	"github.com/LightningDev1/LB-Selfbot/internal/services/eventreactions/types"
-	"github.com/LightningDev1/LB-Selfbot/internal/services/router"
-	"github.com/LightningDev1/LB-Selfbot/internal/utils"
-	"github.com/LightningDev1/LB-Selfbot/internal/utils2"
-	"github.com/LightningDev1/discordgo"
+	"github.com/lb-selfbot/discordgo"
+	"github.com/lb-selfbot/selfbot/internal/services/config"
+	"github.com/lb-selfbot/selfbot/internal/services/eventbroker"
+	"github.com/lb-selfbot/selfbot/internal/services/eventreactions/types"
+	"github.com/lb-selfbot/selfbot/internal/services/router"
+	"github.com/lb-selfbot/selfbot/internal/utils"
+	"github.com/lb-selfbot/selfbot/internal/utils2"
 )
 
 // Service handles event reactions.

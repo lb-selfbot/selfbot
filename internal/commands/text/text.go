@@ -8,12 +8,13 @@ import (
 	"strings"
 	"time"
 
-	"github.com/LightningDev1/LB-Selfbot/internal/constants"
-	"github.com/LightningDev1/LB-Selfbot/internal/encodings"
-	"github.com/LightningDev1/LB-Selfbot/internal/router"
-	"github.com/LightningDev1/LB-Selfbot/internal/services"
-	"github.com/LightningDev1/LB-Selfbot/internal/utils"
 	"github.com/common-nighthawk/go-figure"
+	"github.com/lb-selfbot/selfbot/internal/constants"
+	"github.com/lb-selfbot/selfbot/internal/encodings"
+	"github.com/lb-selfbot/selfbot/internal/services/router"
+
+	"github.com/lb-selfbot/selfbot/internal/services"
+	"github.com/lb-selfbot/selfbot/internal/utils"
 )
 
 type TextCommands struct {

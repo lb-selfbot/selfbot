@@ -6,12 +6,13 @@ import (
 	"net/url"
 	"strings"
 
-	"github.com/LightningDev1/LB-Selfbot/internal/http"
-	"github.com/LightningDev1/LB-Selfbot/internal/random"
-	"github.com/LightningDev1/LB-Selfbot/internal/router"
-	"github.com/LightningDev1/LB-Selfbot/internal/services"
-	"github.com/LightningDev1/LB-Selfbot/internal/utils"
-	"github.com/LightningDev1/LB-Selfbot/internal/utils2"
+	"github.com/lb-selfbot/selfbot/internal/http"
+	"github.com/lb-selfbot/selfbot/internal/random"
+	"github.com/lb-selfbot/selfbot/internal/services/router"
+
+	"github.com/lb-selfbot/selfbot/internal/services"
+	"github.com/lb-selfbot/selfbot/internal/utils"
+	"github.com/lb-selfbot/selfbot/internal/utils2"
 )
 
 type ImageCommands struct{ services *services.Services }

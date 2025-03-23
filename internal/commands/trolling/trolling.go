@@ -5,14 +5,15 @@ import (
 	"strings"
 	"time"
 
-	"github.com/LightningDev1/discordgo"
+	"github.com/lb-selfbot/discordgo"
 
-	"github.com/LightningDev1/LB-Selfbot/internal/constants"
-	"github.com/LightningDev1/LB-Selfbot/internal/random"
-	"github.com/LightningDev1/LB-Selfbot/internal/router"
-	"github.com/LightningDev1/LB-Selfbot/internal/services"
-	"github.com/LightningDev1/LB-Selfbot/internal/utils"
-	"github.com/LightningDev1/LB-Selfbot/internal/utils2"
+	"github.com/lb-selfbot/selfbot/internal/constants"
+	"github.com/lb-selfbot/selfbot/internal/random"
+	"github.com/lb-selfbot/selfbot/internal/services/router"
+
+	"github.com/lb-selfbot/selfbot/internal/services"
+	"github.com/lb-selfbot/selfbot/internal/utils"
+	"github.com/lb-selfbot/selfbot/internal/utils2"
 )
 
 type TrollingCommands struct{ services *services.Services }

@@ -4,10 +4,10 @@ import (
 	"os"
 	"time"
 
-	"github.com/LightningDev1/LB-Selfbot/internal/api"
-	"github.com/LightningDev1/LB-Selfbot/internal/tui"
-	"github.com/LightningDev1/LB-Selfbot/internal/utils"
-	"github.com/LightningDev1/discordgo"
+	"github.com/lb-selfbot/discordgo"
+	"github.com/lb-selfbot/selfbot/internal/api"
+	"github.com/lb-selfbot/selfbot/internal/tui"
+	"github.com/lb-selfbot/selfbot/internal/utils"
 )
 
 func GetLogin() (string, string) {

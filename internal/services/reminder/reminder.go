@@ -3,10 +3,10 @@ package reminder
 import (
 	"time"
 
-	"github.com/LightningDev1/LB-Selfbot/internal/services/config"
-	"github.com/LightningDev1/LB-Selfbot/internal/services/eventbroker"
-	"github.com/LightningDev1/LB-Selfbot/internal/services/ui/featurelogs"
-	"github.com/LightningDev1/LB-Selfbot/internal/utils"
+	"github.com/lb-selfbot/selfbot/internal/services/config"
+	"github.com/lb-selfbot/selfbot/internal/services/eventbroker"
+	"github.com/lb-selfbot/selfbot/internal/services/ui/featurelogs"
+	"github.com/lb-selfbot/selfbot/internal/utils"
 )
 
 // ReminderService handles reminders for the user.

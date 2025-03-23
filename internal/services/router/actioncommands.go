@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/LightningDev1/LB-Selfbot/internal/utils2"
+	"github.com/lb-selfbot/selfbot/internal/utils2"
 )
 
 // CommandAction is an action for an ActionCommand.

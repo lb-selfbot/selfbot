@@ -3,11 +3,12 @@ package nsfw
 import (
 	"fmt"
 
-	"github.com/LightningDev1/LB-Selfbot/internal/api"
-	"github.com/LightningDev1/LB-Selfbot/internal/random"
-	"github.com/LightningDev1/LB-Selfbot/internal/router"
-	"github.com/LightningDev1/LB-Selfbot/internal/services"
-	"github.com/LightningDev1/LB-Selfbot/internal/utils"
+	"github.com/lb-selfbot/selfbot/internal/api"
+	"github.com/lb-selfbot/selfbot/internal/random"
+	"github.com/lb-selfbot/selfbot/internal/services/router"
+
+	"github.com/lb-selfbot/selfbot/internal/services"
+	"github.com/lb-selfbot/selfbot/internal/utils"
 )
 
 type NSFWCommands struct{ services *services.Services }

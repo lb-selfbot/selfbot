@@ -3,10 +3,10 @@ package sessions
 import (
 	"time"
 
-	"github.com/LightningDev1/LB-Selfbot/internal/services/eventbroker"
-	"github.com/LightningDev1/LB-Selfbot/internal/services/ui/featurelogs"
-	"github.com/LightningDev1/LB-Selfbot/internal/utils"
-	"github.com/LightningDev1/discordgo"
+	"github.com/lb-selfbot/discordgo"
+	"github.com/lb-selfbot/selfbot/internal/services/eventbroker"
+	"github.com/lb-selfbot/selfbot/internal/services/ui/featurelogs"
+	"github.com/lb-selfbot/selfbot/internal/utils"
 )
 
 // SessionsService handles the fetching of Discord sessions.

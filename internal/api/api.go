@@ -12,13 +12,13 @@ import (
 	"strings"
 	"time"
 
-	"github.com/LightningDev1/LB-Selfbot/internal/random"
-	"github.com/LightningDev1/discordgo"
+	"github.com/lb-selfbot/discordgo"
+	"github.com/lb-selfbot/selfbot/internal/random"
 	"google.golang.org/protobuf/types/known/wrapperspb"
 
-	"github.com/LightningDev1/LB-Selfbot/internal/constants"
-	"github.com/LightningDev1/LB-Selfbot/internal/http"
 	"github.com/bitly/go-simplejson"
+	"github.com/lb-selfbot/selfbot/internal/constants"
+	"github.com/lb-selfbot/selfbot/internal/http"
 )
 
 func CreatePaste(text string) (string, error) {

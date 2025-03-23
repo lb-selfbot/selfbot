@@ -3,10 +3,10 @@ package o11y
 import (
 	"fmt"
 
-	"github.com/LightningDev1/LB-Selfbot/internal/constants"
-	"github.com/LightningDev1/LB-Selfbot/internal/services/config"
-	"github.com/LightningDev1/LB-Selfbot/internal/services/eventbroker"
 	"github.com/getsentry/sentry-go"
+	"github.com/lb-selfbot/selfbot/internal/constants"
+	"github.com/lb-selfbot/selfbot/internal/services/config"
+	"github.com/lb-selfbot/selfbot/internal/services/eventbroker"
 )
 
 // O11yService handles observability and error tracking.

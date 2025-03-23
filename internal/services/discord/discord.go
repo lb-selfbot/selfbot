@@ -7,13 +7,13 @@ import (
 	"runtime"
 	"strings"
 
-	"github.com/LightningDev1/LB-Selfbot/internal/constants"
-	"github.com/LightningDev1/LB-Selfbot/internal/services/config"
-	"github.com/LightningDev1/LB-Selfbot/internal/services/eventbroker"
-	"github.com/LightningDev1/LB-Selfbot/internal/system"
-	"github.com/LightningDev1/LB-Selfbot/internal/tui"
-	"github.com/LightningDev1/LB-Selfbot/internal/utils"
-	"github.com/LightningDev1/discordgo"
+	"github.com/lb-selfbot/discordgo"
+	"github.com/lb-selfbot/selfbot/internal/constants"
+	"github.com/lb-selfbot/selfbot/internal/services/config"
+	"github.com/lb-selfbot/selfbot/internal/services/eventbroker"
+	"github.com/lb-selfbot/selfbot/internal/system"
+	"github.com/lb-selfbot/selfbot/internal/tui"
+	"github.com/lb-selfbot/selfbot/internal/utils"
 )
 
 // DiscordService handles Discord-related operations.

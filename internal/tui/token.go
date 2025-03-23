@@ -5,11 +5,11 @@ import (
 	"os"
 	"strings"
 
-	"github.com/LightningDev1/LB-Selfbot/internal/browser"
-	"github.com/LightningDev1/LB-Selfbot/internal/savedtokens"
-	"github.com/LightningDev1/LB-Selfbot/internal/utils"
 	"github.com/charmbracelet/bubbles/list"
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/lb-selfbot/selfbot/internal/browser"
+	"github.com/lb-selfbot/selfbot/internal/savedtokens"
+	"github.com/lb-selfbot/selfbot/internal/utils"
 )
 
 func GetToken(title ...string) string {

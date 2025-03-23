@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/LightningDev1/LB-Selfbot/internal/http"
 	"github.com/bitly/go-simplejson"
+	"github.com/lb-selfbot/selfbot/internal/http"
 )
 
 type SpotifyUtils struct {

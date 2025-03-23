@@ -1,10 +1,9 @@
-module github.com/LightningDev1/LB-Selfbot
+module github.com/lb-selfbot/selfbot
 
 go 1.24.0
 
 require (
 	github.com/LightningDev1/beeep v0.1.0
-	github.com/LightningDev1/discordgo v0.26.6-0.20241102192552-62b3fe3be1f7
 	github.com/LightningDev1/go-foreground v0.0.0-20240212172534-661cc0000e42
 	github.com/LightningDev1/go-privnote v0.1.1
 	github.com/bitly/go-simplejson v0.5.1
@@ -24,6 +23,7 @@ require (
 	github.com/hugolgst/rich-go v0.0.0-20240715122152-74618cc1ace2
 	github.com/kbinani/screenshot v0.0.0-20250118074034-a3924b7bbc8c
 	github.com/kkdai/youtube/v2 v2.10.3
+	github.com/lb-selfbot/discordgo v0.26.6-0.20250323160117-7b03d5e03747
 	github.com/mr-tron/base58 v1.2.0
 	github.com/multiformats/go-base36 v0.2.0
 	github.com/robert-nix/ansihtml v1.0.1

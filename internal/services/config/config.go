@@ -6,9 +6,9 @@ import (
 	"sync"
 	"time"
 
-	"github.com/LightningDev1/LB-Selfbot/internal/assets"
-	"github.com/LightningDev1/LB-Selfbot/internal/utils"
 	"github.com/go-json-experiment/json/v1"
+	"github.com/lb-selfbot/selfbot/internal/assets"
+	"github.com/lb-selfbot/selfbot/internal/utils"
 )
 
 // Service is the interface for the config service.

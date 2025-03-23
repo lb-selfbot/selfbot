@@ -17,7 +17,7 @@ jobs:
       - name: Update dependencies
         run: |
           go get -u
-          go get github.com/LightningDev1/discordgo@master
+          go get github.com/lb-selfbot/discordgo@master
           go mod tidy
 
       - name: Push changes

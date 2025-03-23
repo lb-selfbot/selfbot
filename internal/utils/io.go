@@ -7,7 +7,7 @@ import (
 	"slices"
 	"strings"
 
-	"github.com/LightningDev1/LB-Selfbot/internal/constants"
+	"github.com/lb-selfbot/selfbot/internal/constants"
 	"golang.org/x/text/unicode/norm"
 )
 

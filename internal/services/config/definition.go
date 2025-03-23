@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"time"
 
-	"github.com/LightningDev1/discordgo"
+	"github.com/lb-selfbot/discordgo"
 )
 
 type TriggerList struct {

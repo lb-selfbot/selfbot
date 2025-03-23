@@ -14,19 +14,19 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/LightningDev1/LB-Selfbot/internal/assets"
-	"github.com/LightningDev1/LB-Selfbot/internal/browser"
-	"github.com/LightningDev1/LB-Selfbot/internal/commands"
+	"github.com/lb-selfbot/selfbot/internal/assets"
+	"github.com/lb-selfbot/selfbot/internal/browser"
+	"github.com/lb-selfbot/selfbot/internal/commands"
 
-	"github.com/LightningDev1/LB-Selfbot/internal/constants"
-	"github.com/LightningDev1/LB-Selfbot/internal/http"
-	"github.com/LightningDev1/LB-Selfbot/internal/logging"
-	"github.com/LightningDev1/LB-Selfbot/internal/savedtokens"
+	"github.com/lb-selfbot/selfbot/internal/constants"
+	"github.com/lb-selfbot/selfbot/internal/http"
+	"github.com/lb-selfbot/selfbot/internal/logging"
+	"github.com/lb-selfbot/selfbot/internal/savedtokens"
 
-	"github.com/LightningDev1/LB-Selfbot/internal/setup"
-	"github.com/LightningDev1/LB-Selfbot/internal/system"
-	"github.com/LightningDev1/LB-Selfbot/internal/utils"
-	"github.com/LightningDev1/discordgo"
+	"github.com/lb-selfbot/discordgo"
+	"github.com/lb-selfbot/selfbot/internal/setup"
+	"github.com/lb-selfbot/selfbot/internal/system"
+	"github.com/lb-selfbot/selfbot/internal/utils"
 )
 
 var (

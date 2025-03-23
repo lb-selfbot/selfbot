@@ -2,8 +2,6 @@ github.com/BurntSushi/xgb v0.0.0-20210121224620-deaf085860bc h1:7D+Bh06CRPCJO3gr
 github.com/BurntSushi/xgb v0.0.0-20210121224620-deaf085860bc/go.mod h1:IVnqGOEym/WlBOVXweHU+Q+/VP0lqqI8lqeDx9IjBqo=
 github.com/LightningDev1/beeep v0.1.0 h1:1IEV1ydGFb+yvBcwkuCPClL8GP/d0BMTJUKLg9vyL/w=
 github.com/LightningDev1/beeep v0.1.0/go.mod h1:EA+kLCP2cK7DHMJpiFXshjYfYCdGvS+OfhcAOA8fuOw=
-github.com/LightningDev1/discordgo v0.26.6-0.20241102192552-62b3fe3be1f7 h1:ovX48TRq9a/9PfNCOWmtlxCtgbJ3ePHI+bQOM1zHCTg=
-github.com/LightningDev1/discordgo v0.26.6-0.20241102192552-62b3fe3be1f7/go.mod h1:PCJMYDd2i60iTRsEYcfftPwsSAlb4If6RhvLTdI3xVU=
 github.com/LightningDev1/go-foreground v0.0.0-20240212172534-661cc0000e42 h1:3nkZh2ygGSuK/+CT0O9IG4Yho7WIO6QgzMwxEcn9xyc=
 github.com/LightningDev1/go-foreground v0.0.0-20240212172534-661cc0000e42/go.mod h1:VMeeC7SlbdMWtn59r8E47a0GZgmPwNd9btqlDi6Ql+Y=
 github.com/LightningDev1/go-privnote v0.1.1 h1:uBV2vDFJ4FG5oj7YMiKpHBKm5OPY7hnFB5inOEJuE3c=
@@ -104,6 +102,8 @@ github.com/klauspost/compress v1.18.0 h1:c/Cqfb0r+Yi+JtIEq73FWXVkRonBlf0CRNYc8Zt
 github.com/klauspost/compress v1.18.0/go.mod h1:2Pp+KzxcywXVXMr50+X0Q/Lsb43OQHYWRCY2AiWywWQ=
 github.com/kylelemons/godebug v1.1.0 h1:RPNrshWIDI6G2gRW9EHilWtl7Z6Sb1BR0xunSBf0SNc=
 github.com/kylelemons/godebug v1.1.0/go.mod h1:9/0rRGxNHcop5bhtWyNeEfOS8JIWk580+fNqagV/RAw=
+github.com/lb-selfbot/discordgo v0.26.6-0.20250323160117-7b03d5e03747 h1:Vaazf3wDFDvqskvVWzkK1ugHRWHhykl4TmdI4TyI4k4=
+github.com/lb-selfbot/discordgo v0.26.6-0.20250323160117-7b03d5e03747/go.mod h1:GwwNg0BJPVyllBoQttkmh7GAdQp4TXcPVlgDXngUNgQ=
 github.com/ledongthuc/pdf v0.0.0-20220302134840-0c2507a12d80 h1:6Yzfa6GP0rIo/kULo2bwGEkFvCePZ3qHDDTC3/J9Swo=
 github.com/ledongthuc/pdf v0.0.0-20220302134840-0c2507a12d80/go.mod h1:imJHygn/1yfhB7XSJJKlFZKl/J+dCPAknuiaGOshXAs=
 github.com/lucasb-eyer/go-colorful v1.2.0 h1:1nnpGOrhyZZuNyfu1QjKiUICQ74+3FNCN69Aj6K7nkY=

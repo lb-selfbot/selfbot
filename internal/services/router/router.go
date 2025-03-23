@@ -1,8 +1,8 @@
 package router
 
 import (
-	"github.com/LightningDev1/LB-Selfbot/internal/services/config"
-	"github.com/LightningDev1/discordgo"
+	"github.com/lb-selfbot/discordgo"
+	"github.com/lb-selfbot/selfbot/internal/services/config"
 )
 
 // RouterService is the interface for the router service.

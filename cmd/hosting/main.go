@@ -10,13 +10,13 @@ import (
 	"runtime/debug"
 	"syscall"
 
-	"github.com/LightningDev1/LB-Selfbot/internal/assets"
-	"github.com/LightningDev1/LB-Selfbot/internal/constants"
-	"github.com/LightningDev1/LB-Selfbot/internal/logging"
+	"github.com/lb-selfbot/selfbot/internal/assets"
+	"github.com/lb-selfbot/selfbot/internal/constants"
+	"github.com/lb-selfbot/selfbot/internal/logging"
 
-	"github.com/LightningDev1/LB-Selfbot/internal/commands"
+	"github.com/lb-selfbot/selfbot/internal/commands"
 
-	"github.com/LightningDev1/LB-Selfbot/internal/utils"
+	"github.com/lb-selfbot/selfbot/internal/utils"
 )
 
 func main() {

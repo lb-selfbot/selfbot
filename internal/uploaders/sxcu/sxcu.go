@@ -11,9 +11,9 @@ import (
 	"path"
 	"strings"
 
-	"github.com/LightningDev1/LB-Selfbot/internal/uploaders"
-	"github.com/LightningDev1/LB-Selfbot/internal/utils"
 	"github.com/bitly/go-simplejson"
+	"github.com/lb-selfbot/selfbot/internal/uploaders"
+	"github.com/lb-selfbot/selfbot/internal/utils"
 )
 
 var ErrSXCUFileDoesNotExist = fmt.Errorf("sxcu file does not exist! please put your sxcu file in LightningBot/uploader.sxcu")

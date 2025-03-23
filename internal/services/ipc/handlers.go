@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/LightningDev1/LB-Selfbot/internal/services/eventbroker"
+	"github.com/lb-selfbot/selfbot/internal/services/eventbroker"
 )
 
 func (i *ipcService) handleMessage(msg *WSMessage) error {

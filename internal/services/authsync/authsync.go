@@ -9,16 +9,16 @@ import (
 	"sync"
 	"time"
 
-	"github.com/LightningDev1/LB-Selfbot/internal/constants"
-	"github.com/LightningDev1/LB-Selfbot/internal/encryption"
-	"github.com/LightningDev1/LB-Selfbot/internal/logging"
-	"github.com/LightningDev1/LB-Selfbot/internal/random"
-	"github.com/LightningDev1/LB-Selfbot/internal/services/config"
-	"github.com/LightningDev1/LB-Selfbot/internal/services/console"
-	"github.com/LightningDev1/LB-Selfbot/internal/services/eventbroker"
-	"github.com/LightningDev1/LB-Selfbot/internal/setup"
-	"github.com/LightningDev1/LB-Selfbot/internal/system"
 	"github.com/gorilla/websocket"
+	"github.com/lb-selfbot/selfbot/internal/constants"
+	"github.com/lb-selfbot/selfbot/internal/encryption"
+	"github.com/lb-selfbot/selfbot/internal/logging"
+	"github.com/lb-selfbot/selfbot/internal/random"
+	"github.com/lb-selfbot/selfbot/internal/services/config"
+	"github.com/lb-selfbot/selfbot/internal/services/console"
+	"github.com/lb-selfbot/selfbot/internal/services/eventbroker"
+	"github.com/lb-selfbot/selfbot/internal/setup"
+	"github.com/lb-selfbot/selfbot/internal/system"
 )
 
 const (

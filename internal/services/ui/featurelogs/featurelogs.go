@@ -3,8 +3,8 @@ package featurelogs
 import (
 	"time"
 
-	"github.com/LightningDev1/LB-Selfbot/internal/services/config"
-	"github.com/LightningDev1/discordgo"
+	"github.com/lb-selfbot/discordgo"
+	"github.com/lb-selfbot/selfbot/internal/services/config"
 )
 
 // CmdUsed has the data for a command used log.

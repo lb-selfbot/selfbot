@@ -6,15 +6,15 @@ import (
 	"strings"
 	"time"
 
-	"github.com/LightningDev1/LB-Selfbot/internal/api"
+	"github.com/lb-selfbot/selfbot/internal/api"
 
-	"github.com/LightningDev1/LB-Selfbot/internal/services/config"
-	"github.com/LightningDev1/LB-Selfbot/internal/services/eventbroker"
-	"github.com/LightningDev1/LB-Selfbot/internal/services/eventreactions/types"
-	"github.com/LightningDev1/LB-Selfbot/internal/services/ui/featurelogs"
+	"github.com/lb-selfbot/selfbot/internal/services/config"
+	"github.com/lb-selfbot/selfbot/internal/services/eventbroker"
+	"github.com/lb-selfbot/selfbot/internal/services/eventreactions/types"
+	"github.com/lb-selfbot/selfbot/internal/services/ui/featurelogs"
 
-	"github.com/LightningDev1/LB-Selfbot/internal/utils"
-	"github.com/LightningDev1/discordgo"
+	"github.com/lb-selfbot/discordgo"
+	"github.com/lb-selfbot/selfbot/internal/utils"
 )
 
 type AFK struct {

@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/LightningDev1/LB-Selfbot/internal/embed"
-	"github.com/LightningDev1/LB-Selfbot/internal/services/config"
-	"github.com/LightningDev1/discordgo"
+	"github.com/lb-selfbot/discordgo"
+	"github.com/lb-selfbot/selfbot/internal/embed"
+	"github.com/lb-selfbot/selfbot/internal/services/config"
 )
 
 // Ctx represents the context for command execution.

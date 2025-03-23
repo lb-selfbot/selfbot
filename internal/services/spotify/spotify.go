@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/LightningDev1/LB-Selfbot/internal/http"
-	"github.com/LightningDev1/discordgo"
 	"github.com/bitly/go-simplejson"
+	"github.com/lb-selfbot/discordgo"
+	"github.com/lb-selfbot/selfbot/internal/http"
 )
 
 // SpotifyService handles Spotify-related operations.

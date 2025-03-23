@@ -3,9 +3,9 @@ package slashcommand
 import (
 	"errors"
 
-	"github.com/LightningDev1/LB-Selfbot/internal/services/router"
-	"github.com/LightningDev1/LB-Selfbot/internal/utils"
-	"github.com/LightningDev1/discordgo"
+	"github.com/lb-selfbot/discordgo"
+	"github.com/lb-selfbot/selfbot/internal/services/router"
+	"github.com/lb-selfbot/selfbot/internal/utils"
 )
 
 var errInvalidSubCommand = errors.New("invalid subcommand")

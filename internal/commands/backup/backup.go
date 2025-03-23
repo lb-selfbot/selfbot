@@ -6,13 +6,14 @@ import (
 	"strings"
 	"time"
 
-	"github.com/LightningDev1/LB-Selfbot/internal/api"
-	"github.com/LightningDev1/LB-Selfbot/internal/http"
-	"github.com/LightningDev1/LB-Selfbot/internal/router"
-	"github.com/LightningDev1/LB-Selfbot/internal/services"
-	"github.com/LightningDev1/LB-Selfbot/internal/services/backup"
-	"github.com/LightningDev1/LB-Selfbot/internal/utils"
-	"github.com/LightningDev1/discordgo"
+	"github.com/lb-selfbot/discordgo"
+	"github.com/lb-selfbot/selfbot/internal/api"
+	"github.com/lb-selfbot/selfbot/internal/http"
+
+	"github.com/lb-selfbot/selfbot/internal/services"
+	"github.com/lb-selfbot/selfbot/internal/services/backup"
+	"github.com/lb-selfbot/selfbot/internal/services/router"
+	"github.com/lb-selfbot/selfbot/internal/utils"
 )
 
 type BackupCommands struct{ services *services.Services }

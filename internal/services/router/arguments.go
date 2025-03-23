@@ -8,7 +8,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/LightningDev1/discordgo"
+	"github.com/lb-selfbot/discordgo"
 )
 
 var (
