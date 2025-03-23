@@ -14,9 +14,7 @@ import (
 	"github.com/LightningDev1/discordgo"
 )
 
-var (
-	ErrInvalidReactionType = errors.New("invalid reaction type")
-)
+var ErrInvalidReactionType = errors.New("invalid reaction type")
 
 type eventReactionConfig struct {
 	Type types.EventReactionType `json:"Type"`

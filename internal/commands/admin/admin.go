@@ -1843,7 +1843,6 @@ func (c *AdminCommands) lockserver(ctx *router.Ctx) {
 			Position:             channel.Position,
 			PermissionOverwrites: overwrites,
 		})
-
 		if err != nil {
 			ctx.RespondText("Error locking server: %v", err)
 			return
@@ -1879,7 +1878,6 @@ func (c *AdminCommands) unlockserver(ctx *router.Ctx) {
 			Position:             channel.Position,
 			PermissionOverwrites: overwrites,
 		})
-
 		if err != nil {
 			ctx.RespondText("Error unlocking server: %v", err)
 			return

@@ -52,7 +52,6 @@ func (s *sessionsService) subscribe() {
 }
 
 func (s *sessionsService) register(session *discordgo.Session) {
-
 	s.parseStatus(session, session.State.Sessions, false)
 	s.gatewaySessions = s.filterSessions(session.State.Sessions)
 

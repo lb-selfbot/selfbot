@@ -42,7 +42,6 @@ func (MiscUtils) IsPortOpen(hostname string, port int) bool {
 }
 
 func (MiscUtils) FormatBoolYesNo(b bool) string {
-
 	if b {
 		return "Yes"
 	}

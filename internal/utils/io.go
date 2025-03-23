@@ -94,7 +94,7 @@ func (*IOUtils) CreateFolders() error {
 	}
 
 	for _, folder := range folders {
-		err := os.MkdirAll(folder, 0755)
+		err := os.MkdirAll(folder, 0o755)
 		if err != nil {
 			return err
 		}

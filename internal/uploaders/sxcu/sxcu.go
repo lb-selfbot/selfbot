@@ -80,7 +80,7 @@ func (s SXCU) Upload(file *bytes.Buffer, filename string) (*uploaders.UploadResu
 		return nil, err
 	}
 
-	var buf = new(bytes.Buffer)
+	buf := new(bytes.Buffer)
 	writer := multipart.NewWriter(buf)
 
 	part, err := writer.CreateFormFile(data.FileFormName, filename)

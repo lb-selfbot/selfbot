@@ -15,8 +15,7 @@ import (
 )
 
 // RPCService handles Discord Rich Presence.
-type RPCService interface {
-}
+type RPCService interface{}
 
 type rpcService struct {
 	eventBroker eventbroker.Service
@@ -58,6 +57,7 @@ func (r *rpcService) start(session *discordgo.Session) {
 		}
 	}
 }
+
 func (r *rpcService) setRPC(session *discordgo.Session, cfg *config.Config) error {
 	if !cfg.Activity.Enabled {
 		client.Logout()

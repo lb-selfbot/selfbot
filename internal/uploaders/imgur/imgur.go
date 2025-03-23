@@ -21,7 +21,7 @@ func (Imgur) SupportsAllFiles() bool {
 }
 
 func (Imgur) Upload(file *bytes.Buffer, filename string) (*uploaders.UploadResult, error) {
-	var buf = new(bytes.Buffer)
+	buf := new(bytes.Buffer)
 	writer := multipart.NewWriter(buf)
 
 	part, err := writer.CreateFormFile("image", filename)

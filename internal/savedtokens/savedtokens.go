@@ -13,9 +13,7 @@ import (
 	"golang.org/x/exp/slices"
 )
 
-var (
-	plainTokenRegex = regexp.MustCompile(`[\w-]{24}\.[\w-]{6}\.[\w-]{25,110}|mfa\.[\w-]{84}`)
-)
+var plainTokenRegex = regexp.MustCompile(`[\w-]{24}\.[\w-]{6}\.[\w-]{25,110}|mfa\.[\w-]{84}`)
 
 type SavedTokens struct {
 	RawTokens []string

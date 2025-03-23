@@ -25,8 +25,7 @@ const (
 )
 
 // MTSService handles the Multi-Token Sniper.
-type MTSService interface {
-}
+type MTSService interface{}
 
 type sniperInstance struct {
 	state   sniperState

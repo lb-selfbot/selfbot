@@ -19,7 +19,7 @@ func (SulEU) SupportsAllFiles() bool {
 }
 
 func (s SulEU) Upload(file *bytes.Buffer, filename string) (*uploaders.UploadResult, error) {
-	var buf = new(bytes.Buffer)
+	buf := new(bytes.Buffer)
 	writer := multipart.NewWriter(buf)
 
 	part, err := writer.CreateFormFile("file", filename)

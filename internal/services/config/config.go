@@ -76,7 +76,7 @@ func (c *configService) SaveConfig(cfg *Config) error {
 	c.configMu.Lock()
 	defer c.configMu.Unlock()
 
-	cfgFile, err := os.OpenFile(filepath.Join(utils.IO.GetMainFolder(), "Config", "config.json"), os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0644)
+	cfgFile, err := os.OpenFile(filepath.Join(utils.IO.GetMainFolder(), "Config", "config.json"), os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0o644)
 	if err != nil {
 		return err
 	}

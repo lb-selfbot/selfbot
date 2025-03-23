@@ -20,7 +20,7 @@ func (ImgBB) SupportsAllFiles() bool {
 }
 
 func (i ImgBB) Upload(file *bytes.Buffer, filename string) (*uploaders.UploadResult, error) {
-	var buf = new(bytes.Buffer)
+	buf := new(bytes.Buffer)
 	writer := multipart.NewWriter(buf)
 
 	part, err := writer.CreateFormFile("source", filename)

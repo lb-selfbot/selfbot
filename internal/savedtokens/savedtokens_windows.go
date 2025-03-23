@@ -17,9 +17,7 @@ import (
 	"golang.org/x/sys/windows"
 )
 
-var (
-	encryptedTokenRegex = regexp.MustCompile(`dQw4w9WgXcQ:[^\"]*`)
-)
+var encryptedTokenRegex = regexp.MustCompile(`dQw4w9WgXcQ:[^\"]*`)
 
 func win32CryptUnprotectData(data []byte) ([]byte, error) {
 	out := windows.DataBlob{}

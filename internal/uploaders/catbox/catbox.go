@@ -16,7 +16,7 @@ func (Catbox) SupportsAllFiles() bool {
 }
 
 func (c Catbox) Upload(file *bytes.Buffer, filename string) (*uploaders.UploadResult, error) {
-	var buf = new(bytes.Buffer)
+	buf := new(bytes.Buffer)
 	writer := multipart.NewWriter(buf)
 
 	part, err := writer.CreateFormFile("fileToUpload", filename)

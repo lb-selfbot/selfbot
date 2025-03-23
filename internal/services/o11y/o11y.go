@@ -35,7 +35,6 @@ func (s *o11yService) subscribe() {
 }
 
 func (o *o11yService) Init() error {
-
 	var environment string
 
 	if constants.HOSTING {
