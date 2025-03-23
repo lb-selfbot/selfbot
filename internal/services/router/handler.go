@@ -7,7 +7,7 @@ import (
 
 	"github.com/lb-selfbot/discordgo"
 	"github.com/lb-selfbot/selfbot/internal/constants"
-	"github.com/lb-selfbot/selfbot/internal/utils2"
+	"github.com/lb-selfbot/selfbot/internal/fn"
 )
 
 // regexSplitting represents the regex to split the arguments at.
@@ -96,6 +96,7 @@ func (r *routerService) handler(session *discordgo.Session, message *discordgo.M
 		}
 
 		r.triggerCommand(ctx)
+		r.usedCmds++
 		return
 	}
 }
@@ -107,7 +108,7 @@ func (r *routerService) triggerCommand(ctx *Ctx) {
 
 	handler := ctx.Command.Handler
 	if handler == nil {
-		subCmdsReadable := utils2.Map(ctx.Command.SubCommands, func(subCmd *Command) string {
+		subCmdsReadable := fn.Map(ctx.Command.SubCommands, func(subCmd *Command) string {
 			return subCmd.Name
 		})
 

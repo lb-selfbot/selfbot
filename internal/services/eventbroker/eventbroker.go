@@ -48,7 +48,7 @@ type eventBroker struct {
 	mu          sync.RWMutex
 }
 
-func NewEventBrokerService() Service {
+func NewService() Service {
 	return &eventBroker{
 		subscribers: make(map[EventType][]EventHandler),
 	}

@@ -9,8 +9,8 @@ import (
 	"github.com/lb-selfbot/selfbot/internal/utils"
 )
 
-// ReminderService handles reminders for the user.
-type ReminderService interface {
+// Service handles reminders for the user.
+type Service interface {
 	// Start initializes the reminder service.
 	Start()
 }
@@ -20,8 +20,8 @@ type reminderService struct {
 	configSvc   config.Service
 }
 
-// NewReminderService creates a new instance of ReminderService.
-func NewReminderService(eventBroker eventbroker.Service, configSvc config.Service) ReminderService {
+// NewService creates a new instance of ReminderService.
+func NewService(eventBroker eventbroker.Service, configSvc config.Service) Service {
 	return &reminderService{eventBroker: eventBroker, configSvc: configSvc}
 }
 

@@ -16,8 +16,8 @@ import (
 	"github.com/lb-selfbot/selfbot/internal/utils"
 )
 
-// DiscordService handles Discord-related operations.
-type DiscordService interface {
+// Service handles Discord-related operations.
+type Service interface {
 	// Init initializes the Discord session with the provided token.
 	Init(token string, verbose bool) error
 
@@ -37,8 +37,8 @@ type discordService struct {
 	verbose bool
 }
 
-// NewDiscordService creates a new DiscordService instance.
-func NewDiscordService(eventBroker eventbroker.Service, configSvc config.Service) DiscordService {
+// NewService creates a new DiscordService instance.
+func NewService(eventBroker eventbroker.Service, configSvc config.Service) Service {
 	return &discordService{eventBroker: eventBroker, configSvc: configSvc}
 }
 

@@ -8,9 +8,9 @@ import (
 	"github.com/lb-selfbot/selfbot/internal/constants"
 	"github.com/lb-selfbot/selfbot/internal/embed"
 
+	"github.com/lb-selfbot/selfbot/internal/fn"
 	"github.com/lb-selfbot/selfbot/internal/services"
 	"github.com/lb-selfbot/selfbot/internal/utils"
-	"github.com/lb-selfbot/selfbot/internal/utils2"
 )
 
 type HelpCommands struct{ services *services.Services }
@@ -171,7 +171,7 @@ func (c *HelpCommands) renderCategoryHelp(cmdRouter router.Router, category *rou
 	helpPages := map[int]string{}
 	currentPage := 0
 
-	cmds := utils2.Filter(cmdRouter.GetCmds(), func(cmd *router.Command) bool {
+	cmds := fn.Filter(cmdRouter.GetCmds(), func(cmd *router.Command) bool {
 		return cmd.Category == category
 	})
 

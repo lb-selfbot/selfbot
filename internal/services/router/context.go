@@ -12,7 +12,7 @@ import (
 
 // Ctx represents the context for command execution.
 type Ctx struct {
-	Router    RouterService
+	Router    Service
 	configSvc config.Service
 
 	Command   *Command

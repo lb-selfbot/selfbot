@@ -5,8 +5,8 @@ import (
 	"github.com/lb-selfbot/selfbot/internal/services/config"
 )
 
-// RouterService is the interface for the router service.
-type RouterService interface {
+// Service is the interface for the router service.
+type Service interface {
 	// GetHandler returns the message create handler for the command router.
 	GetHandler() func(*discordgo.Session, *discordgo.MessageCreate)
 
@@ -21,6 +21,9 @@ type RouterService interface {
 	GetCommands() []*Command
 	// GetCommand returns the command with the given name.
 	GetCommand(name string) *Command
+
+	// GetNumUsedCommands returns the number of used commands.
+	GetNumUsedCommands() int
 
 	// RegisterMiddleware registers a middleware.
 	RegisterMiddleware(middleware Middleware)
@@ -41,19 +44,18 @@ type ExecutionHandler func(*Ctx)
 // Middleware represents a command middleware.
 type Middleware func(following ExecutionHandler) ExecutionHandler
 
-// Implementation check
-var _ RouterService = (*routerService)(nil)
-
 type routerService struct {
 	cfgService config.Service
 
 	categories []*Category
 	commands   []*Command
 	middleware []Middleware
+
+	usedCmds int
 }
 
-// NewRouterService creates a new router service.
-func NewRouterService(cfg config.Service) *routerService {
+// NewService creates a new router service.
+func NewService(cfg config.Service) *routerService {
 	return &routerService{
 		cfgService: cfg,
 	}
@@ -106,6 +108,10 @@ func (r *routerService) GetCommand(name string) *Command {
 	}
 
 	return nil
+}
+
+func (r *routerService) GetNumUsedCommands() int {
+	return r.usedCmds
 }
 
 func (r *routerService) RegisterMiddleware(middleware Middleware) {

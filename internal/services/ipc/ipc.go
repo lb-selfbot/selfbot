@@ -17,8 +17,8 @@ const (
 	htmlCutOff     = 1e8
 )
 
-// IPCService handles the IPC with the UI process.
-type IPCService interface {
+// Service handles the IPC with the UI process.
+type Service interface {
 	// Connect establishes a connection with the IPC client.
 	Connect() error
 
@@ -37,8 +37,8 @@ type ipcService struct {
 	readyChan chan struct{}
 }
 
-// NewIPCService creates a new IPCService instance.
-func NewIPCService(eventBroker eventbroker.Service, configSvc config.Service) IPCService {
+// NewService creates a new IPCService instance.
+func NewService(eventBroker eventbroker.Service, configSvc config.Service) Service {
 	svc := &ipcService{eventBroker: eventBroker, configSvc: configSvc}
 	svc.subscribe()
 	return svc

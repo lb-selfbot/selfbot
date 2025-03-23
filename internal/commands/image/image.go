@@ -10,9 +10,9 @@ import (
 	"github.com/lb-selfbot/selfbot/internal/random"
 	"github.com/lb-selfbot/selfbot/internal/services/router"
 
+	"github.com/lb-selfbot/selfbot/internal/fn"
 	"github.com/lb-selfbot/selfbot/internal/services"
 	"github.com/lb-selfbot/selfbot/internal/utils"
-	"github.com/lb-selfbot/selfbot/internal/utils2"
 )
 
 type ImageCommands struct{ services *services.Services }
@@ -2778,7 +2778,7 @@ func (c *ImageCommands) speechbubble(ctx *router.Ctx) {
 		return
 	}
 
-	format := utils2.Ternary(forceGIF, "gif", "png")
+	format := fn.IfElse(forceGIF, "gif", "png")
 	url := fmt.Sprintf("https://api.lightning-bot.com/api/v3/imagegen/speechbubble?url=%s&format=%s", url.QueryEscape(link), format)
 
 	httpResponse := http.Get(url)

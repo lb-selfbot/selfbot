@@ -11,6 +11,7 @@ import (
 	"github.com/lb-selfbot/selfbot/internal/services/config"
 	"github.com/lb-selfbot/selfbot/internal/services/eventbroker"
 	"github.com/lb-selfbot/selfbot/internal/services/sessions"
+	"github.com/lb-selfbot/selfbot/internal/services/variables"
 	"github.com/lb-selfbot/selfbot/internal/utils"
 )
 
@@ -18,16 +19,17 @@ import (
 type RPCService interface{}
 
 type rpcService struct {
-	eventBroker eventbroker.Service
-	configSvc   config.Service
-	sessionsSvc sessions.SessionsService
+	eventBroker  eventbroker.Service
+	configSvc    config.Service
+	sessionsSvc  sessions.Service
+	variablesSvc variables.Service
 
 	startTime time.Time
 }
 
 // NewRPCService creates a new instance of RPCService.
-func NewRPCService(eventBroker eventbroker.Service, configSvc config.Service, sessionsSvc sessions.SessionsService) RPCService {
-	svc := &rpcService{eventBroker: eventBroker, configSvc: configSvc, sessionsSvc: sessionsSvc}
+func NewRPCService(eventBroker eventbroker.Service, configSvc config.Service, sessionsSvc sessions.Service, variablesSvc variables.Service) RPCService {
+	svc := &rpcService{eventBroker: eventBroker, configSvc: configSvc, sessionsSvc: sessionsSvc, variablesSvc: variablesSvc}
 	svc.subscribe()
 	return svc
 }

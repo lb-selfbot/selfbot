@@ -15,9 +15,9 @@ import (
 	"github.com/lb-selfbot/selfbot/internal/random"
 	"github.com/lb-selfbot/selfbot/internal/services/router"
 
+	"github.com/lb-selfbot/selfbot/internal/fn"
 	"github.com/lb-selfbot/selfbot/internal/services"
 	"github.com/lb-selfbot/selfbot/internal/utils"
-	"github.com/lb-selfbot/selfbot/internal/utils2"
 )
 
 type FunCommands struct{ services *services.Services }
@@ -1003,7 +1003,7 @@ func (c *FunCommands) randomchannel(ctx *router.Ctx) {
 		ctx.RespondText("An error has occurred.")
 		return
 	}
-	channels = utils2.Filter(channels, func(channel *discordgo.Channel) bool {
+	channels = fn.Filter(channels, func(channel *discordgo.Channel) bool {
 		return channel.Type == discordgo.ChannelTypeGuildText
 	})
 

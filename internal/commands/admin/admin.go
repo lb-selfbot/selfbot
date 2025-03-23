@@ -13,9 +13,9 @@ import (
 	"github.com/lb-selfbot/selfbot/internal/http"
 	"github.com/lb-selfbot/selfbot/internal/services/router"
 
+	"github.com/lb-selfbot/selfbot/internal/fn"
 	"github.com/lb-selfbot/selfbot/internal/services"
 	"github.com/lb-selfbot/selfbot/internal/utils"
-	"github.com/lb-selfbot/selfbot/internal/utils2"
 )
 
 var (
@@ -833,14 +833,14 @@ func (c *AdminCommands) unlockchannel(ctx *router.Ctx) {
 
 func (c *AdminCommands) purge(ctx *router.Ctx) {
 	amount, err := ctx.Arguments.Get(0).Int()
-	amount = utils2.Clamp(amount, 1, 10000)
+	amount = fn.Clamp(amount, 1, 10000)
 	if err != nil {
 		ctx.RespondText("Argument <amount> must be a number.")
 		return
 	}
 
 	delay, err := ctx.Arguments.Get(1).Duration()
-	delay = utils2.Clamp(delay, 1*time.Second, 60*time.Second)
+	delay = fn.Clamp(delay, 1*time.Second, 60*time.Second)
 	if err != nil {
 		ctx.RespondText("Could not parse delay")
 		return
@@ -871,14 +871,14 @@ func (c *AdminCommands) purge(ctx *router.Ctx) {
 
 func (c *AdminCommands) purgeself(ctx *router.Ctx) {
 	amount, err := ctx.Arguments.Get(0).Int()
-	amount = utils2.Clamp(amount, 1, 10000)
+	amount = fn.Clamp(amount, 1, 10000)
 	if err != nil {
 		ctx.RespondText("Argument <amount> must be a number.")
 		return
 	}
 
 	delay, err := ctx.Arguments.Get(1).Duration()
-	delay = utils2.Clamp(delay, 1*time.Second, 60*time.Second)
+	delay = fn.Clamp(delay, 1*time.Second, 60*time.Second)
 	if err != nil {
 		ctx.RespondText("Could not parse delay")
 		return
@@ -908,7 +908,7 @@ func (c *AdminCommands) purgeself(ctx *router.Ctx) {
 
 func (c *AdminCommands) purgeuser(ctx *router.Ctx) {
 	amount, err := ctx.Arguments.Get(0).Int()
-	amount = utils2.Clamp(amount, 1, 10000)
+	amount = fn.Clamp(amount, 1, 10000)
 	if err != nil {
 		ctx.RespondText("Argument <amount> must be a number.")
 		return
@@ -921,7 +921,7 @@ func (c *AdminCommands) purgeuser(ctx *router.Ctx) {
 	}
 
 	delay, _ := ctx.Arguments.Get(2).Duration()
-	delay = utils2.Clamp(delay, 1*time.Second, 60*time.Second)
+	delay = fn.Clamp(delay, 1*time.Second, 60*time.Second)
 
 	channel, err := ctx.Arguments.Get(3).Channel(router.ArgumentFlagFallbackDefault)
 	if err != nil {
@@ -947,7 +947,7 @@ func (c *AdminCommands) purgerange(ctx *router.Ctx) {
 	start, end := ctx.Arguments.Get(0).Raw(), ctx.Arguments.Get(1).Raw()
 
 	delay, _ := ctx.Arguments.Get(2).Duration()
-	delay = utils2.Clamp(delay, 1*time.Second, 60*time.Second)
+	delay = fn.Clamp(delay, 1*time.Second, 60*time.Second)
 
 	channel, err := ctx.Arguments.Get(3).Channel(router.ArgumentFlagFallbackDefault)
 	if err != nil {
@@ -1408,7 +1408,7 @@ func (c *AdminCommands) timeout(ctx *router.Ctx) {
 	}
 
 	duration, err := ctx.Arguments.Get(1).Duration()
-	duration = utils2.Clamp(duration, 1*time.Second, 28*24*time.Hour)
+	duration = fn.Clamp(duration, 1*time.Second, 28*24*time.Hour)
 	if err != nil {
 		ctx.RespondText("Could not parse duration")
 		return
@@ -1529,7 +1529,7 @@ func (c *AdminCommands) banlist(ctx *router.Ctx) {
 		return
 	}
 
-	banReadable := utils2.Map(bans, func(ban *discordgo.GuildBan) string {
+	banReadable := fn.Map(bans, func(ban *discordgo.GuildBan) string {
 		return fmt.Sprintf("%s - %s", ban.User.Username, ban.User.ID)
 	})
 
@@ -1923,13 +1923,13 @@ func (c *AdminCommands) bots(ctx *router.Ctx) {
 		return
 	}
 
-	bots := utils2.Filter(guild.Members, func(member *discordgo.Member) bool { return member.User.Bot })
+	bots := fn.Filter(guild.Members, func(member *discordgo.Member) bool { return member.User.Bot })
 	if len(bots) == 0 {
 		ctx.RespondText("No bots found!")
 		return
 	}
 
-	botsReadable := utils2.Map(bots, func(member *discordgo.Member) string {
+	botsReadable := fn.Map(bots, func(member *discordgo.Member) string {
 		return fmt.Sprintf("%s - %s", member.User.String(), member.User.ID)
 	})
 
@@ -1951,7 +1951,7 @@ func (c *AdminCommands) admins(ctx *router.Ctx) {
 		return
 	}
 
-	admins := utils2.Filter(guild.Members, func(member *discordgo.Member) bool {
+	admins := fn.Filter(guild.Members, func(member *discordgo.Member) bool {
 		permissions, _ := ctx.Session.UserChannelPermissions(member.User.ID, guild.Channels[0].ID)
 		return permissions&discordgo.PermissionAdministrator != 0 && !member.User.Bot
 	})
@@ -1960,7 +1960,7 @@ func (c *AdminCommands) admins(ctx *router.Ctx) {
 		return
 	}
 
-	adminsReadable := utils2.Map(admins, func(member *discordgo.Member) string {
+	adminsReadable := fn.Map(admins, func(member *discordgo.Member) string {
 		return fmt.Sprintf("%s - %s", member.User.String(), member.User.ID)
 	})
 
@@ -1981,7 +1981,7 @@ func (c *AdminCommands) roles(ctx *router.Ctx) {
 		return i.Position - j.Position
 	})
 
-	rolesReadable := utils2.Map(guild.Roles, func(role *discordgo.Role) string {
+	rolesReadable := fn.Map(guild.Roles, func(role *discordgo.Role) string {
 		return fmt.Sprintf("%s - %s", role.Name, role.ID)
 	})
 
@@ -2024,10 +2024,10 @@ func (c *AdminCommands) invite(ctx *router.Ctx) {
 	}
 
 	maxAge, _ := ctx.Arguments.Get(1).Int()
-	maxAge = utils2.Clamp(maxAge, 0, 604800)
+	maxAge = fn.Clamp(maxAge, 0, 604800)
 
 	maxUses, _ := ctx.Arguments.Get(2).Int()
-	maxUses = utils2.Clamp(maxUses, 0, 100)
+	maxUses = fn.Clamp(maxUses, 0, 100)
 
 	invite, err := ctx.Session.ChannelInviteCreate(channel.ID, maxAge, maxUses, false)
 	if err != nil {

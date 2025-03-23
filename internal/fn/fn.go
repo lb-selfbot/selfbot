@@ -1,4 +1,4 @@
-package utils2
+package fn
 
 import (
 	"math/rand"
@@ -122,8 +122,8 @@ func Unique[T comparable](slice []T) []T {
 	return slice[:n]
 }
 
-// Ternary provides a conditional operator that returns trueVal if condition is true, falseVal otherwise
-func Ternary[T any](condition bool, trueVal, falseVal T) T {
+// IfElse provides a conditional operator that returns trueVal if condition is true, falseVal otherwise
+func IfElse[T any](condition bool, trueVal, falseVal T) T {
 	if condition {
 		return trueVal
 	}

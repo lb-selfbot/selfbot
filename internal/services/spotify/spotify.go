@@ -10,8 +10,8 @@ import (
 	"github.com/lb-selfbot/selfbot/internal/http"
 )
 
-// SpotifyService handles Spotify-related operations.
-type SpotifyService interface {
+// Service handles Spotify-related operations.
+type Service interface {
 	// GetBearerToken retrieves the Spotify bearer token.
 	GetBearerToken(session *discordgo.Session) string
 
@@ -43,8 +43,8 @@ type spotifyService struct {
 	currentlyPlayingRetrievedAt time.Time
 }
 
-// NewSpotifyService creates a new instance of SpotifyService.
-func NewSpotifyService() SpotifyService {
+// NewService creates a new instance of SpotifyService.
+func NewService() Service {
 	return &spotifyService{}
 }
 

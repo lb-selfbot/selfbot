@@ -24,8 +24,8 @@ const (
 	maxHostingTokens = 5
 )
 
-// MTSService handles the Multi-Token Sniper.
-type MTSService interface{}
+// Service handles the Multi-Token Sniper.
+type Service interface{}
 
 type sniperInstance struct {
 	state   sniperState
@@ -42,8 +42,8 @@ type mtsService struct {
 	instances []*sniperInstance
 }
 
-// NewMTSService creates a new instance of MTSService.
-func NewMTSService(eventBroker eventbroker.Service, configSvc config.Service, eventReactionsSvc eventreactions.Service) MTSService {
+// NewService creates a new instance of MTSService.
+func NewService(eventBroker eventbroker.Service, configSvc config.Service, eventReactionsSvc eventreactions.Service) Service {
 	svc := &mtsService{
 		eventBroker:       eventBroker,
 		configSvc:         configSvc,

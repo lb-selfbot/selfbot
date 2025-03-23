@@ -111,7 +111,7 @@ func (e *eventReactionsService) constructReaction(session *discordgo.Session, re
 	case types.Snipers:
 		r = impl.NewSnipers(e.eventBroker, e.configSvc, session, e.GetCountryCode, e.GetPaymentSrcID, "")
 	case types.AFKResponder:
-		r = impl.NewAFK(e.eventBroker, e.configSvc, e.IsReactionMessage)
+		r = impl.NewAFK(e.eventBroker, e.configSvc, e.variablesSvc, e.IsReactionMessage)
 	case types.AntiPhishing:
 		r = impl.NewPhishing(e.eventBroker, e.configSvc)
 	case types.Notifiers:

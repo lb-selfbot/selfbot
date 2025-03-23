@@ -5,12 +5,31 @@ import (
 	"time"
 
 	"github.com/lb-selfbot/discordgo"
+	"github.com/lb-selfbot/selfbot/internal/utils"
 )
 
 type TriggerList struct {
 	Type    string   `json:"Type"`
 	Users   []string `json:"Users"`
 	Servers []string `json:"Servers"`
+}
+
+func (t TriggerList) IsTriggered(session *discordgo.Session, userID string, guildID string) bool {
+	if t.Type == "Global" {
+		return true
+	}
+
+	isUserInList := utils.Discord.IsUserInList(session, userID, t.Users)
+	isGuildInList := utils.Discord.IsGuildInList(session, guildID, t.Servers)
+
+	switch t.Type {
+	case "Whitelist":
+		return isUserInList || isGuildInList
+	case "Blacklist":
+		return !isUserInList && !isGuildInList
+	default:
+		return false
+	}
 }
 
 type Activity struct {

@@ -17,8 +17,8 @@ type consoleService struct {
 	mu          sync.Mutex
 }
 
-// NewConsoleService creates a new ConsoleService instance.
-func NewConsoleService() Service {
+// NewService creates a new ConsoleService instance.
+func NewService() Service {
 	return &consoleService{}
 }
 

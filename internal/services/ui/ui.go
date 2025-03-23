@@ -10,11 +10,11 @@ import (
 	"github.com/common-nighthawk/go-figure"
 	"github.com/lb-selfbot/selfbot/internal/constants"
 	"github.com/lb-selfbot/selfbot/internal/embed"
+	"github.com/lb-selfbot/selfbot/internal/fn"
 	"github.com/lb-selfbot/selfbot/internal/services/config"
 	"github.com/lb-selfbot/selfbot/internal/services/discord"
 	"github.com/lb-selfbot/selfbot/internal/services/eventbroker"
 	"github.com/lb-selfbot/selfbot/internal/utils"
-	"github.com/lb-selfbot/selfbot/internal/utils2"
 )
 
 // Service handles high-level logging and displaying information to the user.
@@ -29,11 +29,11 @@ type Service interface {
 type uiService struct {
 	eventBroker eventbroker.Service
 	configSvc   config.Service
-	discordSvc  discord.DiscordService
+	discordSvc  discord.Service
 }
 
 // NewService creates a new UIService instance.
-func NewService(eventBroker eventbroker.Service, configSvc config.Service, discordSvc discord.DiscordService) Service {
+func NewService(eventBroker eventbroker.Service, configSvc config.Service, discordSvc discord.Service) Service {
 	svc := &uiService{eventBroker: eventBroker, configSvc: configSvc, discordSvc: discordSvc}
 	svc.subscribe()
 	return svc
@@ -167,7 +167,7 @@ func (ui *uiService) colored(text string, r, g, b int, bold bool) string {
 		strconv.Itoa(r) + ";" +
 		strconv.Itoa(g) + ";" +
 		strconv.Itoa(b) +
-		utils2.Ternary(bold, ";1", "") +
+		fn.IfElse(bold, ";1", "") +
 		"m" +
 		text +
 		"\033[0m"

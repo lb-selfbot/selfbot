@@ -63,8 +63,8 @@ type GIFs struct {
 	Settings *protos.FrecencyUserSettings `json:"settings"`
 }
 
-// BackupService handles Discord account backup and restore operations.
-type BackupService interface {
+// Service handles Discord account backup and restore operations.
+type Service interface {
 	// CheckEligibility checks if the account is eligible for backup/restore.
 	CheckEligibility(session *discordgo.Session) error
 
@@ -80,8 +80,8 @@ type BackupService interface {
 
 type backupService struct{}
 
-// NewBackupService creates a new BackupService instance.
-func NewBackupService() BackupService {
+// NewService creates a new BackupService instance.
+func NewService() Service {
 	return &backupService{}
 }
 

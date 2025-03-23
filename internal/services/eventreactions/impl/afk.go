@@ -12,14 +12,16 @@ import (
 	"github.com/lb-selfbot/selfbot/internal/services/eventbroker"
 	"github.com/lb-selfbot/selfbot/internal/services/eventreactions/types"
 	"github.com/lb-selfbot/selfbot/internal/services/ui/featurelogs"
+	"github.com/lb-selfbot/selfbot/internal/services/variables"
 
 	"github.com/lb-selfbot/discordgo"
 	"github.com/lb-selfbot/selfbot/internal/utils"
 )
 
 type AFK struct {
-	eventBroker eventbroker.Service
-	configSvc   config.Service
+	eventBroker  eventbroker.Service
+	configSvc    config.Service
+	variablesSvc variables.Service
 
 	isReactionMessage func(*discordgo.Message) bool
 
@@ -27,10 +29,11 @@ type AFK struct {
 	lastActivity   time.Time
 }
 
-func NewAFK(eventBroker eventbroker.Service, configSvc config.Service, isReactionMessage func(*discordgo.Message) bool) *AFK {
+func NewAFK(eventBroker eventbroker.Service, configSvc config.Service, variablesSvc variables.Service, isReactionMessage func(*discordgo.Message) bool) *AFK {
 	return &AFK{
 		eventBroker:       eventBroker,
 		configSvc:         configSvc,
+		variablesSvc:      variablesSvc,
 		isReactionMessage: isReactionMessage,
 	}
 }

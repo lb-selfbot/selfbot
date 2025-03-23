@@ -9,7 +9,6 @@ import (
 	"time"
 
 	"github.com/lb-selfbot/discordgo"
-	"github.com/lb-selfbot/selfbot/internal/constants"
 
 	"github.com/lb-selfbot/selfbot/internal/services/eventbroker"
 	"github.com/lb-selfbot/selfbot/internal/utils"
@@ -17,8 +16,8 @@ import (
 	"github.com/traefik/yaegi/stdlib"
 )
 
-// ExtensionsService handles the loading and interop of extensions.
-type ExtensionsService interface {
+// Service handles the loading and interop of extensions.
+type Service interface {
 	// GetNumExtensions returns the number of loaded extensions.
 	GetNumExtensions() int
 }
@@ -29,8 +28,8 @@ type extensionsService struct {
 	numLoadedExtensions int
 }
 
-// NewExtensionsService creates a new instance of ExtensionsService.
-func NewExtensionsService(eventBroker eventbroker.Service) ExtensionsService {
+// NewService creates a new instance of ExtensionsService.
+func NewService(eventBroker eventbroker.Service) Service {
 	svc := &extensionsService{eventBroker: eventBroker}
 	svc.subscribe()
 	return svc
@@ -50,17 +49,17 @@ func (e *extensionsService) subscribe() {
 func (e *extensionsService) load(session *discordgo.Session) {
 	exports := interp.Exports{
 		"github.com/LightningDev1/LB-Extensions/lightningbot": map[string]reflect.Value{
-			// function, constant and variable definitions
-			"ClearConsole":      reflect.ValueOf(e.clearConsole),
-			"Notification":      reflect.ValueOf(e.notification),
-			"LogError":          reflect.ValueOf(e.logError),
-			"GetConfig":         reflect.ValueOf(config.GetConfig),
-			"NewConsoleMessage": reflect.ValueOf(e.uiSvc.NewConsoleMessage),
-			"NewEmbed":          reflect.ValueOf(e.embedSvc.NewEmbed),
-			"Version":           reflect.ValueOf(&constants.VERSION).Elem(),
+			// // function, constant and variable definitions
+			// "ClearConsole":      reflect.ValueOf(e.clearConsole),
+			// "Notification":      reflect.ValueOf(e.notification),
+			// "LogError":          reflect.ValueOf(e.logError),
+			// "GetConfig":         reflect.ValueOf(config.GetConfig),
+			// "NewConsoleMessage": reflect.ValueOf(e.uiSvc.NewConsoleMessage),
+			// "NewEmbed":          reflect.ValueOf(e.embedSvc.NewEmbed),
+			// "Version":           reflect.ValueOf(&constants.VERSION).Elem(),
 
-			// type definitions
-			"Config": reflect.ValueOf((*config.Config)(nil)),
+			// // type definitions
+			// "Config": reflect.ValueOf((*config.Config)(nil)),
 		},
 	}
 
@@ -103,19 +102,19 @@ func (e *extensionsService) load(session *discordgo.Session) {
 			return nil
 		}
 
-		register, err := i.Eval("extensions.Register")
-		if err != nil {
-			handleError(fmt.Errorf("extension does not have a register function: %w", err))
-			return nil
-		}
+		// register, err := i.Eval("extensions.Register")
+		// if err != nil {
+		// 	handleError(fmt.Errorf("extension does not have a register function: %w", err))
+		// 	return nil
+		// }
 
-		registerFunc, ok := register.Interface().(func(*discordgo.Session, router.Router))
-		if !ok {
-			handleError(fmt.Errorf("Register is not a function, but %T", register.Interface()))
-			return nil
-		}
+		// registerFunc, ok := register.Interface().(func(*discordgo.Session, router.Router))
+		// if !ok {
+		// 	handleError(fmt.Errorf("Register is not a function, but %T", register.Interface()))
+		// 	return nil
+		// }
 
-		registerFunc(session, cmdRouter)
+		// registerFunc(session, cmdRouter)
 
 		e.numLoadedExtensions++
 

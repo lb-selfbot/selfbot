@@ -9,13 +9,13 @@ import (
 type Services struct {
 	Config config.Service
 
-	Router router.RouterService
+	Router router.Service
 }
 
 // InitServices initializes and wires all services.
 func InitServices() *Services {
 	cfg := config.NewService()
-	router := router.NewRouterService(cfg)
+	router := router.NewService(cfg)
 
 	return &Services{
 		Config: cfg,

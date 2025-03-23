@@ -28,8 +28,8 @@ import (
 	"github.com/lb-selfbot/selfbot/internal/random"
 	"github.com/lb-selfbot/selfbot/internal/services/router"
 
+	"github.com/lb-selfbot/selfbot/internal/fn"
 	"github.com/lb-selfbot/selfbot/internal/services"
-	"github.com/lb-selfbot/selfbot/internal/utils2"
 
 	"github.com/LightningDev1/go-foreground"
 	"github.com/bitly/go-simplejson"
@@ -1027,7 +1027,7 @@ func (c *UtilityCommands) copychannel(ctx *router.Ctx) {
 	}
 
 	limit, _ := ctx.Arguments.Get(2).Int()
-	limit = utils2.Clamp(limit, 1, 100)
+	limit = fn.Clamp(limit, 1, 100)
 
 	if limit < 1 {
 		ctx.RespondText("Limit must be greater than 0")
@@ -1594,7 +1594,7 @@ func (c *UtilityCommands) discordpoll(ctx *router.Ctx) {
 		return
 	}
 
-	duration = utils2.Clamp(duration, 1*time.Hour, 168*time.Hour)
+	duration = fn.Clamp(duration, 1*time.Hour, 168*time.Hour)
 
 	question := ctx.Arguments.Get(1).Raw()
 	options := strings.Split(ctx.Arguments.Get(2).Raw(), ",")
@@ -1761,7 +1761,7 @@ func (c *UtilityCommands) uptime(ctx *router.Ctx) {
 }
 
 func (c *UtilityCommands) history(ctx *router.Ctx) {
-	usedCmds := utils2.Limit(c.services.EventReactions.GetUsedCommands(), 10)
+	usedCmds := fn.Limit(c.services.EventReactions.GetUsedCommands(), 10)
 
 	if len(usedCmds) == 0 {
 		c.services.Embed.NewEmbed().
@@ -1770,7 +1770,7 @@ func (c *UtilityCommands) history(ctx *router.Ctx) {
 		return
 	}
 
-	usedCmdsReadable := utils2.MapIndexed(usedCmds, func(i int, cmd *router.Ctx) string {
+	usedCmdsReadable := fn.MapIndexed(usedCmds, func(i int, cmd *router.Ctx) string {
 		return fmt.Sprintf("%d. %s", i+1, cmd.Message.Content)
 	})
 
@@ -1810,7 +1810,7 @@ func (c *UtilityCommands) remote(ctx *router.Ctx) {
 	commandName := ctx.Arguments.Get(1).Raw()
 	args := ctx.Arguments.RawFrom(2)
 
-	cmds := utils2.Filter(ctx.Router.GetCmds(), func(cmd *router.Command) bool {
+	cmds := fn.Filter(ctx.Router.GetCmds(), func(cmd *router.Command) bool {
 		return strings.EqualFold(cmd.Name, commandName)
 	})
 
@@ -2795,7 +2795,7 @@ func (c *UtilityCommands) addReminder(ctx *router.Ctx) {
 		return
 	}
 
-	duration = utils2.Clamp(duration, 5*time.Second, 24*time.Hour)
+	duration = fn.Clamp(duration, 5*time.Second, 24*time.Hour)
 
 	message := ctx.Arguments.RawFrom(3)
 
@@ -2825,7 +2825,7 @@ func (c *UtilityCommands) removeReminder(ctx *router.Ctx) {
 
 	name := ctx.Arguments.Get(0).Raw()
 
-	cfg.Reminders = utils2.Filter(cfg.Reminders, func(r config.Reminder) bool {
+	cfg.Reminders = fn.Filter(cfg.Reminders, func(r config.Reminder) bool {
 		return r.Name != name
 	})
 
@@ -3285,7 +3285,7 @@ func (c *UtilityCommands) passgen(ctx *router.Ctx) {
 		return
 	}
 
-	charAmount = utils2.Clamp(charAmount, 1, 1000)
+	charAmount = fn.Clamp(charAmount, 1, 1000)
 
 	c.services.Embed.NewEmbed().
 		AddField("Password", random.String(charAmount, "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789#$%&")).
@@ -3663,7 +3663,7 @@ func (c *UtilityCommands) previewcolor(ctx *router.Ctx) {
 func (c *UtilityCommands) generatekey(ctx *router.Ctx) {
 	format := ctx.Arguments.Get(0).Raw()
 	amount, _ := ctx.Arguments.Get(1).Int()
-	amount = utils2.Clamp(amount, 1, 100)
+	amount = fn.Clamp(amount, 1, 100)
 
 	var keys []string
 

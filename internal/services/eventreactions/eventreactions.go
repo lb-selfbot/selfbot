@@ -6,12 +6,13 @@ import (
 	"time"
 
 	"github.com/lb-selfbot/discordgo"
+	"github.com/lb-selfbot/selfbot/internal/fn"
 	"github.com/lb-selfbot/selfbot/internal/services/config"
 	"github.com/lb-selfbot/selfbot/internal/services/eventbroker"
 	"github.com/lb-selfbot/selfbot/internal/services/eventreactions/types"
 	"github.com/lb-selfbot/selfbot/internal/services/router"
+	"github.com/lb-selfbot/selfbot/internal/services/variables"
 	"github.com/lb-selfbot/selfbot/internal/utils"
-	"github.com/lb-selfbot/selfbot/internal/utils2"
 )
 
 // Service handles event reactions.
@@ -81,9 +82,10 @@ type Service interface {
 }
 
 type eventReactionsService struct {
-	eventBroker eventbroker.Service
-	configSvc   config.Service
-	routerSvc   router.RouterService
+	eventBroker  eventbroker.Service
+	configSvc    config.Service
+	routerSvc    router.Service
+	variablesSvc variables.Service
 
 	reactions   []types.EventReaction
 	reactionsMu sync.Mutex
@@ -110,11 +112,12 @@ type eventReactionsService struct {
 	countryCode  string
 }
 
-func NewService(eventBroker eventbroker.Service, configService config.Service, routerSvc router.RouterService) *eventReactionsService {
+func NewService(eventBroker eventbroker.Service, configService config.Service, routerSvc router.Service, variablesSvc variables.Service) *eventReactionsService {
 	svc := &eventReactionsService{
 		eventBroker:        eventBroker,
 		configSvc:          configService,
 		routerSvc:          routerSvc,
+		variablesSvc:       variablesSvc,
 		reactions:          make([]types.EventReaction, 0),
 		pinSpamMsgs:        make([]*discordgo.Message, 0),
 		eventReactionsMsgs: make([]*discordgo.Message, 0),
@@ -242,7 +245,7 @@ func (e *eventReactionsService) RemoveAllReactions() {
 	e.reactionsMu.Lock()
 	defer e.reactionsMu.Unlock()
 
-	e.reactions = utils2.Filter(e.reactions, func(r types.EventReaction) bool {
+	e.reactions = fn.Filter(e.reactions, func(r types.EventReaction) bool {
 		return !slices.Contains(types.DefaultReactions, r.Type())
 	})
 

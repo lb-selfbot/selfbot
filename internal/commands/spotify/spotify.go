@@ -11,9 +11,9 @@ import (
 	"github.com/lb-selfbot/selfbot/internal/http"
 	"github.com/lb-selfbot/selfbot/internal/services/router"
 
+	"github.com/lb-selfbot/selfbot/internal/fn"
 	"github.com/lb-selfbot/selfbot/internal/services"
 	"github.com/lb-selfbot/selfbot/internal/utils"
-	"github.com/lb-selfbot/selfbot/internal/utils2"
 )
 
 type SpotifyCommands struct{ services *services.Services }
@@ -342,7 +342,7 @@ func (c *SpotifyCommands) svolume(ctx *router.Ctx) {
 	}
 
 	volume, err := ctx.Arguments.Get(0).Int()
-	volume = utils2.Clamp(volume, 0, 100)
+	volume = fn.Clamp(volume, 0, 100)
 	if err != nil {
 		ctx.RespondText("Argument <volume> must be a number.")
 		return

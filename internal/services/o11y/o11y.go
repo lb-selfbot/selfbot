@@ -9,8 +9,8 @@ import (
 	"github.com/lb-selfbot/selfbot/internal/services/eventbroker"
 )
 
-// O11yService handles observability and error tracking.
-type O11yService interface {
+// Service handles observability and error tracking.
+type Service interface {
 	// Init initializes the observability service.
 	Init() error
 
@@ -23,8 +23,8 @@ type o11yService struct {
 	configSvc   config.Service
 }
 
-// NewO11yService creates a new instance of O11yService.
-func NewO11yService(eventBroker eventbroker.Service, configSvc config.Service) O11yService {
+// NewService creates a new instance of O11yService.
+func NewService(eventBroker eventbroker.Service, configSvc config.Service) Service {
 	svc := &o11yService{eventBroker: eventBroker, configSvc: configSvc}
 	svc.subscribe()
 	return svc

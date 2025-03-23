@@ -9,8 +9,8 @@ import (
 	"github.com/lb-selfbot/selfbot/internal/utils"
 )
 
-// SessionsService handles the fetching of Discord sessions.
-type SessionsService interface {
+// Service handles the fetching of Discord sessions.
+type Service interface {
 	// GetGatewaySessions returns the list of gateway sessions.
 	GetGatewaySessions() []*discordgo.GatewaySession
 
@@ -33,8 +33,8 @@ type sessionsService struct {
 	status           string
 }
 
-// NewSessionsService creates a new instance of SessionsService.
-func NewSessionsService(eventBroker eventbroker.Service) SessionsService {
+// NewService creates a new instance of SessionsService.
+func NewService(eventBroker eventbroker.Service) Service {
 	svc := &sessionsService{eventBroker: eventBroker}
 	svc.subscribe()
 	return svc

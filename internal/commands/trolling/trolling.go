@@ -11,9 +11,9 @@ import (
 	"github.com/lb-selfbot/selfbot/internal/random"
 	"github.com/lb-selfbot/selfbot/internal/services/router"
 
+	"github.com/lb-selfbot/selfbot/internal/fn"
 	"github.com/lb-selfbot/selfbot/internal/services"
 	"github.com/lb-selfbot/selfbot/internal/utils"
-	"github.com/lb-selfbot/selfbot/internal/utils2"
 )
 
 type TrollingCommands struct{ services *services.Services }
@@ -195,7 +195,7 @@ func (c *TrollingCommands) trollnitro(ctx *router.Ctx) {
 
 func (c *TrollingCommands) fakenitro(ctx *router.Ctx) {
 	amount, _ := ctx.Arguments.Get(0).Int()
-	amount = utils2.Clamp(amount, 1, 100)
+	amount = fn.Clamp(amount, 1, 100)
 
 	for range amount {
 		ctx.RespondText("https://discord.gift/%s", random.String(16))
@@ -254,7 +254,7 @@ func (c *TrollingCommands) voicemove(ctx *router.Ctx) {
 	}
 
 	amount, err := ctx.Arguments.Get(0).Int()
-	amount = utils2.Clamp(amount, 1, 100)
+	amount = fn.Clamp(amount, 1, 100)
 	if err != nil {
 		ctx.RespondText("Argument <amount> must be a number.")
 		return
@@ -318,7 +318,7 @@ func (c *TrollingCommands) voicemove(ctx *router.Ctx) {
 
 func (c *TrollingCommands) triggertyping(ctx *router.Ctx) {
 	duration, err := ctx.Arguments.Get(0).Duration()
-	duration = utils2.Clamp(duration, 1*time.Second, 7*24*time.Hour)
+	duration = fn.Clamp(duration, 1*time.Second, 7*24*time.Hour)
 	if err != nil {
 		ctx.RespondText("Failed to parse duration")
 		return
@@ -349,7 +349,7 @@ func (c *TrollingCommands) impersonate(ctx *router.Ctx) {
 
 func (c *TrollingCommands) fakepings(ctx *router.Ctx) {
 	amount, err := ctx.Arguments.Get(0).Int()
-	amount = utils2.Clamp(amount, 1, 1000000000)
+	amount = fn.Clamp(amount, 1, 1000000000)
 	if err != nil {
 		ctx.RespondText("Argument <amount> must be a number.")
 		return

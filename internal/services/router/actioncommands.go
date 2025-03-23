@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/lb-selfbot/selfbot/internal/utils2"
+	"github.com/lb-selfbot/selfbot/internal/fn"
 )
 
 // CommandAction is an action for an ActionCommand.
@@ -111,7 +111,7 @@ func (a *CommandActionValues) ToSubCommand(router *routerService) *Command {
 		Description: a.Desc,
 		Handler: func(ctx *Ctx) {
 			values := a.ValuesGetter()
-			stringValues := utils2.Map(values, func(value any) string {
+			stringValues := fn.Map(values, func(value any) string {
 				return fmt.Sprint(value)
 			})
 
@@ -166,7 +166,7 @@ func parseValue(ctx *Ctx, valueType ActionValueType) (any, error) {
 		if err != nil {
 			return nil, err
 		}
-		return utils2.Clamp(value, 0, 100), nil
+		return fn.Clamp(value, 0, 100), nil
 	case ValueTypeBool:
 		return ctx.Arguments.Get(0).Bool()
 	case ValueTypeDuration:

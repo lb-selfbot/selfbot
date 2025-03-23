@@ -37,8 +37,8 @@ type Credentials struct {
 	Password string
 }
 
-// AuthSyncService handles the authentication and synchronization process.
-type AuthSyncService interface {
+// Service handles the authentication and synchronization process.
+type Service interface {
 	// Connect establishes a connection using the provided credentials.
 	Connect(Credentials) error
 
@@ -73,8 +73,8 @@ type authSyncService struct {
 	errorStart time.Time
 }
 
-// NewAuthSyncService creates a new instance of AuthSyncService.
-func NewAuthSyncService(eventBroker eventbroker.Service, configSvc config.Service, consoleSvc console.Service) AuthSyncService {
+// NewService creates a new instance of AuthSyncService.
+func NewService(eventBroker eventbroker.Service, configSvc config.Service, consoleSvc console.Service) Service {
 	svc := &authSyncService{eventBroker: eventBroker, consoleSvc: consoleSvc}
 	svc.subscribe()
 	return svc
