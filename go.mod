@@ -8,13 +8,13 @@ require (
 	github.com/LightningDev1/go-foreground v0.0.0-20240212172534-661cc0000e42
 	github.com/LightningDev1/go-privnote v0.1.1
 	github.com/bitly/go-simplejson v0.5.1
-	github.com/bogdanfinn/fhttp v0.5.34
+	github.com/bogdanfinn/fhttp v0.5.36
 	github.com/bogdanfinn/tls-client v1.8.0
 	github.com/brianvoe/gofakeit/v6 v6.28.0
 	github.com/charmbracelet/bubbles v0.20.0
-	github.com/charmbracelet/bubbletea v1.3.3
-	github.com/charmbracelet/lipgloss v1.0.0
-	github.com/chromedp/chromedp v0.13.0
+	github.com/charmbracelet/bubbletea v1.3.4
+	github.com/charmbracelet/lipgloss v1.1.0
+	github.com/chromedp/chromedp v0.13.3
 	github.com/common-nighthawk/go-figure v0.0.0-20210622060536-734e95fb86be
 	github.com/darkwyrm/b85 v0.0.0-20210908110113-bdd55eedeb3c
 	github.com/deadshot465/owoify-go v1.0.1
@@ -27,13 +27,13 @@ require (
 	github.com/mr-tron/base58 v1.2.0
 	github.com/multiformats/go-base36 v0.2.0
 	github.com/robert-nix/ansihtml v1.0.1
-	github.com/shirou/gopsutil/v4 v4.25.1
+	github.com/shirou/gopsutil/v4 v4.25.2
 	github.com/traefik/yaegi v0.16.1
-	golang.org/x/crypto v0.35.0
+	golang.org/x/crypto v0.36.0
 	golang.org/x/exp v0.0.0-20250218142911-aa4b98e5adaa
-	golang.org/x/sys v0.30.0
-	golang.org/x/term v0.29.0
-	golang.org/x/text v0.22.0
+	golang.org/x/sys v0.31.0
+	golang.org/x/term v0.30.0
+	golang.org/x/text v0.23.0
 	google.golang.org/protobuf v1.36.5
 )
 
@@ -43,9 +43,11 @@ require (
 	github.com/atotto/clipboard v0.1.4 // indirect
 	github.com/aymanbagabas/go-osc52/v2 v2.0.1 // indirect
 	github.com/bogdanfinn/utls v1.6.5 // indirect
+	github.com/charmbracelet/colorprofile v0.2.3-0.20250311203215-f60798e515dc // indirect
 	github.com/charmbracelet/x/ansi v0.8.0 // indirect
+	github.com/charmbracelet/x/cellbuf v0.0.13-0.20250311204145-2c3ea96c31dd // indirect
 	github.com/charmbracelet/x/term v0.2.1 // indirect
-	github.com/chromedp/cdproto v0.0.0-20250222051814-50c6cb17f10a // indirect
+	github.com/chromedp/cdproto v0.0.0-20250319231242-a755498943c8 // indirect
 	github.com/chromedp/sysutil v1.1.0 // indirect
 	github.com/cloudflare/circl v1.6.0 // indirect
 	github.com/dlclark/regexp2 v1.11.5 // indirect
@@ -82,8 +84,9 @@ require (
 	github.com/tam7t/hpkp v0.0.0-20160821193359-2b70b4024ed5 // indirect
 	github.com/tklauser/go-sysconf v0.3.14 // indirect
 	github.com/tklauser/numcpus v0.9.0 // indirect
+	github.com/xo/terminfo v0.0.0-20220910002029-abceb7e1c41e // indirect
 	github.com/yusufpapurcu/wmi v1.2.4 // indirect
 	golang.org/x/net v0.36.0 // indirect
-	golang.org/x/sync v0.11.0 // indirect
+	golang.org/x/sync v0.12.0 // indirect
 	gopkg.in/natefinch/npipe.v2 v2.0.0-20160621034901-c1b8fa8bdcce // indirect
 )
