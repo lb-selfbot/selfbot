@@ -13,9 +13,9 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-go@v5
         with:
-          go-version-file: "src/go.mod"
+          go-version-file: "go.mod"
           check-latest: true
-          cache-dependency-path: src/go.sum
+          cache-dependency-path: go.sum
 
       - name: Install dependencies
         run: |
@@ -35,7 +35,6 @@ jobs:
           CGO_ENABLED: 1
           GOOS: "windows"
         run: |
-          cd src
           export GOARCH=386
           garble -seed=U4Nxq2YSVm6ivvOejQbElA== build -tags timetzdata -trimpath -ldflags "-s -w" -gcflags=all="-l -B" -o ${{ github.workspace }}/executables/windows/386/selfbot.exe ./cmd/desktop
           export GOARCH=amd64
@@ -61,9 +60,9 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-go@v5
         with:
-          go-version-file: "src/go.mod"
+          go-version-file: "go.mod"
           check-latest: true
-          cache-dependency-path: src/go.sum
+          cache-dependency-path: "go.sum"
 
       - name: Install dependencies
         run: |
@@ -85,7 +84,6 @@ jobs:
           CGO_ENABLED: 0
           GOOS: "linux"
         run: |
-          cd src
           export GOARCH=386
           garble -seed=U4Nxq2YSVm6ivvOejQbElA== build -o ${{ github.workspace }}/executables/linux/386/selfbot -tags timetzdata -trimpath -ldflags "-s -w" -gcflags=all="-l -B" ./cmd/desktop
           export GOARCH=amd64
@@ -132,9 +130,9 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-go@v5
         with:
-          go-version-file: "src/go.mod"
+          go-version-file: "go.mod"
           check-latest: true
-          cache-dependency-path: src/go.sum
+          cache-dependency-path: go.sum
 
       - name: Install dependencies
         run: |
@@ -155,7 +153,6 @@ jobs:
           CGO_ENABLED: 1
           GOOS: "darwin"
         run: |
-          cd src
           export GOARCH=amd64
           garble -seed=U4Nxq2YSVm6ivvOejQbElA== build -tags timetzdata -trimpath -ldflags "-s -w" -gcflags=all="-l -B" -o ${{ github.workspace }}/executables/macos/amd64/selfbot ./cmd/desktop
           export GOARCH=arm64

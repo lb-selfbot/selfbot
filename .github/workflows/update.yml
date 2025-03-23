@@ -10,14 +10,12 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-go@v5
         with:
-          go-version-file: "src/go.mod"
+          go-version-file: "go.mod"
           check-latest: true
-          cache-dependency-path: src/go.sum
+          cache-dependency-path: go.sum
 
       - name: Update dependencies
         run: |
-          cd src
-
           go get -u
           go get github.com/LightningDev1/discordgo@master
           go mod tidy
