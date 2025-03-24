@@ -14,8 +14,6 @@ func NewRedditCommands(s *services.Services) *RedditCommands {
 }
 
 func (c *RedditCommands) Register() {
-	cmdRouter := c.services.Discord.GetRouter()
-
 	subreddits := []string{
 		"mildlyinteresting",
 		"thatsinsane",
@@ -81,7 +79,7 @@ func (c *RedditCommands) Register() {
 		})
 	}
 
-	cmdRouter.RegisterCategory(&router.Category{
+	c.services.Router.RegisterCategory(&router.Category{
 		Name:        "Reddit",
 		Description: "Reddit commands",
 	}, commands)
@@ -98,11 +96,11 @@ func (c *RedditCommands) generateFunc(subreddit string) func(ctx *router.Ctx) {
 			return
 		}
 
-		c.services.Embed.NewEmbed().
+		ctx.NewEmbed().
 			AddField("Subreddit", subreddit).
 			AddField("Title", post.Title).
 			AddField("URL", post.ImageURL).
-			Send(ctx)
+			Send()
 	}
 }
 
@@ -115,9 +113,9 @@ func (c *RedditCommands) subreddit(ctx *router.Ctx) {
 		return
 	}
 
-	c.services.Embed.NewEmbed().
+	ctx.NewEmbed().
 		AddField("Subreddit", subreddit).
 		AddField("Title", post.Title).
 		AddField("URL", post.ImageURL).
-		Send(ctx)
+		Send()
 }

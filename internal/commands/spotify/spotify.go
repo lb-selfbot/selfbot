@@ -9,10 +9,10 @@ import (
 
 	"github.com/lb-selfbot/discordgo"
 	"github.com/lb-selfbot/selfbot/internal/http"
+	"github.com/lb-selfbot/selfbot/internal/services"
 	"github.com/lb-selfbot/selfbot/internal/services/router"
 
 	"github.com/lb-selfbot/selfbot/internal/fn"
-	"github.com/lb-selfbot/selfbot/internal/services"
 	"github.com/lb-selfbot/selfbot/internal/utils"
 )
 
@@ -23,9 +23,7 @@ func NewSpotifyCommands(s *services.Services) *SpotifyCommands {
 }
 
 func (c *SpotifyCommands) Register() {
-	cmdRouter := c.services.Discord.GetRouter()
-
-	cmdRouter.RegisterCategory(&router.Category{
+	c.services.Router.RegisterCategory(&router.Category{
 		Name:        "Spotify",
 		Description: "Control your Spotify music",
 	}, []*router.Command{
@@ -130,7 +128,7 @@ func (c *SpotifyCommands) Register() {
 }
 
 func (c *SpotifyCommands) GetBearerToken(ctx *router.Ctx) (string, bool) {
-	bearerToken := utils.Spotify.GetBearerToken(ctx.Session.Identify.Token)
+	bearerToken := c.services.Spotify.GetBearerToken(ctx.Session)
 	if bearerToken == "" {
 		ctx.RespondText("Could not find a Spotify connection. Please connect your Spotify account to your Discord.")
 		return "", false
@@ -242,7 +240,7 @@ func (c *SpotifyCommands) splay(ctx *router.Ctx) {
 	song := search.GetIndex(0)
 	songName = song.Get("name").MustString()
 	songUrl := song.Get("external_urls").Get("spotify").MustString()
-	songArtists := utils.Spotify.GetSongArtists(song)
+	songArtists := c.services.Spotify.GetSongArtists(song)
 
 	_ = http.Post(
 		fmt.Sprintf("https://api.spotify.com/v1/me/player/queue?uri=%s", url.QueryEscape(songUrl)),
@@ -287,7 +285,7 @@ func (c *SpotifyCommands) squeue(ctx *router.Ctx) {
 	song := search.GetIndex(0)
 	songName = song.Get("name").MustString()
 	songUrl := song.Get("external_urls").Get("spotify").MustString()
-	songArtists := utils.Spotify.GetSongArtists(song)
+	songArtists := c.services.Spotify.GetSongArtists(song)
 
 	httpResponse := http.Post(
 		fmt.Sprintf("https://api.spotify.com/v1/me/player/queue?uri=%s", url.QueryEscape(songUrl)),
@@ -315,7 +313,7 @@ func (c *SpotifyCommands) splaying(ctx *router.Ctx) {
 		return
 	}
 
-	songArtists := utils.Spotify.GetSongArtists(song)
+	songArtists := c.services.Spotify.GetSongArtists(song)
 	songArtistsString := strings.Join(songArtists, ", ")
 	songReleaseDate := song.GetPath("album", "release_date").MustString("Unknown")
 	songExplicit := utils.Misc.FormatBoolYesNo(song.Get("explicit").MustBool(false))
@@ -324,7 +322,7 @@ func (c *SpotifyCommands) splaying(ctx *router.Ctx) {
 	songUrl := song.GetPath("external_urls", "spotify").MustString("Unknown")
 	songImageUrl := song.GetPath("album", "images").GetIndex(0).Get("url").MustString("")
 
-	c.services.Embed.NewEmbed().
+	ctx.NewEmbed().
 		AddField("Title", song.Get("name").MustString()).
 		AddField("Artist", songArtistsString).
 		AddField("Release Date", songReleaseDate).
@@ -332,7 +330,7 @@ func (c *SpotifyCommands) splaying(ctx *router.Ctx) {
 		AddField("Duration", songDuration).
 		AddField("URL", songUrl).
 		SetImage(songImageUrl).
-		Send(ctx)
+		Send()
 }
 
 func (c *SpotifyCommands) svolume(ctx *router.Ctx) {
@@ -452,9 +450,9 @@ func (c *SpotifyCommands) sdevices(ctx *router.Ctx) {
 		deviceList = append(deviceList, deviceData)
 	}
 
-	c.services.Embed.NewEmbed().
+	ctx.NewEmbed().
 		AddField("Devices", strings.Join(deviceList, "\n")).
-		Send(ctx)
+		Send()
 }
 
 func (c *SpotifyCommands) sprofile(ctx *router.Ctx) {
@@ -470,14 +468,14 @@ func (c *SpotifyCommands) sprofile(ctx *router.Ctx) {
 
 	json := httpResponse.Json()
 
-	c.services.Embed.NewEmbed().
+	ctx.NewEmbed().
 		AddField("Username", json.Get("display_name").MustString()).
 		AddField("ID", json.Get("id").MustString()).
 		AddField("Country", json.Get("country").MustString()).
 		AddField("Product", json.Get("product").MustString()).
 		AddField("Followers", fmt.Sprint(json.GetPath("followers", "total").MustInt())).
 		AddField("URL", json.GetPath("href").MustString()).
-		Send(ctx)
+		Send()
 }
 
 func (c *SpotifyCommands) sbearertoken(ctx *router.Ctx) {
@@ -491,10 +489,10 @@ func (c *SpotifyCommands) sbearertoken(ctx *router.Ctx) {
 		return
 	}
 
-	c.services.Embed.NewEmbed().
+	ctx.NewEmbed().
 		AddField("Spotify Account", httpResponse.Json().Get("display_name").MustString()).
 		AddField("Bearer Token", bearerToken).
-		Send(ctx)
+		Send()
 }
 
 func (c *SpotifyCommands) slistenalong(ctx *router.Ctx) {

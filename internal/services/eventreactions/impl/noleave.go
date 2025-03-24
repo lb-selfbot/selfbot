@@ -2,6 +2,7 @@ package impl
 
 import (
 	"github.com/lb-selfbot/discordgo"
+	"github.com/lb-selfbot/selfbot/internal/logging"
 	"github.com/lb-selfbot/selfbot/internal/services/eventreactions/types"
 	"github.com/lb-selfbot/selfbot/internal/utils"
 )
@@ -56,7 +57,7 @@ func (n *NoLeave) Description() string {
 func (n *NoLeave) Equals(other types.EventReaction) bool {
 	otherNoLeave, ok := other.(*NoLeave)
 	if !ok {
-		utils.Logging.Debug("NoLeave.Equals: Other is not a NoLeave")
+		logging.Debug("NoLeave.Equals: Other is not a NoLeave")
 		return false
 	}
 
@@ -80,7 +81,7 @@ func (n *NoLeave) Data() map[string]any {
 func (r *NoLeave) Handler(session *discordgo.Session, event any) {
 	recipientRemove, ok := event.(*discordgo.ChannelRecipientRemove)
 	if !ok {
-		utils.Logging.Debug("NoLeave.Handler: Event is not a channel recipient remove event")
+		logging.Debug("NoLeave.Handler: Event is not a channel recipient remove event")
 		return
 	}
 

@@ -11,6 +11,7 @@ import (
 	owoifygo "github.com/deadshot465/owoify-go"
 	"github.com/lb-selfbot/discordgo"
 	"github.com/lb-selfbot/selfbot/internal/api"
+	"github.com/lb-selfbot/selfbot/internal/embed"
 	"github.com/lb-selfbot/selfbot/internal/http"
 	"github.com/lb-selfbot/selfbot/internal/random"
 	"github.com/lb-selfbot/selfbot/internal/services/router"
@@ -27,9 +28,7 @@ func NewFunCommands(s *services.Services) *FunCommands {
 }
 
 func (c *FunCommands) Register() {
-	cmdRouter := c.services.Discord.GetRouter()
-
-	cmdRouter.RegisterCategory(&router.Category{
+	c.services.Router.RegisterCategory(&router.Category{
 		Name:        "Fun",
 		Description: "Fun commands",
 	}, []*router.Command{
@@ -539,10 +538,10 @@ func (c *FunCommands) eightball(ctx *router.Ctx) {
 		"Very doubtful",
 	}
 	answer := random.Choice(possibleAnswers)
-	c.services.Embed.NewEmbed().
+	ctx.NewEmbed().
 		AddField("Question", question).
 		AddField("Answer", answer).
-		Send(ctx)
+		Send()
 }
 
 func (c *FunCommands) howgay(ctx *router.Ctx) {
@@ -551,10 +550,10 @@ func (c *FunCommands) howgay(ctx *router.Ctx) {
 		ctx.RespondText("Couldn't find user!")
 		return
 	}
-	c.services.Embed.NewEmbed().
+	ctx.NewEmbed().
 		AddField("User", user.String()).
 		AddField("Gay Percentage", random.Percentage()).
-		Send(ctx)
+		Send()
 }
 
 func (c *FunCommands) howsimp(ctx *router.Ctx) {
@@ -563,10 +562,10 @@ func (c *FunCommands) howsimp(ctx *router.Ctx) {
 		ctx.RespondText("Couldn't find user!")
 		return
 	}
-	c.services.Embed.NewEmbed().
+	ctx.NewEmbed().
 		AddField("User", user.String()).
 		AddField("Simp Percentage", random.Percentage()).
-		Send(ctx)
+		Send()
 }
 
 func (c *FunCommands) penis(ctx *router.Ctx) {
@@ -581,11 +580,11 @@ func (c *FunCommands) penis(ctx *router.Ctx) {
 		ctx.RespondText("Couldn't find user!")
 		return
 	}
-	c.services.Embed.NewEmbed().
+	ctx.NewEmbed().
 		AddField("User", user.String()).
 		AddField("Penis", penis).
 		AddField("Penis Length", fmt.Sprintf("%d cm", penisLength)).
-		Send(ctx)
+		Send()
 }
 
 func (c *FunCommands) ego(ctx *router.Ctx) {
@@ -594,10 +593,10 @@ func (c *FunCommands) ego(ctx *router.Ctx) {
 		ctx.RespondText("Couldn't find user!")
 		return
 	}
-	c.services.Embed.NewEmbed().
+	ctx.NewEmbed().
 		AddField("User", user.String()).
 		AddField("Ego", random.Percentage()).
-		Send(ctx)
+		Send()
 }
 
 func (c *FunCommands) iqtest(ctx *router.Ctx) {
@@ -606,10 +605,10 @@ func (c *FunCommands) iqtest(ctx *router.Ctx) {
 		ctx.RespondText("Couldn't find user!")
 		return
 	}
-	c.services.Embed.NewEmbed().
+	ctx.NewEmbed().
 		AddField("User", user.String()).
 		AddField("IQ", fmt.Sprint(random.Int(1, 200))).
-		Send(ctx)
+		Send()
 }
 
 func (c *FunCommands) hack(ctx *router.Ctx) {
@@ -619,7 +618,7 @@ func (c *FunCommands) hack(ctx *router.Ctx) {
 		return
 	}
 	cc := gofakeit.CreditCard()
-	c.services.Embed.NewEmbed().
+	ctx.NewEmbed().
 		AddField("User", user.String()).
 		AddField("Real Name", gofakeit.Name()).
 		AddField("Email", gofakeit.Email()).
@@ -630,7 +629,7 @@ func (c *FunCommands) hack(ctx *router.Ctx) {
 		AddField("Job", gofakeit.JobTitle()).
 		AddField("Favorite Minecraft Biome", gofakeit.MinecraftBiome()).
 		AddField("Idol", gofakeit.CelebrityActor()).
-		Send(ctx)
+		Send()
 }
 
 func (c *FunCommands) insult(ctx *router.Ctx) {
@@ -639,9 +638,9 @@ func (c *FunCommands) insult(ctx *router.Ctx) {
 		ctx.RespondText("An error has occurred.")
 		return
 	}
-	c.services.Embed.NewEmbed().
+	ctx.NewEmbed().
 		AddField("Insult", string(httpResponse.Body)).
-		Send(ctx)
+		Send()
 }
 
 func (c *FunCommands) dadjoke(ctx *router.Ctx) {
@@ -650,9 +649,9 @@ func (c *FunCommands) dadjoke(ctx *router.Ctx) {
 		ctx.RespondText("An error has occurred.")
 		return
 	}
-	c.services.Embed.NewEmbed().
+	ctx.NewEmbed().
 		AddField("Dad Joke", joke.Get("joke").MustString()).
-		Send(ctx)
+		Send()
 }
 
 func (c *FunCommands) yomomma(ctx *router.Ctx) {
@@ -661,9 +660,9 @@ func (c *FunCommands) yomomma(ctx *router.Ctx) {
 		ctx.RespondText("An error has occurred.")
 		return
 	}
-	c.services.Embed.NewEmbed().
+	ctx.NewEmbed().
 		AddField("Yo Momma Joke", joke.Get("joke").MustString()).
-		Send(ctx)
+		Send()
 }
 
 func (c *FunCommands) wouldyourather(ctx *router.Ctx) {
@@ -672,11 +671,11 @@ func (c *FunCommands) wouldyourather(ctx *router.Ctx) {
 		ctx.RespondText("An error has occurred.")
 		return
 	}
-	c.services.Embed.NewEmbed().
+	ctx.NewEmbed().
 		SetDescription("Would you rather...").
 		AddField("A", wyrJson.GetPath("question", "a").MustString()).
 		AddField("B", wyrJson.GetPath("question", "b").MustString()).
-		Send(ctx)
+		Send()
 }
 
 func (c *FunCommands) topic(ctx *router.Ctx) {
@@ -685,9 +684,9 @@ func (c *FunCommands) topic(ctx *router.Ctx) {
 		ctx.RespondText("An error has occurred.")
 		return
 	}
-	c.services.Embed.NewEmbed().
+	ctx.NewEmbed().
 		AddField("Topic", topicJson.Get("topic").MustString()).
-		Send(ctx)
+		Send()
 }
 
 func (c *FunCommands) slot(ctx *router.Ctx) {
@@ -704,14 +703,17 @@ func (c *FunCommands) slot(ctx *router.Ctx) {
 		}
 		return fmt.Sprintf("%s | %s | %s", left, mid, right), text
 	}
+
+	cfg := c.services.Config.GetConfig()
+
 	getEmbed := func(final bool) string {
 		text, winning := getSlot()
 		if final {
 			text += "\n\n" + winning
 		}
-		return c.services.Embed.NewEmbed().
+		return ctx.NewEmbed().
 			SetDescription(text).
-			ToString("load")[0]
+			ToString(embed.EmbedFormat(cfg.Selfbot.CommandMode), 2000)[0]
 	}
 
 	message, err := ctx.Session.ChannelMessageSend(ctx.Message.ChannelID, getEmbed(false))
@@ -737,9 +739,9 @@ func (c *FunCommands) advice(ctx *router.Ctx) {
 		ctx.RespondText("An error has occurred.")
 		return
 	}
-	c.services.Embed.NewEmbed().
+	ctx.NewEmbed().
 		AddField("Advice", advice.GetPath("slip", "advice").MustString()).
-		Send(ctx)
+		Send()
 }
 
 func (c *FunCommands) catfact(ctx *router.Ctx) {
@@ -748,9 +750,9 @@ func (c *FunCommands) catfact(ctx *router.Ctx) {
 		ctx.RespondText("An error has occurred.")
 		return
 	}
-	c.services.Embed.NewEmbed().
+	ctx.NewEmbed().
 		AddField("Cat Fact", fact.Get("fact").MustString()).
-		Send(ctx)
+		Send()
 }
 
 func (c *FunCommands) dogfact(ctx *router.Ctx) {
@@ -759,9 +761,9 @@ func (c *FunCommands) dogfact(ctx *router.Ctx) {
 		ctx.RespondText("An error has occurred.")
 		return
 	}
-	c.services.Embed.NewEmbed().
+	ctx.NewEmbed().
 		AddField("Dog Fact", fact.Get("fact").MustString()).
-		Send(ctx)
+		Send()
 }
 
 func (c *FunCommands) pandafact(ctx *router.Ctx) {
@@ -770,9 +772,9 @@ func (c *FunCommands) pandafact(ctx *router.Ctx) {
 		ctx.RespondText("An error has occurred.")
 		return
 	}
-	c.services.Embed.NewEmbed().
+	ctx.NewEmbed().
 		AddField("Panda Fact", fact.Get("fact").MustString()).
-		Send(ctx)
+		Send()
 }
 
 func (c *FunCommands) foxfact(ctx *router.Ctx) {
@@ -781,9 +783,9 @@ func (c *FunCommands) foxfact(ctx *router.Ctx) {
 		ctx.RespondText("An error has occurred.")
 		return
 	}
-	c.services.Embed.NewEmbed().
+	ctx.NewEmbed().
 		AddField("Fox Fact", fact.Get("fact").MustString()).
-		Send(ctx)
+		Send()
 }
 
 func (c *FunCommands) koalafact(ctx *router.Ctx) {
@@ -792,9 +794,9 @@ func (c *FunCommands) koalafact(ctx *router.Ctx) {
 		ctx.RespondText("An error has occurred.")
 		return
 	}
-	c.services.Embed.NewEmbed().
+	ctx.NewEmbed().
 		AddField("Koala Fact", fact.Get("fact").MustString()).
-		Send(ctx)
+		Send()
 }
 
 func (c *FunCommands) birdfact(ctx *router.Ctx) {
@@ -803,9 +805,9 @@ func (c *FunCommands) birdfact(ctx *router.Ctx) {
 		ctx.RespondText("An error has occurred.")
 		return
 	}
-	c.services.Embed.NewEmbed().
+	ctx.NewEmbed().
 		AddField("Bird Fact", fact.Get("fact").MustString()).
-		Send(ctx)
+		Send()
 }
 
 func (c *FunCommands) redpandafact(ctx *router.Ctx) {
@@ -814,9 +816,9 @@ func (c *FunCommands) redpandafact(ctx *router.Ctx) {
 		ctx.RespondText("An error has occurred.")
 		return
 	}
-	c.services.Embed.NewEmbed().
+	ctx.NewEmbed().
 		AddField("Red Panda Fact", fact.Get("fact").MustString()).
-		Send(ctx)
+		Send()
 }
 
 func (c *FunCommands) whalefact(ctx *router.Ctx) {
@@ -825,9 +827,9 @@ func (c *FunCommands) whalefact(ctx *router.Ctx) {
 		ctx.RespondText("An error has occurred.")
 		return
 	}
-	c.services.Embed.NewEmbed().
+	ctx.NewEmbed().
 		AddField("Whale Fact", fact.Get("fact").MustString()).
-		Send(ctx)
+		Send()
 }
 
 func (c *FunCommands) kangaroofact(ctx *router.Ctx) {
@@ -836,9 +838,9 @@ func (c *FunCommands) kangaroofact(ctx *router.Ctx) {
 		ctx.RespondText("An error has occurred.")
 		return
 	}
-	c.services.Embed.NewEmbed().
+	ctx.NewEmbed().
 		AddField("Kangaroo Fact", fact.Get("fact").MustString()).
-		Send(ctx)
+		Send()
 }
 
 func (c *FunCommands) bunnyfact(ctx *router.Ctx) {
@@ -847,9 +849,9 @@ func (c *FunCommands) bunnyfact(ctx *router.Ctx) {
 		ctx.RespondText("An error has occurred.")
 		return
 	}
-	c.services.Embed.NewEmbed().
+	ctx.NewEmbed().
 		AddField("Bunny Fact", fact.Get("fact").MustString()).
-		Send(ctx)
+		Send()
 }
 
 func (c *FunCommands) lionfact(ctx *router.Ctx) {
@@ -858,9 +860,9 @@ func (c *FunCommands) lionfact(ctx *router.Ctx) {
 		ctx.RespondText("An error has occurred.")
 		return
 	}
-	c.services.Embed.NewEmbed().
+	ctx.NewEmbed().
 		AddField("Lion Fact", fact.Get("fact").MustString()).
-		Send(ctx)
+		Send()
 }
 
 func (c *FunCommands) frogfact(ctx *router.Ctx) {
@@ -869,9 +871,9 @@ func (c *FunCommands) frogfact(ctx *router.Ctx) {
 		ctx.RespondText("An error has occurred.")
 		return
 	}
-	c.services.Embed.NewEmbed().
+	ctx.NewEmbed().
 		AddField("Frog Fact", fact.Get("fact").MustString()).
-		Send(ctx)
+		Send()
 }
 
 func (c *FunCommands) duckfact(ctx *router.Ctx) {
@@ -880,9 +882,9 @@ func (c *FunCommands) duckfact(ctx *router.Ctx) {
 		ctx.RespondText("An error has occurred.")
 		return
 	}
-	c.services.Embed.NewEmbed().
+	ctx.NewEmbed().
 		AddField("Duck Fact", fact.Get("fact").MustString()).
-		Send(ctx)
+		Send()
 }
 
 func (c *FunCommands) penguinfact(ctx *router.Ctx) {
@@ -891,9 +893,9 @@ func (c *FunCommands) penguinfact(ctx *router.Ctx) {
 		ctx.RespondText("An error has occurred.")
 		return
 	}
-	c.services.Embed.NewEmbed().
+	ctx.NewEmbed().
 		AddField("Penguin Fact", fact.Get("fact").MustString()).
-		Send(ctx)
+		Send()
 }
 
 func (c *FunCommands) dolphinfact(ctx *router.Ctx) {
@@ -902,9 +904,9 @@ func (c *FunCommands) dolphinfact(ctx *router.Ctx) {
 		ctx.RespondText("An error has occurred.")
 		return
 	}
-	c.services.Embed.NewEmbed().
+	ctx.NewEmbed().
 		AddField("Dolphin Fact", fact.Get("fact").MustString()).
-		Send(ctx)
+		Send()
 }
 
 func (c *FunCommands) bearfact(ctx *router.Ctx) {
@@ -913,9 +915,9 @@ func (c *FunCommands) bearfact(ctx *router.Ctx) {
 		ctx.RespondText("An error has occurred.")
 		return
 	}
-	c.services.Embed.NewEmbed().
+	ctx.NewEmbed().
 		AddField("Bear Fact", fact.Get("fact").MustString()).
-		Send(ctx)
+		Send()
 }
 
 func (c *FunCommands) axolotlfact(ctx *router.Ctx) {
@@ -924,9 +926,9 @@ func (c *FunCommands) axolotlfact(ctx *router.Ctx) {
 		ctx.RespondText("An error has occurred.")
 		return
 	}
-	c.services.Embed.NewEmbed().
+	ctx.NewEmbed().
 		AddField("Axolotl Fact", fact.Get("fact").MustString()).
-		Send(ctx)
+		Send()
 }
 
 func (c *FunCommands) capybarafact(ctx *router.Ctx) {
@@ -935,9 +937,9 @@ func (c *FunCommands) capybarafact(ctx *router.Ctx) {
 		ctx.RespondText("An error has occurred.")
 		return
 	}
-	c.services.Embed.NewEmbed().
+	ctx.NewEmbed().
 		AddField("Capybara Fact", fact.Get("fact").MustString()).
-		Send(ctx)
+		Send()
 }
 
 func (c *FunCommands) trivia(ctx *router.Ctx) {
@@ -960,19 +962,19 @@ func (c *FunCommands) trivia(ctx *router.Ctx) {
 	answers = append(answers, data.Get("correct_answer").MustString())
 	answers = random.Shuffle(answers)
 
-	c.services.Embed.NewEmbed().
+	ctx.NewEmbed().
 		AddField("Question", html.UnescapeString(data.Get("question").MustString())).
 		AddField("Category", data.Get("category").MustString()).
 		AddField("Difficulty", utils.String.Capitalize(data.Get("difficulty").MustString())).
 		AddField("Answers", html.UnescapeString(strings.Join(answers, ", "))).
 		AddField("Correct Answer", fmt.Sprintf("||%s||", html.UnescapeString(data.Get("correct_answer").MustString()))).
-		Send(ctx)
+		Send()
 }
 
 func (c *FunCommands) dice(ctx *router.Ctx) {
-	c.services.Embed.NewEmbed().
+	ctx.NewEmbed().
 		SetDescription("You rolled: %d", random.Int(1, 6)).
-		Send(ctx)
+		Send()
 }
 
 func (c *FunCommands) randomemoji(ctx *router.Ctx) {
@@ -1013,16 +1015,16 @@ func (c *FunCommands) randomchannel(ctx *router.Ctx) {
 
 func (c *FunCommands) choose(ctx *router.Ctx) {
 	choice := random.Choice(strings.Split(ctx.Arguments.Raw(), " "))
-	c.services.Embed.NewEmbed().
+	ctx.NewEmbed().
 		SetDescription("I choose: %s", choice).
-		Send(ctx)
+		Send()
 }
 
 func (c *FunCommands) poll(ctx *router.Ctx) {
-	messages := c.services.Embed.NewEmbed().
+	messages := ctx.NewEmbed().
 		SetDescription("Answer to this poll by reacting with :thumbsup: or :thumbsdown:").
 		AddField("Question", ctx.Arguments.Raw()).
-		Send(ctx)
+		Send()
 
 	if len(messages) > 0 {
 		_ = ctx.Session.MessageReactionAdd(ctx.Message.ChannelID, messages[0].ID, "👍")
@@ -1037,10 +1039,10 @@ func (c *FunCommands) numberfact(ctx *router.Ctx) {
 		ctx.RespondText("An error has occurred.")
 		return
 	}
-	c.services.Embed.NewEmbed().
+	ctx.NewEmbed().
 		AddField("Number", number).
 		AddField("Fact", string(httpResponse.Body)).
-		Send(ctx)
+		Send()
 }
 
 func (c *FunCommands) joke(ctx *router.Ctx) {
@@ -1049,14 +1051,14 @@ func (c *FunCommands) joke(ctx *router.Ctx) {
 		ctx.RespondText("An error has occurred.")
 		return
 	}
-	emb := c.services.Embed.NewEmbed()
+	emb := ctx.NewEmbed()
 	if joke.Get("type").MustString() == "twopart" {
 		emb.AddField("Setup", joke.Get("setup").MustString()).
 			AddField("Delivery", joke.Get("delivery").MustString())
 	} else {
 		emb.AddField("Joke", joke.Get("joke").MustString())
 	}
-	emb.AddField("Category", joke.Get("category").MustString()).Send(ctx)
+	emb.AddField("Category", joke.Get("category").MustString()).Send()
 }
 
 func (c *FunCommands) fml(ctx *router.Ctx) {
@@ -1065,9 +1067,9 @@ func (c *FunCommands) fml(ctx *router.Ctx) {
 		ctx.RespondText("An error has occurred.")
 		return
 	}
-	c.services.Embed.NewEmbed().
+	ctx.NewEmbed().
 		AddField("FML", fmlJson.Get("fml").MustString()).
-		Send(ctx)
+		Send()
 }
 
 func (c *FunCommands) tronald(ctx *router.Ctx) {
@@ -1076,9 +1078,9 @@ func (c *FunCommands) tronald(ctx *router.Ctx) {
 		ctx.RespondText("An error has occurred.")
 		return
 	}
-	c.services.Embed.NewEmbed().
+	ctx.NewEmbed().
 		AddField("Tronald Dump Quote", tronald.Get("value").MustString()).
-		Send(ctx)
+		Send()
 }
 
 func (c *FunCommands) kanyewest(ctx *router.Ctx) {
@@ -1087,9 +1089,9 @@ func (c *FunCommands) kanyewest(ctx *router.Ctx) {
 		ctx.RespondText("An error has occurred.")
 		return
 	}
-	c.services.Embed.NewEmbed().
+	ctx.NewEmbed().
 		AddField("Kanye West Quote", kanyewest.Get("quote").MustString()).
-		Send(ctx)
+		Send()
 }
 
 func (c *FunCommands) rps(ctx *router.Ctx) {
@@ -1098,10 +1100,10 @@ func (c *FunCommands) rps(ctx *router.Ctx) {
 		ctx.RespondText("You can only choose rock, paper or scissors.")
 		return
 	}
-	c.services.Embed.NewEmbed().
+	ctx.NewEmbed().
 		AddField("Your choice", choice).
 		AddField("Bot's choice", random.Choice([]string{"rock", "paper", "scissors"})).
-		Send(ctx)
+		Send()
 }
 
 func (c *FunCommands) covidtest(ctx *router.Ctx) {
@@ -1110,10 +1112,10 @@ func (c *FunCommands) covidtest(ctx *router.Ctx) {
 		ctx.RespondText("Couldn't find user!")
 		return
 	}
-	c.services.Embed.NewEmbed().
+	ctx.NewEmbed().
 		AddField("User", user.String()).
 		AddField("Result", random.Choice([]string{"Positive", "Negative"})).
-		Send(ctx)
+		Send()
 }
 
 func (c *FunCommands) hug(ctx *router.Ctx) {
@@ -1185,9 +1187,9 @@ func (c *FunCommands) chucknorris(ctx *router.Ctx) {
 		ctx.RespondText("An error has occurred.")
 		return
 	}
-	c.services.Embed.NewEmbed().
+	ctx.NewEmbed().
 		AddField("Chuck Norris Joke", joke.Get("value").MustString()).
-		Send(ctx)
+		Send()
 }
 
 func (c *FunCommands) iss(ctx *router.Ctx) {
@@ -1198,12 +1200,12 @@ func (c *FunCommands) iss(ctx *router.Ctx) {
 	}
 	latitude := iss.GetPath("iss_position", "latitude").MustString()
 	longitude := iss.GetPath("iss_position", "longitude").MustString()
-	c.services.Embed.NewEmbed().
-		SetAuthor("International Space Station Info").
+	ctx.NewEmbed().
+		SetTitle("International Space Station Info").
 		AddField("Latitude", latitude).
 		AddField("Longitude", longitude).
 		AddField("Google Maps URL", fmt.Sprintf("https://maps.google.com/?q=%s,%s", latitude, longitude)).
-		Send(ctx)
+		Send()
 }
 
 func (c *FunCommands) apod(ctx *router.Ctx) {
@@ -1220,20 +1222,20 @@ func (c *FunCommands) apod(ctx *router.Ctx) {
 	if err != nil {
 		explanation = "An error has occurred."
 	}
-	c.services.Embed.NewEmbed().
+	ctx.NewEmbed().
 		SetImage(apod.Get("url").MustString()).
-		SetAuthor(fmt.Sprintf("Astronomy Picture of the Day - ©️%s", copyright)).
+		SetTitle(fmt.Sprintf("Astronomy Picture of the Day - ©️%s", copyright)).
 		AddField("Title", apod.Get("title").MustString()).
 		AddField("Explanation", explanation).
 		AddField("Date", apod.Get("date").MustString()).
-		Send(ctx)
+		Send()
 }
 
 func (c *FunCommands) httpcat(ctx *router.Ctx) {
 	statuscode := ctx.Arguments.Get(0).Raw()
-	c.services.Embed.NewEmbed().
+	ctx.NewEmbed().
 		SetImage(fmt.Sprintf("https://http.cat/%s.jpg", statuscode)).
-		Send(ctx)
+		Send()
 }
 
 func (c *FunCommands) riddle(ctx *router.Ctx) {
@@ -1242,10 +1244,10 @@ func (c *FunCommands) riddle(ctx *router.Ctx) {
 		ctx.RespondText("An error has occurred.")
 		return
 	}
-	c.services.Embed.NewEmbed().
+	ctx.NewEmbed().
 		AddField("Riddle", riddleJson.Get("question").MustString()).
 		AddField("Answer", "||"+riddleJson.Get("answer").MustString()+"||").
-		Send(ctx)
+		Send()
 }
 
 func (c *FunCommands) quote(ctx *router.Ctx) {
@@ -1254,10 +1256,10 @@ func (c *FunCommands) quote(ctx *router.Ctx) {
 		ctx.RespondText("An error has occurred.")
 		return
 	}
-	c.services.Embed.NewEmbed().
+	ctx.NewEmbed().
 		AddField("Quote", quote.Get("content").MustString()).
 		AddField("Author", quote.Get("author").MustString()).
-		Send(ctx)
+		Send()
 }
 
 func (c *FunCommands) evilinsult(ctx *router.Ctx) {
@@ -1266,9 +1268,9 @@ func (c *FunCommands) evilinsult(ctx *router.Ctx) {
 		ctx.RespondText("An error has occurred.")
 		return
 	}
-	c.services.Embed.NewEmbed().
+	ctx.NewEmbed().
 		AddField("Evil Insult", string(httpResponse.Body)).
-		Send(ctx)
+		Send()
 }
 
 func (c *FunCommands) owoify(ctx *router.Ctx) {
@@ -1297,10 +1299,10 @@ func (c *FunCommands) coinflip(ctx *router.Ctx) {
 		"Heads!": "https://www.ssaurel.com/blog/wp-content/uploads/2017/01/heads.png",
 		"Tails!": "https://www.ssaurel.com/blog/wp-content/uploads/2017/01/tails.png",
 	}
-	c.services.Embed.NewEmbed().
+	ctx.NewEmbed().
 		SetDescription(choice).
 		SetImage(images[choice]).
-		Send(ctx)
+		Send()
 }
 
 func (c *FunCommands) notfunny(ctx *router.Ctx) {
@@ -1314,9 +1316,9 @@ func (c *FunCommands) randomquestion(ctx *router.Ctx) {
 		ctx.RespondText("An error has occurred.")
 		return
 	}
-	c.services.Embed.NewEmbed().
+	ctx.NewEmbed().
 		AddField("Question", question.Get("why").MustString()).
-		Send(ctx)
+		Send()
 }
 
 func (c *FunCommands) lyrics(ctx *router.Ctx) {
@@ -1329,11 +1331,11 @@ func (c *FunCommands) lyrics(ctx *router.Ctx) {
 		ctx.RespondText("Could not find lyrics.")
 		return
 	}
-	c.services.Embed.NewEmbed().
+	ctx.NewEmbed().
 		AddField("Artist", lyrics.Get("author").MustString()).
 		AddField("Title", lyrics.Get("title").MustString()).
 		AddField("Lyrics", lyrics.Get("lyrics").MustString()).
-		Send(ctx)
+		Send()
 }
 
 func (c *FunCommands) breakingbadquote(ctx *router.Ctx) {
@@ -1342,10 +1344,10 @@ func (c *FunCommands) breakingbadquote(ctx *router.Ctx) {
 		ctx.RespondText("An error has occurred.")
 		return
 	}
-	c.services.Embed.NewEmbed().
+	ctx.NewEmbed().
 		AddField("Quote", quote.Get("quote").MustString()).
 		AddField("Author", quote.Get("author").MustString()).
-		Send(ctx)
+		Send()
 }
 
 func (c *FunCommands) gameofthronesquote(ctx *router.Ctx) {
@@ -1354,10 +1356,10 @@ func (c *FunCommands) gameofthronesquote(ctx *router.Ctx) {
 		ctx.RespondText("An error has occurred.")
 		return
 	}
-	c.services.Embed.NewEmbed().
+	ctx.NewEmbed().
 		AddField("Quote", quote.Get("quote").MustString()).
 		AddField("Author", quote.Get("author").MustString()).
-		Send(ctx)
+		Send()
 }
 
 func (c *FunCommands) strangerthingsquote(ctx *router.Ctx) {
@@ -1366,10 +1368,10 @@ func (c *FunCommands) strangerthingsquote(ctx *router.Ctx) {
 		ctx.RespondText("An error has occurred.")
 		return
 	}
-	c.services.Embed.NewEmbed().
+	ctx.NewEmbed().
 		AddField("Quote", quote.Get("quote").MustString()).
 		AddField("Author", quote.Get("author").MustString()).
-		Send(ctx)
+		Send()
 }
 
 func (c *FunCommands) luciferquote(ctx *router.Ctx) {
@@ -1378,10 +1380,10 @@ func (c *FunCommands) luciferquote(ctx *router.Ctx) {
 		ctx.RespondText("An error has occurred.")
 		return
 	}
-	c.services.Embed.NewEmbed().
+	ctx.NewEmbed().
 		AddField("Quote", quote.Get("quote").MustString()).
 		AddField("Author", quote.Get("author").MustString()).
-		Send(ctx)
+		Send()
 }
 
 func (c *FunCommands) xkcd(ctx *router.Ctx) {
@@ -1393,11 +1395,11 @@ func (c *FunCommands) xkcd(ctx *router.Ctx) {
 
 	date := json.Get("day").MustString() + "/" + json.Get("month").MustString() + "/" + json.Get("year").MustString()
 
-	c.services.Embed.NewEmbed().
+	ctx.NewEmbed().
 		AddField("Title", json.Get("title").MustString()).
 		AddField("Date", date).
 		SetImage(json.Get("img").MustString()).
-		Send(ctx)
+		Send()
 }
 
 func (c *FunCommands) boredactivity(ctx *router.Ctx) {
@@ -1409,11 +1411,11 @@ func (c *FunCommands) boredactivity(ctx *router.Ctx) {
 
 	activityType := utils.String.Capitalize(json.Get("type").MustString())
 
-	c.services.Embed.NewEmbed().
+	ctx.NewEmbed().
 		AddField("Activity", json.Get("activity").MustString()).
 		AddField("Type", activityType).
 		SetImage(json.Get("img").MustString()).
-		Send(ctx)
+		Send()
 }
 
 func (c *FunCommands) ermahgerd(ctx *router.Ctx) {
@@ -1427,10 +1429,10 @@ func (c *FunCommands) iseven(ctx *router.Ctx) {
 		return
 	}
 
-	c.services.Embed.NewEmbed().
+	ctx.NewEmbed().
 		AddField("Number", ctx.Arguments.Get(0).Raw()).
 		AddField("Is Even", utils.Misc.FormatBoolYesNo(number%2 == 0)).
-		Send(ctx)
+		Send()
 }
 
 func (c *FunCommands) agify(ctx *router.Ctx) {
@@ -1440,11 +1442,11 @@ func (c *FunCommands) agify(ctx *router.Ctx) {
 		return
 	}
 
-	c.services.Embed.NewEmbed().
+	ctx.NewEmbed().
 		AddField("Name", json.Get("name").MustString()).
 		AddField("Age", fmt.Sprint(json.Get("age").MustInt())).
 		AddField("Count", fmt.Sprint(json.Get("count").MustInt())).
-		Send(ctx)
+		Send()
 }
 
 func (c *FunCommands) randomword(ctx *router.Ctx) {
@@ -1457,9 +1459,9 @@ func (c *FunCommands) randomword(ctx *router.Ctx) {
 	words := json.Get("data")
 	word := words.GetIndex(random.Int(0, len(words.MustArray()))).Get("word")
 
-	c.services.Embed.NewEmbed().
+	ctx.NewEmbed().
 		AddField("Random Word", word.Get("value").MustString()).
-		Send(ctx)
+		Send()
 }
 
 func (c *FunCommands) randomweirdword(ctx *router.Ctx) {
@@ -1472,10 +1474,10 @@ func (c *FunCommands) randomweirdword(ctx *router.Ctx) {
 	words := json.Get("data")
 	word := words.GetIndex(random.Int(0, len(words.MustArray()))).Get("word")
 
-	c.services.Embed.NewEmbed().
+	ctx.NewEmbed().
 		AddField("Random Weird Word", word.Get("value").MustString()).
 		AddField("Definition", word.Get("definition").MustString()).
-		Send(ctx)
+		Send()
 }
 
 func (c *FunCommands) startupidea(ctx *router.Ctx) {
@@ -1485,16 +1487,16 @@ func (c *FunCommands) startupidea(ctx *router.Ctx) {
 		return
 	}
 
-	c.services.Embed.NewEmbed().
+	ctx.NewEmbed().
 		AddField("Startup Idea", string(httpResponse.Body)).
-		Send(ctx)
+		Send()
 }
 
 func (c *FunCommands) fakeperson(ctx *router.Ctx) {
-	c.services.Embed.NewEmbed().
+	ctx.NewEmbed().
 		SetDescription("Fake Person").
 		SetImage("https://thispersondoesnotexist.com?" + fmt.Sprint(random.Int(1000, 9999))).
-		Send(ctx)
+		Send()
 }
 
 func (c *FunCommands) commitmessage(ctx *router.Ctx) {
@@ -1504,9 +1506,9 @@ func (c *FunCommands) commitmessage(ctx *router.Ctx) {
 		return
 	}
 
-	c.services.Embed.NewEmbed().
+	ctx.NewEmbed().
 		AddField("Commit Message", string(httpResponse.Body)).
-		Send(ctx)
+		Send()
 }
 
 func (c *FunCommands) showerthought(ctx *router.Ctx) {
@@ -1516,9 +1518,9 @@ func (c *FunCommands) showerthought(ctx *router.Ctx) {
 		return
 	}
 
-	c.services.Embed.NewEmbed().
+	ctx.NewEmbed().
 		AddField("Shower Thought", data.Get("title").MustString()).
-		Send(ctx)
+		Send()
 }
 
 func (c *FunCommands) truth(ctx *router.Ctx) {
@@ -1528,9 +1530,9 @@ func (c *FunCommands) truth(ctx *router.Ctx) {
 		return
 	}
 
-	c.services.Embed.NewEmbed().
+	ctx.NewEmbed().
 		AddField("Truth Question", data.Get("question").MustString()).
-		Send(ctx)
+		Send()
 }
 
 func (c *FunCommands) dare(ctx *router.Ctx) {
@@ -1540,9 +1542,9 @@ func (c *FunCommands) dare(ctx *router.Ctx) {
 		return
 	}
 
-	c.services.Embed.NewEmbed().
+	ctx.NewEmbed().
 		AddField("Dare Question", data.Get("question").MustString()).
-		Send(ctx)
+		Send()
 }
 
 func (c *FunCommands) neverhaveiever(ctx *router.Ctx) {
@@ -1552,9 +1554,9 @@ func (c *FunCommands) neverhaveiever(ctx *router.Ctx) {
 		return
 	}
 
-	c.services.Embed.NewEmbed().
+	ctx.NewEmbed().
 		AddField("Never have I ever...", data.Get("question").MustString()).
-		Send(ctx)
+		Send()
 }
 
 func (c *FunCommands) paranoia(ctx *router.Ctx) {
@@ -1564,9 +1566,9 @@ func (c *FunCommands) paranoia(ctx *router.Ctx) {
 		return
 	}
 
-	c.services.Embed.NewEmbed().
+	ctx.NewEmbed().
 		AddField("Paranoia Question", data.Get("question").MustString()).
-		Send(ctx)
+		Send()
 }
 
 func (c *FunCommands) randomcolor(ctx *router.Ctx) {
@@ -1579,11 +1581,11 @@ func (c *FunCommands) randomcolor(ctx *router.Ctx) {
 		name = data.GetPath("name", "value").MustString()
 	}
 
-	c.services.Embed.NewEmbed().
+	ctx.NewEmbed().
 		AddField("Color", name).
 		AddField("RGB", fmt.Sprintf("%d, %d, %d", r, g, b)).
 		AddField("Hex", "#"+hex).
-		Send(ctx)
+		Send()
 
 	preview, err := utils.Misc.PreviewColorImage(500, 100, r, g, b)
 	if err == nil {
@@ -1598,9 +1600,9 @@ func (c *FunCommands) pickupline(ctx *router.Ctx) {
 		return
 	}
 
-	c.services.Embed.NewEmbed().
+	ctx.NewEmbed().
 		AddField("Pickup Line", data.Get("pickupline").MustString()).
-		Send(ctx)
+		Send()
 }
 
 func (c *FunCommands) elementinfo(ctx *router.Ctx) {
@@ -1610,7 +1612,7 @@ func (c *FunCommands) elementinfo(ctx *router.Ctx) {
 		return
 	}
 
-	c.services.Embed.NewEmbed().
+	ctx.NewEmbed().
 		AddField("Element Name", data.Get("name").MustString()).
 		AddField("Element Symbol", data.Get("symbol").MustString()).
 		AddField("Atomic Number", fmt.Sprint(data.Get("atomic_number").MustInt())).
@@ -1620,7 +1622,7 @@ func (c *FunCommands) elementinfo(ctx *router.Ctx) {
 		AddField("Discovered By", data.Get("discovered_by").MustString()).
 		AddField("Summary", data.Get("summary").MustString()).
 		SetImage(data.Get("image").MustString()).
-		Send(ctx)
+		Send()
 }
 
 func (c *FunCommands) randomelement(ctx *router.Ctx) {
@@ -1630,7 +1632,7 @@ func (c *FunCommands) randomelement(ctx *router.Ctx) {
 		return
 	}
 
-	c.services.Embed.NewEmbed().
+	ctx.NewEmbed().
 		AddField("Element Name", data.Get("name").MustString()).
 		AddField("Element Symbol", data.Get("symbol").MustString()).
 		AddField("Atomic Number", fmt.Sprint(data.Get("atomic_number").MustInt())).
@@ -1640,5 +1642,5 @@ func (c *FunCommands) randomelement(ctx *router.Ctx) {
 		AddField("Discovered By", data.Get("discovered_by").MustString()).
 		AddField("Summary", data.Get("summary").MustString()).
 		SetImage(data.Get("image").MustString()).
-		Send(ctx)
+		Send()
 }

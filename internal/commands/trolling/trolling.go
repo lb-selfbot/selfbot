@@ -23,9 +23,7 @@ func NewTrollingCommands(s *services.Services) *TrollingCommands {
 }
 
 func (c *TrollingCommands) Register() {
-	cmdRouter := c.services.Discord.GetRouter()
-
-	cmdRouter.RegisterCategory(&router.Category{
+	c.services.Router.RegisterCategory(&router.Category{
 		Name:        "Trolling",
 		Description: "Trolling commands",
 	}, []*router.Command{
@@ -154,10 +152,7 @@ func (c *TrollingCommands) purgehack(ctx *router.Ctx) {
 }
 
 func (c *TrollingCommands) ghostping(ctx *router.Ctx) {
-	cfg, err := config.GetConfig()
-	if err != nil {
-		return
-	}
+	cfg := c.services.Config.GetConfig()
 
 	if cfg.Selfbot.DeleteCommands {
 		return
@@ -167,10 +162,7 @@ func (c *TrollingCommands) ghostping(ctx *router.Ctx) {
 }
 
 func (c *TrollingCommands) gprole(ctx *router.Ctx) {
-	cfg, err := config.GetConfig()
-	if err != nil {
-		return
-	}
+	cfg := c.services.Config.GetConfig()
 
 	if cfg.Selfbot.DeleteCommands {
 		return

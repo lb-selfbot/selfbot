@@ -3,6 +3,7 @@ package impl
 import (
 	"strings"
 
+	"github.com/lb-selfbot/selfbot/internal/logging"
 	"github.com/lb-selfbot/selfbot/internal/services/config"
 	"github.com/lb-selfbot/selfbot/internal/services/eventbroker"
 	"github.com/lb-selfbot/selfbot/internal/services/eventreactions/types"
@@ -56,7 +57,7 @@ func (n *Notifiers) Handler(session *discordgo.Session, event any) {
 	case *discordgo.TypingStart:
 		n.TypingStartHandler(session, event, cfg)
 	default:
-		utils.Logging.Debug("Notifiers.Handler: Event is not a notifiers event")
+		logging.Debug("Notifiers.Handler: Event is not a notifiers event")
 	}
 }
 
@@ -131,7 +132,7 @@ func (n *Notifiers) MessageDeleteHandler(session *discordgo.Session, message *di
 
 			filepath, err := utils.Discord.SaveAttachment(attachment)
 			if err != nil {
-				utils.Logging.Error("Notifiers.DeleteHandler: Error saving attachment: " + err.Error())
+				logging.Error("Notifiers.DeleteHandler: Error saving attachment: " + err.Error())
 				attachments = append(attachments, attachment.Filename+": "+attachment.URL+" "+attachment.ProxyURL)
 			}
 

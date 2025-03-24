@@ -6,6 +6,7 @@ import (
 	"unicode"
 
 	"github.com/lb-selfbot/selfbot/internal/api"
+	"github.com/lb-selfbot/selfbot/internal/logging"
 
 	"github.com/lb-selfbot/selfbot/internal/constants"
 	"github.com/lb-selfbot/selfbot/internal/services/config"
@@ -65,7 +66,7 @@ func (p *Protections) Handler(session *discordgo.Session, event any) {
 	case *discordgo.RelationshipAdd:
 		p.RelationshipAddHandler(session, event, cfg)
 	default:
-		utils.Logging.Debug("Protections.Handler: Event is not a protections event")
+		logging.Debug("Protections.Handler: Event is not a protections event")
 	}
 }
 

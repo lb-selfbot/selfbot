@@ -15,9 +15,7 @@ func NewSessionsCommands(s *services.Services) *SessionsCommands {
 }
 
 func (c *SessionsCommands) Register() {
-	cmdRouter := c.services.Discord.GetRouter()
-
-	cmdRouter.RegisterCategory(&router.Category{
+	c.services.Router.RegisterCategory(&router.Category{
 		Name:        "Sessions",
 		Description: "Discord session commands",
 	}, []*router.Command{
@@ -39,7 +37,7 @@ func (c *SessionsCommands) Register() {
 }
 
 func (c *SessionsCommands) viewgatewaysessions(ctx *router.Ctx) {
-	emb := c.services.Embed.NewEmbed().
+	emb := ctx.NewEmbed().
 		SetDescription("Sessions")
 
 	for index, session := range c.services.Sessions.GetGatewaySessions() {
@@ -62,11 +60,11 @@ func (c *SessionsCommands) viewgatewaysessions(ctx *router.Ctx) {
 		)
 	}
 
-	emb.Send(ctx)
+	emb.Send()
 }
 
 func (c *SessionsCommands) viewloginsessions(ctx *router.Ctx) {
-	emb := c.services.Embed.NewEmbed().
+	emb := ctx.NewEmbed().
 		SetDescription("Sessions")
 
 	for index, session := range c.services.Sessions.GetLoginSessions() {
@@ -82,5 +80,5 @@ func (c *SessionsCommands) viewloginsessions(ctx *router.Ctx) {
 		)
 	}
 
-	emb.Send(ctx)
+	emb.Send()
 }

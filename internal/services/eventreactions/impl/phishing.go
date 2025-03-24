@@ -6,13 +6,13 @@ import (
 	"strings"
 
 	"github.com/lb-selfbot/selfbot/internal/http"
+	"github.com/lb-selfbot/selfbot/internal/logging"
 	"github.com/lb-selfbot/selfbot/internal/services/config"
 	"github.com/lb-selfbot/selfbot/internal/services/eventbroker"
 	"github.com/lb-selfbot/selfbot/internal/services/eventreactions/types"
 	"github.com/lb-selfbot/selfbot/internal/services/ui/featurelogs"
 
 	"github.com/lb-selfbot/discordgo"
-	"github.com/lb-selfbot/selfbot/internal/utils"
 )
 
 const (
@@ -58,7 +58,7 @@ func (p *Phishing) Data() map[string]any {
 func (p *Phishing) Handler(session *discordgo.Session, event any) {
 	message, ok := event.(*discordgo.MessageCreate)
 	if !ok {
-		utils.Logging.Debug("Phishing.Handler: Event is not a message create event")
+		logging.Debug("Phishing.Handler: Event is not a message create event")
 		return
 	}
 

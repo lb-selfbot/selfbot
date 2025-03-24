@@ -17,9 +17,6 @@ import (
 
 // Service handles event reactions.
 type Service interface {
-	// Register registers the event handlers.
-	Register()
-
 	// GetAllReactions returns all event reactions.
 	GetAllReactions() []types.EventReaction
 
@@ -42,7 +39,7 @@ type Service interface {
 	IsReactionMessage(message *discordgo.Message) bool
 
 	// HandleReactionMessage handles a reaction message.
-	HandleReactionMessage(message *discordgo.Message, err error)
+	HandleReactionMessage(message *discordgo.Message)
 
 	// LoadCmdAliases loads command aliases.
 	LoadCmdAliases() error
@@ -112,7 +109,7 @@ type eventReactionsService struct {
 	countryCode  string
 }
 
-func NewService(eventBroker eventbroker.Service, configService config.Service, routerSvc router.Service, variablesSvc variables.Service) *eventReactionsService {
+func NewService(eventBroker eventbroker.Service, configService config.Service, routerSvc router.Service, variablesSvc variables.Service) Service {
 	svc := &eventReactionsService{
 		eventBroker:        eventBroker,
 		configSvc:          configService,

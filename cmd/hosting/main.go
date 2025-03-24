@@ -13,6 +13,8 @@ import (
 	"github.com/lb-selfbot/selfbot/internal/assets"
 	"github.com/lb-selfbot/selfbot/internal/constants"
 	"github.com/lb-selfbot/selfbot/internal/logging"
+	"github.com/lb-selfbot/selfbot/internal/services"
+	"github.com/lb-selfbot/selfbot/internal/services/authsync"
 
 	"github.com/lb-selfbot/selfbot/internal/commands"
 
@@ -65,12 +67,12 @@ func main() {
 		os.Exit(1)
 	}
 
-	creds := interfaces.AuthCredentials{
+	creds := authsync.Credentials{
 		Username: username,
 		Password: password,
 	}
 
-	if err = services.Auth.Connect(context.Background(), creds); err != nil {
+	if err = services.AuthSync.Connect(creds); err != nil {
 		os.Exit(1)
 	}
 
@@ -83,8 +85,8 @@ func main() {
 	cmdRegistry.Register(services)
 
 	// Wait for auth to be ready
-	<-services.Auth.OnReady()
-	services.Auth.CheckNonce()
+	<-services.AuthSync.GetReadyChan()
+	services.AuthSync.CheckNonce()
 
 	if err := services.Discord.Open(); err != nil {
 		logging.Error("Discord open error:", err)
@@ -92,14 +94,6 @@ func main() {
 	}
 
 	services.Reminder.Start()
-	services.Variables.Init()
-
-	go func() {
-		err := services.MultiTokenSniper.Init(context.Background())
-		if err != nil {
-			services.UI.LogError("Error initializing multi-token sniper: " + err.Error())
-		}
-	}()
 
 	sc := make(chan os.Signal, 1)
 	signal.Notify(sc, syscall.SIGINT, syscall.SIGTERM)

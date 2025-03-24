@@ -190,15 +190,17 @@ type ActionCommandSingle struct {
 	Actions      []CommandAction
 }
 
-func (a ActionCommandSingle) ToCommand(router *routerService) *Command {
+func (a ActionCommandSingle) ToCommand(router Service) *Command {
 	cmd := &Command{
 		Name:        a.Name,
 		Description: a.Description,
 		Flags:       a.Flags,
 	}
 
+	routerSvc := router.(*routerService)
+
 	for _, action := range a.Actions {
-		cmd.SubCommands = append(cmd.SubCommands, action.ToSubCommand(router))
+		cmd.SubCommands = append(cmd.SubCommands, action.ToSubCommand(routerSvc))
 	}
 
 	return cmd
@@ -284,6 +286,6 @@ func (b *ActionCommandBuilder) WithExample(desc string, example func(ctx *Ctx) e
 }
 
 // Build creates an ActionCommandSingle from the builder.
-func (b *ActionCommandBuilder) Build(router *routerService) *Command {
+func (b *ActionCommandBuilder) Build(router Service) *Command {
 	return b.cmd.ToCommand(router)
 }

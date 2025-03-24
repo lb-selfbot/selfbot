@@ -5,6 +5,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/lb-selfbot/selfbot/internal/logging"
 	"github.com/lb-selfbot/selfbot/internal/services/config"
 	"github.com/lb-selfbot/selfbot/internal/services/eventbroker"
 	"github.com/lb-selfbot/selfbot/internal/services/eventreactions/types"
@@ -151,7 +152,7 @@ func (s *SelfbotDetection) Handler(session *discordgo.Session, event any) {
 
 		s.DeleteHandler(session, message, cfg)
 	} else {
-		utils.Logging.Debug("SelfbotDetection.Handler: Event is not a message create or delete event")
+		logging.Debug("SelfbotDetection.Handler: Event is not a message create or delete event")
 	}
 }
 

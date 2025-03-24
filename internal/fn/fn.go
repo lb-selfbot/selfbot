@@ -172,3 +172,14 @@ func Batch[T any](slice []T, batchSize int) [][]T {
 	}
 	return batches
 }
+
+// First returns the first element that satisfies the predicate
+func First[T any](slice []T, pred func(T) bool) (T, bool) {
+	for _, x := range slice {
+		if pred(x) {
+			return x, true
+		}
+	}
+	var zero T
+	return zero, false
+}

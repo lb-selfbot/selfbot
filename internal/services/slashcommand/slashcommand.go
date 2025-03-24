@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/lb-selfbot/discordgo"
+	"github.com/lb-selfbot/selfbot/internal/logging"
 	"github.com/lb-selfbot/selfbot/internal/services/config"
 	"github.com/lb-selfbot/selfbot/internal/services/eventbroker"
 	"github.com/lb-selfbot/selfbot/internal/services/router"
@@ -64,7 +65,7 @@ func (s *slashCommandService) subscribe() {
 	s.eventBroker.Subscribe(eventbroker.EventSessionReady, func(payload any) {
 		session, ok := payload.(*discordgo.Session)
 		if !ok {
-			utils.Logging.Error("Failed to cast payload to *discordgo.Session")
+			logging.Error("Failed to cast payload to *discordgo.Session")
 			return
 		}
 
@@ -131,14 +132,14 @@ func (s *slashCommandService) runJob(session *discordgo.Session, job *SCJob) {
 
 		err := s.interactJob(session, job)
 		if err != nil {
-			utils.Logging.Error("Failed to interact with job:", err.Error())
+			logging.Error("Failed to interact with job:", err.Error())
 			continue
 		}
 
 		job.LastExecution = time.Now()
 		err = s.SaveJobs()
 		if err != nil {
-			utils.Logging.Error("Failed to save jobs:", err.Error())
+			logging.Error("Failed to save jobs:", err.Error())
 			continue
 		}
 	}
@@ -174,7 +175,7 @@ func (s *slashCommandService) LoadJobs(session *discordgo.Session) error {
 
 	err := json.Unmarshal(cfg.SlashCommandJobs, &s.jobs)
 	if err != nil {
-		utils.Logging.Error("Failed to unmarshal jobs:", err.Error())
+		logging.Error("Failed to unmarshal jobs:", err.Error())
 
 		// Reset the jobs when the unmarshal has failed
 		cfg.SlashCommandJobs = []byte("[]")

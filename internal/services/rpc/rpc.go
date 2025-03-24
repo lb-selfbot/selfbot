@@ -15,8 +15,8 @@ import (
 	"github.com/lb-selfbot/selfbot/internal/utils"
 )
 
-// RPCService handles Discord Rich Presence.
-type RPCService interface{}
+// Service handles Discord Rich Presence.
+type Service interface{}
 
 type rpcService struct {
 	eventBroker  eventbroker.Service
@@ -27,8 +27,8 @@ type rpcService struct {
 	startTime time.Time
 }
 
-// NewRPCService creates a new instance of RPCService.
-func NewRPCService(eventBroker eventbroker.Service, configSvc config.Service, sessionsSvc sessions.Service, variablesSvc variables.Service) RPCService {
+// NewService creates a new instance of RPCService.
+func NewService(eventBroker eventbroker.Service, configSvc config.Service, sessionsSvc sessions.Service, variablesSvc variables.Service) Service {
 	svc := &rpcService{eventBroker: eventBroker, configSvc: configSvc, sessionsSvc: sessionsSvc, variablesSvc: variablesSvc}
 	svc.subscribe()
 	return svc

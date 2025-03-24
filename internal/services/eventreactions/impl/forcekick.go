@@ -2,6 +2,7 @@ package impl
 
 import (
 	"github.com/lb-selfbot/discordgo"
+	"github.com/lb-selfbot/selfbot/internal/logging"
 	"github.com/lb-selfbot/selfbot/internal/services/eventreactions/types"
 	"github.com/lb-selfbot/selfbot/internal/utils"
 )
@@ -56,7 +57,7 @@ func (f *ForceKick) Description() string {
 func (f *ForceKick) Equals(other types.EventReaction) bool {
 	otherForceKick, ok := other.(*ForceKick)
 	if !ok {
-		utils.Logging.Debug("ForceKick.Equals: Other is not a ForceKick")
+		logging.Debug("ForceKick.Equals: Other is not a ForceKick")
 		return false
 	}
 
@@ -80,7 +81,7 @@ func (f *ForceKick) Data() map[string]any {
 func (f *ForceKick) Handler(session *discordgo.Session, event any) {
 	memberAdd, ok := event.(*discordgo.GuildMemberAdd)
 	if !ok {
-		utils.Logging.Debug("ForceKick.Handler: Event is not a guild member update event")
+		logging.Debug("ForceKick.Handler: Event is not a guild member update event")
 		return
 	}
 

@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/lb-selfbot/selfbot/internal/api"
+	"github.com/lb-selfbot/selfbot/internal/logging"
 
 	"github.com/lb-selfbot/selfbot/internal/services/config"
 	"github.com/lb-selfbot/selfbot/internal/services/eventbroker"
@@ -93,7 +94,7 @@ func (a *AFK) GetAFKMessage(m *discordgo.Message, message string) string {
 func (a *AFK) Handler(session *discordgo.Session, event any) {
 	message, ok := event.(*discordgo.MessageCreate)
 	if !ok {
-		utils.Logging.Debug("AFK.Handler: Event is not a message create event")
+		logging.Debug("AFK.Handler: Event is not a message create event")
 		return
 	}
 
@@ -159,7 +160,7 @@ func (a *AFK) Handler(session *discordgo.Session, event any) {
 		var err error
 		afkMessage, err = api.GPT(instructions, message.Content)
 		if err != nil {
-			utils.Logging.Error("AFK.Handler: Error getting AI response: " + err.Error())
+			logging.Error("AFK.Handler: Error getting AI response: " + err.Error())
 			return
 		}
 	}

@@ -17,9 +17,7 @@ func NewAICommands(s *services.Services) *AICommands {
 }
 
 func (c *AICommands) Register() {
-	cmdRouter := c.services.Discord.GetRouter()
-
-	cmdRouter.RegisterCategory(&router.Category{
+	c.services.Router.RegisterCategory(&router.Category{
 		Name:        "AI",
 		Description: "Interact with AI's",
 	}, []*router.Command{
@@ -75,12 +73,12 @@ func (c *AICommands) chatgpt(ctx *router.Ctx) {
 		return
 	}
 
-	c.services.Embed.NewEmbed().
+	ctx.NewEmbed().
 		SetTitle("ChatGPT (GPT-3.5)").
 		AddField("System", system).
 		AddField("Message", message).
 		AddField("Response", response).
-		Send(ctx)
+		Send()
 }
 
 func (c *AICommands) gpt4(ctx *router.Ctx) {
@@ -92,12 +90,12 @@ func (c *AICommands) gpt4(ctx *router.Ctx) {
 		return
 	}
 
-	c.services.Embed.NewEmbed().
+	ctx.NewEmbed().
 		SetTitle("ChatGPT (GPT-4)").
 		AddField("System", system).
 		AddField("Message", message).
 		AddField("Response", response).
-		Send(ctx)
+		Send()
 }
 
 func (c *AICommands) imaginestyles(ctx *router.Ctx) {
@@ -109,10 +107,10 @@ func (c *AICommands) imaginestyles(ctx *router.Ctx) {
 
 	sort.Strings(stylesString)
 
-	c.services.Embed.NewEmbed().
+	ctx.NewEmbed().
 		SetTitle("Image Styles").
 		SetDescription(strings.Join(stylesString, "\n")).
-		Send(ctx)
+		Send()
 }
 
 func (c *AICommands) imaginemodels(ctx *router.Ctx) {
@@ -126,10 +124,10 @@ func (c *AICommands) imaginemodels(ctx *router.Ctx) {
 
 	sort.Strings(modelsString)
 
-	c.services.Embed.NewEmbed().
+	ctx.NewEmbed().
 		SetTitle("Image Models").
 		SetDescription(strings.Join(modelsString, "\n")).
-		Send(ctx)
+		Send()
 }
 
 func (c *AICommands) imagine(ctx *router.Ctx) {
@@ -158,11 +156,11 @@ func (c *AICommands) ocrlink(ctx *router.Ctx) {
 		return
 	}
 
-	c.services.Embed.NewEmbed().
+	ctx.NewEmbed().
 		SetTitle("OCR").
 		AddField("URL", ctx.Arguments.Raw()).
 		AddField("Extracted Text", text).
-		Send(ctx)
+		Send()
 }
 
 func (c *AICommands) ocrfile(ctx *router.Ctx) {
@@ -179,9 +177,9 @@ func (c *AICommands) ocrfile(ctx *router.Ctx) {
 		return
 	}
 
-	c.services.Embed.NewEmbed().
+	ctx.NewEmbed().
 		SetTitle("OCR").
 		AddField("URL", attachments[0].URL).
 		AddField("Extracted Text", text).
-		Send(ctx)
+		Send()
 }

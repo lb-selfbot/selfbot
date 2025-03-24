@@ -23,9 +23,7 @@ func NewGameCommands(s *services.Services) *GameCommands {
 }
 
 func (c *GameCommands) Register() {
-	cmdRouter := c.services.Discord.GetRouter()
-
-	cmdRouter.RegisterCategory(&router.Category{
+	c.services.Router.RegisterCategory(&router.Category{
 		Name:        "Game",
 		Description: "Info about games",
 	}, []*router.Command{
@@ -145,10 +143,10 @@ func (c *GameCommands) mcuuid(ctx *router.Ctx) {
 
 	uuid := resp.GetIndex(0).Get("id").MustString()
 
-	c.services.Embed.NewEmbed().
+	ctx.NewEmbed().
 		AddField("Username", username).
 		AddField("UUID", utils.Misc.Or(uuid, "Not Found")).
-		Send(ctx)
+		Send()
 }
 
 func (c *GameCommands) mcnamehistory(ctx *router.Ctx) {
@@ -166,10 +164,10 @@ func (c *GameCommands) mcnamehistory(ctx *router.Ctx) {
 	if len(names) == 0 {
 		names = append(names, "Invalid UUID.")
 	}
-	c.services.Embed.NewEmbed().
+	ctx.NewEmbed().
 		AddField("UUID", uuid).
 		AddField("Name History", strings.Join(names, ", ")).
-		Send(ctx)
+		Send()
 }
 
 func (c *GameCommands) fnmap(ctx *router.Ctx) {
@@ -178,10 +176,10 @@ func (c *GameCommands) fnmap(ctx *router.Ctx) {
 		ctx.RespondText("An error has occurred.")
 		return
 	}
-	c.services.Embed.NewEmbed().
+	ctx.NewEmbed().
 		SetDescription("Fortnite Map").
 		SetImage(res.GetPath("data", "images", "blank").MustString()).
-		Send(ctx)
+		Send()
 }
 
 func (c *GameCommands) fnmappois(ctx *router.Ctx) {
@@ -190,10 +188,10 @@ func (c *GameCommands) fnmappois(ctx *router.Ctx) {
 		ctx.RespondText("An error has occurred.")
 		return
 	}
-	c.services.Embed.NewEmbed().
+	ctx.NewEmbed().
 		SetDescription("Fortnite Map").
 		SetImage(res.GetPath("data", "images", "pois").MustString()).
-		Send(ctx)
+		Send()
 }
 
 func (c *GameCommands) fnrandomplaylist(ctx *router.Ctx) {
@@ -203,7 +201,7 @@ func (c *GameCommands) fnrandomplaylist(ctx *router.Ctx) {
 		return
 	}
 	playlist := playlists.Get("data").GetIndex(random.Int(0, len(playlists.Get("data").MustArray())-1))
-	c.services.Embed.NewEmbed().
+	ctx.NewEmbed().
 		SetDescription("Random Fortnite Playlist").
 		AddField("ID", playlist.Get("id").MustString("None")).
 		AddField("Name", playlist.Get("name").MustString("None")).
@@ -211,7 +209,7 @@ func (c *GameCommands) fnrandomplaylist(ctx *router.Ctx) {
 		AddField("Game Type", playlist.Get("gameType").MustString("None")).
 		AddField("Max Players", fmt.Sprint(playlist.Get("maxPlayers").MustInt(-1))).
 		AddField("Added At", playlist.Get("added").MustString("None")).
-		Send(ctx)
+		Send()
 }
 
 func (c *GameCommands) fnrandombanner(ctx *router.Ctx) {
@@ -221,7 +219,7 @@ func (c *GameCommands) fnrandombanner(ctx *router.Ctx) {
 		return
 	}
 	banner := banners.Get("data").GetIndex(random.Int(0, len(banners.Get("data").MustArray())-1))
-	c.services.Embed.NewEmbed().
+	ctx.NewEmbed().
 		SetDescription("Random Fortnite Banner").
 		SetImage(banner.GetPath("images", "icon").MustString()).
 		AddField("ID", banner.Get("id").MustString("None")).
@@ -229,7 +227,7 @@ func (c *GameCommands) fnrandombanner(ctx *router.Ctx) {
 		AddField("Name", banner.Get("name").MustString("None")).
 		AddField("Description", banner.Get("description").MustString("None")).
 		AddField("Category", banner.Get("category").MustString("None")).
-		Send(ctx)
+		Send()
 }
 
 func (c *GameCommands) fnstats(ctx *router.Ctx) {
@@ -249,7 +247,7 @@ func (c *GameCommands) fnstats(ctx *router.Ctx) {
 		return
 	}
 	user = user.GetPath("data")
-	c.services.Embed.NewEmbed().
+	ctx.NewEmbed().
 		SetDescription("Fortnite Stats - %s", user.GetPath("account", "name").MustString()).
 		AddField("Name", user.GetPath("account", "name").MustString("None")).
 		AddField("ID", user.GetPath("account", "id").MustString("None")).
@@ -259,7 +257,7 @@ func (c *GameCommands) fnstats(ctx *router.Ctx) {
 		AddField("Kills", fmt.Sprint(user.GetPath("stats", "all", "ltm", "kills").MustInt(-1))).
 		AddField("Deaths", fmt.Sprint(user.GetPath("stats", "all", "ltm", "deaths").MustInt(-1))).
 		AddField("Wins", fmt.Sprint(user.GetPath("stats", "all", "ltm", "wins").MustInt(-1))).
-		Send(ctx)
+		Send()
 }
 
 func (c *GameCommands) fncreatorcode(ctx *router.Ctx) {
@@ -274,13 +272,13 @@ func (c *GameCommands) fncreatorcode(ctx *router.Ctx) {
 		return
 	}
 	res = res.GetPath("data")
-	c.services.Embed.NewEmbed().
+	ctx.NewEmbed().
 		SetDescription("Fortnite Creator Code - %s", res.GetPath("code").MustString()).
 		AddField("Account Name", res.GetPath("account", "name").MustString("None")).
 		AddField("ID", res.GetPath("account", "id").MustString("None")).
 		AddField("Status", res.GetPath("status").MustString("None")).
 		AddField("Verified", utils.Misc.FormatBoolYesNo(res.GetPath("verified").MustBool())).
-		Send(ctx)
+		Send()
 }
 
 func (c *GameCommands) fnrandomcosmetic(ctx *router.Ctx) {
@@ -294,7 +292,7 @@ func (c *GameCommands) fnrandomcosmetic(ctx *router.Ctx) {
 	if image == "" {
 		image = cosmetic.GetPath("images", "icon").MustString()
 	}
-	c.services.Embed.NewEmbed().
+	ctx.NewEmbed().
 		SetDescription("Random Fortnite Cosmetic").
 		AddField("ID", cosmetic.Get("id").MustString("None")).
 		AddField("Name", cosmetic.Get("name").MustString("None")).
@@ -303,7 +301,7 @@ func (c *GameCommands) fnrandomcosmetic(ctx *router.Ctx) {
 		AddField("Rarity", cosmetic.GetPath("rarity", "displayValue").MustString("None")).
 		AddField("Added", cosmetic.GetPath("added").MustString("None")).
 		SetImage(image).
-		Send(ctx)
+		Send()
 }
 
 func (c *GameCommands) fnstatus(ctx *router.Ctx) {
@@ -315,9 +313,9 @@ func (c *GameCommands) fnstatus(ctx *router.Ctx) {
 
 	json := httpResponse.Json()
 
-	c.services.Embed.NewEmbed().
+	ctx.NewEmbed().
 		AddField("Fortnite Status", json.GetPath("status", "description").MustString("Error")).
-		Send(ctx)
+		Send()
 }
 
 func (c *GameCommands) alstatus(ctx *router.Ctx) {
@@ -326,7 +324,7 @@ func (c *GameCommands) alstatus(ctx *router.Ctx) {
 		ctx.RespondText("An error has occurred.")
 		return
 	}
-	c.services.Embed.NewEmbed().
+	ctx.NewEmbed().
 		SetDescription("Apex Legends Status").
 		AddField("Origin Login", status.GetPath("Origin_login", "EU-West", "Status").MustString("None")).
 		AddField("EA Nova Fusion", status.GetPath("EA_novafusion", "EU-West", "Status").MustString("None")).
@@ -335,7 +333,7 @@ func (c *GameCommands) alstatus(ctx *router.Ctx) {
 		AddField("Apex Legends Xbox", status.GetPath("otherPlatforms", "Xbox-Live", "Status").MustString("None")).
 		AddField("Apex Legends Cross Play", status.GetPath("ApexOauth_Crossplay", "EU-West", "Status").MustString("None")).
 		AddField("Apex Legends API", status.GetPath("selfCoreTest", "Stats-API", "Status").MustString("None")).
-		Send(ctx)
+		Send()
 }
 
 func (c *GameCommands) alnews(ctx *router.Ctx) {
@@ -344,7 +342,7 @@ func (c *GameCommands) alnews(ctx *router.Ctx) {
 		ctx.RespondText("An error has occurred.")
 		return
 	}
-	emb := c.services.Embed.NewEmbed().SetDescription("Apex Legends News")
+	emb := ctx.NewEmbed().SetDescription("Apex Legends News")
 	for i := 0; i < len(newsList.MustArray()); i++ {
 		news := newsList.GetIndex(i)
 		emb.AddField(news.GetPath("title").MustString("None"), fmt.Sprintf("%s\n%s", news.GetPath("short_desc").MustString("None"), news.GetPath("link").MustString("None")))
@@ -352,7 +350,7 @@ func (c *GameCommands) alnews(ctx *router.Ctx) {
 			break
 		}
 	}
-	emb.Send(ctx)
+	emb.Send()
 }
 
 func (c *GameCommands) alstats(ctx *router.Ctx) {
@@ -377,7 +375,7 @@ func (c *GameCommands) alstats(ctx *router.Ctx) {
 		ctx.RespondText(stats.Get("Error").MustString())
 		return
 	}
-	c.services.Embed.NewEmbed().
+	ctx.NewEmbed().
 		SetDescription("Apex Legends Stats - %s", stats.GetPath("global", "name").MustString()).
 		AddField("Name", stats.GetPath("global", "name").MustString("None")).
 		AddField("UID", fmt.Sprint(stats.GetPath("global", "uid").MustInt64())).
@@ -393,7 +391,7 @@ func (c *GameCommands) alstats(ctx *router.Ctx) {
 		AddField("Wins as full squad", fmt.Sprint(stats.GetPath("total", "wins_as_full_squad", "value").MustInt())).
 		AddField("Revives", fmt.Sprint(stats.GetPath("total", "revives", "value").MustInt())).
 		AddField("Kill/Death", stats.GetPath("total", "kd", "value").MustString("None")).
-		Send(ctx)
+		Send()
 }
 
 func (c *GameCommands) gtastatus(ctx *router.Ctx) {
@@ -409,14 +407,14 @@ func (c *GameCommands) gtastatus(ctx *router.Ctx) {
 			break
 		}
 	}
-	emb := c.services.Embed.NewEmbed().
+	emb := ctx.NewEmbed().
 		SetDescription("GTA Online Status").
 		AddField("Overall Status", status.Get("status_tag").MustString())
 	for i := 0; i < len(status.Get("services_platforms").MustArray()); i++ {
 		platform := status.Get("services_platforms").GetIndex(i)
 		emb.AddField(platform.Get("name").MustString(), platform.Get("service_status").Get("status").MustString())
 	}
-	emb.Send(ctx)
+	emb.Send()
 }
 
 func (c *GameCommands) fivemplayers(ctx *router.Ctx) {
@@ -429,11 +427,11 @@ func (c *GameCommands) fivemplayers(ctx *router.Ctx) {
 
 	json := httpResponse.Json()
 
-	c.services.Embed.NewEmbed().
+	ctx.NewEmbed().
 		AddField("Host", host).
 		AddField("Players", fmt.Sprint(json.Get("clients").MustInt())).
 		AddField("Max Players", json.Get("sv_maxclients").MustString()).
-		Send(ctx)
+		Send()
 }
 
 func (c *GameCommands) fiveminfo(ctx *router.Ctx) {
@@ -446,14 +444,14 @@ func (c *GameCommands) fiveminfo(ctx *router.Ctx) {
 
 	json := httpResponse.Json()
 
-	c.services.Embed.NewEmbed().
+	ctx.NewEmbed().
 		AddField("Host", host).
 		AddField("Server Name", json.Get("hostname").MustString()).
 		AddField("Game Type", json.Get("gametype").MustString()).
 		AddField("Map", json.Get("mapname").MustString()).
 		AddField("Players", fmt.Sprint(json.Get("clients").MustInt())).
 		AddField("Max Players", json.Get("sv_maxclients").MustString()).
-		Send(ctx)
+		Send()
 }
 
 var HLTBHeaders = map[string]string{
@@ -524,9 +522,9 @@ func (c *GameCommands) hltbsearch(ctx *router.Ctx) {
 		))
 	}
 
-	c.services.Embed.NewEmbed().
+	ctx.NewEmbed().
 		AddField("Games", strings.Join(games, "\n")).
-		Send(ctx)
+		Send()
 }
 
 func secondsToTime(seconds int) string {
@@ -566,7 +564,7 @@ func (c *GameCommands) hltbinfo(ctx *router.Ctx) {
 
 	game := games.GetIndex(0)
 
-	c.services.Embed.NewEmbed().
+	ctx.NewEmbed().
 		AddField("Name", game.Get("game_name").MustString("None")).
 		AddField("Aliases", game.Get("game_alias").MustString("None")).
 		AddField("Main Story", secondsToTime(game.Get("comp_main").MustInt())).
@@ -577,5 +575,5 @@ func (c *GameCommands) hltbinfo(ctx *router.Ctx) {
 		AddField("Currently Playing", fmt.Sprintf("%d Players", game.Get("count_playing").MustInt())).
 		AddField("Developer", game.Get("profile_dev").MustString("None")).
 		AddField("Platforms", game.Get("profile_platform").MustString("None")).
-		Send(ctx)
+		Send()
 }

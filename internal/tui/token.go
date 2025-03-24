@@ -8,8 +8,8 @@ import (
 	"github.com/charmbracelet/bubbles/list"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/lb-selfbot/selfbot/internal/browser"
+	"github.com/lb-selfbot/selfbot/internal/logging"
 	"github.com/lb-selfbot/selfbot/internal/savedtokens"
-	"github.com/lb-selfbot/selfbot/internal/utils"
 )
 
 func GetToken(title ...string) string {
@@ -24,7 +24,7 @@ func GetToken(title ...string) string {
 	model := NewListModel(items, strings.Join(title, " "))
 
 	if _, err := tea.NewProgram(model).Run(); err != nil {
-		utils.Logging.Error("Error running program:", err)
+		logging.Error("Error running program:", err)
 		os.Exit(1)
 	}
 
@@ -52,7 +52,7 @@ func loginWithToken() string {
 	model := NewTextInputModel("Please enter your Discord token:", "", true)
 
 	if _, err := tea.NewProgram(model).Run(); err != nil {
-		utils.Logging.Error("Error running program:", err)
+		logging.Error("Error running program:", err)
 		os.Exit(1)
 	}
 
@@ -73,7 +73,7 @@ func loginWithBrowser() string {
 		program.Quit()
 		reset()
 
-		utils.Logging.Error("Error logging in:", err, "\n")
+		logging.Error("Error logging in:", err, "\n")
 
 		return ""
 	}
@@ -99,7 +99,7 @@ func loginWithSavedToken() string {
 		program.Quit()
 		reset()
 
-		utils.Logging.Error("You have no saved accounts!")
+		logging.Error("You have no saved accounts!")
 
 		return ""
 	}
@@ -116,7 +116,7 @@ func loginWithSavedToken() string {
 
 	accListModel := NewListModel(items, "Please select a saved account:")
 	if _, err := tea.NewProgram(accListModel).Run(); err != nil {
-		utils.Logging.Error("Error running program:", err)
+		logging.Error("Error running program:", err)
 		os.Exit(1)
 	}
 

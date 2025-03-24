@@ -7,6 +7,7 @@ import (
 
 	"github.com/lb-selfbot/discordgo"
 	"github.com/lb-selfbot/selfbot/internal/embed"
+	"github.com/lb-selfbot/selfbot/internal/fn"
 	"github.com/lb-selfbot/selfbot/internal/services/config"
 )
 
@@ -29,36 +30,37 @@ func (ctx *Ctx) NewEmbed() *embed.Embed {
 func (ctx *Ctx) sendEmbed(emb *embed.Embed) []*discordgo.Message {
 	cfg := ctx.configSvc.GetConfig()
 
-	commandMode := cfg.Selfbot.CommandMode
-	if commandMode == "WebhookEmbed" {
-		if err := ctx.sendWebhookEmbed(emb); err == nil {
-			return nil
-		}
-	}
-
-	var messages []*discordgo.Message
-
-	for _, text := range emb.ToString(commandMode) {
-		message, err := ctx.Session.ChannelMessageSend(ctx.Message.ChannelID, text)
-		if err != nil {
-			continue
+	switch cfg.Selfbot.CommandMode {
+	case "WebhookEmbed":
+		_ = ctx.sendWebhookEmbed(emb)
+		return nil
+	default:
+		maxLen := 2000
+		if ctx.Session.State.User.PremiumType == discordgo.UserPremiumTypeNitro {
+			maxLen = 4000
 		}
 
-		messages = append(messages, message)
-	}
+		msgs := emb.ToString(embed.EmbedFormat(cfg.Selfbot.CommandMode), maxLen)
 
-	if emb.Image != nil && emb.Image.URL != "" {
-		message, err := ctx.Session.ChannelMessageSend(ctx.Message.ChannelID, emb.Image.URL)
-		if err == nil {
-			messages = append(messages, message)
+		discordMsgs := fn.Map(msgs, func(text string) *discordgo.Message {
+			message, err := ctx.Session.ChannelMessageSend(ctx.Message.ChannelID, text)
+			if err != nil {
+				return nil
+			}
+
+			return message
+		})
+
+		discordMsgs = fn.Filter(discordMsgs, func(msg *discordgo.Message) bool {
+			return msg != nil
+		})
+
+		if cfg.Selfbot.DeleteResponses {
+			go ctx.deleteMessagesAfter(ctx.Session, discordMsgs, cfg.Selfbot.DeleteResponsesDelay)
 		}
-	}
 
-	if cfg.Selfbot.DeleteResponses {
-		go ctx.deleteMessagesAfter(ctx.Session, messages, cfg.Selfbot.DeleteResponsesDelay)
+		return discordMsgs
 	}
-
-	return messages
 }
 
 func (ctx *Ctx) sendWebhookEmbed(emb *embed.Embed) error {
@@ -71,18 +73,10 @@ func (ctx *Ctx) sendWebhookEmbed(emb *embed.Embed) error {
 		return err
 	}
 
-	var webhook *discordgo.Webhook
-
-	for _, wh := range webhooks {
-		if wh.Name != "LightningBot" {
-			continue
-		}
-
-		webhook = wh
-		break
-	}
-
-	if webhook == nil {
+	webhook, ok := fn.First(webhooks, func(wh *discordgo.Webhook) bool {
+		return wh.Name == "LightningBot"
+	})
+	if !ok {
 		webhook, err = ctx.Session.WebhookCreate(ctx.Message.ChannelID, "LightningBot", "https://lightning-bot.com/logo.png")
 		if err != nil {
 			return err
@@ -92,9 +86,7 @@ func (ctx *Ctx) sendWebhookEmbed(emb *embed.Embed) error {
 	_, err = ctx.Session.WebhookExecute(webhook.ID, webhook.Token, true, &discordgo.WebhookParams{
 		Username:  "LightningBot",
 		AvatarURL: "https://lightning-bot.com/logo.png",
-		Embeds: []*discordgo.MessageEmbed{
-			emb.ToEmbed(),
-		},
+		Embeds:    []*discordgo.MessageEmbed{emb.ToEmbed()},
 	})
 
 	return err

@@ -1,24 +1,97 @@
 package services
 
 import (
+	"github.com/lb-selfbot/selfbot/internal/services/authsync"
+	"github.com/lb-selfbot/selfbot/internal/services/backup"
 	"github.com/lb-selfbot/selfbot/internal/services/config"
+	"github.com/lb-selfbot/selfbot/internal/services/console"
+	"github.com/lb-selfbot/selfbot/internal/services/discord"
+	"github.com/lb-selfbot/selfbot/internal/services/eventbroker"
+	"github.com/lb-selfbot/selfbot/internal/services/eventreactions"
+	"github.com/lb-selfbot/selfbot/internal/services/extensions"
+	"github.com/lb-selfbot/selfbot/internal/services/ipc"
+	"github.com/lb-selfbot/selfbot/internal/services/mts"
+	"github.com/lb-selfbot/selfbot/internal/services/o11y"
+	"github.com/lb-selfbot/selfbot/internal/services/reminder"
 	"github.com/lb-selfbot/selfbot/internal/services/router"
+	"github.com/lb-selfbot/selfbot/internal/services/rpc"
+	"github.com/lb-selfbot/selfbot/internal/services/sessions"
+	"github.com/lb-selfbot/selfbot/internal/services/slashcommand"
+	"github.com/lb-selfbot/selfbot/internal/services/spotify"
+	"github.com/lb-selfbot/selfbot/internal/services/ui"
+	"github.com/lb-selfbot/selfbot/internal/services/variables"
 )
 
 // Services is the container for all service instances.
 type Services struct {
-	Config config.Service
+	EventBroker eventbroker.Service
+	Config      config.Service
+	Console     console.Service
+	Backup      backup.Service
+	Spotify     spotify.Service
 
-	Router router.Service
+	Router       router.Service
+	Sessions     sessions.Service
+	Extensions   extensions.Service
+	Discord      discord.Service
+	O11y         o11y.Service
+	IPC          ipc.Service
+	Reminder     reminder.Service
+	SlashCommand slashcommand.Service
+	AuthSync     authsync.Service
+
+	Variables      variables.Service
+	UI             ui.Service
+	EventReactions eventreactions.Service
+	MTS            mts.Service
+	RPC            rpc.Service
 }
 
-// InitServices initializes and wires all services.
-func InitServices() *Services {
+// NewServices initializes and wires all services.
+func NewServices() *Services {
+	eventBroker := eventbroker.NewService()
 	cfg := config.NewService()
+	console := console.NewService()
+	backup := backup.NewService()
+	spotify := spotify.NewService()
+
 	router := router.NewService(cfg)
+	sessions := sessions.NewService(eventBroker)
+	extensions := extensions.NewService(eventBroker)
+	discord := discord.NewService(eventBroker, cfg)
+	o11y := o11y.NewService(eventBroker, cfg)
+	ipc := ipc.NewService(eventBroker, cfg)
+	reminder := reminder.NewService(eventBroker, cfg)
+	slashCommand := slashcommand.NewService(eventBroker, cfg)
+	authSync := authsync.NewService(eventBroker, cfg, console)
+
+	variables := variables.NewService(eventBroker, router, extensions, spotify)
+	ui := ui.NewService(eventBroker, cfg, discord)
+	eventReactions := eventreactions.NewService(eventBroker, cfg, router, variables)
+	mts := mts.NewService(eventBroker, cfg, eventReactions)
+	rpc := rpc.NewService(eventBroker, cfg, sessions, variables)
 
 	return &Services{
-		Config: cfg,
-		Router: router,
+		EventBroker: eventBroker,
+		Config:      cfg,
+		Console:     console,
+		Backup:      backup,
+		Spotify:     spotify,
+
+		Router:       router,
+		Sessions:     sessions,
+		Extensions:   extensions,
+		Discord:      discord,
+		O11y:         o11y,
+		IPC:          ipc,
+		Reminder:     reminder,
+		SlashCommand: slashCommand,
+		AuthSync:     authSync,
+
+		Variables:      variables,
+		UI:             ui,
+		EventReactions: eventReactions,
+		MTS:            mts,
+		RPC:            rpc,
 	}
 }

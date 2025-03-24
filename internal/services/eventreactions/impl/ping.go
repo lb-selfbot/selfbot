@@ -7,6 +7,7 @@ import (
 
 	"github.com/lb-selfbot/selfbot/internal/api"
 	"github.com/lb-selfbot/selfbot/internal/http"
+	"github.com/lb-selfbot/selfbot/internal/logging"
 	"github.com/lb-selfbot/selfbot/internal/services/eventbroker"
 	"github.com/lb-selfbot/selfbot/internal/services/eventreactions/types"
 
@@ -49,7 +50,7 @@ func NewPingFromData(eventBroker eventbroker.Service, session *discordgo.Session
 	}
 
 	if guild == nil && channel == nil {
-		utils.Logging.Error("Ping.NewPingFromData: Invalid ping data")
+		logging.Error("Ping.NewPingFromData: Invalid ping data")
 
 		return nil, fmt.Errorf("invalid ping data")
 	}
@@ -108,7 +109,7 @@ func (p *Ping) Description() string {
 	case types.PingAIResponse:
 		return "Ping → AI Response" + location
 	default:
-		utils.Logging.Debug("Ping.Description: Unknown reaction type")
+		logging.Debug("Ping.Description: Unknown reaction type")
 		return "Ping reaction" + location
 	}
 }
@@ -116,7 +117,7 @@ func (p *Ping) Description() string {
 func (p *Ping) Equals(other types.EventReaction) bool {
 	otherPing, ok := other.(*Ping)
 	if !ok {
-		utils.Logging.Debug("Ping.Equals: Other is not a Ping")
+		logging.Debug("Ping.Equals: Other is not a Ping")
 		return false
 	}
 
@@ -146,7 +147,7 @@ func (p *Ping) Data() map[string]any {
 func (p *Ping) Handler(session *discordgo.Session, event any) {
 	message, ok := event.(*discordgo.MessageCreate)
 	if !ok {
-		utils.Logging.Debug("Ping.Handler: Event is not a message create event")
+		logging.Debug("Ping.Handler: Event is not a message create event")
 		return
 	}
 
@@ -214,7 +215,7 @@ func (p *Ping) Handler(session *discordgo.Session, event any) {
 		system := utils.Misc.CreateAISystemPing(p.System, session, message.Message)
 		response, err := api.GPT(system, message.Content)
 		if err != nil {
-			utils.Logging.Error("Ping.Handler: Failed to get AI response:", err)
+			logging.Error("Ping.Handler: Failed to get AI response:", err)
 			return
 		}
 

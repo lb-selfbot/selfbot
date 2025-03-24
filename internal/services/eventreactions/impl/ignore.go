@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/lb-selfbot/discordgo"
+	"github.com/lb-selfbot/selfbot/internal/logging"
 	"github.com/lb-selfbot/selfbot/internal/services/eventreactions/types"
 	"github.com/lb-selfbot/selfbot/internal/utils"
 )
@@ -42,7 +43,7 @@ func NewIgnoreFromData(session *discordgo.Session, data map[string]any) (*Ignore
 		return NewIgnoreGuild(guild), nil
 	}
 
-	utils.Logging.Error("Ignore.NewIgnoreFromData: Invalid ignore data")
+	logging.Error("Ignore.NewIgnoreFromData: Invalid ignore data")
 
 	return nil, fmt.Errorf("invalid reaction data")
 }
@@ -53,7 +54,7 @@ func (i *Ignore) Type() types.EventReactionType {
 	} else if i.Guild != nil {
 		return types.IgnoreGuild
 	} else {
-		utils.Logging.Debug("Ignore.Type: Invalid ignore type")
+		logging.Debug("Ignore.Type: Invalid ignore type")
 		return -1
 	}
 }
@@ -64,7 +65,7 @@ func (i *Ignore) Description() string {
 	} else if i.Guild != nil {
 		return "Ignore Server - " + i.Guild.Name
 	} else {
-		utils.Logging.Debug("Ignore.Description: Invalid ignore type")
+		logging.Debug("Ignore.Description: Invalid ignore type")
 		return "Ignore"
 	}
 }
@@ -72,7 +73,7 @@ func (i *Ignore) Description() string {
 func (i *Ignore) Equals(other types.EventReaction) bool {
 	otherIgnore, ok := other.(*Ignore)
 	if !ok {
-		utils.Logging.Debug("Ignore.Equals: Other is not an Ignore")
+		logging.Debug("Ignore.Equals: Other is not an Ignore")
 		return false
 	}
 
@@ -95,7 +96,7 @@ func (i *Ignore) Data() map[string]any {
 func (i *Ignore) Handler(session *discordgo.Session, event any) {
 	message, ok := event.(*discordgo.MessageCreate)
 	if !ok {
-		utils.Logging.Debug("Ignore.Handler: Event is not a message create event")
+		logging.Debug("Ignore.Handler: Event is not a message create event")
 		return
 	}
 

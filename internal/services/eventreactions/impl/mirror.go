@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/lb-selfbot/discordgo"
+	"github.com/lb-selfbot/selfbot/internal/logging"
 	"github.com/lb-selfbot/selfbot/internal/services/eventbroker"
 	"github.com/lb-selfbot/selfbot/internal/services/eventreactions/types"
 	"github.com/lb-selfbot/selfbot/internal/utils"
@@ -43,7 +44,7 @@ func NewMirrorFromData(eventBroker eventbroker.Service, session *discordgo.Sessi
 
 			return NewMirrorGuild(eventBroker, sourceGuild, destGuild), nil
 		} else {
-			utils.Logging.Error("Mirror.NewMirrorFromData: Invalid mirror data")
+			logging.Error("Mirror.NewMirrorFromData: Invalid mirror data")
 			return nil, fmt.Errorf("invalid mirror data")
 		}
 	}
@@ -64,12 +65,12 @@ func NewMirrorFromData(eventBroker eventbroker.Service, session *discordgo.Sessi
 
 			return NewMirrorChannel(eventBroker, sourceChannel, destChannel), nil
 		} else {
-			utils.Logging.Error("Mirror.NewMirrorFromData: Invalid mirror data")
+			logging.Error("Mirror.NewMirrorFromData: Invalid mirror data")
 			return nil, fmt.Errorf("invalid mirror data")
 		}
 	}
 
-	utils.Logging.Error("Mirror.NewMirrorFromData: Invalid mirror data")
+	logging.Error("Mirror.NewMirrorFromData: Invalid mirror data")
 	return nil, fmt.Errorf("invalid mirror data")
 }
 
@@ -79,7 +80,7 @@ func (m *Mirror) Type() types.EventReactionType {
 	} else if m.SourceChannel != nil {
 		return types.MirrorChannel
 	} else {
-		utils.Logging.Debug("Mirror.Type: Invalid ignore type")
+		logging.Debug("Mirror.Type: Invalid ignore type")
 		return -1
 	}
 }
@@ -90,7 +91,7 @@ func (m *Mirror) Description() string {
 	} else if m.SourceChannel != nil && m.DestChannel != nil {
 		return fmt.Sprintf("Mirror Channel - %s --> %s", m.SourceChannel.Name, m.DestChannel.Name)
 	} else {
-		utils.Logging.Debug("Mirror.Description: Invalid ignore type")
+		logging.Debug("Mirror.Description: Invalid ignore type")
 		return "Mirror"
 	}
 }
@@ -98,7 +99,7 @@ func (m *Mirror) Description() string {
 func (m *Mirror) Equals(other types.EventReaction) bool {
 	otherMirror, ok := other.(*Mirror)
 	if !ok {
-		utils.Logging.Debug("Mirror.Equals: Other is not a Mirror")
+		logging.Debug("Mirror.Equals: Other is not a Mirror")
 		return false
 	}
 
@@ -130,7 +131,7 @@ func (m *Mirror) Data() map[string]any {
 func (m *Mirror) Handler(session *discordgo.Session, event any) {
 	message, ok := event.(*discordgo.MessageCreate)
 	if !ok {
-		utils.Logging.Debug("Mirror.Handler: Event is not a message create event")
+		logging.Debug("Mirror.Handler: Event is not a message create event")
 		return
 	}
 
@@ -144,7 +145,7 @@ func (m *Mirror) Handler(session *discordgo.Session, event any) {
 	case m.DestGuild != nil:
 		ogChannel, err := session.State.Channel(message.ChannelID)
 		if err != nil {
-			utils.Logging.Debug("Mirror.Handler: Error getting channel: " + err.Error())
+			logging.Debug("Mirror.Handler: Error getting channel: " + err.Error())
 			return
 		}
 
@@ -157,13 +158,13 @@ func (m *Mirror) Handler(session *discordgo.Session, event any) {
 		}
 
 		if channel == nil {
-			utils.Logging.Error("Mirror.Handler: Could not find channel")
+			logging.Error("Mirror.Handler: Could not find channel")
 			return
 		}
 
 		msg, err := utils.Discord.ImpersonateMessage(session, message.Author, message.Message, channel.ID)
 		if err != nil {
-			utils.Logging.Debug("Mirror.Handler: Error impersonating: " + err.Error())
+			logging.Debug("Mirror.Handler: Error impersonating: " + err.Error())
 			return
 		}
 
@@ -172,14 +173,14 @@ func (m *Mirror) Handler(session *discordgo.Session, event any) {
 	case m.DestChannel != nil:
 		msg, err := utils.Discord.ImpersonateMessage(session, message.Author, message.Message, m.DestChannel.ID)
 		if err != nil {
-			utils.Logging.Debug("Mirror.Handler: Error impersonating: " + err.Error())
+			logging.Debug("Mirror.Handler: Error impersonating: " + err.Error())
 			return
 		}
 
 		m.eventBroker.Publish(eventbroker.EventHandleReactionMessage, msg)
 
 	default:
-		utils.Logging.Debug("Mirror.Handler: Invalid ignore type")
+		logging.Debug("Mirror.Handler: Invalid ignore type")
 		return
 	}
 }

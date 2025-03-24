@@ -4,10 +4,12 @@ import (
 	"fmt"
 	"path/filepath"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/LightningDev1/beeep"
 	"github.com/common-nighthawk/go-figure"
+	"github.com/lb-selfbot/discordgo"
 	"github.com/lb-selfbot/selfbot/internal/constants"
 	"github.com/lb-selfbot/selfbot/internal/embed"
 	"github.com/lb-selfbot/selfbot/internal/fn"
@@ -19,11 +21,20 @@ import (
 
 // Service handles high-level logging and displaying information to the user.
 type Service interface {
+	// ClearConsole clears the console.
+	ClearConsole()
+
 	// ShowBanner displays the LightningBot banner.
 	ShowBanner()
 
 	// ShowNotification displays a notification to the user.
 	ShowNotification(format string, e ...any) error
+
+	// LogError logs an error message.
+	LogError(format string, e ...any)
+
+	// LogInfo logs an info message.
+	LogInfo(format string, e ...any)
 }
 
 type uiService struct {
@@ -55,7 +66,7 @@ func (ui *uiService) subscribe() {
 			return
 		}
 
-		ui.logError("%s", text)
+		ui.LogError("%s", text)
 	})
 
 	ui.eventBroker.Subscribe(eventbroker.EventLogInfo, func(payload any) {
@@ -64,10 +75,14 @@ func (ui *uiService) subscribe() {
 			return
 		}
 
-		ui.logInfo("%s", text)
+		ui.LogInfo("%s", text)
 	})
 
 	ui.eventBroker.Subscribe(eventbroker.EventLogFeature, ui.logFeature)
+}
+
+func (ui *uiService) ClearConsole() {
+	ui.eventBroker.Publish(eventbroker.EventClearConsole, nil)
 }
 
 func (ui *uiService) ShowBanner() {
@@ -132,8 +147,47 @@ func (ui *uiService) ShowConsoleMessage(c *ConsoleMessage) error {
 			emb.AddField(info.Key, info.Value, false)
 		}
 
-		userID := ui.discordSvc.GetSession().State.User.ID
-		_ = emb.SendWebhook(userID, c.WebhookURL, c.Important)
+		cfg := ui.configSvc.GetConfig()
+
+		session := ui.discordSvc.GetSession()
+		userID := session.State.User.ID
+
+		contentBuilder := new(strings.Builder)
+
+		switch cfg.Webhooks.PingSelfMode {
+		case "Disabled":
+			break
+		case "Always":
+			contentBuilder.WriteString("<@!" + userID + ">\n")
+		case "Important":
+			if c.Important {
+				contentBuilder.WriteString("<@!" + userID + ">\n")
+			}
+		default:
+			cfg.Webhooks.PingSelfMode = "Disabled"
+			_ = ui.configSvc.SaveConfig(cfg)
+		}
+
+		switch cfg.Webhooks.PingEveryoneMode {
+		case "Disabled":
+			break
+		case "Always":
+			contentBuilder.WriteString("@everyone\n")
+		case "Important":
+			if c.Important {
+				contentBuilder.WriteString("@everyone\n")
+			}
+		default:
+			cfg.Webhooks.PingEveryoneMode = "Disabled"
+			_ = ui.configSvc.SaveConfig(cfg)
+		}
+
+		_, _ = session.Request("POST", c.WebhookURL, map[string]any{
+			"content":    contentBuilder.String(),
+			"embeds":     []*discordgo.MessageEmbed{emb.ToEmbed()},
+			"username":   "LightningBot",
+			"avatar_url": "https://lightning-bot.com/logo.png",
+		})
 	}
 
 	return nil
@@ -143,7 +197,7 @@ func (ui *uiService) formattedTime() string {
 	return time.Now().Local().Format("2006-01-02 15:04:05")
 }
 
-func (ui *uiService) logError(format string, e ...any) {
+func (ui *uiService) LogError(format string, e ...any) {
 	text := fmt.Sprintf(format, e...)
 
 	// Console
@@ -152,7 +206,7 @@ func (ui *uiService) logError(format string, e ...any) {
 	ui.eventBroker.Publish(eventbroker.EventAppendConsole, ui.colored(text, 255, 100, 100, true))
 }
 
-func (ui *uiService) logInfo(format string, e ...any) {
+func (ui *uiService) LogInfo(format string, e ...any) {
 	text := fmt.Sprintf(format, e...)
 
 	// Console

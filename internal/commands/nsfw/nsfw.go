@@ -18,8 +18,6 @@ func NewNSFWCommands(s *services.Services) *NSFWCommands {
 }
 
 func (c *NSFWCommands) Register() {
-	cmdRouter := c.services.Discord.GetRouter()
-
 	nsfwCommands := map[string][]string{
 		"thighs":  {"girlsinyogapants", "Thighs", "thighhighs", "ThickThighs", "UnderwearGW", "datgap", "leggingsgonewild", "pawg", "hipcleavage", "legs", "pantyhose"},
 		"ass":     {"ass", "asstastic", "facedownassup", "assinthong", "bigasses"},
@@ -57,7 +55,7 @@ func (c *NSFWCommands) Register() {
 		})
 	}
 
-	cmdRouter.RegisterCategory(&router.Category{
+	c.services.Router.RegisterCategory(&router.Category{
 		Name:        "NSFW",
 		Description: "NSFW commands",
 	}, commands)
@@ -74,9 +72,9 @@ func (c *NSFWCommands) generateFunc(name string, subReddits []string) func(ctx *
 			return
 		}
 
-		c.services.Embed.NewEmbed().
+		ctx.NewEmbed().
 			SetDescription(utils.String.Capitalize(name)).
 			SetImage(image.ImageURL).
-			Send(ctx)
+			Send()
 	}
 }

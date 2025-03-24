@@ -21,9 +21,7 @@ func NewCurrencyCommands(s *services.Services) *CurrencyCommands {
 }
 
 func (c *CurrencyCommands) Register() {
-	cmdRouter := c.services.Discord.GetRouter()
-
-	cmdRouter.RegisterCategory(&router.Category{
+	c.services.Router.RegisterCategory(&router.Category{
 		Name:        "Currency",
 		Description: "Info about (crypto)currencies",
 	}, []*router.Command{
@@ -136,14 +134,14 @@ func (c *CurrencyCommands) generateAddressFunc(name, shortCode string, power int
 		totalReceived := float64(json.Get("total_received").MustInt64()) / math.Pow10(power)
 		totalSent := float64(json.Get("total_sent").MustInt64()) / math.Pow10(power)
 
-		c.services.Embed.NewEmbed().
+		ctx.NewEmbed().
 			SetDescription("%s Address Info", name).
 			AddField("Address", address, true).
 			AddField("Balance", fmt.Sprintf("%.8f %s", balance, shortCode), true).
 			AddField("Transactions", transactions, true).
 			AddField("Total Received", fmt.Sprintf("%.8f %s", totalReceived, shortCode), true).
 			AddField("Total Sent", fmt.Sprintf("%.8f %s", totalSent, shortCode), true).
-			Send(ctx)
+			Send()
 	}
 }
 
@@ -170,7 +168,7 @@ func (c *CurrencyCommands) generateTransactionFunc(name, shortCode string, power
 		received := json.Get("received").MustString()
 		addresses := strings.Join(json.Get("addresses").MustStringArray(), ",\n")
 
-		c.services.Embed.NewEmbed().
+		ctx.NewEmbed().
 			SetDescription("%s Transaction Info", name).
 			AddField("Transaction Hash", hash, true).
 			AddField("Total Amount", fmt.Sprintf("%.8f %s", total, shortCode), true).
@@ -178,7 +176,7 @@ func (c *CurrencyCommands) generateTransactionFunc(name, shortCode string, power
 			AddField("Confirmations", confirmations, true).
 			AddField("Received At", received, true).
 			AddField("Addresses", addresses, true).
-			Send(ctx)
+			Send()
 	}
 }
 
@@ -226,13 +224,13 @@ func (c *CurrencyCommands) priceinfo(ctx *router.Ctx) {
 		}
 	}
 
-	emb := c.services.Embed.NewEmbed()
+	emb := ctx.NewEmbed()
 
 	for k, v := range parsed {
 		emb.AddField(k, v)
 	}
 
-	emb.Send(ctx)
+	emb.Send()
 }
 
 func (c *CurrencyCommands) searchsymbol(ctx *router.Ctx) {
@@ -254,7 +252,7 @@ func (c *CurrencyCommands) searchsymbol(ctx *router.Ctx) {
 		return
 	}
 
-	emb := c.services.Embed.NewEmbed()
+	emb := ctx.NewEmbed()
 
 	for i := range bestMatches.MustArray() {
 		stock := bestMatches.GetIndex(i)
@@ -268,7 +266,7 @@ func (c *CurrencyCommands) searchsymbol(ctx *router.Ctx) {
 		emb.AddField("Result "+strconv.Itoa(i+1), info)
 	}
 
-	emb.Send(ctx)
+	emb.Send()
 }
 
 func (c *CurrencyCommands) symbolinfo(ctx *router.Ctx) {
@@ -292,7 +290,7 @@ func (c *CurrencyCommands) symbolinfo(ctx *router.Ctx) {
 		return
 	}
 
-	emb := c.services.Embed.NewEmbed().
+	emb := ctx.NewEmbed().
 		SetDescription("Stock info for %s", symbol)
 
 	for key := range globalQuote.MustMap() {
@@ -303,5 +301,5 @@ func (c *CurrencyCommands) symbolinfo(ctx *router.Ctx) {
 		emb.AddField(utils.String.Capitalize(key), data)
 	}
 
-	emb.Send(ctx)
+	emb.Send()
 }

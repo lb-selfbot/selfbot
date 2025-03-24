@@ -2,6 +2,7 @@ package impl
 
 import (
 	"github.com/lb-selfbot/discordgo"
+	"github.com/lb-selfbot/selfbot/internal/logging"
 	"github.com/lb-selfbot/selfbot/internal/services/eventreactions/types"
 	"github.com/lb-selfbot/selfbot/internal/utils"
 )
@@ -69,7 +70,7 @@ func (r *RemoveReactions) Description() string {
 func (r *RemoveReactions) Equals(other types.EventReaction) bool {
 	otherRemoveReactions, ok := other.(*RemoveReactions)
 	if !ok {
-		utils.Logging.Debug("RemoveReactions.Equals: Other is not a RemoveReactions")
+		logging.Debug("RemoveReactions.Equals: Other is not a RemoveReactions")
 		return false
 	}
 	return r.Guild == otherRemoveReactions.Guild &&
@@ -96,7 +97,7 @@ func (r *RemoveReactions) Data() map[string]any {
 func (r *RemoveReactions) Handler(session *discordgo.Session, event any) {
 	reactionAdd, ok := event.(*discordgo.MessageReactionAdd)
 	if !ok {
-		utils.Logging.Debug("RemoveReactions.Handler: Event is not a message reaction add event")
+		logging.Debug("RemoveReactions.Handler: Event is not a message reaction add event")
 		return
 	}
 

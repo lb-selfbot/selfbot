@@ -15,6 +15,7 @@ import (
 	"time"
 	"unicode"
 
+	"github.com/lb-selfbot/selfbot/internal/logging"
 	"github.com/lb-selfbot/selfbot/internal/services/config"
 	"github.com/lb-selfbot/selfbot/internal/services/eventbroker"
 	"github.com/lb-selfbot/selfbot/internal/services/eventreactions/types"
@@ -136,7 +137,7 @@ func (s *Snipers) CheckNitroSniper(session *discordgo.Session, m *discordgo.Mess
 
 	rawMessage, err := json.Marshal(m)
 	if err != nil {
-		utils.Logging.Debug("Snipers.CheckNitroSniper: Error marshalling message: ", err)
+		logging.Debug("Snipers.CheckNitroSniper: Error marshalling message: ", err)
 		return
 	}
 
@@ -249,7 +250,7 @@ func (s *Snipers) CheckPrivnoteSniper(session *discordgo.Session, m *discordgo.M
 
 	rawMessage, err := json.Marshal(m)
 	if err != nil {
-		utils.Logging.Debug("Snipers.CheckNitroSniper: Error marshalling message: ", err)
+		logging.Debug("Snipers.CheckNitroSniper: Error marshalling message: ", err)
 		return
 	}
 
@@ -262,7 +263,7 @@ func (s *Snipers) CheckPrivnoteSniper(session *discordgo.Session, m *discordgo.M
 		beforeRequest := time.Now()
 		note, err := s.privnoteClient.ReadNoteFromLink(code)
 		if err != nil {
-			utils.Logging.Debug("Snipers.CheckPrivnoteSniper: Error reading note: ", err)
+			logging.Debug("Snipers.CheckPrivnoteSniper: Error reading note: ", err)
 			continue
 		}
 		elapsed := time.Since(beforeRequest)
@@ -277,7 +278,7 @@ func (s *Snipers) CheckPrivnoteSniper(session *discordgo.Session, m *discordgo.M
 
 		err = os.WriteFile(filePath, []byte(note), os.ModePerm)
 		if err != nil {
-			utils.Logging.Debug("Snipers.CheckPrivnoteSniper: Error writing note: ", err)
+			logging.Debug("Snipers.CheckPrivnoteSniper: Error writing note: ", err)
 			continue
 		}
 
@@ -371,7 +372,7 @@ func (s *Snipers) CheckGiveawaySniper(session *discordgo.Session, m *discordgo.M
 			// Evaluate the equation
 			typeValue, err := _types.Eval(token.NewFileSet(), nil, token.NoPos, equation)
 			if err != nil {
-				utils.Logging.Debug("Snipers.CheckGiveawaySniper: Error evaluating equation: ", err)
+				logging.Debug("Snipers.CheckGiveawaySniper: Error evaluating equation: ", err)
 				return
 			}
 
@@ -382,7 +383,7 @@ func (s *Snipers) CheckGiveawaySniper(session *discordgo.Session, m *discordgo.M
 
 			err = session.InteractionSubmitModal(m.Message, modal, textInput.CustomID, solution)
 			if err != nil {
-				utils.Logging.Debug("Snipers.CheckGiveawaySniper: Error submitting modal: ", err)
+				logging.Debug("Snipers.CheckGiveawaySniper: Error submitting modal: ", err)
 			}
 		})
 
@@ -400,7 +401,7 @@ func (s *Snipers) CheckGiveawaySniper(session *discordgo.Session, m *discordgo.M
 			// Click the enter button
 			err := session.InteractionClick(button, m.Message)
 			if err != nil {
-				utils.Logging.Debug("Snipers.CheckGiveawaySniper: Error clicking button: ", err)
+				logging.Debug("Snipers.CheckGiveawaySniper: Error clicking button: ", err)
 			}
 		}()
 	case "294882584201003009", "1041302711750119504": // GiveawayBot#2381, LightningBot#1992
@@ -468,7 +469,7 @@ func (s *Snipers) CheckGiveawaySniper(session *discordgo.Session, m *discordgo.M
 			// Click the enter button
 			err := session.InteractionClick(button, m.Message)
 			if err != nil {
-				utils.Logging.Debug("Snipers.CheckGiveawaySniper: Error clicking button: ", err)
+				logging.Debug("Snipers.CheckGiveawaySniper: Error clicking button: ", err)
 			}
 		}()
 	case "700743797977514004": // Friskytool#6219
@@ -526,7 +527,7 @@ func (s *Snipers) CheckGiveawaySniper(session *discordgo.Session, m *discordgo.M
 			// Add the enter reaction
 			err = session.MessageReactionAdd(m.ChannelID, m.ID, "🎉")
 			if err != nil {
-				utils.Logging.Debug("Snipers.CheckGiveawaySniper: Error adding reaction: ", err)
+				logging.Debug("Snipers.CheckGiveawaySniper: Error adding reaction: ", err)
 			}
 		}()
 	case "530082442967646230": // Giveaway Boat#2911
@@ -593,7 +594,7 @@ func (s *Snipers) CheckGiveawaySniper(session *discordgo.Session, m *discordgo.M
 			// Click the enter button
 			err = session.InteractionClick(button, m.Message)
 			if err != nil {
-				utils.Logging.Debug("Snipers.CheckGiveawaySniper: Error clicking button: ", err)
+				logging.Debug("Snipers.CheckGiveawaySniper: Error clicking button: ", err)
 			}
 		}()
 	case "239631525350604801": // Pancake#3691
@@ -650,7 +651,7 @@ func (s *Snipers) CheckGiveawaySniper(session *discordgo.Session, m *discordgo.M
 			// Add the enter reaction
 			err := session.MessageReactionAdd(m.ChannelID, m.ID, "🎁")
 			if err != nil {
-				utils.Logging.Debug("Snipers.CheckGiveawaySniper: Error adding reaction: ", err)
+				logging.Debug("Snipers.CheckGiveawaySniper: Error adding reaction: ", err)
 			}
 		}()
 	case "651627261782523926": // Giveaways#8717
@@ -715,7 +716,7 @@ func (s *Snipers) CheckGiveawaySniper(session *discordgo.Session, m *discordgo.M
 			// Add the enter reaction
 			err := session.MessageReactionAdd(m.ChannelID, m.ID, "🎉")
 			if err != nil {
-				utils.Logging.Debug("Snipers.CheckGiveawaySniper: Error adding reaction: ", err)
+				logging.Debug("Snipers.CheckGiveawaySniper: Error adding reaction: ", err)
 			}
 		}()
 	case "368521195940741122": // Lawliet#5480
@@ -765,7 +766,7 @@ func (s *Snipers) CheckGiveawaySniper(session *discordgo.Session, m *discordgo.M
 			// Add the enter reaction
 			err := session.MessageReactionAdd(m.ChannelID, m.ID, emoji)
 			if err != nil {
-				utils.Logging.Debug("Snipers.CheckGiveawaySniper: Error adding reaction: ", err)
+				logging.Debug("Snipers.CheckGiveawaySniper: Error adding reaction: ", err)
 			}
 		}()
 	case "159985870458322944": // MEE6#4876
@@ -836,7 +837,7 @@ func (s *Snipers) CheckGiveawaySniper(session *discordgo.Session, m *discordgo.M
 			// Click the enter button
 			err = session.InteractionClick(enterButton, m.Message)
 			if err != nil {
-				utils.Logging.Debug("Snipers.CheckGiveawaySniper: Error clicking button: ", err)
+				logging.Debug("Snipers.CheckGiveawaySniper: Error clicking button: ", err)
 			}
 		}()
 	case "824119071556763668": // Apollo#2300
@@ -904,7 +905,7 @@ func (s *Snipers) CheckGiveawaySniper(session *discordgo.Session, m *discordgo.M
 			// Add the enter reaction
 			err := session.MessageReactionAdd(m.ChannelID, m.ID, "🎉")
 			if err != nil {
-				utils.Logging.Debug("Snipers.CheckGiveawaySniper: Error adding reaction: ", err)
+				logging.Debug("Snipers.CheckGiveawaySniper: Error adding reaction: ", err)
 			}
 		}()
 	case "235148962103951360": // Carl-bot#1536
@@ -968,7 +969,7 @@ func (s *Snipers) CheckGiveawaySniper(session *discordgo.Session, m *discordgo.M
 			// Click the enter button
 			err := session.InteractionClick(button, m.Message)
 			if err != nil {
-				utils.Logging.Debug("Snipers.CheckGiveawaySniper: Error clicking button: ", err)
+				logging.Debug("Snipers.CheckGiveawaySniper: Error clicking button: ", err)
 			}
 		}()
 	case "720351927581278219": // Invite Tracker#0478
@@ -1031,7 +1032,7 @@ func (s *Snipers) CheckGiveawaySniper(session *discordgo.Session, m *discordgo.M
 			// Click the enter button
 			err := session.InteractionClick(button, m.Message)
 			if err != nil {
-				utils.Logging.Debug("Snipers.CheckGiveawaySniper: Error clicking button: ", err)
+				logging.Debug("Snipers.CheckGiveawaySniper: Error clicking button: ", err)
 			}
 		}()
 	default: // Custom bots
@@ -1041,7 +1042,7 @@ func (s *Snipers) CheckGiveawaySniper(session *discordgo.Session, m *discordgo.M
 
 		rawMessage, err := json.Marshal(m)
 		if err != nil {
-			utils.Logging.Debug("Snipers.CheckGiveawaySniper: Error marshalling message: ", err)
+			logging.Debug("Snipers.CheckGiveawaySniper: Error marshalling message: ", err)
 			break
 		}
 
@@ -1095,7 +1096,7 @@ func (s *Snipers) CheckGiveawaySniper(session *discordgo.Session, m *discordgo.M
 				// Click the enter button
 				err = session.InteractionClick(button, m.Message)
 				if err != nil {
-					utils.Logging.Debug("Snipers.CheckGiveawaySniper: Error clicking button: ", err)
+					logging.Debug("Snipers.CheckGiveawaySniper: Error clicking button: ", err)
 				}
 
 				return
@@ -1104,7 +1105,7 @@ func (s *Snipers) CheckGiveawaySniper(session *discordgo.Session, m *discordgo.M
 			// Reload the message to get the updated reactions
 			newMessage, err := utils.Discord.GetChannelMessage(session, m.ChannelID, m.ID)
 			if err != nil {
-				utils.Logging.Debug("Snipers.CheckGiveawaySniper: Error reloading message: ", err)
+				logging.Debug("Snipers.CheckGiveawaySniper: Error reloading message: ", err)
 				return
 			}
 
@@ -1127,7 +1128,7 @@ func (s *Snipers) CheckGiveawaySniper(session *discordgo.Session, m *discordgo.M
 			// Add the enter reaction
 			err = session.MessageReactionAdd(m.ChannelID, m.ID, emoji)
 			if err != nil {
-				utils.Logging.Debug("Snipers.CheckGiveawaySniper: Error adding reaction: ", err)
+				logging.Debug("Snipers.CheckGiveawaySniper: Error adding reaction: ", err)
 			}
 		}()
 	}
@@ -1197,7 +1198,7 @@ func (s *Snipers) CheckGiveawaySniperEdit(session *discordgo.Session, m *discord
 			// Reload the message to get the updated reactions
 			newMessage, err := utils.Discord.GetChannelMessage(session, m.ChannelID, m.ID)
 			if err != nil {
-				utils.Logging.Debug("Snipers.CheckGiveawaySniper: Error reloading message: ", err)
+				logging.Debug("Snipers.CheckGiveawaySniper: Error reloading message: ", err)
 				return
 			}
 
@@ -1220,7 +1221,7 @@ func (s *Snipers) CheckGiveawaySniperEdit(session *discordgo.Session, m *discord
 			// Add the enter reaction
 			err = session.MessageReactionAdd(m.ChannelID, m.ID, emoji)
 			if err != nil {
-				utils.Logging.Debug("Snipers.CheckGiveawaySniper: Error adding reaction: ", err)
+				logging.Debug("Snipers.CheckGiveawaySniper: Error adding reaction: ", err)
 			}
 		}()
 	case "676039466175168543": // ZAP-Hosting Bot#7133
@@ -1270,7 +1271,7 @@ func (s *Snipers) CheckPokeTwoSniper(session *discordgo.Session, m *discordgo.Me
 
 		err := api.PokeTwoVerify(session.State.User.ID)
 		if err != nil {
-			utils.Logging.Debug("Snipers.CheckPokeTwoSniper: Error solving captcha: ", err)
+			logging.Debug("Snipers.CheckPokeTwoSniper: Error solving captcha: ", err)
 
 			s.eventBroker.Publish(eventbroker.EventLogInfo, "PokéTwo Sniper: Error solving captcha! You need to solve it manually at https://verify.poketwo.net/captcha/"+session.State.User.ID)
 
@@ -1339,7 +1340,7 @@ func (s *Snipers) CheckPokeTwoSniper(session *discordgo.Session, m *discordgo.Me
 	// Download the Pokémon image
 	resp := http.Get(emb.Image.URL)
 	if resp.Error != nil {
-		utils.Logging.Debug("Snipers.CheckPokeTwoSniper: Error getting image: ", resp.Error)
+		logging.Debug("Snipers.CheckPokeTwoSniper: Error getting image: ", resp.Error)
 		return
 	}
 
@@ -1349,7 +1350,7 @@ func (s *Snipers) CheckPokeTwoSniper(session *discordgo.Session, m *discordgo.Me
 	beforeRequest := time.Now()
 	pokemon, confidence, err := api.PokeTwo(image, cfg)
 	if err != nil {
-		utils.Logging.Debug("Snipers.CheckPokeTwoSniper: Error getting Pokémon: ", err)
+		logging.Debug("Snipers.CheckPokeTwoSniper: Error getting Pokémon: ", err)
 		return
 	}
 	elapsed := time.Since(beforeRequest)
@@ -1397,7 +1398,7 @@ func (s *Snipers) CheckPokeTwoSniper(session *discordgo.Session, m *discordgo.Me
 
 	_, err = session.ChannelMessageSend(m.ChannelID, "<@716390085896962058> c "+strings.ToLower(label))
 	if err != nil {
-		utils.Logging.Debug("Snipers.CheckPokeTwoSniper: Error catching Pokémon: ", err)
+		logging.Debug("Snipers.CheckPokeTwoSniper: Error catching Pokémon: ", err)
 		return
 	}
 
@@ -1472,7 +1473,7 @@ func (s *Snipers) CheckPokeTwoSniper(session *discordgo.Session, m *discordgo.Me
 		}()
 
 	case <-time.After(5 * time.Second):
-		utils.Logging.Debug("Snipers.CheckPokeTwoSniper: Pokémon not caught in time")
+		logging.Debug("Snipers.CheckPokeTwoSniper: Pokémon not caught in time")
 	}
 
 	// Remove the handler

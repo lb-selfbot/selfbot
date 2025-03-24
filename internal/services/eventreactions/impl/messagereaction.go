@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/lb-selfbot/selfbot/internal/api"
+	"github.com/lb-selfbot/selfbot/internal/logging"
 
 	"github.com/lb-selfbot/discordgo"
 	"github.com/lb-selfbot/selfbot/internal/services/eventbroker"
@@ -166,7 +167,7 @@ func (m *MessageReaction) Description() string {
 	case types.KeywordNotifier:
 		return "Keyword Notifier" + location
 	default:
-		utils.Logging.Debug("MessageReaction.Description: Unknown reaction type")
+		logging.Debug("MessageReaction.Description: Unknown reaction type")
 		return "MessageReaction reaction" + location
 	}
 }
@@ -174,7 +175,7 @@ func (m *MessageReaction) Description() string {
 func (m *MessageReaction) Equals(other types.EventReaction) bool {
 	otherMessageReaction, ok := other.(*MessageReaction)
 	if !ok {
-		utils.Logging.Debug("MessageReaction.Equals: Other is not a MessageReaction")
+		logging.Debug("MessageReaction.Equals: Other is not a MessageReaction")
 		return false
 	}
 
@@ -213,7 +214,7 @@ func (m *MessageReaction) Data() map[string]any {
 func (m *MessageReaction) Handler(session *discordgo.Session, event any) {
 	message, ok := event.(*discordgo.MessageCreate)
 	if !ok {
-		utils.Logging.Debug("MessageReaction.Handler: Event is not a message create event")
+		logging.Debug("MessageReaction.Handler: Event is not a message create event")
 		return
 	}
 
@@ -242,7 +243,7 @@ func (m *MessageReaction) Handler(session *discordgo.Session, event any) {
 	case types.AIResponder:
 		messages, err := utils.Discord.GetChannelMessages(session, message.ChannelID, 20)
 		if err != nil {
-			utils.Logging.Error("Responder.Handler: Error getting channel messages: " + err.Error())
+			logging.Error("Responder.Handler: Error getting channel messages: " + err.Error())
 			return
 		}
 
@@ -250,7 +251,7 @@ func (m *MessageReaction) Handler(session *discordgo.Session, event any) {
 
 		response, err := api.GPTCustom(gptMessages)
 		if err != nil {
-			utils.Logging.Error("Responder.Handler: Error getting AI response: " + response + err.Error())
+			logging.Error("Responder.Handler: Error getting AI response: " + response + err.Error())
 			return
 		}
 

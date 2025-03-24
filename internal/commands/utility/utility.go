@@ -25,7 +25,10 @@ import (
 	"time"
 
 	"github.com/lb-selfbot/selfbot/internal/conversion"
+	"github.com/lb-selfbot/selfbot/internal/logging"
 	"github.com/lb-selfbot/selfbot/internal/random"
+	"github.com/lb-selfbot/selfbot/internal/services/config"
+	"github.com/lb-selfbot/selfbot/internal/services/eventbroker"
 	"github.com/lb-selfbot/selfbot/internal/services/router"
 
 	"github.com/lb-selfbot/selfbot/internal/fn"
@@ -58,9 +61,7 @@ func NewUtilityCommands(s *services.Services) *UtilityCommands {
 }
 
 func (c *UtilityCommands) Register() {
-	cmdRouter := c.services.Discord.GetRouter()
-
-	cmdRouter.RegisterCategory(&router.Category{
+	c.services.Router.RegisterCategory(&router.Category{
 		Name:        "Utility",
 		Description: "Utility commands",
 	}, []*router.Command{
@@ -1008,9 +1009,9 @@ func (c *UtilityCommands) copyserver(ctx *router.Ctx) {
 			time.Sleep(duration)
 		}
 	}
-	c.services.Embed.NewEmbed().
+	ctx.NewEmbed().
 		SetDescription("Server copied successfully!").
-		Send(ctx)
+		Send()
 }
 
 func (c *UtilityCommands) copychannel(ctx *router.Ctx) {
@@ -1148,9 +1149,9 @@ func (c *UtilityCommands) adminservers(ctx *router.Ctx) {
 		}
 	}
 
-	c.services.Embed.NewEmbed().
+	ctx.NewEmbed().
 		AddField("Admin Servers", adminServerString).
-		Send(ctx)
+		Send()
 }
 
 func (c *UtilityCommands) admingroups(ctx *router.Ctx) {
@@ -1162,9 +1163,9 @@ func (c *UtilityCommands) admingroups(ctx *router.Ctx) {
 			}
 		}
 	}
-	c.services.Embed.NewEmbed().
+	ctx.NewEmbed().
 		AddField("Admin Groups", adminGroupsString).
-		Send(ctx)
+		Send()
 }
 
 func (c *UtilityCommands) joinvc(ctx *router.Ctx) {
@@ -1192,9 +1193,9 @@ func (c *UtilityCommands) snipe(ctx *router.Ctx) {
 
 	messages := c.services.EventReactions.GetDeletedMessages(channel.ID)
 	if len(messages) == 0 {
-		c.services.Embed.NewEmbed().
+		ctx.NewEmbed().
 			SetDescription("No deleted message was found in this channel!").
-			Send(ctx)
+			Send()
 		return
 	}
 
@@ -1225,9 +1226,9 @@ func (c *UtilityCommands) snipe(ctx *router.Ctx) {
 		)
 	}
 
-	c.services.Embed.NewEmbed().
+	ctx.NewEmbed().
 		AddField("Deleted Messages", formatted).
-		Send(ctx)
+		Send()
 }
 
 func (c *UtilityCommands) editsnipe(ctx *router.Ctx) {
@@ -1239,21 +1240,21 @@ func (c *UtilityCommands) editsnipe(ctx *router.Ctx) {
 
 	messages := c.services.EventReactions.GetEditedMessages(channel.ID)
 	if len(messages) == 0 {
-		c.services.Embed.NewEmbed().
+		ctx.NewEmbed().
 			SetDescription("No deleted message was found in this channel!").
-			Send(ctx)
+			Send()
 		return
 	}
 
 	message := messages[len(messages)-1]
-	emb := c.services.Embed.NewEmbed()
+	emb := ctx.NewEmbed()
 	if message.Author != nil {
 		emb.AddField("Author", message.Author.String()+" | "+message.Author.ID)
 	}
 	emb.AddField("Sent At", utils.Discord.SnowflakeToTime(message.ID).Format(time.RFC1123))
 	emb.AddField("Old Content", message.BeforeUpdate.Content)
 	emb.AddField("New Content", message.Content)
-	emb.Send(ctx)
+	emb.Send()
 }
 
 func (c *UtilityCommands) firstmessage(ctx *router.Ctx) {
@@ -1271,12 +1272,12 @@ func (c *UtilityCommands) firstmessage(ctx *router.Ctx) {
 		ctx.RespondText("Error getting messages")
 		return
 	}
-	c.services.Embed.NewEmbed().
+	ctx.NewEmbed().
 		SetDescription("First Message").
 		AddField("Author", messages[0].Author.String()).
 		AddField("Message", messages[0].Content).
 		AddField("Jump URL", utils.Discord.GetMessageLink(messages[0])).
-		Send(ctx)
+		Send()
 }
 
 func (c *UtilityCommands) hypesquad(ctx *router.Ctx) {
@@ -1296,9 +1297,9 @@ func (c *UtilityCommands) hypesquad(ctx *router.Ctx) {
 		ctx.RespondText("Error setting hypesquad: %v", err)
 	}
 
-	c.services.Embed.NewEmbed().
+	ctx.NewEmbed().
 		SetDescription("Hypesquad set successfully!").
-		Send(ctx)
+		Send()
 }
 
 func (c *UtilityCommands) leavehypesquad(ctx *router.Ctx) {
@@ -1307,9 +1308,9 @@ func (c *UtilityCommands) leavehypesquad(ctx *router.Ctx) {
 		ctx.RespondText("Error leaving hypesquad: %v", err)
 	}
 
-	c.services.Embed.NewEmbed().
+	ctx.NewEmbed().
 		SetDescription("Left hypesquad successfully!").
-		Send(ctx)
+		Send()
 }
 
 func (c *UtilityCommands) theme(ctx *router.Ctx) {
@@ -1332,9 +1333,9 @@ func (c *UtilityCommands) theme(ctx *router.Ctx) {
 		return
 	}
 
-	c.services.Embed.NewEmbed().
+	ctx.NewEmbed().
 		SetDescription("Theme set successfully!").
-		Send(ctx)
+		Send()
 }
 
 func (c *UtilityCommands) compact(ctx *router.Ctx) {
@@ -1351,9 +1352,9 @@ func (c *UtilityCommands) compact(ctx *router.Ctx) {
 		return
 	}
 
-	c.services.Embed.NewEmbed().
+	ctx.NewEmbed().
 		SetDescription("Compact mode set successfully!").
-		Send(ctx)
+		Send()
 }
 
 func (c *UtilityCommands) devmode(ctx *router.Ctx) {
@@ -1370,15 +1371,15 @@ func (c *UtilityCommands) devmode(ctx *router.Ctx) {
 		return
 	}
 
-	c.services.Embed.NewEmbed().
+	ctx.NewEmbed().
 		SetDescription("Developer mode set successfully!").
-		Send(ctx)
+		Send()
 }
 
 func (c *UtilityCommands) sessionid(ctx *router.Ctx) {
-	c.services.Embed.NewEmbed().
+	ctx.NewEmbed().
 		AddField("Session ID", ctx.Session.State.SessionID).
-		Send(ctx)
+		Send()
 }
 
 func (c *UtilityCommands) aboutme(ctx *router.Ctx) {
@@ -1393,9 +1394,9 @@ func (c *UtilityCommands) aboutme(ctx *router.Ctx) {
 		return
 	}
 
-	c.services.Embed.NewEmbed().
+	ctx.NewEmbed().
 		SetDescription("Bio set successfully!").
-		Send(ctx)
+		Send()
 }
 
 func (c *UtilityCommands) displayname(ctx *router.Ctx) {
@@ -1410,9 +1411,9 @@ func (c *UtilityCommands) displayname(ctx *router.Ctx) {
 		return
 	}
 
-	c.services.Embed.NewEmbed().
+	ctx.NewEmbed().
 		SetDescription("Display name set successfully!").
-		Send(ctx)
+		Send()
 }
 
 func (c *UtilityCommands) pronouns(ctx *router.Ctx) {
@@ -1422,9 +1423,9 @@ func (c *UtilityCommands) pronouns(ctx *router.Ctx) {
 		return
 	}
 
-	c.services.Embed.NewEmbed().
+	ctx.NewEmbed().
 		SetDescription("Pronouns set successfully!").
-		Send(ctx)
+		Send()
 }
 
 func (c *UtilityCommands) nickscan(ctx *router.Ctx) {
@@ -1442,9 +1443,9 @@ func (c *UtilityCommands) nickscan(ctx *router.Ctx) {
 		}
 	}
 
-	c.services.Embed.NewEmbed().
+	ctx.NewEmbed().
 		AddField("Nicknames", nickText).
-		Send(ctx)
+		Send()
 }
 
 func (c *UtilityCommands) getmessagejson(ctx *router.Ctx) {
@@ -1473,10 +1474,10 @@ func (c *UtilityCommands) getmessagejson(ctx *router.Ctx) {
 		return
 	}
 
-	c.services.Embed.NewEmbed().
+	ctx.NewEmbed().
 		SetTitle("Message JSON").
 		SetDescription(string(jsonData)).
-		Send(ctx)
+		Send()
 }
 
 func (c *UtilityCommands) getembedjson(ctx *router.Ctx) {
@@ -1505,10 +1506,10 @@ func (c *UtilityCommands) getembedjson(ctx *router.Ctx) {
 		return
 	}
 
-	c.services.Embed.NewEmbed().
+	ctx.NewEmbed().
 		SetTitle("Message JSON").
 		SetDescription(string(jsonData)).
-		Send(ctx)
+		Send()
 }
 
 func (c *UtilityCommands) sendmessagejson(ctx *router.Ctx) {
@@ -1575,11 +1576,11 @@ func (c *UtilityCommands) sendinterval(ctx *router.Ctx) {
 }
 
 func (c *UtilityCommands) optionpoll(ctx *router.Ctx) {
-	messages := c.services.Embed.NewEmbed().
+	messages := ctx.NewEmbed().
 		SetDescription("Poll: "+ctx.Arguments.Get(0).Raw()).
 		AddField("👍", ctx.Arguments.Get(0).Raw()).
 		AddField("👎", ctx.Arguments.Get(0).Raw()).
-		Send(ctx)
+		Send()
 
 	if len(messages) > 0 {
 		_ = ctx.Session.MessageReactionAdd(ctx.Message.ChannelID, messages[0].ID, "👍")
@@ -1659,9 +1660,9 @@ func (c *UtilityCommands) checktoken(ctx *router.Ctx) {
 			return
 		}
 
-		c.services.Embed.NewEmbed().
+		ctx.NewEmbed().
 			AddField("Status", "Invalid Token").
-			Send(ctx)
+			Send()
 		return
 	}
 
@@ -1671,7 +1672,7 @@ func (c *UtilityCommands) checktoken(ctx *router.Ctx) {
 		return
 	}
 
-	c.services.Embed.NewEmbed().
+	ctx.NewEmbed().
 		AddField("Status", "Valid Token").
 		AddField("Username", fmt.Sprintf("%s#%s", tokenData.Get("username").MustString(), tokenData.Get("discriminator").MustString())).
 		AddField("ID", tokenData.Get("id").MustString()).
@@ -1687,7 +1688,7 @@ func (c *UtilityCommands) checktoken(ctx *router.Ctx) {
 		AddField("Email", tokenData.Get("email").MustString()).
 		AddField("Verified", utils.Misc.FormatBoolYesNo(tokenData.Get("verified").MustBool())).
 		AddField("Phone", tokenData.Get("phone").MustString()).
-		Send(ctx)
+		Send()
 }
 
 func (c *UtilityCommands) discordstatus(ctx *router.Ctx) {
@@ -1699,7 +1700,7 @@ func (c *UtilityCommands) discordstatus(ctx *router.Ctx) {
 
 	components := httpResponse.Json().Get("components")
 
-	emb := c.services.Embed.NewEmbed()
+	emb := ctx.NewEmbed()
 
 	for i := 0; i < len(components.MustArray()); i++ {
 		component := components.GetIndex(i)
@@ -1709,7 +1710,7 @@ func (c *UtilityCommands) discordstatus(ctx *router.Ctx) {
 		)
 	}
 
-	emb.Send(ctx)
+	emb.Send()
 }
 
 // LightningBot Utilities
@@ -1732,10 +1733,10 @@ func (c *UtilityCommands) changelog(ctx *router.Ctx) {
 		return
 	}
 
-	c.services.Embed.NewEmbed().
+	ctx.NewEmbed().
 		AddField("Latest Version", resp.GetPath("latest", "version").MustString()).
 		AddField("Changelog", resp.GetPath("latest", "changelog").MustString()).
-		Send(ctx)
+		Send()
 }
 
 func (c *UtilityCommands) version(ctx *router.Ctx) {
@@ -1748,25 +1749,25 @@ func (c *UtilityCommands) version(ctx *router.Ctx) {
 		return
 	}
 
-	c.services.Embed.NewEmbed().
+	ctx.NewEmbed().
 		AddField("Current Version", constants.VERSION[1:]).
 		AddField("Latest Version", resp.GetPath("latest", "version").MustString()).
-		Send(ctx)
+		Send()
 }
 
 func (c *UtilityCommands) uptime(ctx *router.Ctx) {
-	c.services.Embed.NewEmbed().
+	ctx.NewEmbed().
 		AddField("Uptime", utils.Misc.FormatDuration(time.Since(constants.START_TIME))).
-		Send(ctx)
+		Send()
 }
 
 func (c *UtilityCommands) history(ctx *router.Ctx) {
 	usedCmds := fn.Limit(c.services.EventReactions.GetUsedCommands(), 10)
 
 	if len(usedCmds) == 0 {
-		c.services.Embed.NewEmbed().
+		ctx.NewEmbed().
 			SetDescription("No commands have been used yet.").
-			Send(ctx)
+			Send()
 		return
 	}
 
@@ -1774,16 +1775,16 @@ func (c *UtilityCommands) history(ctx *router.Ctx) {
 		return fmt.Sprintf("%d. %s", i+1, cmd.Message.Content)
 	})
 
-	c.services.Embed.NewEmbed().
+	ctx.NewEmbed().
 		AddField("Used Commands", strings.Join(usedCmdsReadable, "\n")).
-		Send(ctx)
+		Send()
 }
 
 func (c *UtilityCommands) restartbot(*router.Ctx) {
 	if constants.CONSOLE {
 		system.RestartExecution()
 	} else {
-		c.services.IPC.SendRestart()
+		c.services.EventBroker.Publish(eventbroker.EventRestart, nil)
 	}
 }
 
@@ -1810,16 +1811,13 @@ func (c *UtilityCommands) remote(ctx *router.Ctx) {
 	commandName := ctx.Arguments.Get(1).Raw()
 	args := ctx.Arguments.RawFrom(2)
 
-	cmds := fn.Filter(ctx.Router.GetCmds(), func(cmd *router.Command) bool {
-		return strings.EqualFold(cmd.Name, commandName)
-	})
-
-	if len(cmds) == 0 {
+	cmd := ctx.Router.GetCommand(commandName)
+	if cmd == nil {
 		ctx.RespondText("Command not found")
 		return
 	}
 
-	ctx.Router.InvokeRemoteCmd(ctx.Session, channel, ctx.Message.Author, cmds[0], args)
+	ctx.Router.InvokeRemoteCmd(ctx.Session, channel, ctx.Message.Author, cmd, args)
 }
 
 // System Utilities
@@ -1861,7 +1859,7 @@ func (c *UtilityCommands) systeminfo(ctx *router.Ctx) {
 		return
 	}
 
-	c.services.Embed.NewEmbed().
+	ctx.NewEmbed().
 		SetDescription("System Information").
 		AddField("OS", utils.String.Capitalize(hostStat.OS)).
 		AddField("Platform", fmt.Sprintf("%s - %s", hostStat.Platform, hostStat.PlatformVersion)).
@@ -1869,7 +1867,7 @@ func (c *UtilityCommands) systeminfo(ctx *router.Ctx) {
 		AddField("CPU Info", fmt.Sprintf("Model: %s\nFrequency: %.f MHz\nCores: %d\nVendor: %s", cpuInfo.ModelName, cpuInfo.Mhz, cpuInfo.Cores, cpuInfo.VendorID)).
 		AddField("Memory Info", fmt.Sprintf("Total: %d MB\nFree: %d MB\nUsed: %d MB\nUsed Percentage: %.2f%%", vmStat.Total/1024/1024, vmStat.Free/1024/1024, vmStat.Used/1024/1024, vmStat.UsedPercent)).
 		AddField("Disk Info", fmt.Sprintf("Total: %d MB\nFree: %d MB\nUsed: %d MB\nUsed Percentage: %.2f%%", diskStat.Total/1024/1024, diskStat.Free/1024/1024, diskStat.Used/1024/1024, diskStat.UsedPercent)).
-		Send(ctx)
+		Send()
 }
 
 func (c *UtilityCommands) shutdownpc(ctx *router.Ctx) {
@@ -1896,10 +1894,10 @@ func (c *UtilityCommands) activewindow(ctx *router.Ctx) {
 	pid, _ := foreground.GetForegroundPID()
 	title, _ := foreground.GetForegroundTitle()
 
-	c.services.Embed.NewEmbed().
+	ctx.NewEmbed().
 		AddField("Active Window PID", fmt.Sprint(pid)).
 		AddField("Active Window Title", title).
-		Send(ctx)
+		Send()
 }
 
 func (c *UtilityCommands) calc(ctx *router.Ctx) {
@@ -1954,9 +1952,9 @@ func (c *UtilityCommands) listdestinations(ctx *router.Ctx) {
 
 	sort.Strings(destinationsString)
 
-	c.services.Embed.NewEmbed().
+	ctx.NewEmbed().
 		AddField("Destinations", strings.Join(destinationsString, "\n")).
-		Send(ctx)
+		Send()
 }
 
 func (c *UtilityCommands) uploadss(ctx *router.Ctx) {
@@ -1990,11 +1988,11 @@ func (c *UtilityCommands) uploadss(ctx *router.Ctx) {
 		return
 	}
 
-	c.services.Embed.NewEmbed().
+	ctx.NewEmbed().
 		SetDescription("Screenshot").
 		AddField("URL", result.URL).
 		AddField("Direct URL", result.DirectURL).
-		Send(ctx)
+		Send()
 }
 
 func (c *UtilityCommands) uploadfile(ctx *router.Ctx) {
@@ -2033,11 +2031,11 @@ func (c *UtilityCommands) uploadfile(ctx *router.Ctx) {
 		return
 	}
 
-	c.services.Embed.NewEmbed().
+	ctx.NewEmbed().
 		SetDescription("Uploaded file: %s", attachments[0].Filename).
 		AddField("URL", result.URL).
 		AddField("Direct URL", result.DirectURL).
-		Send(ctx)
+		Send()
 }
 
 func (c *UtilityCommands) uploadlink(ctx *router.Ctx) {
@@ -2078,11 +2076,11 @@ func (c *UtilityCommands) uploadlink(ctx *router.Ctx) {
 		return
 	}
 
-	c.services.Embed.NewEmbed().
+	ctx.NewEmbed().
 		SetDescription("Uploaded file: %s", fileName).
 		AddField("URL", result.URL).
 		AddField("Direct URL", result.DirectURL).
-		Send(ctx)
+		Send()
 }
 
 // Paste utilities
@@ -2093,9 +2091,9 @@ func (c *UtilityCommands) pastebin(ctx *router.Ctx) {
 		ctx.RespondText("An error has occurred.")
 		return
 	}
-	c.services.Embed.NewEmbed().
+	ctx.NewEmbed().
 		AddField("Paste URL", paste).
-		Send(ctx)
+		Send()
 }
 
 func (c *UtilityCommands) pastefile(ctx *router.Ctx) {
@@ -2112,9 +2110,9 @@ func (c *UtilityCommands) pastefile(ctx *router.Ctx) {
 		return
 	}
 
-	c.services.Embed.NewEmbed().
+	ctx.NewEmbed().
 		AddField("Paste URL", paste).
-		Send(ctx)
+		Send()
 }
 
 func (c *UtilityCommands) tinyurl(ctx *router.Ctx) {
@@ -2124,10 +2122,10 @@ func (c *UtilityCommands) tinyurl(ctx *router.Ctx) {
 		ctx.RespondText("An error has occurred.")
 		return
 	}
-	c.services.Embed.NewEmbed().
+	ctx.NewEmbed().
 		AddField("URL", sourceUrl).
 		AddField("TinyURL", string(httpResponse.Body)).
-		Send(ctx)
+		Send()
 }
 
 // Obfuscation utilities
@@ -2176,31 +2174,31 @@ func (c *UtilityCommands) obfuscateFunc(lang, ext string) func(ctx *router.Ctx) 
 func (c *UtilityCommands) reviewdbtoken(ctx *router.Ctx) {
 	token, err := api.GetReviewDBToken(ctx.Session)
 	if err != nil {
-		c.services.Embed.NewEmbed().
+		ctx.NewEmbed().
 			SetDescription("Error getting token: %v", err).
-			Send(ctx)
+			Send()
 		return
 	}
 
-	c.services.Embed.NewEmbed().
+	ctx.NewEmbed().
 		AddField("Token", token).
-		Send(ctx)
+		Send()
 }
 
 func (c *UtilityCommands) getreviews(ctx *router.Ctx) {
 	user, err := ctx.Arguments.Get(0).User()
 	if err != nil {
-		c.services.Embed.NewEmbed().
+		ctx.NewEmbed().
 			SetDescription("Could not find user").
-			Send(ctx)
+			Send()
 		return
 	}
 
 	reviews, err := api.GetReviewDBReviews(user.ID)
 	if err != nil {
-		c.services.Embed.NewEmbed().
+		ctx.NewEmbed().
 			SetDescription("Error getting reviews: %v", err).
-			Send(ctx)
+			Send()
 		return
 	}
 
@@ -2210,46 +2208,42 @@ func (c *UtilityCommands) getreviews(ctx *router.Ctx) {
 		reviewString += fmt.Sprintf("**[%s] %s:**\n%s\n\n", review.Timestamp.Format(time.RFC1123), review.Username, review.Comment)
 	}
 
-	c.services.Embed.NewEmbed().
+	ctx.NewEmbed().
 		AddField("Reviews", reviewString).
-		Send(ctx)
+		Send()
 }
 
 func (c *UtilityCommands) addreview(ctx *router.Ctx) {
 	user, err := ctx.Arguments.Get(0).User()
 	if err != nil {
-		c.services.Embed.NewEmbed().
+		ctx.NewEmbed().
 			SetDescription("Could not find user").
-			Send(ctx)
+			Send()
 		return
 	}
 
 	err = api.AddReviewDBReview(ctx.Session, user.ID, ctx.Arguments.RawFrom(1))
 	if err != nil {
-		c.services.Embed.NewEmbed().
+		ctx.NewEmbed().
 			SetDescription("Error adding review: %v", err).
-			Send(ctx)
+			Send()
 		return
 	}
 
-	c.services.Embed.NewEmbed().
+	ctx.NewEmbed().
 		SetDescription("Successfully added review to %s!", user.Username).
-		Send(ctx)
+		Send()
 }
 
 // Tag utilities
 
 func (c *UtilityCommands) getTags(ctx *router.Ctx) {
-	cfg, err := config.GetConfig()
-	if err != nil {
-		ctx.RespondText("Error getting config: %v", err)
-		return
-	}
+	cfg := c.services.Config.GetConfig()
 
 	if len(cfg.Tags) == 0 {
-		c.services.Embed.NewEmbed().
+		ctx.NewEmbed().
 			SetDescription("No tags found.").
-			Send(ctx)
+			Send()
 		return
 	}
 
@@ -2259,17 +2253,13 @@ func (c *UtilityCommands) getTags(ctx *router.Ctx) {
 		tagList = append(tagList, fmt.Sprintf("%s:\n```\n%s\n```\n", tag, value))
 	}
 
-	c.services.Embed.NewEmbed().
+	ctx.NewEmbed().
 		AddField("Tags", strings.Join(tagList, "\n")).
-		Send(ctx)
+		Send()
 }
 
 func (c *UtilityCommands) addTag(ctx *router.Ctx) {
-	cfg, err := config.GetConfig()
-	if err != nil {
-		ctx.RespondText("Error getting config: %v", err)
-		return
-	}
+	cfg := c.services.Config.GetConfig()
 
 	if cfg.Tags == nil {
 		cfg.Tags = map[string]string{}
@@ -2280,142 +2270,131 @@ func (c *UtilityCommands) addTag(ctx *router.Ctx) {
 
 	cfg.Tags[name] = content
 
-	err = cfg.Save()
-	if err != nil {
+	if err := c.services.Config.SaveConfig(cfg); err != nil {
 		ctx.RespondText("Error saving tags: %v", err)
 		return
 	}
 
-	c.services.Embed.NewEmbed().
+	ctx.NewEmbed().
 		SetDescription("Successfully created tag.").
-		Send(ctx)
+		Send()
 }
 
 func (c *UtilityCommands) removeTag(ctx *router.Ctx) {
-	cfg, err := config.GetConfig()
-	if err != nil {
-		ctx.RespondText("Error getting config: %v", err)
-		return
-	}
+	cfg := c.services.Config.GetConfig()
 
 	name := ctx.Arguments.Get(0).Raw()
 
 	delete(cfg.Tags, name)
 
-	err = cfg.Save()
-	if err != nil {
+	if err := c.services.Config.SaveConfig(cfg); err != nil {
 		ctx.RespondText("Error saving tags: %v", err)
 		return
 	}
 
-	c.services.Embed.NewEmbed().
+	ctx.NewEmbed().
 		SetDescription("Successfully deleted tag.").
-		Send(ctx)
+		Send()
 }
 
 func (c *UtilityCommands) clearTags(ctx *router.Ctx) {
-	cfg, err := config.GetConfig()
-	if err != nil {
-		ctx.RespondText("Error getting config: %v", err)
-		return
-	}
+	cfg := c.services.Config.GetConfig()
 
 	cfg.Tags = map[string]string{}
 
-	err = cfg.Save()
-	if err != nil {
+	if err := c.services.Config.SaveConfig(cfg); err != nil {
 		ctx.RespondText("Error saving tags: %v", err)
 		return
 	}
 
-	c.services.Embed.NewEmbed().
+	ctx.NewEmbed().
 		SetDescription("Successfully cleared tags.").
-		Send(ctx)
+		Send()
 }
 
 // Creditcard commands
 
 func (c *UtilityCommands) mastercard(ctx *router.Ctx) {
 	creditCard := api.GenerateCreditCard("mastercard", ctx.Arguments.Raw())
-	c.services.Embed.NewEmbed().
+	ctx.NewEmbed().
 		AddField("Card Type", "Mastercard").
 		AddField("Card Number", creditCard.Number).
 		AddField("CVV", creditCard.CVV).
 		AddField("Expiry Date", creditCard.ExpiryDate).
 		SetImage(creditCard.Visualisation).
-		Send(ctx)
+		Send()
 }
 
 func (c *UtilityCommands) visa16(ctx *router.Ctx) {
 	creditCard := api.GenerateCreditCard("visa16", ctx.Arguments.Raw())
-	c.services.Embed.NewEmbed().
+	ctx.NewEmbed().
 		AddField("Card Type", "Visa").
 		AddField("Card Number", creditCard.Number).
 		AddField("CVV", creditCard.CVV).
 		AddField("Expiry Date", creditCard.ExpiryDate).
 		SetImage(creditCard.Visualisation).
-		Send(ctx)
+		Send()
 }
 
 func (c *UtilityCommands) visa13(ctx *router.Ctx) {
 	creditCard := api.GenerateCreditCard("visa13", ctx.Arguments.Raw())
-	c.services.Embed.NewEmbed().
+	ctx.NewEmbed().
 		AddField("Card Type", "Visa").
 		AddField("Card Number", creditCard.Number).
 		AddField("CVV", creditCard.CVV).
 		AddField("Expiry Date", creditCard.ExpiryDate).
 		SetImage(creditCard.Visualisation).
-		Send(ctx)
+		Send()
 }
 
 func (c *UtilityCommands) amex(ctx *router.Ctx) {
 	creditCard := api.GenerateCreditCard("amex", ctx.Arguments.Raw())
-	c.services.Embed.NewEmbed().
+	ctx.NewEmbed().
 		AddField("Card Type", "American Express").
 		AddField("Card Number", creditCard.Number).
 		AddField("CVV", creditCard.CVV).
 		AddField("Expiry Date", creditCard.ExpiryDate).
 		SetImage(creditCard.Visualisation).
-		Send(ctx)
+		Send()
 }
 
 func (c *UtilityCommands) discover(ctx *router.Ctx) {
 	creditCard := api.GenerateCreditCard("discover", ctx.Arguments.Raw())
-	c.services.Embed.NewEmbed().
+	ctx.NewEmbed().
 		AddField("Card Type", "Discover").
 		AddField("Card Number", creditCard.Number).
 		AddField("CVV", creditCard.CVV).
 		AddField("Expiry Date", creditCard.ExpiryDate).
 		SetImage(creditCard.Visualisation).
-		Send(ctx)
+		Send()
 }
 
 func (c *UtilityCommands) diners(ctx *router.Ctx) {
 	creditCard := api.GenerateCreditCard("diners", ctx.Arguments.Raw())
-	c.services.Embed.NewEmbed().
+	ctx.NewEmbed().
 		AddField("Card Type", "Diners").
 		AddField("Card Number", creditCard.Number).
 		AddField("CVV", creditCard.CVV).
 		AddField("Expiry Date", creditCard.ExpiryDate).
 		SetImage(creditCard.Visualisation).
-		Send(ctx)
+		Send()
 }
 
 func (c *UtilityCommands) jcb(ctx *router.Ctx) {
 	creditCard := api.GenerateCreditCard("jcb", ctx.Arguments.Raw())
-	c.services.Embed.NewEmbed().
+	ctx.NewEmbed().
 		AddField("Card Type", "JCB").
 		AddField("Card Number", creditCard.Number).
 		AddField("CVV", creditCard.CVV).
 		AddField("Expiry Date", creditCard.ExpiryDate).
 		SetImage(creditCard.Visualisation).
-		Send(ctx)
+		Send()
 }
 
 // Network utilities
 
 func (c *UtilityCommands) ping(ctx *router.Ctx) {
-	emb := c.services.Embed.NewEmbed()
+	emb := ctx.NewEmbed()
 	time, err := api.Ping("https://lightning-bot.com")
 	if err != nil {
 		emb.AddField("Ping to LightningBot", "Error")
@@ -2430,12 +2409,12 @@ func (c *UtilityCommands) ping(ctx *router.Ctx) {
 	}
 	emb.
 		AddField("Ping to Discord", fmt.Sprintf("%dms", ctx.Session.HeartbeatLatency().Milliseconds())).
-		Send(ctx)
+		Send()
 }
 
 func (c *UtilityCommands) pingweb(ctx *router.Ctx) {
 	host := ctx.Arguments.Get(0).Raw()
-	emb := c.services.Embed.NewEmbed()
+	emb := ctx.NewEmbed()
 
 	time, err := api.Ping(host)
 	if err != nil {
@@ -2444,7 +2423,7 @@ func (c *UtilityCommands) pingweb(ctx *router.Ctx) {
 		emb.AddField("Ping to "+host, fmt.Sprintf("%dms", time.Milliseconds()))
 	}
 
-	emb.Send(ctx)
+	emb.Send()
 }
 
 func (c *UtilityCommands) ipinfo(ctx *router.Ctx) {
@@ -2471,12 +2450,12 @@ func (c *UtilityCommands) ipinfo(ctx *router.Ctx) {
 		ipinfo.Get("loc").MustString(),
 	)
 
-	c.services.Embed.NewEmbed().
+	ctx.NewEmbed().
 		AddField("IP", ip).
 		AddField("Hostname", ipinfo.Get("hostname").MustString()).
 		AddField("Timezone", ipinfo.Get("timezone").MustString()).
 		AddField("Location", location).
-		Send(ctx)
+		Send()
 }
 
 func (c *UtilityCommands) portscan(ctx *router.Ctx) {
@@ -2499,13 +2478,13 @@ func (c *UtilityCommands) portscan(ctx *router.Ctx) {
 		"VNC":            5900,
 		"HTTP Alt":       8080,
 	}
-	emb := c.services.Embed.NewEmbed()
+	emb := ctx.NewEmbed()
 	for name, port := range ports {
 		if utils.Misc.IsPortOpen(host, port) {
 			emb.AddField(fmt.Sprintf("%s (%d)", name, port), "Open")
 		}
 	}
-	emb.Send(ctx)
+	emb.Send()
 }
 
 func (c *UtilityCommands) resolve(ctx *router.Ctx) {
@@ -2520,14 +2499,14 @@ func (c *UtilityCommands) resolve(ctx *router.Ctx) {
 	response := httpResponse.Json()
 
 	if response.Get("ip").MustString() == "" {
-		c.services.Embed.NewEmbed().SetDescription("Invalid domain.").Send(ctx)
+		ctx.NewEmbed().SetDescription("Invalid domain.").Send()
 		return
 	}
 
-	c.services.Embed.NewEmbed().
+	ctx.NewEmbed().
 		AddField("Domain", domain).
 		AddField("IP", response.Get("ip").MustString()).
-		Send(ctx)
+		Send()
 }
 
 func (c *UtilityCommands) reversedns(ctx *router.Ctx) {
@@ -2543,16 +2522,16 @@ func (c *UtilityCommands) reversedns(ctx *router.Ctx) {
 	response := httpResponse.Json()
 
 	if response.Get("error").MustArray() != nil {
-		c.services.Embed.NewEmbed().SetDescription("Invalid IP Address.").Send(ctx)
+		ctx.NewEmbed().SetDescription("Invalid IP Address.").Send()
 		return
 	}
 
 	domains := response.GetPath("response", "ip_addresses", "domain_names").MustStringArray()
 
-	c.services.Embed.NewEmbed().
+	ctx.NewEmbed().
 		AddField("IP Address", ip).
 		AddField("Domains", strings.Join(domains, ", ")).
-		Send(ctx)
+		Send()
 }
 
 func (c *UtilityCommands) reversemac(ctx *router.Ctx) {
@@ -2563,13 +2542,13 @@ func (c *UtilityCommands) reversemac(ctx *router.Ctx) {
 		return
 	}
 	if strings.Contains(string(httpResponse.Body), "Not Found") {
-		c.services.Embed.NewEmbed().SetDescription("Invalid MAC Address.").Send(ctx)
+		ctx.NewEmbed().SetDescription("Invalid MAC Address.").Send()
 		return
 	}
-	c.services.Embed.NewEmbed().
+	ctx.NewEmbed().
 		AddField("MAC Address", mac).
 		AddField("Vendor", string(httpResponse.Body)).
-		Send(ctx)
+		Send()
 }
 
 func (c *UtilityCommands) headers(ctx *router.Ctx) {
@@ -2585,18 +2564,18 @@ func (c *UtilityCommands) headers(ctx *router.Ctx) {
 		headers += fmt.Sprintf("%s: %s\n", key, strings.Join(value, ", "))
 	}
 
-	c.services.Embed.NewEmbed().
+	ctx.NewEmbed().
 		AddField("URL", url).
 		AddField("Headers", headers).
-		Send(ctx)
+		Send()
 }
 
 func (c *UtilityCommands) _interface(ctx *router.Ctx) {
-	c.services.Embed.NewEmbed().
+	ctx.NewEmbed().
 		AddField("Public IP", api.GetPublicIP()).
 		AddField("Local IP", api.GetLocalIP()).
 		AddField("MAC Address", api.GetMacAddress()).
-		Send(ctx)
+		Send()
 }
 
 // Poketwo utilities
@@ -2646,15 +2625,11 @@ func (c *UtilityCommands) snipepokemon(ctx *router.Ctx) {
 
 	image := utils.Misc.ImageToBase64(resp.Body)
 
-	cfg, err := config.GetConfig()
-	if err != nil {
-		ctx.RespondText("Error getting config: %v", err)
-		return
-	}
+	cfg := c.services.Config.GetConfig()
 
 	pokemon, _, err := api.PokeTwo(image, &cfg)
 	if err != nil {
-		utils.Logging.Debug("Snipers.CheckPokeTwoSniper: Error getting Pokémon: ", err)
+		logging.Debug("Snipers.CheckPokeTwoSniper: Error getting Pokémon: ", err)
 		return
 	}
 
@@ -2683,10 +2658,10 @@ func (c *UtilityCommands) snipepokemon(ctx *router.Ctx) {
 		return
 	}
 
-	c.services.Embed.NewEmbed().
+	ctx.NewEmbed().
 		SetDescription("Successfully sniped Pokémon").
 		AddField("Pokémon", label).
-		Send(ctx)
+		Send()
 }
 
 func (c *UtilityCommands) detectpokemon(ctx *router.Ctx) {
@@ -2706,15 +2681,11 @@ func (c *UtilityCommands) detectpokemon(ctx *router.Ctx) {
 
 	image := utils.Misc.ImageToBase64(resp.Body)
 
-	cfg, err := config.GetConfig()
-	if err != nil {
-		ctx.RespondText("Error getting config: %v", err)
-		return
-	}
+	cfg := c.services.Config.GetConfig()
 
 	pokemon, _, err := api.PokeTwo(image, &cfg)
 	if err != nil {
-		utils.Logging.Debug("Snipers.CheckPokeTwoSniper: Error getting Pokémon: ", err)
+		logging.Debug("Snipers.CheckPokeTwoSniper: Error getting Pokémon: ", err)
 		return
 	}
 
@@ -2741,20 +2712,16 @@ func (c *UtilityCommands) detectpokemon(ctx *router.Ctx) {
 		pokemon.Defense,
 	)
 
-	c.services.Embed.NewEmbed().
+	ctx.NewEmbed().
 		AddField("Names", names).
 		AddField("Info", info).
-		Send(ctx)
+		Send()
 }
 
 // Reminder utilities
 
 func (c *UtilityCommands) getReminders(ctx *router.Ctx) {
-	cfg, err := config.GetConfig()
-	if err != nil {
-		ctx.RespondText("Error getting config.")
-		return
-	}
+	cfg := c.services.Config.GetConfig()
 
 	if len(cfg.Reminders) == 0 {
 		ctx.RespondText("No reminders have been set!")
@@ -2766,17 +2733,13 @@ func (c *UtilityCommands) getReminders(ctx *router.Ctx) {
 		reminders = append(reminders, fmt.Sprintf("**ID: %d**: %s - %s", reminder.ID, reminder.Content, reminder.At.Format(time.RFC1123)))
 	}
 
-	c.services.Embed.NewEmbed().
+	ctx.NewEmbed().
 		AddField("Reminders", strings.Join(reminders, "\n")).
-		Send(ctx)
+		Send()
 }
 
 func (c *UtilityCommands) addReminder(ctx *router.Ctx) {
-	cfg, err := config.GetConfig()
-	if err != nil {
-		ctx.RespondText("Error getting config.")
-		return
-	}
+	cfg := c.services.Config.GetConfig()
 
 	name := ctx.Arguments.Get(0).Raw()
 
@@ -2805,23 +2768,18 @@ func (c *UtilityCommands) addReminder(ctx *router.Ctx) {
 		At:      time.Now().Add(duration),
 	})
 
-	err = cfg.Save()
-	if err != nil {
+	if err := c.services.Config.SaveConfig(cfg); err != nil {
 		ctx.RespondText("Error saving config: %v", err)
 		return
 	}
 
-	c.services.Embed.NewEmbed().
+	ctx.NewEmbed().
 		SetDescription("Successfully set reminder!").
-		Send(ctx)
+		Send()
 }
 
 func (c *UtilityCommands) removeReminder(ctx *router.Ctx) {
-	cfg, err := config.GetConfig()
-	if err != nil {
-		ctx.RespondText("Error getting config.")
-		return
-	}
+	cfg := c.services.Config.GetConfig()
 
 	name := ctx.Arguments.Get(0).Raw()
 
@@ -2829,35 +2787,29 @@ func (c *UtilityCommands) removeReminder(ctx *router.Ctx) {
 		return r.Name != name
 	})
 
-	err = cfg.Save()
-	if err != nil {
+	if err := c.services.Config.SaveConfig(cfg); err != nil {
 		ctx.RespondText("Error saving config: %v", err)
 		return
 	}
 
-	c.services.Embed.NewEmbed().
+	ctx.NewEmbed().
 		SetDescription("Successfully deleted reminder!").
-		Send(ctx)
+		Send()
 }
 
 func (c *UtilityCommands) clearReminders(ctx *router.Ctx) {
-	cfg, err := config.GetConfig()
-	if err != nil {
-		ctx.RespondText("Error getting config.")
-		return
-	}
+	cfg := c.services.Config.GetConfig()
 
 	cfg.Reminders = []config.Reminder{}
 
-	err = cfg.Save()
-	if err != nil {
+	if err := c.services.Config.SaveConfig(cfg); err != nil {
 		ctx.RespondText("Error saving config: %v", err)
 		return
 	}
 
-	c.services.Embed.NewEmbed().
+	ctx.NewEmbed().
 		SetDescription("Successfully cleared reminders!").
-		Send(ctx)
+		Send()
 }
 
 // Conversion utilities
@@ -2868,10 +2820,10 @@ func (c *UtilityCommands) checkIfUnitValid(ctx *router.Ctx, unit string, validUn
 		return true
 	}
 
-	c.services.Embed.NewEmbed().
+	ctx.NewEmbed().
 		AddField("Conversion error", "You have specified an invalid unit.").
 		AddField("Valid units", strings.Join(validUnits, ", ")).
-		Send(ctx)
+		Send()
 
 	return false
 }
@@ -2895,10 +2847,10 @@ func (c *UtilityCommands) convertvelocity(ctx *router.Ctx) {
 		ctx.RespondText("Error converting value: %v", err)
 	}
 
-	c.services.Embed.NewEmbed().
+	ctx.NewEmbed().
 		AddField("Value", strconv.FormatFloat(value, 'g', -1, 64)+" "+sourceUnit).
 		AddField("Converted", strconv.FormatFloat(result, 'g', -1, 64)+" "+destinationUnit).
-		Send(ctx)
+		Send()
 }
 
 func (c *UtilityCommands) convertarea(ctx *router.Ctx) {
@@ -2920,10 +2872,10 @@ func (c *UtilityCommands) convertarea(ctx *router.Ctx) {
 		ctx.RespondText("Error converting value: %v", err)
 	}
 
-	c.services.Embed.NewEmbed().
+	ctx.NewEmbed().
 		AddField("Value", strconv.FormatFloat(value, 'g', -1, 64)+" "+sourceUnit).
 		AddField("Converted", strconv.FormatFloat(result, 'g', -1, 64)+" "+destinationUnit).
-		Send(ctx)
+		Send()
 }
 
 func (c *UtilityCommands) convertlength(ctx *router.Ctx) {
@@ -2945,10 +2897,10 @@ func (c *UtilityCommands) convertlength(ctx *router.Ctx) {
 		ctx.RespondText("Error converting value: %v", err)
 	}
 
-	c.services.Embed.NewEmbed().
+	ctx.NewEmbed().
 		AddField("Value", strconv.FormatFloat(value, 'g', -1, 64)+" "+sourceUnit).
 		AddField("Converted", strconv.FormatFloat(result, 'g', -1, 64)+" "+destinationUnit).
-		Send(ctx)
+		Send()
 }
 
 func (c *UtilityCommands) converttemperature(ctx *router.Ctx) {
@@ -2970,10 +2922,10 @@ func (c *UtilityCommands) converttemperature(ctx *router.Ctx) {
 		ctx.RespondText("Error converting value: %v", err)
 	}
 
-	c.services.Embed.NewEmbed().
+	ctx.NewEmbed().
 		AddField("Value", strconv.FormatFloat(value, 'g', -1, 64)+" "+sourceUnit).
 		AddField("Converted", strconv.FormatFloat(result, 'g', -1, 64)+" "+destinationUnit).
-		Send(ctx)
+		Send()
 }
 
 func (c *UtilityCommands) converttime(ctx *router.Ctx) {
@@ -2995,10 +2947,10 @@ func (c *UtilityCommands) converttime(ctx *router.Ctx) {
 		ctx.RespondText("Error converting value: %v", err)
 	}
 
-	c.services.Embed.NewEmbed().
+	ctx.NewEmbed().
 		AddField("Value", strconv.FormatFloat(value, 'g', -1, 64)+" "+sourceUnit).
 		AddField("Converted", strconv.FormatFloat(result, 'g', -1, 64)+" "+destinationUnit).
-		Send(ctx)
+		Send()
 }
 
 func (c *UtilityCommands) convertvolume(ctx *router.Ctx) {
@@ -3020,10 +2972,10 @@ func (c *UtilityCommands) convertvolume(ctx *router.Ctx) {
 		ctx.RespondText("Error converting value: %v", err)
 	}
 
-	c.services.Embed.NewEmbed().
+	ctx.NewEmbed().
 		AddField("Value", strconv.FormatFloat(value, 'g', -1, 64)+" "+sourceUnit).
 		AddField("Converted", strconv.FormatFloat(result, 'g', -1, 64)+" "+destinationUnit).
-		Send(ctx)
+		Send()
 }
 
 func (c *UtilityCommands) convertmass(ctx *router.Ctx) {
@@ -3045,10 +2997,10 @@ func (c *UtilityCommands) convertmass(ctx *router.Ctx) {
 		ctx.RespondText("Error converting value: %v", err)
 	}
 
-	c.services.Embed.NewEmbed().
+	ctx.NewEmbed().
 		AddField("Value", strconv.FormatFloat(value, 'g', -1, 64)+" "+sourceUnit).
 		AddField("Converted", strconv.FormatFloat(result, 'g', -1, 64)+" "+destinationUnit).
-		Send(ctx)
+		Send()
 }
 
 // Misc utilities
@@ -3078,12 +3030,12 @@ func (c *UtilityCommands) translate(ctx *router.Ctx) {
 		ctx.RespondText("An error has occurred: %v", translateResult.Error)
 		return
 	}
-	c.services.Embed.NewEmbed().
+	ctx.NewEmbed().
 		AddField("Source Language", utils.String.Capitalize(constants.LANGUAGES[translateResult.SourceLanguage])).
 		AddField("Destination Language", utils.String.Capitalize(constants.LANGUAGES[translateResult.DestinationLanguage])).
 		AddField("Original Text", translateResult.Original).
 		AddField("Translated Text", translateResult.Result).
-		Send(ctx)
+		Send()
 }
 
 func (c *UtilityCommands) detectlang(ctx *router.Ctx) {
@@ -3092,11 +3044,11 @@ func (c *UtilityCommands) detectlang(ctx *router.Ctx) {
 		ctx.RespondText("An error has occurred: %v", translateResult.Error)
 		return
 	}
-	c.services.Embed.NewEmbed().
+	ctx.NewEmbed().
 		AddField("Text", translateResult.Original).
 		AddField("Detected Language", utils.String.Capitalize(constants.LANGUAGES[translateResult.SourceLanguage])).
 		AddField("Confidence", fmt.Sprintf("%.2f", translateResult.Confidence)).
-		Send(ctx)
+		Send()
 }
 
 func (c *UtilityCommands) english(ctx *router.Ctx) {
@@ -3105,11 +3057,11 @@ func (c *UtilityCommands) english(ctx *router.Ctx) {
 		ctx.RespondText("An error has occurred: %v", translateResult.Error)
 		return
 	}
-	c.services.Embed.NewEmbed().
+	ctx.NewEmbed().
 		AddField("Source Language", utils.String.Capitalize(constants.LANGUAGES[translateResult.SourceLanguage])).
 		AddField("Original Text", translateResult.Original).
 		AddField("Translated Text", translateResult.Result).
-		Send(ctx)
+		Send()
 }
 
 func (c *UtilityCommands) define(ctx *router.Ctx) {
@@ -3150,10 +3102,10 @@ func (c *UtilityCommands) define(ctx *router.Ctx) {
 		return obj != ""
 	})
 
-	c.services.Embed.NewEmbed().
+	ctx.NewEmbed().
 		AddField("Word", ctx.Arguments.Raw()).
 		AddField("Meanings", strings.Join(meanings, "\n")).
-		Send(ctx)
+		Send()
 }
 
 func (c *UtilityCommands) urbandictionary(ctx *router.Ctx) {
@@ -3177,14 +3129,14 @@ func (c *UtilityCommands) urbandictionary(ctx *router.Ctx) {
 
 	result := list.GetIndex(0)
 
-	c.services.Embed.NewEmbed().
+	ctx.NewEmbed().
 		AddField("Word", ctx.Arguments.Raw()).
 		AddField("Definition", result.Get("definition").MustString()).
 		AddField("Permalink", result.Get("permalink").MustString()).
 		AddField("Thumbs Up", fmt.Sprint(result.Get("thumbs_up").MustFloat64())).
 		AddField("Thumbs Down", fmt.Sprint(result.Get("thumbs_down").MustFloat64())).
 		AddField("Author", result.Get("author").MustString()).
-		Send(ctx)
+		Send()
 }
 
 func (c *UtilityCommands) wikipedia(ctx *router.Ctx) {
@@ -3199,10 +3151,10 @@ func (c *UtilityCommands) wikipedia(ctx *router.Ctx) {
 		article = article[:2000]
 	}
 
-	c.services.Embed.NewEmbed().
+	ctx.NewEmbed().
 		AddField("Query", query).
 		AddField("Wikipedia Summary", article).
-		Send(ctx)
+		Send()
 }
 
 func (c *UtilityCommands) weather(ctx *router.Ctx) {
@@ -3212,7 +3164,7 @@ func (c *UtilityCommands) weather(ctx *router.Ctx) {
 		return
 	}
 
-	c.services.Embed.NewEmbed().
+	ctx.NewEmbed().
 		SetDescription("Weather in %s, %s", weather.Get("name").MustString(), weather.GetPath("sys", "country").MustString()).
 		AddField("Description", utils.String.Capitalize(weather.Get("weather").GetIndex(0).Get("description").MustString())).
 		AddField("Temperature", fmt.Sprintf("%.2f °C", math.Round(weather.GetPath("main", "temp").MustFloat64()-273.15))).
@@ -3225,7 +3177,7 @@ func (c *UtilityCommands) weather(ctx *router.Ctx) {
 		AddField("Wind Speed", fmt.Sprintf("%.2f Km/h", math.Round(weather.GetPath("wind", "speed").MustFloat64()*3.6))).
 		AddField("Wind Gust", fmt.Sprintf("%.2f Km/h", math.Round(weather.GetPath("wind", "gust").MustFloat64()*3.6))).
 		AddField("Wind Direction", fmt.Sprintf("%.2f°", weather.GetPath("wind", "deg").MustFloat64())).
-		Send(ctx)
+		Send()
 }
 
 func (c *UtilityCommands) lvbypass(ctx *router.Ctx) {
@@ -3237,10 +3189,10 @@ func (c *UtilityCommands) lvbypass(ctx *router.Ctx) {
 
 	destination := resp.Get("destination").MustString()
 
-	c.services.Embed.NewEmbed().
+	ctx.NewEmbed().
 		AddField("URL", ctx.Arguments.Raw()).
 		AddField("Bypassed URL", utils.Misc.Or(destination, "An error has occurred")).
-		Send(ctx)
+		Send()
 }
 
 func (c *UtilityCommands) flightinfo(ctx *router.Ctx) {
@@ -3267,7 +3219,7 @@ func (c *UtilityCommands) flightinfo(ctx *router.Ctx) {
 	departureTime := data.GetPath("time", "scheduled", "departure").MustInt64()
 	arrivalTime := data.GetPath("time", "scheduled", "arrival").MustInt64()
 
-	c.services.Embed.NewEmbed().
+	ctx.NewEmbed().
 		AddField("Flight Number", data.GetPath("identification", "number", "default").MustString()).
 		AddField("Airline", data.GetPath("airline", "name").MustString()).
 		AddField("Departure Airport", data.GetPath("airport", "origin", "name").MustString()).
@@ -3275,7 +3227,7 @@ func (c *UtilityCommands) flightinfo(ctx *router.Ctx) {
 		AddField("Arrival Airport", data.GetPath("airport", "destination", "name").MustString()).
 		AddField("Arrival Time", time.Unix(arrivalTime, 0).Format("2006-01-02 15:04:05")).
 		AddField("Status", data.GetPath("status", "text").MustString()).
-		Send(ctx)
+		Send()
 }
 
 func (c *UtilityCommands) passgen(ctx *router.Ctx) {
@@ -3287,9 +3239,9 @@ func (c *UtilityCommands) passgen(ctx *router.Ctx) {
 
 	charAmount = fn.Clamp(charAmount, 1, 1000)
 
-	c.services.Embed.NewEmbed().
+	ctx.NewEmbed().
 		AddField("Password", random.String(charAmount, "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789#$%&")).
-		Send(ctx)
+		Send()
 }
 
 func (c *UtilityCommands) tokengen(ctx *router.Ctx) {
@@ -3301,16 +3253,16 @@ func (c *UtilityCommands) tokengen(ctx *router.Ctx) {
 
 	token := httpResponse.Json().Get("token").MustString()
 
-	c.services.Embed.NewEmbed().
+	ctx.NewEmbed().
 		AddField("Token", token).
-		Send(ctx)
+		Send()
 }
 
 func (c *UtilityCommands) revimage(ctx *router.Ctx) {
 	imageUrl := ctx.Arguments.Get(0).Raw()
-	c.services.Embed.NewEmbed().
+	ctx.NewEmbed().
 		AddField("Reverse Image Search URL", fmt.Sprintf("https://www.google.com/searchbyimage?image_url=%s", imageUrl)).
-		Send(ctx)
+		Send()
 }
 
 func (c *UtilityCommands) revavatar(ctx *router.Ctx) {
@@ -3319,9 +3271,9 @@ func (c *UtilityCommands) revavatar(ctx *router.Ctx) {
 		ctx.RespondText("Could not find user")
 		return
 	}
-	c.services.Embed.NewEmbed().
+	ctx.NewEmbed().
 		AddField("Search URL", fmt.Sprintf("https://www.google.com/searchbyimage?&image_url=%s", url.QueryEscape(user.AvatarURL("")))).
-		Send(ctx)
+		Send()
 }
 
 func (c *UtilityCommands) timezones(ctx *router.Ctx) {
@@ -3339,10 +3291,10 @@ func (c *UtilityCommands) timezones(ctx *router.Ctx) {
 		return
 	}
 
-	c.services.Embed.NewEmbed().
+	ctx.NewEmbed().
 		AddField("Continent", utils.String.Capitalize(continent)).
 		AddField("Timezones", strings.Join(json.MustStringArray(), ", ")).
-		Send(ctx)
+		Send()
 }
 
 func (c *UtilityCommands) timezoneinfo(ctx *router.Ctx) {
@@ -3359,12 +3311,12 @@ func (c *UtilityCommands) timezoneinfo(ctx *router.Ctx) {
 		return
 	}
 
-	c.services.Embed.NewEmbed().
+	ctx.NewEmbed().
 		AddField("Timezone", json.Get("timezone").MustString()).
 		AddField("Abbreviation", json.Get("abbreviation").MustString()).
 		AddField("UTC Offset", json.Get("utc_offset").MustString()).
 		AddField("Current Time", json.Get("datetime").MustString()).
-		Send(ctx)
+		Send()
 }
 
 func (c *UtilityCommands) calculate(ctx *router.Ctx) {
@@ -3381,10 +3333,10 @@ func (c *UtilityCommands) calculate(ctx *router.Ctx) {
 		return
 	}
 
-	c.services.Embed.NewEmbed().
+	ctx.NewEmbed().
 		AddField("Expression", ctx.Arguments.Get(0).Raw()).
 		AddField("Solution", tv.Value.String()).
-		Send(ctx)
+		Send()
 }
 
 func (c *UtilityCommands) googlesearch(ctx *router.Ctx) {
@@ -3393,12 +3345,12 @@ func (c *UtilityCommands) googlesearch(ctx *router.Ctx) {
 		ctx.RespondText("An error has occurred.")
 		return
 	}
-	emb := c.services.Embed.NewEmbed()
+	emb := ctx.NewEmbed()
 	for i := 0; i < len(results.MustArray()); i++ {
 		result := results.GetIndex(i)
 		emb.AddField(result.Get("title").MustString(), result.Get("url").MustString())
 	}
-	emb.Send(ctx)
+	emb.Send()
 }
 
 func (c *UtilityCommands) youtubesearch(ctx *router.Ctx) {
@@ -3407,7 +3359,7 @@ func (c *UtilityCommands) youtubesearch(ctx *router.Ctx) {
 		ctx.RespondText("An error has occurred.")
 		return
 	}
-	emb := c.services.Embed.NewEmbed()
+	emb := ctx.NewEmbed()
 	for i := 0; i < len(results.MustArray()); i++ {
 		result := results.GetIndex(i)
 		resultUrl := result.Get("url").MustString()
@@ -3416,7 +3368,7 @@ func (c *UtilityCommands) youtubesearch(ctx *router.Ctx) {
 		}
 		emb.AddField(result.Get("title").MustString(), result.Get("url").MustString())
 	}
-	emb.Send(ctx)
+	emb.Send()
 }
 
 func (c *UtilityCommands) youtubedl(ctx *router.Ctx) {
@@ -3480,30 +3432,30 @@ func (c *UtilityCommands) youtubedl(ctx *router.Ctx) {
 
 func (c *UtilityCommands) amazon(ctx *router.Ctx) {
 	query := ctx.Arguments.Raw()
-	c.services.Embed.NewEmbed().
+	ctx.NewEmbed().
 		AddField("Amazon Search", fmt.Sprintf("https://www.amazon.com/s?k=%s", url.QueryEscape(query))).
-		Send(ctx)
+		Send()
 }
 
 func (c *UtilityCommands) steam(ctx *router.Ctx) {
 	query := ctx.Arguments.Raw()
-	c.services.Embed.NewEmbed().
+	ctx.NewEmbed().
 		AddField("Steam Search", fmt.Sprintf("https://store.steampowered.com/search/?term=%s", url.QueryEscape(query))).
-		Send(ctx)
+		Send()
 }
 
 func (c *UtilityCommands) github(ctx *router.Ctx) {
 	query := ctx.Arguments.Raw()
-	c.services.Embed.NewEmbed().
+	ctx.NewEmbed().
 		AddField("GitHub Search", fmt.Sprintf("https://github.com/search?q=%s", url.QueryEscape(query))).
-		Send(ctx)
+		Send()
 }
 
 func (c *UtilityCommands) stackoverflow(ctx *router.Ctx) {
 	query := ctx.Arguments.Raw()
-	c.services.Embed.NewEmbed().
+	ctx.NewEmbed().
 		AddField("Stack Overflow Search", fmt.Sprintf("https://stackoverflow.com/search?q=%s", url.QueryEscape(query))).
-		Send(ctx)
+		Send()
 }
 
 func (c *UtilityCommands) searchcountry(ctx *router.Ctx) {
@@ -3529,8 +3481,8 @@ func (c *UtilityCommands) searchcountry(ctx *router.Ctx) {
 		languages = append(languages, language.(string))
 	}
 
-	c.services.Embed.NewEmbed().
-		SetAuthor(fmt.Sprintf("%s - %s", country.GetPath("name", "common").MustString(), country.Get("cca2").MustString())).
+	ctx.NewEmbed().
+		SetTitle(fmt.Sprintf("%s - %s", country.GetPath("name", "common").MustString(), country.Get("cca2").MustString())).
 		AddField("Name", country.GetPath("name", "common").MustString()).
 		AddField("Top-Level Domain", strings.Join(country.Get("tld").MustStringArray(), ", ")).
 		AddField("Country Code", country.Get("cca2").MustString()).
@@ -3542,7 +3494,7 @@ func (c *UtilityCommands) searchcountry(ctx *router.Ctx) {
 		AddField("Timezone", strings.Join(country.Get("timezones").MustStringArray(), ", ")).
 		AddField("Currency", strings.Join(currencies, ", ")).
 		AddField("Language", strings.Join(languages, ", ")).
-		Send(ctx)
+		Send()
 }
 
 func (c *UtilityCommands) randomcountry(ctx *router.Ctx) {
@@ -3568,8 +3520,8 @@ func (c *UtilityCommands) randomcountry(ctx *router.Ctx) {
 		languages = append(languages, language.(string))
 	}
 
-	c.services.Embed.NewEmbed().
-		SetAuthor(fmt.Sprintf("%s - %s", country.GetPath("name", "common").MustString(), country.Get("cca2").MustString())).
+	ctx.NewEmbed().
+		SetTitle(fmt.Sprintf("%s - %s", country.GetPath("name", "common").MustString(), country.Get("cca2").MustString())).
 		AddField("Name", country.GetPath("name", "common").MustString()).
 		AddField("Top-Level Domain", strings.Join(country.Get("tld").MustStringArray(), ", ")).
 		AddField("Country Code", country.Get("cca2").MustString()).
@@ -3581,7 +3533,7 @@ func (c *UtilityCommands) randomcountry(ctx *router.Ctx) {
 		AddField("Timezone", strings.Join(country.Get("timezones").MustStringArray(), ", ")).
 		AddField("Currency", strings.Join(currencies, ", ")).
 		AddField("Language", strings.Join(languages, ", ")).
-		Send(ctx)
+		Send()
 }
 
 func (c *UtilityCommands) loremipsum(ctx *router.Ctx) {
@@ -3596,9 +3548,9 @@ func (c *UtilityCommands) loremipsum(ctx *router.Ctx) {
 		return
 	}
 
-	c.services.Embed.NewEmbed().
+	ctx.NewEmbed().
 		SetDescription(string(httpResponse.Body)).
-		Send(ctx)
+		Send()
 }
 
 func (c *UtilityCommands) baconipsum(ctx *router.Ctx) {
@@ -3613,9 +3565,9 @@ func (c *UtilityCommands) baconipsum(ctx *router.Ctx) {
 		return
 	}
 
-	c.services.Embed.NewEmbed().
+	ctx.NewEmbed().
 		SetDescription(string(httpResponse.Body)).
-		Send(ctx)
+		Send()
 }
 
 func (c *UtilityCommands) previewcolor(ctx *router.Ctx) {
@@ -3648,11 +3600,11 @@ func (c *UtilityCommands) previewcolor(ctx *router.Ctx) {
 		name = data.GetPath("name", "value").MustString()
 	}
 
-	c.services.Embed.NewEmbed().
+	ctx.NewEmbed().
 		AddField("Color", name).
 		AddField("RGB", fmt.Sprintf("%d, %d, %d", r, g, b)).
 		AddField("Hex", "#"+hex).
-		Send(ctx)
+		Send()
 
 	preview, err := utils.Misc.PreviewColorImage(500, 100, r, g, b)
 	if err == nil {
@@ -3686,9 +3638,9 @@ func (c *UtilityCommands) generatekey(ctx *router.Ctx) {
 		keys = append(keys, key)
 	}
 
-	c.services.Embed.NewEmbed().
+	ctx.NewEmbed().
 		AddField("License Keys", strings.Join(keys, "\n")).
-		Send(ctx)
+		Send()
 }
 
 func (c *UtilityCommands) timestampCommand(flags string) func(ctx *router.Ctx) {

@@ -17,11 +17,13 @@ import (
 	"github.com/lb-selfbot/selfbot/internal/assets"
 	"github.com/lb-selfbot/selfbot/internal/browser"
 	"github.com/lb-selfbot/selfbot/internal/commands"
+	"github.com/lb-selfbot/selfbot/internal/services/authsync"
 
 	"github.com/lb-selfbot/selfbot/internal/constants"
 	"github.com/lb-selfbot/selfbot/internal/http"
 	"github.com/lb-selfbot/selfbot/internal/logging"
 	"github.com/lb-selfbot/selfbot/internal/savedtokens"
+	"github.com/lb-selfbot/selfbot/internal/services"
 
 	"github.com/lb-selfbot/discordgo"
 	"github.com/lb-selfbot/selfbot/internal/setup"
@@ -103,13 +105,13 @@ func checkFirstLaunch(services *services.Services) {
 
 	token := setup.GetToken()
 
-	cfg := config.GetDefaultConfig()
+	cfg := services.Config.GetConfig()
 
 	cfg.Account.LightningBot.Username = username
 	cfg.Account.LightningBot.Password = password
 	cfg.Account.Discord.Token = token
 
-	if err := cfg.Save(); err != nil {
+	if err := services.Config.SaveConfig(cfg); err != nil {
 		logging.Error("Save config error:", err)
 		os.Exit(1)
 	}
@@ -161,11 +163,9 @@ func main() {
 
 		cmdRegistry.Register(services)
 
-		router := services.Discord.GetRouter()
-
 		_ = json.NewEncoder(os.Stdout).Encode(map[string]any{
-			"commands":   router.GetCmds(),
-			"categories": router.GetCategories(),
+			"commands":   services.Router.GetCommands(),
+			"categories": services.Router.GetCategories(),
 		})
 		return
 
@@ -177,8 +177,7 @@ func main() {
 
 		cmdRegistry.Register(services)
 
-		router := services.Discord.GetRouter()
-		categories := router.GetCategories()
+		categories := services.Router.GetCategories()
 
 		data := make(map[string]any, len(categories))
 		for _, category := range categories {
@@ -244,23 +243,19 @@ func main() {
 	}
 
 	if constants.CONSOLE {
-		_ = services.UI.ClearConsole()
+		services.UI.ClearConsole()
 		services.UI.ShowBanner()
 
 		checkForUpdates(services)
 		checkFirstLaunch(services)
 	} else {
-		if err := services.IPC.Serve(); err != nil {
+		if err := services.IPC.Connect(); err != nil {
 			logging.Error("IPC serve error:", err)
 			os.Exit(1)
 		}
 	}
 
-	cfg, err := config.GetConfig()
-	if err != nil {
-		logging.Error("Load config error:", err)
-		os.Exit(1)
-	}
+	cfg := services.Config.GetConfig()
 
 	username, ok := os.LookupEnv("LB_USERNAME")
 	if !ok {
@@ -275,12 +270,12 @@ func main() {
 		token = cfg.Account.Discord.Token
 	}
 
-	creds := interfaces.AuthCredentials{
+	creds := authsync.Credentials{
 		Username: username,
 		Password: password,
 	}
 
-	if err = services.Auth.Connect(context.Background(), creds); err != nil {
+	if err = services.AuthSync.Connect(creds); err != nil {
 		os.Exit(1)
 	}
 
@@ -292,12 +287,12 @@ func main() {
 	cmdRegistry.Register(services)
 
 	if !constants.CONSOLE {
-		<-services.IPC.OnConnect()
+		<-services.IPC.GetReadyChan()
 	}
 
 	// Wait for auth to be ready
-	<-services.Auth.OnReady()
-	services.Auth.CheckNonce()
+	<-services.AuthSync.GetReadyChan()
+	services.AuthSync.CheckNonce()
 
 	if err := services.Discord.Open(); err != nil {
 		logging.Error("Discord open error:", err)
@@ -305,14 +300,6 @@ func main() {
 	}
 
 	services.Reminder.Start()
-	services.Variables.Init()
-
-	go func() {
-		err := services.MultiTokenSniper.Init(context.Background())
-		if err != nil {
-			services.UI.LogError("Error initializing multi-token sniper: " + err.Error())
-		}
-	}()
 
 	sc := make(chan os.Signal, 1)
 	signal.Notify(sc, syscall.SIGINT, syscall.SIGTERM)

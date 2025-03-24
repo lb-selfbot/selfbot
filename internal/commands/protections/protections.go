@@ -12,9 +12,7 @@ func NewProtectionsCommands(s *services.Services) *ProtectionsCommands {
 }
 
 func (c *ProtectionsCommands) Register() {
-	cmdRouter := c.services.Discord.GetRouter()
-
-	cmdRouter.RegisterCategory(&router.Category{
+	c.services.Router.RegisterCategory(&router.Category{
 		Name:        "Protections",
 		Description: "Protect your account",
 	}, []*router.Command{
@@ -100,9 +98,9 @@ func (c *ProtectionsCommands) Register() {
 
 // 	switch utils.Arguments["<get/set/toggle>"] {
 // 	case "get":
-// 		c.services.Embed.NewEmbed().
+// 		ctx.NewEmbed().
 // 			AddField("Anti Phishing", utils.Misc.FormatBoolOnOff(cfg.Protections.AntiPhishing)).
-// 			Send(ctx)
+// 			Send()
 // 	case "set":
 // 		toggle, err := ctx.Arguments.Get(0).Bool()
 // 		if err != nil {
@@ -111,18 +109,18 @@ func (c *ProtectionsCommands) Register() {
 // 		}
 
 // 		cfg.Protections.AntiPhishing = toggle
-// 		_ = cfg.Save()
+// 		_ = c.services.Config.SaveConfig(cfg)
 
-// 		c.services.Embed.NewEmbed().
+// 		ctx.NewEmbed().
 // 			SetDescription("Turned " + utils.Misc.FormatBoolOnOff(toggle) + " Anti Phishing").
-// 			Send(ctx)
+// 			Send()
 // 	case "toggle":
 // 		cfg.Protections.AntiPhishing = !cfg.Protections.AntiPhishing
-// 		_ = cfg.Save()
+// 		_ = c.services.Config.SaveConfig(cfg)
 
-// 		c.services.Embed.NewEmbed().
+// 		ctx.NewEmbed().
 // 			SetDescription("Turned " + utils.Misc.FormatBoolOnOff(cfg.Protections.AntiPhishing) + " Anti Phishing").
-// 			Send(ctx)
+// 			Send()
 // 	default:
 // 		ctx.RespondText("Invalid <get/set/toggle> argument. Use `get` or `set` or `toggle`.")
 // 	}
@@ -137,9 +135,9 @@ func (c *ProtectionsCommands) Register() {
 
 // 	switch utils.Arguments["<get/set/toggle>"] {
 // 	case "get":
-// 		c.services.Embed.NewEmbed().
+// 		ctx.NewEmbed().
 // 			AddField("Anti Friend Request Spam", utils.Misc.FormatBoolOnOff(cfg.Protections.AntiFriendRequest)).
-// 			Send(ctx)
+// 			Send()
 // 	case "set":
 // 		toggle, err := ctx.Arguments.Get(0).Bool()
 // 		if err != nil {
@@ -148,18 +146,18 @@ func (c *ProtectionsCommands) Register() {
 // 		}
 
 // 		cfg.Protections.AntiFriendRequest = toggle
-// 		_ = cfg.Save()
+// 		_ = c.services.Config.SaveConfig(cfg)
 
-// 		c.services.Embed.NewEmbed().
+// 		ctx.NewEmbed().
 // 			SetDescription("Turned " + utils.Misc.FormatBoolOnOff(toggle) + " Anti Friend Request Spam").
-// 			Send(ctx)
+// 			Send()
 // 	case "toggle":
 // 		cfg.Protections.AntiFriendRequest = !cfg.Protections.AntiFriendRequest
-// 		_ = cfg.Save()
+// 		_ = c.services.Config.SaveConfig(cfg)
 
-// 		c.services.Embed.NewEmbed().
+// 		ctx.NewEmbed().
 // 			SetDescription("Turned " + utils.Misc.FormatBoolOnOff(cfg.Protections.AntiFriendRequest) + " Anti Friend Request Spam").
-// 			Send(ctx)
+// 			Send()
 // 	default:
 // 		ctx.RespondText("Invalid <get/set/toggle> argument. Use `get` or `set` or `toggle`.")
 // 	}
@@ -174,9 +172,9 @@ func (c *ProtectionsCommands) Register() {
 
 // 	switch utils.Arguments["<get/set/toggle>"] {
 // 	case "get":
-// 		c.services.Embed.NewEmbed().
+// 		ctx.NewEmbed().
 // 			AddField("Anti Mass DM / DM Spam", utils.Misc.FormatBoolOnOff(cfg.Protections.AntiMassDM)).
-// 			Send(ctx)
+// 			Send()
 // 	case "set":
 // 		toggle, err := ctx.Arguments.Get(0).Bool()
 // 		if err != nil {
@@ -185,18 +183,18 @@ func (c *ProtectionsCommands) Register() {
 // 		}
 
 // 		cfg.Protections.AntiMassDM = toggle
-// 		_ = cfg.Save()
+// 		_ = c.services.Config.SaveConfig(cfg)
 
-// 		c.services.Embed.NewEmbed().
+// 		ctx.NewEmbed().
 // 			SetDescription("Turned " + utils.Misc.FormatBoolOnOff(toggle) + " Anti Mass DM / DM Spam").
-// 			Send(ctx)
+// 			Send()
 // 	case "toggle":
 // 		cfg.Protections.AntiMassDM = !cfg.Protections.AntiMassDM
-// 		_ = cfg.Save()
+// 		_ = c.services.Config.SaveConfig(cfg)
 
-// 		c.services.Embed.NewEmbed().
+// 		ctx.NewEmbed().
 // 			SetDescription("Turned " + utils.Misc.FormatBoolOnOff(cfg.Protections.AntiMassDM) + " Anti Mass DM / DM Spam").
-// 			Send(ctx)
+// 			Send()
 // 	default:
 // 		ctx.RespondText("Invalid <get/set/toggle> argument. Use `get` or `set` or `toggle`.")
 // 	}
@@ -223,9 +221,9 @@ func (c *ProtectionsCommands) Register() {
 // 			servers = append(servers, guild.Name+" ("+guild.ID+")")
 // 		}
 
-// 		c.services.Embed.NewEmbed().
+// 		ctx.NewEmbed().
 // 			AddField("Protected Servers List", strings.Join(servers, ", ")).
-// 			Send(ctx)
+// 			Send()
 // 	case "add":
 // 		guild, err := ctx.Arguments.Get(0).Guild(router.ArgumentFlagFallbackDefault)
 // 		if err != nil {
@@ -239,11 +237,11 @@ func (c *ProtectionsCommands) Register() {
 // 		}
 
 // 		cfg.Protections.ServerProtections.ProtectedServers = append(cfg.Protections.ServerProtections.ProtectedServers, guild.ID)
-// 		_ = cfg.Save()
+// 		_ = c.services.Config.SaveConfig(cfg)
 
-// 		c.services.Embed.NewEmbed().
+// 		ctx.NewEmbed().
 // 			SetDescription("Added %s to the Protected Servers List.", guild.Name).
-// 			Send(ctx)
+// 			Send()
 // 	case "rm":
 // 		guild, err := ctx.Arguments.Get(0).Guild(router.ArgumentFlagFallbackDefault)
 // 		if err != nil {
@@ -257,18 +255,18 @@ func (c *ProtectionsCommands) Register() {
 // 		}
 
 // 		cfg.Protections.ServerProtections.ProtectedServers = utils.RemoveSliceItem(cfg.Protections.ServerProtections.ProtectedServers, guild.ID)
-// 		_ = cfg.Save()
+// 		_ = c.services.Config.SaveConfig(cfg)
 
-// 		c.services.Embed.NewEmbed().
+// 		ctx.NewEmbed().
 // 			SetDescription("Removed %s from the Protected Servers List.", guild.Name).
-// 			Send(ctx)
+// 			Send()
 // 	case "clear":
 // 		cfg.Protections.ServerProtections.ProtectedServers = []string{}
-// 		_ = cfg.Save()
+// 		_ = c.services.Config.SaveConfig(cfg)
 
-// 		c.services.Embed.NewEmbed().
+// 		ctx.NewEmbed().
 // 			SetDescription("Cleared all Protected Servers List entries.").
-// 			Send(ctx)
+// 			Send()
 // 	default:
 // 		ctx.RespondText("Invalid <get/add/rm/clear> argument. Use `get`, `add`, `rm`, or `clear`.")
 // 	}
@@ -283,9 +281,9 @@ func (c *ProtectionsCommands) Register() {
 
 // 	switch utils.Arguments["<get/set/toggle>"] {
 // 	case "get":
-// 		c.services.Embed.NewEmbed().
+// 		ctx.NewEmbed().
 // 			AddField("Anti Invite (Server Protections)", utils.Misc.FormatBoolOnOff(cfg.Protections.ServerProtections.AntiInvite)).
-// 			Send(ctx)
+// 			Send()
 // 	case "set":
 // 		toggle, err := ctx.Arguments.Get(0).Bool()
 // 		if err != nil {
@@ -294,18 +292,18 @@ func (c *ProtectionsCommands) Register() {
 // 		}
 
 // 		cfg.Protections.ServerProtections.AntiInvite = toggle
-// 		_ = cfg.Save()
+// 		_ = c.services.Config.SaveConfig(cfg)
 
-// 		c.services.Embed.NewEmbed().
+// 		ctx.NewEmbed().
 // 			SetDescription("Turned " + utils.Misc.FormatBoolOnOff(toggle) + " Anti Invite (Server Protections)").
-// 			Send(ctx)
+// 			Send()
 // 	case "toggle":
 // 		cfg.Protections.ServerProtections.AntiInvite = !cfg.Protections.ServerProtections.AntiInvite
-// 		_ = cfg.Save()
+// 		_ = c.services.Config.SaveConfig(cfg)
 
-// 		c.services.Embed.NewEmbed().
+// 		ctx.NewEmbed().
 // 			SetDescription("Turned " + utils.Misc.FormatBoolOnOff(cfg.Protections.ServerProtections.AntiInvite) + " Anti Invite (Server Protections)").
-// 			Send(ctx)
+// 			Send()
 // 	default:
 // 		ctx.RespondText("Invalid <get/set/toggle> argument. Use `get` or `set` or `toggle`.")
 // 	}
@@ -320,9 +318,9 @@ func (c *ProtectionsCommands) Register() {
 
 // 	switch utils.Arguments["<get/set/toggle>"] {
 // 	case "get":
-// 		c.services.Embed.NewEmbed().
+// 		ctx.NewEmbed().
 // 			AddField("Anti Spam (Server Protections)", utils.Misc.FormatBoolOnOff(cfg.Protections.ServerProtections.AntiSpam)).
-// 			Send(ctx)
+// 			Send()
 // 	case "set":
 // 		toggle, err := ctx.Arguments.Get(0).Bool()
 // 		if err != nil {
@@ -331,18 +329,18 @@ func (c *ProtectionsCommands) Register() {
 // 		}
 
 // 		cfg.Protections.ServerProtections.AntiSpam = toggle
-// 		_ = cfg.Save()
+// 		_ = c.services.Config.SaveConfig(cfg)
 
-// 		c.services.Embed.NewEmbed().
+// 		ctx.NewEmbed().
 // 			SetDescription("Turned " + utils.Misc.FormatBoolOnOff(toggle) + " Anti Spam (Server Protections)").
-// 			Send(ctx)
+// 			Send()
 // 	case "toggle":
 // 		cfg.Protections.ServerProtections.AntiSpam = !cfg.Protections.ServerProtections.AntiSpam
-// 		_ = cfg.Save()
+// 		_ = c.services.Config.SaveConfig(cfg)
 
-// 		c.services.Embed.NewEmbed().
+// 		ctx.NewEmbed().
 // 			SetDescription("Turned " + utils.Misc.FormatBoolOnOff(cfg.Protections.ServerProtections.AntiSpam) + " Anti Spam (Server Protections)").
-// 			Send(ctx)
+// 			Send()
 // 	default:
 // 		ctx.RespondText("Invalid <get/set/toggle> argument. Use `get` or `set` or `toggle`.")
 // 	}
@@ -357,9 +355,9 @@ func (c *ProtectionsCommands) Register() {
 
 // 	switch utils.Arguments["<get/set/toggle>"] {
 // 	case "get":
-// 		c.services.Embed.NewEmbed().
+// 		ctx.NewEmbed().
 // 			AddField("Anti Upper (Server Protections)", utils.Misc.FormatBoolOnOff(cfg.Protections.ServerProtections.AntiUpper)).
-// 			Send(ctx)
+// 			Send()
 // 	case "set":
 // 		toggle, err := ctx.Arguments.Get(0).Bool()
 // 		if err != nil {
@@ -368,18 +366,18 @@ func (c *ProtectionsCommands) Register() {
 // 		}
 
 // 		cfg.Protections.ServerProtections.AntiUpper = toggle
-// 		_ = cfg.Save()
+// 		_ = c.services.Config.SaveConfig(cfg)
 
-// 		c.services.Embed.NewEmbed().
+// 		ctx.NewEmbed().
 // 			SetDescription("Turned " + utils.Misc.FormatBoolOnOff(toggle) + " Anti Upper (Server Protections)").
-// 			Send(ctx)
+// 			Send()
 // 	case "toggle":
 // 		cfg.Protections.ServerProtections.AntiUpper = !cfg.Protections.ServerProtections.AntiUpper
-// 		_ = cfg.Save()
+// 		_ = c.services.Config.SaveConfig(cfg)
 
-// 		c.services.Embed.NewEmbed().
+// 		ctx.NewEmbed().
 // 			SetDescription("Turned " + utils.Misc.FormatBoolOnOff(cfg.Protections.ServerProtections.AntiUpper) + " Anti Upper (Server Protections)").
-// 			Send(ctx)
+// 			Send()
 // 	default:
 // 		ctx.RespondText("Invalid <get/set/toggle> argument. Use `get` or `set` or `toggle`.")
 // 	}
@@ -394,9 +392,9 @@ func (c *ProtectionsCommands) Register() {
 
 // 	switch utils.Arguments["<get/set/toggle>"] {
 // 	case "get":
-// 		c.services.Embed.NewEmbed().
+// 		ctx.NewEmbed().
 // 			AddField("Anti Delete (Server Protections)", utils.Misc.FormatBoolOnOff(cfg.Protections.ServerProtections.AntiDelete)).
-// 			Send(ctx)
+// 			Send()
 // 	case "set":
 // 		toggle, err := ctx.Arguments.Get(0).Bool()
 // 		if err != nil {
@@ -405,18 +403,18 @@ func (c *ProtectionsCommands) Register() {
 // 		}
 
 // 		cfg.Protections.ServerProtections.AntiDelete = toggle
-// 		_ = cfg.Save()
+// 		_ = c.services.Config.SaveConfig(cfg)
 
-// 		c.services.Embed.NewEmbed().
+// 		ctx.NewEmbed().
 // 			SetDescription("Turned " + utils.Misc.FormatBoolOnOff(toggle) + " Anti Delete (Server Protections)").
-// 			Send(ctx)
+// 			Send()
 // 	case "toggle":
 // 		cfg.Protections.ServerProtections.AntiDelete = !cfg.Protections.ServerProtections.AntiDelete
-// 		_ = cfg.Save()
+// 		_ = c.services.Config.SaveConfig(cfg)
 
-// 		c.services.Embed.NewEmbed().
+// 		ctx.NewEmbed().
 // 			SetDescription("Turned " + utils.Misc.FormatBoolOnOff(cfg.Protections.ServerProtections.AntiDelete) + " Anti Delete (Server Protections)").
-// 			Send(ctx)
+// 			Send()
 // 	default:
 // 		ctx.RespondText("Invalid <get/set/toggle> argument. Use `get` or `set` or `toggle`.")
 // 	}
@@ -454,9 +452,9 @@ func (c *ProtectionsCommands) Register() {
 // 		return
 // 	}
 
-// 	c.services.Embed.NewEmbed().
+// 	ctx.NewEmbed().
 // 		SetDescription(action + " DM's from everyone!").
-// 		Send(ctx)
+// 		Send()
 // }
 
 // func (c *ProtectionsCommands) friendrequests(ctx *router.Ctx) {
@@ -480,7 +478,7 @@ func (c *ProtectionsCommands) Register() {
 // 		return
 // 	}
 
-// 	c.services.Embed.NewEmbed().
+// 	ctx.NewEmbed().
 // 		SetDescription(action + " friend requests from everyone!").
-// 		Send(ctx)
+// 		Send()
 // }

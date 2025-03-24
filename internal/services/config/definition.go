@@ -55,6 +55,80 @@ type Activity struct {
 	Button2URL     string `json:"Button2URL"`
 }
 
+func ActivityFromDiscord(activity *discordgo.Activity) Activity {
+	var activityType string
+
+	switch activity.Type {
+	case discordgo.ActivityTypeGame:
+		activityType = "Playing"
+	case discordgo.ActivityTypeStreaming:
+		activityType = "Streaming"
+	case discordgo.ActivityTypeListening:
+		activityType = "Listening"
+	case discordgo.ActivityTypeWatching:
+		activityType = "Watching"
+	case discordgo.ActivityTypeCompeting:
+		activityType = "Competing"
+	default:
+		activityType = "Playing"
+	}
+
+	var platform string
+
+	switch activity.Platform {
+	case "ps4":
+		platform = "PS4"
+	case "ps5":
+		platform = "PS5"
+	case "xbox":
+		platform = "Xbox"
+	case "samsung":
+		platform = "Samsung"
+	default:
+		platform = "Default"
+	}
+
+	clientID := "898932653049393172"
+	if activity.ApplicationID != nil {
+		clientID = *activity.ApplicationID
+	}
+
+	var assets discordgo.Assets
+	if activity.Assets != nil {
+		assets = *activity.Assets
+	}
+
+	var button1, button2 string
+	if len(activity.Buttons) > 0 {
+		button1 = activity.Buttons[0]
+	}
+	if len(activity.Buttons) > 1 {
+		button2 = activity.Buttons[1]
+	}
+
+	return Activity{
+		Enabled:        true,
+		ActivityType:   "CustomActivity",
+		Type:           activityType,
+		Platform:       platform,
+		ClientID:       clientID,
+		Name:           activity.Name,
+		State:          activity.State,
+		Details:        activity.Details,
+		Invitable:      false,
+		Time:           activity.Timestamps != nil,
+		StreamingURL:   activity.URL,
+		LargeImage:     assets.LargeImageID,
+		LargeImageText: assets.LargeText,
+		SmallImage:     assets.SmallImageID,
+		SmallImageText: assets.SmallText,
+		Button1Label:   button1,
+		Button1URL:     "",
+		Button2Label:   button2,
+		Button2URL:     "",
+	}
+}
+
 type Reminder struct {
 	Name    string    `json:"Name"`
 	Content string    `json:"Content"`

@@ -23,9 +23,7 @@ func NewBackupCommands(s *services.Services) *BackupCommands {
 }
 
 func (c *BackupCommands) Register() {
-	cmdRouter := c.services.Discord.GetRouter()
-
-	cmdRouter.RegisterCategory(&router.Category{
+	c.services.Router.RegisterCategory(&router.Category{
 		Name:        "Backup",
 		Description: "Create and restore backups of your account",
 	}, []*router.Command{
@@ -123,7 +121,7 @@ func (c *BackupCommands) Register() {
 }
 
 func (c *BackupCommands) backupRelationships(ctx *router.Ctx) {
-	if err := c.services.Backup.CheckEligibility(); err != nil {
+	if err := c.services.Backup.CheckEligibility(ctx.Session); err != nil {
 		ctx.RespondText("An error has occurred: %v", err)
 		return
 	}
@@ -165,14 +163,14 @@ func (c *BackupCommands) backupRelationships(ctx *router.Ctx) {
 		return
 	}
 
-	c.services.Embed.NewEmbed().
+	ctx.NewEmbed().
 		SetTitle("Backup created").
 		SetDescription("Backed up %d friends and %d blocked users.", len(friends), len(blocked)).
-		Send(ctx)
+		Send()
 }
 
 func (c *BackupCommands) restoreRelationships(ctx *router.Ctx) {
-	if err := c.services.Backup.CheckEligibility(); err != nil {
+	if err := c.services.Backup.CheckEligibility(ctx.Session); err != nil {
 		ctx.RespondText("An error has occurred: %v", err)
 		return
 	}
@@ -223,15 +221,15 @@ func (c *BackupCommands) restoreRelationships(ctx *router.Ctx) {
 		)
 	}
 
-	c.services.Embed.NewEmbed().
+	ctx.NewEmbed().
 		SetDescription("Below are the relationships from your backup. Please add or block the users manually (at your own risk).").
 		AddField("Friends", strings.Join(utils.Map(data.Friends, userToString), "\n")).
 		AddField("Blocked", strings.Join(utils.Map(data.Blocked, userToString), "\n")).
-		Send(ctx)
+		Send()
 }
 
 func (c *BackupCommands) backupServers(ctx *router.Ctx) {
-	if err := c.services.Backup.CheckEligibility(); err != nil {
+	if err := c.services.Backup.CheckEligibility(ctx.Session); err != nil {
 		ctx.RespondText("An error has occurred: %v", err)
 		return
 	}
@@ -268,7 +266,7 @@ func (c *BackupCommands) backupServers(ctx *router.Ctx) {
 			continue
 		}
 
-		channel, err := c.services.Backup.FindInvitableChannel(guild)
+		channel, err := c.services.Backup.FindInvitableChannel(ctx.Session, guild)
 		if err != nil {
 			addServer(guild, "")
 			continue
@@ -311,7 +309,7 @@ func (c *BackupCommands) backupServers(ctx *router.Ctx) {
 }
 
 func (c *BackupCommands) restoreServers(ctx *router.Ctx) {
-	if err := c.services.Backup.CheckEligibility(); err != nil {
+	if err := c.services.Backup.CheckEligibility(ctx.Session); err != nil {
 		ctx.RespondText("An error has occurred: %v", err)
 		return
 	}
@@ -340,14 +338,14 @@ func (c *BackupCommands) restoreServers(ctx *router.Ctx) {
 		return fmt.Sprintf("%s - %s - [click here (Discord App URL)](discord://-/invite/%s) - [click here (Website URL)](https://discord.gg/%s)", server.Name, server.ID, server.Invite, server.Invite)
 	}
 
-	c.services.Embed.NewEmbed().
+	ctx.NewEmbed().
 		SetDescription("Below are the servers from your backup. Please join the servers manually (at your own risk).").
 		AddField("Servers", strings.Join(utils.Map(data.Servers, serverToString), "\n")).
-		Send(ctx)
+		Send()
 }
 
 func (c *BackupCommands) backupProfile(ctx *router.Ctx) {
-	if err := c.services.Backup.CheckEligibility(); err != nil {
+	if err := c.services.Backup.CheckEligibility(ctx.Session); err != nil {
 		ctx.RespondText("An error has occurred: %v", err)
 		return
 	}
@@ -381,14 +379,14 @@ func (c *BackupCommands) backupProfile(ctx *router.Ctx) {
 		return
 	}
 
-	c.services.Embed.NewEmbed().
+	ctx.NewEmbed().
 		SetTitle("Backup created").
 		SetDescription("Successfully backed up your profile!").
-		Send(ctx)
+		Send()
 }
 
 func (c *BackupCommands) restoreProfile(ctx *router.Ctx) {
-	if err := c.services.Backup.CheckEligibility(); err != nil {
+	if err := c.services.Backup.CheckEligibility(ctx.Session); err != nil {
 		ctx.RespondText("An error has occurred: %v", err)
 		return
 	}
@@ -423,14 +421,14 @@ func (c *BackupCommands) restoreProfile(ctx *router.Ctx) {
 		return
 	}
 
-	c.services.Embed.NewEmbed().
+	ctx.NewEmbed().
 		SetTitle("Profile restored").
 		SetDescription("Successfully restored your profile!").
-		Send(ctx)
+		Send()
 }
 
 func (c *BackupCommands) backupSettings(ctx *router.Ctx) {
-	if err := c.services.Backup.CheckEligibility(); err != nil {
+	if err := c.services.Backup.CheckEligibility(ctx.Session); err != nil {
 		ctx.RespondText("An error has occurred: %v", err)
 		return
 	}
@@ -443,14 +441,14 @@ func (c *BackupCommands) backupSettings(ctx *router.Ctx) {
 		return
 	}
 
-	c.services.Embed.NewEmbed().
+	ctx.NewEmbed().
 		SetTitle("Backup created").
 		SetDescription("Successfully backed up your settings!").
-		Send(ctx)
+		Send()
 }
 
 func (c *BackupCommands) restoreSettings(ctx *router.Ctx) {
-	if err := c.services.Backup.CheckEligibility(); err != nil {
+	if err := c.services.Backup.CheckEligibility(ctx.Session); err != nil {
 		ctx.RespondText("An error has occurred: %v", err)
 		return
 	}
@@ -468,14 +466,14 @@ func (c *BackupCommands) restoreSettings(ctx *router.Ctx) {
 		return
 	}
 
-	c.services.Embed.NewEmbed().
+	ctx.NewEmbed().
 		SetTitle("Settings restored").
 		SetDescription("Successfully restored your settings!").
-		Send(ctx)
+		Send()
 }
 
 func (c *BackupCommands) backupGifs(ctx *router.Ctx) {
-	if err := c.services.Backup.CheckEligibility(); err != nil {
+	if err := c.services.Backup.CheckEligibility(ctx.Session); err != nil {
 		ctx.RespondText("An error has occurred: %v", err)
 		return
 	}
@@ -494,14 +492,14 @@ func (c *BackupCommands) backupGifs(ctx *router.Ctx) {
 		return
 	}
 
-	c.services.Embed.NewEmbed().
+	ctx.NewEmbed().
 		SetTitle("Backup created").
 		SetDescription("Successfully backed up your GIFs!").
-		Send(ctx)
+		Send()
 }
 
 func (c *BackupCommands) restoreGifs(ctx *router.Ctx) {
-	if err := c.services.Backup.CheckEligibility(); err != nil {
+	if err := c.services.Backup.CheckEligibility(ctx.Session); err != nil {
 		ctx.RespondText("An error has occurred: %v", err)
 		return
 	}
@@ -519,8 +517,8 @@ func (c *BackupCommands) restoreGifs(ctx *router.Ctx) {
 		return
 	}
 
-	c.services.Embed.NewEmbed().
+	ctx.NewEmbed().
 		SetTitle("Settings restored").
 		SetDescription("Successfully restored your GIFs!").
-		Send(ctx)
+		Send()
 }

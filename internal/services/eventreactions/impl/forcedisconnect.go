@@ -2,6 +2,7 @@ package impl
 
 import (
 	"github.com/lb-selfbot/discordgo"
+	"github.com/lb-selfbot/selfbot/internal/logging"
 	"github.com/lb-selfbot/selfbot/internal/services/eventreactions/types"
 	"github.com/lb-selfbot/selfbot/internal/utils"
 )
@@ -69,7 +70,7 @@ func (r *ForceDisconnect) Description() string {
 func (r *ForceDisconnect) Equals(other types.EventReaction) bool {
 	otherForceDisconnect, ok := other.(*ForceDisconnect)
 	if !ok {
-		utils.Logging.Debug("ForceDisconnect.Equals: Other is not a ForceDisconnect")
+		logging.Debug("ForceDisconnect.Equals: Other is not a ForceDisconnect")
 		return false
 	}
 
@@ -97,7 +98,7 @@ func (r *ForceDisconnect) Data() map[string]any {
 func (r *ForceDisconnect) Handler(session *discordgo.Session, event any) {
 	vcUpdate, ok := event.(*discordgo.VoiceStateUpdate)
 	if !ok {
-		utils.Logging.Debug("ForceDisconnect.Handler: Event is not a voice state update event")
+		logging.Debug("ForceDisconnect.Handler: Event is not a voice state update event")
 		return
 	}
 

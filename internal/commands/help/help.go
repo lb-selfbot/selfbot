@@ -10,6 +10,7 @@ import (
 
 	"github.com/lb-selfbot/selfbot/internal/fn"
 	"github.com/lb-selfbot/selfbot/internal/services"
+	"github.com/lb-selfbot/selfbot/internal/services/router"
 	"github.com/lb-selfbot/selfbot/internal/utils"
 )
 
@@ -20,8 +21,6 @@ func NewHelpCommands(s *services.Services) *HelpCommands {
 }
 
 func (c *HelpCommands) Register() {
-	cmdRouter := c.services.Discord.GetRouter()
-
 	cmds := []*router.Command{
 		{
 			Name:    "help",
@@ -40,7 +39,7 @@ func (c *HelpCommands) Register() {
 		},
 	}
 
-	for _, category := range cmdRouter.GetCategories() {
+	for _, category := range c.services.Router.GetCategories() {
 		name := strings.ReplaceAll(strings.ToLower(category.Name), " ", "")
 
 		cmds = append(cmds, &router.Command{
@@ -50,7 +49,7 @@ func (c *HelpCommands) Register() {
 		})
 	}
 
-	cmdRouter.RegisterCategory(&router.Category{
+	c.services.Router.RegisterCategory(&router.Category{
 		Name:        "Help",
 		Description: "Get help for commands",
 	}, cmds)
@@ -66,7 +65,7 @@ func (c *HelpCommands) generateCategoryHelpFunc(category *router.Category, name 
 	return func(ctx *router.Ctx) {
 		page, _ := ctx.Arguments.Get(0).Int()
 
-		c.renderCategoryHelp(ctx.Router, category, name, page).Send(ctx)
+		c.renderCategoryHelp(ctx, category, name, page).Send()
 	}
 }
 
@@ -79,7 +78,7 @@ func (c *HelpCommands) generalHelpCommand(ctx *router.Ctx) {
 	}
 
 	// Send the general help embed
-	c.renderDefaultGeneralHelpEmbed(ctx.Router).Send(ctx)
+	c.renderDefaultGeneralHelpEmbed(ctx).Send()
 }
 
 func (c *HelpCommands) getNameFromArgument(arg string) string {
@@ -109,21 +108,22 @@ func (c *HelpCommands) specificHelpCommand(ctx *router.Ctx) {
 	oldName := strings.ToLower(ctx.Arguments.Get(0).Raw())
 	name := c.getNameFromArgument(oldName)
 	page, _ := ctx.Arguments.Get(1).Int()
-	prefix := ctx.Router.GetConfig().PrefixFunc()[0]
+	cfg := c.services.Config.GetConfig()
+	prefix := cfg.Selfbot.CommandPrefix
 
 	if category := ctx.Router.GetCategory(utils.String.Capitalize(name)); category != nil {
-		c.renderCategoryHelp(ctx.Router, category, oldName, page).Send(ctx)
+		c.renderCategoryHelp(ctx, category, oldName, page).Send()
 		return
 	}
 
-	if command := ctx.Router.GetCmd(name); command != nil {
-		c.renderCommandHelp(ctx.Router, command).Send(ctx)
+	if command := ctx.Router.GetCommand(name); command != nil {
+		c.renderCommandHelp(ctx, command).Send()
 		return
 	}
 
 	// get close commands and categories
 	var closeCommands []string
-	for _, command := range ctx.Router.GetCmds() {
+	for _, command := range ctx.Router.GetCommands() {
 		if len(closeCommands) >= 5 {
 			break
 		}
@@ -153,30 +153,33 @@ func (c *HelpCommands) specificHelpCommand(ctx *router.Ctx) {
 		suggestions += "\n\nDid you mean one of these categories?\n\n" + strings.Join(closeCategories, "\n")
 	}
 
-	c.services.Embed.NewEmbed().
+	ctx.NewEmbed().
 		SetDescription("`%s` is not a command or category!\n%s", name, suggestions).
-		Send(ctx)
+		Send()
 }
 
-func (c *HelpCommands) renderCommandHelp(cmdRouter router.Router, command *router.Command) *embed.Embed {
-	return c.services.Embed.NewEmbed().
+func (c *HelpCommands) renderCommandHelp(ctx *router.Ctx, command *router.Command) *embed.Embed {
+	cfg := c.services.Config.GetConfig()
+	return ctx.NewEmbed().
 		SetDescription("Command Help: %s", command.Name).
 		AddField("Command Name", command.Name).
-		AddField("Usage", "<> is required, [] is optional\n\n"+cmdRouter.GetConfig().PrefixFunc()[0]+command.Name+" "+command.Arguments).
+		AddField("Usage", "<> is required, [] is optional\n\n"+cfg.Selfbot.CommandPrefix+command.Name+" "+command.Arguments).
 		AddField("Description", command.Description).
 		AddField("Category", command.Category.Name)
 }
 
-func (c *HelpCommands) renderCategoryHelp(cmdRouter router.Router, category *router.Category, rawArgument string, page int) *embed.Embed {
+func (c *HelpCommands) renderCategoryHelp(ctx *router.Ctx, category *router.Category, rawArgument string, page int) *embed.Embed {
 	helpPages := map[int]string{}
 	currentPage := 0
 
-	cmds := fn.Filter(cmdRouter.GetCmds(), func(cmd *router.Command) bool {
+	cmds := fn.Filter(ctx.Router.GetCommands(), func(cmd *router.Command) bool {
 		return cmd.Category == category
 	})
 
+	cfg := c.services.Config.GetConfig()
+
 	for _, command := range cmds {
-		helpText := fmt.Sprintf("%s%s %s - %s\n", cmdRouter.GetConfig().PrefixFunc()[0], command.Name, command.Arguments, command.Description)
+		helpText := fmt.Sprintf("%s%s %s - %s\n", cfg.Selfbot.CommandPrefix, command.Name, command.Arguments, command.Description)
 		if len(helpPages[currentPage])+len(helpText) > 1650 {
 			currentPage++
 		}
@@ -185,11 +188,9 @@ func (c *HelpCommands) renderCategoryHelp(cmdRouter router.Router, category *rou
 
 	page = int(math.Max(0, float64(page-1)))
 
-	emb := c.services.Embed.NewEmbed().
+	emb := ctx.NewEmbed().
 		SetDescription("<> is required, [] is optional\n\nAmount of %s commands: %d", category.Name, len(cmds)).
 		SetSubtext("Page: %d/%d", page+1, len(helpPages))
-
-	cfg, _ := config.GetConfig()
 
 	if page < len(helpPages) {
 		if cfg.Selfbot.CommandMode == "WebhookEmbed" {
@@ -198,33 +199,33 @@ func (c *HelpCommands) renderCategoryHelp(cmdRouter router.Router, category *rou
 			emb.AddField("Commands", helpPages[page], true, true)
 		}
 	} else {
-		return c.services.Embed.NewEmbed().SetDescription("That page does not exist! %s has %d pages.", category.Name, len(helpPages))
+		return ctx.NewEmbed().SetDescription("That page does not exist! %s has %d pages.", category.Name, len(helpPages))
 	}
 	if len(helpPages) > 1 {
 		if cfg.Selfbot.CommandMode == "WebhookEmbed" {
-			emb.SetSubtext("Page: %d/%d\n\nUse %shelp %s <page> to go to the next page", page+1, len(helpPages), cmdRouter.GetConfig().PrefixFunc()[0], rawArgument)
+			emb.SetSubtext("Page: %d/%d\n\nUse %shelp %s <page> to go to the next page", page+1, len(helpPages), cfg.Selfbot.CommandPrefix, rawArgument)
 		} else {
-			emb.SetSubtext("Page: %d/%d\n\nUse \x1b[34;1m%shelp %s <page>\x1b[0m to go to the next page", page+1, len(helpPages), cmdRouter.GetConfig().PrefixFunc()[0], rawArgument)
+			emb.SetSubtext("Page: %d/%d\n\nUse \x1b[34;1m%shelp %s <page>\x1b[0m to go to the next page", page+1, len(helpPages), cfg.Selfbot.CommandPrefix, rawArgument)
 		}
 	}
 	return emb
 }
 
 // renderDefaultGeneralHelpEmbed renders the general help embed on the given page
-func (c *HelpCommands) renderDefaultGeneralHelpEmbed(cmdRouter router.Router) *embed.Embed {
-	cfg, _ := config.GetConfig()
+func (c *HelpCommands) renderDefaultGeneralHelpEmbed(ctx *router.Ctx) *embed.Embed {
+	cfg := c.services.Config.GetConfig()
 	categoriesString := ""
 
-	for _, category := range cmdRouter.GetCategories() {
+	for _, category := range ctx.Router.GetCategories() {
 		// Get the commands in the category, will be empty otherwise
-		category = cmdRouter.GetCategory(category.Name)
+		category = ctx.Router.GetCategory(category.Name)
 		categoriesString += fmt.Sprintf("%s - %s\n", category.Name+strings.Repeat(" ", 14-len(category.Name)), category.Description)
 	}
 
-	prefix := cmdRouter.GetConfig().PrefixFunc()[0]
+	prefix := cfg.Selfbot.CommandPrefix
 
-	emb := c.services.Embed.NewEmbed().
-		SetDescription("LightningBot %s Help\nAmount of Commands: %d, <> is required, [] is optional\n", constants.VERSION, len(cmdRouter.GetCmds()))
+	emb := ctx.NewEmbed().
+		SetDescription("LightningBot %s Help\nAmount of Commands: %d, <> is required, [] is optional\n", constants.VERSION, len(ctx.Router.GetCommands()))
 
 	if cfg.Selfbot.CommandMode == "WebhookEmbed" {
 		emb.Description += "\n\n**Categories**\n" + categoriesString
@@ -239,39 +240,40 @@ func (c *HelpCommands) renderDefaultGeneralHelpEmbed(cmdRouter router.Router) *e
 
 func (c *HelpCommands) search(ctx *router.Ctx) {
 	query := ctx.Arguments.Get(0).Raw()
-	prefix := ctx.Router.GetConfig().PrefixFunc()[0]
+	
+	cfg := c.services.Config.GetConfig()
 
 	var closeCommands []string
-	for _, command := range ctx.Router.GetCmds() {
+	for _, command := range ctx.Router.GetCommands() {
 		if len(closeCommands) >= 10 {
 			break
 		}
 		distance := utils.Misc.GetDistance(command.Name, query)
 		if distance < 2 || strings.Contains(command.Name, query) {
-			closeCommands = append(closeCommands, prefix+command.Name+" "+command.Arguments+" - "+command.Description)
+			closeCommands = append(closeCommands, cfg.Selfbot.CommandPrefix+command.Name+" "+command.Arguments+" - "+command.Description)
 		}
 	}
 
 	if len(closeCommands) == 0 {
-		c.services.Embed.NewEmbed().
+		ctx.NewEmbed().
 			SetDescription("No commands found for query `%s`", query).
-			Send(ctx)
+			Send()
 		return
 	}
 
-	c.services.Embed.NewEmbed().
+	ctx.NewEmbed().
 		SetDescription("Found %d commands for query `%s`", len(closeCommands), query).
 		AddField("Commands", strings.Join(closeCommands, "\n"), true, true).
-		Send(ctx)
+		Send()
 }
 
 func (c *HelpCommands) repeat(ctx *router.Ctx) {
 	usedCommands := c.services.EventReactions.GetUsedCommands()
 
 	if len(usedCommands) < 1 {
-		c.services.Embed.NewEmbed().
+		ctx.NewEmbed().
 			SetDescription("No commands have been used yet").
-			Send(ctx)
+			Send()
 		return
 	}
 
@@ -279,9 +281,9 @@ func (c *HelpCommands) repeat(ctx *router.Ctx) {
 
 	channel, err := ctx.Session.State.Channel(ctx.Message.ChannelID)
 	if err != nil {
-		c.services.Embed.NewEmbed().
+		ctx.NewEmbed().
 			SetDescription("Failed to get channel: %s", err.Error()).
-			Send(ctx)
+			Send()
 		return
 	}
 

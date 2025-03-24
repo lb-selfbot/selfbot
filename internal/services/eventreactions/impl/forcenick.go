@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/lb-selfbot/discordgo"
+	"github.com/lb-selfbot/selfbot/internal/logging"
 	"github.com/lb-selfbot/selfbot/internal/services/eventreactions/types"
 	"github.com/lb-selfbot/selfbot/internal/utils"
 )
@@ -42,7 +43,7 @@ func NewForceNickFromData(session *discordgo.Session, data map[string]any) (*For
 
 	nickname, ok := data["nickname"].(string)
 	if !ok {
-		utils.Logging.Error("ForceNick.NewForceNickFromData: Invalid nickname")
+		logging.Error("ForceNick.NewForceNickFromData: Invalid nickname")
 		return nil, fmt.Errorf("invalid nickname")
 	}
 
@@ -66,7 +67,7 @@ func (f *ForceNick) Description() string {
 func (f *ForceNick) Equals(other types.EventReaction) bool {
 	otherForceNick, ok := other.(*ForceNick)
 	if !ok {
-		utils.Logging.Debug("ForceNick.Equals: Other is not a ForceNick")
+		logging.Debug("ForceNick.Equals: Other is not a ForceNick")
 		return false
 	}
 
@@ -92,7 +93,7 @@ func (f *ForceNick) Data() map[string]any {
 func (f *ForceNick) Handler(session *discordgo.Session, event any) {
 	memberUpdate, ok := event.(*discordgo.GuildMemberUpdate)
 	if !ok {
-		utils.Logging.Debug("ForceNick.Handler: Event is not a guild member update event")
+		logging.Debug("ForceNick.Handler: Event is not a guild member update event")
 		return
 	}
 

@@ -18,8 +18,6 @@ func NewMemeGenCommands(s *services.Services) *MemeGenCommands {
 }
 
 func (c *MemeGenCommands) Register() {
-	cmdRouter := c.services.Discord.GetRouter()
-
 	commands := []*router.Command{
 		{
 			Name:        "randommeme",
@@ -132,7 +130,7 @@ func (c *MemeGenCommands) Register() {
 		})
 	}
 
-	cmdRouter.RegisterCategory(&router.Category{
+	c.services.Router.RegisterCategory(&router.Category{
 		Name:        "Memegen",
 		Description: "Generate memes using imgflip",
 	}, commands)
@@ -159,10 +157,10 @@ func (c *MemeGenCommands) randommeme(ctx *router.Ctx) {
 		return
 	}
 
-	c.services.Embed.NewEmbed().
+	ctx.NewEmbed().
 		AddField("Used Meme", meme.Get("name").MustString()).
 		SetImage(image).
-		Send(ctx)
+		Send()
 }
 
 func (c *MemeGenCommands) custommeme(ctx *router.Ctx) {

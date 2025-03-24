@@ -26,9 +26,7 @@ func NewTextCommands(services *services.Services) *TextCommands {
 }
 
 func (c *TextCommands) Register() {
-	cmdRouter := c.services.Discord.GetRouter()
-
-	cmdRouter.RegisterCategory(&router.Category{
+	c.services.Router.RegisterCategory(&router.Category{
 		Name:        "Text",
 		Description: "Text manipulation commands",
 	}, []*router.Command{
@@ -604,11 +602,11 @@ func (c *TextCommands) zwc(ctx *router.Ctx) {
 func (c *TextCommands) distance(ctx *router.Ctx) {
 	text1, text2 := ctx.Arguments.Get(0).Raw(), ctx.Arguments.Get(1).Raw()
 
-	c.services.Embed.NewEmbed().
+	ctx.NewEmbed().
 		AddField("Text 1", text1).
 		AddField("Text 2", text2).
 		AddField("Distance", strconv.Itoa(utils.Misc.GetDistance(text1, text2))).
-		Send(ctx)
+		Send()
 }
 
 func (c *TextCommands) codeblock(ctx *router.Ctx) {
@@ -832,16 +830,18 @@ func (c *TextCommands) asciianimation(ctx *router.Ctx) {
 }
 
 func (c *TextCommands) customanimationhelp(ctx *router.Ctx) {
-	c.services.Embed.NewEmbed().
+	cfg := c.services.Config.GetConfig()
+
+	ctx.NewEmbed().
 		AddField("Creating an animation", fmt.Sprintf(
 			"To create an animation, create a text file in %s. Every line in the file will be a frame of the animation.\n",
 			filepath.Join(utils.IO.GetMainFolder(), "Animations"),
 		)).
 		AddField("Using an animation", fmt.Sprintf(
 			"To use an animation, use the command `%scustomanimation <filename without .txt>`.\n",
-			ctx.Router.GetConfig().PrefixFunc()[0],
+			cfg.Selfbot.CommandPrefix,
 		)).
-		Send(ctx)
+		Send()
 }
 
 func (c *TextCommands) customanimations(ctx *router.Ctx) {
@@ -867,7 +867,7 @@ func (c *TextCommands) customanimations(ctx *router.Ctx) {
 		return nil
 	})
 
-	c.services.Embed.NewEmbed().AddField("Custom Animations", customAnimString).Send(ctx)
+	ctx.NewEmbed().AddField("Custom Animations", customAnimString).Send()
 }
 
 func (c *TextCommands) customanimation(ctx *router.Ctx) {
@@ -904,9 +904,9 @@ func (c *TextCommands) encodings(ctx *router.Ctx) {
 		encodingNames = append(encodingNames, name)
 	}
 
-	c.services.Embed.NewEmbed().
+	ctx.NewEmbed().
 		AddField("Available Encodings", strings.Join(encodingNames, ", ")).
-		Send(ctx)
+		Send()
 }
 
 func (c *TextCommands) encode(ctx *router.Ctx) {
@@ -925,10 +925,10 @@ func (c *TextCommands) encode(ctx *router.Ctx) {
 		return
 	}
 
-	c.services.Embed.NewEmbed().
+	ctx.NewEmbed().
 		AddField("Text", text).
 		AddField("Encoded", encoded).
-		Send(ctx)
+		Send()
 }
 
 func (c *TextCommands) decode(ctx *router.Ctx) {
@@ -951,10 +951,10 @@ func (c *TextCommands) decode(ctx *router.Ctx) {
 		return
 	}
 
-	c.services.Embed.NewEmbed().
+	ctx.NewEmbed().
 		AddField("Text", text).
 		AddField("Decoded", decoded).
-		Send(ctx)
+		Send()
 }
 
 func (c *TextCommands) hashes(ctx *router.Ctx) {
@@ -963,9 +963,9 @@ func (c *TextCommands) hashes(ctx *router.Ctx) {
 		hashNames = append(hashNames, name)
 	}
 
-	c.services.Embed.NewEmbed().
+	ctx.NewEmbed().
 		AddField("Available Hashes", strings.Join(hashNames, ", ")).
-		Send(ctx)
+		Send()
 }
 
 func (c *TextCommands) hash(ctx *router.Ctx) {
@@ -980,10 +980,10 @@ func (c *TextCommands) hash(ctx *router.Ctx) {
 
 	hashed := hashFunc(text)
 
-	c.services.Embed.NewEmbed().
+	ctx.NewEmbed().
 		AddField("Text", text).
 		AddField("Hashed", hashed).
-		Send(ctx)
+		Send()
 }
 
 func (c *TextCommands) encryptions(ctx *router.Ctx) {
@@ -992,9 +992,9 @@ func (c *TextCommands) encryptions(ctx *router.Ctx) {
 		encryptionNames = append(encryptionNames, name)
 	}
 
-	c.services.Embed.NewEmbed().
+	ctx.NewEmbed().
 		AddField("Available Encryptions", strings.Join(encryptionNames, ", ")).
-		Send(ctx)
+		Send()
 }
 
 func (c *TextCommands) encrypt(ctx *router.Ctx) {
@@ -1012,10 +1012,10 @@ func (c *TextCommands) encrypt(ctx *router.Ctx) {
 		return
 	}
 
-	c.services.Embed.NewEmbed().
+	ctx.NewEmbed().
 		AddField("Text", text).
 		AddField("Encrypted", encrypted).
-		Send(ctx)
+		Send()
 }
 
 func (c *TextCommands) decrypt(ctx *router.Ctx) {
@@ -1033,8 +1033,8 @@ func (c *TextCommands) decrypt(ctx *router.Ctx) {
 		return
 	}
 
-	c.services.Embed.NewEmbed().
+	ctx.NewEmbed().
 		AddField("Text", text).
 		AddField("Decrypted", encrypted).
-		Send(ctx)
+		Send()
 }

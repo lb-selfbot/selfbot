@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/lb-selfbot/selfbot/internal/logging"
 	"github.com/lb-selfbot/selfbot/internal/services/config"
 	"github.com/lb-selfbot/selfbot/internal/services/eventreactions/types"
 
@@ -34,7 +35,7 @@ func NewAntiDeleteMessagesFromData(configSvc config.Service, session *discordgo.
 
 		return NewAntiDeleteMessages(configSvc, channel), nil
 	} else {
-		utils.Logging.Error("AntiDeleteMessages.NewAntiDeleteMessagesFromData: Invalid antideletemessages data")
+		logging.Error("AntiDeleteMessages.NewAntiDeleteMessagesFromData: Invalid antideletemessages data")
 		return nil, fmt.Errorf("invalid antideletemessages data")
 	}
 }
@@ -68,7 +69,7 @@ func (a *AntiDeleteMessages) Data() map[string]any {
 func (a *AntiDeleteMessages) Handler(session *discordgo.Session, event any) {
 	message, ok := event.(*discordgo.MessageDelete)
 	if !ok {
-		utils.Logging.Debug("AntiDeleteMessages.Handler: Event is not a message delete event")
+		logging.Debug("AntiDeleteMessages.Handler: Event is not a message delete event")
 		return
 	}
 
@@ -91,7 +92,7 @@ func (a *AntiDeleteMessages) Handler(session *discordgo.Session, event any) {
 		TTS:      message.TTS,
 	})
 	if err != nil {
-		utils.Logging.Debug("AntiDeleteMessages.Handler: Error sending message: " + err.Error())
+		logging.Debug("AntiDeleteMessages.Handler: Error sending message: " + err.Error())
 		return
 	}
 }

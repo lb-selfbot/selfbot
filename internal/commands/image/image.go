@@ -22,9 +22,7 @@ func NewImageCommands(s *services.Services) *ImageCommands {
 }
 
 func (c *ImageCommands) Register() {
-	cmdRouter := c.services.Discord.GetRouter()
-
-	cmdRouter.RegisterCategory(&router.Category{
+	c.services.Router.RegisterCategory(&router.Category{
 		Name:        "Image",
 		Description: "Image commands",
 	}, []*router.Command{
@@ -1026,12 +1024,12 @@ func (c *ImageCommands) meme(ctx *router.Ctx) {
 	}
 
 	meme := jsonResult.Get("meme")
-	c.services.Embed.NewEmbed().
+	ctx.NewEmbed().
 		SetTitle(meme.Get("title").MustString()).
 		SetImage(meme.Get("imagelink").MustString()).
 		AddField("URL", fmt.Sprintf("`%s`", meme.Get("permalink").MustString())).
-		SetFooter(fmt.Sprintf("Subreddit: %s | Upvotes: %d | Posted by: u/%s", meme.Get("subreddit").MustString(), meme.Get("upvotes").MustInt(), meme.Get("author").MustString())).
-		Send(ctx)
+		SetSubtext(fmt.Sprintf("Subreddit: %s | Upvotes: %d | Posted by: u/%s", meme.Get("subreddit").MustString(), meme.Get("upvotes").MustInt(), meme.Get("author").MustString())).
+		Send()
 }
 
 func (c *ImageCommands) ytcomment(ctx *router.Ctx) {
@@ -1632,21 +1630,21 @@ func (c *ImageCommands) bird(ctx *router.Ctx) {
 }
 
 func (c *ImageCommands) cat(ctx *router.Ctx) {
-	err := utils.Discord.SendFileFromURL(ctx, "https://cataas.com/cat", "cat.jpg")
+	err := utils.Discord.SendFileFromURL(ctx.Session, ctx.Message.ChannelID, "https://cataas.com/cat", "cat.jpg")
 	if err != nil {
 		ctx.RespondText("An error has occurred: %v", err)
 	}
 }
 
 func (c *ImageCommands) catgif(ctx *router.Ctx) {
-	err := utils.Discord.SendFileFromURL(ctx, "https://cataas.com/cat/gif", "cat.gif")
+	err := utils.Discord.SendFileFromURL(ctx.Session, ctx.Message.ChannelID, "https://cataas.com/cat/gif", "cat.gif")
 	if err != nil {
 		ctx.RespondText("An error has occurred: %v", err)
 	}
 }
 
 func (c *ImageCommands) catsays(ctx *router.Ctx) {
-	err := utils.Discord.SendFileFromURL(ctx, "https://cataas.com/cat/says/"+url.PathEscape(ctx.Arguments.Raw()), "cat.jpg")
+	err := utils.Discord.SendFileFromURL(ctx.Session, ctx.Message.ChannelID, "https://cataas.com/cat/says/"+url.PathEscape(ctx.Arguments.Raw()), "cat.jpg")
 	if err != nil {
 		ctx.RespondText("An error has occurred: %v", err)
 	}
@@ -1826,7 +1824,8 @@ func (c *ImageCommands) bed(ctx *router.Ctx) {
 		return
 	}
 	err = utils.Discord.SendFileFromURL(
-		ctx,
+		ctx.Session,
+		ctx.Message.ChannelID,
 		"https://imgen.lightning-bot.com/bed",
 		"bed.png",
 		map[string]string{
@@ -1840,7 +1839,8 @@ func (c *ImageCommands) bed(ctx *router.Ctx) {
 
 func (c *ImageCommands) balloon(ctx *router.Ctx) {
 	err := utils.Discord.SendFileFromURL(
-		ctx,
+		ctx.Session,
+		ctx.Message.ChannelID,
 		"https://imgen.lightning-bot.com/balloon",
 		"balloon.png",
 		map[string]string{
@@ -1854,7 +1854,8 @@ func (c *ImageCommands) balloon(ctx *router.Ctx) {
 
 func (c *ImageCommands) abandon(ctx *router.Ctx) {
 	err := utils.Discord.SendFileFromURL(
-		ctx,
+		ctx.Session,
+		ctx.Message.ChannelID,
 		"https://imgen.lightning-bot.com/abandon",
 		"abandon.png",
 		map[string]string{
@@ -1873,7 +1874,8 @@ func (c *ImageCommands) aborted(ctx *router.Ctx) {
 		return
 	}
 	err = utils.Discord.SendFileFromURL(
-		ctx,
+		ctx.Session,
+		ctx.Message.ChannelID,
 		"https://imgen.lightning-bot.com/aborted",
 		"aborted.png",
 		map[string]string{
@@ -1892,7 +1894,8 @@ func (c *ImageCommands) affect(ctx *router.Ctx) {
 		return
 	}
 	err = utils.Discord.SendFileFromURL(
-		ctx,
+		ctx.Session,
+		ctx.Message.ChannelID,
 		"https://imgen.lightning-bot.com/affect",
 		"affect.png",
 		map[string]string{
@@ -1911,7 +1914,8 @@ func (c *ImageCommands) airpods(ctx *router.Ctx) {
 		return
 	}
 	err = utils.Discord.SendFileFromURL(
-		ctx,
+		ctx.Session,
+		ctx.Message.ChannelID,
 		"https://imgen.lightning-bot.com/airpods",
 		"airpods.gif",
 		map[string]string{
@@ -1930,7 +1934,8 @@ func (c *ImageCommands) america(ctx *router.Ctx) {
 		return
 	}
 	err = utils.Discord.SendFileFromURL(
-		ctx,
+		ctx.Session,
+		ctx.Message.ChannelID,
 		"https://imgen.lightning-bot.com/america",
 		"america.gif",
 		map[string]string{
@@ -1944,7 +1949,8 @@ func (c *ImageCommands) america(ctx *router.Ctx) {
 
 func (c *ImageCommands) armor(ctx *router.Ctx) {
 	err := utils.Discord.SendFileFromURL(
-		ctx,
+		ctx.Session,
+		ctx.Message.ChannelID,
 		"https://imgen.lightning-bot.com/armor",
 		"armor.png",
 		map[string]string{
@@ -1963,7 +1969,8 @@ func (c *ImageCommands) bongocat(ctx *router.Ctx) {
 		return
 	}
 	err = utils.Discord.SendFileFromURL(
-		ctx,
+		ctx.Session,
+		ctx.Message.ChannelID,
 		"https://imgen.lightning-bot.com/bongocat",
 		"bongocat.png",
 		map[string]string{
@@ -1977,7 +1984,8 @@ func (c *ImageCommands) bongocat(ctx *router.Ctx) {
 
 func (c *ImageCommands) boo(ctx *router.Ctx) {
 	err := utils.Discord.SendFileFromURL(
-		ctx,
+		ctx.Session,
+		ctx.Message.ChannelID,
 		"https://imgen.lightning-bot.com/boo",
 		"boo.png",
 		map[string]string{
@@ -1991,7 +1999,8 @@ func (c *ImageCommands) boo(ctx *router.Ctx) {
 
 func (c *ImageCommands) bigbrain(ctx *router.Ctx) {
 	err := utils.Discord.SendFileFromURL(
-		ctx,
+		ctx.Session,
+		ctx.Message.ChannelID,
 		"https://imgen.lightning-bot.com/brain",
 		"bigbrain.png",
 		map[string]string{
@@ -2013,7 +2022,8 @@ func (c *ImageCommands) brazzers(ctx *router.Ctx) {
 		return
 	}
 	err = utils.Discord.SendFileFromURL(
-		ctx,
+		ctx.Session,
+		ctx.Message.ChannelID,
 		"https://imgen.lightning-bot.com/brazzers",
 		"brazzers.png",
 		map[string]string{
@@ -2032,7 +2042,8 @@ func (c *ImageCommands) byemom(ctx *router.Ctx) {
 		return
 	}
 	err = utils.Discord.SendFileFromURL(
-		ctx,
+		ctx.Session,
+		ctx.Message.ChannelID,
 		"https://imgen.lightning-bot.com/byemom",
 		"byemom.png",
 		map[string]string{
@@ -2053,7 +2064,8 @@ func (c *ImageCommands) cancer(ctx *router.Ctx) {
 		return
 	}
 	err = utils.Discord.SendFileFromURL(
-		ctx,
+		ctx.Session,
+		ctx.Message.ChannelID,
 		"https://imgen.lightning-bot.com/cancer",
 		"cancer.png",
 		map[string]string{
@@ -2067,7 +2079,8 @@ func (c *ImageCommands) cancer(ctx *router.Ctx) {
 
 func (c *ImageCommands) cheating(ctx *router.Ctx) {
 	err := utils.Discord.SendFileFromURL(
-		ctx,
+		ctx.Session,
+		ctx.Message.ChannelID,
 		"https://imgen.lightning-bot.com/cheating",
 		"cheating.png",
 		map[string]string{
@@ -2081,7 +2094,8 @@ func (c *ImageCommands) cheating(ctx *router.Ctx) {
 
 func (c *ImageCommands) citation(ctx *router.Ctx) {
 	err := utils.Discord.SendFileFromURL(
-		ctx,
+		ctx.Session,
+		ctx.Message.ChannelID,
 		"https://imgen.lightning-bot.com/citation",
 		"citation.png",
 		map[string]string{
@@ -2100,7 +2114,8 @@ func (c *ImageCommands) communism(ctx *router.Ctx) {
 		return
 	}
 	err = utils.Discord.SendFileFromURL(
-		ctx,
+		ctx.Session,
+		ctx.Message.ChannelID,
 		"https://imgen.lightning-bot.com/communism",
 		"communism.gif",
 		map[string]string{
@@ -2114,7 +2129,8 @@ func (c *ImageCommands) communism(ctx *router.Ctx) {
 
 func (c *ImageCommands) confusedcat(ctx *router.Ctx) {
 	err := utils.Discord.SendFileFromURL(
-		ctx,
+		ctx.Session,
+		ctx.Message.ChannelID,
 		"https://imgen.lightning-bot.com/confusedcat",
 		"confusedcat.png",
 		map[string]string{
@@ -2133,7 +2149,8 @@ func (c *ImageCommands) corporate(ctx *router.Ctx) {
 		return
 	}
 	err = utils.Discord.SendFileFromURL(
-		ctx,
+		ctx.Session,
+		ctx.Message.ChannelID,
 		"https://imgen.lightning-bot.com/corporate",
 		"corporate.png",
 		map[string]string{
@@ -2147,7 +2164,8 @@ func (c *ImageCommands) corporate(ctx *router.Ctx) {
 
 func (c *ImageCommands) cry(ctx *router.Ctx) {
 	err := utils.Discord.SendFileFromURL(
-		ctx,
+		ctx.Session,
+		ctx.Message.ChannelID,
 		"https://imgen.lightning-bot.com/cry",
 		"cry.png",
 		map[string]string{
@@ -2166,7 +2184,8 @@ func (c *ImageCommands) dab(ctx *router.Ctx) {
 		return
 	}
 	err = utils.Discord.SendFileFromURL(
-		ctx,
+		ctx.Session,
+		ctx.Message.ChannelID,
 		"https://imgen.lightning-bot.com/dab",
 		"dab.png",
 		map[string]string{
@@ -2185,7 +2204,8 @@ func (c *ImageCommands) dank(ctx *router.Ctx) {
 		return
 	}
 	err = utils.Discord.SendFileFromURL(
-		ctx,
+		ctx.Session,
+		ctx.Message.ChannelID,
 		"https://imgen.lightning-bot.com/dank",
 		"dank.gif",
 		map[string]string{
@@ -2204,7 +2224,8 @@ func (c *ImageCommands) delete(ctx *router.Ctx) {
 		return
 	}
 	err = utils.Discord.SendFileFromURL(
-		ctx,
+		ctx.Session,
+		ctx.Message.ChannelID,
 		"https://imgen.lightning-bot.com/delete",
 		"delete.png",
 		map[string]string{
@@ -2223,7 +2244,8 @@ func (c *ImageCommands) disability(ctx *router.Ctx) {
 		return
 	}
 	err = utils.Discord.SendFileFromURL(
-		ctx,
+		ctx.Session,
+		ctx.Message.ChannelID,
 		"https://imgen.lightning-bot.com/disability",
 		"disability.png",
 		map[string]string{
@@ -2237,7 +2259,8 @@ func (c *ImageCommands) disability(ctx *router.Ctx) {
 
 func (c *ImageCommands) doglemon(ctx *router.Ctx) {
 	err := utils.Discord.SendFileFromURL(
-		ctx,
+		ctx.Session,
+		ctx.Message.ChannelID,
 		"https://imgen.lightning-bot.com/doglemon",
 		"doglemon.png",
 		map[string]string{
@@ -2256,7 +2279,8 @@ func (c *ImageCommands) door(ctx *router.Ctx) {
 		return
 	}
 	err = utils.Discord.SendFileFromURL(
-		ctx,
+		ctx.Session,
+		ctx.Message.ChannelID,
 		"https://imgen.lightning-bot.com/door",
 		"door.png",
 		map[string]string{
@@ -2275,7 +2299,8 @@ func (c *ImageCommands) egg(ctx *router.Ctx) {
 		return
 	}
 	err = utils.Discord.SendFileFromURL(
-		ctx,
+		ctx.Session,
+		ctx.Message.ChannelID,
 		"https://imgen.lightning-bot.com/egg",
 		"egg.png",
 		map[string]string{
@@ -2289,7 +2314,8 @@ func (c *ImageCommands) egg(ctx *router.Ctx) {
 
 func (c *ImageCommands) excuseme(ctx *router.Ctx) {
 	err := utils.Discord.SendFileFromURL(
-		ctx,
+		ctx.Session,
+		ctx.Message.ChannelID,
 		"https://imgen.lightning-bot.com/excuseme",
 		"excuseme.png",
 		map[string]string{
@@ -2303,7 +2329,8 @@ func (c *ImageCommands) excuseme(ctx *router.Ctx) {
 
 func (c *ImageCommands) expanddong(ctx *router.Ctx) {
 	err := utils.Discord.SendFileFromURL(
-		ctx,
+		ctx.Session,
+		ctx.Message.ChannelID,
 		"https://imgen.lightning-bot.com/expanddong",
 		"expanddong.png",
 		map[string]string{
@@ -2317,7 +2344,8 @@ func (c *ImageCommands) expanddong(ctx *router.Ctx) {
 
 func (c *ImageCommands) expandingwwe(ctx *router.Ctx) {
 	err := utils.Discord.SendFileFromURL(
-		ctx,
+		ctx.Session,
+		ctx.Message.ChannelID,
 		"https://imgen.lightning-bot.com/expandingwwe",
 		"expandingwwe.png",
 		map[string]string{
@@ -2335,7 +2363,8 @@ func (c *ImageCommands) expandingwwe(ctx *router.Ctx) {
 
 func (c *ImageCommands) qrcode(ctx *router.Ctx) {
 	err := utils.Discord.SendFileFromURL(
-		ctx,
+		ctx.Session,
+		ctx.Message.ChannelID,
 		fmt.Sprintf("https://www.qrcoder.co.uk/api/v1/?type=png&text=%s&int=1&background=FFFFFF&foreground=000000&eo=000000&ei=000000&size=8&padding=2", url.QueryEscape(ctx.Arguments.Raw())),
 		"qrcode.png",
 	)
@@ -2346,7 +2375,8 @@ func (c *ImageCommands) qrcode(ctx *router.Ctx) {
 
 func (c *ImageCommands) darkqrcode(ctx *router.Ctx) {
 	err := utils.Discord.SendFileFromURL(
-		ctx,
+		ctx.Session,
+		ctx.Message.ChannelID,
 		fmt.Sprintf("https://www.qrcoder.co.uk/api/v1/?type=png&text=%s&int=1&background=000&foreground=FFFFFF&eo=FFFFFF&ei=FFFFFF&size=8&padding=2", url.QueryEscape(ctx.Arguments.Raw())),
 		"qrcode.png",
 	)
@@ -2792,9 +2822,9 @@ func (c *ImageCommands) speechbubble(ctx *router.Ctx) {
 
 func (c *ImageCommands) quotereply(ctx *router.Ctx) {
 	if ctx.Message.ReferencedMessage == nil {
-		c.services.Embed.NewEmbed().
+		ctx.NewEmbed().
 			SetDescription("You must reply to a message to use quotereply.").
-			Send(ctx)
+			Send()
 		return
 	}
 
@@ -2811,17 +2841,17 @@ func (c *ImageCommands) quotereply(ctx *router.Ctx) {
 func (c *ImageCommands) quotemessage(ctx *router.Ctx) {
 	channel, err := ctx.Arguments.Get(1).Channel(router.ArgumentFlagFallbackDefault)
 	if err != nil {
-		c.services.Embed.NewEmbed().
+		ctx.NewEmbed().
 			SetDescription("Could not find channel.").
-			Send(ctx)
+			Send()
 		return
 	}
 
 	m, err := utils.Discord.GetChannelMessage(ctx.Session, channel.ID, ctx.Arguments.Get(0).Raw())
 	if err != nil {
-		c.services.Embed.NewEmbed().
+		ctx.NewEmbed().
 			SetDescription("Could not find message: %v", err).
-			Send(ctx)
+			Send()
 		return
 	}
 
@@ -2836,9 +2866,9 @@ func (c *ImageCommands) quotemessage(ctx *router.Ctx) {
 func (c *ImageCommands) quoteuser(ctx *router.Ctx) {
 	user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
 	if err != nil {
-		c.services.Embed.NewEmbed().
+		ctx.NewEmbed().
 			SetDescription("Could not find user.").
-			Send(ctx)
+			Send()
 		return
 	}
 
@@ -2888,17 +2918,17 @@ func (c *ImageCommands) getRoleColor(ctx *router.Ctx, userID string) string {
 func (c *ImageCommands) discordquotemessage(ctx *router.Ctx) {
 	channel, err := ctx.Arguments.Get(1).Channel(router.ArgumentFlagFallbackDefault)
 	if err != nil {
-		c.services.Embed.NewEmbed().
+		ctx.NewEmbed().
 			SetDescription("Could not find channel.").
-			Send(ctx)
+			Send()
 		return
 	}
 
 	m, err := utils.Discord.GetChannelMessage(ctx.Session, channel.ID, ctx.Arguments.Get(0).Raw())
 	if err != nil {
-		c.services.Embed.NewEmbed().
+		ctx.NewEmbed().
 			SetDescription("Could not find message: %v", err).
-			Send(ctx)
+			Send()
 		return
 	}
 
@@ -2916,9 +2946,9 @@ func (c *ImageCommands) discordquotemessage(ctx *router.Ctx) {
 
 func (c *ImageCommands) discordquotereply(ctx *router.Ctx) {
 	if ctx.Message.ReferencedMessage == nil {
-		c.services.Embed.NewEmbed().
+		ctx.NewEmbed().
 			SetDescription("You must reply to a message to use quotereply.").
-			Send(ctx)
+			Send()
 		return
 	}
 
@@ -2939,9 +2969,9 @@ func (c *ImageCommands) discordquotereply(ctx *router.Ctx) {
 func (c *ImageCommands) discordquoteuser(ctx *router.Ctx) {
 	user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
 	if err != nil {
-		c.services.Embed.NewEmbed().
+		ctx.NewEmbed().
 			SetDescription("Could not find user.").
-			Send(ctx)
+			Send()
 		return
 	}
 
