@@ -239,7 +239,7 @@ func (v *variablesService) getValue(varName string, args []string) string {
 		if err != nil {
 			return ""
 		}
-		return song.GetPath("album", "name").MustString()
+		return song.Get("album", "name").MustString()
 
 	case "sduration":
 		if v.session == nil {
@@ -249,7 +249,7 @@ func (v *variablesService) getValue(varName string, args []string) string {
 		if err != nil {
 			return ""
 		}
-		duration := song.GetPath("duration_ms").MustInt(0) / 1000
+		duration := song.Get("duration_ms").MustInt(0) / 1000
 		return fmt.Sprintf("%02d:%02d", duration/60, duration%60)
 
 	case "scover":
@@ -260,11 +260,11 @@ func (v *variablesService) getValue(varName string, args []string) string {
 		if err != nil {
 			return ""
 		}
-		imgs := song.GetPath("album", "images")
-		if len(imgs.MustArray()) == 0 {
+		imgs := song.Get("album", "images")
+		if imgs.Len() == 0 {
 			return ""
 		}
-		url := imgs.GetIndex(0).Get("url").MustString()
+		url := imgs.Get(0, "url").MustString()
 		urlParts := strings.Split(url, "/")
 		return "'spotify:" + urlParts[len(urlParts)-1]
 
@@ -276,7 +276,7 @@ func (v *variablesService) getValue(varName string, args []string) string {
 		if err != nil {
 			return ""
 		}
-		return song.GetPath("external_urls", "spotify").MustString()
+		return song.Get("external_urls", "spotify").MustString()
 
 	case "weather":
 		if len(args) == 0 {
@@ -286,7 +286,7 @@ func (v *variablesService) getValue(varName string, args []string) string {
 		if err != nil {
 			return ""
 		}
-		return utils.String.Capitalize(weather.Get("weather").GetIndex(0).Get("description").MustString())
+		return utils.String.Capitalize(weather.Get("weather", 0, "description").MustString())
 
 	case "tempc":
 		if len(args) == 0 {
@@ -296,7 +296,7 @@ func (v *variablesService) getValue(varName string, args []string) string {
 		if err != nil {
 			return ""
 		}
-		tempC := weather.GetPath("main", "temp").MustFloat64() - 273.15
+		tempC := weather.Get("main", "temp").MustFloat64() - 273.15
 		return fmt.Sprintf("%.1f °C", tempC)
 
 	case "tempf":
@@ -307,7 +307,7 @@ func (v *variablesService) getValue(varName string, args []string) string {
 		if err != nil {
 			return ""
 		}
-		tempC := weather.GetPath("main", "temp").MustFloat64() - 273.15
+		tempC := weather.Get("main", "temp").MustFloat64() - 273.15
 		tempF := tempC*9/5 + 32
 		return fmt.Sprintf("%.1f °F", tempF)
 

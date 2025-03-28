@@ -72,8 +72,8 @@ func (c *NSFWCommands) generateFunc(name string, subReddits []string) func(ctx *
 			return
 		}
 
-		ctx.NewEmbed().
-			SetDescription(utils.String.Capitalize(name)).
+		c.services.Embed.New(ctx).
+			SetDescription("%s", utils.String.Capitalize(name)).
 			SetImage(image.ImageURL).
 			Send()
 	}

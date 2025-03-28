@@ -7,6 +7,7 @@ import (
 
 	"github.com/lb-selfbot/discordgo"
 	"github.com/lb-selfbot/selfbot/internal/constants"
+	"github.com/lb-selfbot/selfbot/internal/fn"
 	"github.com/lb-selfbot/selfbot/internal/logging"
 	"github.com/lb-selfbot/selfbot/internal/services/config"
 	"github.com/lb-selfbot/selfbot/internal/services/eventbroker"
@@ -104,7 +105,7 @@ func (ui *uiService) logReady(user *discordgo.User, guilds []*discordgo.Guild, n
 
 	// Count friends (no relationships in the new struct, so we use session)
 	session := ui.discordSvc.GetSession()
-	friends := utils.Filter(session.State.Relationships, func(rel *discordgo.Relationship) bool {
+	friends := fn.Filter(session.State.Relationships, func(rel *discordgo.Relationship) bool {
 		return rel.Type == 1
 	})
 

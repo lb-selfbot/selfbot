@@ -8,15 +8,18 @@ import (
 	"github.com/lb-selfbot/discordgo"
 	"github.com/lb-selfbot/selfbot/internal/fn"
 	"github.com/lb-selfbot/selfbot/internal/services/config"
+	"github.com/lb-selfbot/selfbot/internal/services/discord"
 	"github.com/lb-selfbot/selfbot/internal/services/eventbroker"
 	"github.com/lb-selfbot/selfbot/internal/services/eventreactions/types"
 	"github.com/lb-selfbot/selfbot/internal/services/router"
 	"github.com/lb-selfbot/selfbot/internal/services/variables"
-	"github.com/lb-selfbot/selfbot/internal/utils"
 )
 
 // Service handles event reactions.
 type Service interface {
+	// Register registers the event handlers.
+	Register(session *discordgo.Session)
+
 	// GetAllReactions returns all event reactions.
 	GetAllReactions() []types.EventReaction
 
@@ -83,6 +86,7 @@ type eventReactionsService struct {
 	configSvc    config.Service
 	routerSvc    router.Service
 	variablesSvc variables.Service
+	discordSvc   discord.Service
 
 	reactions   []types.EventReaction
 	reactionsMu sync.Mutex
@@ -109,12 +113,19 @@ type eventReactionsService struct {
 	countryCode  string
 }
 
-func NewService(eventBroker eventbroker.Service, configService config.Service, routerSvc router.Service, variablesSvc variables.Service) Service {
+func NewService(
+	eventBroker eventbroker.Service,
+	configService config.Service,
+	routerSvc router.Service,
+	variablesSvc variables.Service,
+	discordSvc discord.Service,
+) Service {
 	svc := &eventReactionsService{
 		eventBroker:        eventBroker,
 		configSvc:          configService,
 		routerSvc:          routerSvc,
 		variablesSvc:       variablesSvc,
+		discordSvc:         discordSvc,
 		reactions:          make([]types.EventReaction, 0),
 		pinSpamMsgs:        make([]*discordgo.Message, 0),
 		eventReactionsMsgs: make([]*discordgo.Message, 0),
@@ -129,15 +140,6 @@ func NewService(eventBroker eventbroker.Service, configService config.Service, r
 }
 
 func (e *eventReactionsService) subscribe() {
-	e.eventBroker.Subscribe(eventbroker.EventSessionReady, func(payload any) {
-		session, ok := payload.(*discordgo.Session)
-		if !ok {
-			return
-		}
-
-		e.register(session)
-	})
-
 	e.eventBroker.Subscribe(eventbroker.EventHandleReactionMessage, func(payload any) {
 		msg, ok := payload.(*discordgo.Message)
 		if !ok {
@@ -157,11 +159,7 @@ func (e *eventReactionsService) subscribe() {
 	})
 }
 
-func (e *eventReactionsService) register(session *discordgo.Session) {
-	session.AddHandler(func(_ *discordgo.Session, _ any) {
-		e.eventBroker.Publish(eventbroker.EventCheckNonce, nil)
-	})
-
+func (e *eventReactionsService) Register(session *discordgo.Session) {
 	session.AddHandler(e.onReady)
 	session.AddHandler(e.onMessageCreate)
 	session.AddHandler(e.onMessageUpdate)
@@ -213,7 +211,7 @@ func (e *eventReactionsService) GetAllReactions() []types.EventReaction {
 }
 
 func (e *eventReactionsService) GetReactionsByType(t types.EventReactionType) []types.EventReaction {
-	return utils.Filter(e.reactions, func(r types.EventReaction) bool {
+	return fn.Filter(e.reactions, func(r types.EventReaction) bool {
 		return r.Type() == t
 	})
 }
@@ -231,7 +229,7 @@ func (e *eventReactionsService) RemoveReaction(r types.EventReaction) {
 	e.reactionsMu.Lock()
 	defer e.reactionsMu.Unlock()
 
-	e.reactions = utils.Filter(e.reactions, func(rr types.EventReaction) bool {
+	e.reactions = fn.Filter(e.reactions, func(rr types.EventReaction) bool {
 		return !rr.Equals(r)
 	})
 
@@ -253,7 +251,7 @@ func (e *eventReactionsService) RemoveReactionsByType(t types.EventReactionType)
 	e.reactionsMu.Lock()
 	defer e.reactionsMu.Unlock()
 
-	e.reactions = utils.Filter(e.reactions, func(r types.EventReaction) bool {
+	e.reactions = fn.Filter(e.reactions, func(r types.EventReaction) bool {
 		return r.Type() != t
 	})
 

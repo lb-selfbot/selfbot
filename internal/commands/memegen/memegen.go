@@ -136,28 +136,36 @@ func (c *MemeGenCommands) Register() {
 	}, commands)
 }
 
+func (c *MemeGenCommands) getCreds() api.LBCreds {
+	cfg := c.services.Config.GetConfig()
+	return api.LBCreds{
+		Username: cfg.Account.LightningBot.Username,
+		Password: cfg.Account.LightningBot.Password,
+	}
+}
+
 func (c *MemeGenCommands) randommeme(ctx *router.Ctx) {
 	top, bottom := ctx.Arguments.Get(0).Raw(), ctx.Arguments.Get(1).Raw()
-	template, err := http.GetJson("https://api.imgflip.com/get_memes")
+	resp, err := http.DefaultClient().Get("https://api.imgflip.com/get_memes")
 	if err != nil {
 		ctx.RespondText("An error has occurred.")
 		return
 	}
 
-	memes := template.Get("data").Get("memes")
-	memesLen := len(memes.MustArray())
+	memes := resp.Json().Get("data").Get("memes")
+	memesLen := memes.Len()
 
 	// Get a random meme from the list
-	meme := memes.GetIndex(rand.Intn(memesLen))
+	meme := memes.Get(rand.Intn(memesLen))
 	templateID := meme.Get("id").MustString()
 
-	image, err := api.CreateMeme(templateID, top, bottom)
+	image, err := api.LBCreateMeme(c.getCreds(), templateID, top, bottom)
 	if err != nil {
 		ctx.RespondText("An error has occurred: %v", err)
 		return
 	}
 
-	ctx.NewEmbed().
+	c.services.Embed.New(ctx).
 		AddField("Used Meme", meme.Get("name").MustString()).
 		SetImage(image).
 		Send()
@@ -165,13 +173,13 @@ func (c *MemeGenCommands) randommeme(ctx *router.Ctx) {
 
 func (c *MemeGenCommands) custommeme(ctx *router.Ctx) {
 	templateID, top, bottom := ctx.Arguments.Get(0).Raw(), ctx.Arguments.Get(1).Raw(), ctx.Arguments.Get(2).Raw()
-	image, err := api.CreateMeme(templateID, top, bottom)
+	image, err := api.LBCreateMeme(c.getCreds(), templateID, top, bottom)
 	if err != nil {
 		ctx.RespondText("An error has occurred: %v", err)
 		return
 	}
 
-	ctx.RespondText(image)
+	ctx.RespondText("%s", image)
 }
 
 func (c *MemeGenCommands) generateFunc(templateID string) func(ctx *router.Ctx) {
@@ -181,12 +189,12 @@ func (c *MemeGenCommands) generateFunc(templateID string) func(ctx *router.Ctx) 
 
 	return func(ctx *router.Ctx) {
 		top, bottom := ctx.Arguments.Get(0).Raw(), ctx.Arguments.Get(1).Raw()
-		image, err := api.CreateMeme(templateID, top, bottom)
+		image, err := api.LBCreateMeme(c.getCreds(), templateID, top, bottom)
 		if err != nil {
 			ctx.RespondText("An error has occurred: %v", err)
 			return
 		}
 
-		ctx.RespondText(image)
+		ctx.RespondText("%s", image)
 	}
 }

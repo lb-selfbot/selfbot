@@ -3,10 +3,10 @@ package reminder
 import (
 	"time"
 
+	"github.com/lb-selfbot/selfbot/internal/fn"
 	"github.com/lb-selfbot/selfbot/internal/services/config"
 	"github.com/lb-selfbot/selfbot/internal/services/eventbroker"
 	"github.com/lb-selfbot/selfbot/internal/services/ui/featurelogs"
-	"github.com/lb-selfbot/selfbot/internal/utils"
 )
 
 // Service handles reminders for the user.
@@ -43,7 +43,7 @@ func (r *reminderService) start() {
 				Reminder: reminder,
 			})
 
-			cfg.Reminders = utils.RemoveSliceItem(cfg.Reminders, reminder)
+			cfg.Reminders = fn.Delete(cfg.Reminders, reminder)
 
 			err := r.configSvc.SaveConfig(cfg)
 			if err != nil {

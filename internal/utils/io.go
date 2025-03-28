@@ -1,11 +1,12 @@
 package utils
 
 import (
-	"encoding/json"
 	"os"
 	"path/filepath"
 	"slices"
 	"strings"
+
+	"github.com/goccy/go-json"
 
 	"github.com/lb-selfbot/selfbot/internal/constants"
 	"golang.org/x/text/unicode/norm"

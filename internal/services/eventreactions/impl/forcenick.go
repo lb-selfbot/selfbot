@@ -93,7 +93,6 @@ func (f *ForceNick) Data() map[string]any {
 func (f *ForceNick) Handler(session *discordgo.Session, event any) {
 	memberUpdate, ok := event.(*discordgo.GuildMemberUpdate)
 	if !ok {
-		logging.Debug("ForceNick.Handler: Event is not a guild member update event")
 		return
 	}
 

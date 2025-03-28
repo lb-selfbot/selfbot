@@ -5,7 +5,6 @@ import (
 	"sync"
 	"time"
 
-	"github.com/lb-selfbot/selfbot/internal/logging"
 	"github.com/lb-selfbot/selfbot/internal/services/config"
 	"github.com/lb-selfbot/selfbot/internal/services/eventbroker"
 	"github.com/lb-selfbot/selfbot/internal/services/eventreactions/types"
@@ -130,29 +129,35 @@ func (s *SelfbotDetection) logDetection(score *DetectionScore, message *discordg
 	score.Logged = true
 }
 
+func (s *SelfbotDetection) shouldIgnoreAuthor(session *discordgo.Session, message *discordgo.Message) bool {
+	return message.Author.Bot || message.Author.ID == session.State.User.ID
+}
+
 func (s *SelfbotDetection) Handler(session *discordgo.Session, event any) {
 	cfg := s.configSvc.GetConfig()
 
+	if !cfg.Events.SelfbotDetection {
+		return
+	}
+
 	if message, ok := event.(*discordgo.MessageCreate); ok {
-		if !cfg.Events.SelfbotDetection || message.Author.Bot || message.Author.ID == session.State.User.ID {
+		if s.shouldIgnoreAuthor(session, message.Message) {
 			return
 		}
 
 		s.CreateHandler(session, message, cfg)
 	} else if message, ok := event.(*discordgo.MessageUpdate); ok {
-		if !cfg.Events.SelfbotDetection || message.Author.Bot || message.Author.ID == session.State.User.ID {
+		if s.shouldIgnoreAuthor(session, message.Message) {
 			return
 		}
 
 		s.UpdateHandler(session, message, cfg)
 	} else if message, ok := event.(*discordgo.MessageDelete); ok {
-		if !cfg.Events.SelfbotDetection || message.Author.Bot || message.Author.ID == session.State.User.ID {
+		if s.shouldIgnoreAuthor(session, message.Message) {
 			return
 		}
 
 		s.DeleteHandler(session, message, cfg)
-	} else {
-		logging.Debug("SelfbotDetection.Handler: Event is not a message create or delete event")
 	}
 }
 

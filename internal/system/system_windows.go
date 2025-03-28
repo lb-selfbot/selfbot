@@ -29,22 +29,22 @@ func restartProgram() error {
 	return nil
 }
 
-func shutdownSystem() error {
+func shutdown() error {
 	return exec.Command("shutdown", "/s", "/t", "0").Start()
 }
 
-func restartSystem() error {
+func restart() error {
 	return exec.Command("shutdown", "/r", "/t", "0").Start()
 }
 
-func sleepSystem() error {
+func sleep() error {
 	return exec.Command("rundll32", "powrprof.dll,SetSuspendState", "0", "1", "0").Start()
 }
 
-func hibernateSystem() error {
+func hibernate() error {
 	return exec.Command("rundll32", "powrprof.dll,SetSuspendState", "1", "1", "0").Start()
 }
 
-func lockSystem() error {
+func lock() error {
 	return exec.Command("rundll32", "user32.dll,LockWorkStation").Start()
 }

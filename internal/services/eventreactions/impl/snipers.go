@@ -1,7 +1,6 @@
 package impl
 
 import (
-	"encoding/json"
 	"fmt"
 	"go/token"
 	_types "go/types"
@@ -15,6 +14,10 @@ import (
 	"time"
 	"unicode"
 
+	"github.com/goccy/go-json"
+
+	"github.com/lb-selfbot/go-jester"
+	"github.com/lb-selfbot/selfbot/internal/fn"
 	"github.com/lb-selfbot/selfbot/internal/logging"
 	"github.com/lb-selfbot/selfbot/internal/services/config"
 	"github.com/lb-selfbot/selfbot/internal/services/eventbroker"
@@ -27,7 +30,6 @@ import (
 	"github.com/lb-selfbot/selfbot/internal/random"
 
 	"github.com/LightningDev1/go-privnote"
-	"github.com/bitly/go-simplejson"
 	"github.com/lb-selfbot/discordgo"
 	"github.com/lb-selfbot/selfbot/internal/utils"
 )
@@ -57,10 +59,9 @@ type Snipers struct {
 
 	privnoteClient *privnote.Client
 
-	pokeTwoCaptchaRequired bool
-	totalPokemon           int
-	caughtPokemon          int
-	lastCatch              time.Time
+	totalPokemon  int
+	caughtPokemon int
+	lastCatch     time.Time
 }
 
 func NewSnipers(
@@ -162,7 +163,7 @@ func (s *Snipers) CheckNitroSniper(session *discordgo.Session, m *discordgo.Mess
 		s.checkedGiftCodes = append(s.checkedGiftCodes, code)
 
 		// Check if the author is spamming codes
-		s.giftCodesMap[m.Author.ID] = utils.Filter(
+		s.giftCodesMap[m.Author.ID] = fn.Filter(
 			s.giftCodesMap[m.Author.ID],
 			func(giftCode GiftCode) bool {
 				return time.Since(giftCode.Time) < 30*time.Second
@@ -190,7 +191,6 @@ func (s *Snipers) CheckNitroSniper(session *discordgo.Session, m *discordgo.Mess
 		}
 
 		// Redeem code
-		url := "https://discord.com/api/v9/entitlements/gift-codes/" + code + "/redeem"
 		payload := map[string]any{
 			"with_application":       false,
 			"with_subscription_plan": true,
@@ -206,12 +206,11 @@ func (s *Snipers) CheckNitroSniper(session *discordgo.Session, m *discordgo.Mess
 		}
 
 		beforeRequest := time.Now()
-		resp, _ := s.mainSession.Request("POST", url, payload)
+		resp, _ := s.mainSession.Request("POST", "https://discord.com/api/v9/entitlements/gift-codes/"+code+"/redeem", payload)
 		elapsed := time.Since(beforeRequest)
 
 		respString := string(resp)
 
-		// Code has been redeemed
 		status := "Unknown"
 
 		switch {
@@ -222,13 +221,13 @@ func (s *Snipers) CheckNitroSniper(session *discordgo.Session, m *discordgo.Mess
 		case strings.Contains(respString, "Unknown Gift Code"):
 			status = "Unknown Gift Code"
 		default:
-			json, err := simplejson.NewJson(resp)
+			json, err := jester.NewJson(resp)
 			if err != nil {
-				json = simplejson.New()
+				json = jester.NewEmpty()
 			}
 
-			if msg, ok := json.CheckGet("message"); ok {
-				status = msg.MustString()
+			if msg, err := json.Get("message").String(); err == nil {
+				status = msg
 			}
 		}
 
@@ -248,13 +247,7 @@ func (s *Snipers) CheckPrivnoteSniper(session *discordgo.Session, m *discordgo.M
 		return
 	}
 
-	rawMessage, err := json.Marshal(m)
-	if err != nil {
-		logging.Debug("Snipers.CheckNitroSniper: Error marshalling message: ", err)
-		return
-	}
-
-	privnoteCodes := privnoteRegex.FindAllString(string(rawMessage), -1)
+	privnoteCodes := privnoteRegex.FindAllString(fmt.Sprint(m), -1)
 
 	for _, code := range privnoteCodes {
 		code = "https://" + code
@@ -1040,29 +1033,23 @@ func (s *Snipers) CheckGiveawaySniper(session *discordgo.Session, m *discordgo.M
 			break
 		}
 
-		rawMessage, err := json.Marshal(m)
-		if err != nil {
-			logging.Debug("Snipers.CheckGiveawaySniper: Error marshalling message: ", err)
-			break
-		}
-
-		rawMessageString := strings.ToLower(string(rawMessage))
+		rawMsg := strings.ToLower(fmt.Sprint(m))
 
 		// Check if the message is a giveaway
-		isGiveaway := strings.Contains(rawMessageString, "giveaway") ||
-			strings.Contains(rawMessageString, "react with") ||
-			strings.Contains(rawMessageString, "to enter") ||
-			strings.Contains(rawMessageString, "to join")
+		isGiveaway := strings.Contains(rawMsg, "giveaway") ||
+			strings.Contains(rawMsg, "react with") ||
+			strings.Contains(rawMsg, "to enter") ||
+			strings.Contains(rawMsg, "to join")
 		if !isGiveaway {
 			break
 		}
 
 		// Get giveaway info
 		hostRegex := regexp.MustCompile(`\\u003c@!?(.*?)\\u003e`)
-		hostMatches := hostRegex.FindStringSubmatch(rawMessageString)
+		hostMatches := hostRegex.FindStringSubmatch(rawMsg)
 
 		endsRegex := regexp.MustCompile(`\\u003ct:(.*?):R\\u003e`)
-		endsMatches := endsRegex.FindStringSubmatch(rawMessageString)
+		endsMatches := endsRegex.FindStringSubmatch(rawMsg)
 
 		hostID := ""
 		endsIn := ""
@@ -1094,7 +1081,7 @@ func (s *Snipers) CheckGiveawaySniper(session *discordgo.Session, m *discordgo.M
 			button, ok := s.getButtonComponent(m.Message, 0)
 			if ok {
 				// Click the enter button
-				err = session.InteractionClick(button, m.Message)
+				err := session.InteractionClick(button, m.Message)
 				if err != nil {
 					logging.Debug("Snipers.CheckGiveawaySniper: Error clicking button: ", err)
 				}
@@ -1260,38 +1247,23 @@ func (s *Snipers) CheckPokeTwoSniper(session *discordgo.Session, m *discordgo.Me
 	isPokeTwo := cfg.Snipers.PokeTwoSniper.Enabled && // Sniper is enabled
 		m.Author.ID == "716390085896962058" && // Message is from PokeTwo
 		slices.Contains(cfg.Snipers.PokeTwoSniper.Channels, m.ChannelID) // Message is in a sniper channel
+	if !isPokeTwo {
+		return
+	}
 
 	// Captcha check
-	captchaRegex := regexp.MustCompile(`Whoa there. Please tell us you're human! https://verify.poketwo.net/captcha/(\d+)`)
+	captchaRegex := regexp.MustCompile(`https://verify.poketwo.net/captcha/(\d+)`)
 	captchaMatches := captchaRegex.FindStringSubmatch(m.Content)
 	if len(captchaMatches) > 1 && captchaMatches[1] == session.State.User.ID {
-		s.pokeTwoCaptchaRequired = true
+		s.eventBroker.Publish(eventbroker.EventLogInfo, "PokéTwo Sniper: Captcha required! Please complete the captcha at "+captchaMatches[0]+" and then restart the PokeTwo sniper.")
 
-		s.eventBroker.Publish(eventbroker.EventLogInfo, "PokéTwo Sniper: Captcha required!")
-
-		err := api.PokeTwoVerify(session.State.User.ID)
-		if err != nil {
-			logging.Debug("Snipers.CheckPokeTwoSniper: Error solving captcha: ", err)
-
-			s.eventBroker.Publish(eventbroker.EventLogInfo, "PokéTwo Sniper: Error solving captcha! You need to solve it manually at https://verify.poketwo.net/captcha/"+session.State.User.ID)
-
-			// Try again after 5 minutes
-			go func() {
-				time.Sleep(time.Minute * 5)
-				s.pokeTwoCaptchaRequired = false
-			}()
-		} else {
-			s.eventBroker.Publish(eventbroker.EventLogInfo, "PokéTwo Sniper: Captcha completed!")
-
-			s.pokeTwoCaptchaRequired = false
-		}
+		cfg.Snipers.PokeTwoSniper.Enabled = false
+		_ = s.configSvc.SaveConfig(cfg)
 
 		return
 	}
 
-	sniperConditions := isPokeTwo && len(m.Embeds) == 1
-
-	if !sniperConditions {
+	if len(m.Embeds) == 0 {
 		return
 	}
 
@@ -1338,17 +1310,17 @@ func (s *Snipers) CheckPokeTwoSniper(session *discordgo.Session, m *discordgo.Me
 	})
 
 	// Download the Pokémon image
-	resp := http.Get(emb.Image.URL)
-	if resp.Error != nil {
-		logging.Debug("Snipers.CheckPokeTwoSniper: Error getting image: ", resp.Error)
+	resp, err := http.DefaultClient().Get(emb.Image.URL)
+	if err != nil {
+		logging.Debug("Snipers.CheckPokeTwoSniper: Error getting image: ", err)
 		return
 	}
 
-	image := utils.Misc.ImageToBase64(resp.Body)
+	image := utils.Misc.ImageToBase64(resp.MustGetBody())
 
 	// Detect the Pokémon
 	beforeRequest := time.Now()
-	pokemon, confidence, err := api.PokeTwo(image, cfg)
+	pokemon, confidence, err := api.PokeTwo(image)
 	if err != nil {
 		logging.Debug("Snipers.CheckPokeTwoSniper: Error getting Pokémon: ", err)
 		return

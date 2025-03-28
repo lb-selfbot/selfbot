@@ -1,20 +1,21 @@
 package slashcommand
 
 import (
-	"encoding/json"
 	"errors"
 	"fmt"
 	"slices"
 	"sync"
 	"time"
 
+	"github.com/goccy/go-json"
+
 	"github.com/lb-selfbot/discordgo"
+	"github.com/lb-selfbot/selfbot/internal/fn"
 	"github.com/lb-selfbot/selfbot/internal/logging"
 	"github.com/lb-selfbot/selfbot/internal/services/config"
 	"github.com/lb-selfbot/selfbot/internal/services/eventbroker"
 	"github.com/lb-selfbot/selfbot/internal/services/router"
 	"github.com/lb-selfbot/selfbot/internal/services/ui/featurelogs"
-	"github.com/lb-selfbot/selfbot/internal/utils"
 )
 
 var (
@@ -184,7 +185,7 @@ func (s *slashCommandService) LoadJobs(session *discordgo.Session) error {
 		return err
 	}
 
-	s.jobs = utils.Filter(s.jobs, func(job *SCJob) bool {
+	s.jobs = fn.Filter(s.jobs, func(job *SCJob) bool {
 		job.Arguments = router.ParseArguments(&router.Ctx{Session: session}, job.RawArguments)
 
 		if job.Command == nil {
@@ -222,7 +223,7 @@ func (s *slashCommandService) getCommand(session *discordgo.Session, job *SCJob)
 		return nil, err
 	}
 
-	commands = utils.Filter(commands, func(command *discordgo.ApplicationCommand) bool {
+	commands = fn.Filter(commands, func(command *discordgo.ApplicationCommand) bool {
 		return command.Name == job.Command.Name &&
 			command.ApplicationID == job.ApplicationObject.ID
 	})
@@ -273,7 +274,7 @@ func (s *slashCommandService) AddJob(job *SCJob) error {
 
 func (s *slashCommandService) RemoveJob(job *SCJob) error {
 	s.jobsMu.Lock()
-	s.jobs = utils.Filter(s.jobs, func(j *SCJob) bool {
+	s.jobs = fn.Filter(s.jobs, func(j *SCJob) bool {
 		return j.Name != job.Name
 	})
 	s.jobsMu.Unlock()

@@ -88,7 +88,7 @@ func (m *mtsService) init(session *discordgo.Session) {
 		}
 
 		m.instances = append(m.instances, instance)
-		m.startInstance(context.Background(), session, instance)
+		_ = m.startInstance(context.Background(), session, instance)
 	}
 
 	if len(m.instances) > 0 {

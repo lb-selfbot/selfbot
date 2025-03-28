@@ -8,6 +8,7 @@ import (
 	"github.com/lb-selfbot/selfbot/internal/logging"
 
 	"github.com/lb-selfbot/discordgo"
+	"github.com/lb-selfbot/selfbot/internal/services/config"
 	"github.com/lb-selfbot/selfbot/internal/services/eventbroker"
 	"github.com/lb-selfbot/selfbot/internal/services/eventreactions/types"
 	"github.com/lb-selfbot/selfbot/internal/services/ui/featurelogs"
@@ -16,6 +17,7 @@ import (
 
 type MessageReaction struct {
 	eventBroker eventbroker.Service
+	configSvc   config.Service
 
 	ReactionType types.EventReactionType
 	Guild        *discordgo.Guild
@@ -36,6 +38,7 @@ type MessageReaction struct {
 
 func NewMessageReaction(
 	eventBroker eventbroker.Service,
+	configSvc config.Service,
 	reactionType types.EventReactionType,
 	guild *discordgo.Guild,
 	channel *discordgo.Channel,
@@ -43,6 +46,7 @@ func NewMessageReaction(
 ) *MessageReaction {
 	return &MessageReaction{
 		eventBroker:  eventBroker,
+		configSvc:    configSvc,
 		ReactionType: reactionType,
 		Guild:        guild,
 		Channel:      channel,
@@ -50,7 +54,7 @@ func NewMessageReaction(
 	}
 }
 
-func NewMessageReactionFromData(eventBroker eventbroker.Service, session *discordgo.Session, reactionType types.EventReactionType, data map[string]any) (*MessageReaction, error) {
+func NewMessageReactionFromData(eventBroker eventbroker.Service, configSvc config.Service, session *discordgo.Session, reactionType types.EventReactionType, data map[string]any) (*MessageReaction, error) {
 	var guild *discordgo.Guild
 	var channel *discordgo.Channel
 	var user *discordgo.User
@@ -107,6 +111,7 @@ func NewMessageReactionFromData(eventBroker eventbroker.Service, session *discor
 
 	return &MessageReaction{
 		eventBroker:  eventBroker,
+		configSvc:    configSvc,
 		ReactionType: reactionType,
 		Guild:        guild,
 		Channel:      channel,
@@ -214,7 +219,6 @@ func (m *MessageReaction) Data() map[string]any {
 func (m *MessageReaction) Handler(session *discordgo.Session, event any) {
 	message, ok := event.(*discordgo.MessageCreate)
 	if !ok {
-		logging.Debug("MessageReaction.Handler: Event is not a message create event")
 		return
 	}
 
@@ -249,7 +253,13 @@ func (m *MessageReaction) Handler(session *discordgo.Session, event any) {
 
 		gptMessages := utils.Misc.CreateAISystemPingMessages(m.System, session, messages)
 
-		response, err := api.GPTCustom(gptMessages)
+		cfg := m.configSvc.GetConfig()
+		creds := api.LBCreds{
+			Username: cfg.Account.LightningBot.Username,
+			Password: cfg.Account.LightningBot.Password,
+		}
+
+		response, err := api.LBGPTCustom(creds, gptMessages)
 		if err != nil {
 			logging.Error("Responder.Handler: Error getting AI response: " + response + err.Error())
 			return

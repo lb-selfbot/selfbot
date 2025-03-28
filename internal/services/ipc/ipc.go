@@ -46,9 +46,15 @@ func NewService(eventBroker eventbroker.Service, configSvc config.Service) Servi
 
 func (i *ipcService) subscribe() {
 	i.eventBroker.Subscribe(eventbroker.EventRestart, func(payload any) {
-		if i.conn != nil {
-			i.conn.WriteJSON(&WSMessage{Op: OpCodeRestart})
+		if i.conn == nil {
+			return
 		}
+
+		if i.conn == nil {
+			return
+		}
+
+		_ = i.conn.WriteJSON(&WSMessage{Op: OpCodeRestart})
 	})
 
 	i.eventBroker.Subscribe(eventbroker.EventLogError, func(payload any) {
@@ -57,7 +63,45 @@ func (i *ipcService) subscribe() {
 			return
 		}
 
-		i.conn.WriteJSON(&WSMessage{Op: OpCodeError, Data: WSData{Text: text}})
+		if i.conn == nil {
+			return
+		}
+
+		_ = i.conn.WriteJSON(&WSMessage{Op: OpCodeError, Data: WSData{Text: text}})
+	})
+
+	i.eventBroker.Subscribe(eventbroker.EventSetConsole, func(payload any) {
+		console, ok := payload.(string)
+		if !ok {
+			return
+		}
+
+		if i.conn == nil {
+			return
+		}
+
+		_ = i.conn.WriteJSON(&WSMessage{Op: OpCodeConsoleSet, Data: WSData{Text: console}})
+	})
+
+	i.eventBroker.Subscribe(eventbroker.EventAppendConsole, func(payload any) {
+		console, ok := payload.(string)
+		if !ok {
+			return
+		}
+
+		if i.conn == nil {
+			return
+		}
+
+		_ = i.conn.WriteJSON(&WSMessage{Op: OpCodeConsoleAppend, Data: WSData{Text: console}})
+	})
+
+	i.eventBroker.Subscribe(eventbroker.EventClearConsole, func(any) {
+		if i.conn == nil {
+			return
+		}
+
+		_ = i.conn.WriteJSON(&WSMessage{Op: OpCodeConsoleClear})
 	})
 }
 

@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"encoding/json"
 	"flag"
 	"fmt"
 	"net"
@@ -13,6 +12,8 @@ import (
 	"runtime/debug"
 	"syscall"
 	"time"
+
+	"github.com/goccy/go-json"
 
 	"github.com/lb-selfbot/selfbot/internal/assets"
 	"github.com/lb-selfbot/selfbot/internal/browser"
@@ -48,7 +49,7 @@ var (
 )
 
 func checkForUpdates(services *services.Services) {
-	resp, err := http.PostJson(
+	resp, err := http.DefaultClient().Post(
 		"https://api.lightning-bot.com/api/v3/selfbot/check-version",
 		map[string]string{
 			"branch":  "selfbot",
@@ -61,8 +62,9 @@ func checkForUpdates(services *services.Services) {
 		return
 	}
 
-	isLatest := resp.Get("is_latest").MustBool()
-	latestVersion := resp.GetPath("latest", "version").MustString()
+	data := resp.Json()
+	isLatest := data.Get("is_latest").MustBool()
+	latestVersion := data.Get("latest", "version").MustString()
 
 	if isLatest {
 		return
@@ -285,6 +287,8 @@ func main() {
 	}
 
 	cmdRegistry.Register(services)
+
+	services.EventReactions.Register(services.Discord.GetSession())
 
 	if !constants.CONSOLE {
 		<-services.IPC.GetReadyChan()

@@ -4,8 +4,8 @@ import (
 	"errors"
 
 	"github.com/lb-selfbot/discordgo"
+	"github.com/lb-selfbot/selfbot/internal/fn"
 	"github.com/lb-selfbot/selfbot/internal/services/router"
-	"github.com/lb-selfbot/selfbot/internal/utils"
 )
 
 var errInvalidSubCommand = errors.New("invalid subcommand")
@@ -25,7 +25,7 @@ func ArgumentsToCommandOptions(options []*discordgo.ApplicationCommandOption, ar
 		options[0].Type == discordgo.ApplicationCommandOptionSubCommandGroup
 
 	if isSubCommand {
-		subCommands := utils.Filter(options, func(option *discordgo.ApplicationCommandOption) bool {
+		subCommands := fn.Filter(options, func(option *discordgo.ApplicationCommandOption) bool {
 			return option.Name == args.Get(0+offset).Raw()
 		})
 

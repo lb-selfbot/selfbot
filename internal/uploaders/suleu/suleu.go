@@ -7,7 +7,7 @@ import (
 	"mime/multipart"
 	"net/http"
 
-	"github.com/bitly/go-simplejson"
+	"github.com/lb-selfbot/go-jester"
 	"github.com/lb-selfbot/selfbot/internal/uploaders"
 	"github.com/lb-selfbot/selfbot/internal/uploaders/keys"
 )
@@ -54,7 +54,7 @@ func (s SulEU) Upload(file *bytes.Buffer, filename string) (*uploaders.UploadRes
 	}
 	defer resp.Body.Close()
 
-	json, err := simplejson.NewFromReader(resp.Body)
+	json, err := jester.NewReader(resp.Body)
 	if err != nil {
 		return nil, err
 	}

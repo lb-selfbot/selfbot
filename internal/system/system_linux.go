@@ -18,22 +18,22 @@ func restartProgram() error {
 	return syscall.Exec(self, os.Args, os.Environ())
 }
 
-func shutdownSystem() error {
+func shutdown() error {
 	return exec.Command("shutdown", "-h", "now").Start()
 }
 
-func restartSystem() error {
+func restart() error {
 	return exec.Command("shutdown", "-r", "now").Start()
 }
 
-func sleepSystem() error {
+func sleep() error {
 	return exec.Command("systemctl", "suspend").Start()
 }
 
-func hibernateSystem() error {
+func hibernate() error {
 	return exec.Command("systemctl", "suspend").Start()
 }
 
-func lockSystem() error {
+func lock() error {
 	return exec.Command("systemctl", "suspend").Start()
 }

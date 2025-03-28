@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/lb-selfbot/discordgo"
-	"github.com/lb-selfbot/selfbot/internal/api"
+	"github.com/lb-selfbot/selfbot/internal/fn"
 	"github.com/lb-selfbot/selfbot/internal/http"
 
 	"github.com/lb-selfbot/selfbot/internal/services"
@@ -137,11 +137,11 @@ func (c *BackupCommands) backupRelationships(ctx *router.Ctx) {
 		return
 	}
 
-	blocked := utils.Filter(rels, func(rel *discordgo.Relationship) bool {
+	blocked := fn.Filter(rels, func(rel *discordgo.Relationship) bool {
 		return rel.Type == 2 && rel.User != nil
 	})
 
-	friends := utils.Filter(rels, func(rel *discordgo.Relationship) bool {
+	friends := fn.Filter(rels, func(rel *discordgo.Relationship) bool {
 		return rel.Type == 1 && rel.User != nil
 	})
 
@@ -153,8 +153,8 @@ func (c *BackupCommands) backupRelationships(ctx *router.Ctx) {
 	}
 
 	data := backup.Relationships{
-		Blocked: utils.Map(blocked, exportRelationship),
-		Friends: utils.Map(friends, exportRelationship),
+		Blocked: fn.Map(blocked, exportRelationship),
+		Friends: fn.Map(friends, exportRelationship),
 	}
 
 	err = c.services.Backup.SaveBackup("relationships", ctx.Arguments.Get(0).Raw(), data)
@@ -163,7 +163,7 @@ func (c *BackupCommands) backupRelationships(ctx *router.Ctx) {
 		return
 	}
 
-	ctx.NewEmbed().
+	c.services.Embed.New(ctx).
 		SetTitle("Backup created").
 		SetDescription("Backed up %d friends and %d blocked users.", len(friends), len(blocked)).
 		Send()
@@ -203,11 +203,11 @@ func (c *BackupCommands) restoreRelationships(ctx *router.Ctx) {
 		}
 	}
 
-	data.Friends = utils.Filter(data.Friends, func(user backup.User) bool {
+	data.Friends = fn.Filter(data.Friends, func(user backup.User) bool {
 		return !slices.Contains(currentFriends, user.ID)
 	})
 
-	data.Blocked = utils.Filter(data.Blocked, func(user backup.User) bool {
+	data.Blocked = fn.Filter(data.Blocked, func(user backup.User) bool {
 		return !slices.Contains(currentBlocked, user.ID)
 	})
 
@@ -221,10 +221,10 @@ func (c *BackupCommands) restoreRelationships(ctx *router.Ctx) {
 		)
 	}
 
-	ctx.NewEmbed().
+	c.services.Embed.New(ctx).
 		SetDescription("Below are the relationships from your backup. Please add or block the users manually (at your own risk).").
-		AddField("Friends", strings.Join(utils.Map(data.Friends, userToString), "\n")).
-		AddField("Blocked", strings.Join(utils.Map(data.Blocked, userToString), "\n")).
+		AddField("Friends", strings.Join(fn.Map(data.Friends, userToString), "\n")).
+		AddField("Blocked", strings.Join(fn.Map(data.Blocked, userToString), "\n")).
 		Send()
 }
 
@@ -326,11 +326,11 @@ func (c *BackupCommands) restoreServers(ctx *router.Ctx) {
 		return
 	}
 
-	currentServerIDs := utils.Map(ctx.Session.State.Guilds, func(guild *discordgo.Guild) string {
+	currentServerIDs := fn.Map(ctx.Session.State.Guilds, func(guild *discordgo.Guild) string {
 		return guild.ID
 	})
 
-	data.Servers = utils.Filter(data.Servers, func(server backup.Server) bool {
+	data.Servers = fn.Filter(data.Servers, func(server backup.Server) bool {
 		return !slices.Contains(currentServerIDs, server.ID) && server.Invite != ""
 	})
 
@@ -338,9 +338,9 @@ func (c *BackupCommands) restoreServers(ctx *router.Ctx) {
 		return fmt.Sprintf("%s - %s - [click here (Discord App URL)](discord://-/invite/%s) - [click here (Website URL)](https://discord.gg/%s)", server.Name, server.ID, server.Invite, server.Invite)
 	}
 
-	ctx.NewEmbed().
+	c.services.Embed.New(ctx).
 		SetDescription("Below are the servers from your backup. Please join the servers manually (at your own risk).").
-		AddField("Servers", strings.Join(utils.Map(data.Servers, serverToString), "\n")).
+		AddField("Servers", strings.Join(fn.Map(data.Servers, serverToString), "\n")).
 		Send()
 }
 
@@ -350,15 +350,15 @@ func (c *BackupCommands) backupProfile(ctx *router.Ctx) {
 		return
 	}
 
-	avatarResponse := http.Get(ctx.Session.State.User.AvatarURL(""))
-	if avatarResponse.Error != nil {
-		ctx.RespondText("An error has occurred while fetching your avatar: " + avatarResponse.Error.Error())
+	resp, err := http.DefaultClient().Get(ctx.Session.State.User.AvatarURL(""))
+	if err != nil {
+		ctx.RespondText("An error has occurred while fetching your avatar: %v", err)
 		return
 	}
 
 	var avatar string
-	if avatarResponse.Body != nil {
-		avatar = utils.Misc.ImageToBase64(avatarResponse.Body)
+	if body := resp.MustGetBody(); body != nil {
+		avatar = utils.Misc.ImageToBase64(body)
 	}
 
 	profile, err := ctx.Session.UserProfile(ctx.Session.State.User.ID)
@@ -379,7 +379,7 @@ func (c *BackupCommands) backupProfile(ctx *router.Ctx) {
 		return
 	}
 
-	ctx.NewEmbed().
+	c.services.Embed.New(ctx).
 		SetTitle("Backup created").
 		SetDescription("Successfully backed up your profile!").
 		Send()
@@ -400,7 +400,7 @@ func (c *BackupCommands) restoreProfile(ctx *router.Ctx) {
 
 	baseSettings := map[string]any{"avatar": data.Avatar}
 
-	err = api.ChangeSettings(ctx.Session, "", baseSettings)
+	err = c.services.Discord.UpdateSettings("", baseSettings)
 	if err != nil {
 		ctx.RespondText("Error restoring profile [1]: %v", err)
 		return
@@ -415,13 +415,13 @@ func (c *BackupCommands) restoreProfile(ctx *router.Ctx) {
 		}
 	}
 
-	err = api.ChangeSettings(ctx.Session, "/profile", profile)
+	err = c.services.Discord.UpdateSettings("/profile", profile)
 	if err != nil {
 		ctx.RespondText("Error restoring profile [2]: %v", err)
 		return
 	}
 
-	ctx.NewEmbed().
+	c.services.Embed.New(ctx).
 		SetTitle("Profile restored").
 		SetDescription("Successfully restored your profile!").
 		Send()
@@ -441,7 +441,7 @@ func (c *BackupCommands) backupSettings(ctx *router.Ctx) {
 		return
 	}
 
-	ctx.NewEmbed().
+	c.services.Embed.New(ctx).
 		SetTitle("Backup created").
 		SetDescription("Successfully backed up your settings!").
 		Send()
@@ -466,7 +466,7 @@ func (c *BackupCommands) restoreSettings(ctx *router.Ctx) {
 		return
 	}
 
-	ctx.NewEmbed().
+	c.services.Embed.New(ctx).
 		SetTitle("Settings restored").
 		SetDescription("Successfully restored your settings!").
 		Send()
@@ -492,7 +492,7 @@ func (c *BackupCommands) backupGifs(ctx *router.Ctx) {
 		return
 	}
 
-	ctx.NewEmbed().
+	c.services.Embed.New(ctx).
 		SetTitle("Backup created").
 		SetDescription("Successfully backed up your GIFs!").
 		Send()
@@ -517,7 +517,7 @@ func (c *BackupCommands) restoreGifs(ctx *router.Ctx) {
 		return
 	}
 
-	ctx.NewEmbed().
+	c.services.Embed.New(ctx).
 		SetTitle("Settings restored").
 		SetDescription("Successfully restored your GIFs!").
 		Send()

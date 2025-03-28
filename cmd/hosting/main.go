@@ -83,6 +83,8 @@ func main() {
 
 	cmdRegistry := commands.NewCmdRegistry()
 	cmdRegistry.Register(services)
+	
+	services.EventReactions.Register(services.Discord.GetSession())
 
 	// Wait for auth to be ready
 	<-services.AuthSync.GetReadyChan()

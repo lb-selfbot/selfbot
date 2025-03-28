@@ -56,8 +56,6 @@ func (n *Notifiers) Handler(session *discordgo.Session, event any) {
 		n.ChannelCreateHandler(session, event, cfg)
 	case *discordgo.TypingStart:
 		n.TypingStartHandler(session, event, cfg)
-	default:
-		logging.Debug("Notifiers.Handler: Event is not a notifiers event")
 	}
 }
 

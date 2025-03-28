@@ -14,22 +14,22 @@ func RestartExecution() error {
 	return restartProgram()
 }
 
-func ShutdownSystem() error {
-	return shutdownSystem()
+func Shutdown() error {
+	return shutdown()
 }
 
-func RestartSystem() error {
-	return restartSystem()
+func Restart() error {
+	return restart()
 }
 
-func SleepSystem() error {
-	return sleepSystem()
+func Sleep() error {
+	return sleep()
 }
 
-func HibernateSystem() error {
-	return hibernateSystem()
+func Hibernate() error {
+	return hibernate()
 }
 
-func LockSystem() error {
-	return lockSystem()
+func Lock() error {
+	return lock()
 }

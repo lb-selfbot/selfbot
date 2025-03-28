@@ -4,7 +4,6 @@ import (
 	"fmt"
 
 	"github.com/lb-selfbot/discordgo"
-	"github.com/lb-selfbot/selfbot/internal/logging"
 	"github.com/lb-selfbot/selfbot/internal/services/eventreactions/types"
 	"github.com/lb-selfbot/selfbot/internal/utils"
 )
@@ -48,7 +47,6 @@ func (a *AntiGroupChat) Data() map[string]any {
 func (a *AntiGroupChat) Handler(session *discordgo.Session, event any) {
 	channel, ok := event.(*discordgo.ChannelCreate)
 	if !ok {
-		logging.Debug("AntiGroupChat.Handler: Event is not a channel create event")
 		return
 	}
 

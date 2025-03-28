@@ -2,6 +2,7 @@ package router
 
 import (
 	"errors"
+	"net/url"
 	"regexp"
 	"slices"
 	"strconv"
@@ -95,6 +96,11 @@ func (a *Arguments) Raw() string {
 	return a.raw
 }
 
+// Escaped returns the arguments URL query escaped.
+func (a *Arguments) Escaped() string {
+	return url.QueryEscape(a.raw)
+}
+
 // RawFrom returns the raw arguments from the given index.
 func (a *Arguments) RawFrom(index int) string {
 	if a.Amount() <= index {
@@ -135,6 +141,11 @@ type Argument struct {
 // Raw returns the raw argument.
 func (a *Argument) Raw() string {
 	return a.raw
+}
+
+// Escaped returns the argument query escaped.
+func (a *Argument) Escaped() string {
+	return url.QueryEscape(a.raw)
 }
 
 // Int returns the argument as an int.

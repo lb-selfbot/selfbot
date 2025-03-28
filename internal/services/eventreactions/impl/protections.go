@@ -5,11 +5,10 @@ import (
 	"time"
 	"unicode"
 
-	"github.com/lb-selfbot/selfbot/internal/api"
-	"github.com/lb-selfbot/selfbot/internal/logging"
-
 	"github.com/lb-selfbot/selfbot/internal/constants"
+	"github.com/lb-selfbot/selfbot/internal/fn"
 	"github.com/lb-selfbot/selfbot/internal/services/config"
+	"github.com/lb-selfbot/selfbot/internal/services/discord"
 	"github.com/lb-selfbot/selfbot/internal/services/eventbroker"
 	"github.com/lb-selfbot/selfbot/internal/services/eventreactions/types"
 	"github.com/lb-selfbot/selfbot/internal/services/ui/featurelogs"
@@ -27,14 +26,15 @@ type friendRequest struct {
 type Protections struct {
 	eventBroker eventbroker.Service
 	configSvc   config.Service
+	discordSvc  discord.Service
 
 	NewDMs         []*discordgo.Message
 	FriendRequests []*friendRequest
 	LastBlock      time.Time
 }
 
-func NewProtections(eventBroker eventbroker.Service, configSvc config.Service) *Protections {
-	return &Protections{eventBroker: eventBroker, configSvc: configSvc}
+func NewProtections(eventBroker eventbroker.Service, configSvc config.Service, discordSvc discord.Service) *Protections {
+	return &Protections{eventBroker: eventBroker, configSvc: configSvc, discordSvc: discordSvc}
 }
 
 func (p *Protections) Type() types.EventReactionType {
@@ -65,8 +65,6 @@ func (p *Protections) Handler(session *discordgo.Session, event any) {
 		p.MessageDeleteHandler(session, event, cfg)
 	case *discordgo.RelationshipAdd:
 		p.RelationshipAddHandler(session, event, cfg)
-	default:
-		logging.Debug("Protections.Handler: Event is not a protections event")
 	}
 }
 
@@ -80,7 +78,7 @@ func (p *Protections) MessageCreateHandler(session *discordgo.Session, message *
 	if cfg.Protections.AntiMassDM && time.Since(p.LastBlock) > 5*time.Minute && isDM {
 		messages, _ := utils.Discord.GetChannelMessages(session, message.ChannelID, 100)
 
-		directMessages := utils.Filter(messages, func(message *discordgo.Message) bool {
+		directMessages := fn.Filter(messages, func(message *discordgo.Message) bool {
 			return message.Author != nil && message.Author.ID != session.State.User.ID
 		})
 
@@ -91,7 +89,7 @@ func (p *Protections) MessageCreateHandler(session *discordgo.Session, message *
 
 		p.NewDMs = append(p.NewDMs, message.Message)
 
-		newDMsInLastMinute := utils.Filter(p.NewDMs, func(message *discordgo.Message) bool {
+		newDMsInLastMinute := fn.Filter(p.NewDMs, func(message *discordgo.Message) bool {
 			return time.Since(message.Timestamp) < time.Minute
 		})
 
@@ -163,7 +161,7 @@ func (p *Protections) MessageCreateHandler(session *discordgo.Session, message *
 		if cfg.Protections.ServerProtections.AntiSpam {
 			messages, _ := utils.Discord.GetChannelMessages(session, message.ChannelID, 100)
 
-			authorMessagesInLast30Sec := utils.Filter(messages, func(m *discordgo.Message) bool {
+			authorMessagesInLast30Sec := fn.Filter(messages, func(m *discordgo.Message) bool {
 				return m.Author.ID == message.Author.ID && time.Since(message.Timestamp) < time.Second*30
 			})
 
@@ -185,7 +183,7 @@ func (p *Protections) MessageCreateHandler(session *discordgo.Session, message *
 		if cfg.Protections.ServerProtections.AntiUpper && len(message.Content) > 10 {
 			contentRunes := []rune(message.Content)
 
-			upperRunes := utils.Filter(contentRunes, func(char rune) bool {
+			upperRunes := fn.Filter(contentRunes, func(char rune) bool {
 				return unicode.IsUpper(char)
 			})
 
@@ -251,7 +249,7 @@ func (p *Protections) RelationshipAddHandler(session *discordgo.Session, relatio
 			return
 		}
 
-		friendRequestsInLastMinute := utils.Filter(p.FriendRequests, func(fr *friendRequest) bool {
+		friendRequestsInLastMinute := fn.Filter(p.FriendRequests, func(fr *friendRequest) bool {
 			return time.Since(fr.Time) < time.Minute
 		})
 
@@ -260,14 +258,14 @@ func (p *Protections) RelationshipAddHandler(session *discordgo.Session, relatio
 		}
 
 		_ = session.UserRelationshipDelete(relationship.User.ID)
-		_ = api.AllowFriendRequests(session, false)
+		_ = p.discordSvc.SetFriendRequestsAllowed(false)
 
 		p.eventBroker.Publish(eventbroker.EventLogFeature, &featurelogs.FriendRequestSpamBlocked{})
 
 		go func() {
 			time.Sleep(5 * time.Minute)
 
-			_ = api.AllowFriendRequests(session, true)
+			_ = p.discordSvc.SetFriendRequestsAllowed(true)
 		}()
 	}()
 }

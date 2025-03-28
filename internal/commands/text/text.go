@@ -8,6 +8,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/agnivade/levenshtein"
 	"github.com/common-nighthawk/go-figure"
 	"github.com/lb-selfbot/selfbot/internal/constants"
 	"github.com/lb-selfbot/selfbot/internal/encodings"
@@ -326,7 +327,7 @@ func (c *TextCommands) empty(ctx *router.Ctx) {
 }
 
 func (c *TextCommands) reverse(ctx *router.Ctx) {
-	ctx.RespondText(utils.String.Reverse(ctx.Arguments.Raw()))
+	ctx.RespondText("%s", utils.String.Reverse(ctx.Arguments.Raw()))
 }
 
 func (c *TextCommands) alphabet(ctx *router.Ctx) {
@@ -340,23 +341,23 @@ func (c *TextCommands) alphabet(ctx *router.Ctx) {
 
 func (c *TextCommands) ascii(ctx *router.Ctx) {
 	ascii := figure.NewFigure(ctx.Arguments.Raw(), "", false).String()
-	ctx.RespondText("```" + ascii + "```")
+	ctx.RespondText("%s", "```"+ascii+"```")
 }
 
 func (c *TextCommands) bold(ctx *router.Ctx) {
-	ctx.RespondText("**" + ctx.Arguments.Raw() + "**")
+	ctx.RespondText("%s", "**"+ctx.Arguments.Raw()+"**")
 }
 
 func (c *TextCommands) strike(ctx *router.Ctx) {
-	ctx.RespondText("~~" + ctx.Arguments.Raw() + "~~")
+	ctx.RespondText("%s", "~~"+ctx.Arguments.Raw()+"~~")
 }
 
 func (c *TextCommands) italic(ctx *router.Ctx) {
-	ctx.RespondText("*" + ctx.Arguments.Raw() + "*")
+	ctx.RespondText("%s", "*"+ctx.Arguments.Raw()+"*")
 }
 
 func (c *TextCommands) spoiler(ctx *router.Ctx) {
-	ctx.RespondText("||" + ctx.Arguments.Raw() + "||")
+	ctx.RespondText("%s", "||"+ctx.Arguments.Raw()+"||")
 }
 
 func (c *TextCommands) lspoiler(ctx *router.Ctx) {
@@ -366,7 +367,7 @@ func (c *TextCommands) lspoiler(ctx *router.Ctx) {
 		char := string(chars[i])
 		finalString = finalString + "||" + char + "||"
 	}
-	ctx.RespondText(finalString)
+	ctx.RespondText("%s", finalString)
 }
 
 func (c *TextCommands) leet(ctx *router.Ctx) {
@@ -392,7 +393,7 @@ func (c *TextCommands) leet(ctx *router.Ctx) {
 	for _, element := range leetChars {
 		text = strings.ReplaceAll(text, element[0], element[1])
 	}
-	ctx.RespondText(text)
+	ctx.RespondText("%s", text)
 }
 
 func (c *TextCommands) devowel(ctx *router.Ctx) {
@@ -401,7 +402,7 @@ func (c *TextCommands) devowel(ctx *router.Ctx) {
 	for _, element := range vowels {
 		text = strings.ReplaceAll(text, element, "")
 	}
-	ctx.RespondText(text)
+	ctx.RespondText("%s", text)
 }
 
 func (c *TextCommands) edit(ctx *router.Ctx) {
@@ -453,7 +454,7 @@ func (c *TextCommands) emojify(ctx *router.Ctx) {
 	for _, element := range emojiChars {
 		text = strings.ReplaceAll(text, element[0], element[1])
 	}
-	ctx.RespondText(text)
+	ctx.RespondText("%s", text)
 }
 
 func (c *TextCommands) shrug(ctx *router.Ctx) {
@@ -481,7 +482,7 @@ func (c *TextCommands) clap(ctx *router.Ctx) {
 	for _, element := range clapChars {
 		text = strings.ReplaceAll(text, element[0], element[1])
 	}
-	ctx.RespondText(text)
+	ctx.RespondText("%s", text)
 }
 
 func (c *TextCommands) zalgo(ctx *router.Ctx) {
@@ -518,32 +519,32 @@ func (c *TextCommands) zalgo(ctx *router.Ctx) {
 	for _, element := range zalgoChars {
 		text = strings.ReplaceAll(text, element[0], element[1])
 	}
-	ctx.RespondText(text)
+	ctx.RespondText("%s", text)
 }
 
 func (c *TextCommands) unzalgo(ctx *router.Ctx) {
 	text := utils.String.FilterAlphaNumeric(ctx.Arguments.Raw())
-	ctx.RespondText(text)
+	ctx.RespondText("%s", text)
 }
 
 func (c *TextCommands) upper(ctx *router.Ctx) {
 	text := strings.ToUpper(ctx.Arguments.Raw())
-	ctx.RespondText(text)
+	ctx.RespondText("%s", text)
 }
 
 func (c *TextCommands) lower(ctx *router.Ctx) {
 	text := strings.ToLower(ctx.Arguments.Raw())
-	ctx.RespondText(text)
+	ctx.RespondText("%s", text)
 }
 
 func (c *TextCommands) fliptext(ctx *router.Ctx) {
 	text := utils.String.Flip(ctx.Arguments.Raw(), false)
-	ctx.RespondText(text)
+	ctx.RespondText("%s", text)
 }
 
 func (c *TextCommands) unfliptext(ctx *router.Ctx) {
 	text := utils.String.Flip(ctx.Arguments.Raw(), true)
-	ctx.RespondText(text)
+	ctx.RespondText("%s", text)
 }
 
 func (c *TextCommands) wave(ctx *router.Ctx) {
@@ -555,7 +556,7 @@ func (c *TextCommands) wave(ctx *router.Ctx) {
 		wave += strings.Repeat(" ", i) + ctx.Arguments.Raw() + "\n"
 	}
 
-	ctx.RespondText(wave)
+	ctx.RespondText("%s", wave)
 }
 
 func (c *TextCommands) customwave(ctx *router.Ctx) {
@@ -590,22 +591,22 @@ func (c *TextCommands) customwave(ctx *router.Ctx) {
 		wave += strings.Repeat(" ", i) + text + "\n"
 	}
 
-	ctx.RespondText(wave)
+	ctx.RespondText("%s", wave)
 }
 
 func (c *TextCommands) zwc(ctx *router.Ctx) {
 	text := ctx.Arguments.Raw()
 	text = strings.Join(strings.Split(text, ""), "\u200B")
-	ctx.RespondText(text)
+	ctx.RespondText("%s", text)
 }
 
 func (c *TextCommands) distance(ctx *router.Ctx) {
 	text1, text2 := ctx.Arguments.Get(0).Raw(), ctx.Arguments.Get(1).Raw()
 
-	ctx.NewEmbed().
+	c.services.Embed.New(ctx).
 		AddField("Text 1", text1).
 		AddField("Text 2", text2).
-		AddField("Distance", strconv.Itoa(utils.Misc.GetDistance(text1, text2))).
+		AddField("Distance", strconv.Itoa(levenshtein.ComputeDistance(text1, text2))).
 		Send()
 }
 
@@ -613,7 +614,7 @@ func (c *TextCommands) codeblock(ctx *router.Ctx) {
 	language := ctx.Arguments.Get(0).Raw()
 	code := ctx.Arguments.RawFrom(1)
 
-	ctx.RespondText("```" + strings.ToLower(language) + "\n" + code + "\n```")
+	ctx.RespondText("%s", "```"+strings.ToLower(language)+"\n"+code+"\n```")
 }
 
 // Animation commands
@@ -832,7 +833,7 @@ func (c *TextCommands) asciianimation(ctx *router.Ctx) {
 func (c *TextCommands) customanimationhelp(ctx *router.Ctx) {
 	cfg := c.services.Config.GetConfig()
 
-	ctx.NewEmbed().
+	c.services.Embed.New(ctx).
 		AddField("Creating an animation", fmt.Sprintf(
 			"To create an animation, create a text file in %s. Every line in the file will be a frame of the animation.\n",
 			filepath.Join(utils.IO.GetMainFolder(), "Animations"),
@@ -867,7 +868,7 @@ func (c *TextCommands) customanimations(ctx *router.Ctx) {
 		return nil
 	})
 
-	ctx.NewEmbed().AddField("Custom Animations", customAnimString).Send()
+	c.services.Embed.New(ctx).AddField("Custom Animations", customAnimString).Send()
 }
 
 func (c *TextCommands) customanimation(ctx *router.Ctx) {
@@ -904,7 +905,7 @@ func (c *TextCommands) encodings(ctx *router.Ctx) {
 		encodingNames = append(encodingNames, name)
 	}
 
-	ctx.NewEmbed().
+	c.services.Embed.New(ctx).
 		AddField("Available Encodings", strings.Join(encodingNames, ", ")).
 		Send()
 }
@@ -925,7 +926,7 @@ func (c *TextCommands) encode(ctx *router.Ctx) {
 		return
 	}
 
-	ctx.NewEmbed().
+	c.services.Embed.New(ctx).
 		AddField("Text", text).
 		AddField("Encoded", encoded).
 		Send()
@@ -951,7 +952,7 @@ func (c *TextCommands) decode(ctx *router.Ctx) {
 		return
 	}
 
-	ctx.NewEmbed().
+	c.services.Embed.New(ctx).
 		AddField("Text", text).
 		AddField("Decoded", decoded).
 		Send()
@@ -963,7 +964,7 @@ func (c *TextCommands) hashes(ctx *router.Ctx) {
 		hashNames = append(hashNames, name)
 	}
 
-	ctx.NewEmbed().
+	c.services.Embed.New(ctx).
 		AddField("Available Hashes", strings.Join(hashNames, ", ")).
 		Send()
 }
@@ -980,7 +981,7 @@ func (c *TextCommands) hash(ctx *router.Ctx) {
 
 	hashed := hashFunc(text)
 
-	ctx.NewEmbed().
+	c.services.Embed.New(ctx).
 		AddField("Text", text).
 		AddField("Hashed", hashed).
 		Send()
@@ -992,7 +993,7 @@ func (c *TextCommands) encryptions(ctx *router.Ctx) {
 		encryptionNames = append(encryptionNames, name)
 	}
 
-	ctx.NewEmbed().
+	c.services.Embed.New(ctx).
 		AddField("Available Encryptions", strings.Join(encryptionNames, ", ")).
 		Send()
 }
@@ -1012,7 +1013,7 @@ func (c *TextCommands) encrypt(ctx *router.Ctx) {
 		return
 	}
 
-	ctx.NewEmbed().
+	c.services.Embed.New(ctx).
 		AddField("Text", text).
 		AddField("Encrypted", encrypted).
 		Send()
@@ -1033,7 +1034,7 @@ func (c *TextCommands) decrypt(ctx *router.Ctx) {
 		return
 	}
 
-	ctx.NewEmbed().
+	c.services.Embed.New(ctx).
 		AddField("Text", text).
 		AddField("Decrypted", encrypted).
 		Send()

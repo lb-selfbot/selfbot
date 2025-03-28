@@ -1,13 +1,15 @@
 package eventreactions
 
 import (
-	"encoding/json"
 	"errors"
 	"fmt"
 	"slices"
 	"time"
 
+	"github.com/goccy/go-json"
+
 	"github.com/lb-selfbot/discordgo"
+	"github.com/lb-selfbot/selfbot/internal/logging"
 	"github.com/lb-selfbot/selfbot/internal/services/eventbroker"
 	"github.com/lb-selfbot/selfbot/internal/services/eventreactions/impl"
 	"github.com/lb-selfbot/selfbot/internal/services/eventreactions/types"
@@ -46,16 +48,23 @@ func (e *eventReactionsService) loadEventReactions(session *discordgo.Session, i
 
 	cfg := e.configSvc.GetConfig()
 
+	reset := func() {
+		e.eventBroker.Publish(eventbroker.EventLogError, "Failed to load event reactions. Event reactions have been reset.")
+
+		cfg := e.configSvc.GetConfig()
+		cfg.EventReactions = []byte("[]")
+		_ = e.configSvc.SaveConfig(cfg)
+	}
+
 	defer func() {
-		if r := recover(); r == nil {
+		r := recover()
+		if r == nil {
 			return
 		}
 
-		e.eventBroker.Publish(eventbroker.EventLogError, "Failed to load event reactions. Event reactions have been reset.")
+		logging.Debug("Recovered from panic while loading event reactions", r)
 
-		cfg.EventReactions = []byte("[]")
-		e.configSvc.GetConfig()
-		_ = e.configSvc.SaveConfig(cfg)
+		reset()
 	}()
 
 	// Load reaction data from config
@@ -87,21 +96,6 @@ func (e *eventReactionsService) loadEventReactions(session *discordgo.Session, i
 	return nil
 }
 
-func (e *eventReactionsService) constructDefaultReactions(session *discordgo.Session) []types.EventReaction {
-	reactions := make([]types.EventReaction, 0, len(types.DefaultReactions))
-
-	for _, reactionType := range types.DefaultReactions {
-		reaction, err := e.constructReaction(session, eventReactionConfig{Type: reactionType})
-		if err != nil {
-			continue
-		}
-
-		reactions = append(reactions, reaction)
-	}
-
-	return reactions
-}
-
 func (e *eventReactionsService) constructReaction(session *discordgo.Session, reactionCfg eventReactionConfig) (types.EventReaction, error) {
 	var r types.EventReaction
 	var err error
@@ -117,7 +111,7 @@ func (e *eventReactionsService) constructReaction(session *discordgo.Session, re
 	case types.Notifiers:
 		r = impl.NewNotifiers(e.eventBroker, e.configSvc)
 	case types.Protections:
-		r = impl.NewProtections(e.eventBroker, e.configSvc)
+		r = impl.NewProtections(e.eventBroker, e.configSvc, e.discordSvc)
 	case types.SelfbotDetection:
 		r = impl.NewSelfbotDetection(e.eventBroker, e.configSvc)
 
@@ -125,11 +119,11 @@ func (e *eventReactionsService) constructReaction(session *discordgo.Session, re
 	case types.IgnoreUser, types.IgnoreGuild:
 		r, err = impl.NewIgnoreFromData(session, reactionCfg.Data)
 	case types.PingPing, types.PingKick, types.PingBan, types.PingMute, types.PingTimeout, types.PingInsult, types.PingReact, types.PingResponse, types.PingAIResponse:
-		r, err = impl.NewPingFromData(e.eventBroker, session, reactionCfg.Type, reactionCfg.Data)
+		r, err = impl.NewPingFromData(e.eventBroker, e.configSvc, session, reactionCfg.Type, reactionCfg.Data)
 	case types.MirrorGuild, types.MirrorChannel:
 		r, err = impl.NewMirrorFromData(e.eventBroker, session, reactionCfg.Data)
 	case types.Responder, types.AIResponder, types.Copy, types.ReplyCopy, types.Mock, types.PinSpam, types.ReactSpam, types.DeleteMessages, types.KeywordNotifier:
-		r, err = impl.NewMessageReactionFromData(e.eventBroker, session, reactionCfg.Type, reactionCfg.Data)
+		r, err = impl.NewMessageReactionFromData(e.eventBroker, e.configSvc, session, reactionCfg.Type, reactionCfg.Data)
 	case types.RemoveReactions:
 		r, err = impl.NewRemoveReactionsFromData(session, reactionCfg.Data)
 	case types.ForceDisconnect:

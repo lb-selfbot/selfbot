@@ -81,7 +81,6 @@ func (n *NoLeave) Data() map[string]any {
 func (r *NoLeave) Handler(session *discordgo.Session, event any) {
 	recipientRemove, ok := event.(*discordgo.ChannelRecipientRemove)
 	if !ok {
-		logging.Debug("NoLeave.Handler: Event is not a channel recipient remove event")
 		return
 	}
 

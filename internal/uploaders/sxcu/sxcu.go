@@ -2,7 +2,6 @@ package sxcu
 
 import (
 	"bytes"
-	_json "encoding/json"
 	"fmt"
 	"io"
 	"mime/multipart"
@@ -11,7 +10,9 @@ import (
 	"path"
 	"strings"
 
-	"github.com/bitly/go-simplejson"
+	_json "github.com/goccy/go-json"
+
+	"github.com/lb-selfbot/go-jester"
 	"github.com/lb-selfbot/selfbot/internal/uploaders"
 	"github.com/lb-selfbot/selfbot/internal/utils"
 )
@@ -75,7 +76,7 @@ func (SXCU) getSXCU() (data *sxcuData, err error) {
 }
 
 func (s SXCU) Upload(file *bytes.Buffer, filename string) (*uploaders.UploadResult, error) {
-	data, err := s.getSXCU()
+	sxcuData, err := s.getSXCU()
 	if err != nil {
 		return nil, err
 	}
@@ -83,7 +84,7 @@ func (s SXCU) Upload(file *bytes.Buffer, filename string) (*uploaders.UploadResu
 	buf := new(bytes.Buffer)
 	writer := multipart.NewWriter(buf)
 
-	part, err := writer.CreateFormFile(data.FileFormName, filename)
+	part, err := writer.CreateFormFile(sxcuData.FileFormName, filename)
 	if err != nil {
 		return nil, err
 	}
@@ -93,7 +94,7 @@ func (s SXCU) Upload(file *bytes.Buffer, filename string) (*uploaders.UploadResu
 		return nil, err
 	}
 
-	for k, v := range data.Arguments {
+	for k, v := range sxcuData.Arguments {
 		_ = writer.WriteField(k, v)
 	}
 
@@ -102,7 +103,7 @@ func (s SXCU) Upload(file *bytes.Buffer, filename string) (*uploaders.UploadResu
 		return nil, err
 	}
 
-	req, err := http.NewRequest("POST", data.RequestURL, buf)
+	req, err := http.NewRequest("POST", sxcuData.RequestURL, buf)
 	if err != nil {
 		return nil, err
 	}
@@ -115,22 +116,23 @@ func (s SXCU) Upload(file *bytes.Buffer, filename string) (*uploaders.UploadResu
 	}
 	defer resp.Body.Close()
 
-	json, err := simplejson.NewFromReader(resp.Body)
+	data, err := jester.NewReader(resp.Body)
 	if err != nil {
 		return nil, err
 	}
 
 	if resp.StatusCode != 200 {
-		return nil, fmt.Errorf("invalid response: %s", json.MustMap())
+		return nil, fmt.Errorf("invalid response: %s", data.MustMap())
 	}
 
-	data.URL = strings.ReplaceAll(data.URL, "$json:", "")
-	data.URL = strings.ReplaceAll(data.URL, "$", "")
+	url := strings.ReplaceAll(sxcuData.URL, "$json:", "")
+	url = strings.ReplaceAll(url, "$", "")
+	path := strings.Split(url, ".")
 
-	link := json.GetPath(strings.Split(data.URL, ".")...).MustString()
+	link := data.Get(toIfaceSlice(path)...).MustString()
 
 	if link == "" {
-		return nil, fmt.Errorf("invalid response: %s", json.MustMap())
+		return nil, fmt.Errorf("invalid response: %s", data.MustMap())
 	}
 
 	result := &uploaders.UploadResult{
@@ -139,4 +141,8 @@ func (s SXCU) Upload(file *bytes.Buffer, filename string) (*uploaders.UploadResu
 	}
 
 	return result, nil
+}
+
+func toIfaceSlice(arr ...any) []any {
+	return arr
 }

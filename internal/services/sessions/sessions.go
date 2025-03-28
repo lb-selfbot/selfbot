@@ -4,9 +4,9 @@ import (
 	"time"
 
 	"github.com/lb-selfbot/discordgo"
+	"github.com/lb-selfbot/selfbot/internal/fn"
 	"github.com/lb-selfbot/selfbot/internal/services/eventbroker"
 	"github.com/lb-selfbot/selfbot/internal/services/ui/featurelogs"
-	"github.com/lb-selfbot/selfbot/internal/utils"
 )
 
 // Service handles the fetching of Discord sessions.
@@ -94,7 +94,7 @@ func (s *sessionsService) onSessionsReplace(session *discordgo.Session, e *disco
 }
 
 func (s *sessionsService) filterSessions(sessions []*discordgo.GatewaySession) []*discordgo.GatewaySession {
-	return utils.Filter(sessions, func(session *discordgo.GatewaySession) bool {
+	return fn.Filter(sessions, func(session *discordgo.GatewaySession) bool {
 		return session.SessionID != "all"
 	})
 }
@@ -177,7 +177,7 @@ func (s *sessionsService) refreshLoginSessions(session *discordgo.Session) error
 }
 
 func (s *sessionsService) findNewSessions(currentSessions []*discordgo.LoginSession) []*discordgo.LoginSession {
-	return utils.Filter(currentSessions, func(session *discordgo.LoginSession) bool {
+	return fn.Filter(currentSessions, func(session *discordgo.LoginSession) bool {
 		for _, loginSession := range s.loginSessions {
 			if loginSession.IDHash == session.IDHash {
 				return false
@@ -188,7 +188,7 @@ func (s *sessionsService) findNewSessions(currentSessions []*discordgo.LoginSess
 }
 
 func (s *sessionsService) findRemovedSessions(currentSessions []*discordgo.LoginSession) []*discordgo.LoginSession {
-	return utils.Filter(s.loginSessions, func(session *discordgo.LoginSession) bool {
+	return fn.Filter(s.loginSessions, func(session *discordgo.LoginSession) bool {
 		for _, loginSession := range currentSessions {
 			if loginSession.IDHash == session.IDHash {
 				return false

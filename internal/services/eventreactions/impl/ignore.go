@@ -96,7 +96,6 @@ func (i *Ignore) Data() map[string]any {
 func (i *Ignore) Handler(session *discordgo.Session, event any) {
 	message, ok := event.(*discordgo.MessageCreate)
 	if !ok {
-		logging.Debug("Ignore.Handler: Event is not a message create event")
 		return
 	}
 

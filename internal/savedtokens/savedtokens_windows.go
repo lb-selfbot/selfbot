@@ -6,12 +6,13 @@ import (
 	"crypto/aes"
 	"crypto/cipher"
 	"encoding/base64"
-	"encoding/json"
 	"fmt"
 	"os"
 	"regexp"
 	"strings"
 	"unsafe"
+
+	"github.com/goccy/go-json"
 
 	"golang.org/x/exp/slices"
 	"golang.org/x/sys/windows"

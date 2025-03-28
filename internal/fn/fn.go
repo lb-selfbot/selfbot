@@ -94,11 +94,6 @@ func All[T any](slice []T, pred func(T) bool) bool {
 	return true
 }
 
-// Contains uses slices.Contains for better performance
-func Contains[T comparable](slice []T, element T) bool {
-	return slices.Contains(slice, element)
-}
-
 // Unique modifies the slice in-place to remove duplicates
 func Unique[T comparable](slice []T) []T {
 	if len(slice) <= 1 {
@@ -182,4 +177,9 @@ func First[T any](slice []T, pred func(T) bool) (T, bool) {
 	}
 	var zero T
 	return zero, false
+}
+
+// Delete removes the first occurrence of an element from a slice
+func Delete[T comparable](slice []T, value T) []T {
+	return slices.DeleteFunc(slice, func(el T) bool { return el == value })
 }

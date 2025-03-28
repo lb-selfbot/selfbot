@@ -1,10 +1,11 @@
 package eventreactions
 
 import (
-	"encoding/json"
 	"runtime"
 	"strings"
 	"time"
+
+	"github.com/goccy/go-json"
 
 	"github.com/lb-selfbot/discordgo"
 	"github.com/lb-selfbot/selfbot/internal/services/eventbroker"
@@ -55,6 +56,7 @@ func (e *eventReactionsService) onReady(s *discordgo.Session, r *discordgo.Ready
 		}
 	}()
 
+	e.eventBroker.Publish(eventbroker.EventCheckNonce, nil)
 	e.eventBroker.Publish(eventbroker.EventSessionReady, s)
 
 	e.eventBroker.Publish(eventbroker.EventLogFeature, &featurelogs.Ready{

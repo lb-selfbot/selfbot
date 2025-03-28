@@ -5,6 +5,7 @@ import (
 	"math"
 	"strings"
 
+	"github.com/agnivade/levenshtein"
 	"github.com/lb-selfbot/selfbot/internal/constants"
 	"github.com/lb-selfbot/selfbot/internal/embed"
 
@@ -127,7 +128,7 @@ func (c *HelpCommands) specificHelpCommand(ctx *router.Ctx) {
 		if len(closeCommands) >= 5 {
 			break
 		}
-		distance := utils.Misc.GetDistance(command.Name, name)
+		distance := levenshtein.ComputeDistance(command.Name, name)
 		if distance < 2 || strings.Contains(command.Name, name) {
 			closeCommands = append(closeCommands, prefix+command.Name+" "+command.Arguments+" - "+command.Description)
 		}
@@ -138,7 +139,7 @@ func (c *HelpCommands) specificHelpCommand(ctx *router.Ctx) {
 		if len(closeCategories) >= 5 {
 			break
 		}
-		distance := utils.Misc.GetDistance(category.Name, utils.String.Capitalize(name))
+		distance := levenshtein.ComputeDistance(category.Name, utils.String.Capitalize(name))
 		if distance < 2 || strings.Contains(category.Name, utils.String.Capitalize(name)) {
 			closeCategories = append(closeCategories, category.Name+" - "+category.Description)
 		}
@@ -153,14 +154,14 @@ func (c *HelpCommands) specificHelpCommand(ctx *router.Ctx) {
 		suggestions += "\n\nDid you mean one of these categories?\n\n" + strings.Join(closeCategories, "\n")
 	}
 
-	ctx.NewEmbed().
+	c.services.Embed.New(ctx).
 		SetDescription("`%s` is not a command or category!\n%s", name, suggestions).
 		Send()
 }
 
 func (c *HelpCommands) renderCommandHelp(ctx *router.Ctx, command *router.Command) *embed.Embed {
 	cfg := c.services.Config.GetConfig()
-	return ctx.NewEmbed().
+	return c.services.Embed.New(ctx).
 		SetDescription("Command Help: %s", command.Name).
 		AddField("Command Name", command.Name).
 		AddField("Usage", "<> is required, [] is optional\n\n"+cfg.Selfbot.CommandPrefix+command.Name+" "+command.Arguments).
@@ -188,7 +189,7 @@ func (c *HelpCommands) renderCategoryHelp(ctx *router.Ctx, category *router.Cate
 
 	page = int(math.Max(0, float64(page-1)))
 
-	emb := ctx.NewEmbed().
+	emb := c.services.Embed.New(ctx).
 		SetDescription("<> is required, [] is optional\n\nAmount of %s commands: %d", category.Name, len(cmds)).
 		SetSubtext("Page: %d/%d", page+1, len(helpPages))
 
@@ -199,7 +200,7 @@ func (c *HelpCommands) renderCategoryHelp(ctx *router.Ctx, category *router.Cate
 			emb.AddField("Commands", helpPages[page], true, true)
 		}
 	} else {
-		return ctx.NewEmbed().SetDescription("That page does not exist! %s has %d pages.", category.Name, len(helpPages))
+		return c.services.Embed.New(ctx).SetDescription("That page does not exist! %s has %d pages.", category.Name, len(helpPages))
 	}
 	if len(helpPages) > 1 {
 		if cfg.Selfbot.CommandMode == "WebhookEmbed" {
@@ -224,7 +225,7 @@ func (c *HelpCommands) renderDefaultGeneralHelpEmbed(ctx *router.Ctx) *embed.Emb
 
 	prefix := cfg.Selfbot.CommandPrefix
 
-	emb := ctx.NewEmbed().
+	emb := c.services.Embed.New(ctx).
 		SetDescription("LightningBot %s Help\nAmount of Commands: %d, <> is required, [] is optional\n", constants.VERSION, len(ctx.Router.GetCommands()))
 
 	if cfg.Selfbot.CommandMode == "WebhookEmbed" {
@@ -240,7 +241,7 @@ func (c *HelpCommands) renderDefaultGeneralHelpEmbed(ctx *router.Ctx) *embed.Emb
 
 func (c *HelpCommands) search(ctx *router.Ctx) {
 	query := ctx.Arguments.Get(0).Raw()
-	
+
 	cfg := c.services.Config.GetConfig()
 
 	var closeCommands []string
@@ -248,20 +249,20 @@ func (c *HelpCommands) search(ctx *router.Ctx) {
 		if len(closeCommands) >= 10 {
 			break
 		}
-		distance := utils.Misc.GetDistance(command.Name, query)
+		distance := levenshtein.ComputeDistance(command.Name, query)
 		if distance < 2 || strings.Contains(command.Name, query) {
 			closeCommands = append(closeCommands, cfg.Selfbot.CommandPrefix+command.Name+" "+command.Arguments+" - "+command.Description)
 		}
 	}
 
 	if len(closeCommands) == 0 {
-		ctx.NewEmbed().
+		c.services.Embed.New(ctx).
 			SetDescription("No commands found for query `%s`", query).
 			Send()
 		return
 	}
 
-	ctx.NewEmbed().
+	c.services.Embed.New(ctx).
 		SetDescription("Found %d commands for query `%s`", len(closeCommands), query).
 		AddField("Commands", strings.Join(closeCommands, "\n"), true, true).
 		Send()
@@ -271,7 +272,7 @@ func (c *HelpCommands) repeat(ctx *router.Ctx) {
 	usedCommands := c.services.EventReactions.GetUsedCommands()
 
 	if len(usedCommands) < 1 {
-		ctx.NewEmbed().
+		c.services.Embed.New(ctx).
 			SetDescription("No commands have been used yet").
 			Send()
 		return
@@ -281,7 +282,7 @@ func (c *HelpCommands) repeat(ctx *router.Ctx) {
 
 	channel, err := ctx.Session.State.Channel(ctx.Message.ChannelID)
 	if err != nil {
-		ctx.NewEmbed().
+		c.services.Embed.New(ctx).
 			SetDescription("Failed to get channel: %s", err.Error()).
 			Send()
 		return

@@ -69,7 +69,6 @@ func (a *AntiDeleteMessages) Data() map[string]any {
 func (a *AntiDeleteMessages) Handler(session *discordgo.Session, event any) {
 	message, ok := event.(*discordgo.MessageDelete)
 	if !ok {
-		logging.Debug("AntiDeleteMessages.Handler: Event is not a message delete event")
 		return
 	}
 

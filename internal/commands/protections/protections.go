@@ -98,7 +98,7 @@ func (c *ProtectionsCommands) Register() {
 
 // 	switch utils.Arguments["<get/set/toggle>"] {
 // 	case "get":
-// 		ctx.NewEmbed().
+// 		c.services.Embed.New(ctx).
 // 			AddField("Anti Phishing", utils.Misc.FormatBoolOnOff(cfg.Protections.AntiPhishing)).
 // 			Send()
 // 	case "set":
@@ -111,14 +111,14 @@ func (c *ProtectionsCommands) Register() {
 // 		cfg.Protections.AntiPhishing = toggle
 // 		_ = c.services.Config.SaveConfig(cfg)
 
-// 		ctx.NewEmbed().
+// 		c.services.Embed.New(ctx).
 // 			SetDescription("Turned " + utils.Misc.FormatBoolOnOff(toggle) + " Anti Phishing").
 // 			Send()
 // 	case "toggle":
 // 		cfg.Protections.AntiPhishing = !cfg.Protections.AntiPhishing
 // 		_ = c.services.Config.SaveConfig(cfg)
 
-// 		ctx.NewEmbed().
+// 		c.services.Embed.New(ctx).
 // 			SetDescription("Turned " + utils.Misc.FormatBoolOnOff(cfg.Protections.AntiPhishing) + " Anti Phishing").
 // 			Send()
 // 	default:
@@ -135,7 +135,7 @@ func (c *ProtectionsCommands) Register() {
 
 // 	switch utils.Arguments["<get/set/toggle>"] {
 // 	case "get":
-// 		ctx.NewEmbed().
+// 		c.services.Embed.New(ctx).
 // 			AddField("Anti Friend Request Spam", utils.Misc.FormatBoolOnOff(cfg.Protections.AntiFriendRequest)).
 // 			Send()
 // 	case "set":
@@ -148,14 +148,14 @@ func (c *ProtectionsCommands) Register() {
 // 		cfg.Protections.AntiFriendRequest = toggle
 // 		_ = c.services.Config.SaveConfig(cfg)
 
-// 		ctx.NewEmbed().
+// 		c.services.Embed.New(ctx).
 // 			SetDescription("Turned " + utils.Misc.FormatBoolOnOff(toggle) + " Anti Friend Request Spam").
 // 			Send()
 // 	case "toggle":
 // 		cfg.Protections.AntiFriendRequest = !cfg.Protections.AntiFriendRequest
 // 		_ = c.services.Config.SaveConfig(cfg)
 
-// 		ctx.NewEmbed().
+// 		c.services.Embed.New(ctx).
 // 			SetDescription("Turned " + utils.Misc.FormatBoolOnOff(cfg.Protections.AntiFriendRequest) + " Anti Friend Request Spam").
 // 			Send()
 // 	default:
@@ -172,7 +172,7 @@ func (c *ProtectionsCommands) Register() {
 
 // 	switch utils.Arguments["<get/set/toggle>"] {
 // 	case "get":
-// 		ctx.NewEmbed().
+// 		c.services.Embed.New(ctx).
 // 			AddField("Anti Mass DM / DM Spam", utils.Misc.FormatBoolOnOff(cfg.Protections.AntiMassDM)).
 // 			Send()
 // 	case "set":
@@ -185,14 +185,14 @@ func (c *ProtectionsCommands) Register() {
 // 		cfg.Protections.AntiMassDM = toggle
 // 		_ = c.services.Config.SaveConfig(cfg)
 
-// 		ctx.NewEmbed().
+// 		c.services.Embed.New(ctx).
 // 			SetDescription("Turned " + utils.Misc.FormatBoolOnOff(toggle) + " Anti Mass DM / DM Spam").
 // 			Send()
 // 	case "toggle":
 // 		cfg.Protections.AntiMassDM = !cfg.Protections.AntiMassDM
 // 		_ = c.services.Config.SaveConfig(cfg)
 
-// 		ctx.NewEmbed().
+// 		c.services.Embed.New(ctx).
 // 			SetDescription("Turned " + utils.Misc.FormatBoolOnOff(cfg.Protections.AntiMassDM) + " Anti Mass DM / DM Spam").
 // 			Send()
 // 	default:
@@ -221,7 +221,7 @@ func (c *ProtectionsCommands) Register() {
 // 			servers = append(servers, guild.Name+" ("+guild.ID+")")
 // 		}
 
-// 		ctx.NewEmbed().
+// 		c.services.Embed.New(ctx).
 // 			AddField("Protected Servers List", strings.Join(servers, ", ")).
 // 			Send()
 // 	case "add":
@@ -239,7 +239,7 @@ func (c *ProtectionsCommands) Register() {
 // 		cfg.Protections.ServerProtections.ProtectedServers = append(cfg.Protections.ServerProtections.ProtectedServers, guild.ID)
 // 		_ = c.services.Config.SaveConfig(cfg)
 
-// 		ctx.NewEmbed().
+// 		c.services.Embed.New(ctx).
 // 			SetDescription("Added %s to the Protected Servers List.", guild.Name).
 // 			Send()
 // 	case "rm":
@@ -254,17 +254,17 @@ func (c *ProtectionsCommands) Register() {
 // 			return
 // 		}
 
-// 		cfg.Protections.ServerProtections.ProtectedServers = utils.RemoveSliceItem(cfg.Protections.ServerProtections.ProtectedServers, guild.ID)
+// 		cfg.Protections.ServerProtections.ProtectedServers = fn.Delete(cfg.Protections.ServerProtections.ProtectedServers, guild.ID)
 // 		_ = c.services.Config.SaveConfig(cfg)
 
-// 		ctx.NewEmbed().
+// 		c.services.Embed.New(ctx).
 // 			SetDescription("Removed %s from the Protected Servers List.", guild.Name).
 // 			Send()
 // 	case "clear":
 // 		cfg.Protections.ServerProtections.ProtectedServers = []string{}
 // 		_ = c.services.Config.SaveConfig(cfg)
 
-// 		ctx.NewEmbed().
+// 		c.services.Embed.New(ctx).
 // 			SetDescription("Cleared all Protected Servers List entries.").
 // 			Send()
 // 	default:
@@ -281,7 +281,7 @@ func (c *ProtectionsCommands) Register() {
 
 // 	switch utils.Arguments["<get/set/toggle>"] {
 // 	case "get":
-// 		ctx.NewEmbed().
+// 		c.services.Embed.New(ctx).
 // 			AddField("Anti Invite (Server Protections)", utils.Misc.FormatBoolOnOff(cfg.Protections.ServerProtections.AntiInvite)).
 // 			Send()
 // 	case "set":
@@ -294,14 +294,14 @@ func (c *ProtectionsCommands) Register() {
 // 		cfg.Protections.ServerProtections.AntiInvite = toggle
 // 		_ = c.services.Config.SaveConfig(cfg)
 
-// 		ctx.NewEmbed().
+// 		c.services.Embed.New(ctx).
 // 			SetDescription("Turned " + utils.Misc.FormatBoolOnOff(toggle) + " Anti Invite (Server Protections)").
 // 			Send()
 // 	case "toggle":
 // 		cfg.Protections.ServerProtections.AntiInvite = !cfg.Protections.ServerProtections.AntiInvite
 // 		_ = c.services.Config.SaveConfig(cfg)
 
-// 		ctx.NewEmbed().
+// 		c.services.Embed.New(ctx).
 // 			SetDescription("Turned " + utils.Misc.FormatBoolOnOff(cfg.Protections.ServerProtections.AntiInvite) + " Anti Invite (Server Protections)").
 // 			Send()
 // 	default:
@@ -318,7 +318,7 @@ func (c *ProtectionsCommands) Register() {
 
 // 	switch utils.Arguments["<get/set/toggle>"] {
 // 	case "get":
-// 		ctx.NewEmbed().
+// 		c.services.Embed.New(ctx).
 // 			AddField("Anti Spam (Server Protections)", utils.Misc.FormatBoolOnOff(cfg.Protections.ServerProtections.AntiSpam)).
 // 			Send()
 // 	case "set":
@@ -331,14 +331,14 @@ func (c *ProtectionsCommands) Register() {
 // 		cfg.Protections.ServerProtections.AntiSpam = toggle
 // 		_ = c.services.Config.SaveConfig(cfg)
 
-// 		ctx.NewEmbed().
+// 		c.services.Embed.New(ctx).
 // 			SetDescription("Turned " + utils.Misc.FormatBoolOnOff(toggle) + " Anti Spam (Server Protections)").
 // 			Send()
 // 	case "toggle":
 // 		cfg.Protections.ServerProtections.AntiSpam = !cfg.Protections.ServerProtections.AntiSpam
 // 		_ = c.services.Config.SaveConfig(cfg)
 
-// 		ctx.NewEmbed().
+// 		c.services.Embed.New(ctx).
 // 			SetDescription("Turned " + utils.Misc.FormatBoolOnOff(cfg.Protections.ServerProtections.AntiSpam) + " Anti Spam (Server Protections)").
 // 			Send()
 // 	default:
@@ -355,7 +355,7 @@ func (c *ProtectionsCommands) Register() {
 
 // 	switch utils.Arguments["<get/set/toggle>"] {
 // 	case "get":
-// 		ctx.NewEmbed().
+// 		c.services.Embed.New(ctx).
 // 			AddField("Anti Upper (Server Protections)", utils.Misc.FormatBoolOnOff(cfg.Protections.ServerProtections.AntiUpper)).
 // 			Send()
 // 	case "set":
@@ -368,14 +368,14 @@ func (c *ProtectionsCommands) Register() {
 // 		cfg.Protections.ServerProtections.AntiUpper = toggle
 // 		_ = c.services.Config.SaveConfig(cfg)
 
-// 		ctx.NewEmbed().
+// 		c.services.Embed.New(ctx).
 // 			SetDescription("Turned " + utils.Misc.FormatBoolOnOff(toggle) + " Anti Upper (Server Protections)").
 // 			Send()
 // 	case "toggle":
 // 		cfg.Protections.ServerProtections.AntiUpper = !cfg.Protections.ServerProtections.AntiUpper
 // 		_ = c.services.Config.SaveConfig(cfg)
 
-// 		ctx.NewEmbed().
+// 		c.services.Embed.New(ctx).
 // 			SetDescription("Turned " + utils.Misc.FormatBoolOnOff(cfg.Protections.ServerProtections.AntiUpper) + " Anti Upper (Server Protections)").
 // 			Send()
 // 	default:
@@ -392,7 +392,7 @@ func (c *ProtectionsCommands) Register() {
 
 // 	switch utils.Arguments["<get/set/toggle>"] {
 // 	case "get":
-// 		ctx.NewEmbed().
+// 		c.services.Embed.New(ctx).
 // 			AddField("Anti Delete (Server Protections)", utils.Misc.FormatBoolOnOff(cfg.Protections.ServerProtections.AntiDelete)).
 // 			Send()
 // 	case "set":
@@ -405,14 +405,14 @@ func (c *ProtectionsCommands) Register() {
 // 		cfg.Protections.ServerProtections.AntiDelete = toggle
 // 		_ = c.services.Config.SaveConfig(cfg)
 
-// 		ctx.NewEmbed().
+// 		c.services.Embed.New(ctx).
 // 			SetDescription("Turned " + utils.Misc.FormatBoolOnOff(toggle) + " Anti Delete (Server Protections)").
 // 			Send()
 // 	case "toggle":
 // 		cfg.Protections.ServerProtections.AntiDelete = !cfg.Protections.ServerProtections.AntiDelete
 // 		_ = c.services.Config.SaveConfig(cfg)
 
-// 		ctx.NewEmbed().
+// 		c.services.Embed.New(ctx).
 // 			SetDescription("Turned " + utils.Misc.FormatBoolOnOff(cfg.Protections.ServerProtections.AntiDelete) + " Anti Delete (Server Protections)").
 // 			Send()
 // 	default:
@@ -452,7 +452,7 @@ func (c *ProtectionsCommands) Register() {
 // 		return
 // 	}
 
-// 	ctx.NewEmbed().
+// 	c.services.Embed.New(ctx).
 // 		SetDescription(action + " DM's from everyone!").
 // 		Send()
 // }
@@ -478,7 +478,7 @@ func (c *ProtectionsCommands) Register() {
 // 		return
 // 	}
 
-// 	ctx.NewEmbed().
+// 	c.services.Embed.New(ctx).
 // 		SetDescription(action + " friend requests from everyone!").
 // 		Send()
 // }

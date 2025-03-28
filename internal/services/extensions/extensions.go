@@ -38,9 +38,6 @@ func NewService(eventBroker eventbroker.Service) Service {
 func (e *extensionsService) subscribe() {
 	e.eventBroker.Subscribe(eventbroker.EventSessionReady, func(payload any) {
 		session := payload.(*discordgo.Session)
-		if session.State.User.ID != session.State.User.ID {
-			return
-		}
 
 		e.load(session)
 	})

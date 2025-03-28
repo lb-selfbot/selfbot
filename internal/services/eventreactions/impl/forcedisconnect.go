@@ -98,7 +98,6 @@ func (r *ForceDisconnect) Data() map[string]any {
 func (r *ForceDisconnect) Handler(session *discordgo.Session, event any) {
 	vcUpdate, ok := event.(*discordgo.VoiceStateUpdate)
 	if !ok {
-		logging.Debug("ForceDisconnect.Handler: Event is not a voice state update event")
 		return
 	}
 

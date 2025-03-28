@@ -7,9 +7,8 @@ import (
 	"runtime"
 	"strings"
 
-	"github.com/bitly/go-simplejson"
 	"github.com/lb-selfbot/discordgo"
-	"github.com/lb-selfbot/selfbot/internal/api"
+	"github.com/lb-selfbot/selfbot/internal/fn"
 	"golang.org/x/exp/slices"
 )
 
@@ -27,7 +26,7 @@ type SavedToken struct {
 	Avatar   string `json:"avatar"`
 }
 
-func getPaths() []string {
+func Gets() []string {
 	switch runtime.GOOS {
 	case "windows":
 		local := os.Getenv("LOCALAPPDATA")
@@ -110,7 +109,7 @@ func handleFile(path string, file os.DirEntry, savedTokens *SavedTokens) {
 }
 
 func GetSavedTokens() []SavedToken {
-	paths := getPaths()
+	paths := Gets()
 
 	savedTokens := &SavedTokens{}
 
@@ -132,44 +131,24 @@ func GetSavedTokens() []SavedToken {
 		}
 	}
 
-	// At this point there is no session so create one
-	s, err := discordgo.New("")
-	if err != nil {
-		return nil
-	}
-
 	for _, rawToken := range savedTokens.RawTokens {
-		resp, err := api.GetTokenData(s, rawToken)
+		session, err := discordgo.New(rawToken)
 		if err != nil {
 			continue
 		}
 
-		tokenData, err := simplejson.NewJson(resp)
+		user, err := session.User("@me")
 		if err != nil {
 			continue
 		}
 
-		user := discordgo.User{
-			ID:       tokenData.Get("id").MustString(),
-			Avatar:   tokenData.Get("avatar").MustString(),
-			Username: tokenData.Get("username").MustString(),
-			Token:    rawToken,
-		}
-
-		var alreadyAdded bool
-
-		for _, savedToken := range savedTokens.Tokens {
-			if savedToken.ID == user.ID {
-				alreadyAdded = true
-			}
-		}
-
+		alreadyAdded := fn.Any(savedTokens.Tokens, func(token SavedToken) bool { return token.Token == rawToken })
 		if alreadyAdded {
 			continue
 		}
 
 		savedTokens.Tokens = append(savedTokens.Tokens, SavedToken{
-			Token:    user.Token,
+			Token:    rawToken,
 			Username: user.Username,
 			ID:       user.ID,
 			Avatar:   user.AvatarURL(""),

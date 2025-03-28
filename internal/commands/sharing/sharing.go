@@ -78,13 +78,13 @@ func (c *SharingCommands) Register() {
 // 			userString = "No users set."
 // 		}
 
-// 		ctx.NewEmbed().
+// 		c.services.Embed.New(ctx).
 // 			AddField("Shared Users", userString).
 // 			Send()
 // 	case "add":
 // 		user, err := ctx.Arguments.Get(1).User(router.ArgumentFlagFallbackDefault)
 // 		if err != nil {
-// 			ctx.NewEmbed().
+// 			c.services.Embed.New(ctx).
 // 				SetDescription("Could not find user.").
 // 				Send()
 // 			return
@@ -99,13 +99,13 @@ func (c *SharingCommands) Register() {
 
 // 		_ = c.services.Config.SaveConfig(cfg)
 
-// 		ctx.NewEmbed().
+// 		c.services.Embed.New(ctx).
 // 			SetDescription("Added %s to the Shared Users list.", user.Mention()).
 // 			Send()
 // 	case "rm":
 // 		user, err := ctx.Arguments.Get(1).User(router.ArgumentFlagFallbackDefault)
 // 		if err != nil {
-// 			ctx.NewEmbed().
+// 			c.services.Embed.New(ctx).
 // 				SetDescription("Could not find user.").
 // 				Send()
 // 			return
@@ -116,18 +116,18 @@ func (c *SharingCommands) Register() {
 // 			return
 // 		}
 
-// 		cfg.Sharing.SharedUsers = utils.RemoveSliceItem(cfg.Sharing.SharedUsers, user.ID)
+// 		cfg.Sharing.SharedUsers = fn.Delete(cfg.Sharing.SharedUsers, user.ID)
 
 // 		_ = c.services.Config.SaveConfig(cfg)
 
-// 		ctx.NewEmbed().
+// 		c.services.Embed.New(ctx).
 // 			SetDescription("Removed %s from the Shared Users list.", user.Mention()).
 // 			Send()
 // 	case "clear":
 // 		cfg.Sharing.SharedUsers = []string{}
 // 		_ = c.services.Config.SaveConfig(cfg)
 
-// 		ctx.NewEmbed().
+// 		c.services.Embed.New(ctx).
 // 			SetDescription("Cleared all users from the Shared Users list.").
 // 			Send()
 // 	default:
@@ -144,7 +144,7 @@ func (c *SharingCommands) Register() {
 
 // 	switch utils.Arguments["<get/add/rm/clear/values>"] {
 // 	case "get":
-// 		ctx.NewEmbed().
+// 		c.services.Embed.New(ctx).
 // 			AddField("Shared Categories", strings.Join(cfg.Sharing.SharedCategories, ", ")).
 // 			Send()
 // 	case "add":
@@ -174,7 +174,7 @@ func (c *SharingCommands) Register() {
 // 		cfg.Sharing.SharedCategories = append(cfg.Sharing.SharedCategories, entry)
 // 		_ = c.services.Config.SaveConfig(cfg)
 
-// 		ctx.NewEmbed().
+// 		c.services.Embed.New(ctx).
 // 			SetDescription("Added " + entry + " to the Shared Categories list.").
 // 			Send()
 // 	case "rm":
@@ -201,17 +201,17 @@ func (c *SharingCommands) Register() {
 // 			return
 // 		}
 
-// 		cfg.Sharing.SharedCategories = utils.RemoveSliceItem(cfg.Sharing.SharedCategories, entry)
+// 		cfg.Sharing.SharedCategories = fn.Delete(cfg.Sharing.SharedCategories, entry)
 // 		_ = c.services.Config.SaveConfig(cfg)
 
-// 		ctx.NewEmbed().
+// 		c.services.Embed.New(ctx).
 // 			SetDescription("Removed " + entry + " from the Shared Categories list.").
 // 			Send()
 // 	case "clear":
 // 		cfg.Sharing.SharedCategories = []string{}
 // 		_ = c.services.Config.SaveConfig(cfg)
 
-// 		ctx.NewEmbed().
+// 		c.services.Embed.New(ctx).
 // 			SetDescription("Cleared all Shared Categories list entries.").
 // 			Send()
 // 	case "values":
@@ -221,7 +221,7 @@ func (c *SharingCommands) Register() {
 // 			categories = append(categories, category.Name)
 // 		}
 
-// 		ctx.NewEmbed().
+// 		c.services.Embed.New(ctx).
 // 			AddField("Available Command Categories", strings.Join(categories, ", ")).
 // 			Send()
 // 	default:
@@ -238,7 +238,7 @@ func (c *SharingCommands) Register() {
 
 // 	switch utils.Arguments["<get/add/rm/clear/values>"] {
 // 	case "get":
-// 		ctx.NewEmbed().
+// 		c.services.Embed.New(ctx).
 // 			AddField("Shared Commands", strings.Join(cfg.Sharing.SharedCommands, ", ")).
 // 			Send()
 // 	case "add":
@@ -268,7 +268,7 @@ func (c *SharingCommands) Register() {
 // 		cfg.Sharing.SharedCommands = append(cfg.Sharing.SharedCommands, entry)
 // 		_ = c.services.Config.SaveConfig(cfg)
 
-// 		ctx.NewEmbed().
+// 		c.services.Embed.New(ctx).
 // 			SetDescription("Added " + entry + " to the Shared Commands list.").
 // 			Send()
 // 	case "rm":
@@ -295,21 +295,21 @@ func (c *SharingCommands) Register() {
 // 			return
 // 		}
 
-// 		cfg.Sharing.SharedCommands = utils.RemoveSliceItem(cfg.Sharing.SharedCommands, entry)
+// 		cfg.Sharing.SharedCommands = fn.Delete(cfg.Sharing.SharedCommands, entry)
 // 		_ = c.services.Config.SaveConfig(cfg)
 
-// 		ctx.NewEmbed().
+// 		c.services.Embed.New(ctx).
 // 			SetDescription("Removed " + entry + " from the Shared Commands list.").
 // 			Send()
 // 	case "clear":
 // 		cfg.Sharing.SharedCommands = []string{}
 // 		_ = c.services.Config.SaveConfig(cfg)
 
-// 		ctx.NewEmbed().
+// 		c.services.Embed.New(ctx).
 // 			SetDescription("Cleared all Shared Commands list entries.").
 // 			Send()
 // 	case "values":
-// 		ctx.NewEmbed().
+// 		c.services.Embed.New(ctx).
 // 			AddField("Available Commands", "Use `[p]help` or view <https://docs.lightning-bot.com/category/commands> for a list of commands.").
 // 			Send()
 // 	default:
@@ -326,7 +326,7 @@ func (c *SharingCommands) Register() {
 
 // 	switch utils.Arguments["<get/set/toggle>"] {
 // 	case "get":
-// 		ctx.NewEmbed().
+// 		c.services.Embed.New(ctx).
 // 			AddField("Share All Commands", utils.Misc.FormatBoolOnOff(cfg.Sharing.ShareAll)).
 // 			Send()
 // 	case "set":
@@ -339,14 +339,14 @@ func (c *SharingCommands) Register() {
 // 		cfg.Sharing.ShareAll = toggle
 // 		_ = c.services.Config.SaveConfig(cfg)
 
-// 		ctx.NewEmbed().
+// 		c.services.Embed.New(ctx).
 // 			SetDescription("Turned " + utils.Misc.FormatBoolOnOff(toggle) + " Share All Commands").
 // 			Send()
 // 	case "toggle":
 // 		cfg.Sharing.ShareAll = !cfg.Sharing.ShareAll
 // 		_ = c.services.Config.SaveConfig(cfg)
 
-// 		ctx.NewEmbed().
+// 		c.services.Embed.New(ctx).
 // 			SetDescription("Turned " + utils.Misc.FormatBoolOnOff(cfg.Sharing.ShareAll) + " Share All Commands").
 // 			Send()
 // 	default:
@@ -363,7 +363,7 @@ func (c *SharingCommands) Register() {
 
 // 	switch utils.Arguments["<get/set/toggle>"] {
 // 	case "get":
-// 		ctx.NewEmbed().
+// 		c.services.Embed.New(ctx).
 // 			AddField("Sharing Block Dangerous", utils.Misc.FormatBoolOnOff(cfg.Sharing.BlockDangerousCommands)).
 // 			Send()
 // 	case "set":
@@ -376,14 +376,14 @@ func (c *SharingCommands) Register() {
 // 		cfg.Sharing.BlockDangerousCommands = toggle
 // 		_ = c.services.Config.SaveConfig(cfg)
 
-// 		ctx.NewEmbed().
+// 		c.services.Embed.New(ctx).
 // 			SetDescription("Turned " + utils.Misc.FormatBoolOnOff(toggle) + " Sharing Block Dangerous").
 // 			Send()
 // 	case "toggle":
 // 		cfg.Sharing.BlockDangerousCommands = !cfg.Sharing.BlockDangerousCommands
 // 		_ = c.services.Config.SaveConfig(cfg)
 
-// 		ctx.NewEmbed().
+// 		c.services.Embed.New(ctx).
 // 			SetDescription("Turned " + utils.Misc.FormatBoolOnOff(cfg.Sharing.BlockDangerousCommands) + " Sharing Block Dangerous").
 // 			Send()
 // 	default:

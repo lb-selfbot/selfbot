@@ -97,7 +97,6 @@ func (r *RemoveReactions) Data() map[string]any {
 func (r *RemoveReactions) Handler(session *discordgo.Session, event any) {
 	reactionAdd, ok := event.(*discordgo.MessageReactionAdd)
 	if !ok {
-		logging.Debug("RemoveReactions.Handler: Event is not a message reaction add event")
 		return
 	}
 

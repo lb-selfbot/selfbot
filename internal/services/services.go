@@ -6,6 +6,7 @@ import (
 	"github.com/lb-selfbot/selfbot/internal/services/config"
 	"github.com/lb-selfbot/selfbot/internal/services/console"
 	"github.com/lb-selfbot/selfbot/internal/services/discord"
+	"github.com/lb-selfbot/selfbot/internal/services/embed"
 	"github.com/lb-selfbot/selfbot/internal/services/eventbroker"
 	"github.com/lb-selfbot/selfbot/internal/services/eventreactions"
 	"github.com/lb-selfbot/selfbot/internal/services/extensions"
@@ -41,6 +42,7 @@ type Services struct {
 	AuthSync     authsync.Service
 
 	Variables      variables.Service
+	Embed          embed.Service
 	UI             ui.Service
 	EventReactions eventreactions.Service
 	MTS            mts.Service
@@ -55,7 +57,7 @@ func NewServices() *Services {
 	backup := backup.NewService()
 	spotify := spotify.NewService()
 
-	router := router.NewService(cfg)
+	router := router.NewService(eventBroker, cfg)
 	sessions := sessions.NewService(eventBroker)
 	extensions := extensions.NewService(eventBroker)
 	discord := discord.NewService(eventBroker, cfg)
@@ -66,8 +68,9 @@ func NewServices() *Services {
 	authSync := authsync.NewService(eventBroker, cfg, console)
 
 	variables := variables.NewService(eventBroker, router, extensions, spotify)
+	embed := embed.NewService(cfg, variables)
 	ui := ui.NewService(eventBroker, cfg, discord)
-	eventReactions := eventreactions.NewService(eventBroker, cfg, router, variables)
+	eventReactions := eventreactions.NewService(eventBroker, cfg, router, variables, discord)
 	mts := mts.NewService(eventBroker, cfg, eventReactions)
 	rpc := rpc.NewService(eventBroker, cfg, sessions, variables)
 
@@ -89,6 +92,7 @@ func NewServices() *Services {
 		AuthSync:     authSync,
 
 		Variables:      variables,
+		Embed:          embed,
 		UI:             ui,
 		EventReactions: eventReactions,
 		MTS:            mts,

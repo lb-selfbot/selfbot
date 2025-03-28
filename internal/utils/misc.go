@@ -10,8 +10,6 @@ import (
 	"image/png"
 	"io"
 	"math"
-	"net"
-	"slices"
 	"strconv"
 	"strings"
 	"time"
@@ -22,23 +20,13 @@ import (
 
 type MiscUtils struct{}
 
-func (MiscUtils) GetImageUrlFromJson(url string, jsonQuery string) (string, error) {
-	httpResult := http.Get(url)
-	if httpResult.Error != nil {
-		return "", httpResult.Error
-	}
-
-	return httpResult.Json().Get(jsonQuery).MustString(), nil
-}
-
-func (MiscUtils) IsPortOpen(hostname string, port int) bool {
-	address := hostname + ":" + strconv.Itoa(port)
-	conn, err := net.DialTimeout("tcp", address, 50*time.Millisecond)
+func (MiscUtils) GetImageUrlFromJson(url string, key string) (string, error) {
+	resp, err := http.DefaultClient().Get(url)
 	if err != nil {
-		return false
+		return "", err
 	}
-	_ = conn.Close()
-	return true
+
+	return resp.Json().Get(key).MustString(), nil
 }
 
 func (MiscUtils) FormatBoolYesNo(b bool) string {
@@ -105,32 +93,6 @@ func (MiscUtils) FormatDurationShort(duration time.Duration) string {
 	return fmt.Sprintf("%dd %dh %dm %ds",
 		int64(duration.Hours()/24), int64(remainingHours),
 		int64(remainingMinutes), int64(remainingSeconds))
-}
-
-// GetDistance returns the Levenshtein distance between two strings.
-func (MiscUtils) GetDistance(str1, str2 string) int {
-	s1len := len(str1)
-	s2len := len(str2)
-	column := make([]int, len(str1)+1)
-
-	for y := 1; y <= s1len; y++ {
-		column[y] = y
-	}
-	for x := 1; x <= s2len; x++ {
-		column[0] = x
-		lastKey := x - 1
-		for y := 1; y <= s1len; y++ {
-			oldKey := column[y]
-			var incr int
-			if str1[y-1] != str2[x-1] {
-				incr = 1
-			}
-
-			column[y] = min(column[y]+1, column[y-1]+1, lastKey+incr)
-			lastKey = oldKey
-		}
-	}
-	return column[s1len]
 }
 
 func (MiscUtils) HexToRGB(hex string) (int, int, int, error) {
@@ -236,35 +198,3 @@ func (MiscUtils) PreviewColorImage(x, y, r, g, b int) (io.Reader, error) {
 }
 
 var Misc = &MiscUtils{}
-
-// RemoveSliceItem removes an item from a slice
-func RemoveSliceItem[T comparable](s []T, e T) []T {
-	for i, v := range s {
-		if v == e {
-			return slices.Delete(s, i, i+1)
-		}
-	}
-	return s
-}
-
-// Map applies a function to every element of a slice
-func Map[T, U any](s []T, f func(T) U) []U {
-	r := make([]U, len(s))
-	for i, v := range s {
-		r[i] = f(v)
-	}
-	return r
-}
-
-// Filter filters a slice based on a function
-func Filter[T any](s []T, f func(T) bool) []T {
-	r := make([]T, len(s))
-	counter := 0
-	for _, v := range s {
-		if f(v) {
-			r[counter] = v
-			counter++
-		}
-	}
-	return r[:counter]
-}

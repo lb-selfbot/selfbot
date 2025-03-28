@@ -1,12 +1,13 @@
 package backup
 
 import (
-	"encoding/json"
 	"errors"
 	"os"
 	"path"
 	"path/filepath"
 	"time"
+
+	"github.com/goccy/go-json"
 
 	"github.com/lb-selfbot/discordgo"
 	"github.com/lb-selfbot/discordgo/protos"

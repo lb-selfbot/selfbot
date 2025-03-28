@@ -148,7 +148,7 @@ func (c *TrollingCommands) Register() {
 }
 
 func (c *TrollingCommands) purgehack(ctx *router.Ctx) {
-	ctx.RespondText("ﾠ" + strings.Repeat("\n", 1998) + "ﾠ")
+	ctx.RespondText("%s", "ﾠ"+strings.Repeat("\n", 1998)+"ﾠ")
 }
 
 func (c *TrollingCommands) ghostping(ctx *router.Ctx) {
@@ -178,7 +178,7 @@ func (c *TrollingCommands) token(ctx *router.Ctx) {
 		return
 	}
 
-	ctx.RespondText(base64.StdEncoding.EncodeToString([]byte(user.ID)))
+	ctx.RespondText("%s", base64.StdEncoding.EncodeToString([]byte(user.ID)))
 }
 
 func (c *TrollingCommands) trollnitro(ctx *router.Ctx) {
@@ -256,7 +256,7 @@ func (c *TrollingCommands) voicemove(ctx *router.Ctx) {
 		_ = conn.Disconnect()
 	}
 
-	channels := utils.Filter(guild.Channels, func(channel *discordgo.Channel) bool {
+	channels := fn.Filter(guild.Channels, func(channel *discordgo.Channel) bool {
 		if channel.Type != discordgo.ChannelTypeGuildVoice {
 			return false
 		}

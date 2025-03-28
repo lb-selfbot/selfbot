@@ -338,7 +338,7 @@ func (c *EventReactionsCommands) Register() {
 // 	// Delete the raction if it already exists
 // 	if slices.Contains(c.services.EventReactions.GetAllReactions(), reaction) {
 // 		c.services.EventReactions.RemoveReactionsByType(reaction.Type())
-// 		ctx.NewEmbed().
+// 		c.services.Embed.New(ctx).
 // 			SetDescription("Removed event reaction: " + reaction.Description()).
 // 			Send()
 // 		return
@@ -346,24 +346,24 @@ func (c *EventReactionsCommands) Register() {
 
 // 	c.services.EventReactions.AddReaction(reaction)
 
-// 	ctx.NewEmbed().
+// 	c.services.Embed.New(ctx).
 // 		SetDescription("Added event reaction: " + reaction.Description()).
 // 		Send()
 // }
 
 // func (c *EventReactionsCommands) mapReactions(ctx *router.Ctx, reactions []types.EventReaction, errText, title string) {
 // 	if len(reactions) == 0 {
-// 		ctx.NewEmbed().
+// 		c.services.Embed.New(ctx).
 // 			SetDescription(errText).
 // 			Send()
 // 		return
 // 	}
 
-// 	descriptions := utils.Map(reactions, func(reaction types.EventReaction) string {
+// 	descriptions := fn.Map(reactions, func(reaction types.EventReaction) string {
 // 		return reaction.Description()
 // 	})
 
-// 	ctx.NewEmbed().
+// 	c.services.Embed.New(ctx).
 // 		SetDescription(title + ":\n\n" + strings.Join(descriptions, "\n")).
 // 		Send()
 // }
@@ -397,7 +397,7 @@ func (c *EventReactionsCommands) Register() {
 
 // func (c *EventReactionsCommands) clearreactions(ctx *router.Ctx) {
 // 	c.services.EventReactions.RemoveAllReactions()
-// 	ctx.NewEmbed().
+// 	c.services.Embed.New(ctx).
 // 		SetDescription("Cleared all event reactions").
 // 		Send()
 // }
@@ -409,7 +409,7 @@ func (c *EventReactionsCommands) Register() {
 // 	case "toggle":
 // 		user, err := ctx.Arguments.Get(1).User(router.ArgumentFlagFallbackDefault)
 // 		if err != nil {
-// 			ctx.NewEmbed().
+// 			c.services.Embed.New(ctx).
 // 				SetDescription("Could not find user").
 // 				Send()
 // 			return
@@ -423,11 +423,11 @@ func (c *EventReactionsCommands) Register() {
 // 	case "clear":
 // 		c.services.EventReactions.RemoveReactionsByType(types.EventReactionIgnoreUser)
 
-// 		ctx.NewEmbed().
+// 		c.services.Embed.New(ctx).
 // 			SetDescription("Cleared all ignored users.").
 // 			Send()
 // 	default:
-// 		ctx.NewEmbed().
+// 		c.services.Embed.New(ctx).
 // 			SetDescription("Invalid toggle/list/clear argument.").
 // 			Send()
 // 	}
@@ -442,7 +442,7 @@ func (c *EventReactionsCommands) Register() {
 
 // 		guild, err := utils.Discord.GetGuild(ctx.Session, guildID)
 // 		if err != nil {
-// 			ctx.NewEmbed().
+// 			c.services.Embed.New(ctx).
 // 				SetDescription("Could not find server: " + err.Error()).
 // 				Send()
 // 			return
@@ -456,11 +456,11 @@ func (c *EventReactionsCommands) Register() {
 // 	case "clear":
 // 		c.services.EventReactions.RemoveReactionsByType(types.EventReactionIgnoreGuild)
 
-// 		ctx.NewEmbed().
+// 		c.services.Embed.New(ctx).
 // 			SetDescription("Cleared all ignored servers.").
 // 			Send()
 // 	default:
-// 		ctx.NewEmbed().
+// 		c.services.Embed.New(ctx).
 // 			SetDescription("Invalid toggle/list/clear argument.").
 // 			Send()
 // 	}
@@ -473,7 +473,7 @@ func (c *EventReactionsCommands) Register() {
 // 	case "toggle":
 // 		guild, channel, err := c.getGuildOrChannel(ctx, ctx.Arguments.Get(i))
 // 		if err != nil {
-// 			ctx.NewEmbed().
+// 			c.services.Embed.New(ctx).
 // 				SetDescription("Could not find server/channel: " + err.Error()).
 // 				Send()
 // 			return
@@ -489,7 +489,7 @@ func (c *EventReactionsCommands) Register() {
 // 		eventReaction.Reaction = strings.ReplaceAll(eventReaction.Reaction, ">", "")
 
 // 		if eventReaction.Reaction == "" && reactionType == types.EventReactionPingReact {
-// 			ctx.NewEmbed().
+// 			c.services.Embed.New(ctx).
 // 				SetDescription("Reaction cannot be empty!").
 // 				Send()
 // 			return
@@ -503,11 +503,11 @@ func (c *EventReactionsCommands) Register() {
 // 	case "clear":
 // 		c.services.EventReactions.RemoveReactionsByType(reactionType)
 
-// 		ctx.NewEmbed().
+// 		c.services.Embed.New(ctx).
 // 			SetDescription("Cleared all ping --> %s reactions.", reaction).
 // 			Send()
 // 	default:
-// 		ctx.NewEmbed().
+// 		c.services.Embed.New(ctx).
 // 			SetDescription("Invalid toggle/list/clear argument").
 // 			Send()
 // 	}
@@ -556,7 +556,7 @@ func (c *EventReactionsCommands) Register() {
 // 	case "toggle":
 // 		srcChannel, err := ctx.Arguments.Get(1).Channel()
 // 		if err != nil {
-// 			ctx.NewEmbed().
+// 			c.services.Embed.New(ctx).
 // 				SetDescription("Could not find source channel").
 // 				Send()
 // 			return
@@ -564,7 +564,7 @@ func (c *EventReactionsCommands) Register() {
 
 // 		destChannel, err := ctx.Arguments.Get(2).Channel()
 // 		if err != nil {
-// 			ctx.NewEmbed().
+// 			c.services.Embed.New(ctx).
 // 				SetDescription("Could not find destination channel").
 // 				Send()
 // 			return
@@ -578,11 +578,11 @@ func (c *EventReactionsCommands) Register() {
 // 	case "clear":
 // 		c.services.EventReactions.RemoveReactionsByType(types.EventReactionMirrorChannel)
 
-// 		ctx.NewEmbed().
+// 		c.services.Embed.New(ctx).
 // 			SetDescription("Cleared all mirrored channels.").
 // 			Send()
 // 	default:
-// 		ctx.NewEmbed().
+// 		c.services.Embed.New(ctx).
 // 			SetDescription("Invalid toggle/list/clear argument").
 // 			Send()
 // 	}
@@ -595,7 +595,7 @@ func (c *EventReactionsCommands) Register() {
 // 		destGuild, destErr := utils.Discord.GetGuild(ctx.Session, utils.Arguments["[dest server]"])
 
 // 		if srcErr != nil || destErr != nil {
-// 			ctx.NewEmbed().
+// 			c.services.Embed.New(ctx).
 // 				SetDescription("Could not find server").
 // 				Send()
 // 			return
@@ -609,11 +609,11 @@ func (c *EventReactionsCommands) Register() {
 // 	case "clear":
 // 		c.services.EventReactions.RemoveReactionsByType(types.EventReactionMirrorGuild)
 
-// 		ctx.NewEmbed().
+// 		c.services.Embed.New(ctx).
 // 			SetDescription("Cleared all mirrored servers.").
 // 			Send()
 // 	default:
-// 		ctx.NewEmbed().
+// 		c.services.Embed.New(ctx).
 // 			SetDescription("Invalid toggle/list/clear argument").
 // 			Send()
 // 	}
@@ -626,7 +626,7 @@ func (c *EventReactionsCommands) Register() {
 // 	case "toggle":
 // 		guild, channel, err := c.getGuildOrChannel(ctx, ctx.Arguments.Get(2))
 // 		if err != nil {
-// 			ctx.NewEmbed().
+// 			c.services.Embed.New(ctx).
 // 				SetDescription("Could not find server/channel: " + err.Error()).
 // 				Send()
 // 			return
@@ -642,11 +642,11 @@ func (c *EventReactionsCommands) Register() {
 // 	case "clear":
 // 		c.services.EventReactions.RemoveReactionsByType(types.EventReactionResponder)
 
-// 		ctx.NewEmbed().
+// 		c.services.Embed.New(ctx).
 // 			SetDescription("Cleared all responders.").
 // 			Send()
 // 	default:
-// 		ctx.NewEmbed().
+// 		c.services.Embed.New(ctx).
 // 			SetDescription("Invalid toggle/list/clear argument").
 // 			Send()
 // 	}
@@ -657,7 +657,7 @@ func (c *EventReactionsCommands) Register() {
 // 	case "toggle":
 // 		guild, channel, err := c.getGuildOrChannel(ctx, ctx.Arguments.Get(2))
 // 		if err != nil {
-// 			ctx.NewEmbed().
+// 			c.services.Embed.New(ctx).
 // 				SetDescription("Could not find server/channel: " + err.Error()).
 // 				Send()
 // 			return
@@ -673,11 +673,11 @@ func (c *EventReactionsCommands) Register() {
 // 	case "clear":
 // 		c.services.EventReactions.RemoveReactionsByType(types.EventReactionAIResponder)
 
-// 		ctx.NewEmbed().
+// 		c.services.Embed.New(ctx).
 // 			SetDescription("Cleared all AI responders.").
 // 			Send()
 // 	default:
-// 		ctx.NewEmbed().
+// 		c.services.Embed.New(ctx).
 // 			SetDescription("Invalid toggle/list/clear argument").
 // 			Send()
 // 	}
@@ -688,7 +688,7 @@ func (c *EventReactionsCommands) Register() {
 // 	case "toggle":
 // 		user, err := ctx.Arguments.Get(1).User(router.ArgumentFlagFallbackDefault)
 // 		if err != nil {
-// 			ctx.NewEmbed().
+// 			c.services.Embed.New(ctx).
 // 				SetDescription("Could not find user").
 // 				Send()
 // 			return
@@ -697,7 +697,7 @@ func (c *EventReactionsCommands) Register() {
 
 // 		guild, channel, err := c.getGuildOrChannel(ctx, ctx.Arguments.Get(2))
 // 		if err != nil {
-// 			ctx.NewEmbed().
+// 			c.services.Embed.New(ctx).
 // 				SetDescription("Could not find server/channel: " + err.Error()).
 // 				Send()
 // 			return
@@ -711,11 +711,11 @@ func (c *EventReactionsCommands) Register() {
 // 	case "clear":
 // 		c.services.EventReactions.RemoveReactionsByType(types.EventReactionCopy)
 
-// 		ctx.NewEmbed().
+// 		c.services.Embed.New(ctx).
 // 			SetDescription("Cleared all copied users.").
 // 			Send()
 // 	default:
-// 		ctx.NewEmbed().
+// 		c.services.Embed.New(ctx).
 // 			SetDescription("Invalid toggle/list/clear argument").
 // 			Send()
 // 	}
@@ -726,7 +726,7 @@ func (c *EventReactionsCommands) Register() {
 // 	case "toggle":
 // 		user, err := ctx.Arguments.Get(1).User(router.ArgumentFlagFallbackDefault)
 // 		if err != nil {
-// 			ctx.NewEmbed().
+// 			c.services.Embed.New(ctx).
 // 				SetDescription("Could not find user").
 // 				Send()
 // 			return
@@ -735,7 +735,7 @@ func (c *EventReactionsCommands) Register() {
 
 // 		guild, channel, err := c.getGuildOrChannel(ctx, ctx.Arguments.Get(2))
 // 		if err != nil {
-// 			ctx.NewEmbed().
+// 			c.services.Embed.New(ctx).
 // 				SetDescription("Could not find server/channel: " + err.Error()).
 // 				Send()
 // 			return
@@ -749,11 +749,11 @@ func (c *EventReactionsCommands) Register() {
 // 	case "clear":
 // 		c.services.EventReactions.RemoveReactionsByType(types.EventReactionReplyCopy)
 
-// 		ctx.NewEmbed().
+// 		c.services.Embed.New(ctx).
 // 			SetDescription("Cleared all replycopied users.").
 // 			Send()
 // 	default:
-// 		ctx.NewEmbed().
+// 		c.services.Embed.New(ctx).
 // 			SetDescription("Invalid toggle/list/clear argument").
 // 			Send()
 // 	}
@@ -764,7 +764,7 @@ func (c *EventReactionsCommands) Register() {
 // 	case "toggle":
 // 		user, err := ctx.Arguments.Get(1).User(router.ArgumentFlagFallbackDefault)
 // 		if err != nil {
-// 			ctx.NewEmbed().
+// 			c.services.Embed.New(ctx).
 // 				SetDescription("Could not find user").
 // 				Send()
 // 			return
@@ -773,7 +773,7 @@ func (c *EventReactionsCommands) Register() {
 
 // 		guild, channel, err := c.getGuildOrChannel(ctx, ctx.Arguments.Get(2))
 // 		if err != nil {
-// 			ctx.NewEmbed().
+// 			c.services.Embed.New(ctx).
 // 				SetDescription("Could not find server/channel: " + err.Error()).
 // 				Send()
 // 			return
@@ -787,11 +787,11 @@ func (c *EventReactionsCommands) Register() {
 // 	case "clear":
 // 		c.services.EventReactions.RemoveReactionsByType(types.EventReactionMock)
 
-// 		ctx.NewEmbed().
+// 		c.services.Embed.New(ctx).
 // 			SetDescription("Cleared all mocked users.").
 // 			Send()
 // 	default:
-// 		ctx.NewEmbed().
+// 		c.services.Embed.New(ctx).
 // 			SetDescription("Invalid toggle/list/clear argument").
 // 			Send()
 // 	}
@@ -802,7 +802,7 @@ func (c *EventReactionsCommands) Register() {
 // 	case "toggle":
 // 		user, err := ctx.Arguments.Get(1).User(router.ArgumentFlagFallbackDefault)
 // 		if err != nil {
-// 			ctx.NewEmbed().
+// 			c.services.Embed.New(ctx).
 // 				SetDescription("Could not find user").
 // 				Send()
 // 			return
@@ -811,7 +811,7 @@ func (c *EventReactionsCommands) Register() {
 
 // 		guild, channel, err := c.getGuildOrChannel(ctx, ctx.Arguments.Get(2))
 // 		if err != nil {
-// 			ctx.NewEmbed().
+// 			c.services.Embed.New(ctx).
 // 				SetDescription("Could not find server/channel: " + err.Error()).
 // 				Send()
 // 			return
@@ -825,11 +825,11 @@ func (c *EventReactionsCommands) Register() {
 // 	case "clear":
 // 		c.services.EventReactions.RemoveReactionsByType(types.EventReactionPinSpam)
 
-// 		ctx.NewEmbed().
+// 		c.services.Embed.New(ctx).
 // 			SetDescription("Cleared all pinspammed users.").
 // 			Send()
 // 	default:
-// 		ctx.NewEmbed().
+// 		c.services.Embed.New(ctx).
 // 			SetDescription("Invalid toggle/list/clear argument").
 // 			Send()
 // 	}
@@ -839,7 +839,7 @@ func (c *EventReactionsCommands) Register() {
 // 	for _, message := range c.services.EventReactions.GetPinSpamMessages() {
 // 		err := ctx.Session.ChannelMessageUnpin(message.ChannelID, message.ID)
 // 		if err != nil {
-// 			ctx.NewEmbed().
+// 			c.services.Embed.New(ctx).
 // 				SetDescription("Could not unpin message: " + err.Error()).
 // 				Send()
 // 			return
@@ -848,7 +848,7 @@ func (c *EventReactionsCommands) Register() {
 
 // 	c.services.EventReactions.ClearPinSpamMessages()
 
-// 	ctx.NewEmbed().
+// 	c.services.Embed.New(ctx).
 // 		SetDescription("Unpinned all messages.").
 // 		Send()
 // }
@@ -858,7 +858,7 @@ func (c *EventReactionsCommands) Register() {
 // 	case "toggle":
 // 		user, err := ctx.Arguments.Get(1).User(router.ArgumentFlagFallbackDefault)
 // 		if err != nil {
-// 			ctx.NewEmbed().
+// 			c.services.Embed.New(ctx).
 // 				SetDescription("Could not find user").
 // 				Send()
 // 			return
@@ -874,7 +874,7 @@ func (c *EventReactionsCommands) Register() {
 // 		if !global {
 // 			guild, channel, err = c.getGuildOrChannel(ctx, ctx.Arguments.Get(3))
 // 			if err != nil {
-// 				ctx.NewEmbed().
+// 				c.services.Embed.New(ctx).
 // 					SetDescription("Could not find server/channel: " + err.Error()).
 // 					Send()
 // 				return
@@ -900,11 +900,11 @@ func (c *EventReactionsCommands) Register() {
 // 	case "clear":
 // 		c.services.EventReactions.RemoveReactionsByType(types.EventReactionReactSpam)
 
-// 		ctx.NewEmbed().
+// 		c.services.Embed.New(ctx).
 // 			SetDescription("Cleared all reactspammed users.").
 // 			Send()
 // 	default:
-// 		ctx.NewEmbed().
+// 		c.services.Embed.New(ctx).
 // 			SetDescription("Invalid toggle/list/clear argument").
 // 			Send()
 // 	}
@@ -915,7 +915,7 @@ func (c *EventReactionsCommands) Register() {
 // 	case "toggle":
 // 		user, err := ctx.Arguments.Get(1).User(router.ArgumentFlagFallbackDefault)
 // 		if err != nil {
-// 			ctx.NewEmbed().
+// 			c.services.Embed.New(ctx).
 // 				SetDescription("Could not find user").
 // 				Send()
 // 			return
@@ -924,7 +924,7 @@ func (c *EventReactionsCommands) Register() {
 
 // 		guild, channel, err := c.getGuildOrChannel(ctx, ctx.Arguments.Get(2))
 // 		if err != nil {
-// 			ctx.NewEmbed().
+// 			c.services.Embed.New(ctx).
 // 				SetDescription("Could not find server/channel: " + err.Error()).
 // 				Send()
 // 			return
@@ -938,11 +938,11 @@ func (c *EventReactionsCommands) Register() {
 // 	case "clear":
 // 		c.services.EventReactions.RemoveReactionsByType(types.EventReactionDeleteMessages)
 
-// 		ctx.NewEmbed().
+// 		c.services.Embed.New(ctx).
 // 			SetDescription("Cleared all deletemessage reactions.").
 // 			Send()
 // 	default:
-// 		ctx.NewEmbed().
+// 		c.services.Embed.New(ctx).
 // 			SetDescription("Invalid toggle/list/clear argument").
 // 			Send()
 // 	}
@@ -961,7 +961,7 @@ func (c *EventReactionsCommands) Register() {
 // 		if !global {
 // 			guild, channel, err = c.getGuildOrChannel(ctx, ctx.Arguments.Get(2))
 // 			if err != nil {
-// 				ctx.NewEmbed().
+// 				c.services.Embed.New(ctx).
 // 					SetDescription("Could not find server/channel: " + err.Error()).
 // 					Send()
 // 				return
@@ -980,11 +980,11 @@ func (c *EventReactionsCommands) Register() {
 // 	case "clear":
 // 		c.services.EventReactions.RemoveReactionsByType(types.EventReactionKeywordNotifier)
 
-// 		ctx.NewEmbed().
+// 		c.services.Embed.New(ctx).
 // 			SetDescription("Cleared all keyword notifiers.").
 // 			Send()
 // 	default:
-// 		ctx.NewEmbed().
+// 		c.services.Embed.New(ctx).
 // 			SetDescription("Invalid toggle/list/clear argument").
 // 			Send()
 // 	}
@@ -995,7 +995,7 @@ func (c *EventReactionsCommands) Register() {
 // 	case "toggle":
 // 		user, err := ctx.Arguments.Get(1).User(router.ArgumentFlagFallbackDefault)
 // 		if err != nil {
-// 			ctx.NewEmbed().
+// 			c.services.Embed.New(ctx).
 // 				SetDescription("Could not find user").
 // 				Send()
 // 			return
@@ -1004,7 +1004,7 @@ func (c *EventReactionsCommands) Register() {
 
 // 		guild, channel, err := c.getGuildOrChannel(ctx, ctx.Arguments.Get(2))
 // 		if err != nil {
-// 			ctx.NewEmbed().
+// 			c.services.Embed.New(ctx).
 // 				SetDescription("Could not find server/channel: " + err.Error()).
 // 				Send()
 // 			return
@@ -1018,11 +1018,11 @@ func (c *EventReactionsCommands) Register() {
 // 	case "clear":
 // 		c.services.EventReactions.RemoveReactionsByType(types.EventReactionRemoveReactions)
 
-// 		ctx.NewEmbed().
+// 		c.services.Embed.New(ctx).
 // 			SetDescription("Cleared all users with removed reactions.").
 // 			Send()
 // 	default:
-// 		ctx.NewEmbed().
+// 		c.services.Embed.New(ctx).
 // 			SetDescription("Invalid toggle/list/clear argument").
 // 			Send()
 // 	}
@@ -1033,7 +1033,7 @@ func (c *EventReactionsCommands) Register() {
 // 	case "toggle":
 // 		user, err := ctx.Arguments.Get(1).User(router.ArgumentFlagFallbackDefault)
 // 		if err != nil {
-// 			ctx.NewEmbed().
+// 			c.services.Embed.New(ctx).
 // 				SetDescription("Could not find user").
 // 				Send()
 // 			return
@@ -1042,7 +1042,7 @@ func (c *EventReactionsCommands) Register() {
 
 // 		guild, channel, err := c.getGuildOrChannel(ctx, ctx.Arguments.Get(2))
 // 		if err != nil {
-// 			ctx.NewEmbed().
+// 			c.services.Embed.New(ctx).
 // 				SetDescription("Could not find server/channel: " + err.Error()).
 // 				Send()
 // 			return
@@ -1056,11 +1056,11 @@ func (c *EventReactionsCommands) Register() {
 // 	case "clear":
 // 		c.services.EventReactions.RemoveReactionsByType(types.EventReactionForceDisconnect)
 
-// 		ctx.NewEmbed().
+// 		c.services.Embed.New(ctx).
 // 			SetDescription("Cleared all force disconnected users").
 // 			Send()
 // 	default:
-// 		ctx.NewEmbed().
+// 		c.services.Embed.New(ctx).
 // 			SetDescription("Invalid toggle/list/clear argument").
 // 			Send()
 // 	}
@@ -1071,7 +1071,7 @@ func (c *EventReactionsCommands) Register() {
 // 	case "toggle":
 // 		user, err := ctx.Arguments.Get(1).User(router.ArgumentFlagFallbackDefault)
 // 		if err != nil {
-// 			ctx.NewEmbed().
+// 			c.services.Embed.New(ctx).
 // 				SetDescription("Could not find user").
 // 				Send()
 // 			return
@@ -1082,7 +1082,7 @@ func (c *EventReactionsCommands) Register() {
 
 // 		guild, err := utils.Discord.GetGuild(ctx.Session, guildID)
 // 		if err != nil {
-// 			ctx.NewEmbed().
+// 			c.services.Embed.New(ctx).
 // 				SetDescription("Could not find server: " + err.Error()).
 // 				Send()
 // 			return
@@ -1092,7 +1092,7 @@ func (c *EventReactionsCommands) Register() {
 
 // 		err = ctx.Session.GuildMemberNickname(ctx.Message.GuildID, user.ID, nickname)
 // 		if err != nil {
-// 			ctx.NewEmbed().
+// 			c.services.Embed.New(ctx).
 // 				SetDescription("Could not set nickname: " + err.Error()).
 // 				Send()
 // 			return
@@ -1106,11 +1106,11 @@ func (c *EventReactionsCommands) Register() {
 // 	case "clear":
 // 		c.services.EventReactions.RemoveReactionsByType(types.EventReactionForceNick)
 
-// 		ctx.NewEmbed().
+// 		c.services.Embed.New(ctx).
 // 			SetDescription("Cleared all force nicked users.").
 // 			Send()
 // 	default:
-// 		ctx.NewEmbed().
+// 		c.services.Embed.New(ctx).
 // 			SetDescription("Invalid toggle/list/clear argument.").
 // 			Send()
 // 	}
@@ -1121,7 +1121,7 @@ func (c *EventReactionsCommands) Register() {
 // 	case "toggle":
 // 		user, err := ctx.Arguments.Get(1).User(router.ArgumentFlagFallbackDefault)
 // 		if err != nil {
-// 			ctx.NewEmbed().
+// 			c.services.Embed.New(ctx).
 // 				SetDescription("Could not find user").
 // 				Send()
 // 			return
@@ -1132,7 +1132,7 @@ func (c *EventReactionsCommands) Register() {
 
 // 		guild, err := utils.Discord.GetGuild(ctx.Session, guildID)
 // 		if err != nil {
-// 			ctx.NewEmbed().
+// 			c.services.Embed.New(ctx).
 // 				SetDescription("Could not find server: " + err.Error()).
 // 				Send()
 // 			return
@@ -1140,7 +1140,7 @@ func (c *EventReactionsCommands) Register() {
 
 // 		err = ctx.Session.GuildMemberDelete(ctx.Message.GuildID, user.ID)
 // 		if err != nil {
-// 			ctx.NewEmbed().
+// 			c.services.Embed.New(ctx).
 // 				SetDescription("Could not kick user: " + err.Error()).
 // 				Send()
 // 			return
@@ -1154,11 +1154,11 @@ func (c *EventReactionsCommands) Register() {
 // 	case "clear":
 // 		c.services.EventReactions.RemoveReactionsByType(types.EventReactionForceKick)
 
-// 		ctx.NewEmbed().
+// 		c.services.Embed.New(ctx).
 // 			SetDescription("Cleared all force kicked users.").
 // 			Send()
 // 	default:
-// 		ctx.NewEmbed().
+// 		c.services.Embed.New(ctx).
 // 			SetDescription("Invalid toggle/list/clear argument.").
 // 			Send()
 // 	}
@@ -1169,19 +1169,19 @@ func (c *EventReactionsCommands) Register() {
 // 	case "toggle":
 // 		user, err := ctx.Arguments.Get(1).User(router.ArgumentFlagFallbackDefault)
 // 		if err != nil {
-// 			ctx.NewEmbed().
+// 			c.services.Embed.New(ctx).
 // 				SetDescription("Could not find user").
 // 				Send()
 // 			return
 
 // 		}
 
-// 		relationships := utils.Filter(ctx.Session.State.Relationships, func(r *discordgo.Relationship) bool {
+// 		relationships := fn.Filter(ctx.Session.State.Relationships, func(r *discordgo.Relationship) bool {
 // 			return r.Type == 1 && r.ID == user.ID
 // 		})
 
 // 		if len(relationships) == 0 {
-// 			ctx.NewEmbed().
+// 			c.services.Embed.New(ctx).
 // 				SetDescription("The user must be a friend.").
 // 				Send()
 // 			return
@@ -1189,14 +1189,14 @@ func (c *EventReactionsCommands) Register() {
 
 // 		channel, err := ctx.Arguments.Get(2).Channel(router.ArgumentFlagFallbackDefault)
 // 		if err != nil {
-// 			ctx.NewEmbed().
+// 			c.services.Embed.New(ctx).
 // 				SetDescription("Could not find channel").
 // 				Send()
 // 			return
 // 		}
 
 // 		if channel.Type != discordgo.ChannelTypeGroupDM {
-// 			ctx.NewEmbed().
+// 			c.services.Embed.New(ctx).
 // 				SetDescription("The channel must be a group DM.").
 // 				Send()
 // 			return
@@ -1210,11 +1210,11 @@ func (c *EventReactionsCommands) Register() {
 // 	case "clear":
 // 		c.services.EventReactions.RemoveReactionsByType(types.EventReactionNoLeave)
 
-// 		ctx.NewEmbed().
+// 		c.services.Embed.New(ctx).
 // 			SetDescription("Cleared all noleave users.").
 // 			Send()
 // 	default:
-// 		ctx.NewEmbed().
+// 		c.services.Embed.New(ctx).
 // 			SetDescription("Invalid toggle/list/clear argument.").
 // 			Send()
 // 	}
@@ -1237,11 +1237,11 @@ func (c *EventReactionsCommands) Register() {
 // 	if toggle {
 // 		c.services.EventReactions.AddReaction(reaction)
 
-// 		ctx.NewEmbed().
+// 		c.services.Embed.New(ctx).
 // 			SetDescription("Turned on the anti group chat reaction!").
 // 			Send()
 // 	} else {
-// 		ctx.NewEmbed().
+// 		c.services.Embed.New(ctx).
 // 			SetDescription("Turned off the anti group chat reaction!").
 // 			Send()
 // 	}
@@ -1252,7 +1252,7 @@ func (c *EventReactionsCommands) Register() {
 // 	case "toggle":
 // 		channel, err := ctx.Arguments.Get(1).Channel(router.ArgumentFlagFallbackDefault)
 // 		if err != nil {
-// 			ctx.NewEmbed().
+// 			c.services.Embed.New(ctx).
 // 				SetDescription("Could not find channel").
 // 				Send()
 // 			return
@@ -1266,11 +1266,11 @@ func (c *EventReactionsCommands) Register() {
 // 	case "clear":
 // 		c.services.EventReactions.RemoveReactionsByType(types.EventReactionAntiDeleteMessages)
 
-// 		ctx.NewEmbed().
+// 		c.services.Embed.New(ctx).
 // 			SetDescription("Cleared all anti delete messages.").
 // 			Send()
 // 	default:
-// 		ctx.NewEmbed().
+// 		c.services.Embed.New(ctx).
 // 			SetDescription("Invalid toggle/list/clear argument").
 // 			Send()
 // 	}
@@ -1287,7 +1287,7 @@ func (c *EventReactionsCommands) Register() {
 
 // 	switch utils.Arguments["<get/set/toggle>"] {
 // 	case "get":
-// 		ctx.NewEmbed().
+// 		c.services.Embed.New(ctx).
 // 			AddField("AFK Responder", utils.Misc.FormatBoolOnOff(cfg.AFK.Enabled)).
 // 			Send()
 // 	case "set":
@@ -1300,14 +1300,14 @@ func (c *EventReactionsCommands) Register() {
 // 		cfg.AFK.Enabled = toggle
 // 		_ = c.services.Config.SaveConfig(cfg)
 
-// 		ctx.NewEmbed().
+// 		c.services.Embed.New(ctx).
 // 			SetDescription("Turned " + utils.Misc.FormatBoolOnOff(toggle) + " AFK Responder").
 // 			Send()
 // 	case "toggle":
 // 		cfg.AFK.Enabled = !cfg.AFK.Enabled
 // 		_ = c.services.Config.SaveConfig(cfg)
 
-// 		ctx.NewEmbed().
+// 		c.services.Embed.New(ctx).
 // 			SetDescription("Turned " + utils.Misc.FormatBoolOnOff(cfg.AFK.Enabled) + " AFK Responder").
 // 			Send()
 // 	default:
@@ -1324,7 +1324,7 @@ func (c *EventReactionsCommands) Register() {
 
 // 	switch utils.Arguments["<get/set/toggle>"] {
 // 	case "get":
-// 		ctx.NewEmbed().
+// 		c.services.Embed.New(ctx).
 // 			AddField("AFK On Ping", utils.Misc.FormatBoolOnOff(cfg.AFK.OnPing)).
 // 			Send()
 // 	case "set":
@@ -1337,14 +1337,14 @@ func (c *EventReactionsCommands) Register() {
 // 		cfg.AFK.OnPing = toggle
 // 		_ = c.services.Config.SaveConfig(cfg)
 
-// 		ctx.NewEmbed().
+// 		c.services.Embed.New(ctx).
 // 			SetDescription("Turned " + utils.Misc.FormatBoolOnOff(toggle) + " AFK On Ping").
 // 			Send()
 // 	case "toggle":
 // 		cfg.AFK.OnPing = !cfg.AFK.OnPing
 // 		_ = c.services.Config.SaveConfig(cfg)
 
-// 		ctx.NewEmbed().
+// 		c.services.Embed.New(ctx).
 // 			SetDescription("Turned " + utils.Misc.FormatBoolOnOff(cfg.AFK.OnPing) + " AFK On Ping").
 // 			Send()
 // 	default:
@@ -1361,7 +1361,7 @@ func (c *EventReactionsCommands) Register() {
 
 // 	switch utils.Arguments["<get/set/toggle>"] {
 // 	case "get":
-// 		ctx.NewEmbed().
+// 		c.services.Embed.New(ctx).
 // 			AddField("AFK On DM", utils.Misc.FormatBoolOnOff(cfg.AFK.OnDM)).
 // 			Send()
 // 	case "set":
@@ -1374,14 +1374,14 @@ func (c *EventReactionsCommands) Register() {
 // 		cfg.AFK.OnDM = toggle
 // 		_ = c.services.Config.SaveConfig(cfg)
 
-// 		ctx.NewEmbed().
+// 		c.services.Embed.New(ctx).
 // 			SetDescription("Turned " + utils.Misc.FormatBoolOnOff(toggle) + " AFK On DM").
 // 			Send()
 // 	case "toggle":
 // 		cfg.AFK.OnDM = !cfg.AFK.OnDM
 // 		_ = c.services.Config.SaveConfig(cfg)
 
-// 		ctx.NewEmbed().
+// 		c.services.Embed.New(ctx).
 // 			SetDescription("Turned " + utils.Misc.FormatBoolOnOff(cfg.AFK.OnDM) + " AFK On DM").
 // 			Send()
 // 	default:
@@ -1400,7 +1400,7 @@ func (c *EventReactionsCommands) Register() {
 // 	case "get":
 // 		formatted := utils.Misc.FormatDuration(time.Duration(cfg.AFK.Delay) * time.Second)
 
-// 		ctx.NewEmbed().
+// 		c.services.Embed.New(ctx).
 // 			AddField("AFK Delay", formatted).
 // 			Send()
 // 	case "set":
@@ -1415,7 +1415,7 @@ func (c *EventReactionsCommands) Register() {
 
 // 		formatted := utils.Misc.FormatDuration(time.Duration(cfg.AFK.Delay) * time.Second)
 
-// 		ctx.NewEmbed().
+// 		c.services.Embed.New(ctx).
 // 			SetDescription("AFK Delay set to %s.", formatted).
 // 			Send()
 // 	default:
@@ -1432,7 +1432,7 @@ func (c *EventReactionsCommands) Register() {
 
 // 	switch utils.Arguments["<get/set/toggle>"] {
 // 	case "get":
-// 		ctx.NewEmbed().
+// 		c.services.Embed.New(ctx).
 // 			AddField("AFK Random Delay", utils.Misc.FormatBoolOnOff(cfg.AFK.RandomDelay)).
 // 			Send()
 // 	case "set":
@@ -1445,14 +1445,14 @@ func (c *EventReactionsCommands) Register() {
 // 		cfg.AFK.RandomDelay = toggle
 // 		_ = c.services.Config.SaveConfig(cfg)
 
-// 		ctx.NewEmbed().
+// 		c.services.Embed.New(ctx).
 // 			SetDescription("Turned " + utils.Misc.FormatBoolOnOff(toggle) + " AFK Random Delay").
 // 			Send()
 // 	case "toggle":
 // 		cfg.AFK.RandomDelay = !cfg.AFK.RandomDelay
 // 		_ = c.services.Config.SaveConfig(cfg)
 
-// 		ctx.NewEmbed().
+// 		c.services.Embed.New(ctx).
 // 			SetDescription("Turned " + utils.Misc.FormatBoolOnOff(cfg.AFK.RandomDelay) + " AFK Random Delay").
 // 			Send()
 // 	default:
@@ -1469,7 +1469,7 @@ func (c *EventReactionsCommands) Register() {
 
 // 	switch utils.Arguments["<get/set/toggle>"] {
 // 	case "get":
-// 		ctx.NewEmbed().
+// 		c.services.Embed.New(ctx).
 // 			AddField("AFK Must Be Inactive", utils.Misc.FormatBoolOnOff(cfg.AFK.MustBeInactive)).
 // 			Send()
 // 	case "set":
@@ -1482,14 +1482,14 @@ func (c *EventReactionsCommands) Register() {
 // 		cfg.AFK.MustBeInactive = toggle
 // 		_ = c.services.Config.SaveConfig(cfg)
 
-// 		ctx.NewEmbed().
+// 		c.services.Embed.New(ctx).
 // 			SetDescription("Turned " + utils.Misc.FormatBoolOnOff(toggle) + " AFK Must Be Inactive").
 // 			Send()
 // 	case "toggle":
 // 		cfg.AFK.MustBeInactive = !cfg.AFK.MustBeInactive
 // 		_ = c.services.Config.SaveConfig(cfg)
 
-// 		ctx.NewEmbed().
+// 		c.services.Embed.New(ctx).
 // 			SetDescription("Turned " + utils.Misc.FormatBoolOnOff(cfg.AFK.MustBeInactive) + " AFK Must Be Inactive").
 // 			Send()
 // 	default:
@@ -1508,7 +1508,7 @@ func (c *EventReactionsCommands) Register() {
 // 	case "get":
 // 		formatted := utils.Misc.FormatDuration(time.Duration(cfg.AFK.InactiveTimeout) * time.Second)
 
-// 		ctx.NewEmbed().
+// 		c.services.Embed.New(ctx).
 // 			AddField("AFK Inactive Timeout", formatted).
 // 			Send()
 // 	case "set":
@@ -1523,7 +1523,7 @@ func (c *EventReactionsCommands) Register() {
 
 // 		formatted := utils.Misc.FormatDuration(time.Duration(cfg.AFK.InactiveTimeout) * time.Second)
 
-// 		ctx.NewEmbed().
+// 		c.services.Embed.New(ctx).
 // 			SetDescription("AFK Inactive Timeout set to %s.", formatted).
 // 			Send()
 // 	default:
@@ -1540,7 +1540,7 @@ func (c *EventReactionsCommands) Register() {
 
 // 	switch utils.Arguments["<get/set/toggle>"] {
 // 	case "get":
-// 		ctx.NewEmbed().
+// 		c.services.Embed.New(ctx).
 // 			AddField("AFK Typing", utils.Misc.FormatBoolOnOff(cfg.AFK.Typing)).
 // 			Send()
 // 	case "set":
@@ -1553,14 +1553,14 @@ func (c *EventReactionsCommands) Register() {
 // 		cfg.AFK.Typing = toggle
 // 		_ = c.services.Config.SaveConfig(cfg)
 
-// 		ctx.NewEmbed().
+// 		c.services.Embed.New(ctx).
 // 			SetDescription("Turned " + utils.Misc.FormatBoolOnOff(toggle) + " AFK Typing").
 // 			Send()
 // 	case "toggle":
 // 		cfg.AFK.Typing = !cfg.AFK.Typing
 // 		_ = c.services.Config.SaveConfig(cfg)
 
-// 		ctx.NewEmbed().
+// 		c.services.Embed.New(ctx).
 // 			SetDescription("Turned " + utils.Misc.FormatBoolOnOff(cfg.AFK.Typing) + " AFK Typing").
 // 			Send()
 // 	default:
@@ -1577,7 +1577,7 @@ func (c *EventReactionsCommands) Register() {
 
 // 	switch utils.Arguments["<get/set/toggle>"] {
 // 	case "get":
-// 		ctx.NewEmbed().
+// 		c.services.Embed.New(ctx).
 // 			AddField("AFK AI Response", utils.Misc.FormatBoolOnOff(cfg.AFK.AI)).
 // 			Send()
 // 	case "set":
@@ -1590,14 +1590,14 @@ func (c *EventReactionsCommands) Register() {
 // 		cfg.AFK.AI = toggle
 // 		_ = c.services.Config.SaveConfig(cfg)
 
-// 		ctx.NewEmbed().
+// 		c.services.Embed.New(ctx).
 // 			SetDescription("Turned " + utils.Misc.FormatBoolOnOff(toggle) + " AFK AI Response").
 // 			Send()
 // 	case "toggle":
 // 		cfg.AFK.AI = !cfg.AFK.AI
 // 		_ = c.services.Config.SaveConfig(cfg)
 
-// 		ctx.NewEmbed().
+// 		c.services.Embed.New(ctx).
 // 			SetDescription("Turned " + utils.Misc.FormatBoolOnOff(cfg.AFK.AI) + " AFK AI Response").
 // 			Send()
 // 	default:
@@ -1614,7 +1614,7 @@ func (c *EventReactionsCommands) Register() {
 
 // 	switch utils.Arguments["<get/set>"] {
 // 	case "get":
-// 		ctx.NewEmbed().
+// 		c.services.Embed.New(ctx).
 // 			AddField("AFK Message", cfg.AFK.Message).
 // 			Send()
 // 	case "set":
@@ -1623,7 +1623,7 @@ func (c *EventReactionsCommands) Register() {
 // 		cfg.AFK.Message = value
 // 		_ = c.services.Config.SaveConfig(cfg)
 
-// 		ctx.NewEmbed().
+// 		c.services.Embed.New(ctx).
 // 			SetDescription("AFK Message set to " + value).
 // 			Send()
 // 	default:
@@ -1640,7 +1640,7 @@ func (c *EventReactionsCommands) Register() {
 
 // 	switch utils.Arguments["<get/set/values>"] {
 // 	case "get":
-// 		ctx.NewEmbed().
+// 		c.services.Embed.New(ctx).
 // 			AddField("AFK Trigger Type", cfg.AFK.TriggerList.Type).
 // 			Send()
 // 	case "set":
@@ -1660,11 +1660,11 @@ func (c *EventReactionsCommands) Register() {
 
 // 		_ = c.services.Config.SaveConfig(cfg)
 
-// 		ctx.NewEmbed().
+// 		c.services.Embed.New(ctx).
 // 			SetDescription("AFK Trigger Type set to " + cfg.Selfbot.Client).
 // 			Send()
 // 	case "values":
-// 		ctx.NewEmbed().
+// 		c.services.Embed.New(ctx).
 // 			SetDescription("Available AFK Trigger Type values: `Global`, `Whitelist`, `Blacklist`.").
 // 			Send()
 // 	default:
@@ -1696,13 +1696,13 @@ func (c *EventReactionsCommands) Register() {
 // 			userString = "No users set."
 // 		}
 
-// 		ctx.NewEmbed().
+// 		c.services.Embed.New(ctx).
 // 			AddField("AFK Triggerlist Users", userString).
 // 			Send()
 // 	case "add":
 // 		user, err := ctx.Arguments.Get(1).User(router.ArgumentFlagFallbackDefault)
 // 		if err != nil {
-// 			ctx.NewEmbed().
+// 			c.services.Embed.New(ctx).
 // 				SetDescription("Could not find user.").
 // 				Send()
 // 			return
@@ -1718,13 +1718,13 @@ func (c *EventReactionsCommands) Register() {
 
 // 		_ = c.services.Config.SaveConfig(cfg)
 
-// 		ctx.NewEmbed().
+// 		c.services.Embed.New(ctx).
 // 			SetDescription("Added %s to the AFK Triggerlist.", user.Mention()).
 // 			Send()
 // 	case "rm":
 // 		user, err := ctx.Arguments.Get(1).User(router.ArgumentFlagFallbackDefault)
 // 		if err != nil {
-// 			ctx.NewEmbed().
+// 			c.services.Embed.New(ctx).
 // 				SetDescription("Could not find user.").
 // 				Send()
 // 			return
@@ -1736,18 +1736,18 @@ func (c *EventReactionsCommands) Register() {
 // 			return
 // 		}
 
-// 		cfg.AFK.TriggerList.Users = utils.RemoveSliceItem(cfg.AFK.TriggerList.Users, user.ID)
+// 		cfg.AFK.TriggerList.Users = fn.Delete(cfg.AFK.TriggerList.Users, user.ID)
 
 // 		_ = c.services.Config.SaveConfig(cfg)
 
-// 		ctx.NewEmbed().
+// 		c.services.Embed.New(ctx).
 // 			SetDescription("Removed %s from the AFK Triggerlist.", user.Mention()).
 // 			Send()
 // 	case "clear":
 // 		cfg.AFK.TriggerList.Users = []string{}
 // 		_ = c.services.Config.SaveConfig(cfg)
 
-// 		ctx.NewEmbed().
+// 		c.services.Embed.New(ctx).
 // 			SetDescription("Cleared all users from the AFK Triggerlist.").
 // 			Send()
 // 	default:
@@ -1776,13 +1776,13 @@ func (c *EventReactionsCommands) Register() {
 // 			servers = append(servers, guild.Name+" ("+guild.ID+")")
 // 		}
 
-// 		ctx.NewEmbed().
+// 		c.services.Embed.New(ctx).
 // 			AddField("AFK Triggerlist Servers", strings.Join(servers, ", ")).
 // 			Send()
 // 	case "add":
 // 		guild, err := utils.Discord.GetGuild(ctx.Session, utils.Misc.Or(utils.Arguments["[server id]"], ctx.Message.GuildID))
 // 		if err != nil {
-// 			ctx.NewEmbed().
+// 			c.services.Embed.New(ctx).
 // 				SetDescription("Could not find server.").
 // 				Send()
 // 			return
@@ -1797,13 +1797,13 @@ func (c *EventReactionsCommands) Register() {
 
 // 		_ = c.services.Config.SaveConfig(cfg)
 
-// 		ctx.NewEmbed().
+// 		c.services.Embed.New(ctx).
 // 			SetDescription("Added %s to the AFK Triggerlist.", guild.Name).
 // 			Send()
 // 	case "rm":
 // 		guild, err := utils.Discord.GetGuild(ctx.Session, utils.Misc.Or(utils.Arguments["[server id]"], ctx.Message.GuildID))
 // 		if err != nil {
-// 			ctx.NewEmbed().
+// 			c.services.Embed.New(ctx).
 // 				SetDescription("Could not find server.").
 // 				Send()
 // 			return
@@ -1814,18 +1814,18 @@ func (c *EventReactionsCommands) Register() {
 // 			return
 // 		}
 
-// 		cfg.AFK.TriggerList.Servers = utils.RemoveSliceItem(cfg.AFK.TriggerList.Servers, guild.ID)
+// 		cfg.AFK.TriggerList.Servers = fn.Delete(cfg.AFK.TriggerList.Servers, guild.ID)
 
 // 		_ = c.services.Config.SaveConfig(cfg)
 
-// 		ctx.NewEmbed().
+// 		c.services.Embed.New(ctx).
 // 			SetDescription("Removed %s from the AFK Triggerlist.", guild.Name).
 // 			Send()
 // 	case "clear":
 // 		cfg.AFK.TriggerList.Servers = []string{}
 // 		_ = c.services.Config.SaveConfig(cfg)
 
-// 		ctx.NewEmbed().
+// 		c.services.Embed.New(ctx).
 // 			SetDescription("Cleared all servers from the AFK Triggerlist.").
 // 			Send()
 // 	default:

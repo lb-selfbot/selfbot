@@ -4,7 +4,9 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/agnivade/levenshtein"
 	"github.com/lb-selfbot/discordgo"
+	"github.com/lb-selfbot/selfbot/internal/fn"
 	"github.com/lb-selfbot/selfbot/internal/services"
 	"github.com/lb-selfbot/selfbot/internal/services/router"
 	"github.com/lb-selfbot/selfbot/internal/services/slashcommand"
@@ -119,8 +121,8 @@ func (c *SlashCommands) searchslash(ctx *router.Ctx) {
 		return
 	}
 
-	commands = utils.Filter(commands, func(command *discordgo.ApplicationCommand) bool {
-		return command.Name == query || utils.Misc.GetDistance(command.Name, query) < 2
+	commands = fn.Filter(commands, func(command *discordgo.ApplicationCommand) bool {
+		return command.Name == query || levenshtein.ComputeDistance(command.Name, query) < 2
 	})
 
 	if len(commands) == 0 {
@@ -142,9 +144,9 @@ func (c *SlashCommands) searchslash(ctx *router.Ctx) {
 		desc += fmt.Sprintf("`/%s` - %s - %s\n", cmd.Name, botName, cmd.Description)
 	}
 
-	ctx.NewEmbed().
-		SetTitle("Slash Commands: " + query).
-		SetDescription(desc).
+	c.services.Embed.New(ctx).
+		SetTitle("%s", "Slash Commands: "+query).
+		SetDescription("%s", desc).
 		Send()
 }
 
@@ -179,7 +181,7 @@ func (c *SlashCommands) executeslash(ctx *router.Ctx) {
 		}
 	}
 
-	commands = utils.Filter(commands, func(command *discordgo.ApplicationCommand) bool {
+	commands = fn.Filter(commands, func(command *discordgo.ApplicationCommand) bool {
 		return command.Name == ctx.Arguments.Get(2).Raw() && command.ApplicationID == appID
 	})
 
@@ -218,7 +220,7 @@ func (c *SlashCommands) executeslash(ctx *router.Ctx) {
 }
 
 func (c *SlashCommands) slashcommandjobhelp(ctx *router.Ctx) {
-	ctx.NewEmbed().
+	c.services.Embed.New(ctx).
 		SetDescription(
 			"Slash command jobs are jobs that run slash commands on a set interval. " +
 				"To get more information and examples, read the documentation at " +
@@ -235,7 +237,7 @@ func (c *SlashCommands) listSlashCommand(ctx *router.Ctx) {
 		false: "s",
 	}[len(jobs) == 1]
 
-	emb := ctx.NewEmbed().
+	emb := c.services.Embed.New(ctx).
 		SetTitle("Slash Command Jobs").
 		SetDescription("Found %d job%s", len(jobs), suffix)
 
@@ -271,7 +273,7 @@ func (c *SlashCommands) getscjob(ctx *router.Ctx) {
 
 	job := c.services.SlashCommand.GetJobByName(name)
 	if job == nil {
-		ctx.RespondText("Could not find a job with name `" + name + "`")
+		ctx.RespondText("%s", "Could not find a job with name `"+name+"`")
 		return
 	}
 
@@ -287,7 +289,7 @@ func (c *SlashCommands) getscjob(ctx *router.Ctx) {
 		args = " " + args
 	}
 
-	ctx.NewEmbed().
+	c.services.Embed.New(ctx).
 		SetTitle("Slash command job information").
 		AddField("Name", job.Name).
 		AddField("Command", fmt.Sprintf("`/%s%s` (%s)", cmd.Name, args, cmd.ID)).
@@ -308,7 +310,7 @@ func (c *SlashCommands) createscjob(ctx *router.Ctx) {
 			continue
 		}
 
-		ctx.RespondText("A job with the name `" + name + "` already exists.")
+		ctx.RespondText("%s", "A job with the name `"+name+"` already exists.")
 		return
 	}
 
@@ -354,7 +356,7 @@ func (c *SlashCommands) createscjob(ctx *router.Ctx) {
 		}
 	}
 
-	commands = utils.Filter(commands, func(command *discordgo.ApplicationCommand) bool {
+	commands = fn.Filter(commands, func(command *discordgo.ApplicationCommand) bool {
 		return command.Name == ctx.Arguments.Get(4).Raw() && command.ApplicationID == appID
 	})
 
@@ -402,7 +404,7 @@ func (c *SlashCommands) createscjob(ctx *router.Ctx) {
 		return
 	}
 
-	ctx.NewEmbed().
+	c.services.Embed.New(ctx).
 		SetDescription("Successfully created slash command job!").
 		AddField("Job Name", job.Name).
 		Send()
@@ -413,7 +415,7 @@ func (c *SlashCommands) deletescjob(ctx *router.Ctx) {
 
 	job := c.services.SlashCommand.GetJobByName(name)
 	if job == nil {
-		ctx.RespondText("Could not find a job with name `" + name + "`")
+		ctx.RespondText("%s", "Could not find a job with name `"+name+"`")
 		return
 	}
 
@@ -423,7 +425,7 @@ func (c *SlashCommands) deletescjob(ctx *router.Ctx) {
 		return
 	}
 
-	ctx.NewEmbed().
+	c.services.Embed.New(ctx).
 		SetDescription("Successfully deleted slash command job!").
 		AddField("Job Name", job.Name).
 		Send()
@@ -434,7 +436,7 @@ func (c *SlashCommands) setscjobcommand(ctx *router.Ctx) {
 
 	job := c.services.SlashCommand.GetJobByName(name)
 	if job == nil {
-		ctx.RespondText("Could not find a job with name `" + name + "`")
+		ctx.RespondText("%s", "Could not find a job with name `"+name+"`")
 		return
 	}
 
@@ -457,7 +459,7 @@ func (c *SlashCommands) setscjobcommand(ctx *router.Ctx) {
 		}
 	}
 
-	commands = utils.Filter(commands, func(command *discordgo.ApplicationCommand) bool {
+	commands = fn.Filter(commands, func(command *discordgo.ApplicationCommand) bool {
 		return command.Name == ctx.Arguments.Get(2).Raw() && command.ApplicationID == appID
 	})
 
@@ -494,7 +496,7 @@ func (c *SlashCommands) setscjobcommand(ctx *router.Ctx) {
 		return
 	}
 
-	ctx.NewEmbed().
+	c.services.Embed.New(ctx).
 		SetDescription("Successfully updated slash command job").
 		AddField("Job Name", job.Name).
 		AddField("Command", fmt.Sprintf("`/%s%s` (%s)", command.Name, job.RawArguments, command.ID)).
@@ -506,7 +508,7 @@ func (c *SlashCommands) setscjobchannel(ctx *router.Ctx) {
 
 	job := c.services.SlashCommand.GetJobByName(name)
 	if job == nil {
-		ctx.RespondText("Could not find a job with name `" + name + "`")
+		ctx.RespondText("%s", "Could not find a job with name `"+name+"`")
 		return
 	}
 
@@ -543,7 +545,7 @@ func (c *SlashCommands) setscjobchannel(ctx *router.Ctx) {
 		return
 	}
 
-	ctx.NewEmbed().
+	c.services.Embed.New(ctx).
 		SetDescription("Successfully updated slash command job").
 		AddField("Job Name", job.Name).
 		AddField("Channel", channel.Mention()).
@@ -555,7 +557,7 @@ func (c *SlashCommands) setscjobinterval(ctx *router.Ctx) {
 
 	job := c.services.SlashCommand.GetJobByName(name)
 	if job == nil {
-		ctx.RespondText("Could not find a job with name `" + name + "`")
+		ctx.RespondText("%s", "Could not find a job with name `"+name+"`")
 		return
 	}
 
@@ -573,7 +575,7 @@ func (c *SlashCommands) setscjobinterval(ctx *router.Ctx) {
 		return
 	}
 
-	ctx.NewEmbed().
+	c.services.Embed.New(ctx).
 		SetDescription("Successfully updated slash command job").
 		AddField("Job Name", job.Name).
 		AddField("Interval", utils.Misc.FormatDuration(job.Interval)).
@@ -585,7 +587,7 @@ func (c *SlashCommands) setscjobpaused(ctx *router.Ctx) {
 
 	job := c.services.SlashCommand.GetJobByName(name)
 	if job == nil {
-		ctx.RespondText("Could not find a job with name `" + name + "`")
+		ctx.RespondText("%s", "Could not find a job with name `"+name+"`")
 		return
 	}
 
@@ -602,7 +604,7 @@ func (c *SlashCommands) setscjobpaused(ctx *router.Ctx) {
 		return
 	}
 
-	ctx.NewEmbed().
+	c.services.Embed.New(ctx).
 		SetDescription("Successfully updated slash command job").
 		AddField("Job Name", job.Name).
 		AddField("Paused", utils.Misc.FormatBoolOnOff(job.Paused)).

@@ -8,12 +8,14 @@ import (
 	"strings"
 
 	"github.com/lb-selfbot/discordgo"
+	"github.com/lb-selfbot/go-jester"
 	"github.com/lb-selfbot/selfbot/internal/constants"
 	"github.com/lb-selfbot/selfbot/internal/services/config"
 	"github.com/lb-selfbot/selfbot/internal/services/eventbroker"
 	"github.com/lb-selfbot/selfbot/internal/system"
 	"github.com/lb-selfbot/selfbot/internal/tui"
 	"github.com/lb-selfbot/selfbot/internal/utils"
+	"google.golang.org/protobuf/types/known/wrapperspb"
 )
 
 // Service handles Discord-related operations.
@@ -26,6 +28,21 @@ type Service interface {
 
 	// Open opens the Discord session.
 	Open() error
+
+	// SetHypesquad sets the Hypesquad house for the session user.
+	SetHypesquad(house int) error
+
+	// LeaveHypesquad leaves the Hypesquad house for the session user.
+	LeaveHypesquad() error
+
+	// GetTokenInfo retrieves information about the provided token.
+	GetTokenInfo(token string) (*jester.Data, error)
+
+	// UpdateSettings updates the settings for the session user.
+	UpdateSettings(path string, settings any) error
+
+	// SetAllowedFriendRequests updates the allowed friend requests for the session user.
+	SetFriendRequestsAllowed(allowed bool) error
 }
 
 type discordService struct {
@@ -144,4 +161,55 @@ func (d *discordService) discordgoLogger() func(int, int, string, ...any) {
 			d.eventBroker.Publish(eventbroker.EventLogError, "discordgo error: "+msg)
 		}
 	}
+}
+
+func (d *discordService) SetHypesquad(houseID int) error {
+	_, err := d.session.Request(
+		"POST",
+		"https://discord.com/api/v9/hypesquad/online",
+		map[string]int{"house_id": houseID},
+	)
+	return err
+}
+
+func (d *discordService) LeaveHypesquad() error {
+	_, err := d.session.Request("DELETE", "https://discord.com/api/v9/hypesquad/online", nil)
+	return err
+}
+
+func (d *discordService) GetTokenInfo(token string) (*jester.Data, error) {
+	resp, err := d.session.RequestWithBucketID(
+		"GET",
+		discordgo.EndpointUser("@me"),
+		nil,
+		discordgo.EndpointUser("@me"),
+		map[string]string{
+			"Authorization": token,
+		},
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	data, err := jester.NewJson(resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return data, nil
+}
+
+func (d *discordService) UpdateSettings(path string, settings any) error {
+	_, err := d.session.Request("PATCH", discordgo.EndpointUser("@me")+path, settings)
+	return err
+}
+
+func (d *discordService) SetFriendRequestsAllowed(allowed bool) error {
+	if allowed {
+		d.session.State.UserSettings.Privacy.FriendSourceFlags = wrapperspb.UInt32(14)
+	} else {
+		d.session.State.UserSettings.Privacy.FriendSourceFlags = wrapperspb.UInt32(0)
+	}
+
+	return d.session.UserSettingsUpdate(d.session.State.UserSettings, true)
 }

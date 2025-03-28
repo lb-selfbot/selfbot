@@ -34,21 +34,22 @@ func GetLogin() (string, string) {
 		return GetLogin()
 	}
 
-	httpResponse := api.Auth(username, password)
-	if httpResponse.Error != nil {
-		logging.Error("Error connecting to API:", httpResponse.Error)
+	data, err := api.LBAuth(api.LBCreds{
+		Username: username,
+		Password: password,
+	})
+	if err != nil {
+		logging.Error("Error connecting to API:", err)
 		os.Exit(1)
 	}
 
-	json := httpResponse.Json()
-
-	errorString := json.Get("error").MustString()
+	errorString := data.Get("error").MustString()
 
 	if errorString == "INVALID_CREDENTIALS" {
 		logging.Error("Invalid credentials! Try again...")
 		return GetLogin()
 	} else if errorString != "" {
-		logging.Error("Error logging in:", errorString, "status", json.Get("status").MustString())
+		logging.Error("Error logging in:", errorString, "status", data.Get("status").MustString())
 		os.Exit(1)
 	}
 

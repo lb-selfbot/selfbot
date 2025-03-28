@@ -6,8 +6,9 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/bitly/go-simplejson"
 	"github.com/lb-selfbot/discordgo"
+	"github.com/lb-selfbot/go-jester"
+	"github.com/lb-selfbot/selfbot/internal/fn"
 	"github.com/lb-selfbot/selfbot/internal/http"
 	"github.com/lb-selfbot/selfbot/internal/random"
 	"github.com/lb-selfbot/selfbot/internal/services/router"
@@ -132,7 +133,7 @@ func (c *GameCommands) Register() {
 func (c *GameCommands) mcuuid(ctx *router.Ctx) {
 	username := ctx.Arguments.Get(0).Raw()
 
-	resp, err := http.PostJson(
+	resp, err := http.DefaultClient().Post(
 		"https://api.mojang.com/profiles/minecraft",
 		[]string{username},
 	)
@@ -141,67 +142,74 @@ func (c *GameCommands) mcuuid(ctx *router.Ctx) {
 		return
 	}
 
-	uuid := resp.GetIndex(0).Get("id").MustString()
+	uuid := resp.Json().Get(0).Get("id").MustString()
 
-	ctx.NewEmbed().
+	c.services.Embed.New(ctx).
 		AddField("Username", username).
 		AddField("UUID", utils.Misc.Or(uuid, "Not Found")).
 		Send()
 }
 
 func (c *GameCommands) mcnamehistory(ctx *router.Ctx) {
-	uuid := ctx.Arguments.Get(0).Raw()
-	res, err := http.GetJson(fmt.Sprintf("https://api.mojang.com/user/profiles/%s/names", url.QueryEscape(uuid)))
+	resp, err := http.DefaultClient().Get(fmt.Sprintf("https://api.mojang.com/user/profiles/%s/names", ctx.Arguments.Get(0).Escaped()))
 	if err != nil {
 		ctx.RespondText("An error has occurred.")
 		return
 	}
-	nameLen := len(res.MustArray())
+
 	var names []string
-	for i := 0; i < nameLen; i++ {
-		names = append(names, res.GetIndex(i).Get("name").MustString())
+	for item := range resp.Json().Iterator() {
+		name := item.Get("name").MustString()
+		if name == "" {
+			continue
+		}
+
+		names = append(names, name)
 	}
+
 	if len(names) == 0 {
-		names = append(names, "Invalid UUID.")
+		ctx.RespondText("No name history found (Invalid UUID).")
+		return
 	}
-	ctx.NewEmbed().
-		AddField("UUID", uuid).
+	c.services.Embed.New(ctx).
+		AddField("UUID", ctx.Arguments.Get(0).Raw()).
 		AddField("Name History", strings.Join(names, ", ")).
 		Send()
 }
 
 func (c *GameCommands) fnmap(ctx *router.Ctx) {
-	res, err := http.GetJson("https://fortnite-api.com/v1/map")
+	resp, err := http.DefaultClient().Get("https://fortnite-api.com/v1/map")
 	if err != nil {
 		ctx.RespondText("An error has occurred.")
 		return
 	}
-	ctx.NewEmbed().
+	c.services.Embed.New(ctx).
 		SetDescription("Fortnite Map").
-		SetImage(res.GetPath("data", "images", "blank").MustString()).
+		SetImage(resp.Json().Get("data", "images", "blank").MustString()).
 		Send()
 }
 
 func (c *GameCommands) fnmappois(ctx *router.Ctx) {
-	res, err := http.GetJson("https://fortnite-api.com/v1/map")
+	resp, err := http.DefaultClient().Get("https://fortnite-api.com/v1/map")
 	if err != nil {
 		ctx.RespondText("An error has occurred.")
 		return
 	}
-	ctx.NewEmbed().
+	c.services.Embed.New(ctx).
 		SetDescription("Fortnite Map").
-		SetImage(res.GetPath("data", "images", "pois").MustString()).
+		SetImage(resp.Json().Get("data", "images", "pois").MustString()).
 		Send()
 }
 
 func (c *GameCommands) fnrandomplaylist(ctx *router.Ctx) {
-	playlists, err := http.GetJson("https://fortnite-api.com/v1/playlists")
+	resp, err := http.DefaultClient().Get("https://fortnite-api.com/v1/playlists")
 	if err != nil {
 		ctx.RespondText("An error has occurred.")
 		return
 	}
-	playlist := playlists.Get("data").GetIndex(random.Int(0, len(playlists.Get("data").MustArray())-1))
-	ctx.NewEmbed().
+	data := resp.Json().Get("data")
+	playlist := data.Get(random.Int(0, data.Len()-1))
+	c.services.Embed.New(ctx).
 		SetDescription("Random Fortnite Playlist").
 		AddField("ID", playlist.Get("id").MustString("None")).
 		AddField("Name", playlist.Get("name").MustString("None")).
@@ -213,15 +221,16 @@ func (c *GameCommands) fnrandomplaylist(ctx *router.Ctx) {
 }
 
 func (c *GameCommands) fnrandombanner(ctx *router.Ctx) {
-	banners, err := http.GetJson("https://fortnite-api.com/v1/banners")
+	resp, err := http.DefaultClient().Get("https://fortnite-api.com/v1/banners")
 	if err != nil {
 		ctx.RespondText("An error has occurred.")
 		return
 	}
-	banner := banners.Get("data").GetIndex(random.Int(0, len(banners.Get("data").MustArray())-1))
-	ctx.NewEmbed().
+	data := resp.Json().Get("data")
+	banner := data.Get(random.Int(0, data.Len()-1))
+	c.services.Embed.New(ctx).
 		SetDescription("Random Fortnite Banner").
-		SetImage(banner.GetPath("images", "icon").MustString()).
+		SetImage(banner.Get("images", "icon").MustString()).
 		AddField("ID", banner.Get("id").MustString("None")).
 		AddField("Developer", banner.Get("devName").MustString("None")).
 		AddField("Name", banner.Get("name").MustString("None")).
@@ -232,124 +241,118 @@ func (c *GameCommands) fnrandombanner(ctx *router.Ctx) {
 
 func (c *GameCommands) fnstats(ctx *router.Ctx) {
 	username := ctx.Arguments.Get(0).Raw()
-	user, err := http.GetJson(
+	resp, err := http.DefaultClient().Get(
 		fmt.Sprintf("https://fortnite-api.com/v1/stats/br/v2?name=%s", url.QueryEscape(username)),
-		map[string]string{
-			"Authorization": "111a67c8-39d1-4d7c-a5bf-74842b0f112c",
-		},
+		http.WithHeader("Authorization", "111a67c8-39d1-4d7c-a5bf-74842b0f112c"),
 	)
 	if err != nil {
 		ctx.RespondText("An error has occurred.")
 		return
 	}
-	if user.Get("status").MustInt(-1) != 200 {
+
+	data := resp.Json()
+	if data.Get("status").MustInt() != 200 {
 		ctx.RespondText("Invalid username.")
 		return
 	}
-	user = user.GetPath("data")
-	ctx.NewEmbed().
-		SetDescription("Fortnite Stats - %s", user.GetPath("account", "name").MustString()).
-		AddField("Name", user.GetPath("account", "name").MustString("None")).
-		AddField("ID", user.GetPath("account", "id").MustString("None")).
-		AddField("Battlepass Level", user.GetPath("battlePass", "level").MustString("None")).
-		AddField("Battlepass Progress", user.GetPath("battlePass", "progress").MustString("None")).
-		AddField("Image", user.GetPath("image").MustString("None")).
-		AddField("Kills", fmt.Sprint(user.GetPath("stats", "all", "ltm", "kills").MustInt(-1))).
-		AddField("Deaths", fmt.Sprint(user.GetPath("stats", "all", "ltm", "deaths").MustInt(-1))).
-		AddField("Wins", fmt.Sprint(user.GetPath("stats", "all", "ltm", "wins").MustInt(-1))).
+
+	user := data.Get("data")
+	c.services.Embed.New(ctx).
+		SetDescription("Fortnite Stats - %s", user.Get("account", "name").MustString()).
+		AddField("Name", user.Get("account", "name").MustString("None")).
+		AddField("ID", user.Get("account", "id").MustString("None")).
+		AddField("Battlepass Level", user.Get("battlePass", "level").MustString("None")).
+		AddField("Battlepass Progress", user.Get("battlePass", "progress").MustString("None")).
+		AddField("Image", user.Get("image").MustString("None")).
+		AddField("Kills", fmt.Sprint(user.Get("stats", "all", "ltm", "kills").MustInt(-1))).
+		AddField("Deaths", fmt.Sprint(user.Get("stats", "all", "ltm", "deaths").MustInt(-1))).
+		AddField("Wins", fmt.Sprint(user.Get("stats", "all", "ltm", "wins").MustInt(-1))).
 		Send()
 }
 
 func (c *GameCommands) fncreatorcode(ctx *router.Ctx) {
-	code := ctx.Arguments.Get(0).Raw()
-	res, err := http.GetJson(fmt.Sprintf("https://fortnite-api.com/v2/creatorcode/search?name=%s", url.QueryEscape(code)))
+	resp, err := http.DefaultClient().Get(fmt.Sprintf("https://fortnite-api.com/v2/creatorcode/search?name=%s", ctx.Arguments.Get(0).Escaped()))
 	if err != nil {
 		ctx.RespondText("An error has occurred.")
 		return
 	}
-	if res.Get("status").MustInt(-1) != 200 {
+	data := resp.Json()
+	if data.Get("status").MustInt() != 200 {
 		ctx.RespondText("Invalid code.")
 		return
 	}
-	res = res.GetPath("data")
-	ctx.NewEmbed().
-		SetDescription("Fortnite Creator Code - %s", res.GetPath("code").MustString()).
-		AddField("Account Name", res.GetPath("account", "name").MustString("None")).
-		AddField("ID", res.GetPath("account", "id").MustString("None")).
-		AddField("Status", res.GetPath("status").MustString("None")).
-		AddField("Verified", utils.Misc.FormatBoolYesNo(res.GetPath("verified").MustBool())).
+	data = data.Get("data")
+	c.services.Embed.New(ctx).
+		SetDescription("Fortnite Creator Code - %s", data.Get("code").MustString()).
+		AddField("Account Name", data.Get("account", "name").MustString("None")).
+		AddField("ID", data.Get("account", "id").MustString("None")).
+		AddField("Status", data.Get("status").MustString("None")).
+		AddField("Verified", utils.Misc.FormatBoolYesNo(data.Get("verified").MustBool())).
 		Send()
 }
 
 func (c *GameCommands) fnrandomcosmetic(ctx *router.Ctx) {
-	cosmetics, err := http.GetJson("https://fortnite-api.com/v2/cosmetics/br")
+	resp, err := http.DefaultClient().Get("https://fortnite-api.com/v2/cosmetics/br")
 	if err != nil {
 		ctx.RespondText("An error has occurred.")
 		return
 	}
-	cosmetic := cosmetics.Get("data").GetIndex(random.Int(0, len(cosmetics.Get("data").MustArray())-1))
-	image := cosmetic.GetPath("images", "featured").MustString()
-	if image == "" {
-		image = cosmetic.GetPath("images", "icon").MustString()
-	}
-	ctx.NewEmbed().
+	data := resp.Json().Get("data")
+	cosmetic := data.Get(random.Int(0, data.Len()-1))
+	image := cosmetic.Get("images", "featured").MustString(cosmetic.Get("images", "icon").MustString())
+	c.services.Embed.New(ctx).
 		SetDescription("Random Fortnite Cosmetic").
 		AddField("ID", cosmetic.Get("id").MustString("None")).
 		AddField("Name", cosmetic.Get("name").MustString("None")).
 		AddField("Description", cosmetic.Get("description").MustString("None")).
-		AddField("Type", cosmetic.GetPath("type", "displayValue").MustString("None")).
-		AddField("Rarity", cosmetic.GetPath("rarity", "displayValue").MustString("None")).
-		AddField("Added", cosmetic.GetPath("added").MustString("None")).
+		AddField("Type", cosmetic.Get("type", "displayValue").MustString("None")).
+		AddField("Rarity", cosmetic.Get("rarity", "displayValue").MustString("None")).
+		AddField("Added", cosmetic.Get("added").MustString("None")).
 		SetImage(image).
 		Send()
 }
 
 func (c *GameCommands) fnstatus(ctx *router.Ctx) {
-	httpResponse := http.Get("https://status.epicgames.com/api/v2/status.json")
-	if httpResponse.Error != nil {
+	resp, err := http.DefaultClient().Get("https://status.epicgames.com/api/v2/status.json")
+	if err != nil {
 		ctx.RespondText("An error has occurred.")
 		return
 	}
-
-	json := httpResponse.Json()
-
-	ctx.NewEmbed().
-		AddField("Fortnite Status", json.GetPath("status", "description").MustString("Error")).
+	c.services.Embed.New(ctx).
+		AddField("Fortnite Status", resp.Json().Get("status", "description").MustString("Error")).
 		Send()
 }
 
 func (c *GameCommands) alstatus(ctx *router.Ctx) {
-	status, err := http.GetJson("https://api.mozambiquehe.re/servers?auth=IgUq5IRUFvvFxdXbrgmy")
+	resp, err := http.DefaultClient().Get("https://api.mozambiquehe.re/servers?auth=IgUq5IRUFvvFxdXbrgmy")
 	if err != nil {
 		ctx.RespondText("An error has occurred.")
 		return
 	}
-	ctx.NewEmbed().
+	data := resp.Json()
+	c.services.Embed.New(ctx).
 		SetDescription("Apex Legends Status").
-		AddField("Origin Login", status.GetPath("Origin_login", "EU-West", "Status").MustString("None")).
-		AddField("EA Nova Fusion", status.GetPath("EA_novafusion", "EU-West", "Status").MustString("None")).
-		AddField("EA Accounts", status.GetPath("EA_accounts", "EU-West", "Status").MustString("None")).
-		AddField("Apex Legends PlayStation", status.GetPath("otherPlatforms", "Playstation-Network", "Status").MustString("None")).
-		AddField("Apex Legends Xbox", status.GetPath("otherPlatforms", "Xbox-Live", "Status").MustString("None")).
-		AddField("Apex Legends Cross Play", status.GetPath("ApexOauth_Crossplay", "EU-West", "Status").MustString("None")).
-		AddField("Apex Legends API", status.GetPath("selfCoreTest", "Stats-API", "Status").MustString("None")).
+		AddField("Origin Login", data.Get("Origin_login", "EU-West", "Status").MustString("None")).
+		AddField("EA Nova Fusion", data.Get("EA_novafusion", "EU-West", "Status").MustString("None")).
+		AddField("EA Accounts", data.Get("EA_accounts", "EU-West", "Status").MustString("None")).
+		AddField("Apex Legends PlayStation", data.Get("otherPlatforms", "Playstation-Network", "Status").MustString("None")).
+		AddField("Apex Legends Xbox", data.Get("otherPlatforms", "Xbox-Live", "Status").MustString("None")).
+		AddField("Apex Legends Cross Play", data.Get("ApexOauth_Crossplay", "EU-West", "Status").MustString("None")).
+		AddField("Apex Legends API", data.Get("selfCoreTest", "Stats-API", "Status").MustString("None")).
 		Send()
 }
 
 func (c *GameCommands) alnews(ctx *router.Ctx) {
-	newsList, err := http.GetJson("https://api.mozambiquehe.re/news?lang=en-us&auth=IgUq5IRUFvvFxdXbrgmy")
+	resp, err := http.DefaultClient().Get("https://api.mozambiquehe.re/news?lang=en-us&auth=IgUq5IRUFvvFxdXbrgmy")
 	if err != nil {
 		ctx.RespondText("An error has occurred.")
 		return
 	}
-	emb := ctx.NewEmbed().SetDescription("Apex Legends News")
-	for i := 0; i < len(newsList.MustArray()); i++ {
-		news := newsList.GetIndex(i)
-		emb.AddField(news.GetPath("title").MustString("None"), fmt.Sprintf("%s\n%s", news.GetPath("short_desc").MustString("None"), news.GetPath("link").MustString("None")))
-		if i > 4 {
-			break
-		}
+	emb := c.services.Embed.New(ctx).SetDescription("Apex Legends News")
+	for news := range resp.Json().Iterator() {
+		emb.AddField(news.Get("title").MustString("None"), fmt.Sprintf("%s\n%s", news.Get("short_desc").MustString("None"), news.Get("link").MustString("None")))
 	}
+	emb.Fields = fn.Limit(emb.Fields, 4)
 	emb.Send()
 }
 
@@ -360,7 +363,7 @@ func (c *GameCommands) alstats(ctx *router.Ctx) {
 		return
 	}
 	platform = strings.ReplaceAll(platform, "xbox", "x1")
-	stats, err := http.GetJson(
+	resp, err := http.DefaultClient().Get(
 		fmt.Sprintf(
 			"https://api.mozambiquehe.re/bridge?version=4&platform=%s&player=%s&auth=IgUq5IRUFvvFxdXbrgmy",
 			url.QueryEscape(strings.ToUpper(platform)),
@@ -371,47 +374,52 @@ func (c *GameCommands) alstats(ctx *router.Ctx) {
 		ctx.RespondText("An error has occurred.")
 		return
 	}
+
+	stats := resp.Json()
 	if stats.Get("Error").MustString() != "" {
-		ctx.RespondText(stats.Get("Error").MustString())
+		ctx.RespondText("%s", stats.Get("Error").MustString())
 		return
 	}
-	ctx.NewEmbed().
-		SetDescription("Apex Legends Stats - %s", stats.GetPath("global", "name").MustString()).
-		AddField("Name", stats.GetPath("global", "name").MustString("None")).
-		AddField("UID", fmt.Sprint(stats.GetPath("global", "uid").MustInt64())).
-		AddField("Level", fmt.Sprint(stats.GetPath("global", "level").MustInt())).
-		AddField("Rank", stats.GetPath("global", "rank", "rankName").MustString("None")).
-		AddField("Battlepass Level", stats.GetPath("global", "battlepass", "level").MustString("None")).
-		AddField("Selected Legend", stats.GetPath("legends", "selected", "LegendName").MustString("None")).
-		AddField("Kills", fmt.Sprint(stats.GetPath("total", "kills", "value").MustInt())).
-		AddField("Winning Kills", fmt.Sprint(stats.GetPath("total", "winning_kills", "value").MustInt())).
-		AddField("Executions", fmt.Sprint(stats.GetPath("total", "executions", "value").MustInt())).
-		AddField("Headshots", fmt.Sprint(stats.GetPath("total", "headshots", "value").MustInt())).
-		AddField("Bamboozles", fmt.Sprint(stats.GetPath("total", "bamboozles", "value").MustInt())).
-		AddField("Wins as full squad", fmt.Sprint(stats.GetPath("total", "wins_as_full_squad", "value").MustInt())).
-		AddField("Revives", fmt.Sprint(stats.GetPath("total", "revives", "value").MustInt())).
-		AddField("Kill/Death", stats.GetPath("total", "kd", "value").MustString("None")).
+
+	c.services.Embed.New(ctx).
+		SetDescription("Apex Legends Stats - %s", stats.Get("global", "name").MustString()).
+		AddField("Name", stats.Get("global", "name").MustString("None")).
+		AddField("UID", fmt.Sprint(stats.Get("global", "uid").MustInt64())).
+		AddField("Level", fmt.Sprint(stats.Get("global", "level").MustInt())).
+		AddField("Rank", stats.Get("global", "rank", "rankName").MustString("None")).
+		AddField("Battlepass Level", stats.Get("global", "battlepass", "level").MustString("None")).
+		AddField("Selected Legend", stats.Get("legends", "selected", "LegendName").MustString("None")).
+		AddField("Kills", fmt.Sprint(stats.Get("total", "kills", "value").MustInt())).
+		AddField("Winning Kills", fmt.Sprint(stats.Get("total", "winning_kills", "value").MustInt())).
+		AddField("Executions", fmt.Sprint(stats.Get("total", "executions", "value").MustInt())).
+		AddField("Headshots", fmt.Sprint(stats.Get("total", "headshots", "value").MustInt())).
+		AddField("Bamboozles", fmt.Sprint(stats.Get("total", "bamboozles", "value").MustInt())).
+		AddField("Wins as full squad", fmt.Sprint(stats.Get("total", "wins_as_full_squad", "value").MustInt())).
+		AddField("Revives", fmt.Sprint(stats.Get("total", "revives", "value").MustInt())).
+		AddField("Kill/Death", stats.Get("total", "kd", "value").MustString("None")).
 		Send()
 }
 
 func (c *GameCommands) gtastatus(ctx *router.Ctx) {
-	status, err := http.GetJson("https://support.rockstargames.com/services/status.json")
+	resp, err := http.DefaultClient().Get("https://support.rockstargames.com/services/status.json")
 	if err != nil {
 		ctx.RespondText("An error has occurred.")
 		return
 	}
-	status = status.Get("statuses")
-	for i := 0; i < len(status.MustArray()); i++ {
-		if status.GetIndex(i).Get("name").MustString() == "Grand Theft Auto Online" {
-			status = status.GetIndex(i)
+
+	var gtaStatus *jester.Data
+	for status := range resp.Json().Get("statuses").Iterator() {
+		if status.Get("name").MustString() == "Grand Theft Auto Online" {
+			gtaStatus = status
 			break
 		}
 	}
-	emb := ctx.NewEmbed().
+
+	emb := c.services.Embed.New(ctx).
 		SetDescription("GTA Online Status").
-		AddField("Overall Status", status.Get("status_tag").MustString())
-	for i := 0; i < len(status.Get("services_platforms").MustArray()); i++ {
-		platform := status.Get("services_platforms").GetIndex(i)
+		AddField("Overall Status", gtaStatus.Get("status_tag").MustString())
+	for i := 0; i < gtaStatus.Get("services_platforms").Len(); i++ {
+		platform := gtaStatus.Get("services_platforms").Get(i)
 		emb.AddField(platform.Get("name").MustString(), platform.Get("service_status").Get("status").MustString())
 	}
 	emb.Send()
@@ -419,15 +427,15 @@ func (c *GameCommands) gtastatus(ctx *router.Ctx) {
 
 func (c *GameCommands) fivemplayers(ctx *router.Ctx) {
 	host := ctx.Arguments.Get(0).Raw()
-	httpResponse := http.Get("http://" + host + "/dynamic.json")
-	if httpResponse.Error != nil {
+	resp, err := http.DefaultClient().Get("http://" + host + "/dynamic.json")
+	if err != nil {
 		ctx.RespondText("An error has occurred.")
 		return
 	}
 
-	json := httpResponse.Json()
+	json := resp.Json()
 
-	ctx.NewEmbed().
+	c.services.Embed.New(ctx).
 		AddField("Host", host).
 		AddField("Players", fmt.Sprint(json.Get("clients").MustInt())).
 		AddField("Max Players", json.Get("sv_maxclients").MustString()).
@@ -436,15 +444,15 @@ func (c *GameCommands) fivemplayers(ctx *router.Ctx) {
 
 func (c *GameCommands) fiveminfo(ctx *router.Ctx) {
 	host := ctx.Arguments.Get(0).Raw()
-	httpResponse := http.Get("http://" + host + "/dynamic.json")
-	if httpResponse.Error != nil {
+	resp, err := http.DefaultClient().Get("http://" + host + "/dynamic.json")
+	if err != nil {
 		ctx.RespondText("An error has occurred.")
 		return
 	}
 
-	json := httpResponse.Json()
+	json := resp.Json()
 
-	ctx.NewEmbed().
+	c.services.Embed.New(ctx).
 		AddField("Host", host).
 		AddField("Server Name", json.Get("hostname").MustString()).
 		AddField("Game Type", json.Get("gametype").MustString()).
@@ -454,7 +462,7 @@ func (c *GameCommands) fiveminfo(ctx *router.Ctx) {
 		Send()
 }
 
-var HLTBHeaders = map[string]string{
+var HLTBHeaders = http.WithHeaders(map[string]string{
 	"Authority":          "howlongtobeat.com",
 	"Method":             "POST",
 	"Path":               "/api/search",
@@ -471,10 +479,10 @@ var HLTBHeaders = map[string]string{
 	"Sec-Fetch-Mode":     "cors",
 	"Sec-Fetch-Site":     "same-origin",
 	"User-Agent":         discordgo.UserAgentWeb,
-}
+})
 
 func (c *GameCommands) hltbsearch(ctx *router.Ctx) {
-	resp, err := http.PostJson(
+	resp, err := http.DefaultClient().Post(
 		"https://howlongtobeat.com/api/search",
 		map[string]any{
 			"searchType":  "games",
@@ -506,15 +514,15 @@ func (c *GameCommands) hltbsearch(ctx *router.Ctx) {
 		return
 	}
 
-	if resp.Get("count").MustInt() == 0 {
+	if resp.Json().Get("count").MustInt() == 0 {
 		ctx.RespondText("No results found.")
 		return
 	}
 
 	var games []string
 
-	for i := 0; i < len(resp.Get("data").MustArray()); i++ {
-		game := resp.Get("data").GetIndex(i)
+	for i := 0; i < resp.Json().Get("data").Len(); i++ {
+		game := resp.Json().Get("data").Get(i)
 		games = append(games, fmt.Sprintf(
 			"%s (%d)",
 			game.Get("game_name").MustString(),
@@ -522,7 +530,7 @@ func (c *GameCommands) hltbsearch(ctx *router.Ctx) {
 		))
 	}
 
-	ctx.NewEmbed().
+	c.services.Embed.New(ctx).
 		AddField("Games", strings.Join(games, "\n")).
 		Send()
 }
@@ -534,37 +542,37 @@ func secondsToTime(seconds int) string {
 }
 
 func (c *GameCommands) hltbinfo(ctx *router.Ctx) {
-	httpResponse := http.Post(
+	resp, err := http.DefaultClient().Post(
 		"https://howlongtobeat.com/game?id="+ctx.Arguments.Get(0).Raw(),
 		nil,
 		HLTBHeaders,
 	)
-	if httpResponse.Error != nil {
-		ctx.RespondText("An error has occurred: %v", httpResponse.Error)
-		return
-	}
-
-	dataMatches := regexp.MustCompile("<script id=\"__NEXT_DATA__\" type=\"application/json\">(.*?)</script>").FindStringSubmatch(string(httpResponse.Body))
-	if len(dataMatches) < 2 {
-		ctx.RespondText("An error has occurred: No data matches")
-		return
-	}
-
-	json, err := simplejson.NewJson([]byte(dataMatches[1]))
 	if err != nil {
 		ctx.RespondText("An error has occurred: %v", err)
 		return
 	}
 
-	games := json.GetPath("props", "pageProps", "game", "data", "game")
-	if len(games.MustArray()) == 0 {
+	dataMatches := regexp.MustCompile("<script id=\"__NEXT_DATA__\" type=\"application/json\">(.*?)</script>").FindSubmatch(resp.MustGetBody())
+	if len(dataMatches) < 2 {
+		ctx.RespondText("An error has occurred: No data matches")
+		return
+	}
+
+	data, err := jester.NewJson(dataMatches[1])
+	if err != nil {
+		ctx.RespondText("An error has occurred: %v", err)
+		return
+	}
+
+	games := data.Get("props", "pageProps", "game", "data", "game")
+	if games.Len() == 0 {
 		ctx.RespondText("An error has occurred: Game not found")
 		return
 	}
 
-	game := games.GetIndex(0)
+	game := games.Get(0)
 
-	ctx.NewEmbed().
+	c.services.Embed.New(ctx).
 		AddField("Name", game.Get("game_name").MustString("None")).
 		AddField("Aliases", game.Get("game_alias").MustString("None")).
 		AddField("Main Story", secondsToTime(game.Get("comp_main").MustInt())).

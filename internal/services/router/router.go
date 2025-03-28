@@ -3,13 +3,11 @@ package router
 import (
 	"github.com/lb-selfbot/discordgo"
 	"github.com/lb-selfbot/selfbot/internal/services/config"
+	"github.com/lb-selfbot/selfbot/internal/services/eventbroker"
 )
 
 // Service is the interface for the router service.
 type Service interface {
-	// GetHandler returns the message create handler for the command router.
-	GetHandler() func(*discordgo.Session, *discordgo.MessageCreate)
-
 	// GetCategories returns all registered categories.
 	GetCategories() []*Category
 	// GetCategory returns the category with the given name.
@@ -45,7 +43,8 @@ type ExecutionHandler func(*Ctx)
 type Middleware func(following ExecutionHandler) ExecutionHandler
 
 type routerService struct {
-	cfgService config.Service
+	eventBroker eventbroker.Service
+	configSvc   config.Service
 
 	categories []*Category
 	commands   []*Command
@@ -55,18 +54,25 @@ type routerService struct {
 }
 
 // NewService creates a new router service.
-func NewService(cfg config.Service) *routerService {
-	return &routerService{
-		cfgService: cfg,
-	}
+func NewService(eventBroker eventbroker.Service, configSvc config.Service) *routerService {
+	svc := &routerService{eventBroker: eventBroker, configSvc: configSvc}
+	svc.subscribe()
+	return svc
+}
+
+func (r *routerService) subscribe() {
+	r.eventBroker.Subscribe(eventbroker.EventSessionReady, func(payload any) {
+		session, ok := payload.(*discordgo.Session)
+		if !ok {
+			return
+		}
+
+		session.AddHandler(r.handler)
+	})
 }
 
 func (r *routerService) getCommandPrefix() string {
-	return r.cfgService.GetConfig().Selfbot.CommandPrefix
-}
-
-func (r *routerService) GetHandler() func(*discordgo.Session, *discordgo.MessageCreate) {
-	return r.handler
+	return r.configSvc.GetConfig().Selfbot.CommandPrefix
 }
 
 func (r *routerService) RegisterCategory(category *Category, commands []*Command) {

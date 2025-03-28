@@ -2,12 +2,14 @@ package authsync
 
 import (
 	"context"
-	"encoding/json"
+	"errors"
 	"fmt"
 	"net/http"
 	"os"
 	"sync"
 	"time"
+
+	"github.com/goccy/go-json"
 
 	"github.com/gorilla/websocket"
 	"github.com/lb-selfbot/selfbot/internal/constants"
@@ -75,7 +77,7 @@ type authSyncService struct {
 
 // NewService creates a new instance of AuthSyncService.
 func NewService(eventBroker eventbroker.Service, configSvc config.Service, consoleSvc console.Service) Service {
-	svc := &authSyncService{eventBroker: eventBroker, consoleSvc: consoleSvc}
+	svc := &authSyncService{eventBroker: eventBroker, configSvc: configSvc, consoleSvc: consoleSvc}
 	svc.subscribe()
 	return svc
 }
@@ -91,6 +93,34 @@ func (a *authSyncService) subscribe() {
 
 		if err := a.SendSync(SyncTypeConfigUpdate, cfg); err != nil {
 			logging.Error("Failed to send config update sync:", err)
+		}
+	})
+
+	a.eventBroker.Subscribe(eventbroker.EventSetConsole, func(payload any) {
+		console, ok := payload.(string)
+		if !ok {
+			return
+		}
+
+		if err := a.SendSync(SyncTypeConsoleSet, console); err != nil {
+			logging.Error("Failed to send console set sync:", err)
+		}
+	})
+
+	a.eventBroker.Subscribe(eventbroker.EventAppendConsole, func(payload any) {
+		html, ok := payload.(string)
+		if !ok {
+			return
+		}
+
+		if err := a.SendSync(SyncTypeConsoleAppend, html); err != nil {
+			logging.Error("Failed to send console append sync:", err)
+		}
+	})
+
+	a.eventBroker.Subscribe(eventbroker.EventClearConsole, func(any) {
+		if err := a.SendSync(SyncTypeConsoleClear, nil); err != nil {
+			logging.Error("Failed to send console clear sync:", err)
 		}
 	})
 }
@@ -134,12 +164,13 @@ func (a *authSyncService) SendSync(syncType SyncType, data any) error {
 		}
 
 		// Remove sensitive data
-		cfg.Account.LightningBot.Password = ""
-		cfg.Account.Discord.Token = ""
+		cfgCopy := *cfg
+		cfgCopy.Account.LightningBot.Password = ""
+		cfgCopy.Account.Discord.Token = ""
 
 		msg = &WSMessage{
 			Op:   OpCodeConfigUpdate,
-			Data: WSData{Config: cfg},
+			Data: WSData{Config: &cfgCopy},
 		}
 
 	case SyncTypeConsoleAppend:
@@ -169,7 +200,7 @@ func (a *authSyncService) SendSync(syncType SyncType, data any) error {
 		}
 
 	default:
-		return fmt.Errorf("unsupported sync type: %s", syncType)
+		return fmt.Errorf("unsupported sync type: %d", syncType)
 	}
 
 	if err := a.write(msg); err != nil {
@@ -208,7 +239,7 @@ func (a *authSyncService) connectWS(context context.Context) error {
 		return err
 	}
 
-	hostname := "unknown"
+	var hostname string
 	if constants.HOSTING {
 		hostname = "LB Hosting"
 	} else {
@@ -325,13 +356,14 @@ func (a *authSyncService) ping(ctx context.Context) {
 }
 
 func (a *authSyncService) onError(err error) {
-	_ = a.conn.Close()
-	a.conn = nil
-
-	logging.Error("AuthSync error:", err)
+	if a.conn != nil {
+		_ = a.conn.Close()
+		a.conn = nil
+	}
 
 	// Check if the error was induced by the AuthSync server
-	if closeErr, ok := err.(*websocket.CloseError); ok && closeErr.Code > 3000 {
+	var closeErr *websocket.CloseError
+	if errors.As(err, &closeErr) && closeErr.Code > 3000 {
 		a.logError(err, closeErr.Code)
 		os.Exit(1)
 	}

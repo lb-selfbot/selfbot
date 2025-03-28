@@ -131,7 +131,6 @@ func (m *Mirror) Data() map[string]any {
 func (m *Mirror) Handler(session *discordgo.Session, event any) {
 	message, ok := event.(*discordgo.MessageCreate)
 	if !ok {
-		logging.Debug("Mirror.Handler: Event is not a message create event")
 		return
 	}
 

@@ -6,7 +6,6 @@ require (
 	github.com/LightningDev1/beeep v0.1.0
 	github.com/LightningDev1/go-foreground v0.0.0-20240212172534-661cc0000e42
 	github.com/LightningDev1/go-privnote v0.1.1
-	github.com/bitly/go-simplejson v0.5.1
 	github.com/bogdanfinn/fhttp v0.5.36
 	github.com/bogdanfinn/tls-client v1.8.0
 	github.com/brianvoe/gofakeit/v6 v6.28.0
@@ -19,14 +18,15 @@ require (
 	github.com/deadshot465/owoify-go v1.0.1
 	github.com/getsentry/sentry-go v0.31.1
 	github.com/go-json-experiment/json v0.0.0-20250211171154-1ae217ad3535
+	github.com/goccy/go-json v0.10.5
 	github.com/gorilla/websocket v1.5.3
 	github.com/hugolgst/rich-go v0.0.0-20240715122152-74618cc1ace2
 	github.com/kbinani/screenshot v0.0.0-20250118074034-a3924b7bbc8c
 	github.com/kkdai/youtube/v2 v2.10.3
-	github.com/lb-selfbot/discordgo v0.26.6-0.20250323160117-7b03d5e03747
+	github.com/lb-selfbot/discordgo v0.26.6-0.20250328184310-42ba2a23aa9b
+	github.com/lb-selfbot/go-jester v0.3.0
 	github.com/mr-tron/base58 v1.2.0
 	github.com/multiformats/go-base36 v0.2.0
-	github.com/robert-nix/ansihtml v1.0.1
 	github.com/shirou/gopsutil/v4 v4.25.2
 	github.com/traefik/yaegi v0.16.1
 	golang.org/x/crypto v0.36.0
@@ -34,14 +34,16 @@ require (
 	golang.org/x/sys v0.31.0
 	golang.org/x/term v0.30.0
 	golang.org/x/text v0.23.0
-	google.golang.org/protobuf v1.36.5
+	google.golang.org/protobuf v1.36.6
 )
 
 require (
 	github.com/BurntSushi/xgb v0.0.0-20210121224620-deaf085860bc // indirect
+	github.com/agnivade/levenshtein v1.2.1 // indirect
 	github.com/andybalholm/brotli v1.1.1 // indirect
 	github.com/atotto/clipboard v0.1.4 // indirect
 	github.com/aymanbagabas/go-osc52/v2 v2.0.1 // indirect
+	github.com/bitly/go-simplejson v0.5.1 // indirect
 	github.com/bogdanfinn/utls v1.6.5 // indirect
 	github.com/charmbracelet/colorprofile v0.2.3-0.20250311203215-f60798e515dc // indirect
 	github.com/charmbracelet/x/ansi v0.8.0 // indirect
@@ -77,7 +79,7 @@ require (
 	github.com/nu7hatch/gouuid v0.0.0-20131221200532-179d4d0c4d8d // indirect
 	github.com/power-devops/perfstat v0.0.0-20240221224432-82ca36839d55 // indirect
 	github.com/progrium/macdriver v0.5.0-preview.0.20240129182626-6a98f82290e5 // indirect
-	github.com/quic-go/quic-go v0.50.0 // indirect
+	github.com/quic-go/quic-go v0.50.1 // indirect
 	github.com/rivo/uniseg v0.4.7 // indirect
 	github.com/sahilm/fuzzy v0.1.1 // indirect
 	github.com/tadvi/systray v0.0.0-20190226123456-11a2b8fa57af // indirect
@@ -86,7 +88,7 @@ require (
 	github.com/tklauser/numcpus v0.9.0 // indirect
 	github.com/xo/terminfo v0.0.0-20220910002029-abceb7e1c41e // indirect
 	github.com/yusufpapurcu/wmi v1.2.4 // indirect
-	golang.org/x/net v0.36.0 // indirect
+	golang.org/x/net v0.38.0 // indirect
 	golang.org/x/sync v0.12.0 // indirect
 	gopkg.in/natefinch/npipe.v2 v2.0.0-20160621034901-c1b8fa8bdcce // indirect
 )

@@ -122,19 +122,19 @@ func (c *CurrencyCommands) generateAddressFunc(name, shortCode string, power int
 
 		url := fmt.Sprintf("https://api.blockcypher.com/v1/%s/main/addrs/%s", strings.ToLower(shortCode), url.PathEscape(address))
 
-		httpResponse := http.Get(url)
-		if httpResponse.Error != nil {
+		resp, err := http.DefaultClient().Get(url)
+		if err != nil {
 			ctx.RespondText("An error has occurred.")
 			return
 		}
 
-		json := httpResponse.Json()
+		json := resp.Json()
 		balance := float64(json.Get("final_balance").MustInt64()) / math.Pow10(power)
 		transactions := fmt.Sprint(json.Get("final_n_tx").MustInt64())
 		totalReceived := float64(json.Get("total_received").MustInt64()) / math.Pow10(power)
 		totalSent := float64(json.Get("total_sent").MustInt64()) / math.Pow10(power)
 
-		ctx.NewEmbed().
+		c.services.Embed.New(ctx).
 			SetDescription("%s Address Info", name).
 			AddField("Address", address, true).
 			AddField("Balance", fmt.Sprintf("%.8f %s", balance, shortCode), true).
@@ -155,20 +155,20 @@ func (c *CurrencyCommands) generateTransactionFunc(name, shortCode string, power
 
 		url := fmt.Sprintf("https://api.blockcypher.com/v1/%s/main/txs/%s", strings.ToLower(shortCode), url.PathEscape(hash))
 
-		httpResponse := http.Get(url)
-		if httpResponse.Error != nil {
+		resp, err := http.DefaultClient().Get(url)
+		if err != nil {
 			ctx.RespondText("An error has occurred.")
 			return
 		}
 
-		json := httpResponse.Json()
+		json := resp.Json()
 		total := float64(json.Get("total").MustInt64()) / math.Pow10(power)
 		fees := float64(json.Get("fees").MustInt64()) / math.Pow10(power)
 		confirmations := fmt.Sprint(json.Get("confirmations").MustInt64())
 		received := json.Get("received").MustString()
-		addresses := strings.Join(json.Get("addresses").MustStringArray(), ",\n")
+		addresses := strings.Join(json.Get("addresses").MustStringSlice(), ",\n")
 
-		ctx.NewEmbed().
+		c.services.Embed.New(ctx).
 			SetDescription("%s Transaction Info", name).
 			AddField("Transaction Hash", hash, true).
 			AddField("Total Amount", fmt.Sprintf("%.8f %s", total, shortCode), true).
@@ -186,16 +186,16 @@ func (c *CurrencyCommands) priceinfo(ctx *router.Ctx) {
 		to = "USD,EUR"
 	}
 
-	httpResponse := http.Get(fmt.Sprintf("https://min-api.cryptocompare.com/data/pricemultifull?fsyms=%s&tsyms=%s", from, to))
-	if httpResponse.Error != nil {
-		ctx.RespondText("An error has occurred: %v", httpResponse.Error)
+	resp, err := http.DefaultClient().Get(fmt.Sprintf("https://min-api.cryptocompare.com/data/pricemultifull?fsyms=%s&tsyms=%s", from, to))
+	if err != nil {
+		ctx.RespondText("An error has occurred: %v", err)
 		return
 	}
 
-	json := httpResponse.Json()
+	json := resp.Json()
 
 	if msg := json.Get("Message").MustString(); msg != "" {
-		ctx.RespondText("An error has occurred: " + msg)
+		ctx.RespondText("%s", "An error has occurred: "+msg)
 		return
 	}
 
@@ -224,7 +224,7 @@ func (c *CurrencyCommands) priceinfo(ctx *router.Ctx) {
 		}
 	}
 
-	emb := ctx.NewEmbed()
+	emb := c.services.Embed.New(ctx)
 
 	for k, v := range parsed {
 		emb.AddField(k, v)
@@ -236,26 +236,26 @@ func (c *CurrencyCommands) priceinfo(ctx *router.Ctx) {
 func (c *CurrencyCommands) searchsymbol(ctx *router.Ctx) {
 	uri := fmt.Sprintf(
 		"https://www.alphavantage.co/query?function=SYMBOL_SEARCH&keywords=%s&apikey=KBJ3RJS2JAYNH3WD",
-		url.QueryEscape(ctx.Arguments.Raw()),
+		ctx.Arguments.Escaped(),
 	)
 
-	httpResponse := http.Get(uri)
-	if httpResponse.Error != nil {
-		ctx.RespondText("An error occurred: %v", httpResponse.Error)
+	resp, err := http.DefaultClient().Get(uri)
+	if err != nil {
+		ctx.RespondText("An error occurred: %v", err)
 		return
 	}
 
-	bestMatches := httpResponse.Json().Get("bestMatches")
+	bestMatches := resp.Json().Get("bestMatches")
 
-	if len(bestMatches.MustArray()) == 0 {
+	if bestMatches.Len() == 0 {
 		ctx.RespondText("No results found")
 		return
 	}
 
-	emb := ctx.NewEmbed()
+	emb := c.services.Embed.New(ctx)
 
-	for i := range bestMatches.MustArray() {
-		stock := bestMatches.GetIndex(i)
+	for i := range bestMatches.MustSlice() {
+		stock := bestMatches.Get(i)
 
 		info := fmt.Sprintf(
 			"Symbol: %s\nName: %s",
@@ -277,20 +277,20 @@ func (c *CurrencyCommands) symbolinfo(ctx *router.Ctx) {
 		symbol,
 	)
 
-	httpResponse := http.Get(uri)
-	if httpResponse.Error != nil {
-		ctx.RespondText("An error occurred: %v", httpResponse.Error)
+	resp, err := http.DefaultClient().Get(uri)
+	if err != nil {
+		ctx.RespondText("An error occurred: %v", err)
 		return
 	}
 
-	globalQuote := httpResponse.Json().Get("Global Quote")
+	globalQuote := resp.Json().Get("Global Quote")
 
 	if len(globalQuote.MustMap()) == 0 {
 		ctx.RespondText("No results found")
 		return
 	}
 
-	emb := ctx.NewEmbed().
+	emb := c.services.Embed.New(ctx).
 		SetDescription("Stock info for %s", symbol)
 
 	for key := range globalQuote.MustMap() {

@@ -29,12 +29,26 @@ type Phishing struct {
 }
 
 func NewPhishing(eventBroker eventbroker.Service, configSvc config.Service) *Phishing {
-	return &Phishing{
-		eventBroker:       eventBroker,
-		configSvc:         configSvc,
-		phishingDomains:   http.Get(phishingDomainsURL).Json().Get("domains").MustStringArray(),
-		suspiciousDomains: http.Get(suspiciousDomainsURL).Json().Get("domains").MustStringArray(),
+	phishing := &Phishing{
+		eventBroker: eventBroker,
+		configSvc:   configSvc,
 	}
+
+	resp, err := http.DefaultClient().Get(phishingDomainsURL)
+	if err != nil {
+		logging.Error("Phishing.NewPhishing: Failed to fetch phishing domains:", err)
+		return nil
+	}
+	phishing.phishingDomains = resp.Json().Get("domains").MustStringSlice()
+
+	resp, err = http.DefaultClient().Get(suspiciousDomainsURL)
+	if err != nil {
+		logging.Error("Phishing.NewPhishing: Failed to fetch suspicious domains:", err)
+		return nil
+	}
+	phishing.suspiciousDomains = resp.Json().Get("domains").MustStringSlice()
+
+	return phishing
 }
 
 func (p *Phishing) Type() types.EventReactionType {
@@ -58,7 +72,6 @@ func (p *Phishing) Data() map[string]any {
 func (p *Phishing) Handler(session *discordgo.Session, event any) {
 	message, ok := event.(*discordgo.MessageCreate)
 	if !ok {
-		logging.Debug("Phishing.Handler: Event is not a message create event")
 		return
 	}
 

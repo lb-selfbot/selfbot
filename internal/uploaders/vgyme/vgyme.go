@@ -7,7 +7,7 @@ import (
 	"mime/multipart"
 	"net/http"
 
-	"github.com/bitly/go-simplejson"
+	"github.com/lb-selfbot/go-jester"
 	"github.com/lb-selfbot/selfbot/internal/uploaders"
 	"github.com/lb-selfbot/selfbot/internal/uploaders/keys"
 )
@@ -52,22 +52,22 @@ func (Vgyme) Upload(file *bytes.Buffer, filename string) (*uploaders.UploadResul
 	}
 	defer resp.Body.Close()
 
-	json, err := simplejson.NewFromReader(resp.Body)
+	data, err := jester.NewReader(resp.Body)
 	if err != nil {
 		return nil, err
 	}
 
 	if resp.StatusCode != 200 {
-		return nil, fmt.Errorf("invalid vgy.me response: %s", json.MustMap())
+		return nil, fmt.Errorf("invalid vgy.me response: %s", data.MustMap())
 	}
 
-	if json.Get("error").MustBool() {
-		return nil, fmt.Errorf("invalid vgy.me response: %s", json.MustMap())
+	if data.Get("error").MustBool() {
+		return nil, fmt.Errorf("invalid vgy.me response: %s", data.MustMap())
 	}
 
 	result := &uploaders.UploadResult{
-		URL:       json.Get("url").MustString(),
-		DirectURL: json.Get("image").MustString(),
+		URL:       data.Get("url").MustString(),
+		DirectURL: data.Get("image").MustString(),
 	}
 
 	return result, nil

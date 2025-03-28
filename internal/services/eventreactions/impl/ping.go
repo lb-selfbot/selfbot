@@ -8,6 +8,7 @@ import (
 	"github.com/lb-selfbot/selfbot/internal/api"
 	"github.com/lb-selfbot/selfbot/internal/http"
 	"github.com/lb-selfbot/selfbot/internal/logging"
+	"github.com/lb-selfbot/selfbot/internal/services/config"
 	"github.com/lb-selfbot/selfbot/internal/services/eventbroker"
 	"github.com/lb-selfbot/selfbot/internal/services/eventreactions/types"
 
@@ -17,6 +18,7 @@ import (
 
 type Ping struct {
 	eventBroker eventbroker.Service
+	configSvc   config.Service
 
 	ReactionType types.EventReactionType
 	Guild        *discordgo.Guild
@@ -26,16 +28,17 @@ type Ping struct {
 	Reaction     string
 }
 
-func NewPingReaction(eventBroker eventbroker.Service, reactionType types.EventReactionType, guild *discordgo.Guild, channel *discordgo.Channel) *Ping {
+func NewPingReaction(eventBroker eventbroker.Service, configSvc config.Service, reactionType types.EventReactionType, guild *discordgo.Guild, channel *discordgo.Channel) *Ping {
 	return &Ping{
 		eventBroker:  eventBroker,
+		configSvc:    configSvc,
 		ReactionType: reactionType,
 		Guild:        guild,
 		Channel:      channel,
 	}
 }
 
-func NewPingFromData(eventBroker eventbroker.Service, session *discordgo.Session, reactionType types.EventReactionType, data map[string]any) (*Ping, error) {
+func NewPingFromData(eventBroker eventbroker.Service, configSvc config.Service, session *discordgo.Session, reactionType types.EventReactionType, data map[string]any) (*Ping, error) {
 	var guild *discordgo.Guild
 	var channel *discordgo.Channel
 
@@ -55,7 +58,7 @@ func NewPingFromData(eventBroker eventbroker.Service, session *discordgo.Session
 		return nil, fmt.Errorf("invalid ping data")
 	}
 
-	reaction := NewPingReaction(eventBroker, reactionType, guild, channel)
+	reaction := NewPingReaction(eventBroker, configSvc, reactionType, guild, channel)
 
 	reaction.System, _ = data["system"].(string)
 	reaction.Response, _ = data["response"].(string)
@@ -147,7 +150,6 @@ func (p *Ping) Data() map[string]any {
 func (p *Ping) Handler(session *discordgo.Session, event any) {
 	message, ok := event.(*discordgo.MessageCreate)
 	if !ok {
-		logging.Debug("Ping.Handler: Event is not a message create event")
 		return
 	}
 
@@ -193,8 +195,13 @@ func (p *Ping) Handler(session *discordgo.Session, event any) {
 		until := time.Now().Add(5 * time.Minute)
 		_ = session.GuildMemberTimeout(member.GuildID, member.User.ID, &until)
 	case types.PingInsult:
-		httpResponse := http.Get("https://evilinsult.com/generate_insult.php?lang=en")
-		insult := message.Author.Mention() + " " + string(httpResponse.Body)
+		resp, err := http.DefaultClient().Get("https://evilinsult.com/generate_insult.php?lang=en")
+		if err != nil {
+			logging.Error("Ping.Handler: Failed to get insult:", err)
+			return
+		}
+
+		insult := message.Author.Mention() + " " + string(resp.MustGetBody())
 
 		m, err := session.ChannelMessageSend(message.ChannelID, insult)
 		if err != nil {
@@ -213,7 +220,14 @@ func (p *Ping) Handler(session *discordgo.Session, event any) {
 		p.eventBroker.Publish(eventbroker.EventHandleReactionMessage, m)
 	case types.PingAIResponse:
 		system := utils.Misc.CreateAISystemPing(p.System, session, message.Message)
-		response, err := api.GPT(system, message.Content)
+
+		cfg := p.configSvc.GetConfig()
+		creds := api.LBCreds{
+			Username: cfg.Account.LightningBot.Username,
+			Password: cfg.Account.LightningBot.Password,
+		}
+
+		response, err := api.LBGPT(creds, system, message.Content)
 		if err != nil {
 			logging.Error("Ping.Handler: Failed to get AI response:", err)
 			return

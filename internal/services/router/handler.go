@@ -8,6 +8,8 @@ import (
 	"github.com/lb-selfbot/discordgo"
 	"github.com/lb-selfbot/selfbot/internal/constants"
 	"github.com/lb-selfbot/selfbot/internal/fn"
+	"github.com/lb-selfbot/selfbot/internal/services/eventbroker"
+	"github.com/lb-selfbot/selfbot/internal/services/ui/featurelogs"
 )
 
 // regexSplitting represents the regex to split the arguments at.
@@ -23,7 +25,7 @@ func (r *routerService) isUserAllowed(ctx *Ctx) bool {
 		return true
 	}
 
-	cfg := r.cfgService.GetConfig()
+	cfg := r.configSvc.GetConfig()
 
 	if !slices.Contains(cfg.Sharing.SharedUsers, ctx.Message.Author.ID) {
 		return false
@@ -83,7 +85,7 @@ func (r *routerService) handler(session *discordgo.Session, message *discordgo.M
 
 		ctx := &Ctx{
 			Router:    r,
-			configSvc: r.cfgService,
+			configSvc: r.configSvc,
 			Command:   cmd,
 			Session:   session,
 			Message:   message.Message,
@@ -94,6 +96,8 @@ func (r *routerService) handler(session *discordgo.Session, message *discordgo.M
 		if !r.isUserAllowed(ctx) {
 			return
 		}
+
+		r.eventBroker.Publish(eventbroker.EventLogFeature, &featurelogs.CmdUsed{Name: cmd.Name})
 
 		r.triggerCommand(ctx)
 		r.usedCmds++
@@ -136,7 +140,7 @@ func (r *routerService) triggerSubCommand(ctx *Ctx) bool {
 
 	subCtx := &Ctx{
 		Router:    r,
-		configSvc: r.cfgService,
+		configSvc: r.configSvc,
 		Command:   subCmd,
 		Session:   ctx.Session,
 		Message:   ctx.Message,

@@ -81,7 +81,6 @@ func (f *ForceKick) Data() map[string]any {
 func (f *ForceKick) Handler(session *discordgo.Session, event any) {
 	memberAdd, ok := event.(*discordgo.GuildMemberAdd)
 	if !ok {
-		logging.Debug("ForceKick.Handler: Event is not a guild member update event")
 		return
 	}
 

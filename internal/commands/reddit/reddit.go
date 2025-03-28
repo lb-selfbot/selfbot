@@ -96,7 +96,7 @@ func (c *RedditCommands) generateFunc(subreddit string) func(ctx *router.Ctx) {
 			return
 		}
 
-		ctx.NewEmbed().
+		c.services.Embed.New(ctx).
 			AddField("Subreddit", subreddit).
 			AddField("Title", post.Title).
 			AddField("URL", post.ImageURL).
@@ -113,7 +113,7 @@ func (c *RedditCommands) subreddit(ctx *router.Ctx) {
 		return
 	}
 
-	ctx.NewEmbed().
+	c.services.Embed.New(ctx).
 		AddField("Subreddit", subreddit).
 		AddField("Title", post.Title).
 		AddField("URL", post.ImageURL).

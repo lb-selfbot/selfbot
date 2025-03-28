@@ -37,7 +37,7 @@ func (c *SessionsCommands) Register() {
 }
 
 func (c *SessionsCommands) viewgatewaysessions(ctx *router.Ctx) {
-	emb := ctx.NewEmbed().
+	emb := c.services.Embed.New(ctx).
 		SetDescription("Sessions")
 
 	for index, session := range c.services.Sessions.GetGatewaySessions() {
@@ -64,7 +64,7 @@ func (c *SessionsCommands) viewgatewaysessions(ctx *router.Ctx) {
 }
 
 func (c *SessionsCommands) viewloginsessions(ctx *router.Ctx) {
-	emb := ctx.NewEmbed().
+	emb := c.services.Embed.New(ctx).
 		SetDescription("Sessions")
 
 	for index, session := range c.services.Sessions.GetLoginSessions() {

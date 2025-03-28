@@ -38,13 +38,14 @@ func NewService() Service {
 }
 
 func (c *configService) GetConfig() *Config {
-	if c.configDate.IsZero() || time.Since(c.configDate).Minutes() > 1 {
-		_ = c.LoadConfig()
-		c.configDate = time.Now()
-	}
-
 	c.configMu.RLock()
 	defer c.configMu.RUnlock()
+
+	if c.config == nil || c.configDate.IsZero() || time.Since(c.configDate).Minutes() > 1 {
+		c.configMu.RUnlock()
+		_ = c.LoadConfig()
+		c.configMu.RLock()
+	}
 
 	return c.config
 }
@@ -56,16 +57,20 @@ func (c *configService) LoadConfig() error {
 	cfgFile, err := os.Open(filepath.Join(utils.IO.GetMainFolder(), "Config", "config.json"))
 	if err != nil {
 		if os.IsNotExist(err) {
-			return c.setupDefaultConfig()
+			c.configDate = time.Now()
+			return c.getDefaultConfig()
 		}
 
 		return err
 	}
 	defer cfgFile.Close()
 
-	if err := json.NewDecoder(cfgFile).Decode(c.config); err != nil {
-		return err
+	if err := json.NewDecoder(cfgFile).Decode(&c.config); err != nil {
+		c.configDate = time.Now()
+		return c.getDefaultConfig()
 	}
+
+	c.configDate = time.Now()
 
 	time.Local = c.config.GetTimezone()
 
@@ -102,11 +107,11 @@ func (c *configService) SetConfigFromUI(cfg *Config) {
 	c.configDate = time.Now()
 }
 
-func (c *configService) setupDefaultConfig() error {
+func (c *configService) getDefaultConfig() error {
 	data, err := assets.ReadFile(assets.AssetDefaultConfig)
 	if err != nil {
 		return err
 	}
 
-	return json.Unmarshal(data, c.config)
+	return json.Unmarshal(data, &c.config)
 }

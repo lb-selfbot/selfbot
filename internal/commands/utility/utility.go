@@ -2,7 +2,6 @@ package utility
 
 import (
 	"bytes"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"go/token"
@@ -10,6 +9,7 @@ import (
 	"image/png"
 	"io"
 	"math"
+	"net"
 	nethttp "net/http"
 	"net/url"
 	"os"
@@ -24,8 +24,11 @@ import (
 	"strings"
 	"time"
 
+	"github.com/goccy/go-json"
+
 	"github.com/lb-selfbot/selfbot/internal/conversion"
 	"github.com/lb-selfbot/selfbot/internal/logging"
+	"github.com/lb-selfbot/selfbot/internal/network"
 	"github.com/lb-selfbot/selfbot/internal/random"
 	"github.com/lb-selfbot/selfbot/internal/services/config"
 	"github.com/lb-selfbot/selfbot/internal/services/eventbroker"
@@ -35,7 +38,6 @@ import (
 	"github.com/lb-selfbot/selfbot/internal/services"
 
 	"github.com/LightningDev1/go-foreground"
-	"github.com/bitly/go-simplejson"
 	"github.com/kbinani/screenshot"
 	"github.com/kkdai/youtube/v2"
 	"github.com/lb-selfbot/discordgo/protos"
@@ -885,8 +887,8 @@ func (c *UtilityCommands) copyserver(ctx *router.Ctx) {
 
 	time.Sleep(duration)
 
-	iconResp := http.Get(guild.IconURL())
-	icon := utils.Misc.ImageToBase64(iconResp.Body)
+	resp, _ := http.DefaultClient().Get(guild.IconURL())
+	icon := utils.Misc.ImageToBase64(resp.MustGetBody())
 
 	_, _ = ctx.Session.GuildEdit(newGuild.ID, &discordgo.GuildParams{
 		VerificationLevel:           &guild.VerificationLevel,
@@ -1009,7 +1011,7 @@ func (c *UtilityCommands) copyserver(ctx *router.Ctx) {
 			time.Sleep(duration)
 		}
 	}
-	ctx.NewEmbed().
+	c.services.Embed.New(ctx).
 		SetDescription("Server copied successfully!").
 		Send()
 }
@@ -1149,7 +1151,7 @@ func (c *UtilityCommands) adminservers(ctx *router.Ctx) {
 		}
 	}
 
-	ctx.NewEmbed().
+	c.services.Embed.New(ctx).
 		AddField("Admin Servers", adminServerString).
 		Send()
 }
@@ -1163,7 +1165,7 @@ func (c *UtilityCommands) admingroups(ctx *router.Ctx) {
 			}
 		}
 	}
-	ctx.NewEmbed().
+	c.services.Embed.New(ctx).
 		AddField("Admin Groups", adminGroupsString).
 		Send()
 }
@@ -1181,7 +1183,7 @@ func (c *UtilityCommands) joinvc(ctx *router.Ctx) {
 		return
 	}
 
-	ctx.RespondText("Joined channel " + channel.Name)
+	ctx.RespondText("%s", "Joined channel "+channel.Name)
 }
 
 func (c *UtilityCommands) snipe(ctx *router.Ctx) {
@@ -1193,7 +1195,7 @@ func (c *UtilityCommands) snipe(ctx *router.Ctx) {
 
 	messages := c.services.EventReactions.GetDeletedMessages(channel.ID)
 	if len(messages) == 0 {
-		ctx.NewEmbed().
+		c.services.Embed.New(ctx).
 			SetDescription("No deleted message was found in this channel!").
 			Send()
 		return
@@ -1226,7 +1228,7 @@ func (c *UtilityCommands) snipe(ctx *router.Ctx) {
 		)
 	}
 
-	ctx.NewEmbed().
+	c.services.Embed.New(ctx).
 		AddField("Deleted Messages", formatted).
 		Send()
 }
@@ -1240,14 +1242,14 @@ func (c *UtilityCommands) editsnipe(ctx *router.Ctx) {
 
 	messages := c.services.EventReactions.GetEditedMessages(channel.ID)
 	if len(messages) == 0 {
-		ctx.NewEmbed().
+		c.services.Embed.New(ctx).
 			SetDescription("No deleted message was found in this channel!").
 			Send()
 		return
 	}
 
 	message := messages[len(messages)-1]
-	emb := ctx.NewEmbed()
+	emb := c.services.Embed.New(ctx)
 	if message.Author != nil {
 		emb.AddField("Author", message.Author.String()+" | "+message.Author.ID)
 	}
@@ -1272,7 +1274,7 @@ func (c *UtilityCommands) firstmessage(ctx *router.Ctx) {
 		ctx.RespondText("Error getting messages")
 		return
 	}
-	ctx.NewEmbed().
+	c.services.Embed.New(ctx).
 		SetDescription("First Message").
 		AddField("Author", messages[0].Author.String()).
 		AddField("Message", messages[0].Content).
@@ -1292,23 +1294,21 @@ func (c *UtilityCommands) hypesquad(ctx *router.Ctx) {
 		return
 	}
 
-	err := api.SetHypesquad(ctx.Session, house)
-	if err != nil {
+	if err := c.services.Discord.SetHypesquad(house); err != nil {
 		ctx.RespondText("Error setting hypesquad: %v", err)
 	}
 
-	ctx.NewEmbed().
+	c.services.Embed.New(ctx).
 		SetDescription("Hypesquad set successfully!").
 		Send()
 }
 
 func (c *UtilityCommands) leavehypesquad(ctx *router.Ctx) {
-	err := api.LeaveHypesquad(ctx.Session)
-	if err != nil {
+	if err := c.services.Discord.LeaveHypesquad(); err != nil {
 		ctx.RespondText("Error leaving hypesquad: %v", err)
 	}
 
-	ctx.NewEmbed().
+	c.services.Embed.New(ctx).
 		SetDescription("Left hypesquad successfully!").
 		Send()
 }
@@ -1333,7 +1333,7 @@ func (c *UtilityCommands) theme(ctx *router.Ctx) {
 		return
 	}
 
-	ctx.NewEmbed().
+	c.services.Embed.New(ctx).
 		SetDescription("Theme set successfully!").
 		Send()
 }
@@ -1352,7 +1352,7 @@ func (c *UtilityCommands) compact(ctx *router.Ctx) {
 		return
 	}
 
-	ctx.NewEmbed().
+	c.services.Embed.New(ctx).
 		SetDescription("Compact mode set successfully!").
 		Send()
 }
@@ -1371,13 +1371,13 @@ func (c *UtilityCommands) devmode(ctx *router.Ctx) {
 		return
 	}
 
-	ctx.NewEmbed().
+	c.services.Embed.New(ctx).
 		SetDescription("Developer mode set successfully!").
 		Send()
 }
 
 func (c *UtilityCommands) sessionid(ctx *router.Ctx) {
-	ctx.NewEmbed().
+	c.services.Embed.New(ctx).
 		AddField("Session ID", ctx.Session.State.SessionID).
 		Send()
 }
@@ -1388,13 +1388,13 @@ func (c *UtilityCommands) aboutme(ctx *router.Ctx) {
 		bio = nil
 	}
 
-	err := api.ChangeSettings(ctx.Session, "/profile", map[string]any{"bio": bio})
+	err := c.services.Discord.UpdateSettings("/profile", map[string]any{"bio": bio})
 	if err != nil {
 		ctx.RespondText("Error setting bio: %v", err)
 		return
 	}
 
-	ctx.NewEmbed().
+	c.services.Embed.New(ctx).
 		SetDescription("Bio set successfully!").
 		Send()
 }
@@ -1405,25 +1405,25 @@ func (c *UtilityCommands) displayname(ctx *router.Ctx) {
 		globalName = nil
 	}
 
-	err := api.ChangeSettings(ctx.Session, "", map[string]any{"global_name": globalName})
+	err := c.services.Discord.UpdateSettings("", map[string]any{"global_name": globalName})
 	if err != nil {
 		ctx.RespondText("Error setting display name: %v", err)
 		return
 	}
 
-	ctx.NewEmbed().
+	c.services.Embed.New(ctx).
 		SetDescription("Display name set successfully!").
 		Send()
 }
 
 func (c *UtilityCommands) pronouns(ctx *router.Ctx) {
-	err := api.ChangeSettings(ctx.Session, "/profile", map[string]any{"pronouns": ctx.Arguments.Raw()})
+	err := c.services.Discord.UpdateSettings("/profile", map[string]any{"pronouns": ctx.Arguments.Raw()})
 	if err != nil {
 		ctx.RespondText("Error setting pronouns: %v", err)
 		return
 	}
 
-	ctx.NewEmbed().
+	c.services.Embed.New(ctx).
 		SetDescription("Pronouns set successfully!").
 		Send()
 }
@@ -1443,7 +1443,7 @@ func (c *UtilityCommands) nickscan(ctx *router.Ctx) {
 		}
 	}
 
-	ctx.NewEmbed().
+	c.services.Embed.New(ctx).
 		AddField("Nicknames", nickText).
 		Send()
 }
@@ -1474,9 +1474,9 @@ func (c *UtilityCommands) getmessagejson(ctx *router.Ctx) {
 		return
 	}
 
-	ctx.NewEmbed().
+	c.services.Embed.New(ctx).
 		SetTitle("Message JSON").
-		SetDescription(string(jsonData)).
+		SetDescription("%s", string(jsonData)).
 		Send()
 }
 
@@ -1506,9 +1506,9 @@ func (c *UtilityCommands) getembedjson(ctx *router.Ctx) {
 		return
 	}
 
-	ctx.NewEmbed().
+	c.services.Embed.New(ctx).
 		SetTitle("Message JSON").
-		SetDescription(string(jsonData)).
+		SetDescription("%s", string(jsonData)).
 		Send()
 }
 
@@ -1576,8 +1576,8 @@ func (c *UtilityCommands) sendinterval(ctx *router.Ctx) {
 }
 
 func (c *UtilityCommands) optionpoll(ctx *router.Ctx) {
-	messages := ctx.NewEmbed().
-		SetDescription("Poll: "+ctx.Arguments.Get(0).Raw()).
+	messages := c.services.Embed.New(ctx).
+		SetDescription("%s", "Poll: "+ctx.Arguments.Get(0).Raw()).
 		AddField("👍", ctx.Arguments.Get(0).Raw()).
 		AddField("👎", ctx.Arguments.Get(0).Raw()).
 		Send()
@@ -1653,26 +1653,13 @@ func (c *UtilityCommands) discordpoll(ctx *router.Ctx) {
 func (c *UtilityCommands) checktoken(ctx *router.Ctx) {
 	token := ctx.Arguments.Get(0).Raw()
 
-	response, err := api.GetTokenData(ctx.Session, token)
-	if err != nil {
-		if !bytes.Contains(response, []byte("401: Unauthorized")) {
-			ctx.RespondText("An error has occurred: %v", err)
-			return
-		}
-
-		ctx.NewEmbed().
-			AddField("Status", "Invalid Token").
-			Send()
-		return
-	}
-
-	tokenData, err := simplejson.NewJson(response)
+	tokenData, err := c.services.Discord.GetTokenInfo(token)
 	if err != nil {
 		ctx.RespondText("An error has occurred: %v", err)
 		return
 	}
 
-	ctx.NewEmbed().
+	c.services.Embed.New(ctx).
 		AddField("Status", "Valid Token").
 		AddField("Username", fmt.Sprintf("%s#%s", tokenData.Get("username").MustString(), tokenData.Get("discriminator").MustString())).
 		AddField("ID", tokenData.Get("id").MustString()).
@@ -1692,18 +1679,18 @@ func (c *UtilityCommands) checktoken(ctx *router.Ctx) {
 }
 
 func (c *UtilityCommands) discordstatus(ctx *router.Ctx) {
-	httpResponse := http.Get("https://srhpyqt94yxb.statuspage.io/api/v2/summary.json")
-	if httpResponse.Error != nil {
+	resp, err := http.DefaultClient().Get("https://srhpyqt94yxb.statuspage.io/api/v2/summary.json")
+	if err != nil {
 		ctx.RespondText("An error has occurred.")
 		return
 	}
 
-	components := httpResponse.Json().Get("components")
+	components := resp.Json().Get("components")
 
-	emb := ctx.NewEmbed()
+	emb := c.services.Embed.New(ctx)
 
-	for i := 0; i < len(components.MustArray()); i++ {
-		component := components.GetIndex(i)
+	for i := 0; i < components.Len(); i++ {
+		component := components.Get(i)
 		emb.AddField(
 			component.Get("name").MustString(),
 			component.Get("status").MustString(),
@@ -1724,8 +1711,8 @@ func (c *UtilityCommands) dashboard(*router.Ctx) {
 }
 
 func (c *UtilityCommands) changelog(ctx *router.Ctx) {
-	resp, err := http.PostJson(
-		"https://api.lightning-bot.com/api/v3/selfbot/check-version",
+	resp, err := http.DefaultClient().Post(
+		"https://api.LBlightning-bot.com/api/v3/selfbot/check-version",
 		map[string]string{"branch": "selfbot", "version": ""},
 	)
 	if err != nil {
@@ -1733,15 +1720,15 @@ func (c *UtilityCommands) changelog(ctx *router.Ctx) {
 		return
 	}
 
-	ctx.NewEmbed().
-		AddField("Latest Version", resp.GetPath("latest", "version").MustString()).
-		AddField("Changelog", resp.GetPath("latest", "changelog").MustString()).
+	c.services.Embed.New(ctx).
+		AddField("Latest Version", resp.Json().Get("latest", "version").MustString()).
+		AddField("Changelog", resp.Json().Get("latest", "changelog").MustString()).
 		Send()
 }
 
 func (c *UtilityCommands) version(ctx *router.Ctx) {
-	resp, err := http.PostJson(
-		"https://api.lightning-bot.com/api/v3/selfbot/check-version",
+	resp, err := http.DefaultClient().Post(
+		"https://api.LBlightning-bot.com/api/v3/selfbot/check-version",
 		map[string]string{"branch": "selfbot", "version": ""},
 	)
 	if err != nil {
@@ -1749,14 +1736,14 @@ func (c *UtilityCommands) version(ctx *router.Ctx) {
 		return
 	}
 
-	ctx.NewEmbed().
+	c.services.Embed.New(ctx).
 		AddField("Current Version", constants.VERSION[1:]).
-		AddField("Latest Version", resp.GetPath("latest", "version").MustString()).
+		AddField("Latest Version", resp.Json().Get("latest", "version").MustString()).
 		Send()
 }
 
 func (c *UtilityCommands) uptime(ctx *router.Ctx) {
-	ctx.NewEmbed().
+	c.services.Embed.New(ctx).
 		AddField("Uptime", utils.Misc.FormatDuration(time.Since(constants.START_TIME))).
 		Send()
 }
@@ -1765,7 +1752,7 @@ func (c *UtilityCommands) history(ctx *router.Ctx) {
 	usedCmds := fn.Limit(c.services.EventReactions.GetUsedCommands(), 10)
 
 	if len(usedCmds) == 0 {
-		ctx.NewEmbed().
+		c.services.Embed.New(ctx).
 			SetDescription("No commands have been used yet.").
 			Send()
 		return
@@ -1775,14 +1762,14 @@ func (c *UtilityCommands) history(ctx *router.Ctx) {
 		return fmt.Sprintf("%d. %s", i+1, cmd.Message.Content)
 	})
 
-	ctx.NewEmbed().
+	c.services.Embed.New(ctx).
 		AddField("Used Commands", strings.Join(usedCmdsReadable, "\n")).
 		Send()
 }
 
 func (c *UtilityCommands) restartbot(*router.Ctx) {
 	if constants.CONSOLE {
-		system.RestartExecution()
+		_ = system.RestartExecution()
 	} else {
 		c.services.EventBroker.Publish(eventbroker.EventRestart, nil)
 	}
@@ -1859,7 +1846,7 @@ func (c *UtilityCommands) systeminfo(ctx *router.Ctx) {
 		return
 	}
 
-	ctx.NewEmbed().
+	c.services.Embed.New(ctx).
 		SetDescription("System Information").
 		AddField("OS", utils.String.Capitalize(hostStat.OS)).
 		AddField("Platform", fmt.Sprintf("%s - %s", hostStat.Platform, hostStat.PlatformVersion)).
@@ -1871,30 +1858,30 @@ func (c *UtilityCommands) systeminfo(ctx *router.Ctx) {
 }
 
 func (c *UtilityCommands) shutdownpc(ctx *router.Ctx) {
-	_ = system.ShutdownSystem()
+	_ = system.Shutdown()
 }
 
 func (c *UtilityCommands) restartpc(ctx *router.Ctx) {
-	_ = system.RestartSystem()
+	_ = system.Restart()
 }
 
 func (c *UtilityCommands) sleeppc(ctx *router.Ctx) {
-	_ = system.SleepSystem()
+	_ = system.Sleep()
 }
 
 func (c *UtilityCommands) hibernatepc(ctx *router.Ctx) {
-	_ = system.HibernateSystem()
+	_ = system.Hibernate()
 }
 
 func (c *UtilityCommands) lockpc(ctx *router.Ctx) {
-	_ = system.LockSystem()
+	_ = system.Lock()
 }
 
 func (c *UtilityCommands) activewindow(ctx *router.Ctx) {
 	pid, _ := foreground.GetForegroundPID()
 	title, _ := foreground.GetForegroundTitle()
 
-	ctx.NewEmbed().
+	c.services.Embed.New(ctx).
 		AddField("Active Window PID", fmt.Sprint(pid)).
 		AddField("Active Window Title", title).
 		Send()
@@ -1952,7 +1939,7 @@ func (c *UtilityCommands) listdestinations(ctx *router.Ctx) {
 
 	sort.Strings(destinationsString)
 
-	ctx.NewEmbed().
+	c.services.Embed.New(ctx).
 		AddField("Destinations", strings.Join(destinationsString, "\n")).
 		Send()
 }
@@ -1988,7 +1975,7 @@ func (c *UtilityCommands) uploadss(ctx *router.Ctx) {
 		return
 	}
 
-	ctx.NewEmbed().
+	c.services.Embed.New(ctx).
 		SetDescription("Screenshot").
 		AddField("URL", result.URL).
 		AddField("Direct URL", result.DirectURL).
@@ -2031,7 +2018,7 @@ func (c *UtilityCommands) uploadfile(ctx *router.Ctx) {
 		return
 	}
 
-	ctx.NewEmbed().
+	c.services.Embed.New(ctx).
 		SetDescription("Uploaded file: %s", attachments[0].Filename).
 		AddField("URL", result.URL).
 		AddField("Direct URL", result.DirectURL).
@@ -2076,7 +2063,7 @@ func (c *UtilityCommands) uploadlink(ctx *router.Ctx) {
 		return
 	}
 
-	ctx.NewEmbed().
+	c.services.Embed.New(ctx).
 		SetDescription("Uploaded file: %s", fileName).
 		AddField("URL", result.URL).
 		AddField("Direct URL", result.DirectURL).
@@ -2086,12 +2073,12 @@ func (c *UtilityCommands) uploadlink(ctx *router.Ctx) {
 // Paste utilities
 
 func (c *UtilityCommands) pastebin(ctx *router.Ctx) {
-	paste, err := api.CreatePaste(ctx.Arguments.Raw())
+	paste, err := api.LBCreatePaste(ctx.Arguments.Raw())
 	if err != nil {
 		ctx.RespondText("An error has occurred.")
 		return
 	}
-	ctx.NewEmbed().
+	c.services.Embed.New(ctx).
 		AddField("Paste URL", paste).
 		Send()
 }
@@ -2104,27 +2091,27 @@ func (c *UtilityCommands) pastefile(ctx *router.Ctx) {
 		return
 	}
 
-	paste, err := api.CreatePaste(string(content))
+	paste, err := api.LBCreatePaste(string(content))
 	if err != nil {
 		ctx.RespondText("An error has occurred.")
 		return
 	}
 
-	ctx.NewEmbed().
+	c.services.Embed.New(ctx).
 		AddField("Paste URL", paste).
 		Send()
 }
 
 func (c *UtilityCommands) tinyurl(ctx *router.Ctx) {
 	sourceUrl := ctx.Arguments.Raw()
-	httpResponse := http.Get(fmt.Sprintf("https://tinyurl.com/api-create.php?url=%s", sourceUrl))
-	if httpResponse.Error != nil {
+	resp, err := http.DefaultClient().Get(fmt.Sprintf("https://tinyurl.com/api-create.php?url=%s", sourceUrl))
+	if err != nil {
 		ctx.RespondText("An error has occurred.")
 		return
 	}
-	ctx.NewEmbed().
+	c.services.Embed.New(ctx).
 		AddField("URL", sourceUrl).
-		AddField("TinyURL", string(httpResponse.Body)).
+		AddField("TinyURL", string(resp.MustGetBody())).
 		Send()
 }
 
@@ -2136,13 +2123,13 @@ func (c *UtilityCommands) obfuscateFunc(lang, ext string) func(ctx *router.Ctx) 
 
 		attachments := ctx.Message.Attachments
 		if script == "" && len(attachments) > 0 {
-			httpResponse := http.Get(attachments[0].URL)
-			if httpResponse.Error != nil {
-				ctx.RespondText("Error getting script: %v", httpResponse.Error)
+			resp, err := http.DefaultClient().Get(attachments[0].URL)
+			if err != nil {
+				ctx.RespondText("Error getting script: %v", err)
 				return
 			}
 
-			script = string(httpResponse.Body)
+			script = string(resp.MustGetBody())
 		}
 
 		if script == "" {
@@ -2150,9 +2137,9 @@ func (c *UtilityCommands) obfuscateFunc(lang, ext string) func(ctx *router.Ctx) 
 			return
 		}
 
-		obf := api.Obfuscate(lang, script)
+		obf := api.LBObfuscate(lang, script)
 		if strings.HasPrefix(obf, "An error") {
-			ctx.RespondText(obf)
+			ctx.RespondText("%s", obf)
 			return
 		}
 
@@ -2174,13 +2161,13 @@ func (c *UtilityCommands) obfuscateFunc(lang, ext string) func(ctx *router.Ctx) 
 func (c *UtilityCommands) reviewdbtoken(ctx *router.Ctx) {
 	token, err := api.GetReviewDBToken(ctx.Session)
 	if err != nil {
-		ctx.NewEmbed().
+		c.services.Embed.New(ctx).
 			SetDescription("Error getting token: %v", err).
 			Send()
 		return
 	}
 
-	ctx.NewEmbed().
+	c.services.Embed.New(ctx).
 		AddField("Token", token).
 		Send()
 }
@@ -2188,7 +2175,7 @@ func (c *UtilityCommands) reviewdbtoken(ctx *router.Ctx) {
 func (c *UtilityCommands) getreviews(ctx *router.Ctx) {
 	user, err := ctx.Arguments.Get(0).User()
 	if err != nil {
-		ctx.NewEmbed().
+		c.services.Embed.New(ctx).
 			SetDescription("Could not find user").
 			Send()
 		return
@@ -2196,7 +2183,7 @@ func (c *UtilityCommands) getreviews(ctx *router.Ctx) {
 
 	reviews, err := api.GetReviewDBReviews(user.ID)
 	if err != nil {
-		ctx.NewEmbed().
+		c.services.Embed.New(ctx).
 			SetDescription("Error getting reviews: %v", err).
 			Send()
 		return
@@ -2208,7 +2195,7 @@ func (c *UtilityCommands) getreviews(ctx *router.Ctx) {
 		reviewString += fmt.Sprintf("**[%s] %s:**\n%s\n\n", review.Timestamp.Format(time.RFC1123), review.Username, review.Comment)
 	}
 
-	ctx.NewEmbed().
+	c.services.Embed.New(ctx).
 		AddField("Reviews", reviewString).
 		Send()
 }
@@ -2216,7 +2203,7 @@ func (c *UtilityCommands) getreviews(ctx *router.Ctx) {
 func (c *UtilityCommands) addreview(ctx *router.Ctx) {
 	user, err := ctx.Arguments.Get(0).User()
 	if err != nil {
-		ctx.NewEmbed().
+		c.services.Embed.New(ctx).
 			SetDescription("Could not find user").
 			Send()
 		return
@@ -2224,13 +2211,13 @@ func (c *UtilityCommands) addreview(ctx *router.Ctx) {
 
 	err = api.AddReviewDBReview(ctx.Session, user.ID, ctx.Arguments.RawFrom(1))
 	if err != nil {
-		ctx.NewEmbed().
+		c.services.Embed.New(ctx).
 			SetDescription("Error adding review: %v", err).
 			Send()
 		return
 	}
 
-	ctx.NewEmbed().
+	c.services.Embed.New(ctx).
 		SetDescription("Successfully added review to %s!", user.Username).
 		Send()
 }
@@ -2241,7 +2228,7 @@ func (c *UtilityCommands) getTags(ctx *router.Ctx) {
 	cfg := c.services.Config.GetConfig()
 
 	if len(cfg.Tags) == 0 {
-		ctx.NewEmbed().
+		c.services.Embed.New(ctx).
 			SetDescription("No tags found.").
 			Send()
 		return
@@ -2253,7 +2240,7 @@ func (c *UtilityCommands) getTags(ctx *router.Ctx) {
 		tagList = append(tagList, fmt.Sprintf("%s:\n```\n%s\n```\n", tag, value))
 	}
 
-	ctx.NewEmbed().
+	c.services.Embed.New(ctx).
 		AddField("Tags", strings.Join(tagList, "\n")).
 		Send()
 }
@@ -2275,7 +2262,7 @@ func (c *UtilityCommands) addTag(ctx *router.Ctx) {
 		return
 	}
 
-	ctx.NewEmbed().
+	c.services.Embed.New(ctx).
 		SetDescription("Successfully created tag.").
 		Send()
 }
@@ -2292,7 +2279,7 @@ func (c *UtilityCommands) removeTag(ctx *router.Ctx) {
 		return
 	}
 
-	ctx.NewEmbed().
+	c.services.Embed.New(ctx).
 		SetDescription("Successfully deleted tag.").
 		Send()
 }
@@ -2307,7 +2294,7 @@ func (c *UtilityCommands) clearTags(ctx *router.Ctx) {
 		return
 	}
 
-	ctx.NewEmbed().
+	c.services.Embed.New(ctx).
 		SetDescription("Successfully cleared tags.").
 		Send()
 }
@@ -2315,8 +2302,12 @@ func (c *UtilityCommands) clearTags(ctx *router.Ctx) {
 // Creditcard commands
 
 func (c *UtilityCommands) mastercard(ctx *router.Ctx) {
-	creditCard := api.GenerateCreditCard("mastercard", ctx.Arguments.Raw())
-	ctx.NewEmbed().
+	creditCard, err := api.LBGenerateCC("mastercard", ctx.Arguments.Raw())
+	if err != nil {
+		ctx.RespondText("An error has occurred.")
+		return
+	}
+	c.services.Embed.New(ctx).
 		AddField("Card Type", "Mastercard").
 		AddField("Card Number", creditCard.Number).
 		AddField("CVV", creditCard.CVV).
@@ -2326,8 +2317,12 @@ func (c *UtilityCommands) mastercard(ctx *router.Ctx) {
 }
 
 func (c *UtilityCommands) visa16(ctx *router.Ctx) {
-	creditCard := api.GenerateCreditCard("visa16", ctx.Arguments.Raw())
-	ctx.NewEmbed().
+	creditCard, err := api.LBGenerateCC("visa16", ctx.Arguments.Raw())
+	if err != nil {
+		ctx.RespondText("An error has occurred.")
+		return
+	}
+	c.services.Embed.New(ctx).
 		AddField("Card Type", "Visa").
 		AddField("Card Number", creditCard.Number).
 		AddField("CVV", creditCard.CVV).
@@ -2337,8 +2332,12 @@ func (c *UtilityCommands) visa16(ctx *router.Ctx) {
 }
 
 func (c *UtilityCommands) visa13(ctx *router.Ctx) {
-	creditCard := api.GenerateCreditCard("visa13", ctx.Arguments.Raw())
-	ctx.NewEmbed().
+	creditCard, err := api.LBGenerateCC("visa13", ctx.Arguments.Raw())
+	if err != nil {
+		ctx.RespondText("An error has occurred.")
+		return
+	}
+	c.services.Embed.New(ctx).
 		AddField("Card Type", "Visa").
 		AddField("Card Number", creditCard.Number).
 		AddField("CVV", creditCard.CVV).
@@ -2348,8 +2347,12 @@ func (c *UtilityCommands) visa13(ctx *router.Ctx) {
 }
 
 func (c *UtilityCommands) amex(ctx *router.Ctx) {
-	creditCard := api.GenerateCreditCard("amex", ctx.Arguments.Raw())
-	ctx.NewEmbed().
+	creditCard, err := api.LBGenerateCC("amex", ctx.Arguments.Raw())
+	if err != nil {
+		ctx.RespondText("An error has occurred.")
+		return
+	}
+	c.services.Embed.New(ctx).
 		AddField("Card Type", "American Express").
 		AddField("Card Number", creditCard.Number).
 		AddField("CVV", creditCard.CVV).
@@ -2359,8 +2362,12 @@ func (c *UtilityCommands) amex(ctx *router.Ctx) {
 }
 
 func (c *UtilityCommands) discover(ctx *router.Ctx) {
-	creditCard := api.GenerateCreditCard("discover", ctx.Arguments.Raw())
-	ctx.NewEmbed().
+	creditCard, err := api.LBGenerateCC("discover", ctx.Arguments.Raw())
+	if err != nil {
+		ctx.RespondText("An error has occurred.")
+		return
+	}
+	c.services.Embed.New(ctx).
 		AddField("Card Type", "Discover").
 		AddField("Card Number", creditCard.Number).
 		AddField("CVV", creditCard.CVV).
@@ -2370,8 +2377,12 @@ func (c *UtilityCommands) discover(ctx *router.Ctx) {
 }
 
 func (c *UtilityCommands) diners(ctx *router.Ctx) {
-	creditCard := api.GenerateCreditCard("diners", ctx.Arguments.Raw())
-	ctx.NewEmbed().
+	creditCard, err := api.LBGenerateCC("diners", ctx.Arguments.Raw())
+	if err != nil {
+		ctx.RespondText("An error has occurred.")
+		return
+	}
+	c.services.Embed.New(ctx).
 		AddField("Card Type", "Diners").
 		AddField("Card Number", creditCard.Number).
 		AddField("CVV", creditCard.CVV).
@@ -2381,8 +2392,12 @@ func (c *UtilityCommands) diners(ctx *router.Ctx) {
 }
 
 func (c *UtilityCommands) jcb(ctx *router.Ctx) {
-	creditCard := api.GenerateCreditCard("jcb", ctx.Arguments.Raw())
-	ctx.NewEmbed().
+	creditCard, err := api.LBGenerateCC("jcb", ctx.Arguments.Raw())
+	if err != nil {
+		ctx.RespondText("An error has occurred.")
+		return
+	}
+	c.services.Embed.New(ctx).
 		AddField("Card Type", "JCB").
 		AddField("Card Number", creditCard.Number).
 		AddField("CVV", creditCard.CVV).
@@ -2394,29 +2409,29 @@ func (c *UtilityCommands) jcb(ctx *router.Ctx) {
 // Network utilities
 
 func (c *UtilityCommands) ping(ctx *router.Ctx) {
-	emb := ctx.NewEmbed()
-	time, err := api.Ping("https://lightning-bot.com")
+	emb := c.services.Embed.New(ctx)
+	time, err := network.GetPingLatency("https://lightning-bot.com")
 	if err != nil {
-		emb.AddField("Ping to LightningBot", "Error")
+		emb.AddField("Ping to LightningBot", "Error: "+err.Error())
 	} else {
 		emb.AddField("Ping to LightningBot", fmt.Sprintf("%dms", time.Milliseconds()))
 	}
-	time, err = api.Ping("https://google.com")
+	time, err = network.GetPingLatency("https://google.com")
 	if err != nil {
-		emb.AddField("Ping to Google", "Error")
+		emb.AddField("Ping to Google", "Error: "+err.Error())
 	} else {
 		emb.AddField("Ping to Google", fmt.Sprintf("%dms", time.Milliseconds()))
 	}
 	emb.
-		AddField("Ping to Discord", fmt.Sprintf("%dms", ctx.Session.HeartbeatLatency().Milliseconds())).
+		AddField("Discord Socket Latency", fmt.Sprintf("%dms", ctx.Session.HeartbeatLatency().Milliseconds())).
 		Send()
 }
 
 func (c *UtilityCommands) pingweb(ctx *router.Ctx) {
 	host := ctx.Arguments.Get(0).Raw()
-	emb := ctx.NewEmbed()
+	emb := c.services.Embed.New(ctx)
 
-	time, err := api.Ping(host)
+	time, err := network.GetPingLatency(host)
 	if err != nil {
 		emb.AddField("Ping to "+host, "Error")
 	} else {
@@ -2430,13 +2445,13 @@ func (c *UtilityCommands) ipinfo(ctx *router.Ctx) {
 	ip := ctx.Arguments.Get(0).Raw()
 	url := fmt.Sprintf("https://ipinfo.io/%s/json", url.QueryEscape(ip))
 
-	httpResponse := http.Get(url)
-	if httpResponse.Error != nil {
+	resp, err := http.DefaultClient().Get(url)
+	if err != nil {
 		ctx.RespondText("An error has occurred.")
 		return
 	}
 
-	ipinfo := httpResponse.Json()
+	ipinfo := resp.Json()
 
 	if ipinfo.Get("status").MustInt(0) == 404 {
 		ctx.RespondText("No results found.")
@@ -2450,7 +2465,7 @@ func (c *UtilityCommands) ipinfo(ctx *router.Ctx) {
 		ipinfo.Get("loc").MustString(),
 	)
 
-	ctx.NewEmbed().
+	c.services.Embed.New(ctx).
 		AddField("IP", ip).
 		AddField("Hostname", ipinfo.Get("hostname").MustString()).
 		AddField("Timezone", ipinfo.Get("timezone").MustString()).
@@ -2478,11 +2493,15 @@ func (c *UtilityCommands) portscan(ctx *router.Ctx) {
 		"VNC":            5900,
 		"HTTP Alt":       8080,
 	}
-	emb := ctx.NewEmbed()
+	emb := c.services.Embed.New(ctx)
 	for name, port := range ports {
-		if utils.Misc.IsPortOpen(host, port) {
+		address := net.JoinHostPort(host, strconv.Itoa(port))
+		conn, err := net.DialTimeout("tcp", address, 50*time.Millisecond)
+		if err == nil {
 			emb.AddField(fmt.Sprintf("%s (%d)", name, port), "Open")
+			_ = conn.Close()
 		}
+
 	}
 	emb.Send()
 }
@@ -2490,20 +2509,20 @@ func (c *UtilityCommands) portscan(ctx *router.Ctx) {
 func (c *UtilityCommands) resolve(ctx *router.Ctx) {
 	domain := ctx.Arguments.Get(0).Raw()
 
-	httpResponse := http.Get(fmt.Sprintf("https://json.geoiplookup.io/%s", domain))
-	if httpResponse.Error != nil {
+	resp, err := http.DefaultClient().Get(fmt.Sprintf("https://json.geoiplookup.io/%s", domain))
+	if err != nil {
 		ctx.RespondText("An error has occurred.")
 		return
 	}
 
-	response := httpResponse.Json()
+	response := resp.Json()
 
 	if response.Get("ip").MustString() == "" {
-		ctx.NewEmbed().SetDescription("Invalid domain.").Send()
+		c.services.Embed.New(ctx).SetDescription("Invalid domain.").Send()
 		return
 	}
 
-	ctx.NewEmbed().
+	c.services.Embed.New(ctx).
 		AddField("Domain", domain).
 		AddField("IP", response.Get("ip").MustString()).
 		Send()
@@ -2511,24 +2530,24 @@ func (c *UtilityCommands) resolve(ctx *router.Ctx) {
 
 func (c *UtilityCommands) reversedns(ctx *router.Ctx) {
 	ip := ctx.Arguments.Get(0).Raw()
-	url := fmt.Sprintf("https://api.domaintools.com/v1/%s/host-domains/", ip)
+	url := fmt.Sprintf("https://api.LBdomaintools.com/v1/%s/host-domains/", ip)
 
-	httpResponse := http.Get(url)
-	if httpResponse.Error != nil {
+	resp, err := http.DefaultClient().Get(url)
+	if err != nil {
 		ctx.RespondText("An error has occurred.")
 		return
 	}
 
-	response := httpResponse.Json()
+	response := resp.Json()
 
-	if response.Get("error").MustArray() != nil {
-		ctx.NewEmbed().SetDescription("Invalid IP Address.").Send()
+	if response.Get("error").MustSlice() != nil {
+		c.services.Embed.New(ctx).SetDescription("Invalid IP Address.").Send()
 		return
 	}
 
-	domains := response.GetPath("response", "ip_addresses", "domain_names").MustStringArray()
+	domains := response.Get("response", "ip_addresses", "domain_names").MustStringSlice()
 
-	ctx.NewEmbed().
+	c.services.Embed.New(ctx).
 		AddField("IP Address", ip).
 		AddField("Domains", strings.Join(domains, ", ")).
 		Send()
@@ -2536,45 +2555,46 @@ func (c *UtilityCommands) reversedns(ctx *router.Ctx) {
 
 func (c *UtilityCommands) reversemac(ctx *router.Ctx) {
 	mac := ctx.Arguments.Get(0).Raw()
-	httpResponse := http.Get(fmt.Sprintf("https://api.macvendors.com/%s", mac))
-	if httpResponse.Error != nil {
+	resp, err := http.DefaultClient().Get(fmt.Sprintf("https://api.LBmacvendors.com/%s", mac))
+	if err != nil {
 		ctx.RespondText("An error has occurred.")
 		return
 	}
-	if strings.Contains(string(httpResponse.Body), "Not Found") {
-		ctx.NewEmbed().SetDescription("Invalid MAC Address.").Send()
+	vendor := string(resp.MustGetBody())
+	if strings.Contains(vendor, "Not Found") {
+		c.services.Embed.New(ctx).SetDescription("Invalid MAC Address.").Send()
 		return
 	}
-	ctx.NewEmbed().
+	c.services.Embed.New(ctx).
 		AddField("MAC Address", mac).
-		AddField("Vendor", string(httpResponse.Body)).
+		AddField("Vendor", vendor).
 		Send()
 }
 
 func (c *UtilityCommands) headers(ctx *router.Ctx) {
 	url := ctx.Arguments.Get(0).Raw()
-	httpResponse := http.Get(url)
-	if httpResponse.Error != nil {
+	resp, err := http.DefaultClient().Get(url)
+	if err != nil {
 		ctx.RespondText("An error has occurred.")
 		return
 	}
 
 	var headers string
-	for key, value := range httpResponse.Header {
+	for key, value := range resp.Header {
 		headers += fmt.Sprintf("%s: %s\n", key, strings.Join(value, ", "))
 	}
 
-	ctx.NewEmbed().
+	c.services.Embed.New(ctx).
 		AddField("URL", url).
 		AddField("Headers", headers).
 		Send()
 }
 
 func (c *UtilityCommands) _interface(ctx *router.Ctx) {
-	ctx.NewEmbed().
-		AddField("Public IP", api.GetPublicIP()).
-		AddField("Local IP", api.GetLocalIP()).
-		AddField("MAC Address", api.GetMacAddress()).
+	c.services.Embed.New(ctx).
+		AddField("Public IP", network.GetPublicIP()).
+		AddField("Local IP", network.GetLocalIP()).
+		AddField("MAC Address", network.GetMacAddress()).
 		Send()
 }
 
@@ -2617,21 +2637,21 @@ func (c *UtilityCommands) snipepokemon(ctx *router.Ctx) {
 	emb := message.Embeds[0]
 
 	// Download the Pokémon image
-	resp := http.Get(emb.Image.URL)
-	if resp.Error != nil {
-		ctx.RespondText("Error downloading image: %v", resp.Error)
+	resp, err := http.DefaultClient().Get(emb.Image.URL)
+	if err != nil {
+		ctx.RespondText("Error downloading image: %v", err)
 		return
 	}
 
-	image := utils.Misc.ImageToBase64(resp.Body)
+	image := utils.Misc.ImageToBase64(resp.MustGetBody())
 
-	cfg := c.services.Config.GetConfig()
-
-	pokemon, _, err := api.PokeTwo(image, &cfg)
+	pokemon, _, err := api.PokeTwo(image)
 	if err != nil {
 		logging.Debug("Snipers.CheckPokeTwoSniper: Error getting Pokémon: ", err)
 		return
 	}
+
+	cfg := c.services.Config.GetConfig()
 
 	// Catch the Pokémon
 	label := pokemon.NameEnglish
@@ -2658,7 +2678,7 @@ func (c *UtilityCommands) snipepokemon(ctx *router.Ctx) {
 		return
 	}
 
-	ctx.NewEmbed().
+	c.services.Embed.New(ctx).
 		SetDescription("Successfully sniped Pokémon").
 		AddField("Pokémon", label).
 		Send()
@@ -2673,17 +2693,15 @@ func (c *UtilityCommands) detectpokemon(ctx *router.Ctx) {
 	emb := message.Embeds[0]
 
 	// Download the Pokémon image
-	resp := http.Get(emb.Image.URL)
-	if resp.Error != nil {
-		ctx.RespondText("Error downloading image: %v", resp.Error)
+	resp, err := http.DefaultClient().Get(emb.Image.URL)
+	if err != nil {
+		ctx.RespondText("Error downloading image: %v", err)
 		return
 	}
 
-	image := utils.Misc.ImageToBase64(resp.Body)
+	image := utils.Misc.ImageToBase64(resp.MustGetBody())
 
-	cfg := c.services.Config.GetConfig()
-
-	pokemon, _, err := api.PokeTwo(image, &cfg)
+	pokemon, _, err := api.PokeTwo(image)
 	if err != nil {
 		logging.Debug("Snipers.CheckPokeTwoSniper: Error getting Pokémon: ", err)
 		return
@@ -2712,7 +2730,7 @@ func (c *UtilityCommands) detectpokemon(ctx *router.Ctx) {
 		pokemon.Defense,
 	)
 
-	ctx.NewEmbed().
+	c.services.Embed.New(ctx).
 		AddField("Names", names).
 		AddField("Info", info).
 		Send()
@@ -2733,7 +2751,7 @@ func (c *UtilityCommands) getReminders(ctx *router.Ctx) {
 		reminders = append(reminders, fmt.Sprintf("**ID: %d**: %s - %s", reminder.ID, reminder.Content, reminder.At.Format(time.RFC1123)))
 	}
 
-	ctx.NewEmbed().
+	c.services.Embed.New(ctx).
 		AddField("Reminders", strings.Join(reminders, "\n")).
 		Send()
 }
@@ -2773,7 +2791,7 @@ func (c *UtilityCommands) addReminder(ctx *router.Ctx) {
 		return
 	}
 
-	ctx.NewEmbed().
+	c.services.Embed.New(ctx).
 		SetDescription("Successfully set reminder!").
 		Send()
 }
@@ -2792,7 +2810,7 @@ func (c *UtilityCommands) removeReminder(ctx *router.Ctx) {
 		return
 	}
 
-	ctx.NewEmbed().
+	c.services.Embed.New(ctx).
 		SetDescription("Successfully deleted reminder!").
 		Send()
 }
@@ -2807,7 +2825,7 @@ func (c *UtilityCommands) clearReminders(ctx *router.Ctx) {
 		return
 	}
 
-	ctx.NewEmbed().
+	c.services.Embed.New(ctx).
 		SetDescription("Successfully cleared reminders!").
 		Send()
 }
@@ -2820,7 +2838,7 @@ func (c *UtilityCommands) checkIfUnitValid(ctx *router.Ctx, unit string, validUn
 		return true
 	}
 
-	ctx.NewEmbed().
+	c.services.Embed.New(ctx).
 		AddField("Conversion error", "You have specified an invalid unit.").
 		AddField("Valid units", strings.Join(validUnits, ", ")).
 		Send()
@@ -2847,7 +2865,7 @@ func (c *UtilityCommands) convertvelocity(ctx *router.Ctx) {
 		ctx.RespondText("Error converting value: %v", err)
 	}
 
-	ctx.NewEmbed().
+	c.services.Embed.New(ctx).
 		AddField("Value", strconv.FormatFloat(value, 'g', -1, 64)+" "+sourceUnit).
 		AddField("Converted", strconv.FormatFloat(result, 'g', -1, 64)+" "+destinationUnit).
 		Send()
@@ -2872,7 +2890,7 @@ func (c *UtilityCommands) convertarea(ctx *router.Ctx) {
 		ctx.RespondText("Error converting value: %v", err)
 	}
 
-	ctx.NewEmbed().
+	c.services.Embed.New(ctx).
 		AddField("Value", strconv.FormatFloat(value, 'g', -1, 64)+" "+sourceUnit).
 		AddField("Converted", strconv.FormatFloat(result, 'g', -1, 64)+" "+destinationUnit).
 		Send()
@@ -2897,7 +2915,7 @@ func (c *UtilityCommands) convertlength(ctx *router.Ctx) {
 		ctx.RespondText("Error converting value: %v", err)
 	}
 
-	ctx.NewEmbed().
+	c.services.Embed.New(ctx).
 		AddField("Value", strconv.FormatFloat(value, 'g', -1, 64)+" "+sourceUnit).
 		AddField("Converted", strconv.FormatFloat(result, 'g', -1, 64)+" "+destinationUnit).
 		Send()
@@ -2922,7 +2940,7 @@ func (c *UtilityCommands) converttemperature(ctx *router.Ctx) {
 		ctx.RespondText("Error converting value: %v", err)
 	}
 
-	ctx.NewEmbed().
+	c.services.Embed.New(ctx).
 		AddField("Value", strconv.FormatFloat(value, 'g', -1, 64)+" "+sourceUnit).
 		AddField("Converted", strconv.FormatFloat(result, 'g', -1, 64)+" "+destinationUnit).
 		Send()
@@ -2947,7 +2965,7 @@ func (c *UtilityCommands) converttime(ctx *router.Ctx) {
 		ctx.RespondText("Error converting value: %v", err)
 	}
 
-	ctx.NewEmbed().
+	c.services.Embed.New(ctx).
 		AddField("Value", strconv.FormatFloat(value, 'g', -1, 64)+" "+sourceUnit).
 		AddField("Converted", strconv.FormatFloat(result, 'g', -1, 64)+" "+destinationUnit).
 		Send()
@@ -2972,7 +2990,7 @@ func (c *UtilityCommands) convertvolume(ctx *router.Ctx) {
 		ctx.RespondText("Error converting value: %v", err)
 	}
 
-	ctx.NewEmbed().
+	c.services.Embed.New(ctx).
 		AddField("Value", strconv.FormatFloat(value, 'g', -1, 64)+" "+sourceUnit).
 		AddField("Converted", strconv.FormatFloat(result, 'g', -1, 64)+" "+destinationUnit).
 		Send()
@@ -2997,7 +3015,7 @@ func (c *UtilityCommands) convertmass(ctx *router.Ctx) {
 		ctx.RespondText("Error converting value: %v", err)
 	}
 
-	ctx.NewEmbed().
+	c.services.Embed.New(ctx).
 		AddField("Value", strconv.FormatFloat(value, 'g', -1, 64)+" "+sourceUnit).
 		AddField("Converted", strconv.FormatFloat(result, 'g', -1, 64)+" "+destinationUnit).
 		Send()
@@ -3006,22 +3024,13 @@ func (c *UtilityCommands) convertmass(ctx *router.Ctx) {
 // Misc utilities
 
 func (c *UtilityCommands) tts(ctx *router.Ctx) {
-	httpResponse := api.TTS(ctx.Arguments.RawFrom(1), ctx.Arguments.Get(0).Raw())
-	if httpResponse.Error != nil {
-		ctx.RespondText("An error has occurred.")
+	reader, err := api.TTS(ctx.Arguments.RawFrom(1), ctx.Arguments.Get(0).Raw())
+	if err != nil {
+		ctx.RespondText("An error has occurred: %v", err)
 		return
 	}
 
-	if httpResponse.StatusCode == 400 {
-		ctx.RespondText("Invalid language. Please use an ISO 639-1 language code. See https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes for more information.")
-		return
-	}
-
-	_, _ = ctx.Session.ChannelFileSend(
-		ctx.Message.ChannelID,
-		"tts.mp3",
-		bytes.NewReader(httpResponse.Body),
-	)
+	_, _ = ctx.Session.ChannelFileSend(ctx.Message.ChannelID, "tts.mp3", reader)
 }
 
 func (c *UtilityCommands) translate(ctx *router.Ctx) {
@@ -3030,7 +3039,7 @@ func (c *UtilityCommands) translate(ctx *router.Ctx) {
 		ctx.RespondText("An error has occurred: %v", translateResult.Error)
 		return
 	}
-	ctx.NewEmbed().
+	c.services.Embed.New(ctx).
 		AddField("Source Language", utils.String.Capitalize(constants.LANGUAGES[translateResult.SourceLanguage])).
 		AddField("Destination Language", utils.String.Capitalize(constants.LANGUAGES[translateResult.DestinationLanguage])).
 		AddField("Original Text", translateResult.Original).
@@ -3044,7 +3053,7 @@ func (c *UtilityCommands) detectlang(ctx *router.Ctx) {
 		ctx.RespondText("An error has occurred: %v", translateResult.Error)
 		return
 	}
-	ctx.NewEmbed().
+	c.services.Embed.New(ctx).
 		AddField("Text", translateResult.Original).
 		AddField("Detected Language", utils.String.Capitalize(constants.LANGUAGES[translateResult.SourceLanguage])).
 		AddField("Confidence", fmt.Sprintf("%.2f", translateResult.Confidence)).
@@ -3057,7 +3066,7 @@ func (c *UtilityCommands) english(ctx *router.Ctx) {
 		ctx.RespondText("An error has occurred: %v", translateResult.Error)
 		return
 	}
-	ctx.NewEmbed().
+	c.services.Embed.New(ctx).
 		AddField("Source Language", utils.String.Capitalize(constants.LANGUAGES[translateResult.SourceLanguage])).
 		AddField("Original Text", translateResult.Original).
 		AddField("Translated Text", translateResult.Result).
@@ -3066,26 +3075,26 @@ func (c *UtilityCommands) english(ctx *router.Ctx) {
 
 func (c *UtilityCommands) define(ctx *router.Ctx) {
 	url := fmt.Sprintf(
-		"https://api.dictionaryapi.dev/api/v2/entries/en/%s",
-		url.QueryEscape(ctx.Arguments.Raw()),
+		"https://api.LBdictionaryapi.LBdev/api/v2/entries/en/%s",
+		ctx.Arguments.Escaped(),
 	)
 
-	httpResponse := http.Get(url)
-	if httpResponse.Error != nil {
+	resp, err := http.DefaultClient().Get(url)
+	if err != nil {
 		ctx.RespondText("An error has occurred.")
 		return
 	}
 
-	list := httpResponse.Json()
+	list := resp.Json()
 
-	if len(list.MustArray()) == 0 {
+	if list.Len() == 0 {
 		ctx.RespondText("No results found.")
 		return
 	}
 
-	result := list.GetIndex(0)
+	result := list.Get(0)
 
-	meanings := utils.Map(result.Get("meanings").MustArray(), func(obj any) string {
+	meanings := fn.Map(result.Get("meanings").MustSlice(), func(obj any) string {
 		meaning := obj.(map[string]any)
 		definitions := meaning["definitions"].([]any)
 
@@ -3098,11 +3107,11 @@ func (c *UtilityCommands) define(ctx *router.Ctx) {
 		return fmt.Sprintf("**%s**: %s", meaning["partOfSpeech"].(string), definition)
 	})
 
-	meanings = utils.Filter(meanings, func(obj string) bool {
+	meanings = fn.Filter(meanings, func(obj string) bool {
 		return obj != ""
 	})
 
-	ctx.NewEmbed().
+	c.services.Embed.New(ctx).
 		AddField("Word", ctx.Arguments.Raw()).
 		AddField("Meanings", strings.Join(meanings, "\n")).
 		Send()
@@ -3110,26 +3119,26 @@ func (c *UtilityCommands) define(ctx *router.Ctx) {
 
 func (c *UtilityCommands) urbandictionary(ctx *router.Ctx) {
 	url := fmt.Sprintf(
-		"https://api.urbandictionary.com/v0/define?term=%s",
-		url.QueryEscape(ctx.Arguments.Raw()),
+		"https://api.LBurbandictionary.com/v0/define?term=%s",
+		ctx.Arguments.Escaped(),
 	)
 
-	httpResponse := http.Get(url)
-	if httpResponse.Error != nil {
+	resp, err := http.DefaultClient().Get(url)
+	if err != nil {
 		ctx.RespondText("An error has occurred.")
 		return
 	}
 
-	list := httpResponse.Json().Get("list")
+	list := resp.Json().Get("list")
 
-	if len(list.MustArray()) == 0 {
+	if list.Len() == 0 {
 		ctx.RespondText("No results found.")
 		return
 	}
 
-	result := list.GetIndex(0)
+	result := list.Get(0)
 
-	ctx.NewEmbed().
+	c.services.Embed.New(ctx).
 		AddField("Word", ctx.Arguments.Raw()).
 		AddField("Definition", result.Get("definition").MustString()).
 		AddField("Permalink", result.Get("permalink").MustString()).
@@ -3151,7 +3160,7 @@ func (c *UtilityCommands) wikipedia(ctx *router.Ctx) {
 		article = article[:2000]
 	}
 
-	ctx.NewEmbed().
+	c.services.Embed.New(ctx).
 		AddField("Query", query).
 		AddField("Wikipedia Summary", article).
 		Send()
@@ -3164,32 +3173,32 @@ func (c *UtilityCommands) weather(ctx *router.Ctx) {
 		return
 	}
 
-	ctx.NewEmbed().
-		SetDescription("Weather in %s, %s", weather.Get("name").MustString(), weather.GetPath("sys", "country").MustString()).
-		AddField("Description", utils.String.Capitalize(weather.Get("weather").GetIndex(0).Get("description").MustString())).
-		AddField("Temperature", fmt.Sprintf("%.2f °C", math.Round(weather.GetPath("main", "temp").MustFloat64()-273.15))).
-		AddField("Feels Like", fmt.Sprintf("%.2f °C", math.Round(weather.GetPath("main", "feels_like").MustFloat64()-273.15))).
-		AddField("Min. Temperature", fmt.Sprintf("%.2f °C", math.Round(weather.GetPath("main", "temp_min").MustFloat64()-273.15))).
-		AddField("Max. Temperature", fmt.Sprintf("%.2f °C", math.Round(weather.GetPath("main", "temp_max").MustFloat64()-273.15))).
-		AddField("Pressure", fmt.Sprintf("%.2f hPa", weather.GetPath("main", "pressure").MustFloat64())).
-		AddField("Humidity", fmt.Sprintf("%.2f %%", weather.GetPath("main", "humidity").MustFloat64())).
+	c.services.Embed.New(ctx).
+		SetDescription("Weather in %s, %s", weather.Get("name").MustString(), weather.Get("sys", "country").MustString()).
+		AddField("Description", utils.String.Capitalize(weather.Get("weather").Get(0).Get("description").MustString())).
+		AddField("Temperature", fmt.Sprintf("%.2f °C", math.Round(weather.Get("main", "temp").MustFloat64()-273.15))).
+		AddField("Feels Like", fmt.Sprintf("%.2f °C", math.Round(weather.Get("main", "feels_like").MustFloat64()-273.15))).
+		AddField("Min. Temperature", fmt.Sprintf("%.2f °C", math.Round(weather.Get("main", "temp_min").MustFloat64()-273.15))).
+		AddField("Max. Temperature", fmt.Sprintf("%.2f °C", math.Round(weather.Get("main", "temp_max").MustFloat64()-273.15))).
+		AddField("Pressure", fmt.Sprintf("%.2f hPa", weather.Get("main", "pressure").MustFloat64())).
+		AddField("Humidity", fmt.Sprintf("%.2f %%", weather.Get("main", "humidity").MustFloat64())).
 		AddField("Visibility", fmt.Sprintf("%.2f m", weather.Get("visibility").MustFloat64())).
-		AddField("Wind Speed", fmt.Sprintf("%.2f Km/h", math.Round(weather.GetPath("wind", "speed").MustFloat64()*3.6))).
-		AddField("Wind Gust", fmt.Sprintf("%.2f Km/h", math.Round(weather.GetPath("wind", "gust").MustFloat64()*3.6))).
-		AddField("Wind Direction", fmt.Sprintf("%.2f°", weather.GetPath("wind", "deg").MustFloat64())).
+		AddField("Wind Speed", fmt.Sprintf("%.2f Km/h", math.Round(weather.Get("wind", "speed").MustFloat64()*3.6))).
+		AddField("Wind Gust", fmt.Sprintf("%.2f Km/h", math.Round(weather.Get("wind", "gust").MustFloat64()*3.6))).
+		AddField("Wind Direction", fmt.Sprintf("%.2f°", weather.Get("wind", "deg").MustFloat64())).
 		Send()
 }
 
 func (c *UtilityCommands) lvbypass(ctx *router.Ctx) {
-	resp, err := http.GetJson("https://bypass.pm/bypass2?url=" + ctx.Arguments.Raw())
+	resp, err := http.DefaultClient().Get("https://bypass.pm/bypass2?url=" + ctx.Arguments.Raw())
 	if err != nil {
 		ctx.RespondText("An error has occurred: %v", err)
 		return
 	}
 
-	destination := resp.Get("destination").MustString()
+	destination := resp.Json().Get("destination").MustString()
 
-	ctx.NewEmbed().
+	c.services.Embed.New(ctx).
 		AddField("URL", ctx.Arguments.Raw()).
 		AddField("Bypassed URL", utils.Misc.Or(destination, "An error has occurred")).
 		Send()
@@ -3197,36 +3206,36 @@ func (c *UtilityCommands) lvbypass(ctx *router.Ctx) {
 
 func (c *UtilityCommands) flightinfo(ctx *router.Ctx) {
 	uri := fmt.Sprintf(
-		"https://api.flightradar24.com/common/v1/flight/list.json?query=%s&fetchBy=flight&page=1",
+		"https://api.LBflightradar24.com/common/v1/flight/list.json?query=%s&fetchBy=flight&page=1",
 		url.QueryEscape(ctx.Arguments.Get(0).Raw()),
 	)
 
-	httpResponse := http.Get(uri)
-	if httpResponse.Error != nil {
+	resp, err := http.DefaultClient().Get(uri)
+	if err != nil {
 		ctx.RespondText("An error has occurred.")
 		return
 	}
 
-	json := httpResponse.Json()
+	json := resp.Json()
 
-	if _, exists := json.CheckGet("errors"); exists {
+	if errors := json.Get("errors").Interface(); errors != nil {
 		ctx.RespondText("That flight does not exist or an error has occurred.")
 		return
 	}
 
-	data := json.GetPath("result", "response", "data").GetIndex(0)
+	data := json.Get("result", "response", "data").Get(0)
 
-	departureTime := data.GetPath("time", "scheduled", "departure").MustInt64()
-	arrivalTime := data.GetPath("time", "scheduled", "arrival").MustInt64()
+	departureTime := data.Get("time", "scheduled", "departure").MustInt64()
+	arrivalTime := data.Get("time", "scheduled", "arrival").MustInt64()
 
-	ctx.NewEmbed().
-		AddField("Flight Number", data.GetPath("identification", "number", "default").MustString()).
-		AddField("Airline", data.GetPath("airline", "name").MustString()).
-		AddField("Departure Airport", data.GetPath("airport", "origin", "name").MustString()).
+	c.services.Embed.New(ctx).
+		AddField("Flight Number", data.Get("identification", "number", "default").MustString()).
+		AddField("Airline", data.Get("airline", "name").MustString()).
+		AddField("Departure Airport", data.Get("airport", "origin", "name").MustString()).
 		AddField("Departure Time", time.Unix(departureTime, 0).Format("2006-01-02 15:04:05")).
-		AddField("Arrival Airport", data.GetPath("airport", "destination", "name").MustString()).
+		AddField("Arrival Airport", data.Get("airport", "destination", "name").MustString()).
 		AddField("Arrival Time", time.Unix(arrivalTime, 0).Format("2006-01-02 15:04:05")).
-		AddField("Status", data.GetPath("status", "text").MustString()).
+		AddField("Status", data.Get("status", "text").MustString()).
 		Send()
 }
 
@@ -3239,28 +3248,28 @@ func (c *UtilityCommands) passgen(ctx *router.Ctx) {
 
 	charAmount = fn.Clamp(charAmount, 1, 1000)
 
-	ctx.NewEmbed().
+	c.services.Embed.New(ctx).
 		AddField("Password", random.String(charAmount, "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789#$%&")).
 		Send()
 }
 
 func (c *UtilityCommands) tokengen(ctx *router.Ctx) {
-	httpResponse := http.Get("https://some-random-api.com/bottoken")
-	if httpResponse.Error != nil {
-		ctx.RespondText("Error: %v", httpResponse.Error)
+	resp, err := http.DefaultClient().Get("https://some-random-api.LBcom/bottoken")
+	if err != nil {
+		ctx.RespondText("Error: %v", err)
 		return
 	}
 
-	token := httpResponse.Json().Get("token").MustString()
+	token := resp.Json().Get("token").MustString()
 
-	ctx.NewEmbed().
+	c.services.Embed.New(ctx).
 		AddField("Token", token).
 		Send()
 }
 
 func (c *UtilityCommands) revimage(ctx *router.Ctx) {
 	imageUrl := ctx.Arguments.Get(0).Raw()
-	ctx.NewEmbed().
+	c.services.Embed.New(ctx).
 		AddField("Reverse Image Search URL", fmt.Sprintf("https://www.google.com/searchbyimage?image_url=%s", imageUrl)).
 		Send()
 }
@@ -3271,47 +3280,47 @@ func (c *UtilityCommands) revavatar(ctx *router.Ctx) {
 		ctx.RespondText("Could not find user")
 		return
 	}
-	ctx.NewEmbed().
+	c.services.Embed.New(ctx).
 		AddField("Search URL", fmt.Sprintf("https://www.google.com/searchbyimage?&image_url=%s", url.QueryEscape(user.AvatarURL("")))).
 		Send()
 }
 
 func (c *UtilityCommands) timezones(ctx *router.Ctx) {
 	continent := ctx.Arguments.Get(0).Raw()
-	httpResponse := http.Get("http://worldtimeapi.org/api/timezone/" + url.PathEscape(continent))
-	if httpResponse.Error != nil {
-		ctx.RespondText("Error getting timezones: %v", httpResponse.Error)
+	resp, err := http.DefaultClient().Get("http://worldtimeapi.LBorg/api/timezone/" + url.PathEscape(continent))
+	if err != nil {
+		ctx.RespondText("Error getting timezones: %v", err)
 		return
 	}
 
-	json := httpResponse.Json()
+	json := resp.Json()
 
 	if err := json.Get("error").MustString(); err != "" {
 		ctx.RespondText("Error getting timezones: %v", err)
 		return
 	}
 
-	ctx.NewEmbed().
+	c.services.Embed.New(ctx).
 		AddField("Continent", utils.String.Capitalize(continent)).
-		AddField("Timezones", strings.Join(json.MustStringArray(), ", ")).
+		AddField("Timezones", strings.Join(json.MustStringSlice(), ", ")).
 		Send()
 }
 
 func (c *UtilityCommands) timezoneinfo(ctx *router.Ctx) {
-	httpResponse := http.Get("http://worldtimeapi.org/api/timezone/" + ctx.Arguments.Get(0).Raw())
-	if httpResponse.Error != nil {
-		ctx.RespondText("Error getting timezones: %v", httpResponse.Error)
+	resp, err := http.DefaultClient().Get("http://worldtimeapi.LBorg/api/timezone/" + ctx.Arguments.Get(0).Raw())
+	if err != nil {
+		ctx.RespondText("Error getting timezones: %v", err)
 		return
 	}
 
-	json := httpResponse.Json()
+	json := resp.Json()
 
 	if err := json.Get("error").MustString(); err != "" {
 		ctx.RespondText("Error getting timezones: %v", err)
 		return
 	}
 
-	ctx.NewEmbed().
+	c.services.Embed.New(ctx).
 		AddField("Timezone", json.Get("timezone").MustString()).
 		AddField("Abbreviation", json.Get("abbreviation").MustString()).
 		AddField("UTC Offset", json.Get("utc_offset").MustString()).
@@ -3333,35 +3342,43 @@ func (c *UtilityCommands) calculate(ctx *router.Ctx) {
 		return
 	}
 
-	ctx.NewEmbed().
+	c.services.Embed.New(ctx).
 		AddField("Expression", ctx.Arguments.Get(0).Raw()).
 		AddField("Solution", tv.Value.String()).
 		Send()
 }
 
+func (c *UtilityCommands) getCreds() api.LBCreds {
+	cfg := c.services.Config.GetConfig()
+	return api.LBCreds{
+		Username: cfg.Account.LightningBot.Username,
+		Password: cfg.Account.LightningBot.Password,
+	}
+}
+
 func (c *UtilityCommands) googlesearch(ctx *router.Ctx) {
-	results, err := api.GoogleSearch(ctx.Arguments.Raw())
+	results, err := api.LBSearch(c.getCreds(), ctx.Arguments.Raw())
 	if err != nil {
 		ctx.RespondText("An error has occurred.")
 		return
 	}
-	emb := ctx.NewEmbed()
-	for i := 0; i < len(results.MustArray()); i++ {
-		result := results.GetIndex(i)
+	emb := c.services.Embed.New(ctx)
+	for i := 0; i < results.Len(); i++ {
+		result := results.Get(i)
 		emb.AddField(result.Get("title").MustString(), result.Get("url").MustString())
 	}
 	emb.Send()
 }
 
 func (c *UtilityCommands) youtubesearch(ctx *router.Ctx) {
-	results, err := api.GoogleSearch(ctx.Arguments.Raw() + " site:youtube.com")
+	results, err := api.LBSearch(c.getCreds(), ctx.Arguments.Raw()+" site:youtube.com")
 	if err != nil {
 		ctx.RespondText("An error has occurred.")
 		return
 	}
-	emb := ctx.NewEmbed()
-	for i := 0; i < len(results.MustArray()); i++ {
-		result := results.GetIndex(i)
+	emb := c.services.Embed.New(ctx)
+	for i := 0; i < results.Len(); i++ {
+		result := results.Get(i)
 		resultUrl := result.Get("url").MustString()
 		if strings.Contains(resultUrl, "playlist") {
 			continue
@@ -3372,13 +3389,13 @@ func (c *UtilityCommands) youtubesearch(ctx *router.Ctx) {
 }
 
 func (c *UtilityCommands) youtubedl(ctx *router.Ctx) {
-	results, err := api.GoogleSearch(ctx.Arguments.Raw() + " site:youtube.com")
+	results, err := api.LBSearch(c.getCreds(), ctx.Arguments.Raw()+" site:youtube.com")
 	if err != nil {
 		ctx.RespondText("An error has occurred: %v", err)
 		return
 	}
-	for i := 0; i < len(results.MustArray()); i++ {
-		result := results.GetIndex(i)
+	for i := 0; i < results.Len(); i++ {
+		result := results.Get(i)
 		resultUrl := result.Get("url").MustString()
 
 		if !strings.Contains(resultUrl, "/watch?v=") {
@@ -3432,42 +3449,42 @@ func (c *UtilityCommands) youtubedl(ctx *router.Ctx) {
 
 func (c *UtilityCommands) amazon(ctx *router.Ctx) {
 	query := ctx.Arguments.Raw()
-	ctx.NewEmbed().
+	c.services.Embed.New(ctx).
 		AddField("Amazon Search", fmt.Sprintf("https://www.amazon.com/s?k=%s", url.QueryEscape(query))).
 		Send()
 }
 
 func (c *UtilityCommands) steam(ctx *router.Ctx) {
 	query := ctx.Arguments.Raw()
-	ctx.NewEmbed().
+	c.services.Embed.New(ctx).
 		AddField("Steam Search", fmt.Sprintf("https://store.steampowered.com/search/?term=%s", url.QueryEscape(query))).
 		Send()
 }
 
 func (c *UtilityCommands) github(ctx *router.Ctx) {
 	query := ctx.Arguments.Raw()
-	ctx.NewEmbed().
+	c.services.Embed.New(ctx).
 		AddField("GitHub Search", fmt.Sprintf("https://github.com/search?q=%s", url.QueryEscape(query))).
 		Send()
 }
 
 func (c *UtilityCommands) stackoverflow(ctx *router.Ctx) {
 	query := ctx.Arguments.Raw()
-	ctx.NewEmbed().
+	c.services.Embed.New(ctx).
 		AddField("Stack Overflow Search", fmt.Sprintf("https://stackoverflow.com/search?q=%s", url.QueryEscape(query))).
 		Send()
 }
 
 func (c *UtilityCommands) searchcountry(ctx *router.Ctx) {
-	httpResponse := http.Get(fmt.Sprintf("https://restcountries.com/v3.1/name/%s?fullText=true", ctx.Arguments.Raw()))
-	if httpResponse.Error != nil {
+	resp, err := http.DefaultClient().Get(fmt.Sprintf("https://restcountries.com/v3.1/name/%s?fullText=true", ctx.Arguments.Raw()))
+	if err != nil {
 		ctx.RespondText("An error has occurred.")
 		return
 	}
 
-	countryList := httpResponse.Json()
+	countryList := resp.Json()
 
-	country := countryList.GetIndex(0)
+	country := countryList.Get(0)
 
 	rawCurrencies := country.Get("currencies").Interface().(map[string]any)
 	var currencies []string
@@ -3481,32 +3498,32 @@ func (c *UtilityCommands) searchcountry(ctx *router.Ctx) {
 		languages = append(languages, language.(string))
 	}
 
-	ctx.NewEmbed().
-		SetTitle(fmt.Sprintf("%s - %s", country.GetPath("name", "common").MustString(), country.Get("cca2").MustString())).
-		AddField("Name", country.GetPath("name", "common").MustString()).
-		AddField("Top-Level Domain", strings.Join(country.Get("tld").MustStringArray(), ", ")).
+	c.services.Embed.New(ctx).
+		SetTitle("%s - %s", country.Get("name", "common").MustString(), country.Get("cca2").MustString()).
+		AddField("Name", country.Get("name", "common").MustString()).
+		AddField("Top-Level Domain", strings.Join(country.Get("tld").MustStringSlice(), ", ")).
 		AddField("Country Code", country.Get("cca2").MustString()).
-		AddField("Capital", strings.Join(country.Get("capital").MustStringArray(), ", ")).
+		AddField("Capital", strings.Join(country.Get("capital").MustStringSlice(), ", ")).
 		AddField("Region", country.Get("region").MustString()).
 		AddField("Subregion", country.Get("subregion").MustString()).
 		AddField("Population", fmt.Sprint(country.Get("population").MustInt())).
-		AddField("Latitude/Longitude", fmt.Sprintf("%f, %f", country.Get("latlng").GetIndex(0).MustFloat64(), country.Get("latlng").GetIndex(1).MustFloat64())).
-		AddField("Timezone", strings.Join(country.Get("timezones").MustStringArray(), ", ")).
+		AddField("Latitude/Longitude", fmt.Sprintf("%f, %f", country.Get("latlng").Get(0).MustFloat64(), country.Get("latlng").Get(1).MustFloat64())).
+		AddField("Timezone", strings.Join(country.Get("timezones").MustStringSlice(), ", ")).
 		AddField("Currency", strings.Join(currencies, ", ")).
 		AddField("Language", strings.Join(languages, ", ")).
 		Send()
 }
 
 func (c *UtilityCommands) randomcountry(ctx *router.Ctx) {
-	httpResponse := http.Get("https://restcountries.com/v3.1/all")
-	if httpResponse.Error != nil {
+	resp, err := http.DefaultClient().Get("https://restcountries.com/v3.1/all")
+	if err != nil {
 		ctx.RespondText("An error has occurred.")
 		return
 	}
 
-	countryList := httpResponse.Json()
+	countryList := resp.Json()
 
-	country := countryList.GetIndex(random.Int(0, len(countryList.MustArray())))
+	country := countryList.Get(random.Int(0, countryList.Len()))
 
 	rawCurrencies := country.Get("currencies").Interface().(map[string]any)
 	var currencies []string
@@ -3520,17 +3537,17 @@ func (c *UtilityCommands) randomcountry(ctx *router.Ctx) {
 		languages = append(languages, language.(string))
 	}
 
-	ctx.NewEmbed().
-		SetTitle(fmt.Sprintf("%s - %s", country.GetPath("name", "common").MustString(), country.Get("cca2").MustString())).
-		AddField("Name", country.GetPath("name", "common").MustString()).
-		AddField("Top-Level Domain", strings.Join(country.Get("tld").MustStringArray(), ", ")).
+	c.services.Embed.New(ctx).
+		SetTitle("%s - %s", country.Get("name", "common").MustString(), country.Get("cca2").MustString()).
+		AddField("Name", country.Get("name", "common").MustString()).
+		AddField("Top-Level Domain", strings.Join(country.Get("tld").MustStringSlice(), ", ")).
 		AddField("Country Code", country.Get("cca2").MustString()).
-		AddField("Capital", strings.Join(country.Get("capital").MustStringArray(), ", ")).
+		AddField("Capital", strings.Join(country.Get("capital").MustStringSlice(), ", ")).
 		AddField("Region", country.Get("region").MustString()).
 		AddField("Subregion", country.Get("subregion").MustString()).
 		AddField("Population", fmt.Sprint(country.Get("population").MustInt())).
-		AddField("Latitude/Longitude", fmt.Sprintf("%f, %f", country.Get("latlng").GetIndex(0).MustFloat64(), country.Get("latlng").GetIndex(1).MustFloat64())).
-		AddField("Timezone", strings.Join(country.Get("timezones").MustStringArray(), ", ")).
+		AddField("Latitude/Longitude", fmt.Sprintf("%f, %f", country.Get("latlng").Get(0).MustFloat64(), country.Get("latlng").Get(1).MustFloat64())).
+		AddField("Timezone", strings.Join(country.Get("timezones").MustStringSlice(), ", ")).
 		AddField("Currency", strings.Join(currencies, ", ")).
 		AddField("Language", strings.Join(languages, ", ")).
 		Send()
@@ -3542,14 +3559,14 @@ func (c *UtilityCommands) loremipsum(ctx *router.Ctx) {
 		paragrahps = 1
 	}
 
-	httpResponse := http.Get(fmt.Sprintf("https://loripsum.net/api/%d/short/plaintext", paragrahps))
-	if httpResponse.Error != nil {
+	resp, err := http.DefaultClient().Get(fmt.Sprintf("https://loripsum.net/api/%d/short/plaintext", paragrahps))
+	if err != nil {
 		ctx.RespondText("An error has occurred.")
 		return
 	}
 
-	ctx.NewEmbed().
-		SetDescription(string(httpResponse.Body)).
+	c.services.Embed.New(ctx).
+		SetDescription("%s", string(resp.MustGetBody())).
 		Send()
 }
 
@@ -3559,14 +3576,14 @@ func (c *UtilityCommands) baconipsum(ctx *router.Ctx) {
 		paragrahps = 1
 	}
 
-	httpResponse := http.Get(fmt.Sprintf("https://baconipsum.com/api/?type=all-meat&paras=%d&format=text", paragrahps))
-	if httpResponse.Error != nil {
+	resp, err := http.DefaultClient().Get(fmt.Sprintf("https://baconipsum.com/api/?type=all-meat&paras=%d&format=text", paragrahps))
+	if err != nil {
 		ctx.RespondText("An error has occurred.")
 		return
 	}
 
-	ctx.NewEmbed().
-		SetDescription(string(httpResponse.Body)).
+	c.services.Embed.New(ctx).
+		SetDescription("%s", string(resp.MustGetBody())).
 		Send()
 }
 
@@ -3595,12 +3612,12 @@ func (c *UtilityCommands) previewcolor(ctx *router.Ctx) {
 	hex := fmt.Sprintf("%02x%02x%02x", r, g, b)
 	name := "Unknown"
 
-	data, err := http.GetJson("https://www.thecolorapi.com/id?hex=" + hex)
+	resp, err := http.DefaultClient().Get("https://www.thecolorapi.LBcom/id?hex=" + hex)
 	if err == nil {
-		name = data.GetPath("name", "value").MustString()
+		name = resp.Json().Get("name", "value").MustString()
 	}
 
-	ctx.NewEmbed().
+	c.services.Embed.New(ctx).
 		AddField("Color", name).
 		AddField("RGB", fmt.Sprintf("%d, %d, %d", r, g, b)).
 		AddField("Hex", "#"+hex).
@@ -3638,14 +3655,14 @@ func (c *UtilityCommands) generatekey(ctx *router.Ctx) {
 		keys = append(keys, key)
 	}
 
-	ctx.NewEmbed().
+	c.services.Embed.New(ctx).
 		AddField("License Keys", strings.Join(keys, "\n")).
 		Send()
 }
 
 func (c *UtilityCommands) timestampCommand(flags string) func(ctx *router.Ctx) {
 	return func(ctx *router.Ctx) {
-		timestamp, err := api.GPT(utils.Misc.CreateAISystemTimestamp(), ctx.Arguments.Raw())
+		timestamp, err := api.LBGPT(c.getCreds(), utils.Misc.CreateAISystemTimestamp(), ctx.Arguments.Raw())
 		if err != nil {
 			ctx.RespondText("An error has occurred while parsing the timestamp.")
 			return

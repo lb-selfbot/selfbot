@@ -8,13 +8,11 @@ import (
 	"github.com/lb-selfbot/selfbot/internal/fn"
 )
 
-type EmbedFormat string
-
 const (
-	EmbedFormatCodeblock EmbedFormat = "Codeblock"
-	EmbedFormatText      EmbedFormat = "Text"
-	EmbedFormatIndent    EmbedFormat = "Indent"
-	EmbedFormatURLEmbed  EmbedFormat = "URLEmbed"
+	EmbedFormatCodeblock  = "Codeblock"
+	EmbedFormatText       = "Text"
+	EmbedFormatIndent     = "Indent"
+	EmbedFormatURLEmbed   = "URLEmbed"
 )
 
 type EmbedField struct {
@@ -88,7 +86,7 @@ func (e *Embed) ToEmbed() *discordgo.MessageEmbed {
 	}
 }
 
-func (e *Embed) ToString(format EmbedFormat, maxLen int) []string {
+func (e *Embed) ToString(format string, maxLen int) []string {
 	switch format {
 	case EmbedFormatCodeblock:
 		return e.toCodeblock(maxLen)

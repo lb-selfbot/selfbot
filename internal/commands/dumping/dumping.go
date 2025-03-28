@@ -127,11 +127,11 @@ func (c *DumpingCommands) processAttachments(messages []*discordgo.Message, fold
 			}
 			fileName := utils.IO.SanitizeFilename(att.ID + "_" + att.Filename)
 			filePath := filepath.Join(folder, fileName)
-			httpResponse := http.Get(utils.Misc.Or(att.URL, att.ProxyURL))
-			if httpResponse.Error != nil {
+			resp, err := http.DefaultClient().Get(utils.Misc.Or(att.URL, att.ProxyURL))
+			if err != nil {
 				continue
 			}
-			_ = os.WriteFile(filePath, httpResponse.Body, os.ModePerm)
+			_ = os.WriteFile(filePath, resp.MustGetBody(), os.ModePerm)
 			count++
 		}
 	}
@@ -199,7 +199,7 @@ func (c *DumpingCommands) dumpall(ctx *router.Ctx) {
 	_ = os.WriteFile(filePath, []byte(logString), os.ModePerm)
 	_ = system.OpenURL(filePath)
 
-	ctx.NewEmbed().
+	c.services.Embed.New(ctx).
 		SetDescription("Dumped %d messages from %s", len(messages), channel.Name).
 		Send()
 }
@@ -221,7 +221,7 @@ func (c *DumpingCommands) dumpimages(ctx *router.Ctx) {
 		return strings.HasPrefix(att.ContentType, "image/")
 	})
 
-	ctx.NewEmbed().
+	c.services.Embed.New(ctx).
 		SetDescription("Dumped %d images from %s", images, channel.Name).
 		Send()
 }
@@ -243,7 +243,7 @@ func (c *DumpingCommands) dumpvideos(ctx *router.Ctx) {
 		return strings.HasPrefix(att.ContentType, "video/")
 	})
 
-	ctx.NewEmbed().
+	c.services.Embed.New(ctx).
 		SetDescription("Dumped %d videos from %s", videos, channel.Name).
 		Send()
 }
@@ -265,7 +265,7 @@ func (c *DumpingCommands) dumpaudio(ctx *router.Ctx) {
 		return strings.HasPrefix(att.ContentType, "audio/")
 	})
 
-	ctx.NewEmbed().
+	c.services.Embed.New(ctx).
 		SetDescription("Dumped %d audios from %s", audios, channel.Name).
 		Send()
 }
@@ -287,7 +287,7 @@ func (c *DumpingCommands) dumptext(ctx *router.Ctx) {
 		return strings.HasPrefix(att.ContentType, "text/")
 	})
 
-	ctx.NewEmbed().
+	c.services.Embed.New(ctx).
 		SetDescription("Dumped %d texts from %s", texts, channel.Name).
 		Send()
 }
@@ -309,7 +309,7 @@ func (c *DumpingCommands) dumpattachments(ctx *router.Ctx) {
 		return true
 	})
 
-	ctx.NewEmbed().
+	c.services.Embed.New(ctx).
 		SetDescription("Dumped %d attachments from %s", attachments, channel.Name).
 		Send()
 }
@@ -332,7 +332,7 @@ func (c *DumpingCommands) dumpfiletype(ctx *router.Ctx) {
 		return strings.HasSuffix(att.Filename, extension)
 	})
 
-	ctx.NewEmbed().
+	c.services.Embed.New(ctx).
 		SetDescription("Dumped %d attachments from %s", count, channel.Name).
 		Send()
 }
@@ -355,7 +355,7 @@ func (c *DumpingCommands) dumpcontenttype(ctx *router.Ctx) {
 		return strings.Contains(att.ContentType, contentType)
 	})
 
-	ctx.NewEmbed().
+	c.services.Embed.New(ctx).
 		SetDescription("Dumped %d attachments from %s", count, channel.Name).
 		Send()
 }
@@ -381,14 +381,14 @@ func (c *DumpingCommands) dumpemojis(ctx *router.Ctx) {
 			name += ".png"
 		}
 		filePath := filepath.Join(folder, utils.IO.SanitizeFilename(name))
-		httpResponse := http.Get(emoji.URL())
-		if httpResponse.Error != nil {
+		resp, err := http.DefaultClient().Get(emoji.URL())
+		if err != nil {
 			continue
 		}
-		_ = os.WriteFile(filePath, httpResponse.Body, os.ModePerm)
+		_ = os.WriteFile(filePath, resp.MustGetBody(), os.ModePerm)
 	}
 
-	ctx.NewEmbed().
+	c.services.Embed.New(ctx).
 		SetDescription("Dumped %d emojis from %s", len(emojis), guild.Name).
 		Send()
 }
@@ -414,14 +414,14 @@ func (c *DumpingCommands) dumpstickers(ctx *router.Ctx) {
 		}
 		fileName := fmt.Sprintf("%s_%s%s", sticker.ID, sticker.Name, format)
 		filePath := filepath.Join(folder, utils.IO.SanitizeFilename(fileName))
-		httpResponse := http.Get(fmt.Sprintf("https://media.discordapp.net/stickers/%s%s", sticker.ID, format))
-		if httpResponse.Error != nil {
+		resp, err := http.DefaultClient().Get(fmt.Sprintf("https://media.discordapp.net/stickers/%s%s", sticker.ID, format))
+		if err != nil {
 			continue
 		}
-		_ = os.WriteFile(filePath, httpResponse.Body, os.ModePerm)
+		_ = os.WriteFile(filePath, resp.MustGetBody(), os.ModePerm)
 	}
 
-	ctx.NewEmbed().
+	c.services.Embed.New(ctx).
 		SetDescription("Dumped %d stickers from %s", len(guild.Stickers), guild.Name).
 		Send()
 }
@@ -442,14 +442,14 @@ func (c *DumpingCommands) dumpavatars(ctx *router.Ctx) {
 			name += ".png"
 		}
 		filePath := filepath.Join(folder, utils.IO.SanitizeFilename(name))
-		httpResponse := http.Get(member.AvatarURL(""))
-		if httpResponse.Error != nil {
+		resp, err := http.DefaultClient().Get(member.AvatarURL(""))
+		if err != nil {
 			continue
 		}
-		_ = os.WriteFile(filePath, httpResponse.Body, os.ModePerm)
+		_ = os.WriteFile(filePath, resp.MustGetBody(), os.ModePerm)
 	}
 
-	ctx.NewEmbed().
+	c.services.Embed.New(ctx).
 		SetDescription("Dumped %d avatars from %s", len(guild.Members), guild.Name).
 		Send()
 }
@@ -480,7 +480,7 @@ func (c *DumpingCommands) dumpchannels(ctx *router.Ctx) {
 	_ = os.WriteFile(filePath, []byte(logString), os.ModePerm)
 	_ = system.OpenURL(filePath)
 
-	ctx.NewEmbed().
+	c.services.Embed.New(ctx).
 		SetDescription("Dumped %d channels from %s", len(guild.Channels), guild.Name).
 		Send()
 }
@@ -507,7 +507,7 @@ func (c *DumpingCommands) dumpmembers(ctx *router.Ctx) {
 
 	runtime.GC()
 
-	ctx.NewEmbed().
+	c.services.Embed.New(ctx).
 		SetDescription("Dumped %d members from %s", len(guild.Members), guild.Name).
 		Send()
 }

@@ -6,9 +6,10 @@ import (
 	"io"
 	"mime/multipart"
 	"net/http"
+	"strconv"
 	"time"
 
-	"github.com/bitly/go-simplejson"
+	"github.com/lb-selfbot/go-jester"
 	"github.com/lb-selfbot/selfbot/internal/uploaders"
 	"github.com/lb-selfbot/selfbot/internal/uploaders/keys"
 )
@@ -35,7 +36,7 @@ func (i ImgBB) Upload(file *bytes.Buffer, filename string) (*uploaders.UploadRes
 
 	_ = writer.WriteField("type", "file")
 	_ = writer.WriteField("action", "upload")
-	_ = writer.WriteField("timestamp", fmt.Sprint((time.Now().Second())))
+	_ = writer.WriteField("timestamp", strconv.Itoa(time.Now().Second()))
 	_ = writer.WriteField("auth_token", keys.ImgBBAuthToken)
 
 	err = writer.Close()
@@ -56,18 +57,18 @@ func (i ImgBB) Upload(file *bytes.Buffer, filename string) (*uploaders.UploadRes
 	}
 	defer resp.Body.Close()
 
-	json, err := simplejson.NewFromReader(resp.Body)
+	data, err := jester.NewReader(resp.Body)
 	if err != nil {
 		return nil, err
 	}
 
-	if resp.StatusCode != 200 || json.Get("status_code").MustInt() != 200 {
-		return nil, fmt.Errorf("invalid ImgBB response: %s", json.MustMap())
+	if resp.StatusCode != 200 || data.Get("status_code").MustInt() != 200 {
+		return nil, fmt.Errorf("invalid ImgBB response: %s", data.MustMap())
 	}
 
 	result := &uploaders.UploadResult{
-		URL:       json.GetPath("image", "url_viewer").MustString(),
-		DirectURL: json.GetPath("image", "url").MustString(),
+		URL:       data.Get("image", "url_viewer").MustString(),
+		DirectURL: data.Get("image", "url").MustString(),
 	}
 
 	return result, nil

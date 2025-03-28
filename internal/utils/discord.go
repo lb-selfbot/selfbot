@@ -1,7 +1,6 @@
 package utils
 
 import (
-	"bytes"
 	"fmt"
 	"io"
 	"math"
@@ -15,6 +14,7 @@ import (
 
 	"github.com/lb-selfbot/discordgo"
 	"github.com/lb-selfbot/selfbot/internal/constants"
+	"github.com/lb-selfbot/selfbot/internal/fn"
 	"github.com/lb-selfbot/selfbot/internal/http"
 )
 
@@ -332,15 +332,20 @@ Permission: View Guild Insights      | Value: %s`,
 }
 
 func (DiscordUtils) SendFileFromURL(session *discordgo.Session, channelID, url, fileName string, headers ...map[string]string) error {
-	httpResponse := http.Get(url, headers...)
-	if httpResponse.Error != nil {
-		return httpResponse.Error
+	var reqData http.RequestData
+	if len(headers) > 0 {
+		reqData.Headers = headers[0]
 	}
 
-	_, err := session.ChannelFileSend(
+	resp, err := http.DefaultClient().Get(url, reqData)
+	if err != nil {
+		return err
+	}
+
+	_, err = session.ChannelFileSend(
 		channelID,
 		fileName,
-		bytes.NewReader(httpResponse.Body),
+		resp.Body,
 	)
 	return err
 }
@@ -362,7 +367,7 @@ func (DiscordUtils) MapCategories(channels []*discordgo.Channel) (categories []*
 		}
 	}
 
-	looseChannels = Filter(channels, func(channel *discordgo.Channel) bool {
+	looseChannels = fn.Filter(channels, func(channel *discordgo.Channel) bool {
 		return channel.Type != discordgo.ChannelTypeGuildCategory && channel.ParentID == ""
 	})
 
@@ -724,17 +729,7 @@ func (DiscordUtils) SaveAttachment(attachment *discordgo.MessageAttachment) (str
 }
 
 func (DiscordUtils) IsUserMentioned(message *discordgo.Message, userID string) bool {
-	for _, user := range message.Mentions {
-		if user.ID == userID {
-			return true
-		}
-	}
-
-	return false
-}
-
-func (DiscordUtils) WebhookURL(id, token string) string {
-	return fmt.Sprintf("https://discord.com/api/webhooks/%s/%s", id, token)
+	return fn.Any(message.Mentions, func(mention *discordgo.User) bool { return mention.ID == userID })
 }
 
 var Discord = &DiscordUtils{}

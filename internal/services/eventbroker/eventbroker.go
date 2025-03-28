@@ -63,9 +63,11 @@ func (b *eventBroker) Subscribe(eventType EventType, handler EventHandler) {
 
 func (b *eventBroker) Publish(eventType EventType, payload any) {
 	b.mu.RLock()
-	defer b.mu.RUnlock()
+	handlers := make([]EventHandler, len(b.subscribers[eventType]))
+	copy(handlers, b.subscribers[eventType])
+	b.mu.RUnlock()
 
-	for _, handler := range b.subscribers[eventType] {
+	for _, handler := range handlers {
 		go handler(payload)
 	}
 }

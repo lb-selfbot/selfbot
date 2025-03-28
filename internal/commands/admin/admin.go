@@ -580,7 +580,7 @@ func (c *AdminCommands) channelinfo(ctx *router.Ctx) {
 		return
 	}
 
-	ctx.NewEmbed().
+	c.services.Embed.New(ctx).
 		AddField("Name", channel.Name).
 		AddField("ID", channel.ID).
 		AddField("Topic", channel.Topic).
@@ -599,7 +599,7 @@ func (c *AdminCommands) textchannel(ctx *router.Ctx) {
 		ctx.RespondText("Error creating channel: %v", err)
 		return
 	}
-	ctx.NewEmbed().
+	c.services.Embed.New(ctx).
 		SetDescription("Successfully created text channel!").
 		AddField("Channel", channel.Mention()).
 		Send()
@@ -611,7 +611,7 @@ func (c *AdminCommands) voicechannel(ctx *router.Ctx) {
 		ctx.RespondText("Error creating channel: %v", err)
 		return
 	}
-	ctx.NewEmbed().
+	c.services.Embed.New(ctx).
 		SetDescription("Successfully created voice channel!").
 		AddField("Channel", channel.Mention()).
 		Send()
@@ -623,7 +623,7 @@ func (c *AdminCommands) stagechannel(ctx *router.Ctx) {
 		ctx.RespondText("Error creating channel: %v", err)
 		return
 	}
-	ctx.NewEmbed().
+	c.services.Embed.New(ctx).
 		SetDescription("Successfully created stage channel!").
 		AddField("Channel", channel.Mention()).
 		Send()
@@ -635,7 +635,7 @@ func (c *AdminCommands) newschannel(ctx *router.Ctx) {
 		ctx.RespondText("Error creating channel: %v", err)
 		return
 	}
-	ctx.NewEmbed().
+	c.services.Embed.New(ctx).
 		SetDescription("Successfully created news channel!").
 		AddField("Channel", channel.Mention()).
 		Send()
@@ -647,7 +647,7 @@ func (c *AdminCommands) thread(ctx *router.Ctx) {
 		ctx.RespondText("Error creating thread: %v", err)
 		return
 	}
-	ctx.NewEmbed().
+	c.services.Embed.New(ctx).
 		SetDescription("Successfully created thread!").
 		AddField("Thread", channel.Mention()).
 		Send()
@@ -659,7 +659,7 @@ func (c *AdminCommands) category(ctx *router.Ctx) {
 		ctx.RespondText("Error creating category: %v", err)
 		return
 	}
-	ctx.NewEmbed().
+	c.services.Embed.New(ctx).
 		SetDescription("Successfully created category!").
 		AddField("Category", channel.Mention()).
 		Send()
@@ -677,7 +677,7 @@ func (c *AdminCommands) deletecategory(ctx *router.Ctx) {
 		return
 	}
 
-	ctx.NewEmbed().
+	c.services.Embed.New(ctx).
 		SetDescription("Successfully deleted category!").
 		Send()
 }
@@ -697,7 +697,7 @@ func (c *AdminCommands) renamechannel(ctx *router.Ctx) {
 		return
 	}
 
-	ctx.NewEmbed().
+	c.services.Embed.New(ctx).
 		SetDescription("Successfully renamed channel!").
 		AddField("Channel", channel.Mention()).
 		Send()
@@ -716,7 +716,7 @@ func (c *AdminCommands) deletechannel(ctx *router.Ctx) {
 		return
 	}
 
-	ctx.NewEmbed().
+	c.services.Embed.New(ctx).
 		SetDescription("Successfully deleted channel!").
 		Send()
 }
@@ -745,7 +745,7 @@ func (c *AdminCommands) slowmode(ctx *router.Ctx) {
 		return
 	}
 
-	ctx.NewEmbed().
+	c.services.Embed.New(ctx).
 		SetDescription("Successfully set slowmode to %s", duration.String()).
 		AddField("Channel", channel.Mention()).
 		Send()
@@ -767,7 +767,7 @@ func (c *AdminCommands) removeslowmode(ctx *router.Ctx) {
 		return
 	}
 
-	ctx.NewEmbed().
+	c.services.Embed.New(ctx).
 		SetDescription("Successfully removed slowmode!").
 		AddField("Channel", channel.Mention()).
 		Send()
@@ -795,7 +795,7 @@ func (c *AdminCommands) lockchannel(ctx *router.Ctx) {
 		return
 	}
 
-	ctx.NewEmbed().
+	c.services.Embed.New(ctx).
 		SetDescription("Successfully locked channel!").
 		AddField("Channel", channel.Mention()).
 		Send()
@@ -823,7 +823,7 @@ func (c *AdminCommands) unlockchannel(ctx *router.Ctx) {
 		return
 	}
 
-	ctx.NewEmbed().
+	c.services.Embed.New(ctx).
 		SetDescription("Successfully unlocked channel!").
 		AddField("Channel", channel.Mention()).
 		Send()
@@ -899,7 +899,7 @@ func (c *AdminCommands) purgeself(ctx *router.Ctx) {
 		return
 	}
 
-	ctx.NewEmbed().
+	c.services.Embed.New(ctx).
 		SetDescription("Successfully deleted %d messages!", deleted).
 		Send()
 }
@@ -936,7 +936,7 @@ func (c *AdminCommands) purgeuser(ctx *router.Ctx) {
 		return
 	}
 
-	ctx.NewEmbed().
+	c.services.Embed.New(ctx).
 		SetDescription("Successfully deleted %d messages!", deleted).
 		Send()
 }
@@ -1009,7 +1009,7 @@ func (c *AdminCommands) nuke(ctx *router.Ctx) {
 
 	ctx.Message.ChannelID = channel.ID
 
-	ctx.NewEmbed().
+	c.services.Embed.New(ctx).
 		SetDescription("Successfully nuked channel!").
 		Send()
 }
@@ -1060,12 +1060,12 @@ func (c *AdminCommands) listwebhooks(ctx *router.Ctx) {
 	for _, webhook := range webhooks {
 		fmtWebhooks = append(
 			fmtWebhooks,
-			webhook.Name+" - "+utils.Discord.WebhookURL(webhook.ID, webhook.Token),
+			webhook.Name+" - "+discordgo.EndpointWebhookToken(webhook.ID, webhook.Token),
 		)
 	}
 
-	ctx.NewEmbed().
-		SetDescription("Webhooks in "+channel.Mention()).
+	c.services.Embed.New(ctx).
+		SetDescription("%s", "Webhooks in "+channel.Mention()).
 		AddField("Webhooks", strings.Join(fmtWebhooks, "\n")).
 		Send()
 }
@@ -1088,9 +1088,9 @@ func (c *AdminCommands) createwebhook(ctx *router.Ctx) {
 		return
 	}
 
-	ctx.NewEmbed().
+	c.services.Embed.New(ctx).
 		SetDescription("Successfully created webhook!").
-		AddField("Webhook", webhook.Name+" - "+utils.Discord.WebhookURL(webhook.ID, webhook.Token)).
+		AddField("Webhook", webhook.Name+" - "+discordgo.EndpointWebhookToken(webhook.ID, webhook.Token)).
 		Send()
 }
 
@@ -1106,15 +1106,15 @@ func (c *AdminCommands) webhookinfo(ctx *router.Ctx) {
 		return
 	}
 
-	httpResponse := http.Get(webhookUrl.String())
-	if httpResponse.Error != nil || httpResponse.StatusCode != 200 {
+	resp, err := http.DefaultClient().Get(webhookUrl.String())
+	if err != nil || resp.StatusCode != 200 {
 		ctx.RespondText("Invalid webhook URL!")
 		return
 	}
 
-	webhookInfo := httpResponse.Json()
+	webhookInfo := resp.Json()
 
-	ctx.NewEmbed().
+	c.services.Embed.New(ctx).
 		AddField("Type", map[int]string{1: "Incoming", 2: "Channel Follower", 3: "Application"}[webhookInfo.Get("type").MustInt()]).
 		AddField("ID", webhookInfo.Get("id").MustString()).
 		AddField("Name", webhookInfo.Get("name").MustString()).
@@ -1143,13 +1143,13 @@ func (c *AdminCommands) webhooksend(ctx *router.Ctx) {
 		"content": ctx.Arguments.RawFrom(1),
 	}
 
-	httpResponse := http.Post(webhookUrl.String(), data)
-	if httpResponse.Error != nil || httpResponse.StatusCode != 204 {
-		ctx.RespondText("Error sending message to webhook: " + string(httpResponse.Body))
+	resp, err := http.DefaultClient().Post(webhookUrl.String(), data)
+	if err != nil || resp.StatusCode != 204 {
+		ctx.RespondText("%s", "Error sending message to webhook: "+string(resp.MustGetBody()))
 		return
 	}
 
-	ctx.NewEmbed().
+	c.services.Embed.New(ctx).
 		SetDescription("Successfully sent message to webhook.").
 		Send()
 }
@@ -1166,9 +1166,9 @@ func (c *AdminCommands) webhookdelete(ctx *router.Ctx) {
 		return
 	}
 
-	_ = http.CustomMethodWithData(webhookUrl.String(), "DELETE", nil)
+	_, _ = http.DefaultClient().Delete(webhookUrl.String(), nil)
 
-	ctx.NewEmbed().
+	c.services.Embed.New(ctx).
 		SetDescription("Successfully deleted webhook.").
 		Send()
 }
@@ -1187,7 +1187,7 @@ func (c *AdminCommands) userinfo(ctx *router.Ctx) {
 		member, _ = utils.Discord.GetMember(ctx.Session, ctx.Message.GuildID, user.ID, true)
 	}
 
-	emb := ctx.NewEmbed().
+	emb := c.services.Embed.New(ctx).
 		SetDescription("User Info (%s - %s)", user.String(), user.ID).
 		AddField("Avatar", user.AvatarURL(""))
 
@@ -1235,7 +1235,7 @@ func (c *AdminCommands) userage(ctx *router.Ctx) {
 		return
 	}
 	age := time.Since(utils.Discord.SnowflakeToTime(user.ID))
-	ctx.NewEmbed().
+	c.services.Embed.New(ctx).
 		SetDescription("User Age (%s - %s)", user.String(), user.ID).
 		AddField("Age", utils.Misc.FormatDuration(age)).
 		Send()
@@ -1256,7 +1256,7 @@ func (c *AdminCommands) mutualfriends(ctx *router.Ctx) {
 	for _, friend := range mutualFriends {
 		mutualFriendsString += fmt.Sprintf("%s - %s\n", friend.String(), friend.ID)
 	}
-	ctx.NewEmbed().
+	c.services.Embed.New(ctx).
 		SetDescription("Mutual Friends (%s - %s)", user.String(), user.ID).
 		AddField("Mutual Friends", mutualFriendsString).
 		Send()
@@ -1281,7 +1281,7 @@ func (c *AdminCommands) mutualservers(ctx *router.Ctx) {
 		}
 		mutualServersString += fmt.Sprintf("%s - %s\n", guild.Name, guild.ID)
 	}
-	ctx.NewEmbed().
+	c.services.Embed.New(ctx).
 		SetDescription("Mutual Servers (%s - %s)", user.String(), user.ID).
 		AddField("Mutual Servers", mutualServersString).
 		Send()
@@ -1299,7 +1299,7 @@ func (c *AdminCommands) platform(ctx *router.Ctx) {
 		return
 	}
 
-	ctx.NewEmbed().
+	c.services.Embed.New(ctx).
 		AddField("User", member.User.Username).
 		AddField("Status", utils.Discord.FormatStatusEmoji(member.Presence.Status)).
 		AddField("Platform", utils.Discord.FormatClientStatus(member.Presence.ClientStatus)).
@@ -1316,7 +1316,7 @@ func (c *AdminCommands) avatar(ctx *router.Ctx) {
 		ctx.RespondText("User has no avatar")
 		return
 	}
-	ctx.RespondText(user.AvatarURL(""))
+	ctx.RespondText("%s", user.AvatarURL(""))
 }
 
 func (c *AdminCommands) banner(ctx *router.Ctx) {
@@ -1329,7 +1329,7 @@ func (c *AdminCommands) banner(ctx *router.Ctx) {
 		ctx.RespondText("User has no banner")
 		return
 	}
-	ctx.RespondText(user.BannerURL(""))
+	ctx.RespondText("%s", user.BannerURL(""))
 }
 
 func (c *AdminCommands) mute(ctx *router.Ctx) {
@@ -1340,11 +1340,11 @@ func (c *AdminCommands) mute(ctx *router.Ctx) {
 	}
 
 	if err := utils.Discord.MuteUser(ctx.Session, member); err != nil {
-		ctx.RespondText(utils.String.Capitalize(err.Error()))
+		ctx.RespondText("%s", utils.String.Capitalize(err.Error()))
 		return
 	}
 
-	ctx.NewEmbed().
+	c.services.Embed.New(ctx).
 		SetDescription("Successfully muted user!").
 		Send()
 }
@@ -1368,7 +1368,7 @@ func (c *AdminCommands) unmute(ctx *router.Ctx) {
 		}
 
 		if !slices.Contains(member.Roles, role.ID) {
-			ctx.NewEmbed().
+			c.services.Embed.New(ctx).
 				SetDescription("User is already unmuted!").
 				Send()
 			return
@@ -1389,7 +1389,7 @@ func (c *AdminCommands) unmute(ctx *router.Ctx) {
 			return
 		}
 
-		ctx.NewEmbed().
+		c.services.Embed.New(ctx).
 			SetDescription("Successfully unmuted user!").
 			Send()
 
@@ -1420,7 +1420,7 @@ func (c *AdminCommands) timeout(ctx *router.Ctx) {
 		return
 	}
 
-	ctx.NewEmbed().
+	c.services.Embed.New(ctx).
 		SetDescription("Successfully timed out user for %s!", duration.String()).
 		Send()
 }
@@ -1438,7 +1438,7 @@ func (c *AdminCommands) removetimeout(ctx *router.Ctx) {
 		return
 	}
 
-	ctx.NewEmbed().
+	c.services.Embed.New(ctx).
 		SetDescription("Successfully removed timeout!").
 		Send()
 }
@@ -1456,7 +1456,7 @@ func (c *AdminCommands) kick(ctx *router.Ctx) {
 		return
 	}
 
-	ctx.NewEmbed().
+	c.services.Embed.New(ctx).
 		SetDescription("Successfully kicked user!").
 		Send()
 }
@@ -1474,7 +1474,7 @@ func (c *AdminCommands) ban(ctx *router.Ctx) {
 		return
 	}
 
-	ctx.NewEmbed().
+	c.services.Embed.New(ctx).
 		SetDescription("Successfully banned user!").
 		Send()
 }
@@ -1497,7 +1497,7 @@ func (c *AdminCommands) softban(ctx *router.Ctx) {
 		return
 	}
 
-	ctx.NewEmbed().
+	c.services.Embed.New(ctx).
 		SetDescription("Successfully softbanned user!").
 		Send()
 }
@@ -1509,7 +1509,7 @@ func (c *AdminCommands) unban(ctx *router.Ctx) {
 		return
 	}
 
-	ctx.NewEmbed().
+	c.services.Embed.New(ctx).
 		SetDescription("Successfully unbanned user!").
 		Send()
 }
@@ -1531,7 +1531,7 @@ func (c *AdminCommands) banlist(ctx *router.Ctx) {
 		return fmt.Sprintf("%s - %s", ban.User.Username, ban.User.ID)
 	})
 
-	ctx.NewEmbed().
+	c.services.Embed.New(ctx).
 		AddField("Banned Amount", strconv.Itoa(len(bans))).
 		AddField("Ban List", strings.Join(banReadable, "\n")).
 		Send()
@@ -1566,7 +1566,7 @@ func (c *AdminCommands) copybans(ctx *router.Ctx) {
 		time.Sleep(2 * time.Second)
 	}
 
-	ctx.NewEmbed().
+	c.services.Embed.New(ctx).
 		SetDescription("Successfully copied bans from %s to %s!", srcGuild.Name, destGuild.Name).
 		Send()
 }
@@ -1579,7 +1579,7 @@ func (c *AdminCommands) nick(ctx *router.Ctx) {
 		ctx.RespondText("Error changing nickname: %v", err)
 		return
 	}
-	ctx.NewEmbed().
+	c.services.Embed.New(ctx).
 		SetDescription("Successfully changed nickname!").
 		Send()
 }
@@ -1596,7 +1596,7 @@ func (c *AdminCommands) nickuser(ctx *router.Ctx) {
 		ctx.RespondText("Error changing nickname: %v", err)
 		return
 	}
-	ctx.NewEmbed().
+	c.services.Embed.New(ctx).
 		SetDescription("Successfully changed nickname!").
 		Send()
 }
@@ -1613,7 +1613,7 @@ func (c *AdminCommands) clearnick(ctx *router.Ctx) {
 		ctx.RespondText("Error changing nickname: %v", err)
 		return
 	}
-	ctx.NewEmbed().
+	c.services.Embed.New(ctx).
 		SetDescription("Successfully changed nickname!").
 		Send()
 }
@@ -1633,7 +1633,7 @@ func (c *AdminCommands) serverinfo(ctx *router.Ctx) {
 		ownerMention = owner.User.String()
 	}
 
-	ctx.NewEmbed().
+	c.services.Embed.New(ctx).
 		SetDescription("Server Info - %s", guild.Name).
 		AddField("ID", guild.ID).
 		AddField("Owner", ownerMention).
@@ -1656,7 +1656,7 @@ func (c *AdminCommands) serverage(ctx *router.Ctx) {
 		return
 	}
 	age := time.Since(utils.Discord.SnowflakeToTime(guild.ID))
-	ctx.NewEmbed().
+	c.services.Embed.New(ctx).
 		SetDescription("Server Age (%s - %s)", guild.Name, guild.ID).
 		AddField("Age", utils.Misc.FormatDuration(age)).
 		Send()
@@ -1673,8 +1673,8 @@ func (c *AdminCommands) serverowner(ctx *router.Ctx) {
 		ctx.RespondText("Error getting server owner")
 		return
 	}
-	ctx.NewEmbed().
-		SetDescription(guild.Name).
+	c.services.Embed.New(ctx).
+		SetDescription("%s", guild.Name).
 		AddField("Owner", owner.Mention()).
 		Send()
 }
@@ -1686,7 +1686,7 @@ func (c *AdminCommands) servericon(ctx *router.Ctx) {
 		return
 	}
 
-	emb := ctx.NewEmbed().
+	emb := c.services.Embed.New(ctx).
 		SetDescription("Server Icon - %s", guild.Name).
 		SetImage(guild.IconURL())
 	if guild.Icon == "" {
@@ -1702,9 +1702,9 @@ func (c *AdminCommands) serverbanner(ctx *router.Ctx) {
 		return
 	}
 	if guild.Banner == "" {
-		ctx.NewEmbed().AddField("Error", "Server has no banner!").Send()
+		c.services.Embed.New(ctx).AddField("Error", "Server has no banner!").Send()
 	}
-	ctx.NewEmbed().
+	c.services.Embed.New(ctx).
 		SetDescription("Server Banner - %s", guild.Name).
 		SetImage(guild.BannerURL()).
 		Send()
@@ -1720,7 +1720,7 @@ func (c *AdminCommands) serversplash(ctx *router.Ctx) {
 		ctx.RespondText("Server has no invite splash!")
 		return
 	}
-	ctx.NewEmbed().
+	c.services.Embed.New(ctx).
 		SetDescription("Server Invite Splash - %s", guild.Name).
 		SetImage(discordgo.EndpointGuildSplash(guild.ID, guild.Splash)).
 		Send()
@@ -1736,7 +1736,7 @@ func (c *AdminCommands) serverdsplash(ctx *router.Ctx) {
 		ctx.RespondText("Server has no discovery splash!")
 		return
 	}
-	ctx.NewEmbed().
+	c.services.Embed.New(ctx).
 		SetDescription("Server Discovery Splash - %s", guild.Name).
 		SetImage(discordgo.EndpointGuildSplash(guild.ID, guild.DiscoverySplash)).
 		Send()
@@ -1760,7 +1760,7 @@ func (c *AdminCommands) serverboosters(ctx *router.Ctx) {
 		boostersString = "No boosters"
 	}
 
-	ctx.NewEmbed().
+	c.services.Embed.New(ctx).
 		SetDescription("Server Boosters - %s", guild.Name).
 		AddField("Boosters", boostersString).
 		Send()
@@ -1773,7 +1773,7 @@ func (c *AdminCommands) serverboostlevel(ctx *router.Ctx) {
 		return
 	}
 
-	ctx.NewEmbed().
+	c.services.Embed.New(ctx).
 		SetDescription("Server Boost Level - %s", guild.Name).
 		AddField("Boost Level", boostLevels[int(guild.PremiumTier)]).
 		Send()
@@ -1787,7 +1787,7 @@ func (c *AdminCommands) setservername(ctx *router.Ctx) {
 		ctx.RespondText("Error changing server name: %v", err)
 		return
 	}
-	ctx.NewEmbed().
+	c.services.Embed.New(ctx).
 		SetDescription("Successfully changed server name to %s!", guild.Name).
 		Send()
 }
@@ -1800,7 +1800,7 @@ func (c *AdminCommands) setservericon(ctx *router.Ctx) {
 		ctx.RespondText("Error changing server icon: %v", err)
 		return
 	}
-	ctx.NewEmbed().
+	c.services.Embed.New(ctx).
 		SetDescription("Successfully changed server icon!").
 		Send()
 }
@@ -1813,7 +1813,7 @@ func (c *AdminCommands) setserverbanner(ctx *router.Ctx) {
 		ctx.RespondText("Error changing server icon: %v", err)
 		return
 	}
-	ctx.NewEmbed().
+	c.services.Embed.New(ctx).
 		SetDescription("Successfully changed server icon!").
 		Send()
 }
@@ -1848,7 +1848,7 @@ func (c *AdminCommands) lockserver(ctx *router.Ctx) {
 		}
 	}
 
-	ctx.NewEmbed().
+	c.services.Embed.New(ctx).
 		SetDescription("Successfully locked server!").
 		Send()
 }
@@ -1883,7 +1883,7 @@ func (c *AdminCommands) unlockserver(ctx *router.Ctx) {
 		}
 	}
 
-	ctx.NewEmbed().
+	c.services.Embed.New(ctx).
 		SetDescription("Successfully unlocked server!").
 		Send()
 }
@@ -1896,7 +1896,7 @@ func (c *AdminCommands) channels(ctx *router.Ctx) {
 	}
 
 	categories, categoryChannels, looseChannels := utils.Discord.MapCategories(guild.Channels)
-	emb := ctx.NewEmbed().SetDescription("Server Channels - %s", guild.Name)
+	emb := c.services.Embed.New(ctx).SetDescription("Server Channels - %s", guild.Name)
 
 	looseString := ""
 	for _, channel := range looseChannels {
@@ -1931,7 +1931,7 @@ func (c *AdminCommands) bots(ctx *router.Ctx) {
 		return fmt.Sprintf("%s - %s", member.User.String(), member.User.ID)
 	})
 
-	ctx.NewEmbed().
+	c.services.Embed.New(ctx).
 		SetDescription("Server Bots - %s", guild.Name).
 		AddField("Server Bots", strings.Join(botsReadable, "\n")).
 		Send()
@@ -1962,7 +1962,7 @@ func (c *AdminCommands) admins(ctx *router.Ctx) {
 		return fmt.Sprintf("%s - %s", member.User.String(), member.User.ID)
 	})
 
-	ctx.NewEmbed().
+	c.services.Embed.New(ctx).
 		SetDescription("Server Admins - %s", guild.Name).
 		AddField("Server Admins", strings.Join(adminsReadable, "\n")).
 		Send()
@@ -1983,7 +1983,7 @@ func (c *AdminCommands) roles(ctx *router.Ctx) {
 		return fmt.Sprintf("%s - %s", role.Name, role.ID)
 	})
 
-	ctx.NewEmbed().
+	c.services.Embed.New(ctx).
 		SetDescription("Server Roles - %s", guild.Name).
 		AddField("Server Roles", strings.Join(rolesReadable, "\n")).
 		Send()
@@ -2033,7 +2033,7 @@ func (c *AdminCommands) invite(ctx *router.Ctx) {
 		return
 	}
 
-	ctx.NewEmbed().
+	c.services.Embed.New(ctx).
 		SetDescription("Created invite: https://discord.gg/%s", invite.Code).
 		Send()
 }
@@ -2045,7 +2045,7 @@ func (c *AdminCommands) friendinvite(ctx *router.Ctx) {
 		return
 	}
 
-	ctx.NewEmbed().
+	c.services.Embed.New(ctx).
 		SetDescription("Successfully created friend invite!").
 		AddField("Invite", fmt.Sprintf("https://discord.gg/%s", invite.Code)).
 		Send()
@@ -2059,7 +2059,7 @@ func (c *AdminCommands) inviteinfo(ctx *router.Ctx) {
 		return
 	}
 
-	emb := ctx.NewEmbed().SetDescription("Invite Info - %s", invite.Code)
+	emb := c.services.Embed.New(ctx).SetDescription("Invite Info - %s", invite.Code)
 	if invite.Guild != nil {
 		emb.AddField("Server", invite.Guild.Name)
 		if invite.Guild.Icon != "" {
@@ -2097,7 +2097,7 @@ func (c *AdminCommands) deleteinvite(ctx *router.Ctx) {
 		return
 	}
 
-	ctx.NewEmbed().
+	c.services.Embed.New(ctx).
 		SetDescription("Deleted invite: %s", invite.Code).
 		Send()
 }
@@ -2126,7 +2126,7 @@ func (c *AdminCommands) serverinvites(ctx *router.Ctx) {
 			username,
 		)
 	}
-	ctx.NewEmbed().
+	c.services.Embed.New(ctx).
 		SetDescription("Invite List").
 		AddField("Invites", invitesString).
 		Send()
@@ -2156,7 +2156,7 @@ func (c *AdminCommands) channelinvites(ctx *router.Ctx) {
 			username,
 		)
 	}
-	ctx.NewEmbed().
+	c.services.Embed.New(ctx).
 		SetDescription("Invite List").
 		AddField("Invites", invitesString).
 		Send()
@@ -2194,7 +2194,7 @@ func (c *AdminCommands) userinvites(ctx *router.Ctx) {
 			utils.Discord.GetTimestamp(invite.ExpiresAt, "Never"),
 		)
 	}
-	ctx.NewEmbed().
+	c.services.Embed.New(ctx).
 		SetDescription("Invite List (%s)", member.User.String()).
 		AddField("Invites", invitesString).
 		Send()
@@ -2219,8 +2219,8 @@ func (c *AdminCommands) roleinfo(ctx *router.Ctx) {
 		}
 	}
 	createdAt := utils.Discord.SnowflakeToTime(role.ID)
-	perms, _ := api.CreatePaste(utils.Discord.FormatPermissions(role.Name, role.ID, role.Permissions))
-	ctx.NewEmbed().
+	perms, _ := api.LBCreatePaste(utils.Discord.FormatPermissions(role.Name, role.ID, role.Permissions))
+	c.services.Embed.New(ctx).
 		SetDescription("Role Info (%s)", role.Name).
 		AddField("ID", role.ID).
 		AddField("Color", fmt.Sprintf("#%x", role.Color)).
@@ -2250,7 +2250,7 @@ func (c *AdminCommands) giverole(ctx *router.Ctx) {
 		ctx.RespondText("Error giving role: %v", err)
 		return
 	}
-	ctx.NewEmbed().
+	c.services.Embed.New(ctx).
 		SetDescription("Successfully gave role (%s) to (%s)", role.Name, member.User.String()).
 		Send()
 }
@@ -2272,7 +2272,7 @@ func (c *AdminCommands) removerole(ctx *router.Ctx) {
 		ctx.RespondText("Error removing role: %v", err)
 		return
 	}
-	ctx.NewEmbed().
+	c.services.Embed.New(ctx).
 		SetDescription("Successfully removed role (%s) from (%s)", role.Name, member.User.String()).
 		Send()
 }
@@ -2286,7 +2286,7 @@ func (c *AdminCommands) createrole(ctx *router.Ctx) {
 		return
 	}
 
-	ctx.NewEmbed().
+	c.services.Embed.New(ctx).
 		SetDescription("Successfully created role (%s)", role.Name).
 		Send()
 }
@@ -2302,7 +2302,7 @@ func (c *AdminCommands) deleterole(ctx *router.Ctx) {
 		ctx.RespondText("Error deleting role: %v", err)
 		return
 	}
-	ctx.NewEmbed().
+	c.services.Embed.New(ctx).
 		SetDescription("Successfully deleted role (%s)", role.Name).
 		Send()
 }
@@ -2322,7 +2322,7 @@ func (c *AdminCommands) renamerole(ctx *router.Ctx) {
 		return
 	}
 
-	ctx.NewEmbed().
+	c.services.Embed.New(ctx).
 		SetDescription("Successfully renamed role (%s)", role.Name).
 		Send()
 }

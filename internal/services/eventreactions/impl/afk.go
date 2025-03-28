@@ -94,7 +94,6 @@ func (a *AFK) GetAFKMessage(m *discordgo.Message, message string) string {
 func (a *AFK) Handler(session *discordgo.Session, event any) {
 	message, ok := event.(*discordgo.MessageCreate)
 	if !ok {
-		logging.Debug("AFK.Handler: Event is not a message create event")
 		return
 	}
 
@@ -157,8 +156,13 @@ func (a *AFK) Handler(session *discordgo.Session, event any) {
 
 		message.Content = strings.ReplaceAll(message.Content, session.State.User.Mention(), message.Author.Mention())
 
+		creds := api.LBCreds{
+			Username: cfg.Account.LightningBot.Username,
+			Password: cfg.Account.LightningBot.Password,
+		}
+
 		var err error
-		afkMessage, err = api.GPT(instructions, message.Content)
+		afkMessage, err = api.LBGPT(creds, instructions, message.Content)
 		if err != nil {
 			logging.Error("AFK.Handler: Error getting AI response: " + err.Error())
 			return
@@ -173,7 +177,7 @@ func (a *AFK) Handler(session *discordgo.Session, event any) {
 	if cfg.AFK.Reply {
 		m, err := session.ChannelMessageSendReply(message.ChannelID, afkMessage, message.Reference())
 		if err == nil {
-			err = session.MessageUnack(message.ChannelID, message.ID, 1)
+			_ = session.MessageUnack(message.ChannelID, message.ID, 1)
 			return
 		}
 
@@ -181,7 +185,7 @@ func (a *AFK) Handler(session *discordgo.Session, event any) {
 	} else {
 		m, err := session.ChannelMessageSend(message.ChannelID, afkMessage)
 		if err == nil {
-			err = session.MessageUnack(message.ChannelID, message.ID, 1)
+			_ = session.MessageUnack(message.ChannelID, message.ID, 1)
 			return
 		}
 

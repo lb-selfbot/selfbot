@@ -9,7 +9,7 @@ import (
 	"path"
 	"strings"
 
-	"github.com/bitly/go-simplejson"
+	"github.com/lb-selfbot/go-jester"
 	"github.com/lb-selfbot/selfbot/internal/uploaders"
 	"github.com/lb-selfbot/selfbot/internal/uploaders/keys"
 )
@@ -53,22 +53,22 @@ func (Imgur) Upload(file *bytes.Buffer, filename string) (*uploaders.UploadResul
 	}
 	defer resp.Body.Close()
 
-	json, err := simplejson.NewFromReader(resp.Body)
+	data, err := jester.NewReader(resp.Body)
 	if err != nil {
 		return nil, err
 	}
 
 	if resp.StatusCode != 200 {
-		return nil, fmt.Errorf("invalid Imgur response: %s", json.MustMap())
+		return nil, fmt.Errorf("invalid Imgur response: %s", data.MustMap())
 	}
 
-	if !json.Get("success").MustBool() || json.Get("status").MustInt() != 200 {
-		return nil, fmt.Errorf("invalid Imgur response: %s", json.MustMap())
+	if !data.Get("success").MustBool() || data.Get("status").MustInt() != 200 {
+		return nil, fmt.Errorf("invalid Imgur response: %s", data.MustMap())
 	}
 
-	directUrl := json.GetPath("data", "link").MustString()
+	directUrl := data.Get("data", "link").MustString()
 	if directUrl == "" || !strings.Contains(directUrl, ".") {
-		return nil, fmt.Errorf("invalid Imgur response: %s", json.MustMap())
+		return nil, fmt.Errorf("invalid Imgur response: %s", data.MustMap())
 	}
 
 	ext := path.Ext(directUrl)

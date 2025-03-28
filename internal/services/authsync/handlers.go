@@ -38,7 +38,7 @@ func (a *authSyncService) handleHelloAck(msg *WSMessage) error {
 	close(a.readyChan)
 
 	cfg := a.configSvc.GetConfig()
-	return a.SendSync(SyncTypeConfigUpdate, &cfg)
+	return a.SendSync(SyncTypeConfigUpdate, cfg)
 }
 
 func (a *authSyncService) handleFreeTrialStart(_ *WSMessage) error {
@@ -63,7 +63,7 @@ func (a *authSyncService) handleWebsiteConnect(_ *WSMessage) error {
 	}
 
 	cfg := a.configSvc.GetConfig()
-	err = a.SendSync(SyncTypeConfigUpdate, &cfg)
+	err = a.SendSync(SyncTypeConfigUpdate, cfg)
 	if err != nil {
 		return fmt.Errorf("failed to send config update: %w", err)
 	}

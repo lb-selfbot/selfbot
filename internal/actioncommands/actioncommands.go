@@ -1,15 +1,17 @@
-package router
+package actioncommands
 
 import (
 	"fmt"
 	"strings"
 
 	"github.com/lb-selfbot/selfbot/internal/fn"
+	"github.com/lb-selfbot/selfbot/internal/services"
+	"github.com/lb-selfbot/selfbot/internal/services/router"
 )
 
 // CommandAction is an action for an ActionCommand.
 type CommandAction interface {
-	ToSubCommand(router *routerService) *Command
+	ToSubCommand(services *services.Services) *router.Command
 }
 
 // CommandActionGet is an action for an ActionCommand that
@@ -17,14 +19,14 @@ type CommandAction interface {
 type CommandActionGet struct {
 	ReadableName string
 	Desc         string
-	Getter       func(ctx *Ctx) (any, error)
+	Getter       func(ctx *router.Ctx) (any, error)
 }
 
-func (a *CommandActionGet) ToSubCommand(router *routerService) *Command {
-	return &Command{
+func (a *CommandActionGet) ToSubCommand(services *services.Services) *router.Command {
+	return &router.Command{
 		Name:        "get",
 		Description: a.Desc,
-		Handler: func(ctx *Ctx) {
+		Handler: func(ctx *router.Ctx) {
 			value, err := a.Getter(ctx)
 			if err != nil {
 				ctx.RespondText("Error getting value: %v", err)
@@ -32,8 +34,8 @@ func (a *CommandActionGet) ToSubCommand(router *routerService) *Command {
 			}
 
 			// Display the retrieved value
-			ctx.NewEmbed().
-				SetDescription(fmt.Sprintf("%s is currently set to: %v", a.ReadableName, value)).
+			services.Embed.New(ctx).
+				SetDescription("%s", fmt.Sprintf("%s is currently set to: %v", a.ReadableName, value)).
 				Send()
 		},
 	}
@@ -45,15 +47,15 @@ type CommandActionSet struct {
 	ReadableName string
 	Desc         string
 	ValueType    ActionValueType
-	Setter       func(ctx *Ctx, value any) error
+	Setter       func(ctx *router.Ctx, value any) error
 }
 
-func (a *CommandActionSet) ToSubCommand(router *routerService) *Command {
-	return &Command{
+func (a *CommandActionSet) ToSubCommand(services *services.Services) *router.Command {
+	return &router.Command{
 		Name:        "set",
 		Description: a.Desc,
 		Arguments:   "[value]",
-		Handler: func(ctx *Ctx) {
+		Handler: func(ctx *router.Ctx) {
 			value, err := parseValue(ctx, a.ValueType)
 			if err != nil {
 				ctx.RespondText("Error parsing value: %v", err)
@@ -65,8 +67,8 @@ func (a *CommandActionSet) ToSubCommand(router *routerService) *Command {
 				return
 			}
 
-			ctx.NewEmbed().
-				SetDescription(fmt.Sprintf("%s set to %v", a.ReadableName, value)).
+			services.Embed.New(ctx).
+				SetDescription("%s", fmt.Sprintf("%s set to %v", a.ReadableName, value)).
 				Send()
 		},
 	}
@@ -77,21 +79,21 @@ func (a *CommandActionSet) ToSubCommand(router *routerService) *Command {
 type CommandActionToggle struct {
 	ReadableName string
 	Desc         string
-	Toggler      func(ctx *Ctx) error
+	Toggler      func(ctx *router.Ctx) error
 }
 
-func (a *CommandActionToggle) ToSubCommand(router *routerService) *Command {
-	return &Command{
+func (a *CommandActionToggle) ToSubCommand(services *services.Services) *router.Command {
+	return &router.Command{
 		Name:        "toggle",
 		Description: a.Desc,
-		Handler: func(ctx *Ctx) {
+		Handler: func(ctx *router.Ctx) {
 			if err := a.Toggler(ctx); err != nil {
 				ctx.RespondText("Error toggling value: %v", err)
 				return
 			}
 
-			ctx.NewEmbed().
-				SetDescription(fmt.Sprintf("%s toggled", a.ReadableName)).
+			services.Embed.New(ctx).
+				SetDescription("%s", fmt.Sprintf("%s toggled", a.ReadableName)).
 				Send()
 		},
 	}
@@ -105,17 +107,17 @@ type CommandActionValues struct {
 	ValuesGetter func() []any
 }
 
-func (a *CommandActionValues) ToSubCommand(router *routerService) *Command {
-	return &Command{
+func (a *CommandActionValues) ToSubCommand(services *services.Services) *router.Command {
+	return &router.Command{
 		Name:        "values",
 		Description: a.Desc,
-		Handler: func(ctx *Ctx) {
+		Handler: func(ctx *router.Ctx) {
 			values := a.ValuesGetter()
 			stringValues := fn.Map(values, func(value any) string {
 				return fmt.Sprint(value)
 			})
 
-			ctx.NewEmbed().
+			services.Embed.New(ctx).
 				AddField(a.ReadableName, strings.Join(stringValues, "\n")).
 				Send()
 		},
@@ -127,14 +129,14 @@ func (a *CommandActionValues) ToSubCommand(router *routerService) *Command {
 type CommandActionExample struct {
 	ReadableName string
 	Desc         string
-	Example      func(ctx *Ctx) error
+	Example      func(ctx *router.Ctx) error
 }
 
-func (a *CommandActionExample) ToSubCommand(router *routerService) *Command {
-	return &Command{
+func (a *CommandActionExample) ToSubCommand(services *services.Services) *router.Command {
+	return &router.Command{
 		Name:        "example",
 		Description: a.Desc,
-		Handler: func(ctx *Ctx) {
+		Handler: func(ctx *router.Ctx) {
 			if err := a.Example(ctx); err != nil {
 				ctx.RespondText("Error demonstrating example: %v", err)
 				return
@@ -155,7 +157,7 @@ const (
 )
 
 // parseValue parses a value from the context based on its type.
-func parseValue(ctx *Ctx, valueType ActionValueType) (any, error) {
+func parseValue(ctx *router.Ctx, valueType ActionValueType) (any, error) {
 	switch valueType {
 	case ValueTypeString:
 		return ctx.Arguments.Raw(), nil
@@ -186,56 +188,54 @@ type ActionCommandSingle struct {
 	Name         string
 	ReadableName string
 	Description  string
-	Flags        []CommandFlag
+	Flags        []router.CommandFlag
 	Actions      []CommandAction
 }
 
-func (a ActionCommandSingle) ToCommand(router Service) *Command {
-	cmd := &Command{
+func (a ActionCommandSingle) ToCommand(services *services.Services) *router.Command {
+	cmd := &router.Command{
 		Name:        a.Name,
 		Description: a.Description,
 		Flags:       a.Flags,
 	}
 
-	routerSvc := router.(*routerService)
-
 	for _, action := range a.Actions {
-		cmd.SubCommands = append(cmd.SubCommands, action.ToSubCommand(routerSvc))
+		cmd.SubCommands = append(cmd.SubCommands, action.ToSubCommand(services))
 	}
 
 	return cmd
 }
 
-// ActionCommandBuilder helps with building an ActionCommandSingle.
-type ActionCommandBuilder struct {
+// Builder helps with building an ActionCommandSingle.
+type Builder struct {
 	cmd ActionCommandSingle
 }
 
-// NewActionCommandBuilder creates a new builder for an ActionCommandSingle.
-func NewActionCommandBuilder(name, readableName string) *ActionCommandBuilder {
-	return &ActionCommandBuilder{
+// NewBuilder creates a new builder for an ActionCommandSingle.
+func NewBuilder(name, readableName string) *Builder {
+	return &Builder{
 		cmd: ActionCommandSingle{
 			Name:         name,
 			ReadableName: readableName,
-			Flags:        []CommandFlag{CmdFlagDangerous},
+			Flags:        []router.CommandFlag{router.CmdFlagDangerous},
 		},
 	}
 }
 
 // WithDescription adds a description to the command.
-func (b *ActionCommandBuilder) WithDescription(description string) *ActionCommandBuilder {
+func (b *Builder) WithDescription(description string) *Builder {
 	b.cmd.Description = description
 	return b
 }
 
 // WithFlags adds flags to the command.
-func (b *ActionCommandBuilder) WithFlags(flags ...CommandFlag) *ActionCommandBuilder {
+func (b *Builder) WithFlags(flags ...router.CommandFlag) *Builder {
 	b.cmd.Flags = flags
 	return b
 }
 
 // WithGetter adds a getter action to the command.
-func (b *ActionCommandBuilder) WithGetter(desc string, getter func(ctx *Ctx) (any, error)) *ActionCommandBuilder {
+func (b *Builder) WithGetter(desc string, getter func(ctx *router.Ctx) (any, error)) *Builder {
 	b.cmd.Actions = append(b.cmd.Actions, &CommandActionGet{
 		ReadableName: b.cmd.ReadableName,
 		Desc:         desc,
@@ -245,7 +245,7 @@ func (b *ActionCommandBuilder) WithGetter(desc string, getter func(ctx *Ctx) (an
 }
 
 // WithSetter adds a setter action to the command.
-func (b *ActionCommandBuilder) WithSetter(desc string, valueType ActionValueType, setter func(ctx *Ctx, value any) error) *ActionCommandBuilder {
+func (b *Builder) WithSetter(desc string, valueType ActionValueType, setter func(ctx *router.Ctx, value any) error) *Builder {
 	b.cmd.Actions = append(b.cmd.Actions, &CommandActionSet{
 		ReadableName: b.cmd.ReadableName,
 		Desc:         desc,
@@ -256,7 +256,7 @@ func (b *ActionCommandBuilder) WithSetter(desc string, valueType ActionValueType
 }
 
 // WithToggler adds a toggler action to the command.
-func (b *ActionCommandBuilder) WithToggler(desc string, toggler func(ctx *Ctx) error) *ActionCommandBuilder {
+func (b *Builder) WithToggler(desc string, toggler func(ctx *router.Ctx) error) *Builder {
 	b.cmd.Actions = append(b.cmd.Actions, &CommandActionToggle{
 		ReadableName: b.cmd.ReadableName,
 		Desc:         desc,
@@ -266,7 +266,7 @@ func (b *ActionCommandBuilder) WithToggler(desc string, toggler func(ctx *Ctx) e
 }
 
 // WithValues adds a values action to the command.
-func (b *ActionCommandBuilder) WithValues(desc string, valuesGetter func() []any) *ActionCommandBuilder {
+func (b *Builder) WithValues(desc string, valuesGetter func() []any) *Builder {
 	b.cmd.Actions = append(b.cmd.Actions, &CommandActionValues{
 		ReadableName: b.cmd.ReadableName,
 		Desc:         desc,
@@ -276,7 +276,7 @@ func (b *ActionCommandBuilder) WithValues(desc string, valuesGetter func() []any
 }
 
 // WithExample adds an example action to the command.
-func (b *ActionCommandBuilder) WithExample(desc string, example func(ctx *Ctx) error) *ActionCommandBuilder {
+func (b *Builder) WithExample(desc string, example func(ctx *router.Ctx) error) *Builder {
 	b.cmd.Actions = append(b.cmd.Actions, &CommandActionExample{
 		ReadableName: b.cmd.ReadableName,
 		Desc:         desc,
@@ -286,6 +286,6 @@ func (b *ActionCommandBuilder) WithExample(desc string, example func(ctx *Ctx) e
 }
 
 // Build creates an ActionCommandSingle from the builder.
-func (b *ActionCommandBuilder) Build(router Service) *Command {
-	return b.cmd.ToCommand(router)
+func (b *Builder) Build(services *services.Services) *router.Command {
+	return b.cmd.ToCommand(services)
 }
