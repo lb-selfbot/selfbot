@@ -4,7 +4,7 @@ go 1.24.0
 
 require (
 	github.com/LightningDev1/beeep v0.1.0
-	github.com/LightningDev1/go-foreground v0.0.0-20240212172534-661cc0000e42
+	github.com/LightningDev1/go-foreground v0.0.0-20250330070915-9682351327d9
 	github.com/LightningDev1/go-privnote v0.1.1
 	github.com/bogdanfinn/fhttp v0.5.36
 	github.com/bogdanfinn/tls-client v1.8.0
@@ -78,6 +78,7 @@ require (
 	github.com/muesli/termenv v0.16.0 // indirect
 	github.com/nu7hatch/gouuid v0.0.0-20131221200532-179d4d0c4d8d // indirect
 	github.com/power-devops/perfstat v0.0.0-20240221224432-82ca36839d55 // indirect
+	github.com/progrium/darwinkit v0.5.0 // indirect
 	github.com/progrium/macdriver v0.5.0-preview.0.20240129182626-6a98f82290e5 // indirect
 	github.com/quic-go/quic-go v0.50.1 // indirect
 	github.com/rivo/uniseg v0.4.7 // indirect

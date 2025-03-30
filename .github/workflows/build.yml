@@ -158,20 +158,19 @@ jobs:
           export GOARCH=arm64
           garble -seed=U4Nxq2YSVm6ivvOejQbElA== build -tags timetzdata -trimpath -ldflags "-s -w" -gcflags=all="-l -B" -o ${{ github.workspace }}/executables/macos/arm64/selfbot ./cmd/desktop
 
-      - name: Compress UPX
-        uses: crazy-max/ghaction-upx@v3
-        with:
-          version: latest
-          files: |
-            ${{ github.workspace }}/executables/macos/amd64/selfbot
-            ${{ github.workspace }}/executables/macos/arm64/selfbot
-          args: --lzma
-
       - name: Combine darwin-amd64 and darwin-arm64
         run: |
           lipo -create -output ${{ github.workspace }}/executables/macos/selfbot ${{ github.workspace }}/executables/macos/amd64/selfbot ${{ github.workspace }}/executables/macos/arm64/selfbot
           rm -rf ${{ github.workspace }}/executables/macos/amd64
           rm -rf ${{ github.workspace }}/executables/macos/arm64
+
+      - name: Compress UPX
+        uses: crazy-max/ghaction-upx@v3
+        with:
+          version: latest
+          files: |
+            ${{ github.workspace }}/executables/macos/selfbot
+          args: --lzma
 
       - name: Upload builds
         uses: actions/upload-artifact@v4
