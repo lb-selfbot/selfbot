@@ -2,10 +2,13 @@ module github.com/lb-selfbot/selfbot
 
 go 1.24.0
 
+toolchain go1.24.1
+
 require (
 	github.com/LightningDev1/beeep v0.1.0
 	github.com/LightningDev1/go-foreground v0.0.0-20250330070915-9682351327d9
 	github.com/LightningDev1/go-privnote v0.1.1
+	github.com/agnivade/levenshtein v1.2.1
 	github.com/bogdanfinn/fhttp v0.5.36
 	github.com/bogdanfinn/tls-client v1.8.0
 	github.com/brianvoe/gofakeit/v6 v6.28.0
@@ -27,7 +30,7 @@ require (
 	github.com/lb-selfbot/go-jester v0.3.0
 	github.com/mr-tron/base58 v1.2.0
 	github.com/multiformats/go-base36 v0.2.0
-	github.com/shirou/gopsutil/v4 v4.25.2
+	github.com/shirou/gopsutil/v4 v4.25.3
 	github.com/traefik/yaegi v0.16.1
 	golang.org/x/crypto v0.36.0
 	golang.org/x/exp v0.0.0-20250218142911-aa4b98e5adaa
@@ -39,7 +42,6 @@ require (
 
 require (
 	github.com/BurntSushi/xgb v0.0.0-20210121224620-deaf085860bc // indirect
-	github.com/agnivade/levenshtein v1.2.1 // indirect
 	github.com/andybalholm/brotli v1.1.1 // indirect
 	github.com/atotto/clipboard v0.1.4 // indirect
 	github.com/aymanbagabas/go-osc52/v2 v2.0.1 // indirect
@@ -79,7 +81,6 @@ require (
 	github.com/nu7hatch/gouuid v0.0.0-20131221200532-179d4d0c4d8d // indirect
 	github.com/power-devops/perfstat v0.0.0-20240221224432-82ca36839d55 // indirect
 	github.com/progrium/darwinkit v0.5.0 // indirect
-	github.com/progrium/macdriver v0.5.0-preview.0.20240129182626-6a98f82290e5 // indirect
 	github.com/quic-go/quic-go v0.50.1 // indirect
 	github.com/rivo/uniseg v0.4.7 // indirect
 	github.com/sahilm/fuzzy v0.1.1 // indirect
