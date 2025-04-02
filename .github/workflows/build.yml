@@ -56,14 +56,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Cache Tools
-        uses: actions/cache@v3
-        with:
-          path: ~/go/bin
-          key: ${{ runner.os }}-go-tools-${{ hashFiles('**/go.sum') }}
-          restore-keys: |
-            ${{ runner.os }}-go-tools-
-
       - name: Cache Go Build
         uses: actions/cache@v3
         with:
@@ -84,7 +76,7 @@ jobs:
       - name: Install dependencies
         run: |
           # sudo apt-get update
-          sudo apt-get install gcc-multilib
+          # sudo apt-get install gcc-multilib
 
           go install mvdan.cc/garble@latest
 
@@ -122,15 +114,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
-      - name: Cache Tools
-        uses: actions/cache@v3
-        with:
-          path: ~/go/bin
-          key: ${{ runner.os }}-go-tools-hosting-${{ hashFiles('**/go.sum') }}
-          restore-keys: |
-            ${{ runner.os }}-go-tools-hosting-
-            ${{ runner.os }}-go-tools-
 
       - name: Cache Go Build
         uses: actions/cache@v3
