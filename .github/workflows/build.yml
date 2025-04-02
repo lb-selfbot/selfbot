@@ -7,8 +7,52 @@ permissions:
   contents: read
 
 jobs:
-  build-windows:
+  build:
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # Windows builds
+          - os: windows
+            arch: 386
+            extension: .exe
+            upx: true
+          - os: windows
+            arch: amd64
+            extension: .exe
+            upx: true
+          - os: windows
+            arch: arm64
+            extension: .exe
+            upx: false
+          # Linux builds
+          - os: linux
+            arch: 386
+            extension: ""
+            upx: true
+          - os: linux
+            arch: amd64
+            extension: ""
+            upx: true
+          - os: linux
+            arch: arm
+            extension: ""
+            upx: true
+          - os: linux
+            arch: arm64
+            extension: ""
+            upx: true
+          # macOS builds
+          - os: darwin
+            arch: amd64
+            extension: ""
+            upx: false
+          - os: darwin
+            arch: arm64
+            extension: ""
+            upx: false
+
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-go@v5
@@ -26,41 +70,35 @@ jobs:
 
       - name: Create directories
         run: |
-          mkdir -p ${{ github.workspace }}/executables/windows/386
-          mkdir -p ${{ github.workspace }}/executables/windows/amd64
-          mkdir -p ${{ github.workspace }}/executables/windows/arm64
+          mkdir -p ${{ github.workspace }}/executables/${{ matrix.os }}/${{ matrix.arch }}
 
-      - name: Build for Windows
+      - name: Build
         env:
           GOPROXY: "https://proxy.golang.org"
           CGO_ENABLED: 0
-          GOOS: "windows"
+          GOOS: ${{ matrix.os }}
+          GOARCH: ${{ matrix.arch }}
           GOGARBLE: "github.com/lb-selfbot/*,github.com/LightningDev1/*"
         run: |
-          export GOARCH=386
-          garble -seed=U4Nxq2YSVm6ivvOejQbElA== build -tags timetzdata -trimpath -ldflags "-s -w" -gcflags=all="-l -B" -o ${{ github.workspace }}/executables/windows/386/selfbot.exe ./cmd/desktop
-          export GOARCH=amd64
-          garble -seed=U4Nxq2YSVm6ivvOejQbElA== build -tags timetzdata -trimpath -ldflags "-s -w" -gcflags=all="-l -B" -o ${{ github.workspace }}/executables/windows/amd64/selfbot.exe ./cmd/desktop
-          export GOARCH=arm64
-          garble -seed=U4Nxq2YSVm6ivvOejQbElA== build -tags timetzdata -trimpath -ldflags "-s -w" -gcflags=all="-l -B" -o ${{ github.workspace }}/executables/windows/arm64/selfbot.exe ./cmd/desktop
+          garble -seed=U4Nxq2YSVm6ivvOejQbElA== build -tags timetzdata -trimpath -ldflags "-s -w" -gcflags=all="-l -B" -o ${{ github.workspace }}/executables/${{ matrix.os }}/${{ matrix.arch }}/selfbot${{ matrix.extension }} ./cmd/desktop
 
       - name: Compress UPX
+        if: ${{ matrix.upx }}
         uses: crazy-max/ghaction-upx@v3
         with:
           version: latest
           files: |
-            ${{ github.workspace }}/executables/windows/386/selfbot.exe
-            ${{ github.workspace }}/executables/windows/amd64/selfbot.exe
+            ${{ github.workspace }}/executables/${{ matrix.os }}/${{ matrix.arch }}/selfbot${{ matrix.extension }}
           args: --best --lzma
 
       - name: Upload builds
         uses: actions/upload-artifact@v4
         with:
-          name: windows
+          name: ${{ matrix.os }}-${{ matrix.arch }}
           path: ${{ github.workspace }}/executables
           overwrite: true
 
-  build-linux:
+  build-linux-hosting:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -68,52 +106,25 @@ jobs:
         with:
           go-version-file: "go.mod"
           check-latest: true
-          cache-dependency-path: "go.sum"
+          cache-dependency-path: go.sum
 
       - name: Install dependencies
         run: |
           sudo apt-get update
           sudo apt-get install gcc-multilib
 
-          go install mvdan.cc/garble@latest
-
       - name: Create directories
         run: |
-          mkdir -p ${{ github.workspace }}/executables/linux/386
-          mkdir -p ${{ github.workspace }}/executables/linux/amd64
-          mkdir -p ${{ github.workspace }}/executables/linux/arm
-          mkdir -p ${{ github.workspace }}/executables/linux/arm64
+          mkdir -p ${{ github.workspace }}/executables
 
-      - name: Build for Linux
+      - name: Build Hosting
         env:
           GOPROXY: "https://proxy.golang.org"
           CGO_ENABLED: 0
-          GOOS: "linux"
-          GOGARBLE: "github.com/lb-selfbot/*,github.com/LightningDev1/*"
+          GOOS: linux
+          GOARCH: amd64
         run: |
-          export GOARCH=386
-          garble -seed=U4Nxq2YSVm6ivvOejQbElA== build -o ${{ github.workspace }}/executables/linux/386/selfbot -tags timetzdata -trimpath -ldflags "-s -w" -gcflags=all="-l -B" ./cmd/desktop
-          export GOARCH=amd64
-          garble -seed=U4Nxq2YSVm6ivvOejQbElA== build -o ${{ github.workspace }}/executables/linux/amd64/selfbot -tags timetzdata -trimpath -ldflags "-s -w" -gcflags=all="-l -B" ./cmd/desktop
-          export GOARCH=arm
-          garble -seed=U4Nxq2YSVm6ivvOejQbElA== build -o ${{ github.workspace }}/executables/linux/arm/selfbot -tags timetzdata -trimpath -ldflags "-s -w" -gcflags=all="-l -B" ./cmd/desktop
-          export GOARCH=arm64
-          garble -seed=U4Nxq2YSVm6ivvOejQbElA== build -o ${{ github.workspace }}/executables/linux/arm64/selfbot -tags timetzdata -trimpath -ldflags "-s -w" -gcflags=all="-l -B" ./cmd/desktop
-
-          # Hosting build
-          export GOARCH=amd64
           go build -tags timetzdata -trimpath -ldflags "-s -w" -gcflags=all="-l -B" -o ${{ github.workspace }}/executables/LB-Selfbot ./cmd/hosting
-
-      - name: Compress UPX
-        uses: crazy-max/ghaction-upx@v3
-        with:
-          version: latest
-          files: |
-            ${{ github.workspace }}/executables/linux/386/selfbot
-            ${{ github.workspace }}/executables/linux/amd64/selfbot
-            ${{ github.workspace }}/executables/linux/arm/selfbot
-            ${{ github.workspace }}/executables/linux/arm64/selfbot
-          args: --best --lzma
 
       - name: Install SSH Key
         uses: shimataro/ssh-key-action@v2
@@ -126,66 +137,38 @@ jobs:
           rsync -a ${{ github.workspace }}/executables/LB-Selfbot ${{ secrets.USERNAME }}@${{ secrets.HOST }}:/hosting/LB-Selfbot-New
           rm -rf ${{ github.workspace }}/executables/LB-Selfbot
 
-      - name: Upload builds
-        uses: actions/upload-artifact@v4
-        with:
-          name: linux
-          path: ${{ github.workspace }}/executables
-          overwrite: true
-
-  build-darwin:
+  combine-darwin:
     runs-on: ubuntu-latest
+    needs: [build]
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-go@v5
-        with:
-          go-version-file: "go.mod"
-          check-latest: true
-          cache-dependency-path: go.sum
-
       - name: Install dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install gcc-multilib
-
           go install github.com/konoui/lipo@latest
-          go install mvdan.cc/garble@latest
+
+      - name: Download darwin-amd64 builds
+        uses: actions/download-artifact@v4
+        with:
+          name: darwin-amd64
+          path: ${{ github.workspace }}/darwin-amd64
+
+      - name: Download darwin-arm64 builds
+        uses: actions/download-artifact@v4
+        with:
+          name: darwin-arm64
+          path: ${{ github.workspace }}/darwin-arm64
 
       - name: Create directories
         run: |
-          mkdir -p ${{ github.workspace }}/executables/macos/amd64
-          mkdir -p ${{ github.workspace }}/executables/macos/arm64
-
-      - name: Build for macOS
-        env:
-          GOPROXY: "https://proxy.golang.org"
-          CGO_ENABLED: 0
-          GOOS: "darwin"
-          GOGARBLE: "github.com/lb-selfbot/*,github.com/LightningDev1/*"
-        run: |
-          export GOARCH=amd64
-          garble -seed=U4Nxq2YSVm6ivvOejQbElA== build -tags timetzdata -trimpath -ldflags "-s -w" -gcflags=all="-l -B" -o ${{ github.workspace }}/executables/macos/amd64/selfbot ./cmd/desktop
-          export GOARCH=arm64
-          garble -seed=U4Nxq2YSVm6ivvOejQbElA== build -tags timetzdata -trimpath -ldflags "-s -w" -gcflags=all="-l -B" -o ${{ github.workspace }}/executables/macos/arm64/selfbot ./cmd/desktop
+          mkdir -p ${{ github.workspace }}/executables/macos
 
       - name: Combine darwin-amd64 and darwin-arm64
         run: |
-          lipo -create -output ${{ github.workspace }}/executables/macos/selfbot ${{ github.workspace }}/executables/macos/amd64/selfbot ${{ github.workspace }}/executables/macos/arm64/selfbot
-          rm -rf ${{ github.workspace }}/executables/macos/amd64
-          rm -rf ${{ github.workspace }}/executables/macos/arm64
+          lipo -create -output ${{ github.workspace }}/executables/macos/selfbot ${{ github.workspace }}/darwin-amd64/darwin/amd64/selfbot ${{ github.workspace }}/darwin-arm64/darwin/arm64/selfbot
 
-      # TODO: UPX doesn't support macOS
-      # - name: Compress UPX
-      #   uses: crazy-max/ghaction-upx@v3
-      #   with:
-      #     version: latest
-      #     files: |
-      #       ${{ github.workspace }}/executables/macos/selfbot
-      #     args: --best --lzma
-
-      - name: Upload builds
+      - name: Upload macOS universal binary
         uses: actions/upload-artifact@v4
         with:
-          name: darwin
+          name: darwin-universal
           path: ${{ github.workspace }}/executables
           overwrite: true
