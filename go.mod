@@ -9,16 +9,14 @@ require (
 	github.com/agnivade/levenshtein v1.2.1
 	github.com/bogdanfinn/fhttp v0.5.36
 	github.com/bogdanfinn/tls-client v1.8.0
-	github.com/brianvoe/gofakeit/v6 v6.28.0
 	github.com/charmbracelet/bubbles v0.20.0
 	github.com/charmbracelet/bubbletea v1.3.4
 	github.com/charmbracelet/lipgloss v1.1.0
-	github.com/chromedp/chromedp v0.13.3
+	github.com/chromedp/chromedp v0.12.1
 	github.com/common-nighthawk/go-figure v0.0.0-20210622060536-734e95fb86be
 	github.com/darkwyrm/b85 v0.0.0-20210908110113-bdd55eedeb3c
 	github.com/deadshot465/owoify-go v1.0.1
 	github.com/getsentry/sentry-go v0.31.1
-	github.com/go-json-experiment/json v0.0.0-20250211171154-1ae217ad3535
 	github.com/goccy/go-json v0.10.5
 	github.com/gorilla/websocket v1.5.3
 	github.com/hugolgst/rich-go v0.0.0-20240715122152-74618cc1ace2
@@ -27,7 +25,7 @@ require (
 	github.com/lb-selfbot/go-jester v0.3.0
 	github.com/mr-tron/base58 v1.2.0
 	github.com/multiformats/go-base36 v0.2.0
-	github.com/shirou/gopsutil/v4 v4.25.2
+	github.com/shirou/gopsutil/v4 v4.25.3
 	golang.org/x/crypto v0.36.0
 	golang.org/x/exp v0.0.0-20250218142911-aa4b98e5adaa
 	golang.org/x/sys v0.31.0
@@ -46,7 +44,7 @@ require (
 	github.com/charmbracelet/x/ansi v0.8.0 // indirect
 	github.com/charmbracelet/x/cellbuf v0.0.13-0.20250311204145-2c3ea96c31dd // indirect
 	github.com/charmbracelet/x/term v0.2.1 // indirect
-	github.com/chromedp/cdproto v0.0.0-20250319231242-a755498943c8 // indirect
+	github.com/chromedp/cdproto v0.0.0-20250120090109-d38428e4d9c8 // indirect
 	github.com/chromedp/sysutil v1.1.0 // indirect
 	github.com/cloudflare/circl v1.6.0 // indirect
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
@@ -60,10 +58,12 @@ require (
 	github.com/gobwas/ws v1.4.0 // indirect
 	github.com/godbus/dbus/v5 v5.1.0 // indirect
 	github.com/jezek/xgb v1.1.1 // indirect
+	github.com/josharian/intern v1.0.0 // indirect
 	github.com/klauspost/compress v1.18.0 // indirect
 	github.com/lucasb-eyer/go-colorful v1.2.0 // indirect
 	github.com/lufia/plan9stats v0.0.0-20240909124753-873cd0166683 // indirect
 	github.com/lxn/win v0.0.0-20210218163916-a377121e959e // indirect
+	github.com/mailru/easyjson v0.9.0 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
 	github.com/mattn/go-localereader v0.0.1 // indirect
 	github.com/mattn/go-runewidth v0.0.16 // indirect

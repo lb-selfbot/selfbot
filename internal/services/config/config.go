@@ -6,7 +6,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/go-json-experiment/json/v1"
+	"github.com/goccy/go-json"
 	"github.com/lb-selfbot/selfbot/internal/assets"
 	"github.com/lb-selfbot/selfbot/internal/utils"
 )

@@ -6,7 +6,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/brianvoe/gofakeit/v6"
 	owoifygo "github.com/deadshot465/owoify-go"
 	"github.com/lb-selfbot/discordgo"
 	"github.com/lb-selfbot/selfbot/internal/api"
@@ -610,24 +609,24 @@ func (c *FunCommands) iqtest(ctx *router.Ctx) {
 }
 
 func (c *FunCommands) hack(ctx *router.Ctx) {
-	user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
-	if err != nil {
-		ctx.RespondText("Couldn't find user!")
-		return
-	}
-	cc := gofakeit.CreditCard()
-	c.services.Embed.New(ctx).
-		AddField("User", user.String()).
-		AddField("Real Name", gofakeit.Name()).
-		AddField("Email", gofakeit.Email()).
-		AddField("Phone", gofakeit.PhoneFormatted()).
-		AddField("Credit Card Number", cc.Number).
-		AddField("CCV", cc.Cvv).
-		AddField("Address", gofakeit.Address().Address).
-		AddField("Job", gofakeit.JobTitle()).
-		AddField("Favorite Minecraft Biome", gofakeit.MinecraftBiome()).
-		AddField("Idol", gofakeit.CelebrityActor()).
-		Send()
+	// user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
+	// if err != nil {
+	// 	ctx.RespondText("Couldn't find user!")
+	// 	return
+	// }
+	// // cc := gofakeit.CreditCard()
+	// c.services.Embed.New(ctx).
+	// 	AddField("User", user.String()).
+	// 	AddField("Real Name", gofakeit.Name()).
+	// 	AddField("Email", gofakeit.Email()).
+	// 	AddField("Phone", gofakeit.PhoneFormatted()).
+	// 	AddField("Credit Card Number", cc.Number).
+	// 	AddField("CCV", cc.Cvv).
+	// 	AddField("Address", gofakeit.Address().Address).
+	// 	AddField("Job", gofakeit.JobTitle()).
+	// 	AddField("Favorite Minecraft Biome", gofakeit.MinecraftBiome()).
+	// 	AddField("Idol", gofakeit.CelebrityActor()).
+	// 	Send()
 }
 
 func (c *FunCommands) insult(ctx *router.Ctx) {
