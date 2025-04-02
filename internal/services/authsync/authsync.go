@@ -230,11 +230,11 @@ func (a *authSyncService) setupEncryption() error {
 	return nil
 }
 
-func (a *authSyncService) connectWS(context context.Context) error {
+func (a *authSyncService) connectWS(ctx context.Context) error {
 	header := http.Header{"origin": []string{"http://localhost/"}}
 
 	var err error
-	a.conn, _, err = websocket.DefaultDialer.DialContext(context, defaultWebsocketURL, header)
+	a.conn, _, err = websocket.DefaultDialer.DialContext(ctx, defaultWebsocketURL, header)
 	if err != nil {
 		return err
 	}
@@ -263,7 +263,7 @@ func (a *authSyncService) connectWS(context context.Context) error {
 	}
 
 	go a.listen()
-	go a.ping(context)
+	go a.ping(ctx)
 
 	return nil
 }

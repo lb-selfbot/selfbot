@@ -88,6 +88,22 @@ func (ui *uiService) logFeature(payload any) {
 	}
 }
 
+func (ui *uiService) getGuildName(session *discordgo.Session, guildID string) string {
+	guild, err := session.GuildWithFallback(guildID)
+	if err != nil {
+		return "No Server"
+	}
+	return guild.Name
+}
+
+func (ui *uiService) getChannelName(session *discordgo.Session, channelID string) string {
+	channel, err := session.ChannelWithFallback(channelID)
+	if err != nil {
+		return "No Channel"
+	}
+	return channel.Name
+}
+
 func (ui *uiService) logCmdUsed(data featurelogs.CmdUsed) {
 	_ = ui.ShowNotification("You used the %s command.", data.Name)
 	_ = ui.NewConsoleMessage().
@@ -129,8 +145,8 @@ func (ui *uiService) logReady(user *discordgo.User, guilds []*discordgo.Guild, n
 
 func (ui *uiService) logNitroSniper(msg *discordgo.Message, elapsed time.Duration, status, code, account string) {
 	session := ui.discordSvc.GetSession()
-	guildName := utils.Discord.GetGuildName(session, msg.GuildID)
-	channelName := utils.Discord.GetChannelName(session, msg.ChannelID)
+	guildName := ui.getGuildName(session, msg.GuildID)
+	channelName := ui.getChannelName(session, msg.ChannelID)
 
 	cfg := ui.configSvc.GetConfig()
 
@@ -155,8 +171,8 @@ func (ui *uiService) logNitroSniper(msg *discordgo.Message, elapsed time.Duratio
 
 func (ui *uiService) logNitroSniperFake(msg *discordgo.Message, code, account string) {
 	session := ui.discordSvc.GetSession()
-	guildName := utils.Discord.GetGuildName(session, msg.GuildID)
-	channelName := utils.Discord.GetChannelName(session, msg.ChannelID)
+	guildName := ui.getGuildName(session, msg.GuildID)
+	channelName := ui.getChannelName(session, msg.ChannelID)
 
 	cfg := ui.configSvc.GetConfig()
 
@@ -179,8 +195,8 @@ func (ui *uiService) logNitroSniperFake(msg *discordgo.Message, code, account st
 
 func (ui *uiService) logPrivnoteSniper(msg *discordgo.Message, elapsed time.Duration, status, path, account string) {
 	session := ui.discordSvc.GetSession()
-	guildName := utils.Discord.GetGuildName(session, msg.GuildID)
-	channelName := utils.Discord.GetChannelName(session, msg.ChannelID)
+	guildName := ui.getGuildName(session, msg.GuildID)
+	channelName := ui.getChannelName(session, msg.ChannelID)
 
 	cfg := ui.configSvc.GetConfig()
 
@@ -205,10 +221,10 @@ func (ui *uiService) logPrivnoteSniper(msg *discordgo.Message, elapsed time.Dura
 
 func (ui *uiService) logGiveawaySniperFound(msg *discordgo.Message, prize, hostID, endsIn, account string) {
 	session := ui.discordSvc.GetSession()
-	guildName := utils.Discord.GetGuildName(session, msg.GuildID)
-	channelName := utils.Discord.GetChannelName(session, msg.ChannelID)
+	guildName := ui.getGuildName(session, msg.GuildID)
+	channelName := ui.getChannelName(session, msg.ChannelID)
 	var hostName string
-	host, err := utils.Discord.GetUser(session, hostID)
+	host, err := session.UserWithFallback(hostID)
 	if err == nil {
 		hostName = host.DisplayName
 	}
@@ -242,8 +258,8 @@ func (ui *uiService) logGiveawaySniperFound(msg *discordgo.Message, prize, hostI
 
 func (ui *uiService) logGiveawaySniperWon(msg *discordgo.Message, prize, account string) {
 	session := ui.discordSvc.GetSession()
-	guildName := utils.Discord.GetGuildName(session, msg.GuildID)
-	channelName := utils.Discord.GetChannelName(session, msg.ChannelID)
+	guildName := ui.getGuildName(session, msg.GuildID)
+	channelName := ui.getChannelName(session, msg.ChannelID)
 
 	cfg := ui.configSvc.GetConfig()
 
@@ -270,8 +286,8 @@ func (ui *uiService) logGiveawaySniperWon(msg *discordgo.Message, prize, account
 
 func (ui *uiService) logPokeTwoSniper(msg *discordgo.Message, elapsed time.Duration, confidence float64, pokemon, received, iv, account string) {
 	session := ui.discordSvc.GetSession()
-	guildName := utils.Discord.GetGuildName(session, msg.GuildID)
-	channelName := utils.Discord.GetChannelName(session, msg.ChannelID)
+	guildName := ui.getGuildName(session, msg.GuildID)
+	channelName := ui.getChannelName(session, msg.ChannelID)
 
 	cfg := ui.configSvc.GetConfig()
 
@@ -300,7 +316,7 @@ func (ui *uiService) logPokeTwoSniper(msg *discordgo.Message, elapsed time.Durat
 
 func (ui *uiService) logBanNotifier(guildID string) {
 	session := ui.discordSvc.GetSession()
-	guildName := utils.Discord.GetGuildName(session, guildID)
+	guildName := ui.getGuildName(session, guildID)
 
 	cfg := ui.configSvc.GetConfig()
 
@@ -369,8 +385,8 @@ func (ui *uiService) logDMTypingNotifier(username string) {
 
 func (ui *uiService) logMessageDeleteNotifier(msg *discordgo.Message, attachments []string) {
 	session := ui.discordSvc.GetSession()
-	guildName := utils.Discord.GetGuildName(session, msg.GuildID)
-	channelName := utils.Discord.GetChannelName(session, msg.ChannelID)
+	guildName := ui.getGuildName(session, msg.GuildID)
+	channelName := ui.getChannelName(session, msg.ChannelID)
 
 	cfg := ui.configSvc.GetConfig()
 
@@ -389,8 +405,8 @@ func (ui *uiService) logMessageDeleteNotifier(msg *discordgo.Message, attachment
 
 func (ui *uiService) logDiscordStaffDetection(msg *discordgo.Message) {
 	session := ui.discordSvc.GetSession()
-	guildName := utils.Discord.GetGuildName(session, msg.GuildID)
-	channelName := utils.Discord.GetChannelName(session, msg.ChannelID)
+	guildName := ui.getGuildName(session, msg.GuildID)
+	channelName := ui.getChannelName(session, msg.ChannelID)
 
 	cfg := ui.configSvc.GetConfig()
 
@@ -410,8 +426,8 @@ func (ui *uiService) logDiscordStaffDetection(msg *discordgo.Message) {
 
 func (ui *uiService) logGhostPingDetection(msg *discordgo.Message) {
 	session := ui.discordSvc.GetSession()
-	guildName := utils.Discord.GetGuildName(session, msg.GuildID)
-	channelName := utils.Discord.GetChannelName(session, msg.ChannelID)
+	guildName := ui.getGuildName(session, msg.GuildID)
+	channelName := ui.getChannelName(session, msg.ChannelID)
 
 	cfg := ui.configSvc.GetConfig()
 
@@ -428,8 +444,8 @@ func (ui *uiService) logGhostPingDetection(msg *discordgo.Message) {
 
 func (ui *uiService) logSelfbotDetection(msg *discordgo.Message, selfbot string) {
 	session := ui.discordSvc.GetSession()
-	guildName := utils.Discord.GetGuildName(session, msg.GuildID)
-	channelName := utils.Discord.GetChannelName(session, msg.ChannelID)
+	guildName := ui.getGuildName(session, msg.GuildID)
+	channelName := ui.getChannelName(session, msg.ChannelID)
 
 	cfg := ui.configSvc.GetConfig()
 
@@ -448,8 +464,8 @@ func (ui *uiService) logSelfbotDetection(msg *discordgo.Message, selfbot string)
 
 func (ui *uiService) logTicketNotifier(channel *discordgo.Channel) {
 	session := ui.discordSvc.GetSession()
-	guildName := utils.Discord.GetGuildName(session, channel.GuildID)
-	channelName := utils.Discord.GetChannelName(session, channel.ID)
+	guildName := ui.getGuildName(session, channel.GuildID)
+	channelName := ui.getChannelName(session, channel.ID)
 
 	cfg := ui.configSvc.GetConfig()
 
@@ -467,8 +483,8 @@ func (ui *uiService) logTicketNotifier(channel *discordgo.Channel) {
 
 func (ui *uiService) logKeywordNotifier(msg *discordgo.Message, keyword string) {
 	session := ui.discordSvc.GetSession()
-	guildName := utils.Discord.GetGuildName(session, msg.GuildID)
-	channelName := utils.Discord.GetChannelName(session, msg.ChannelID)
+	guildName := ui.getGuildName(session, msg.GuildID)
+	channelName := ui.getChannelName(session, msg.ChannelID)
 
 	cfg := ui.configSvc.GetConfig()
 
@@ -491,8 +507,8 @@ func (ui *uiService) logKeywordNotifier(msg *discordgo.Message, keyword string) 
 
 func (ui *uiService) logPhishingDetection(msg *discordgo.Message, domain string) {
 	session := ui.discordSvc.GetSession()
-	guildName := utils.Discord.GetGuildName(session, msg.GuildID)
-	channelName := utils.Discord.GetChannelName(session, msg.ChannelID)
+	guildName := ui.getGuildName(session, msg.GuildID)
+	channelName := ui.getChannelName(session, msg.ChannelID)
 
 	cfg := ui.configSvc.GetConfig()
 
@@ -540,8 +556,8 @@ func (ui *uiService) logFriendRequestSpamBlocked() {
 
 func (ui *uiService) logAntiDelete(msg *discordgo.Message) {
 	session := ui.discordSvc.GetSession()
-	guildName := utils.Discord.GetGuildName(session, msg.GuildID)
-	channelName := utils.Discord.GetChannelName(session, msg.ChannelID)
+	guildName := ui.getGuildName(session, msg.GuildID)
+	channelName := ui.getChannelName(session, msg.ChannelID)
 
 	cfg := ui.configSvc.GetConfig()
 
@@ -558,8 +574,8 @@ func (ui *uiService) logAntiDelete(msg *discordgo.Message) {
 
 func (ui *uiService) logAFKMessage(msg *discordgo.Message, response string) {
 	session := ui.discordSvc.GetSession()
-	guildName := utils.Discord.GetGuildName(session, msg.GuildID)
-	channelName := utils.Discord.GetChannelName(session, msg.ChannelID)
+	guildName := ui.getGuildName(session, msg.GuildID)
+	channelName := ui.getChannelName(session, msg.ChannelID)
 
 	cfg := ui.configSvc.GetConfig()
 

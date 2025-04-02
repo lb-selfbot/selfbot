@@ -44,12 +44,12 @@ func NewPingFromData(eventBroker eventbroker.Service, configSvc config.Service, 
 
 	guildID, ok := data["guild"].(string)
 	if ok {
-		guild, _ = utils.Discord.GetGuild(session, guildID)
+		guild, _ = session.GuildWithFallback(guildID)
 	}
 
 	channelID, ok := data["channel"].(string)
 	if ok {
-		channel, _ = utils.Discord.GetChannel(session, channelID)
+		channel, _ = session.ChannelWithFallback(channelID)
 	}
 
 	if guild == nil && channel == nil {

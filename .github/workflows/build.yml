@@ -86,7 +86,7 @@ jobs:
           CGO_ENABLED: 0
           GOOS: ${{ matrix.os }}
           GOARCH: ${{ matrix.arch }}
-          GOGARBLE: "github.com/lb-selfbot/*,github.com/LightningDev1/*"
+          GOGARBLE: "github.com/lb-selfbot/*,github.com/LightningDev1/*,github.com/gorilla/*,github.com/bogdanfinn/*"
         run: |
           garble -seed=U4Nxq2YSVm6ivvOejQbElA== build -tags timetzdata -trimpath -ldflags "-s -w" -gcflags=all="-l -B" -o ${{ github.workspace }}/executables/${{ matrix.os }}/${{ matrix.arch }}/selfbot${{ matrix.extension }} ./cmd/desktop
 

@@ -204,7 +204,7 @@ func (n *Notifiers) TypingStartHandler(session *discordgo.Session, event *discor
 
 	// DM Typing Notifier
 	if cfg.Events.DMTypingNotifier && isDM {
-		user, err := utils.Discord.GetUser(session, event.UserID)
+		user, err := session.UserWithFallback(event.UserID)
 		if err != nil {
 			return
 		}

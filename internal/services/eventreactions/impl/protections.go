@@ -1,6 +1,7 @@
 package impl
 
 import (
+	"slices"
 	"strconv"
 	"time"
 	"unicode"
@@ -128,13 +129,7 @@ func (p *Protections) MessageCreateHandler(session *discordgo.Session, message *
 		}()
 	}
 
-	isGuildProtected := utils.Discord.IsGuildInList(
-		session,
-		message.GuildID,
-		cfg.Protections.ServerProtections.ProtectedServers,
-	)
-
-	if isGuildProtected {
+	if slices.Contains(cfg.Protections.ServerProtections.ProtectedServers, message.GuildID) {
 		userPerms, _ := session.UserChannelPermissions(message.Author.ID, message.ChannelID)
 
 		userHasManageMessages := userPerms&discordgo.PermissionManageMessages != 0
@@ -211,13 +206,7 @@ func (p *Protections) MessageDeleteHandler(session *discordgo.Session, message *
 		return
 	}
 
-	isGuildProtected := utils.Discord.IsGuildInList(
-		session,
-		message.GuildID,
-		cfg.Protections.ServerProtections.ProtectedServers,
-	)
-
-	if isGuildProtected && cfg.Protections.ServerProtections.AntiDelete {
+	if slices.Contains(cfg.Protections.ServerProtections.ProtectedServers, message.GuildID) && cfg.Protections.ServerProtections.AntiDelete {
 		userPerms, _ := session.UserChannelPermissions(message.Author.ID, message.ChannelID)
 
 		userHasManageMessages := userPerms&discordgo.PermissionManageMessages != 0

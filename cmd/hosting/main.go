@@ -3,12 +3,13 @@ package hosting
 import (
 	"context"
 	"net"
-	_ "net/http/pprof"
 	"os"
 	"os/signal"
 	"path/filepath"
 	"runtime/debug"
 	"syscall"
+
+	_ "net/http/pprof"
 
 	"github.com/lb-selfbot/selfbot/internal/assets"
 	"github.com/lb-selfbot/selfbot/internal/constants"
@@ -83,7 +84,7 @@ func main() {
 
 	cmdRegistry := commands.NewCmdRegistry()
 	cmdRegistry.Register(services)
-	
+
 	services.EventReactions.Register(services.Discord.GetSession())
 
 	// Wait for auth to be ready

@@ -33,6 +33,14 @@ func (a *CommandActionGet) ToSubCommand(services *services.Services) *router.Com
 				return
 			}
 
+			valueStr, ok := value.(string)
+			if value == nil || (ok && len(valueStr) == 0) {
+				services.Embed.New(ctx).
+					SetDescription("%s", fmt.Sprintf("%s is currently empty", a.ReadableName)).
+					Send()
+				return
+			}
+
 			// Display the retrieved value
 			services.Embed.New(ctx).
 				SetDescription("%s", fmt.Sprintf("%s is currently set to: %v", a.ReadableName, value)).
@@ -64,6 +72,14 @@ func (a *CommandActionSet) ToSubCommand(services *services.Services) *router.Com
 
 			if err := a.Setter(ctx, value); err != nil {
 				ctx.RespondText("Error setting value: %v", err)
+				return
+			}
+
+			valueStr, ok := value.(string)
+			if value == nil || (ok && len(valueStr) == 0) {
+				services.Embed.New(ctx).
+					SetDescription("%s", fmt.Sprintf("%s set to empty", a.ReadableName)).
+					Send()
 				return
 			}
 

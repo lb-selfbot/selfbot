@@ -353,7 +353,6 @@ func (c *SpotifyCommands) sprofile(ctx *router.Ctx) {
 }
 
 func (c *SpotifyCommands) sbearertoken(ctx *router.Ctx) {
-	// TODO: confirm
 	token, err := c.services.Spotify.GetBearerToken(ctx.Session)
 	if err != nil {
 		c.handleErr(ctx, err)

@@ -61,7 +61,6 @@ func (e *extensionsService) load(_ *discordgo.Session) {
 
 	// _ = i.Use(stdlib.Symbols)
 	// _ = i.Use(discordgo.Symbols)
-	// TODO: add router symbols
 	// _ = i.Use(router.Symbols)
 	// _ = i.Use(exports)
 

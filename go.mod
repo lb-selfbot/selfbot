@@ -5,7 +5,7 @@ toolchain go1.24.1
 
 require (
 	github.com/LightningDev1/beeep v0.1.0
-	github.com/LightningDev1/go-foreground v0.0.0-20250330080612-36c95bf36010
+	github.com/LightningDev1/go-foreground v0.0.0-20250402184805-913886c46a00
 	github.com/LightningDev1/go-privnote v0.1.1
 	github.com/agnivade/levenshtein v1.2.1
 	github.com/bogdanfinn/fhttp v0.5.36
@@ -22,7 +22,7 @@ require (
 	github.com/gorilla/websocket v1.5.3
 	github.com/hugolgst/rich-go v0.0.0-20240715122152-74618cc1ace2
 	github.com/kbinani/screenshot v0.0.0-20250118074034-a3924b7bbc8c
-	github.com/lb-selfbot/discordgo v0.26.6-0.20250330150059-784a6fb57965
+	github.com/lb-selfbot/discordgo v0.26.6-0.20250402181851-9405eed33a4a
 	github.com/lb-selfbot/go-jester v0.3.0
 	github.com/mr-tron/base58 v1.2.0
 	github.com/multiformats/go-base36 v0.2.0
@@ -36,7 +36,6 @@ require (
 )
 
 require (
-	github.com/BurntSushi/xgb v0.0.0-20210121224620-deaf085860bc // indirect
 	github.com/andybalholm/brotli v1.1.1 // indirect
 	github.com/atotto/clipboard v0.1.4 // indirect
 	github.com/aymanbagabas/go-osc52/v2 v2.0.1 // indirect

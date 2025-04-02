@@ -30,14 +30,14 @@ func NewMirrorChannel(eventBroker eventbroker.Service, source, dest *discordgo.C
 func NewMirrorFromData(eventBroker eventbroker.Service, session *discordgo.Session, data map[string]any) (*Mirror, error) {
 	sourceGuildID, ok := data["source_guild"].(string)
 	if ok {
-		sourceGuild, err := utils.Discord.GetGuild(session, sourceGuildID)
+		sourceGuild, err := session.GuildWithFallback(sourceGuildID)
 		if err != nil {
 			sourceGuild = &discordgo.Guild{ID: sourceGuildID}
 		}
 
 		destGuildID, ok := data["dest_guild"].(string)
 		if ok {
-			destGuild, err := utils.Discord.GetGuild(session, destGuildID)
+			destGuild, err := session.GuildWithFallback(destGuildID)
 			if err != nil {
 				destGuild = &discordgo.Guild{ID: destGuildID}
 			}
@@ -51,14 +51,14 @@ func NewMirrorFromData(eventBroker eventbroker.Service, session *discordgo.Sessi
 
 	sourceChannelID, ok := data["source_channel"].(string)
 	if ok {
-		sourceChannel, err := utils.Discord.GetChannel(session, sourceChannelID)
+		sourceChannel, err := session.ChannelWithFallback(sourceChannelID)
 		if err != nil {
 			sourceChannel = &discordgo.Channel{ID: sourceChannelID}
 		}
 
 		destChannelID, ok := data["dest_channel"].(string)
 		if ok {
-			destChannel, err := utils.Discord.GetChannel(session, destChannelID)
+			destChannel, err := session.ChannelWithFallback(destChannelID)
 			if err != nil {
 				destChannel = &discordgo.Channel{ID: destChannelID}
 			}

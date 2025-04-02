@@ -131,5 +131,18 @@ func (r *routerService) InvokeRemoteCmd(
 	cmd *Command,
 	args string,
 ) {
-	// todo
+	ctx := &Ctx{
+		Router:    r,
+		configSvc: r.configSvc,
+		Command:   cmd,
+		Session:   session,
+		Message: &discordgo.Message{
+			ChannelID: channel.ID,
+			Content:   r.getCommandPrefix() + cmd.Name + " " + args,
+		},
+	}
+
+	ctx.Arguments = ParseArguments(ctx, args)
+
+	r.triggerCommand(ctx)
 }

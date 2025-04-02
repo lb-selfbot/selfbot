@@ -380,11 +380,11 @@ func (c *EventReactionsCommands) Register() {
 // 	}
 
 // 	if ctx.Message.GuildID != "" {
-// 		guild, err = utils.Discord.GetGuild(ctx.Session, ctx.Message.GuildID)
+// 		guild, err = ctx.Session.GuildWithFallback(ctx.Message.GuildID)
 // 		return guild, nil, err
 // 	}
 
-// 	channel, err = utils.Discord.GetChannel(ctx.Session, ctx.Message.ChannelID)
+// 	channel, err = ctx.Sessionctx.Message.ChannelID)
 // 	return nil, channel, err
 // }
 
@@ -440,7 +440,7 @@ func (c *EventReactionsCommands) Register() {
 // 	case "toggle":
 // 		guildID := utils.Misc.Or(utils.Arguments["[server id]"], ctx.Message.GuildID)
 
-// 		guild, err := utils.Discord.GetGuild(ctx.Session, guildID)
+// 		guild, err := ctx.Session.GuildWithFallback(guildID)
 // 		if err != nil {
 // 			c.services.Embed.New(ctx).
 // 				SetDescription("Could not find server: " + err.Error()).
@@ -591,8 +591,8 @@ func (c *EventReactionsCommands) Register() {
 // func (c *EventReactionsCommands) mirrorserver(ctx *router.Ctx) {
 // 	switch strings.ToLower(utils.Arguments["<toggle/list/clear>"]) {
 // 	case "toggle":
-// 		srcGuild, srcErr := utils.Discord.GetGuild(ctx.Session, utils.Arguments["[source server]"])
-// 		destGuild, destErr := utils.Discord.GetGuild(ctx.Session, utils.Arguments["[dest server]"])
+// 		srcGuild, srcErr := ctx.Session.GuildWithFallback(utils.Arguments["[source server]"])
+// 		destGuild, destErr := ctx.Session.GuildWithFallback(utils.Arguments["[dest server]"])
 
 // 		if srcErr != nil || destErr != nil {
 // 			c.services.Embed.New(ctx).
@@ -1080,7 +1080,7 @@ func (c *EventReactionsCommands) Register() {
 
 // 		guildID := utils.Misc.Or(utils.Arguments["[server id]"], ctx.Message.GuildID)
 
-// 		guild, err := utils.Discord.GetGuild(ctx.Session, guildID)
+// 		guild, err := ctx.Session.GuildWithFallback(guildID)
 // 		if err != nil {
 // 			c.services.Embed.New(ctx).
 // 				SetDescription("Could not find server: " + err.Error()).
@@ -1130,7 +1130,7 @@ func (c *EventReactionsCommands) Register() {
 
 // 		guildID := utils.Misc.Or(utils.Arguments["[server id]"], ctx.Message.GuildID)
 
-// 		guild, err := utils.Discord.GetGuild(ctx.Session, guildID)
+// 		guild, err := ctx.Session.GuildWithFallback(guildID)
 // 		if err != nil {
 // 			c.services.Embed.New(ctx).
 // 				SetDescription("Could not find server: " + err.Error()).
@@ -1683,7 +1683,7 @@ func (c *EventReactionsCommands) Register() {
 // 	case "get":
 // 		userString := ""
 // 		for _, userID := range cfg.AFK.TriggerList.Users {
-// 			user, err := utils.Discord.GetUser(ctx.Session, userID)
+// 			user, err := ctx.Session.UserWithFallback(userID)
 // 			if err != nil {
 // 				userString += fmt.Sprintf("%s - %s\n", "Unknown", userID)
 // 				continue
@@ -1767,7 +1767,7 @@ func (c *EventReactionsCommands) Register() {
 // 		var servers []string
 
 // 		for _, serverID := range cfg.AFK.TriggerList.Servers {
-// 			guild, err := utils.Discord.GetGuild(ctx.Session, serverID)
+// 			guild, err := ctx.Session.GuildWithFallback(serverID)
 // 			if err != nil {
 // 				servers = append(servers, serverID)
 // 				continue
@@ -1780,7 +1780,7 @@ func (c *EventReactionsCommands) Register() {
 // 			AddField("AFK Triggerlist Servers", strings.Join(servers, ", ")).
 // 			Send()
 // 	case "add":
-// 		guild, err := utils.Discord.GetGuild(ctx.Session, utils.Misc.Or(utils.Arguments["[server id]"], ctx.Message.GuildID))
+// 		guild, err := ctx.Session.GuildWithFallback(utils.Misc.Or(utils.Arguments["[server id]"], ctx.Message.GuildID))
 // 		if err != nil {
 // 			c.services.Embed.New(ctx).
 // 				SetDescription("Could not find server.").
@@ -1801,7 +1801,7 @@ func (c *EventReactionsCommands) Register() {
 // 			SetDescription("Added %s to the AFK Triggerlist.", guild.Name).
 // 			Send()
 // 	case "rm":
-// 		guild, err := utils.Discord.GetGuild(ctx.Session, utils.Misc.Or(utils.Arguments["[server id]"], ctx.Message.GuildID))
+// 		guild, err := ctx.Session.GuildWithFallback(utils.Misc.Or(utils.Arguments["[server id]"], ctx.Message.GuildID))
 // 		if err != nil {
 // 			c.services.Embed.New(ctx).
 // 				SetDescription("Could not find server.").

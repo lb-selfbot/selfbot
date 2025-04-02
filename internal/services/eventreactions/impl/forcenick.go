@@ -6,7 +6,6 @@ import (
 	"github.com/lb-selfbot/discordgo"
 	"github.com/lb-selfbot/selfbot/internal/logging"
 	"github.com/lb-selfbot/selfbot/internal/services/eventreactions/types"
-	"github.com/lb-selfbot/selfbot/internal/utils"
 )
 
 type ForceNick struct {
@@ -27,7 +26,7 @@ func NewForceNickFromData(session *discordgo.Session, data map[string]any) (*For
 
 	guildID, ok := data["guild"].(string)
 	if ok {
-		guild, err = utils.Discord.GetGuild(session, guildID)
+		guild, err = session.GuildWithFallback(guildID)
 		if err != nil {
 			guild = &discordgo.Guild{ID: guildID}
 		}
@@ -35,7 +34,7 @@ func NewForceNickFromData(session *discordgo.Session, data map[string]any) (*For
 
 	userID, ok := data["user"].(string)
 	if ok {
-		user, err = utils.Discord.GetUser(session, userID)
+		user, err = session.UserWithFallback(userID)
 		if err != nil {
 			user = &discordgo.User{ID: userID}
 		}

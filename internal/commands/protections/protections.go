@@ -212,7 +212,7 @@ func (c *ProtectionsCommands) Register() {
 // 		var servers []string
 
 // 		for _, serverID := range cfg.Protections.ServerProtections.ProtectedServers {
-// 			guild, err := utils.Discord.GetGuild(ctx.Session, serverID)
+// 			guild, err := ctx.Session.GuildWithFallback(serverID)
 // 			if err != nil {
 // 				servers = append(servers, serverID)
 // 				continue

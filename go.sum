@@ -1,9 +1,7 @@
-github.com/BurntSushi/xgb v0.0.0-20210121224620-deaf085860bc h1:7D+Bh06CRPCJO3gr2F7h1sriovOZ8BMhca2Rg85c2nk=
-github.com/BurntSushi/xgb v0.0.0-20210121224620-deaf085860bc/go.mod h1:IVnqGOEym/WlBOVXweHU+Q+/VP0lqqI8lqeDx9IjBqo=
 github.com/LightningDev1/beeep v0.1.0 h1:1IEV1ydGFb+yvBcwkuCPClL8GP/d0BMTJUKLg9vyL/w=
 github.com/LightningDev1/beeep v0.1.0/go.mod h1:EA+kLCP2cK7DHMJpiFXshjYfYCdGvS+OfhcAOA8fuOw=
-github.com/LightningDev1/go-foreground v0.0.0-20250330080612-36c95bf36010 h1:gmIcNu/LUoovEMth1ad2JnnJNqTnIGzh0X7QSJSLGso=
-github.com/LightningDev1/go-foreground v0.0.0-20250330080612-36c95bf36010/go.mod h1:GN52d5zdMLb8BOFt+edptkybUxBcLQCnYZ0U2KlimSs=
+github.com/LightningDev1/go-foreground v0.0.0-20250402184805-913886c46a00 h1:71lMYbNvbOOR5GONQb7N3R3telYFiO1FdcO1WjrMTVM=
+github.com/LightningDev1/go-foreground v0.0.0-20250402184805-913886c46a00/go.mod h1:amWCpp0rbKz286e/cnmfHJ4PPKxMLlM8d7miVs02LTU=
 github.com/LightningDev1/go-privnote v0.1.1 h1:uBV2vDFJ4FG5oj7YMiKpHBKm5OPY7hnFB5inOEJuE3c=
 github.com/LightningDev1/go-privnote v0.1.1/go.mod h1:0Tz8flTrxXQaCydfGiUqbt87BXSFSl7V5fKd5Iete6Q=
 github.com/agnivade/levenshtein v1.2.1 h1:EHBY3UOn1gwdy/VbFwgo4cxecRznFk7fKWN1KOX7eoM=
@@ -96,8 +94,8 @@ github.com/klauspost/compress v1.18.0 h1:c/Cqfb0r+Yi+JtIEq73FWXVkRonBlf0CRNYc8Zt
 github.com/klauspost/compress v1.18.0/go.mod h1:2Pp+KzxcywXVXMr50+X0Q/Lsb43OQHYWRCY2AiWywWQ=
 github.com/kylelemons/godebug v1.1.0 h1:RPNrshWIDI6G2gRW9EHilWtl7Z6Sb1BR0xunSBf0SNc=
 github.com/kylelemons/godebug v1.1.0/go.mod h1:9/0rRGxNHcop5bhtWyNeEfOS8JIWk580+fNqagV/RAw=
-github.com/lb-selfbot/discordgo v0.26.6-0.20250330150059-784a6fb57965 h1:4ugb3jdYeg9yKnmjvK/iPE+zx2Cm85cDKNgo8CsGovk=
-github.com/lb-selfbot/discordgo v0.26.6-0.20250330150059-784a6fb57965/go.mod h1:reBUc7rfEvw/ypVnUt3smnNqhYPaG/CZlfa0GCfV8EM=
+github.com/lb-selfbot/discordgo v0.26.6-0.20250402181851-9405eed33a4a h1:d2BJeH3ZWSaF0A/uqDbZKnh/9rM5R5roFgrSs7Fxbh8=
+github.com/lb-selfbot/discordgo v0.26.6-0.20250402181851-9405eed33a4a/go.mod h1:reBUc7rfEvw/ypVnUt3smnNqhYPaG/CZlfa0GCfV8EM=
 github.com/lb-selfbot/go-jester v0.3.0 h1:2mUIugNNahaQu7zxU9svSt23SeCHcyGbE6sFH9WCs1k=
 github.com/lb-selfbot/go-jester v0.3.0/go.mod h1:YW2wSFjT3CbWbFmfmS4/tm12kjJXyKxmNxF0nsHylPU=
 github.com/ledongthuc/pdf v0.0.0-20220302134840-0c2507a12d80 h1:6Yzfa6GP0rIo/kULo2bwGEkFvCePZ3qHDDTC3/J9Swo=

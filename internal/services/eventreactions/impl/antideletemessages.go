@@ -9,7 +9,6 @@ import (
 	"github.com/lb-selfbot/selfbot/internal/services/eventreactions/types"
 
 	"github.com/lb-selfbot/discordgo"
-	"github.com/lb-selfbot/selfbot/internal/utils"
 )
 
 type AntiDeleteMessages struct {
@@ -28,7 +27,7 @@ func NewAntiDeleteMessages(configSvc config.Service, channel *discordgo.Channel)
 func NewAntiDeleteMessagesFromData(configSvc config.Service, session *discordgo.Session, data map[string]any) (*AntiDeleteMessages, error) {
 	channelID, ok := data["channel"].(string)
 	if ok {
-		channel, err := utils.Discord.GetChannel(session, channelID)
+		channel, err := session.ChannelWithFallback(channelID)
 		if err != nil {
 			channel = &discordgo.Channel{ID: channelID}
 		}

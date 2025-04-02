@@ -239,7 +239,7 @@ func (c *TrollingCommands) hiddenhere(ctx *router.Ctx) {
 }
 
 func (c *TrollingCommands) voicemove(ctx *router.Ctx) {
-	guild, err := utils.Discord.GetGuild(ctx.Session, ctx.Message.GuildID)
+	guild, err := ctx.Session.GuildWithFallback(ctx.Message.GuildID)
 	if err != nil {
 		ctx.RespondText("Error getting server: %v", err)
 		return
@@ -321,7 +321,8 @@ func (c *TrollingCommands) triggertyping(ctx *router.Ctx) {
 		ctx.RespondText("Could not find channel")
 		return
 	}
-	utils.Discord.SleepWithTypingFix(ctx.Session, channel.ID, duration)
+
+	ctx.Session.ChannelTypingDuration(channel.ID, duration)
 }
 
 func (c *TrollingCommands) impersonate(ctx *router.Ctx) {

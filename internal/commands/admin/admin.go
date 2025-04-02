@@ -1275,7 +1275,7 @@ func (c *AdminCommands) mutualservers(ctx *router.Ctx) {
 	}
 	mutualServersString := ""
 	for _, guild_ := range mutualServers.MutualGuilds {
-		guild, err := utils.Discord.GetGuild(ctx.Session, guild_.ID)
+		guild, err := ctx.Session.GuildWithFallback(guild_.ID)
 		if err != nil {
 			continue
 		}
@@ -2207,7 +2207,7 @@ func (c *AdminCommands) roleinfo(ctx *router.Ctx) {
 		return
 	}
 	// Get all members in guild and check if they have the role
-	guild, err := utils.Discord.GetGuild(ctx.Session, ctx.Message.GuildID)
+	guild, err := ctx.Session.GuildWithFallback(ctx.Message.GuildID)
 	if err != nil {
 		ctx.RespondText("Error getting server: %v", err)
 		return

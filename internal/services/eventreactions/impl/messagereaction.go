@@ -62,7 +62,7 @@ func NewMessageReactionFromData(eventBroker eventbroker.Service, configSvc confi
 
 	guildID, ok := data["Guild"].(string)
 	if ok {
-		guild, err = utils.Discord.GetGuild(session, guildID)
+		guild, err = session.GuildWithFallback(guildID)
 		if err != nil {
 			guild = &discordgo.Guild{ID: guildID}
 		}
@@ -70,7 +70,7 @@ func NewMessageReactionFromData(eventBroker eventbroker.Service, configSvc confi
 
 	channelID, ok := data["Channel"].(string)
 	if ok {
-		channel, err = utils.Discord.GetChannel(session, channelID)
+		channel, err = session.ChannelWithFallback(channelID)
 		if err != nil {
 			channel = &discordgo.Channel{ID: channelID}
 		}
@@ -78,7 +78,7 @@ func NewMessageReactionFromData(eventBroker eventbroker.Service, configSvc confi
 
 	userID, ok := data["User"].(string)
 	if ok {
-		user, err = utils.Discord.GetUser(session, userID)
+		user, err = session.UserWithFallback(userID)
 		if err != nil {
 			user = &discordgo.User{ID: userID}
 		}

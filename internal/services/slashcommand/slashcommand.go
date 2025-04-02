@@ -75,11 +75,9 @@ func (s *slashCommandService) subscribe() {
 }
 
 func (s *slashCommandService) start(session *discordgo.Session) {
-	ticker := time.NewTicker(time.Second * 5)
-	defer ticker.Stop()
-
 	isFirstIteration := true
-	for range ticker.C {
+
+	for range time.Tick(time.Second * 5) {
 		err := s.LoadJobs(session)
 		if err != nil {
 			s.eventBroker.Publish(eventbroker.EventLogError, "Failed to load SC jobs: "+err.Error())

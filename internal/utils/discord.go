@@ -20,17 +20,6 @@ import (
 
 type DiscordUtils struct{}
 
-func (DiscordUtils) GetChannel(session *discordgo.Session, channelID string) (*discordgo.Channel, error) {
-	channel, err := session.State.Channel(channelID)
-	if err != nil {
-		channel, err = session.Channel(channelID)
-		if err != nil {
-			return nil, err
-		}
-	}
-	return channel, nil
-}
-
 func (DiscordUtils) SnowflakeToTime(snowflake string) time.Time {
 	// parse snowflake to int64
 	snowflakeInt, err := strconv.ParseInt(snowflake, 10, 64)
@@ -71,7 +60,7 @@ func (DiscordUtils) GetChannelMessages(session *discordgo.Session, channelID str
 	amountOfRequests := int(math.Ceil(float64(limit) / 100))
 	var messages []*discordgo.Message
 
-	for i := 0; i < amountOfRequests; i++ {
+	for range amountOfRequests {
 		lastID := ""
 		if len(messages) > 0 {
 			lastID = messages[len(messages)-1].ID
@@ -183,29 +172,14 @@ func (DiscordUtils) DeleteMessages(session *discordgo.Session, channelID, userID
 }
 
 func (DiscordUtils) GetRoleNames(session *discordgo.Session, member *discordgo.Member) string {
-	var roleNames []string
-	for _, role := range member.Roles {
-		role, err := session.State.Role(member.GuildID, role)
+	return strings.Join(fn.Map(member.Roles, func(roleID string) string {
+		role, err := session.State.Role(member.GuildID, roleID)
 		if err == nil {
-			roleNames = append(roleNames, role.Name)
+			return role.Name
 		}
-	}
-	return strings.Join(roleNames, ", ")
-}
 
-func (DiscordUtils) GetGuild(session *discordgo.Session, guildID string) (guild *discordgo.Guild, err error) {
-	if guildID == "" {
-		return nil, fmt.Errorf("guildID is empty")
-	}
-
-	guild, err = session.State.Guild(guildID)
-	if err != nil {
-		guild, err = session.Guild(guildID)
-		if err != nil {
-			return nil, err
-		}
-	}
-	return guild, nil
+		return roleID
+	}), ", ")
 }
 
 func (DiscordUtils) GetMember(session *discordgo.Session, guildID, userID string, reload ...bool) (*discordgo.Member, bool) {
@@ -450,61 +424,6 @@ func (DiscordUtils) MuteUser(session *discordgo.Session, member *discordgo.Membe
 	return err
 }
 
-func (DiscordUtils) SleepWithTyping(session *discordgo.Session, channelID string, duration time.Duration) {
-	for range int(duration.Seconds() / 5) {
-		time.Sleep(5 * time.Second)
-		_ = session.ChannelTyping(channelID)
-	}
-	time.Sleep(duration - (time.Duration(int(duration.Seconds()/5)) * 5 * time.Second))
-}
-
-func (DiscordUtils) SleepWithTypingFix(session *discordgo.Session, channelID string, duration time.Duration) {
-	for range int(duration.Seconds() / 5) {
-		_ = session.ChannelTyping(channelID)
-		time.Sleep(5 * time.Second)
-	}
-	time.Sleep(duration - (time.Duration(int(duration.Seconds()/5)) * 5 * time.Second))
-}
-
-func (DiscordUtils) GetGuildName(session *discordgo.Session, guildID string) string {
-	guild, _ := Discord.GetGuild(session, guildID)
-	guildName := "No Server"
-	if guild != nil {
-		guildName = guild.Name
-	}
-	return guildName
-}
-
-func (DiscordUtils) GetChannelName(session *discordgo.Session, channelID string) string {
-	channel, _ := Discord.GetChannel(session, channelID)
-	channelName := "No Channel"
-	if channel != nil {
-		channelName = channel.Name
-	}
-	return channelName
-}
-
-func (DiscordUtils) GetUser(session *discordgo.Session, userID string) (*discordgo.User, error) {
-	if user, err := session.State.GetUser(userID); err == nil {
-		return user, nil
-	}
-
-	return session.User(userID)
-}
-
-func (DiscordUtils) IsGuildInList(session *discordgo.Session, guildID string, guildsList []string) bool {
-	guild, err := Discord.GetGuild(session, guildID)
-	if err != nil {
-		return false
-	}
-
-	return slices.Contains(guildsList, guild.ID) || slices.Contains(guildsList, guild.Name)
-}
-
-func (DiscordUtils) IsUserInList(session *discordgo.Session, userID string, usersList []string) bool {
-	return slices.Contains(usersList, userID)
-}
-
 func (DiscordUtils) UserChannelPermissions(session *discordgo.Session, guildID string, channelID string, userID string) (apermissions int64, err error) {
 	userId, _ := strconv.Atoi(userID)
 
@@ -701,14 +620,9 @@ func (DiscordUtils) SaveAttachment(attachment *discordgo.MessageAttachment) (str
 	filename := IO.SanitizeFilename(attachment.ID + "-" + attachment.Filename)
 	filepath := path.Join(IO.GetMainFolder(), "Downloads", filename)
 
-	outFile, err := os.Create(filepath)
-	if err != nil {
-		return "", fmt.Errorf("error creating attachment file: %w", err)
-	}
-
-	defer outFile.Close()
-
 	var resp *nethttp.Response
+	var err error
+
 	resp, err = nethttp.Get(attachment.URL)
 	if err != nil {
 		var err error
@@ -717,8 +631,18 @@ func (DiscordUtils) SaveAttachment(attachment *discordgo.MessageAttachment) (str
 			return "", fmt.Errorf("error downloading attachment: %w", err)
 		}
 	}
-
 	defer resp.Body.Close()
+
+	if resp.StatusCode != 200 {
+		return "", fmt.Errorf("error downloading attachment: %s", resp.Status)
+	}
+
+	outFile, err := os.Create(filepath)
+	if err != nil {
+		return "", fmt.Errorf("error creating attachment file: %w", err)
+	}
+
+	defer outFile.Close()
 
 	_, err = io.Copy(outFile, resp.Body)
 	if err != nil {

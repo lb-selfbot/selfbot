@@ -671,7 +671,7 @@ func (c *ActivityCommands) copyactivity(ctx *router.Ctx) {
 	}
 
 	for _, guildID := range guilds {
-		guild, err := utils.Discord.GetGuild(ctx.Session, guildID)
+		guild, err := ctx.Session.GuildWithFallback(guildID)
 		if err != nil {
 			continue
 		}
@@ -749,7 +749,7 @@ func (c *ActivityCommands) getactivityjson(ctx *router.Ctx) {
 	}
 
 	for _, guildID := range guilds {
-		guild, err := utils.Discord.GetGuild(ctx.Session, guildID)
+		guild, err := ctx.Session.GuildWithFallback(guildID)
 		if err != nil {
 			continue
 		}

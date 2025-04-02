@@ -1,12 +1,12 @@
 package config
 
 import (
+	"slices"
 	"time"
 
 	"github.com/goccy/go-json"
 
 	"github.com/lb-selfbot/discordgo"
-	"github.com/lb-selfbot/selfbot/internal/utils"
 )
 
 type TriggerList struct {
@@ -20,14 +20,13 @@ func (t TriggerList) IsTriggered(session *discordgo.Session, userID string, guil
 		return true
 	}
 
-	isUserInList := utils.Discord.IsUserInList(session, userID, t.Users)
-	isGuildInList := utils.Discord.IsGuildInList(session, guildID, t.Servers)
+	containsAny := slices.Contains(t.Users, userID) || slices.Contains(t.Servers, guildID)
 
 	switch t.Type {
 	case "Whitelist":
-		return isUserInList || isGuildInList
+		return containsAny
 	case "Blacklist":
-		return !isUserInList && !isGuildInList
+		return !containsAny
 	default:
 		return false
 	}

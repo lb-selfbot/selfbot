@@ -65,7 +65,7 @@ func (c *SharingCommands) Register() {
 // 	case "get":
 // 		userString := ""
 // 		for _, userID := range cfg.Sharing.SharedUsers {
-// 			user, err := utils.Discord.GetUser(ctx.Session, userID)
+// 			user, err := ctx.Session.UserWithFallback(userID)
 // 			if err != nil {
 // 				userString += fmt.Sprintf("%s - %s\n", "Unknown", userID)
 // 				continue

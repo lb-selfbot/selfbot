@@ -1029,7 +1029,7 @@ func (s *Snipers) CheckGiveawaySniper(session *discordgo.Session, m *discordgo.M
 			}
 		}()
 	default: // Custom bots
-		if !utils.Discord.IsUserInList(session, m.Author.ID, cfg.Snipers.GiveawaySniper.CustomBots) {
+		if !slices.Contains(cfg.Snipers.GiveawaySniper.CustomBots, m.Author.ID) {
 			break
 		}
 

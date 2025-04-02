@@ -42,16 +42,14 @@ func (e *eventReactionsService) onReady(s *discordgo.Session, r *discordgo.Ready
 
 	// Run GC periodically
 	go func() {
-		ticker := time.NewTicker(1 * time.Minute)
-		for range ticker.C {
+		for range time.Tick(1 * time.Minute) {
 			runtime.GC()
 		}
 	}()
 
 	// Clear console periodically
 	go func() {
-		ticker := time.NewTicker(24 * time.Hour)
-		for range ticker.C {
+		for range time.Tick(24 * time.Hour) {
 			e.eventBroker.Publish(eventbroker.EventClearConsole, nil)
 		}
 	}()

@@ -325,7 +325,7 @@ func (c *SlashCommands) createscjob(ctx *router.Ctx) {
 		return
 	}
 
-	guild, err := utils.Discord.GetGuild(ctx.Session, channel.GuildID)
+	guild, err := ctx.Session.GuildWithFallback(channel.GuildID)
 	if err != nil {
 		ctx.RespondText("Could not find server: %v", err)
 		return
@@ -523,7 +523,7 @@ func (c *SlashCommands) setscjobchannel(ctx *router.Ctx) {
 		return
 	}
 
-	guild, err := utils.Discord.GetGuild(ctx.Session, channel.GuildID)
+	guild, err := ctx.Session.GuildWithFallback(channel.GuildID)
 	if err != nil {
 		ctx.RespondText("Could not find server: %v", err)
 		return

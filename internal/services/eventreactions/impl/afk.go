@@ -135,7 +135,12 @@ func (a *AFK) Handler(session *discordgo.Session, event any) {
 		}
 
 		if cfg.AFK.Typing {
-			utils.Discord.SleepWithTyping(session, message.ChannelID, time.Second*time.Duration(delay))
+			time.Sleep(5 * time.Second)
+
+			duration := time.Duration(delay) * time.Second
+			duration = max(duration-time.Second*5, 0)
+
+			session.ChannelTypingDuration(message.ChannelID, time.Second*time.Duration(delay))
 		} else {
 			time.Sleep(time.Second * time.Duration(delay))
 		}
