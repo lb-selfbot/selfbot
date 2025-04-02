@@ -32,7 +32,7 @@ jobs:
       - name: Build for Windows
         env:
           GOPROXY: "https://proxy.golang.org"
-          CGO_ENABLED: 1
+          CGO_ENABLED: 0
           GOOS: "windows"
           GOGARBLE: "github.com/lb-selfbot/*,github.com/LightningDev1/*"
         run: |
@@ -152,7 +152,7 @@ jobs:
       - name: Build for macOS
         env:
           GOPROXY: "https://proxy.golang.org"
-          CGO_ENABLED: 1
+          CGO_ENABLED: 0
           GOOS: "darwin"
           GOGARBLE: "github.com/lb-selfbot/*,github.com/LightningDev1/*"
         run: |
