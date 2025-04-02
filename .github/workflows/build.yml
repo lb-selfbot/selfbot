@@ -54,9 +54,11 @@ jobs:
           args: --best --lzma
 
       - name: Upload builds
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
+          name: windows
           path: ${{ github.workspace }}/executables
+          overwrite: true
 
   build-linux:
     runs-on: ubuntu-latest
@@ -125,9 +127,11 @@ jobs:
           rm -rf ${{ github.workspace }}/executables/LB-Selfbot
 
       - name: Upload builds
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
+          name: linux
           path: ${{ github.workspace }}/executables
+          overwrite: true
 
   build-darwin:
     runs-on: ubuntu-latest
@@ -180,6 +184,8 @@ jobs:
       #     args: --best --lzma
 
       - name: Upload builds
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
+          name: darwin
           path: ${{ github.workspace }}/executables
+          overwrite: true
