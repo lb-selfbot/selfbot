@@ -87,4 +87,4 @@ require (
 )
 
 // Add npipe support for Windows ARM64
-replace github.com/natefinch/npipe => github.com/ph4r05/npipe v0.0.0-20240527105247-e977e49ae283
+replace gopkg.in/natefinch/npipe.v2 => github.com/ph4r05/npipe v0.0.0-20240527105247-e977e49ae283
