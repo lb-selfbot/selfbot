@@ -74,11 +74,7 @@ jobs:
           cache-dependency-path: go.sum
 
       - name: Install dependencies
-        run: |
-          # sudo apt-get update
-          # sudo apt-get install gcc-multilib
-
-          go install mvdan.cc/garble@latest
+        run: go install mvdan.cc/garble@latest
 
       - name: Create directories
         run: |
