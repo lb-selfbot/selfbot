@@ -173,3 +173,10 @@ jobs:
           name: darwin-universal
           path: ${{ github.workspace }}/executables
           overwrite: true
+
+      - name: Delete old separate macOS build artifacts
+        uses: geekyeggo/delete-artifact@v5
+        with:
+          name: |
+            darwin-amd64
+            darwin-arm64
