@@ -37,9 +37,9 @@ jobs:
           GOGARBLE: "github.com/lb-selfbot/*,github.com/LightningDev1/*"
         run: |
           export GOARCH=386
-          garble -seed=U4Nxq2YSVm6ivvOejQbElA== build -tags timetzdata -trimpath -ldflags "-s -w" -gcflags=all="-l -B -buildid=" -o ${{ github.workspace }}/executables/windows/386/selfbot.exe ./cmd/desktop
+          garble -seed=U4Nxq2YSVm6ivvOejQbElA== build -tags timetzdata -trimpath -ldflags "-s -w" -gcflags=all="-l -B" -o ${{ github.workspace }}/executables/windows/386/selfbot.exe ./cmd/desktop
           export GOARCH=amd64
-          garble -seed=U4Nxq2YSVm6ivvOejQbElA== build -tags timetzdata -trimpath -ldflags "-s -w" -gcflags=all="-l -B -buildid=" -o ${{ github.workspace }}/executables/windows/amd64/selfbot.exe ./cmd/desktop
+          garble -seed=U4Nxq2YSVm6ivvOejQbElA== build -tags timetzdata -trimpath -ldflags "-s -w" -gcflags=all="-l -B" -o ${{ github.workspace }}/executables/windows/amd64/selfbot.exe ./cmd/desktop
 
       - name: Compress UPX
         uses: crazy-max/ghaction-upx@v3
@@ -87,17 +87,17 @@ jobs:
           GOGARBLE: "github.com/lb-selfbot/*,github.com/LightningDev1/*"
         run: |
           export GOARCH=386
-          garble -seed=U4Nxq2YSVm6ivvOejQbElA== build -o ${{ github.workspace }}/executables/linux/386/selfbot -tags timetzdata -trimpath -ldflags "-s -w" -gcflags=all="-l -B -buildid=" ./cmd/desktop
+          garble -seed=U4Nxq2YSVm6ivvOejQbElA== build -o ${{ github.workspace }}/executables/linux/386/selfbot -tags timetzdata -trimpath -ldflags "-s -w" -gcflags=all="-l -B" ./cmd/desktop
           export GOARCH=amd64
-          garble -seed=U4Nxq2YSVm6ivvOejQbElA== build -o ${{ github.workspace }}/executables/linux/amd64/selfbot -tags timetzdata -trimpath -ldflags "-s -w" -gcflags=all="-l -B -buildid=" ./cmd/desktop
+          garble -seed=U4Nxq2YSVm6ivvOejQbElA== build -o ${{ github.workspace }}/executables/linux/amd64/selfbot -tags timetzdata -trimpath -ldflags "-s -w" -gcflags=all="-l -B" ./cmd/desktop
           export GOARCH=arm
-          garble -seed=U4Nxq2YSVm6ivvOejQbElA== build -o ${{ github.workspace }}/executables/linux/arm/selfbot -tags timetzdata -trimpath -ldflags "-s -w" -gcflags=all="-l -B -buildid=" ./cmd/desktop
+          garble -seed=U4Nxq2YSVm6ivvOejQbElA== build -o ${{ github.workspace }}/executables/linux/arm/selfbot -tags timetzdata -trimpath -ldflags "-s -w" -gcflags=all="-l -B" ./cmd/desktop
           export GOARCH=arm64
-          garble -seed=U4Nxq2YSVm6ivvOejQbElA== build -o ${{ github.workspace }}/executables/linux/arm64/selfbot -tags timetzdata -trimpath -ldflags "-s -w" -gcflags=all="-l -B -buildid=" ./cmd/desktop
+          garble -seed=U4Nxq2YSVm6ivvOejQbElA== build -o ${{ github.workspace }}/executables/linux/arm64/selfbot -tags timetzdata -trimpath -ldflags "-s -w" -gcflags=all="-l -B" ./cmd/desktop
 
           # Hosting build
           export GOARCH=amd64
-          go build -tags timetzdata -trimpath -ldflags "-s -w" -gcflags=all="-l -B -buildid=" -o ${{ github.workspace }}/executables/LB-Selfbot ./cmd/hosting
+          go build -tags timetzdata -trimpath -ldflags "-s -w" -gcflags=all="-l -B" -o ${{ github.workspace }}/executables/LB-Selfbot ./cmd/hosting
 
       - name: Compress UPX
         uses: crazy-max/ghaction-upx@v3
@@ -157,9 +157,9 @@ jobs:
           GOGARBLE: "github.com/lb-selfbot/*,github.com/LightningDev1/*"
         run: |
           export GOARCH=amd64
-          garble -seed=U4Nxq2YSVm6ivvOejQbElA== build -tags timetzdata -trimpath -ldflags "-s -w" -gcflags=all="-l -B -buildid=" -o ${{ github.workspace }}/executables/macos/amd64/selfbot ./cmd/desktop
+          garble -seed=U4Nxq2YSVm6ivvOejQbElA== build -tags timetzdata -trimpath -ldflags "-s -w" -gcflags=all="-l -B" -o ${{ github.workspace }}/executables/macos/amd64/selfbot ./cmd/desktop
           export GOARCH=arm64
-          garble -seed=U4Nxq2YSVm6ivvOejQbElA== build -tags timetzdata -trimpath -ldflags "-s -w" -gcflags=all="-l -B -buildid=" -o ${{ github.workspace }}/executables/macos/arm64/selfbot ./cmd/desktop
+          garble -seed=U4Nxq2YSVm6ivvOejQbElA== build -tags timetzdata -trimpath -ldflags "-s -w" -gcflags=all="-l -B" -o ${{ github.workspace }}/executables/macos/arm64/selfbot ./cmd/desktop
 
       - name: Combine darwin-amd64 and darwin-arm64
         run: |
