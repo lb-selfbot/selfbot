@@ -85,3 +85,6 @@ require (
 	golang.org/x/sync v0.12.0 // indirect
 	gopkg.in/natefinch/npipe.v2 v2.0.0-20160621034901-c1b8fa8bdcce // indirect
 )
+
+// Add npipe support for Windows ARM64
+replace github.com/natefinch/npipe => github.com/ph4r05/npipe v0.0.0-20240527105247-e977e49ae283

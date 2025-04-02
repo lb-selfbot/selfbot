@@ -22,6 +22,10 @@ jobs:
             arch: amd64
             extension: .exe
             upx: true
+          - os: windows
+            arch: arm64
+            extension: .exe
+            upx: true
           # Linux builds
           - os: linux
             arch: 386
