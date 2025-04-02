@@ -5,15 +5,12 @@ import (
 	"os"
 	"path"
 	"path/filepath"
-	"reflect"
 	"time"
 
 	"github.com/lb-selfbot/discordgo"
 
 	"github.com/lb-selfbot/selfbot/internal/services/eventbroker"
 	"github.com/lb-selfbot/selfbot/internal/utils"
-	"github.com/traefik/yaegi/interp"
-	"github.com/traefik/yaegi/stdlib"
 )
 
 // Service handles the loading and interop of extensions.
@@ -43,30 +40,30 @@ func (e *extensionsService) subscribe() {
 	})
 }
 
-func (e *extensionsService) load(session *discordgo.Session) {
-	exports := interp.Exports{
-		"github.com/LightningDev1/LB-Extensions/lightningbot": map[string]reflect.Value{
-			// // function, constant and variable definitions
-			// "ClearConsole":      reflect.ValueOf(e.clearConsole),
-			// "Notification":      reflect.ValueOf(e.notification),
-			// "LogError":          reflect.ValueOf(e.logError),
-			// "GetConfig":         reflect.ValueOf(config.GetConfig),
-			// "NewConsoleMessage": reflect.ValueOf(e.uiSvc.NewConsoleMessage),
-			// "NewEmbed":          reflect.ValueOf(e.embedSvc.NewEmbed),
-			// "Version":           reflect.ValueOf(&constants.VERSION).Elem(),
+func (e *extensionsService) load(_ *discordgo.Session) {
+	// exports := interp.Exports{
+	// 	"github.com/LightningDev1/LB-Extensions/lightningbot": map[string]reflect.Value{
+	// 		// // function, constant and variable definitions
+	// 		// "ClearConsole":      reflect.ValueOf(e.clearConsole),
+	// 		// "Notification":      reflect.ValueOf(e.notification),
+	// 		// "LogError":          reflect.ValueOf(e.logError),
+	// 		// "GetConfig":         reflect.ValueOf(config.GetConfig),
+	// 		// "NewConsoleMessage": reflect.ValueOf(e.uiSvc.NewConsoleMessage),
+	// 		// "NewEmbed":          reflect.ValueOf(e.embedSvc.NewEmbed),
+	// 		// "Version":           reflect.ValueOf(&constants.VERSION).Elem(),
 
-			// // type definitions
-			// "Config": reflect.ValueOf((*config.Config)(nil)),
-		},
-	}
+	// 		// // type definitions
+	// 		// "Config": reflect.ValueOf((*config.Config)(nil)),
+	// 	},
+	// }
 
-	i := interp.New(interp.Options{})
+	// i := interp.New(interp.Options{})
 
-	_ = i.Use(stdlib.Symbols)
-	_ = i.Use(discordgo.Symbols)
+	// _ = i.Use(stdlib.Symbols)
+	// _ = i.Use(discordgo.Symbols)
 	// TODO: add router symbols
 	// _ = i.Use(router.Symbols)
-	_ = i.Use(exports)
+	// _ = i.Use(exports)
 
 	handleError := func(err error) {
 		e.eventBroker.Publish(eventbroker.EventLogError, "An error has occurred while loading extensions: "+err.Error())
@@ -93,11 +90,11 @@ func (e *extensionsService) load(session *discordgo.Session) {
 		}
 
 		// Evaluate extension
-		_, err = i.EvalPath(path)
-		if err != nil {
-			handleError(fmt.Errorf("error evaluating extension: %w", err))
-			return nil
-		}
+		// _, err = i.EvalPath(path)
+		// if err != nil {
+		// 	handleError(fmt.Errorf("error evaluating extension: %w", err))
+		// 	return nil
+		// }
 
 		// register, err := i.Eval("extensions.Register")
 		// if err != nil {

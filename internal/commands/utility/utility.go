@@ -7,7 +7,6 @@ import (
 	"go/token"
 	"go/types"
 	"image/png"
-	"io"
 	"math"
 	"net"
 	nethttp "net/http"
@@ -15,7 +14,6 @@ import (
 	"os"
 	"os/exec"
 	"path"
-	"path/filepath"
 	"regexp"
 	"runtime"
 	"slices"
@@ -39,7 +37,6 @@ import (
 
 	"github.com/LightningDev1/go-foreground"
 	"github.com/kbinani/screenshot"
-	"github.com/kkdai/youtube/v2"
 	"github.com/lb-selfbot/discordgo/protos"
 	"github.com/lb-selfbot/selfbot/internal/uploaders/destinations"
 	"github.com/shirou/gopsutil/v4/cpu"
@@ -776,12 +773,6 @@ func (c *UtilityCommands) Register() {
 			Description: "Search someting on Youtube",
 			Arguments:   "<query>",
 			Handler:     c.youtubesearch,
-		},
-		{
-			Name:        "youtubedl",
-			Description: "Download a YouTube video to the desktop",
-			Arguments:   "<query>",
-			Handler:     c.youtubedl,
 		},
 		{
 			Name:        "amazon",
@@ -3386,65 +3377,6 @@ func (c *UtilityCommands) youtubesearch(ctx *router.Ctx) {
 		emb.AddField(result.Get("title").MustString(), result.Get("url").MustString())
 	}
 	emb.Send()
-}
-
-func (c *UtilityCommands) youtubedl(ctx *router.Ctx) {
-	results, err := api.LBSearch(c.getCreds(), ctx.Arguments.Raw()+" site:youtube.com")
-	if err != nil {
-		ctx.RespondText("An error has occurred: %v", err)
-		return
-	}
-	for i := 0; i < results.Len(); i++ {
-		result := results.Get(i)
-		resultUrl := result.Get("url").MustString()
-
-		if !strings.Contains(resultUrl, "/watch?v=") {
-			continue
-		}
-
-		client := youtube.Client{}
-
-		video, err := client.GetVideo(resultUrl)
-		if err != nil {
-			ctx.RespondText("An error has occurred: %v", err)
-			return
-		}
-
-		ctx.RespondText("Downloading %s...", video.Title)
-
-		formats := video.Formats.WithAudioChannels()
-
-		stream, _, err := client.GetStream(video, &formats[0])
-		if err != nil {
-			ctx.RespondText("An error has occurred: %v", err)
-			return
-		}
-
-		downloadPath := filepath.Join(
-			utils.IO.GetMainFolder(),
-			"Downloads",
-			utils.IO.SanitizeFilename(fmt.Sprintf("%s.mp4", video.Title)),
-		)
-
-		file, err := os.Create(downloadPath)
-		if err != nil {
-			ctx.RespondText("An error has occurred: %v", err)
-			return
-		}
-		defer file.Close()
-
-		_, err = io.Copy(file, stream)
-		if err != nil {
-			ctx.RespondText("An error has occurred: %v", err)
-			_ = file.Close()
-			return
-		}
-
-		_ = system.OpenURL(downloadPath)
-		ctx.RespondText("Successfully downloaded %s", video.Title)
-
-		break
-	}
 }
 
 func (c *UtilityCommands) amazon(ctx *router.Ctx) {
