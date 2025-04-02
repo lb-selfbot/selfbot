@@ -28,6 +28,7 @@ jobs:
         run: |
           mkdir -p ${{ github.workspace }}/executables/windows/386
           mkdir -p ${{ github.workspace }}/executables/windows/amd64
+          mkdir -p ${{ github.workspace }}/executables/windows/arm64
 
       - name: Build for Windows
         env:
@@ -40,6 +41,8 @@ jobs:
           garble -seed=U4Nxq2YSVm6ivvOejQbElA== build -tags timetzdata -trimpath -ldflags "-s -w" -gcflags=all="-l -B" -o ${{ github.workspace }}/executables/windows/386/selfbot.exe ./cmd/desktop
           export GOARCH=amd64
           garble -seed=U4Nxq2YSVm6ivvOejQbElA== build -tags timetzdata -trimpath -ldflags "-s -w" -gcflags=all="-l -B" -o ${{ github.workspace }}/executables/windows/amd64/selfbot.exe ./cmd/desktop
+          export GOARCH=arm64
+          garble -seed=U4Nxq2YSVm6ivvOejQbElA== build -tags timetzdata -trimpath -ldflags "-s -w" -gcflags=all="-l -B" -o ${{ github.workspace }}/executables/windows/arm64/selfbot.exe ./cmd/desktop
 
       - name: Compress UPX
         uses: crazy-max/ghaction-upx@v3
@@ -51,7 +54,7 @@ jobs:
           args: --best --lzma
 
       - name: Upload builds
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v3
         with:
           path: ${{ github.workspace }}/executables
 
@@ -122,7 +125,7 @@ jobs:
           rm -rf ${{ github.workspace }}/executables/LB-Selfbot
 
       - name: Upload builds
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v3
         with:
           path: ${{ github.workspace }}/executables
 
@@ -177,6 +180,6 @@ jobs:
       #     args: --best --lzma
 
       - name: Upload builds
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v3
         with:
           path: ${{ github.workspace }}/executables
