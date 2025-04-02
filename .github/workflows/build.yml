@@ -25,7 +25,7 @@ jobs:
           - os: windows
             arch: arm64
             extension: .exe
-            upx: true
+            upx: false
           # Linux builds
           - os: linux
             arch: 386
