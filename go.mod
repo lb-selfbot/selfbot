@@ -2,8 +2,6 @@ module github.com/lb-selfbot/selfbot
 
 go 1.24.2
 
-toolchain go1.24.1
-
 require (
 	github.com/LightningDev1/beeep v0.1.0
 	github.com/LightningDev1/go-foreground v0.0.0-20250330080612-36c95bf36010
