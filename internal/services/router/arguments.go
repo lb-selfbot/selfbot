@@ -19,6 +19,9 @@ var (
 	// ErrNotInGuild is returned when the command is not executed in a guild.
 	ErrNotInGuild = errors.New("command is not executed in a guild")
 
+	// ErrUserNotFound is returned when a user is not found.
+	ErrUserNotFound = errors.New("user not found")
+
 	// ErrMemberNotFound is returned when a member is not found.
 	ErrMemberNotFound = errors.New("member not found")
 
@@ -34,6 +37,9 @@ type ArgumentFlag int
 const (
 	// ArgumentFlagFallbackDefault returns the default value if the argument is not found.
 	ArgumentFlagFallbackDefault ArgumentFlag = iota
+
+	// ArgumentFlagNoFetch skips fetching the argument from the API.
+	ArgumentFlagNoFetch
 )
 
 var (
@@ -284,6 +290,10 @@ func (a *Argument) User(flags ...ArgumentFlag) (*discordgo.User, error) {
 		return user, nil
 	}
 
+	if slices.Contains(flags, ArgumentFlagNoFetch) {
+		return nil, ErrUserNotFound
+	}
+
 	// Fallback to API
 	return a.ctx.Session.User(userID)
 }
@@ -318,6 +328,10 @@ func (a *Argument) Member(flags ...ArgumentFlag) (*discordgo.Member, error) {
 	// Try to get the member from the state
 	if member, err := a.ctx.Session.State.Member(a.ctx.Message.GuildID, userID); err == nil {
 		return member, nil
+	}
+
+	if slices.Contains(flags, ArgumentFlagNoFetch) {
+		return nil, ErrMemberNotFound
 	}
 
 	// Fallback to QueryGuildMembers gateway operation
@@ -372,6 +386,10 @@ func (a *Argument) Role(flags ...ArgumentFlag) (*discordgo.Role, error) {
 		return role, nil
 	}
 
+	if slices.Contains(flags, ArgumentFlagNoFetch) {
+		return nil, ErrRoleNotFound
+	}
+
 	// Fallback to API
 	roles, err := a.ctx.Session.GuildRoles(a.ctx.Message.GuildID)
 	if err != nil {
@@ -413,6 +431,10 @@ func (a *Argument) Channel(flags ...ArgumentFlag) (*discordgo.Channel, error) {
 		return channel, nil
 	}
 
+	if slices.Contains(flags, ArgumentFlagNoFetch) {
+		return nil, ErrChannelNotFound
+	}
+
 	// Fallback to API
 	return a.ctx.Session.Channel(channelID)
 }
@@ -441,6 +463,10 @@ func (a *Argument) Guild(flags ...ArgumentFlag) (*discordgo.Guild, error) {
 	// Try to get the guild from the state
 	if guild, err := a.ctx.Session.State.Guild(guildID); err == nil {
 		return guild, nil
+	}
+
+	if slices.Contains(flags, ArgumentFlagNoFetch) {
+		return nil, ErrNotInGuild
 	}
 
 	// Fallback to API

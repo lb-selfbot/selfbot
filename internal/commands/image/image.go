@@ -1027,7 +1027,7 @@ func (c *ImageCommands) meme(ctx *router.Ctx) {
 		SetTitle("%s", meme.Get("title").MustString()).
 		SetImage(meme.Get("imagelink").MustString()).
 		AddField("URL", fmt.Sprintf("`%s`", meme.Get("permalink").MustString())).
-		SetSubtext("%s", fmt.Sprintf("Subreddit: %s | Upvotes: %d | Posted by: u/%s", meme.Get("subreddit").MustString(), meme.Get("upvotes").MustInt(), meme.Get("author").MustString())).
+		SetSubtext("Subreddit: %s | Upvotes: %d | Posted by: u/%s", meme.Get("subreddit").MustString(), meme.Get("upvotes").MustInt(), meme.Get("author").MustString()).
 		Send()
 }
 

@@ -2,10 +2,12 @@ package actioncommands
 
 import (
 	"fmt"
+	"slices"
 	"strings"
 
 	"github.com/lb-selfbot/selfbot/internal/fn"
 	"github.com/lb-selfbot/selfbot/internal/services"
+	"github.com/lb-selfbot/selfbot/internal/services/eventreactions/types"
 	"github.com/lb-selfbot/selfbot/internal/services/router"
 )
 
@@ -36,14 +38,14 @@ func (a *CommandActionGet) ToSubCommand(services *services.Services) *router.Com
 			valueStr, ok := value.(string)
 			if value == nil || (ok && len(valueStr) == 0) {
 				services.Embed.New(ctx).
-					SetDescription("%s", fmt.Sprintf("%s is currently empty", a.ReadableName)).
+					SetDescription("%s is currently empty", a.ReadableName).
 					Send()
 				return
 			}
 
 			// Display the retrieved value
 			services.Embed.New(ctx).
-				SetDescription("%s", fmt.Sprintf("%s is currently set to: %v", a.ReadableName, value)).
+				SetDescription("%s is currently set to: %v", a.ReadableName, value).
 				Send()
 		},
 	}
@@ -78,13 +80,47 @@ func (a *CommandActionSet) ToSubCommand(services *services.Services) *router.Com
 			valueStr, ok := value.(string)
 			if value == nil || (ok && len(valueStr) == 0) {
 				services.Embed.New(ctx).
-					SetDescription("%s", fmt.Sprintf("%s set to empty", a.ReadableName)).
+					SetDescription("%s set to empty", a.ReadableName).
 					Send()
 				return
 			}
 
 			services.Embed.New(ctx).
-				SetDescription("%s", fmt.Sprintf("%s set to %v", a.ReadableName, value)).
+				SetDescription("%s set to %v", a.ReadableName, value).
+				Send()
+		},
+	}
+}
+
+// CommandActionAdd is an action for an ActionCommand that
+// adds a value.
+type CommandActionAdd struct {
+	ReadableName string
+	Desc         string
+	Arguments    string
+	ValueType    ActionValueType
+	AddFunc      func(ctx *router.Ctx, value any) error
+}
+
+func (a *CommandActionAdd) ToSubCommand(services *services.Services) *router.Command {
+	return &router.Command{
+		Name:        "add",
+		Description: a.Desc,
+		Arguments:   a.Arguments,
+		Handler: func(ctx *router.Ctx) {
+			value, err := parseValue(ctx, a.ValueType)
+			if err != nil {
+				ctx.RespondText("Error parsing value: %v", err)
+				return
+			}
+
+			if err := a.AddFunc(ctx, value); err != nil {
+				ctx.RespondText("Error adding value: %v", err)
+				return
+			}
+
+			services.Embed.New(ctx).
+				SetDescription("%s added value %v", a.ReadableName, value).
 				Send()
 		},
 	}
@@ -109,7 +145,7 @@ func (a *CommandActionToggle) ToSubCommand(services *services.Services) *router.
 			}
 
 			services.Embed.New(ctx).
-				SetDescription("%s", fmt.Sprintf("%s toggled", a.ReadableName)).
+				SetDescription("%s toggled", a.ReadableName).
 				Send()
 		},
 	}
@@ -156,6 +192,99 @@ func (a *CommandActionExample) ToSubCommand(services *services.Services) *router
 			if err := a.Example(ctx); err != nil {
 				ctx.RespondText("Error demonstrating example: %v", err)
 				return
+			}
+		},
+	}
+}
+
+// CommandActionEventReactionList is an action for an ActionCommand that
+// lists available event reactions.
+type CommandActionEventReactionList struct {
+	ReadableName string
+	Desc         string
+	ReactionType types.EventReactionType
+}
+
+func (a *CommandActionEventReactionList) ToSubCommand(services *services.Services) *router.Command {
+	return &router.Command{
+		Name:        "list",
+		Description: a.Desc,
+		Handler: func(ctx *router.Ctx) {
+			reactions := services.EventReactions.GetReactionsByType(a.ReactionType)
+			if len(reactions) == 0 {
+				services.Embed.New(ctx).
+					SetDescription("No %s reactions found", a.ReadableName).
+					Send()
+				return
+			}
+
+			stringReactions := fn.Map(reactions, func(reaction types.EventReaction) string {
+				return reaction.Description()
+			})
+
+			services.Embed.New(ctx).
+				AddField(a.ReadableName, strings.Join(stringReactions, "\n")).
+				Send()
+		},
+	}
+}
+
+// CommandActionEventReactionClear is an action for an ActionCommand that
+// clears all event reactions.
+type CommandActionEventReactionClear struct {
+	ReadableName string
+	Desc         string
+	ReactionType types.EventReactionType
+}
+
+func (a *CommandActionEventReactionClear) ToSubCommand(services *services.Services) *router.Command {
+	return &router.Command{
+		Name:        "clear",
+		Description: a.Desc,
+		Handler: func(ctx *router.Ctx) {
+			services.EventReactions.RemoveReactionsByType(a.ReactionType)
+
+			services.Embed.New(ctx).
+				SetDescription("Cleared all %s reactions", a.ReadableName).
+				Send()
+		},
+	}
+}
+
+// GetEventReactionFunc is a function that retrieves an event reaction.
+type GetEventReactionFunc func(ctx *router.Ctx) (types.EventReaction, error)
+
+// CommandActionEventReactionToggle is an action for an ActionCommand that
+// toggles an event reaction.
+type CommandActionEventReactionToggle struct {
+	ReadableName    string
+	Desc            string
+	Arguments       string
+	GetReactionFunc GetEventReactionFunc
+}
+
+func (a *CommandActionEventReactionToggle) ToSubCommand(services *services.Services) *router.Command {
+	return &router.Command{
+		Name:        "toggle",
+		Description: a.Desc,
+		Arguments:   a.Arguments,
+		Handler: func(ctx *router.Ctx) {
+			reaction, err := a.GetReactionFunc(ctx)
+			if err != nil {
+				ctx.RespondText("Error getting reaction: %v", err)
+				return
+			}
+
+			if slices.Contains(services.EventReactions.GetAllReactions(), reaction) {
+				services.EventReactions.RemoveReaction(reaction)
+				services.Embed.New(ctx).
+					SetDescription("Removed event reaction: %s", reaction.Description()).
+					Send()
+			} else {
+				services.EventReactions.AddReaction(reaction)
+				services.Embed.New(ctx).
+					SetDescription("Added event reaction: %s", reaction.Description()).
+					Send()
 			}
 		},
 	}
@@ -297,6 +426,37 @@ func (b *Builder) WithExample(desc string, example func(ctx *router.Ctx) error) 
 		ReadableName: b.cmd.ReadableName,
 		Desc:         desc,
 		Example:      example,
+	})
+	return b
+}
+
+// WithEventReactionList adds an event reaction list action to the command.
+func (b *Builder) WithEventReactionList(reactionType types.EventReactionType, desc string) *Builder {
+	b.cmd.Actions = append(b.cmd.Actions, &CommandActionEventReactionList{
+		ReadableName: b.cmd.ReadableName,
+		Desc:         desc,
+		ReactionType: reactionType,
+	})
+	return b
+}
+
+// WithEventReactionClear adds an event reaction clear action to the command.
+func (b *Builder) WithEventReactionClear(reactionType types.EventReactionType, desc string) *Builder {
+	b.cmd.Actions = append(b.cmd.Actions, &CommandActionEventReactionClear{
+		ReadableName: b.cmd.ReadableName,
+		Desc:         desc,
+		ReactionType: reactionType,
+	})
+	return b
+}
+
+// WithEventReactionToggle adds an event reaction toggle action to the command.
+func (b *Builder) WithEventReactionToggle(desc, args string, getReactionFunc GetEventReactionFunc) *Builder {
+	b.cmd.Actions = append(b.cmd.Actions, &CommandActionEventReactionToggle{
+		ReadableName:    b.cmd.ReadableName,
+		Desc:            desc,
+		Arguments:       args,
+		GetReactionFunc: getReactionFunc,
 	})
 	return b
 }

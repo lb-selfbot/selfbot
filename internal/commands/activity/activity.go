@@ -1264,7 +1264,7 @@ func (c *ActivityCommands) setCAButton1(ctx *router.Ctx) {
 	_ = c.services.Config.SaveConfig(cfg)
 
 	c.services.Embed.New(ctx).
-		SetDescription("%s", fmt.Sprintf("CA Button 1 set to %s (%s)", label, url)).
+		SetDescription("CA Button 1 set to %s (%s)", label, url).
 		Send()
 }
 
@@ -1287,7 +1287,7 @@ func (c *ActivityCommands) setCAButton2(ctx *router.Ctx) {
 	_ = c.services.Config.SaveConfig(cfg)
 
 	c.services.Embed.New(ctx).
-		SetDescription("%s", fmt.Sprintf("CA Button 2 set to %s (%s)", label, url)).
+		SetDescription("CA Button 2 set to %s (%s)", label, url).
 		Send()
 }
 
