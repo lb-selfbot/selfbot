@@ -174,7 +174,7 @@ func (e *eventReactionsService) saveEventReactions() error {
 func (e *eventReactionsService) LoadCmdAliases() error {
 	cfg := e.configSvc.GetConfig()
 
-	for cmdName, alias := range cfg.Selfbot.CommandAliases {
+	for alias, cmdName := range cfg.Selfbot.CommandAliases {
 		cmd := e.routerSvc.GetCommand(cmdName)
 		if cmd == nil {
 			continue

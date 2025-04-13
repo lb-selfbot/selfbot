@@ -15,7 +15,15 @@ import (
 // Service handles the creation and sending of embeds.
 type Service interface {
 	// NewEmbed creates a new embed with the given title and description.
-	New(e *router.Ctx) *embed.Embed
+	New(ctx *router.Ctx) *embed.Embed
+
+	// RespondEmbed creates a new embed with the given description and sends
+	// it in the given context.
+	Respond(ctx *router.Ctx, format string, a ...any) []*discordgo.Message
+
+	// RespondEmbed creates a new embed with the given field and sends
+	// it in the given context.
+	RespondField(ctx *router.Ctx, name, value string, cond ...bool) []*discordgo.Message
 }
 
 type embedService struct {
@@ -35,6 +43,14 @@ func (e *embedService) New(ctx *router.Ctx) *embed.Embed {
 	return embed.NewEmbed(e.getEmbedSendFunc(ctx)).
 		SetTitle("%s", e.variablesSvc.Parse(cfg.Selfbot.Title)).
 		SetSubtext("%s", e.variablesSvc.Parse(cfg.Selfbot.Footer))
+}
+
+func (e *embedService) Respond(ctx *router.Ctx, format string, a ...any) []*discordgo.Message {
+	return e.New(ctx).SetDescription(format, a...).Send()
+}
+
+func (e *embedService) RespondField(ctx *router.Ctx, name, value string, cond ...bool) []*discordgo.Message {
+	return e.New(ctx).AddField(name, value, cond...).Send()
 }
 
 func (e *embedService) getEmbedSendFunc(ctx *router.Ctx) func(*embed.Embed) []*discordgo.Message {

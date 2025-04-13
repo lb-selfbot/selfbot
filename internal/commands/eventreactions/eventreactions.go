@@ -7,6 +7,7 @@ import (
 
 	"github.com/lb-selfbot/discordgo"
 	"github.com/lb-selfbot/selfbot/internal/actioncommands"
+	"github.com/lb-selfbot/selfbot/internal/actioncommands/actionvalue"
 	"github.com/lb-selfbot/selfbot/internal/fn"
 	"github.com/lb-selfbot/selfbot/internal/services"
 	"github.com/lb-selfbot/selfbot/internal/services/eventreactions/impl"
@@ -607,16 +608,16 @@ func (c *EventReactionsCommands) Register() {
 
 		// AFK Related Commands
 		actioncommands.NewBuilder("afkresponder", "AFK Responder").
-			WithGetter("Get AFK responder status", func(ctx *router.Ctx) (any, error) {
+			WithValueGetter("Get AFK responder status", func(ctx *router.Ctx) (any, error) {
 				cfg := c.services.Config.GetConfig()
 				return cfg.AFK.Enabled, nil
 			}).
-			WithSetter("Set AFK responder status", actioncommands.ValueTypeBool, func(ctx *router.Ctx, value any) error {
+			WithValueSetter("Set AFK responder status", actionvalue.TypeBool, func(ctx *router.Ctx, value any) error {
 				cfg := c.services.Config.GetConfig()
 				cfg.AFK.Enabled = value.(bool)
 				return c.services.Config.SaveConfig(cfg)
 			}).
-			WithToggler("Toggle AFK responder", func(ctx *router.Ctx) error {
+			WithValueToggler("Toggle AFK responder", func(ctx *router.Ctx) error {
 				cfg := c.services.Config.GetConfig()
 				cfg.AFK.Enabled = !cfg.AFK.Enabled
 				return c.services.Config.SaveConfig(cfg)
@@ -624,16 +625,16 @@ func (c *EventReactionsCommands) Register() {
 			Build(c.services),
 
 		actioncommands.NewBuilder("afkonping", "AFK On Ping").
-			WithGetter("Get AFK on ping status", func(ctx *router.Ctx) (any, error) {
+			WithValueGetter("Get AFK on ping status", func(ctx *router.Ctx) (any, error) {
 				cfg := c.services.Config.GetConfig()
 				return cfg.AFK.OnPing, nil
 			}).
-			WithSetter("Set AFK on ping status", actioncommands.ValueTypeBool, func(ctx *router.Ctx, value any) error {
+			WithValueSetter("Set AFK on ping status", actionvalue.TypeBool, func(ctx *router.Ctx, value any) error {
 				cfg := c.services.Config.GetConfig()
 				cfg.AFK.OnPing = value.(bool)
 				return c.services.Config.SaveConfig(cfg)
 			}).
-			WithToggler("Toggle AFK on ping", func(ctx *router.Ctx) error {
+			WithValueToggler("Toggle AFK on ping", func(ctx *router.Ctx) error {
 				cfg := c.services.Config.GetConfig()
 				cfg.AFK.OnPing = !cfg.AFK.OnPing
 				return c.services.Config.SaveConfig(cfg)
@@ -641,16 +642,16 @@ func (c *EventReactionsCommands) Register() {
 			Build(c.services),
 
 		actioncommands.NewBuilder("afkondm", "AFK On DM").
-			WithGetter("Get AFK on DM status", func(ctx *router.Ctx) (any, error) {
+			WithValueGetter("Get AFK on DM status", func(ctx *router.Ctx) (any, error) {
 				cfg := c.services.Config.GetConfig()
 				return cfg.AFK.OnDM, nil
 			}).
-			WithSetter("Set AFK on DM status", actioncommands.ValueTypeBool, func(ctx *router.Ctx, value any) error {
+			WithValueSetter("Set AFK on DM status", actionvalue.TypeBool, func(ctx *router.Ctx, value any) error {
 				cfg := c.services.Config.GetConfig()
 				cfg.AFK.OnDM = value.(bool)
 				return c.services.Config.SaveConfig(cfg)
 			}).
-			WithToggler("Toggle AFK on DM", func(ctx *router.Ctx) error {
+			WithValueToggler("Toggle AFK on DM", func(ctx *router.Ctx) error {
 				cfg := c.services.Config.GetConfig()
 				cfg.AFK.OnDM = !cfg.AFK.OnDM
 				return c.services.Config.SaveConfig(cfg)
@@ -658,11 +659,11 @@ func (c *EventReactionsCommands) Register() {
 			Build(c.services),
 
 		actioncommands.NewBuilder("afkdelay", "AFK Delay").
-			WithGetter("Get AFK delay", func(ctx *router.Ctx) (any, error) {
+			WithValueGetter("Get AFK delay", func(ctx *router.Ctx) (any, error) {
 				cfg := c.services.Config.GetConfig()
 				return cfg.AFK.Delay, nil
 			}).
-			WithSetter("Set AFK delay", actioncommands.ValueTypeDuration, func(ctx *router.Ctx, value any) error {
+			WithValueSetter("Set AFK delay", actionvalue.TypeDuration, func(ctx *router.Ctx, value any) error {
 				cfg := c.services.Config.GetConfig()
 				cfg.AFK.Delay = value.(int)
 				return c.services.Config.SaveConfig(cfg)
@@ -670,16 +671,16 @@ func (c *EventReactionsCommands) Register() {
 			Build(c.services),
 
 		actioncommands.NewBuilder("afkrandomdelay", "AFK Random Delay").
-			WithGetter("Get AFK random delay status", func(ctx *router.Ctx) (any, error) {
+			WithValueGetter("Get AFK random delay status", func(ctx *router.Ctx) (any, error) {
 				cfg := c.services.Config.GetConfig()
 				return cfg.AFK.RandomDelay, nil
 			}).
-			WithSetter("Set AFK random delay status", actioncommands.ValueTypeBool, func(ctx *router.Ctx, value any) error {
+			WithValueSetter("Set AFK random delay status", actionvalue.TypeBool, func(ctx *router.Ctx, value any) error {
 				cfg := c.services.Config.GetConfig()
 				cfg.AFK.RandomDelay = value.(bool)
 				return c.services.Config.SaveConfig(cfg)
 			}).
-			WithToggler("Toggle AFK random delay", func(ctx *router.Ctx) error {
+			WithValueToggler("Toggle AFK random delay", func(ctx *router.Ctx) error {
 				cfg := c.services.Config.GetConfig()
 				cfg.AFK.RandomDelay = !cfg.AFK.RandomDelay
 				return c.services.Config.SaveConfig(cfg)
@@ -687,16 +688,16 @@ func (c *EventReactionsCommands) Register() {
 			Build(c.services),
 
 		actioncommands.NewBuilder("afkinactive", "AFK Inactive").
-			WithGetter("Get AFK inactive status", func(ctx *router.Ctx) (any, error) {
+			WithValueGetter("Get AFK inactive status", func(ctx *router.Ctx) (any, error) {
 				cfg := c.services.Config.GetConfig()
 				return cfg.AFK.MustBeInactive, nil
 			}).
-			WithSetter("Set AFK inactive status", actioncommands.ValueTypeBool, func(ctx *router.Ctx, value any) error {
+			WithValueSetter("Set AFK inactive status", actionvalue.TypeBool, func(ctx *router.Ctx, value any) error {
 				cfg := c.services.Config.GetConfig()
 				cfg.AFK.MustBeInactive = value.(bool)
 				return c.services.Config.SaveConfig(cfg)
 			}).
-			WithToggler("Toggle AFK inactive", func(ctx *router.Ctx) error {
+			WithValueToggler("Toggle AFK inactive", func(ctx *router.Ctx) error {
 				cfg := c.services.Config.GetConfig()
 				cfg.AFK.MustBeInactive = !cfg.AFK.MustBeInactive
 				return c.services.Config.SaveConfig(cfg)
@@ -704,11 +705,11 @@ func (c *EventReactionsCommands) Register() {
 			Build(c.services),
 
 		actioncommands.NewBuilder("afkinactivetimeout", "AFK Inactive Timeout").
-			WithGetter("Get AFK inactive timeout", func(ctx *router.Ctx) (any, error) {
+			WithValueGetter("Get AFK inactive timeout", func(ctx *router.Ctx) (any, error) {
 				cfg := c.services.Config.GetConfig()
 				return cfg.AFK.InactiveTimeout, nil
 			}).
-			WithSetter("Set AFK inactive timeout", actioncommands.ValueTypeDuration, func(ctx *router.Ctx, value any) error {
+			WithValueSetter("Set AFK inactive timeout", actionvalue.TypeDuration, func(ctx *router.Ctx, value any) error {
 				cfg := c.services.Config.GetConfig()
 				cfg.AFK.InactiveTimeout = value.(int)
 				return c.services.Config.SaveConfig(cfg)
@@ -716,16 +717,16 @@ func (c *EventReactionsCommands) Register() {
 			Build(c.services),
 
 		actioncommands.NewBuilder("afktyping", "AFK Typing").
-			WithGetter("Get AFK typing status", func(ctx *router.Ctx) (any, error) {
+			WithValueGetter("Get AFK typing status", func(ctx *router.Ctx) (any, error) {
 				cfg := c.services.Config.GetConfig()
 				return cfg.AFK.Typing, nil
 			}).
-			WithSetter("Set AFK typing status", actioncommands.ValueTypeBool, func(ctx *router.Ctx, value any) error {
+			WithValueSetter("Set AFK typing status", actionvalue.TypeBool, func(ctx *router.Ctx, value any) error {
 				cfg := c.services.Config.GetConfig()
 				cfg.AFK.Typing = value.(bool)
 				return c.services.Config.SaveConfig(cfg)
 			}).
-			WithToggler("Toggle AFK typing", func(ctx *router.Ctx) error {
+			WithValueToggler("Toggle AFK typing", func(ctx *router.Ctx) error {
 				cfg := c.services.Config.GetConfig()
 				cfg.AFK.Typing = !cfg.AFK.Typing
 				return c.services.Config.SaveConfig(cfg)
@@ -733,16 +734,16 @@ func (c *EventReactionsCommands) Register() {
 			Build(c.services),
 
 		actioncommands.NewBuilder("afkai", "AFK AI").
-			WithGetter("Get AFK AI status", func(ctx *router.Ctx) (any, error) {
+			WithValueGetter("Get AFK AI status", func(ctx *router.Ctx) (any, error) {
 				cfg := c.services.Config.GetConfig()
 				return cfg.AFK.AI, nil
 			}).
-			WithSetter("Set AFK AI status", actioncommands.ValueTypeBool, func(ctx *router.Ctx, value any) error {
+			WithValueSetter("Set AFK AI status", actionvalue.TypeBool, func(ctx *router.Ctx, value any) error {
 				cfg := c.services.Config.GetConfig()
 				cfg.AFK.AI = value.(bool)
 				return c.services.Config.SaveConfig(cfg)
 			}).
-			WithToggler("Toggle AFK AI", func(ctx *router.Ctx) error {
+			WithValueToggler("Toggle AFK AI", func(ctx *router.Ctx) error {
 				cfg := c.services.Config.GetConfig()
 				cfg.AFK.AI = !cfg.AFK.AI
 				return c.services.Config.SaveConfig(cfg)
@@ -750,11 +751,11 @@ func (c *EventReactionsCommands) Register() {
 			Build(c.services),
 
 		actioncommands.NewBuilder("afkmessage", "AFK Message").
-			WithGetter("Get AFK message", func(ctx *router.Ctx) (any, error) {
+			WithValueGetter("Get AFK message", func(ctx *router.Ctx) (any, error) {
 				cfg := c.services.Config.GetConfig()
 				return cfg.AFK.Message, nil
 			}).
-			WithSetter("Set AFK message", actioncommands.ValueTypeString, func(ctx *router.Ctx, value any) error {
+			WithValueSetter("Set AFK message", actionvalue.TypeString, func(ctx *router.Ctx, value any) error {
 				cfg := c.services.Config.GetConfig()
 				cfg.AFK.Message = value.(string)
 				return c.services.Config.SaveConfig(cfg)
@@ -762,11 +763,11 @@ func (c *EventReactionsCommands) Register() {
 			Build(c.services),
 
 		actioncommands.NewBuilder("afktriggertype", "AFK Trigger Type").
-			WithGetter("Get AFK trigger type", func(ctx *router.Ctx) (any, error) {
+			WithValueGetter("Get AFK trigger type", func(ctx *router.Ctx) (any, error) {
 				cfg := c.services.Config.GetConfig()
 				return cfg.AFK.TriggerList.Type, nil
 			}).
-			WithSetter("Set AFK trigger type", actioncommands.ValueTypeString, func(ctx *router.Ctx, value any) error {
+			WithValueSetter("Set AFK trigger type", actionvalue.TypeString, func(ctx *router.Ctx, value any) error {
 				cfg := c.services.Config.GetConfig()
 				valueStr := strings.ToLower(value.(string))
 

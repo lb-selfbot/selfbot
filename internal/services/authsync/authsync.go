@@ -299,8 +299,8 @@ func (a *authSyncService) read() (*WSMessage, error) {
 }
 
 func (a *authSyncService) write(msg *WSMessage) error {
-	if a.conn == nil || a.enc == nil {
-		return fmt.Errorf("connection not initialized")
+	if a.enc == nil {
+		return fmt.Errorf("encryption not initialized")
 	}
 
 	data, err := json.Marshal(msg)
@@ -315,6 +315,10 @@ func (a *authSyncService) write(msg *WSMessage) error {
 
 	a.mu.Lock()
 	defer a.mu.Unlock()
+
+	if a.conn == nil {
+		return fmt.Errorf("cannot write message: connection is nil")
+	}
 
 	if err := a.conn.WriteMessage(websocket.TextMessage, encrypted); err != nil {
 		return fmt.Errorf("failed to write message: %w", err)
