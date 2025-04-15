@@ -3,6 +3,7 @@ package fun
 import (
 	"fmt"
 	"html"
+	"strconv"
 	"strings"
 	"time"
 
@@ -609,24 +610,27 @@ func (c *FunCommands) iqtest(ctx *router.Ctx) {
 }
 
 func (c *FunCommands) hack(ctx *router.Ctx) {
-	// user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
-	// if err != nil {
-	// 	ctx.RespondText("Couldn't find user!")
-	// 	return
-	// }
-	// // cc := gofakeit.CreditCard()
-	// c.services.Embed.New(ctx).
-	// 	AddField("User", user.String()).
-	// 	AddField("Real Name", gofakeit.Name()).
-	// 	AddField("Email", gofakeit.Email()).
-	// 	AddField("Phone", gofakeit.PhoneFormatted()).
-	// 	AddField("Credit Card Number", cc.Number).
-	// 	AddField("CCV", cc.Cvv).
-	// 	AddField("Address", gofakeit.Address().Address).
-	// 	AddField("Job", gofakeit.JobTitle()).
-	// 	AddField("Favorite Minecraft Biome", gofakeit.MinecraftBiome()).
-	// 	AddField("Idol", gofakeit.CelebrityActor()).
-	// 	Send()
+	user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
+	if err != nil {
+		ctx.RespondText("Couldn't find user!")
+		return
+	}
+
+	resp, err := http.DefaultClient().Get("https://randomuser.me/api/")
+	if err != nil {
+		ctx.RespondText("An error has occurred.")
+		return
+	}
+
+	data := resp.Json().Get("results", 0)
+	c.services.Embed.New(ctx).
+		AddField("User", user.String()).
+		AddField("Real Name", data.Get("name", "first").MustString()+" "+data.Get("name", "last").MustString()).
+		AddField("Email", strings.ReplaceAll(data.Get("email").MustString(), "example", "gmail")).
+		AddField("Phone", data.Get("cell").MustString()).
+		AddField("Address", strconv.Itoa(data.Get("location", "street", "number").MustInt())+" "+data.Get("location", "street", "name").MustString()+", "+data.Get("location", "city").MustString()+", "+data.Get("location", "country").MustString()).
+		AddField(data.Get("id", "name").MustString(), data.Get("id", "value").MustString()).
+		Send()
 }
 
 func (c *FunCommands) insult(ctx *router.Ctx) {

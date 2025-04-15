@@ -1,6 +1,13 @@
 package sharing
 
 import (
+	"fmt"
+	"slices"
+	"strings"
+
+	"github.com/lb-selfbot/selfbot/internal/actioncommands"
+	"github.com/lb-selfbot/selfbot/internal/actioncommands/actionvalue"
+	"github.com/lb-selfbot/selfbot/internal/fn"
 	"github.com/lb-selfbot/selfbot/internal/services"
 	"github.com/lb-selfbot/selfbot/internal/services/router"
 )
@@ -16,377 +23,315 @@ func (c *SharingCommands) Register() {
 		Name:        "Sharing",
 		Description: "Share the bot with other users",
 	}, []*router.Command{
-		// {
-		// 	Name:        "sharedusers",
-		// 	Description: "Get, add, remove or clear shared users",
-		// 	Arguments:   "<get/add/rm/clear> [user]",
-		// 	Flags:       []router.CommandFlag{router.CmdFlagDangerous},
-		// 	Handler:     c.sharedusers,
-		// },
-		// {
-		// 	Name:        "sharedcategories",
-		// 	Description: "Get, add, remove or clear shared command categories",
-		// 	Arguments:   "<get/add/rm/clear/values> [category]",
-		// 	Flags:       []router.CommandFlag{router.CmdFlagDangerous},
-		// 	Handler:     c.sharedcategories,
-		// },
-		// {
-		// 	Name:        "sharedcommands",
-		// 	Description: "Get, add, remove or clear shared commands",
-		// 	Arguments:   "<get/add/rm/clear/values> [command]",
-		// 	Flags:       []router.CommandFlag{router.CmdFlagDangerous},
-		// 	Handler:     c.sharedcommands,
-		// },
-		// {
-		// 	Name:        "shareall",
-		// 	Description: "Get, set or toggle sharing of all commands",
-		// 	Arguments:   "<get/set/toggle> [on/off]",
-		// 	Flags:       []router.CommandFlag{router.CmdFlagDangerous},
-		// 	Handler:     c.shareall,
-		// },
-		// {
-		// 	Name:        "blockdangerous",
-		// 	Description: "Get, set or toggle blocking sharing of dangerous commands",
-		// 	Arguments:   "<get/set/toggle> [on/off]",
-		// 	Flags:       []router.CommandFlag{router.CmdFlagDangerous},
-		// 	Handler:     c.blockdangerous,
-		// },
+		// Shared Users
+		actioncommands.NewBuilder("sharedusers", "Shared Users").
+			WithListGetter("Get shared users", func(ctx *router.Ctx) error {
+				cfg := c.services.Config.GetConfig()
+				if len(cfg.Sharing.SharedUsers) == 0 {
+					c.services.Embed.Respond(ctx, "No shared users found.")
+					return nil
+				}
+
+				userStrings := make([]string, 0, len(cfg.Sharing.SharedUsers))
+				for _, userID := range cfg.Sharing.SharedUsers {
+					user, err := ctx.Session.UserWithFallback(userID)
+					if err != nil {
+						userStrings = append(userStrings, fmt.Sprintf("%s (Unknown)", userID))
+						continue
+					}
+					userStrings = append(userStrings, fmt.Sprintf("%s (%s)", user.Username, userID))
+				}
+
+				c.services.Embed.RespondField(ctx, "Shared Users", strings.Join(userStrings, "\n"))
+				return nil
+			}).
+			WithListAdder("Add shared user", "<user>", func(ctx *router.Ctx) error {
+				user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
+				if err != nil {
+					return fmt.Errorf("could not find user: %v", err)
+				}
+
+				cfg := c.services.Config.GetConfig()
+
+				if slices.Contains(cfg.Sharing.SharedUsers, user.ID) {
+					return fmt.Errorf("user %s is already in the shared users list", user.Username)
+				}
+
+				cfg.Sharing.SharedUsers = append(cfg.Sharing.SharedUsers, user.ID)
+				if err := c.services.Config.SaveConfig(cfg); err != nil {
+					return fmt.Errorf("error saving config: %v", err)
+				}
+
+				c.services.Embed.Respond(ctx, "Added user %s to shared users.", user.Username)
+				return nil
+			}).
+			WithListRemover("Remove shared user", "<user>", func(ctx *router.Ctx) error {
+				user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
+				if err != nil {
+					return fmt.Errorf("could not find user: %v", err)
+				}
+
+				cfg := c.services.Config.GetConfig()
+
+				if !slices.Contains(cfg.Sharing.SharedUsers, user.ID) {
+					return fmt.Errorf("user %s is not in the shared users list", user.Username)
+				}
+
+				cfg.Sharing.SharedUsers = fn.Delete(cfg.Sharing.SharedUsers, user.ID)
+				if err := c.services.Config.SaveConfig(cfg); err != nil {
+					return fmt.Errorf("error saving config: %v", err)
+				}
+
+				c.services.Embed.Respond(ctx, "Removed user %s from shared users.", user.Username)
+				return nil
+			}).
+			WithListClearer("Clear shared users", func(ctx *router.Ctx) error {
+				cfg := c.services.Config.GetConfig()
+				cfg.Sharing.SharedUsers = []string{}
+				if err := c.services.Config.SaveConfig(cfg); err != nil {
+					return fmt.Errorf("error saving config: %v", err)
+				}
+
+				c.services.Embed.Respond(ctx, "Cleared all shared users.")
+				return nil
+			}).
+			Build(c.services),
+
+		// Shared Categories
+		actioncommands.NewBuilder("sharedcategories", "Shared Categories").
+			WithListGetter("Get shared categories", func(ctx *router.Ctx) error {
+				cfg := c.services.Config.GetConfig()
+				if len(cfg.Sharing.SharedCategories) == 0 {
+					c.services.Embed.Respond(ctx, "No shared command categories found.")
+					return nil
+				}
+
+				c.services.Embed.RespondField(ctx, "Shared Categories", strings.Join(cfg.Sharing.SharedCategories, "\n"))
+				return nil
+			}).
+			WithListAdder("Add shared category", "<category>", func(ctx *router.Ctx) error {
+				categoryName := ctx.Arguments.Get(0).Raw()
+
+				var found bool
+				var actualName string
+				for _, category := range ctx.Router.GetCategories() {
+					if !strings.EqualFold(category.Name, categoryName) {
+						continue
+					}
+
+					actualName = category.Name
+					found = true
+					break
+				}
+
+				if !found {
+					return fmt.Errorf("category %s not found. Use the 'values' subcommand to see available categories", categoryName)
+				}
+
+				cfg := c.services.Config.GetConfig()
+
+				if slices.Contains(cfg.Sharing.SharedCategories, actualName) {
+					return fmt.Errorf("category %s is already in the shared categories list", actualName)
+				}
+
+				cfg.Sharing.SharedCategories = append(cfg.Sharing.SharedCategories, actualName)
+				if err := c.services.Config.SaveConfig(cfg); err != nil {
+					return fmt.Errorf("error saving config: %v", err)
+				}
+
+				c.services.Embed.Respond(ctx, "Added category %s to shared categories.", actualName)
+				return nil
+			}).
+			WithListRemover("Remove shared category", "<category>", func(ctx *router.Ctx) error {
+				categoryName := ctx.Arguments.Get(0).Raw()
+
+				var found bool
+				var actualName string
+				for _, category := range ctx.Router.GetCategories() {
+					if !strings.EqualFold(category.Name, categoryName) {
+						continue
+					}
+
+					actualName = category.Name
+					found = true
+					break
+				}
+
+				if !found {
+					return fmt.Errorf("category %s not found. Use the 'values' subcommand to see available categories", categoryName)
+				}
+
+				cfg := c.services.Config.GetConfig()
+
+				if !slices.Contains(cfg.Sharing.SharedCategories, actualName) {
+					return fmt.Errorf("category %s is not in the shared categories list", actualName)
+				}
+
+				cfg.Sharing.SharedCategories = fn.Delete(cfg.Sharing.SharedCategories, actualName)
+				if err := c.services.Config.SaveConfig(cfg); err != nil {
+					return fmt.Errorf("error saving config: %v", err)
+				}
+
+				c.services.Embed.Respond(ctx, "Removed category %s from shared categories.", actualName)
+				return nil
+			}).
+			WithListClearer("Clear shared categories", func(ctx *router.Ctx) error {
+				cfg := c.services.Config.GetConfig()
+				cfg.Sharing.SharedCategories = []string{}
+				if err := c.services.Config.SaveConfig(cfg); err != nil {
+					return fmt.Errorf("error saving config: %v", err)
+				}
+
+				c.services.Embed.Respond(ctx, "Cleared all shared categories.")
+				return nil
+			}).
+			Build(c.services),
+
+		// Shared Commands
+		actioncommands.NewBuilder("sharedcommands", "Shared Commands").
+			WithListGetter("Get shared commands", func(ctx *router.Ctx) error {
+				cfg := c.services.Config.GetConfig()
+				if len(cfg.Sharing.SharedCommands) == 0 {
+					c.services.Embed.Respond(ctx, "No shared commands found.")
+					return nil
+				}
+
+				c.services.Embed.RespondField(ctx, "Shared Commands", strings.Join(cfg.Sharing.SharedCommands, "\n"))
+				return nil
+			}).
+			WithListAdder("Add shared command", "<command>", func(ctx *router.Ctx) error {
+				commandName := ctx.Arguments.Get(0).Raw()
+
+				var found bool
+				var actualName string
+				for _, command := range ctx.Router.GetCommands() {
+					if !strings.EqualFold(command.Name, commandName) {
+						continue
+					}
+
+					actualName = command.Name
+					found = true
+					break
+				}
+
+				if !found {
+					return fmt.Errorf("command %s not found", commandName)
+				}
+
+				cfg := c.services.Config.GetConfig()
+
+				if slices.Contains(cfg.Sharing.SharedCommands, actualName) {
+					return fmt.Errorf("command %s is already in the shared commands list", actualName)
+				}
+
+				cfg.Sharing.SharedCommands = append(cfg.Sharing.SharedCommands, actualName)
+				if err := c.services.Config.SaveConfig(cfg); err != nil {
+					return fmt.Errorf("error saving config: %v", err)
+				}
+
+				c.services.Embed.Respond(ctx, "Added command %s to shared commands.", actualName)
+				return nil
+			}).
+			WithListRemover("Remove shared command", "<command>", func(ctx *router.Ctx) error {
+				commandName := ctx.Arguments.Get(0).Raw()
+
+				var found bool
+				var actualName string
+				for _, command := range ctx.Router.GetCommands() {
+					if !strings.EqualFold(command.Name, commandName) {
+						continue
+					}
+
+					actualName = command.Name
+					found = true
+					break
+				}
+
+				if !found {
+					return fmt.Errorf("command %s not found", commandName)
+				}
+
+				cfg := c.services.Config.GetConfig()
+
+				if !slices.Contains(cfg.Sharing.SharedCommands, actualName) {
+					return fmt.Errorf("command %s is not in the shared commands list", actualName)
+				}
+
+				cfg.Sharing.SharedCommands = fn.Delete(cfg.Sharing.SharedCommands, actualName)
+				if err := c.services.Config.SaveConfig(cfg); err != nil {
+					return fmt.Errorf("error saving config: %v", err)
+				}
+
+				c.services.Embed.Respond(ctx, "Removed command %s from shared commands.", actualName)
+				return nil
+			}).
+			WithListClearer("Clear shared commands", func(ctx *router.Ctx) error {
+				cfg := c.services.Config.GetConfig()
+				cfg.Sharing.SharedCommands = []string{}
+				if err := c.services.Config.SaveConfig(cfg); err != nil {
+					return fmt.Errorf("error saving config: %v", err)
+				}
+
+				c.services.Embed.Respond(ctx, "Cleared all shared commands.")
+				return nil
+			}).
+			Build(c.services),
+
+		// Share All
+		actioncommands.NewBuilder("shareall", "Share All").
+			WithValueGetter("Get share all status", func(ctx *router.Ctx) (any, error) {
+				cfg := c.services.Config.GetConfig()
+				return cfg.Sharing.ShareAll, nil
+			}).
+			WithValueSetter("Set share all status", actionvalue.TypeBool, func(ctx *router.Ctx, value any) error {
+				cfg := c.services.Config.GetConfig()
+				cfg.Sharing.ShareAll = value.(bool)
+				return c.services.Config.SaveConfig(cfg)
+			}).
+			WithValueToggler("Toggle share all", func(ctx *router.Ctx) error {
+				cfg := c.services.Config.GetConfig()
+				cfg.Sharing.ShareAll = !cfg.Sharing.ShareAll
+				return c.services.Config.SaveConfig(cfg)
+			}).
+			Build(c.services),
+
+		// Block Dangerous
+		actioncommands.NewBuilder("blockdangerous", "Block Dangerous Commands").
+			WithValueGetter("Get block dangerous commands status", func(ctx *router.Ctx) (any, error) {
+				cfg := c.services.Config.GetConfig()
+				return cfg.Sharing.BlockDangerousCommands, nil
+			}).
+			WithValueSetter("Set block dangerous commands status", actionvalue.TypeBool, func(ctx *router.Ctx, value any) error {
+				cfg := c.services.Config.GetConfig()
+				cfg.Sharing.BlockDangerousCommands = value.(bool)
+				return c.services.Config.SaveConfig(cfg)
+			}).
+			WithValueToggler("Toggle block dangerous commands", func(ctx *router.Ctx) error {
+				cfg := c.services.Config.GetConfig()
+				cfg.Sharing.BlockDangerousCommands = !cfg.Sharing.BlockDangerousCommands
+				return c.services.Config.SaveConfig(cfg)
+			}).
+			Build(c.services),
+
+		// Values subcommands registered as separate commands
+		{
+			Name:        "sharedcategories-values",
+			Description: "List available command categories",
+			Handler: func(ctx *router.Ctx) {
+				var categories []string
+				for _, category := range ctx.Router.GetCategories() {
+					categories = append(categories, category.Name)
+				}
+
+				c.services.Embed.RespondField(ctx, "Available Categories", strings.Join(categories, "\n"))
+			},
+		},
+		{
+			Name:        "sharedcommands-values",
+			Description: "Show help for available commands",
+			Handler: func(ctx *router.Ctx) {
+				c.services.Embed.RespondField(ctx, "Available Commands", "Use `help` or view <https://docs.lightning-bot.com/category/commands> for a list of commands.")
+			},
+		},
 	})
 }
-
-// func (c *SharingCommands) sharedusers(ctx *router.Ctx) {
-// 	cfg, err := config.GetConfig()
-// 	if err != nil {
-// 		ctx.RespondText("Error getting config")
-// 		return
-// 	}
-
-// 	switch strings.ToLower(utils.Arguments["<get/add/rm/clear>"]) {
-// 	case "get":
-// 		userString := ""
-// 		for _, userID := range cfg.Sharing.SharedUsers {
-// 			user, err := ctx.Session.UserWithFallback(userID)
-// 			if err != nil {
-// 				userString += fmt.Sprintf("%s - %s\n", "Unknown", userID)
-// 				continue
-// 			}
-
-// 			userString += fmt.Sprintf("%s - %s\n", user.Username, userID)
-// 		}
-
-// 		if userString == "" {
-// 			userString = "No users set."
-// 		}
-
-// 		c.services.Embed.New(ctx).
-// 			AddField("Shared Users", userString).
-// 			Send()
-// 	case "add":
-// 		user, err := ctx.Arguments.Get(1).User(router.ArgumentFlagFallbackDefault)
-// 		if err != nil {
-// 			c.services.Embed.New(ctx).
-// 				SetDescription("Could not find user.").
-// 				Send()
-// 			return
-// 		}
-
-// 		if slices.Contains(cfg.Sharing.SharedUsers, user.ID) {
-// 			ctx.RespondText("User is already in the Shared Users list.")
-// 			return
-// 		}
-
-// 		cfg.Sharing.SharedUsers = append(cfg.Sharing.SharedUsers, user.ID)
-
-// 		_ = c.services.Config.SaveConfig(cfg)
-
-// 		c.services.Embed.New(ctx).
-// 			SetDescription("Added %s to the Shared Users list.", user.Mention()).
-// 			Send()
-// 	case "rm":
-// 		user, err := ctx.Arguments.Get(1).User(router.ArgumentFlagFallbackDefault)
-// 		if err != nil {
-// 			c.services.Embed.New(ctx).
-// 				SetDescription("Could not find user.").
-// 				Send()
-// 			return
-// 		}
-
-// 		if !slices.Contains(cfg.Sharing.SharedUsers, user.ID) {
-// 			ctx.RespondText("User already isn't in the Shared Users list.")
-// 			return
-// 		}
-
-// 		cfg.Sharing.SharedUsers = fn.Delete(cfg.Sharing.SharedUsers, user.ID)
-
-// 		_ = c.services.Config.SaveConfig(cfg)
-
-// 		c.services.Embed.New(ctx).
-// 			SetDescription("Removed %s from the Shared Users list.", user.Mention()).
-// 			Send()
-// 	case "clear":
-// 		cfg.Sharing.SharedUsers = []string{}
-// 		_ = c.services.Config.SaveConfig(cfg)
-
-// 		c.services.Embed.New(ctx).
-// 			SetDescription("Cleared all users from the Shared Users list.").
-// 			Send()
-// 	default:
-// 		ctx.RespondText("Invalid <get/add/rm/clear> argument. Use `get`, `add`, `rm`, or `clear`.")
-// 	}
-// }
-
-// func (c *SharingCommands) sharedcategories(ctx *router.Ctx) {
-// 	cfg, err := config.GetConfig()
-// 	if err != nil {
-// 		ctx.RespondText("Error getting config.")
-// 		return
-// 	}
-
-// 	switch utils.Arguments["<get/add/rm/clear/values>"] {
-// 	case "get":
-// 		c.services.Embed.New(ctx).
-// 			AddField("Shared Categories", strings.Join(cfg.Sharing.SharedCategories, ", ")).
-// 			Send()
-// 	case "add":
-// 		entry := utils.Arguments["[category]"]
-
-// 		var found bool
-// 		for _, category := range ctx.Router.GetCategories() {
-// 			if !strings.EqualFold(category.Name, entry) {
-// 				continue
-// 			}
-
-// 			entry = category.Name
-// 			found = true
-// 			break
-// 		}
-
-// 		if !found {
-// 			ctx.RespondText("Category not found. Use `[p]sharedcategories values` to get a list of available categories.")
-// 			return
-// 		}
-
-// 		if slices.Contains(cfg.Sharing.SharedCategories, entry) {
-// 			ctx.RespondText("Category is already in the Shared Categories list!")
-// 			return
-// 		}
-
-// 		cfg.Sharing.SharedCategories = append(cfg.Sharing.SharedCategories, entry)
-// 		_ = c.services.Config.SaveConfig(cfg)
-
-// 		c.services.Embed.New(ctx).
-// 			SetDescription("Added " + entry + " to the Shared Categories list.").
-// 			Send()
-// 	case "rm":
-// 		entry := utils.Arguments["[category]"]
-
-// 		var found bool
-// 		for _, category := range ctx.Router.GetCategories() {
-// 			if !strings.EqualFold(category.Name, entry) {
-// 				continue
-// 			}
-
-// 			entry = category.Name
-// 			found = true
-// 			break
-// 		}
-
-// 		if !found {
-// 			ctx.RespondText("Category not found. Use `[p]sharedcategories values` to get a list of available categories.")
-// 			return
-// 		}
-
-// 		if !slices.Contains(cfg.Sharing.SharedCategories, entry) {
-// 			ctx.RespondText("Category already isn't in the Shared Categories list!")
-// 			return
-// 		}
-
-// 		cfg.Sharing.SharedCategories = fn.Delete(cfg.Sharing.SharedCategories, entry)
-// 		_ = c.services.Config.SaveConfig(cfg)
-
-// 		c.services.Embed.New(ctx).
-// 			SetDescription("Removed " + entry + " from the Shared Categories list.").
-// 			Send()
-// 	case "clear":
-// 		cfg.Sharing.SharedCategories = []string{}
-// 		_ = c.services.Config.SaveConfig(cfg)
-
-// 		c.services.Embed.New(ctx).
-// 			SetDescription("Cleared all Shared Categories list entries.").
-// 			Send()
-// 	case "values":
-// 		var categories []string
-
-// 		for _, category := range ctx.Router.GetCategories() {
-// 			categories = append(categories, category.Name)
-// 		}
-
-// 		c.services.Embed.New(ctx).
-// 			AddField("Available Command Categories", strings.Join(categories, ", ")).
-// 			Send()
-// 	default:
-// 		ctx.RespondText("Invalid <get/add/rm/clear/values> argument. Use `get`, `add`, `rm`, `clear` or `values`.")
-// 	}
-// }
-
-// func (c *SharingCommands) sharedcommands(ctx *router.Ctx) {
-// 	cfg, err := config.GetConfig()
-// 	if err != nil {
-// 		ctx.RespondText("Error getting config.")
-// 		return
-// 	}
-
-// 	switch utils.Arguments["<get/add/rm/clear/values>"] {
-// 	case "get":
-// 		c.services.Embed.New(ctx).
-// 			AddField("Shared Commands", strings.Join(cfg.Sharing.SharedCommands, ", ")).
-// 			Send()
-// 	case "add":
-// 		entry := utils.Arguments["[command]"]
-
-// 		var found bool
-// 		for _, command := range ctx.Router.GetCmds() {
-// 			if !strings.EqualFold(entry, command.Name) {
-// 				continue
-// 			}
-
-// 			entry = command.Name
-// 			found = true
-// 			break
-// 		}
-
-// 		if !found {
-// 			ctx.RespondText("Command not found. Use `[p]sharedcommands values` to get a list of available commands.")
-// 			return
-// 		}
-
-// 		if slices.Contains(cfg.Sharing.SharedCommands, entry) {
-// 			ctx.RespondText("Command is already in the Shared Commands list!")
-// 			return
-// 		}
-
-// 		cfg.Sharing.SharedCommands = append(cfg.Sharing.SharedCommands, entry)
-// 		_ = c.services.Config.SaveConfig(cfg)
-
-// 		c.services.Embed.New(ctx).
-// 			SetDescription("Added " + entry + " to the Shared Commands list.").
-// 			Send()
-// 	case "rm":
-// 		entry := utils.Arguments["[command]"]
-
-// 		var found bool
-// 		for _, command := range ctx.Router.GetCmds() {
-// 			if !strings.EqualFold(entry, command.Name) {
-// 				continue
-// 			}
-
-// 			entry = command.Name
-// 			found = true
-// 			break
-// 		}
-
-// 		if !found {
-// 			ctx.RespondText("Command not found. Use `[p]sharedcommands values` to get a list of available commands.")
-// 			return
-// 		}
-
-// 		if !slices.Contains(cfg.Sharing.SharedCommands, entry) {
-// 			ctx.RespondText("Command already isn't in the Shared Commands list!")
-// 			return
-// 		}
-
-// 		cfg.Sharing.SharedCommands = fn.Delete(cfg.Sharing.SharedCommands, entry)
-// 		_ = c.services.Config.SaveConfig(cfg)
-
-// 		c.services.Embed.New(ctx).
-// 			SetDescription("Removed " + entry + " from the Shared Commands list.").
-// 			Send()
-// 	case "clear":
-// 		cfg.Sharing.SharedCommands = []string{}
-// 		_ = c.services.Config.SaveConfig(cfg)
-
-// 		c.services.Embed.New(ctx).
-// 			SetDescription("Cleared all Shared Commands list entries.").
-// 			Send()
-// 	case "values":
-// 		c.services.Embed.New(ctx).
-// 			AddField("Available Commands", "Use `[p]help` or view <https://docs.lightning-bot.com/category/commands> for a list of commands.").
-// 			Send()
-// 	default:
-// 		ctx.RespondText("Invalid <get/add/rm/clear/values> argument. Use `get`, `add`, `rm`, `clear` or `values`.")
-// 	}
-// }
-
-// func (c *SharingCommands) shareall(ctx *router.Ctx) {
-// 	cfg, err := config.GetConfig()
-// 	if err != nil {
-// 		ctx.RespondText("Error getting config")
-// 		return
-// 	}
-
-// 	switch utils.Arguments["<get/set/toggle>"] {
-// 	case "get":
-// 		c.services.Embed.New(ctx).
-// 			AddField("Share All Commands", utils.Misc.FormatBoolOnOff(cfg.Sharing.ShareAll)).
-// 			Send()
-// 	case "set":
-// 		toggle, err := ctx.Arguments.Get(0).Bool()
-// 		if err != nil {
-// 			ctx.RespondText("Invalid value. Use `on` or `off`.")
-// 			return
-// 		}
-
-// 		cfg.Sharing.ShareAll = toggle
-// 		_ = c.services.Config.SaveConfig(cfg)
-
-// 		c.services.Embed.New(ctx).
-// 			SetDescription("Turned " + utils.Misc.FormatBoolOnOff(toggle) + " Share All Commands").
-// 			Send()
-// 	case "toggle":
-// 		cfg.Sharing.ShareAll = !cfg.Sharing.ShareAll
-// 		_ = c.services.Config.SaveConfig(cfg)
-
-// 		c.services.Embed.New(ctx).
-// 			SetDescription("Turned " + utils.Misc.FormatBoolOnOff(cfg.Sharing.ShareAll) + " Share All Commands").
-// 			Send()
-// 	default:
-// 		ctx.RespondText("Invalid <get/set/toggle> argument. Use `get`, `set` or `toggle`.")
-// 	}
-// }
-
-// func (c *SharingCommands) blockdangerous(ctx *router.Ctx) {
-// 	cfg, err := config.GetConfig()
-// 	if err != nil {
-// 		ctx.RespondText("Error getting config")
-// 		return
-// 	}
-
-// 	switch utils.Arguments["<get/set/toggle>"] {
-// 	case "get":
-// 		c.services.Embed.New(ctx).
-// 			AddField("Sharing Block Dangerous", utils.Misc.FormatBoolOnOff(cfg.Sharing.BlockDangerousCommands)).
-// 			Send()
-// 	case "set":
-// 		toggle, err := ctx.Arguments.Get(0).Bool()
-// 		if err != nil {
-// 			ctx.RespondText("Invalid value. Use `on` or `off`.")
-// 			return
-// 		}
-
-// 		cfg.Sharing.BlockDangerousCommands = toggle
-// 		_ = c.services.Config.SaveConfig(cfg)
-
-// 		c.services.Embed.New(ctx).
-// 			SetDescription("Turned " + utils.Misc.FormatBoolOnOff(toggle) + " Sharing Block Dangerous").
-// 			Send()
-// 	case "toggle":
-// 		cfg.Sharing.BlockDangerousCommands = !cfg.Sharing.BlockDangerousCommands
-// 		_ = c.services.Config.SaveConfig(cfg)
-
-// 		c.services.Embed.New(ctx).
-// 			SetDescription("Turned " + utils.Misc.FormatBoolOnOff(cfg.Sharing.BlockDangerousCommands) + " Sharing Block Dangerous").
-// 			Send()
-// 	default:
-// 		ctx.RespondText("Invalid <get/set/toggle> argument. Use `get`, `set` or `toggle`.")
-// 	}
-// }

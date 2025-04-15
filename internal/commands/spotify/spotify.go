@@ -365,10 +365,18 @@ func (c *SpotifyCommands) sbearertoken(ctx *router.Ctx) {
 		return
 	}
 
-	c.services.Embed.New(ctx).
-		AddField("Spotify Account", profile.Get("display_name").MustString()).
-		AddField("Bearer Token", token).
-		Send()
+	confirmed, err := c.services.Discord.ShowConfirmDialog(ctx.Message.ChannelID, "Please confirm you want to show your bearer token in this channel by removing the reaction.\n\nWarning: Your bearer token can be used to control your Spotify account.")
+	if err != nil {
+		c.handleErr(ctx, err)
+		return
+	}
+
+	if confirmed {
+		c.services.Embed.New(ctx).
+			AddField("Spotify Account", profile.Get("display_name").MustString()).
+			AddField("Bearer Token", token).
+			Send()
+	}
 }
 
 func (c *SpotifyCommands) slistenalong(ctx *router.Ctx) {

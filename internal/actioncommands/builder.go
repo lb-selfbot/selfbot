@@ -160,6 +160,17 @@ func (b *Builder) WithEventReactionToggle(desc, args string, getReactionFunc act
 	return b
 }
 
+// WithCustomAction adds a custom action to the command.
+func (b *Builder) WithCustomAction(name, desc, args string, handler router.ExecutionHandler) *Builder {
+	b.cmd.Actions = append(b.cmd.Actions, &actions.CustomAction{
+		ActionName: name,
+		Desc:       desc,
+		Arguments:  args,
+		Handler:    handler,
+	})
+	return b
+}
+
 // Build creates an ActionCommandSingle from the builder.
 func (b *Builder) Build(services *services.Services) *router.Command {
 	return b.cmd.ToCommand(services)

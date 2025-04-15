@@ -2,11 +2,15 @@ package config
 
 import (
 	"fmt"
+	"slices"
+	"strconv"
 	"strings"
 	"time"
 
+	"github.com/lb-selfbot/discordgo"
 	"github.com/lb-selfbot/selfbot/internal/actioncommands"
 	"github.com/lb-selfbot/selfbot/internal/actioncommands/actionvalue"
+	"github.com/lb-selfbot/selfbot/internal/fn"
 	"github.com/lb-selfbot/selfbot/internal/services"
 	"github.com/lb-selfbot/selfbot/internal/services/router"
 	"github.com/lb-selfbot/selfbot/internal/utils"
@@ -200,7 +204,78 @@ func (c *ConfigCommands) Register() {
 			}).
 			Build(c.services),
 
-		// TODO: Force Subscribed Servers
+		// Force Subscribed Servers
+		actioncommands.NewBuilder("forcesubs", "Force Subscribed Servers").
+			WithListGetter("Get force subscribed servers", func(ctx *router.Ctx) error {
+				cfg := c.services.Config.GetConfig()
+				if len(cfg.Selfbot.ForceSubscribedServers) == 0 {
+					c.services.Embed.Respond(ctx, "No force subscribed servers found.")
+					return nil
+				}
+
+				servers := fn.Map(cfg.Selfbot.ForceSubscribedServers, func(guildID string) string {
+					guild, err := ctx.Session.GuildWithFallback(guildID)
+					if err != nil {
+						return fmt.Sprintf("%s (Unknown)", guildID)
+					}
+
+					return fmt.Sprintf("%s (%s)", guild.Name, guild.ID)
+				})
+
+				c.services.Embed.RespondField(ctx, "Force Subscribed Servers", strings.Join(servers, "\n"))
+				return nil
+			}).
+			WithListAdder("Add force subscribed server", "[server id]", func(ctx *router.Ctx) error {
+				guild, err := ctx.Arguments.Get(0).Guild(router.ArgumentFlagFallbackDefault)
+				if err != nil {
+					return fmt.Errorf("could not find server: %v", err)
+				}
+
+				cfg := c.services.Config.GetConfig()
+
+				if slices.Contains(cfg.Selfbot.ForceSubscribedServers, guild.ID) {
+					return fmt.Errorf("server %s (%s) is already in the force subscribed servers list", guild.Name, guild.ID)
+				}
+
+				cfg.Selfbot.ForceSubscribedServers = append(cfg.Selfbot.ForceSubscribedServers, guild.ID)
+				if err := c.services.Config.SaveConfig(cfg); err != nil {
+					return fmt.Errorf("error saving config: %v", err)
+				}
+
+				c.services.Embed.Respond(ctx, "Added server %s (%s) to force subscribed servers.", guild.Name, guild.ID)
+				return nil
+			}).
+			WithListRemover("Remove force subscribed server", "[server id]", func(ctx *router.Ctx) error {
+				guild, err := ctx.Arguments.Get(0).Guild(router.ArgumentFlagFallbackDefault)
+				if err != nil {
+					return fmt.Errorf("could not find server: %v", err)
+				}
+
+				cfg := c.services.Config.GetConfig()
+
+				if !slices.Contains(cfg.Selfbot.ForceSubscribedServers, guild.ID) {
+					return fmt.Errorf("server %s (%s) is not in the force subscribed servers list", guild.Name, guild.ID)
+				}
+
+				cfg.Selfbot.ForceSubscribedServers = fn.Delete(cfg.Selfbot.ForceSubscribedServers, guild.ID)
+				if err := c.services.Config.SaveConfig(cfg); err != nil {
+					return fmt.Errorf("error saving config: %v", err)
+				}
+
+				c.services.Embed.Respond(ctx, "Removed server %s (%s) from force subscribed servers.", guild.Name, guild.ID)
+				return nil
+			}).
+			WithListClearer("Clear force subscribed servers", func(ctx *router.Ctx) error {
+				cfg := c.services.Config.GetConfig()
+				cfg.Selfbot.ForceSubscribedServers = make([]string, 0)
+				if err := c.services.Config.SaveConfig(cfg); err != nil {
+					return fmt.Errorf("error saving config: %v", err)
+				}
+
+				c.services.Embed.Respond(ctx, "Cleared all force subscribed servers.")
+				return nil
+			}).
+			Build(c.services),
 
 		// Aliases
 		actioncommands.NewBuilder("aliases", "Command Aliases").
@@ -340,11 +415,282 @@ func (c *ConfigCommands) Register() {
 			}).
 			Build(c.services),
 
-		// TODO: Custom Bots
+		// Custom Bots
+		actioncommands.NewBuilder("custombots", "Custom Giveaway Sniper Bots").
+			WithListGetter("Get custom bots", func(ctx *router.Ctx) error {
+				cfg := c.services.Config.GetConfig()
+				if len(cfg.Snipers.GiveawaySniper.CustomBots) == 0 {
+					c.services.Embed.Respond(ctx, "No custom bots found.")
+					return nil
+				}
 
-		// TODO: Sniper Blacklist
+				bots := fn.Map(cfg.Snipers.GiveawaySniper.CustomBots, func(botID string) string {
+					user, err := ctx.Session.UserWithFallback(botID)
+					if err != nil {
+						return fmt.Sprintf("%s (Unknown)", botID)
+					}
 
-		// TODO: Server Blacklist
+					return fmt.Sprintf("%s (%s)", user.Username, user.ID)
+				})
+
+				c.services.Embed.RespondField(ctx, "Custom Giveaway Sniper Bots", strings.Join(bots, "\n"))
+				return nil
+			}).
+			WithListAdder("Add custom bot", "<@bot>", func(ctx *router.Ctx) error {
+				bot, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
+				if err != nil {
+					return fmt.Errorf("could not find bot: %v", err)
+				}
+
+				cfg := c.services.Config.GetConfig()
+
+				if slices.Contains(cfg.Snipers.GiveawaySniper.CustomBots, bot.ID) {
+					return fmt.Errorf("bot %s (%s) is already in the custom bots list", bot.Username, bot.ID)
+				}
+
+				cfg.Snipers.GiveawaySniper.CustomBots = append(cfg.Snipers.GiveawaySniper.CustomBots, bot.ID)
+				if err := c.services.Config.SaveConfig(cfg); err != nil {
+					return fmt.Errorf("error saving config: %v", err)
+				}
+
+				c.services.Embed.Respond(ctx, "Added bot %s (%s) to custom bots.", bot.Username, bot.ID)
+				return nil
+			}).
+			WithListRemover("Remove custom bot", "<@bot>", func(ctx *router.Ctx) error {
+				bot, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
+				if err != nil {
+					return fmt.Errorf("could not find bot: %v", err)
+				}
+
+				cfg := c.services.Config.GetConfig()
+
+				if !slices.Contains(cfg.Snipers.GiveawaySniper.CustomBots, bot.ID) {
+					return fmt.Errorf("bot %s (%s) is not in the custom bots list", bot.Username, bot.ID)
+				}
+
+				cfg.Snipers.GiveawaySniper.CustomBots = fn.Delete(cfg.Snipers.GiveawaySniper.CustomBots, bot.ID)
+				if err := c.services.Config.SaveConfig(cfg); err != nil {
+					return fmt.Errorf("error saving config: %v", err)
+				}
+
+				c.services.Embed.Respond(ctx, "Removed bot %s (%s) from custom bots.", bot.Username, bot.ID)
+				return nil
+			}).
+			WithListClearer("Clear custom bots", func(ctx *router.Ctx) error {
+				cfg := c.services.Config.GetConfig()
+				cfg.Snipers.GiveawaySniper.CustomBots = make([]string, 0)
+				if err := c.services.Config.SaveConfig(cfg); err != nil {
+					return fmt.Errorf("error saving config: %v", err)
+				}
+
+				c.services.Embed.Respond(ctx, "Cleared all custom bots.")
+				return nil
+			}).
+			Build(c.services),
+
+		// Sniper Blacklist
+		actioncommands.NewBuilder("sniperblacklist", "Sniper Blacklist").
+			WithListGetter("Get sniper blacklist", func(ctx *router.Ctx) error {
+				cfg := c.services.Config.GetConfig()
+				if len(cfg.Snipers.Blacklist) == 0 {
+					c.services.Embed.Respond(ctx, "No sniper blacklist entries found.")
+					return nil
+				}
+
+				c.services.Embed.RespondField(ctx, "Sniper Blacklist", strings.Join(cfg.Snipers.Blacklist, "\n"))
+				return nil
+			}).
+			WithListAdder("Add to sniper blacklist", "<value>", func(ctx *router.Ctx) error {
+				value := ctx.Arguments.Get(0).Raw()
+
+				cfg := c.services.Config.GetConfig()
+
+				if slices.Contains(cfg.Snipers.Blacklist, value) {
+					return fmt.Errorf("value '%s' is already in the sniper blacklist", value)
+				}
+
+				cfg.Snipers.Blacklist = append(cfg.Snipers.Blacklist, value)
+				if err := c.services.Config.SaveConfig(cfg); err != nil {
+					return fmt.Errorf("error saving config: %v", err)
+				}
+
+				c.services.Embed.Respond(ctx, "Added '%s' to sniper blacklist.", value)
+				return nil
+			}).
+			WithListRemover("Remove from sniper blacklist", "<value>", func(ctx *router.Ctx) error {
+				value := ctx.Arguments.Get(0).Raw()
+
+				cfg := c.services.Config.GetConfig()
+
+				if !slices.Contains(cfg.Snipers.Blacklist, value) {
+					return fmt.Errorf("value '%s' is not in the sniper blacklist", value)
+				}
+
+				cfg.Snipers.Blacklist = fn.Delete(cfg.Snipers.Blacklist, value)
+				if err := c.services.Config.SaveConfig(cfg); err != nil {
+					return fmt.Errorf("error saving config: %v", err)
+				}
+
+				c.services.Embed.Respond(ctx, "Removed '%s' from sniper blacklist.", value)
+				return nil
+			}).
+			WithListClearer("Clear sniper blacklist", func(ctx *router.Ctx) error {
+				cfg := c.services.Config.GetConfig()
+				cfg.Snipers.Blacklist = make([]string, 0)
+				if err := c.services.Config.SaveConfig(cfg); err != nil {
+					return fmt.Errorf("error saving config: %v", err)
+				}
+
+				c.services.Embed.Respond(ctx, "Cleared sniper blacklist.")
+				return nil
+			}).
+			Build(c.services),
+
+		// Server Blacklist
+		actioncommands.NewBuilder("serverblacklist", "Server Blacklist").
+			WithListGetter("Get server blacklist", func(ctx *router.Ctx) error {
+				cfg := c.services.Config.GetConfig()
+				if len(cfg.Snipers.ServerBlacklist) == 0 {
+					c.services.Embed.Respond(ctx, "No server blacklist entries found.")
+					return nil
+				}
+
+				servers := fn.Map(cfg.Snipers.ServerBlacklist, func(guildID string) string {
+					guild, err := ctx.Session.GuildWithFallback(guildID)
+					if err != nil {
+						return fmt.Sprintf("%s (Unknown)", guildID)
+					}
+
+					return fmt.Sprintf("%s (%s)", guild.Name, guild.ID)
+				})
+
+				c.services.Embed.RespondField(ctx, "Server Blacklist", strings.Join(servers, "\n"))
+				return nil
+			}).
+			WithListAdder("Add to server blacklist", "[server id]", func(ctx *router.Ctx) error {
+				guild, err := ctx.Arguments.Get(0).Guild(router.ArgumentFlagFallbackDefault)
+				if err != nil {
+					return fmt.Errorf("could not find server: %v", err)
+				}
+
+				cfg := c.services.Config.GetConfig()
+
+				if slices.Contains(cfg.Snipers.ServerBlacklist, guild.ID) {
+					return fmt.Errorf("server %s (%s) is already in the server blacklist", guild.Name, guild.ID)
+				}
+
+				cfg.Snipers.ServerBlacklist = append(cfg.Snipers.ServerBlacklist, guild.ID)
+				if err := c.services.Config.SaveConfig(cfg); err != nil {
+					return fmt.Errorf("error saving config: %v", err)
+				}
+
+				c.services.Embed.Respond(ctx, "Added server %s (%s) to server blacklist.", guild.Name, guild.ID)
+				return nil
+			}).
+			WithListRemover("Remove from server blacklist", "[server id]", func(ctx *router.Ctx) error {
+				guild, err := ctx.Arguments.Get(0).Guild(router.ArgumentFlagFallbackDefault)
+				if err != nil {
+					return fmt.Errorf("could not find server: %v", err)
+				}
+
+				cfg := c.services.Config.GetConfig()
+
+				if !slices.Contains(cfg.Snipers.ServerBlacklist, guild.ID) {
+					return fmt.Errorf("server %s (%s) is not in the server blacklist", guild.Name, guild.ID)
+				}
+
+				cfg.Snipers.ServerBlacklist = fn.Delete(cfg.Snipers.ServerBlacklist, guild.ID)
+				if err := c.services.Config.SaveConfig(cfg); err != nil {
+					return fmt.Errorf("error saving config: %v", err)
+				}
+
+				c.services.Embed.Respond(ctx, "Removed server %s (%s) from server blacklist.", guild.Name, guild.ID)
+				return nil
+			}).
+			WithListClearer("Clear server blacklist", func(ctx *router.Ctx) error {
+				cfg := c.services.Config.GetConfig()
+				cfg.Snipers.ServerBlacklist = make([]string, 0)
+				if err := c.services.Config.SaveConfig(cfg); err != nil {
+					return fmt.Errorf("error saving config: %v", err)
+				}
+
+				c.services.Embed.Respond(ctx, "Cleared server blacklist.")
+				return nil
+			}).
+			Build(c.services),
+
+		// Sniper Tokens
+		actioncommands.NewBuilder("snipertokens", "Sniper Tokens").
+			WithListGetter("Get sniper tokens", func(ctx *router.Ctx) error {
+				cfg := c.services.Config.GetConfig()
+				if len(cfg.Snipers.Tokens) == 0 {
+					c.services.Embed.Respond(ctx, "No sniper tokens found.")
+					return nil
+				}
+
+				// Create a masked list of tokens for security
+				tokens := fn.MapIndexed(cfg.Snipers.Tokens, func(i int, token string) string {
+					if len(token) <= 12 {
+						return strconv.Itoa(i+1) + ". ••••••••••••"
+					}
+					return strconv.Itoa(i+1) + ". " + token[:6] + "••••••••••••" + token[len(token)-6:]
+				})
+
+				c.services.Embed.RespondField(ctx, "Sniper Tokens", strings.Join(tokens, "\n"))
+				return nil
+			}).
+			WithListAdder("Add sniper token", "<token>", func(ctx *router.Ctx) error {
+				token := ctx.Arguments.Get(0).Raw()
+				if token == "" {
+					return fmt.Errorf("please provide a token to add")
+				}
+
+				cfg := c.services.Config.GetConfig()
+
+				if slices.Contains(cfg.Snipers.Tokens, token) {
+					return fmt.Errorf("token is already in the sniper tokens list")
+				}
+
+				cfg.Snipers.Tokens = append(cfg.Snipers.Tokens, token)
+				if err := c.services.Config.SaveConfig(cfg); err != nil {
+					return fmt.Errorf("error saving config: %v", err)
+				}
+
+				c.services.Embed.Respond(ctx, "Added token to sniper tokens.")
+				return nil
+			}).
+			WithListRemover("Remove sniper token", "<index>", func(ctx *router.Ctx) error {
+				index, err := ctx.Arguments.Get(0).Int()
+				if err != nil {
+					return fmt.Errorf("invalid index: %v", err)
+				}
+
+				cfg := c.services.Config.GetConfig()
+				index--
+
+				if index < 0 || index >= len(cfg.Snipers.Tokens) {
+					return fmt.Errorf("index out of range (0-%d)", len(cfg.Snipers.Tokens)-1)
+				}
+
+				cfg.Snipers.Tokens = slices.Delete(cfg.Snipers.Tokens, index, index+1)
+				if err := c.services.Config.SaveConfig(cfg); err != nil {
+					return fmt.Errorf("error saving config: %v", err)
+				}
+
+				c.services.Embed.Respond(ctx, "Removed token from sniper tokens.")
+				return nil
+			}).
+			WithListClearer("Clear sniper tokens", func(ctx *router.Ctx) error {
+				cfg := c.services.Config.GetConfig()
+				cfg.Snipers.Tokens = make([]string, 0)
+				if err := c.services.Config.SaveConfig(cfg); err != nil {
+					return fmt.Errorf("error saving config: %v", err)
+				}
+
+				c.services.Embed.Respond(ctx, "Cleared all sniper tokens.")
+				return nil
+			}).
+			Build(c.services),
 
 		// Multi-Token Sniper
 		actioncommands.NewBuilder("multitokensniper", "Multi-Token Sniper").
@@ -363,8 +709,6 @@ func (c *ConfigCommands) Register() {
 				return c.services.Config.SaveConfig(cfg)
 			}).
 			Build(c.services),
-
-		// TODO: Sniper Tokens
 
 		// Privnote Sniper
 		actioncommands.NewBuilder("privnotesniper", "Privnote Sniper").
@@ -495,7 +839,7 @@ func (c *ConfigCommands) Register() {
 			}).
 			Build(c.services),
 
-		// TODO: Poketwo Channels
+		// Poketwo Sniper Channels
 
 		// Poketwo Sniper Language
 		actioncommands.NewBuilder("poketwolanguage", "Poketwo Sniper Language").
@@ -513,9 +857,23 @@ func (c *ConfigCommands) Register() {
 			}).
 			Build(c.services),
 
-		// TODO: Setup Webhooks
+		// Setup Webhooks
+		{
+			Name:        "setupwebhooks",
+			Description: "Setup all webhooks automatically",
+			Arguments:   "[server id]",
+			Flags:       []router.CommandFlag{router.CmdFlagDangerous},
+			Handler:     c.setupwebhooks,
+		},
 
-		// TODO: Webhook all
+		// Webhook all
+		{
+			Name:        "wall",
+			Description: "Set all webhooks to the same URL",
+			Arguments:   "[webhook url]",
+			Flags:       []router.CommandFlag{router.CmdFlagDangerous},
+			Handler:     c.wall,
+		},
 
 		// Nitro Sniper Webhook
 		actioncommands.NewBuilder("wnitro", "Nitro Sniper Webhook").
@@ -940,4 +1298,74 @@ func (c *ConfigCommands) Register() {
 			}).
 			Build(c.services),
 	})
+}
+
+func createWebhookChannel(ctx *router.Ctx, serverID, categoryID, name string) (string, error) {
+	channel, err := ctx.Session.GuildChannelCreateComplex(serverID, discordgo.GuildChannelCreateData{
+		Type:     discordgo.ChannelTypeGuildText,
+		ParentID: categoryID,
+		Name:     name,
+	})
+	if err != nil {
+		return "", err
+	}
+
+	webhook, err := ctx.Session.WebhookCreate(channel.ID, name, "")
+	if err != nil {
+		return "", err
+	}
+
+	return fmt.Sprintf("https://discord.com/api/webhooks/%s/%s", webhook.ID, webhook.Token), nil
+}
+
+func (c *ConfigCommands) setupwebhooks(ctx *router.Ctx) {
+	guild, err := ctx.Arguments.Get(0).Guild(router.ArgumentFlagFallbackDefault)
+	if err != nil {
+		_ = ctx.RespondText("Could not find server: %v", err)
+		return
+	}
+
+	category, err := ctx.Session.GuildChannelCreate(guild.ID, "LightningBot", discordgo.ChannelTypeGuildCategory)
+	if err != nil {
+		_ = ctx.RespondText("Failed to create category: %v", err)
+		return
+	}
+
+	cfg := c.services.Config.GetConfig()
+	cfg.Webhooks.NitroSniper, _ = createWebhookChannel(ctx, guild.ID, category.ID, "nitrosniper")
+	cfg.Webhooks.GiveawaySniper, _ = createWebhookChannel(ctx, guild.ID, category.ID, "giveawaysniper")
+	cfg.Webhooks.SelfbotDetection, _ = createWebhookChannel(ctx, guild.ID, category.ID, "selfbotdetection")
+	cfg.Webhooks.StaffDetection, _ = createWebhookChannel(ctx, guild.ID, category.ID, "staffdetection")
+	cfg.Webhooks.Notifiers, _ = createWebhookChannel(ctx, guild.ID, category.ID, "notifiers")
+	cfg.Webhooks.PingDetection, _ = createWebhookChannel(ctx, guild.ID, category.ID, "pingdetection")
+	cfg.Webhooks.Misc, _ = createWebhookChannel(ctx, guild.ID, category.ID, "misc")
+	cfg.Webhooks.Sessions, _ = createWebhookChannel(ctx, guild.ID, category.ID, "sessions")
+
+	if err := c.services.Config.SaveConfig(cfg); err != nil {
+		_ = ctx.RespondText("Failed to save config: %v", err)
+		return
+	}
+
+	c.services.Embed.Respond(ctx, "Webhooks setup successfully.")
+}
+
+func (c *ConfigCommands) wall(ctx *router.Ctx) {
+	cfg := c.services.Config.GetConfig()
+
+	webhookURL := ctx.Arguments.Get(0).Raw()
+	cfg.Webhooks.NitroSniper = webhookURL
+	cfg.Webhooks.GiveawaySniper = webhookURL
+	cfg.Webhooks.SelfbotDetection = webhookURL
+	cfg.Webhooks.StaffDetection = webhookURL
+	cfg.Webhooks.Notifiers = webhookURL
+	cfg.Webhooks.PingDetection = webhookURL
+	cfg.Webhooks.Misc = webhookURL
+	cfg.Webhooks.Sessions = webhookURL
+
+	if err := c.services.Config.SaveConfig(cfg); err != nil {
+		_ = ctx.RespondText("Error saving config: %v", err)
+		return
+	}
+
+	c.services.Embed.Respond(ctx, "All webhooks set to %s", webhookURL)
 }

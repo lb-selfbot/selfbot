@@ -26,15 +26,6 @@ func Limit[T any](slice []T, n int) []T {
 
 // Map performs an in-place transformation of the slice if the input and output types are the same
 func Map[T, R any](slice []T, f func(T) R) []R {
-	if result, ok := any(slice).([]R); ok {
-		// If types match, transform in-place
-		for i, v := range slice {
-			result[i] = f(v)
-		}
-		return result
-	}
-
-	// Otherwise allocate new slice
 	result := make([]R, len(slice))
 	for i, v := range slice {
 		result[i] = f(v)
@@ -44,14 +35,6 @@ func Map[T, R any](slice []T, f func(T) R) []R {
 
 // MapIndexed performs an in-place transformation if possible
 func MapIndexed[T, R any](slice []T, f func(int, T) R) []R {
-	if result, ok := any(slice).([]R); ok {
-		// If types match, transform in-place
-		for i, v := range slice {
-			result[i] = f(i, v)
-		}
-		return result
-	}
-	// Otherwise allocate new slice
 	result := make([]R, len(slice))
 	for i, v := range slice {
 		result[i] = f(i, v)
@@ -180,6 +163,8 @@ func First[T any](slice []T, pred func(T) bool) (T, bool) {
 }
 
 // Delete removes the first occurrence of an element from a slice
+// Warning! You must reassign the slice to the result of this function:
+// slice = fn.Delete(slice, value)
 func Delete[T comparable](slice []T, value T) []T {
 	return slices.DeleteFunc(slice, func(el T) bool { return el == value })
 }

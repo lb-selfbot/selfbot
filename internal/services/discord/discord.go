@@ -6,6 +6,7 @@ import (
 	"path/filepath"
 	"runtime"
 	"strings"
+	"time"
 
 	"github.com/lb-selfbot/discordgo"
 	"github.com/lb-selfbot/go-jester"
@@ -43,6 +44,9 @@ type Service interface {
 
 	// SetAllowedFriendRequests updates the allowed friend requests for the session user.
 	SetFriendRequestsAllowed(allowed bool) error
+
+	// ShowConfirmDialog shows a confirmation dialog with the provided message.
+	ShowConfirmDialog(channelID string, message string) (bool, error)
 }
 
 type discordService struct {
@@ -212,4 +216,42 @@ func (d *discordService) SetFriendRequestsAllowed(allowed bool) error {
 	}
 
 	return d.session.UserSettingsUpdate(d.session.State.UserSettings, true)
+}
+
+func (d *discordService) ShowConfirmDialog(channelID string, message string) (bool, error) {
+	msg, err := d.session.ChannelMessageSend(channelID, message)
+	if err != nil {
+		return false, err
+	}
+
+	const confirmEmoji = "✅"
+	const cancelEmoji = "❌"
+
+	if err := d.session.MessageReactionAdd(msg.ChannelID, msg.ID, confirmEmoji); err != nil {
+		return false, err
+	}
+	if err := d.session.MessageReactionAdd(msg.ChannelID, msg.ID, cancelEmoji); err != nil {
+		return false, err
+	}
+
+	confirmChannel := make(chan bool, 1)
+
+	remove := d.session.AddHandler(func(s *discordgo.Session, r *discordgo.MessageReactionRemove) {
+		if r.UserID != d.session.State.User.ID || r.MessageID != msg.ID {
+			return
+		}
+
+		confirmChannel <- r.Emoji.Name == confirmEmoji
+	})
+	defer remove()
+
+	select {
+	case confirmed := <-confirmChannel:
+		_ = d.session.ChannelMessageDelete(msg.ChannelID, msg.ID)
+		return confirmed, nil
+
+	case <-time.After(1 * time.Minute):
+		_ = d.session.ChannelMessageDelete(msg.ChannelID, msg.ID)
+		return false, nil
+	}
 }

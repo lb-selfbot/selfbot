@@ -333,32 +333,8 @@ func (c *EventReactionsCommands) Register() {
 			}).
 			WithEventReactionList(types.PinSpam, "List all pinspammed users").
 			WithEventReactionClear(types.PinSpam, "Clear all pinspammed users").
+			WithCustomAction("undo", "Unpin all messages pinned by pinspam", "", c.unpinspam).
 			Build(c.services),
-
-		// Special case for unpinspam since it doesn't follow the same pattern
-		{
-			Name:        "unpinspam",
-			Description: "Unpin messages pinned by pinspam",
-			Arguments:   "unpinspam",
-			Flags:       []router.CommandFlag{router.CmdFlagDangerous},
-			Handler: func(ctx *router.Ctx) {
-				for _, message := range c.services.EventReactions.GetPinSpamMessages() {
-					err := ctx.Session.ChannelMessageUnpin(message.ChannelID, message.ID)
-					if err != nil {
-						c.services.Embed.New(ctx).
-							SetDescription("Could not unpin message: %s", err.Error()).
-							Send()
-						return
-					}
-				}
-
-				c.services.EventReactions.ClearPinSpamMessages()
-
-				c.services.Embed.New(ctx).
-					SetDescription("Unpinned all messages.").
-					Send()
-			},
-		},
 
 		actioncommands.NewBuilder("reactspam", "React Spam").
 			WithEventReactionToggle("React to all of a user's messages", "[@user] [reaction] [global/server/channel id]", func(ctx *router.Ctx) (types.EventReaction, error) {
@@ -559,7 +535,6 @@ func (c *EventReactionsCommands) Register() {
 			WithEventReactionClear(types.NoLeave, "Clear all noleave users").
 			Build(c.services),
 
-		// Special case for antigroupchat since it uses custom arguments
 		{
 			Name:        "antigroupchat",
 			Description: "Prevent users from adding you to group chats",
@@ -789,174 +764,148 @@ func (c *EventReactionsCommands) Register() {
 			}).
 			Build(c.services),
 
-		// Special case for afktriggerusers due to add/remove functionality
-		{
-			Name:        "afktriggerusers",
-			Description: "Get, add, remove or clear users that trigger AFK message",
-			Arguments:   "<get/add/rm/clear> [user]",
-			Flags:       []router.CommandFlag{router.CmdFlagDangerous},
-			Handler: func(ctx *router.Ctx) {
+		actioncommands.NewBuilder("afktriggerusers", "AFK Trigger Users").
+			WithListGetter("Get AFK trigger users", func(ctx *router.Ctx) error {
+				cfg := c.services.Config.GetConfig()
+				if len(cfg.AFK.TriggerList.Users) == 0 {
+					c.services.Embed.Respond(ctx, "No AFK trigger users found.")
+					return nil
+				}
+
+				users := fn.Map(cfg.AFK.TriggerList.Users, func(userID string) string {
+					user, err := ctx.Session.UserWithFallback(userID)
+					if err != nil {
+						return userID
+					}
+					return fmt.Sprintf("%s - %s", user.DisplayName, userID)
+				})
+
+				c.services.Embed.RespondField(ctx, "AFK Triggerlist Users", strings.Join(users, "\n"))
+				return nil
+			}).
+			WithListAdder("Add AFK trigger user", "<user>", func(ctx *router.Ctx) error {
+				user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
+				if err != nil {
+					return fmt.Errorf("could not find user: %v", err)
+				}
+
 				cfg := c.services.Config.GetConfig()
 
-				switch strings.ToLower(ctx.Arguments.Get(0).Raw()) {
-				case "get":
-					userString := ""
-					for _, userID := range cfg.AFK.TriggerList.Users {
-						user, err := ctx.Session.UserWithFallback(userID)
-						if err != nil {
-							userString += fmt.Sprintf("%s - %s\n", "Unknown", userID)
-							continue
-						}
-
-						userString += fmt.Sprintf("%s - %s\n", user.DisplayName, userID)
-					}
-
-					if userString == "" {
-						userString = "No users set."
-					}
-
-					c.services.Embed.New(ctx).
-						AddField("AFK Triggerlist Users", userString).
-						Send()
-				case "add":
-					user, err := ctx.Arguments.Get(1).User(router.ArgumentFlagFallbackDefault)
-					if err != nil {
-						c.services.Embed.New(ctx).
-							SetDescription("Could not find user.").
-							Send()
-						return
-					}
-
-					if slices.Contains(cfg.AFK.TriggerList.Users, user.ID) {
-						c.services.Embed.New(ctx).
-							SetDescription("%s is already in the AFK Triggerlist.", user.Mention()).
-							Send()
-						return
-					}
-
-					cfg.AFK.TriggerList.Users = append(cfg.AFK.TriggerList.Users, user.ID)
-					_ = c.services.Config.SaveConfig(cfg)
-
-					c.services.Embed.New(ctx).
-						SetDescription("Added %s to the AFK Triggerlist.", user.Mention()).
-						Send()
-				case "rm":
-					user, err := ctx.Arguments.Get(1).User(router.ArgumentFlagFallbackDefault)
-					if err != nil {
-						c.services.Embed.New(ctx).
-							SetDescription("Could not find user.").
-							Send()
-						return
-					}
-
-					if !slices.Contains(cfg.AFK.TriggerList.Users, user.ID) {
-						c.services.Embed.New(ctx).
-							SetDescription("%s is not in the AFK Triggerlist.", user.Mention()).
-							Send()
-						return
-					}
-
-					cfg.AFK.TriggerList.Users = fn.Delete(cfg.AFK.TriggerList.Users, user.ID)
-					_ = c.services.Config.SaveConfig(cfg)
-
-					c.services.Embed.New(ctx).
-						SetDescription("Removed %s from the AFK Triggerlist.", user.Mention()).
-						Send()
-				case "clear":
-					cfg.AFK.TriggerList.Users = []string{}
-					_ = c.services.Config.SaveConfig(cfg)
-
-					c.services.Embed.New(ctx).
-						SetDescription("Cleared all users from the AFK Triggerlist.").
-						Send()
-				default:
-					ctx.RespondText("Invalid <get/add/rm/clear> argument. Use `get`, `add`, `rm`, or `clear`.")
+				if slices.Contains(cfg.AFK.TriggerList.Users, user.ID) {
+					return fmt.Errorf("user %s is already in the AFK Triggerlist", user.Username)
 				}
-			},
-		},
 
-		// Special case for afktriggerservers due to add/remove functionality
-		{
-			Name:        "afktriggerservers",
-			Description: "Get, add, remove or clear servers that trigger AFK message",
-			Arguments:   "<get/add/rm/clear> [server id]",
-			Flags:       []router.CommandFlag{router.CmdFlagDangerous},
-			Handler: func(ctx *router.Ctx) {
+				cfg.AFK.TriggerList.Users = append(cfg.AFK.TriggerList.Users, user.ID)
+				if err := c.services.Config.SaveConfig(cfg); err != nil {
+					return fmt.Errorf("error saving config: %v", err)
+				}
+
+				c.services.Embed.Respond(ctx, "Added %s to the AFK Triggerlist.", user.Mention())
+				return nil
+			}).
+			WithListRemover("Remove AFK trigger user", "<user>", func(ctx *router.Ctx) error {
+				user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
+				if err != nil {
+					return fmt.Errorf("could not find user: %v", err)
+				}
+
 				cfg := c.services.Config.GetConfig()
 
-				switch strings.ToLower(ctx.Arguments.Get(0).Raw()) {
-				case "get":
-					var servers []string
-
-					for _, serverID := range cfg.AFK.TriggerList.Servers {
-						guild, err := ctx.Session.GuildWithFallback(serverID)
-						if err != nil {
-							servers = append(servers, serverID)
-							continue
-						}
-
-						servers = append(servers, guild.Name+" ("+guild.ID+")")
-					}
-
-					c.services.Embed.New(ctx).
-						AddField("AFK Triggerlist Servers", strings.Join(servers, ", ")).
-						Send()
-				case "add":
-					guild, err := ctx.Session.GuildWithFallback(utils.Misc.Or(ctx.Arguments.Get(1).Raw(), ctx.Message.GuildID))
-					if err != nil {
-						c.services.Embed.New(ctx).
-							SetDescription("Could not find server.").
-							Send()
-						return
-					}
-
-					if slices.Contains(cfg.AFK.TriggerList.Servers, guild.ID) {
-						c.services.Embed.New(ctx).
-							SetDescription("%s is already in the AFK Triggerlist.", guild.Name).
-							Send()
-						return
-					}
-
-					cfg.AFK.TriggerList.Servers = append(cfg.AFK.TriggerList.Servers, guild.ID)
-					_ = c.services.Config.SaveConfig(cfg)
-
-					c.services.Embed.New(ctx).
-						SetDescription("Added %s to the AFK Triggerlist.", guild.Name).
-						Send()
-				case "rm":
-					guild, err := ctx.Session.GuildWithFallback(utils.Misc.Or(ctx.Arguments.Get(1).Raw(), ctx.Message.GuildID))
-					if err != nil {
-						c.services.Embed.New(ctx).
-							SetDescription("Could not find server.").
-							Send()
-						return
-					}
-
-					if !slices.Contains(cfg.AFK.TriggerList.Servers, guild.ID) {
-						c.services.Embed.New(ctx).
-							SetDescription("%s is not in the AFK Triggerlist.", guild.Name).
-							Send()
-						return
-					}
-
-					cfg.AFK.TriggerList.Servers = fn.Delete(cfg.AFK.TriggerList.Servers, guild.ID)
-					_ = c.services.Config.SaveConfig(cfg)
-
-					c.services.Embed.New(ctx).
-						SetDescription("Removed %s from the AFK Triggerlist.", guild.Name).
-						Send()
-				case "clear":
-					cfg.AFK.TriggerList.Servers = []string{}
-					_ = c.services.Config.SaveConfig(cfg)
-
-					c.services.Embed.New(ctx).
-						SetDescription("Cleared all servers from the AFK Triggerlist.").
-						Send()
-				default:
-					ctx.RespondText("Invalid <get/add/rm/clear> argument. Use `get`, `add`, `rm`, or `clear`.")
+				if !slices.Contains(cfg.AFK.TriggerList.Users, user.ID) {
+					return fmt.Errorf("user %s is not in the AFK Triggerlist", user.Username)
 				}
-			},
-		},
+
+				cfg.AFK.TriggerList.Users = fn.Delete(cfg.AFK.TriggerList.Users, user.ID)
+				if err := c.services.Config.SaveConfig(cfg); err != nil {
+					return fmt.Errorf("error saving config: %v", err)
+				}
+
+				c.services.Embed.Respond(ctx, "Removed %s from the AFK Triggerlist.", user.Mention())
+				return nil
+			}).
+			WithListClearer("Clear AFK trigger users", func(ctx *router.Ctx) error {
+				cfg := c.services.Config.GetConfig()
+				cfg.AFK.TriggerList.Users = []string{}
+				if err := c.services.Config.SaveConfig(cfg); err != nil {
+					return fmt.Errorf("error saving config: %v", err)
+				}
+
+				c.services.Embed.Respond(ctx, "Cleared all users from the AFK Triggerlist.")
+				return nil
+			}).
+			Build(c.services),
+
+		actioncommands.NewBuilder("afktriggerservers", "AFK Trigger Servers").
+			WithListGetter("Get AFK trigger servers", func(ctx *router.Ctx) error {
+				cfg := c.services.Config.GetConfig()
+				if len(cfg.AFK.TriggerList.Servers) == 0 {
+					c.services.Embed.Respond(ctx, "No AFK trigger servers found.")
+					return nil
+				}
+
+				servers := fn.Map(cfg.AFK.TriggerList.Servers, func(serverID string) string {
+					guild, err := ctx.Session.GuildWithFallback(serverID)
+					if err != nil {
+						return serverID
+					}
+
+					return fmt.Sprintf("%s - %s", guild.Name, guild.ID)
+				})
+
+				c.services.Embed.RespondField(ctx, "AFK Triggerlist Servers", strings.Join(servers, "\n"))
+				return nil
+			}).
+			WithListAdder("Add AFK trigger server", "[server id]", func(ctx *router.Ctx) error {
+				guild, err := ctx.Arguments.Get(0).Guild(router.ArgumentFlagFallbackDefault)
+				if err != nil {
+					return fmt.Errorf("could not find server: %v", err)
+				}
+
+				cfg := c.services.Config.GetConfig()
+
+				if slices.Contains(cfg.AFK.TriggerList.Servers, guild.ID) {
+					return fmt.Errorf("server %s is already in the AFK Triggerlist", guild.Name)
+				}
+
+				cfg.AFK.TriggerList.Servers = append(cfg.AFK.TriggerList.Servers, guild.ID)
+				if err := c.services.Config.SaveConfig(cfg); err != nil {
+					return fmt.Errorf("error saving config: %v", err)
+				}
+
+				c.services.Embed.Respond(ctx, "Added server %s to the AFK Triggerlist.", guild.Name)
+				return nil
+			}).
+			WithListRemover("Remove AFK trigger server", "[server id]", func(ctx *router.Ctx) error {
+				guild, err := ctx.Arguments.Get(0).Guild(router.ArgumentFlagFallbackDefault)
+				if err != nil {
+					return fmt.Errorf("could not find server: %v", err)
+				}
+
+				cfg := c.services.Config.GetConfig()
+
+				if !slices.Contains(cfg.AFK.TriggerList.Servers, guild.ID) {
+					return fmt.Errorf("server %s is not in the AFK Triggerlist", guild.Name)
+				}
+
+				cfg.AFK.TriggerList.Servers = fn.Delete(cfg.AFK.TriggerList.Servers, guild.ID)
+				if err := c.services.Config.SaveConfig(cfg); err != nil {
+					return fmt.Errorf("error saving config: %v", err)
+				}
+
+				c.services.Embed.Respond(ctx, "Removed server %s from the AFK Triggerlist.", guild.Name)
+				return nil
+			}).
+			WithListClearer("Clear AFK trigger servers", func(ctx *router.Ctx) error {
+				cfg := c.services.Config.GetConfig()
+				cfg.AFK.TriggerList.Servers = []string{}
+				if err := c.services.Config.SaveConfig(cfg); err != nil {
+					return fmt.Errorf("error saving config: %v", err)
+				}
+
+				c.services.Embed.Respond(ctx, "Cleared all servers from the AFK Triggerlist.")
+				return nil
+			}).
+			Build(c.services),
 	})
 }
 
@@ -1013,5 +962,23 @@ func (c *EventReactionsCommands) clearreactions(ctx *router.Ctx) {
 	c.services.EventReactions.RemoveAllReactions()
 	c.services.Embed.New(ctx).
 		SetDescription("Cleared all event reactions").
+		Send()
+}
+
+func (c *EventReactionsCommands) unpinspam(ctx *router.Ctx) {
+	for _, message := range c.services.EventReactions.GetPinSpamMessages() {
+		err := ctx.Session.ChannelMessageUnpin(message.ChannelID, message.ID)
+		if err != nil {
+			c.services.Embed.New(ctx).
+				SetDescription("Could not unpin message: %s", err.Error()).
+				Send()
+			return
+		}
+	}
+
+	c.services.EventReactions.ClearPinSpamMessages()
+
+	c.services.Embed.New(ctx).
+		SetDescription("Unpinned all messages.").
 		Send()
 }
