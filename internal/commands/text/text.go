@@ -349,23 +349,23 @@ func (c *TextCommands) alphabet(ctx *router.Ctx) {
 
 func (c *TextCommands) ascii(ctx *router.Ctx) {
 	ascii := figure.NewFigure(ctx.Arguments.Raw(), "", false).String()
-	ctx.RespondText("%s", "```"+ascii+"```")
+	ctx.RespondText("```%s```", ascii)
 }
 
 func (c *TextCommands) bold(ctx *router.Ctx) {
-	ctx.RespondText("%s", "**"+ctx.Arguments.Raw()+"**")
+	ctx.RespondText("**%s**", ctx.Arguments.Raw())
 }
 
 func (c *TextCommands) strike(ctx *router.Ctx) {
-	ctx.RespondText("%s", "~~"+ctx.Arguments.Raw()+"~~")
+	ctx.RespondText("~~%s~~", ctx.Arguments.Raw())
 }
 
 func (c *TextCommands) italic(ctx *router.Ctx) {
-	ctx.RespondText("%s", "*"+ctx.Arguments.Raw()+"*")
+	ctx.RespondText("*%s*", ctx.Arguments.Raw())
 }
 
 func (c *TextCommands) spoiler(ctx *router.Ctx) {
-	ctx.RespondText("%s", "||"+ctx.Arguments.Raw()+"||")
+	ctx.RespondText("||%s||", ctx.Arguments.Raw())
 }
 
 func (c *TextCommands) lspoiler(ctx *router.Ctx) {
@@ -406,11 +406,18 @@ func (c *TextCommands) leet(ctx *router.Ctx) {
 
 func (c *TextCommands) devowel(ctx *router.Ctx) {
 	text := ctx.Arguments.Raw()
-	vowels := []string{"a", "A", "e", "E", "i", "I", "o", "O", "u", "U"}
-	for _, element := range vowels {
-		text = strings.ReplaceAll(text, element, "")
+	builder := strings.Builder{}
+
+	for _, c := range text {
+		if c == 'a' || c == 'e' || c == 'i' || c == 'o' || c == 'u' ||
+			c == 'A' || c == 'E' || c == 'I' || c == 'O' || c == 'U' {
+			continue
+		}
+
+		builder.WriteRune(c)
 	}
-	ctx.RespondText("%s", text)
+
+	ctx.RespondText("%s", builder.String())
 }
 
 func (c *TextCommands) edit(ctx *router.Ctx) {
@@ -431,7 +438,7 @@ func (c *TextCommands) edit(ctx *router.Ctx) {
 func (c *TextCommands) emojify(ctx *router.Ctx) {
 	text := strings.ToLower(ctx.Arguments.Raw())
 	emojiChars := [][]string{
-		{"a", "🇦"},
+		{"a", "🇦-"},
 		{"b", "🇧-"},
 		{"c", "🇨-"},
 		{"d", "🇩-"},
@@ -452,7 +459,7 @@ func (c *TextCommands) emojify(ctx *router.Ctx) {
 		{"s", "🇸-"},
 		{"t", "🇹-"},
 		{"u", "🇺-"},
-		{"v", "🇻"},
+		{"v", "🇻-"},
 		{"w", "🇼-"},
 		{"x", "🇽-"},
 		{"y", "🇾-"},
