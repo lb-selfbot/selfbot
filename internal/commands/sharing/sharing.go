@@ -32,17 +32,15 @@ func (c *SharingCommands) Register() {
 					return nil
 				}
 
-				userStrings := make([]string, 0, len(cfg.Sharing.SharedUsers))
-				for _, userID := range cfg.Sharing.SharedUsers {
+				users := fn.Map(cfg.Sharing.SharedUsers, func(userID string) string {
 					user, err := ctx.Session.UserWithFallback(userID)
 					if err != nil {
-						userStrings = append(userStrings, fmt.Sprintf("%s (Unknown)", userID))
-						continue
+						return fmt.Sprintf("%s (Unknown)", userID)
 					}
-					userStrings = append(userStrings, fmt.Sprintf("%s (%s)", user.Username, userID))
-				}
+					return fmt.Sprintf("%s (%s)", user.Username, userID)
+				})
 
-				c.services.Embed.RespondField(ctx, "Shared Users", strings.Join(userStrings, "\n"))
+				c.services.Embed.RespondField(ctx, "Shared Users", strings.Join(users, "\n"))
 				return nil
 			}).
 			WithListAdder("Add shared user", "<user>", func(ctx *router.Ctx) error {
@@ -112,21 +110,14 @@ func (c *SharingCommands) Register() {
 			WithListAdder("Add shared category", "<category>", func(ctx *router.Ctx) error {
 				categoryName := ctx.Arguments.Get(0).Raw()
 
-				var found bool
-				var actualName string
-				for _, category := range ctx.Router.GetCategories() {
-					if !strings.EqualFold(category.Name, categoryName) {
-						continue
-					}
-
-					actualName = category.Name
-					found = true
-					break
-				}
-
-				if !found {
+				categories := ctx.Router.GetCategories()
+				filtered := fn.Filter(categories, func(category *router.Category) bool {
+					return strings.EqualFold(category.Name, categoryName)
+				})
+				if len(filtered) == 0 {
 					return fmt.Errorf("category %s not found. Use the 'values' subcommand to see available categories", categoryName)
 				}
+				actualName := filtered[0].Name
 
 				cfg := c.services.Config.GetConfig()
 
@@ -145,21 +136,14 @@ func (c *SharingCommands) Register() {
 			WithListRemover("Remove shared category", "<category>", func(ctx *router.Ctx) error {
 				categoryName := ctx.Arguments.Get(0).Raw()
 
-				var found bool
-				var actualName string
-				for _, category := range ctx.Router.GetCategories() {
-					if !strings.EqualFold(category.Name, categoryName) {
-						continue
-					}
-
-					actualName = category.Name
-					found = true
-					break
-				}
-
-				if !found {
+				categories := ctx.Router.GetCategories()
+				filtered := fn.Filter(categories, func(category *router.Category) bool {
+					return strings.EqualFold(category.Name, categoryName)
+				})
+				if len(filtered) == 0 {
 					return fmt.Errorf("category %s not found. Use the 'values' subcommand to see available categories", categoryName)
 				}
+				actualName := filtered[0].Name
 
 				cfg := c.services.Config.GetConfig()
 
@@ -185,6 +169,11 @@ func (c *SharingCommands) Register() {
 				c.services.Embed.Respond(ctx, "Cleared all shared categories.")
 				return nil
 			}).
+			WithValues("Get available categories", func() []any {
+				return fn.ToIfaceSlice(fn.Map(c.services.Router.GetCategories(), func(category *router.Category) string {
+					return category.Name
+				}))
+			}).
 			Build(c.services),
 
 		// Shared Commands
@@ -202,22 +191,15 @@ func (c *SharingCommands) Register() {
 			WithListAdder("Add shared command", "<command>", func(ctx *router.Ctx) error {
 				commandName := ctx.Arguments.Get(0).Raw()
 
-				var found bool
-				var actualName string
-				for _, command := range ctx.Router.GetCommands() {
-					if !strings.EqualFold(command.Name, commandName) {
-						continue
-					}
+				commands := fn.Filter(ctx.Router.GetCommands(), func(command *router.Command) bool {
+					return strings.EqualFold(command.Name, commandName)
+				})
 
-					actualName = command.Name
-					found = true
-					break
-				}
-
-				if !found {
+				if len(commands) == 0 {
 					return fmt.Errorf("command %s not found", commandName)
 				}
 
+				actualName := commands[0].Name
 				cfg := c.services.Config.GetConfig()
 
 				if slices.Contains(cfg.Sharing.SharedCommands, actualName) {
@@ -235,22 +217,15 @@ func (c *SharingCommands) Register() {
 			WithListRemover("Remove shared command", "<command>", func(ctx *router.Ctx) error {
 				commandName := ctx.Arguments.Get(0).Raw()
 
-				var found bool
-				var actualName string
-				for _, command := range ctx.Router.GetCommands() {
-					if !strings.EqualFold(command.Name, commandName) {
-						continue
-					}
+				commands := fn.Filter(ctx.Router.GetCommands(), func(command *router.Command) bool {
+					return strings.EqualFold(command.Name, commandName)
+				})
 
-					actualName = command.Name
-					found = true
-					break
-				}
-
-				if !found {
+				if len(commands) == 0 {
 					return fmt.Errorf("command %s not found", commandName)
 				}
 
+				actualName := commands[0].Name
 				cfg := c.services.Config.GetConfig()
 
 				if !slices.Contains(cfg.Sharing.SharedCommands, actualName) {
@@ -274,6 +249,9 @@ func (c *SharingCommands) Register() {
 
 				c.services.Embed.Respond(ctx, "Cleared all shared commands.")
 				return nil
+			}).
+			WithValues("Get available commands", func() []any {
+				return []any{"Available Commands", "Use `help` or view <https://docs.lightning-bot.com/category/commands> for a list of commands."}
 			}).
 			Build(c.services),
 
@@ -312,26 +290,5 @@ func (c *SharingCommands) Register() {
 				return c.services.Config.SaveConfig(cfg)
 			}).
 			Build(c.services),
-
-		// Values subcommands registered as separate commands
-		{
-			Name:        "sharedcategories-values",
-			Description: "List available command categories",
-			Handler: func(ctx *router.Ctx) {
-				var categories []string
-				for _, category := range ctx.Router.GetCategories() {
-					categories = append(categories, category.Name)
-				}
-
-				c.services.Embed.RespondField(ctx, "Available Categories", strings.Join(categories, "\n"))
-			},
-		},
-		{
-			Name:        "sharedcommands-values",
-			Description: "Show help for available commands",
-			Handler: func(ctx *router.Ctx) {
-				c.services.Embed.RespondField(ctx, "Available Commands", "Use `help` or view <https://docs.lightning-bot.com/category/commands> for a list of commands.")
-			},
-		},
 	})
 }

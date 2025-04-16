@@ -13,6 +13,7 @@ import (
 	_json "github.com/goccy/go-json"
 
 	"github.com/lb-selfbot/go-jester"
+	"github.com/lb-selfbot/selfbot/internal/fn"
 	"github.com/lb-selfbot/selfbot/internal/uploaders"
 	"github.com/lb-selfbot/selfbot/internal/utils"
 )
@@ -129,7 +130,7 @@ func (s SXCU) Upload(file *bytes.Buffer, filename string) (*uploaders.UploadResu
 	url = strings.ReplaceAll(url, "$", "")
 	path := strings.Split(url, ".")
 
-	link := data.Get(toIfaceSlice(path)...).MustString()
+	link := data.Get(fn.ToIfaceSlice(path)...).MustString()
 
 	if link == "" {
 		return nil, fmt.Errorf("invalid response: %s", data.MustMap())
@@ -141,8 +142,4 @@ func (s SXCU) Upload(file *bytes.Buffer, filename string) (*uploaders.UploadResu
 	}
 
 	return result, nil
-}
-
-func toIfaceSlice(arr ...any) []any {
-	return arr
 }

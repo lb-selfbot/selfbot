@@ -168,3 +168,8 @@ func First[T any](slice []T, pred func(T) bool) (T, bool) {
 func Delete[T comparable](slice []T, value T) []T {
 	return slices.DeleteFunc(slice, func(el T) bool { return el == value })
 }
+
+// ToIfaceSlice converts a slice of any type to a slice of any
+func ToIfaceSlice(arr ...any) []any {
+	return arr
+}
