@@ -569,7 +569,7 @@ func (c *FunCommands) howsimp(ctx *router.Ctx) {
 func (c *FunCommands) penis(ctx *router.Ctx) {
 	penisLength := random.Int(1, 20)
 	penis := "8"
-	for i := 0; i < penisLength; i++ {
+	for range penisLength {
 		penis += "="
 	}
 	penis += "Đ"
@@ -723,7 +723,7 @@ func (c *FunCommands) slot(ctx *router.Ctx) {
 		return
 	}
 
-	for i := 0; i < 5; i++ {
+	for range 5 {
 		time.Sleep(500 * time.Millisecond)
 
 		_, err = ctx.Session.ChannelMessageEdit(message.ChannelID, message.ID, getEmbed(false))

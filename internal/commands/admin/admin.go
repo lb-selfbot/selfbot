@@ -1145,7 +1145,7 @@ func (c *AdminCommands) webhooksend(ctx *router.Ctx) {
 
 	resp, err := http.DefaultClient().Post(webhookUrl.String(), data)
 	if err != nil || resp.StatusCode != 204 {
-		ctx.RespondText("%s", "Error sending message to webhook: "+string(resp.MustGetBody()))
+		ctx.RespondText("Error sending message to webhook: %s", string(resp.MustGetBody()))
 		return
 	}
 

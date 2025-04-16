@@ -363,7 +363,7 @@ func (c *TextCommands) spoiler(ctx *router.Ctx) {
 func (c *TextCommands) lspoiler(ctx *router.Ctx) {
 	finalString := ""
 	chars := []rune(ctx.Arguments.Raw())
-	for i := 0; i < len(chars); i++ {
+	for i := range chars {
 		char := string(chars[i])
 		finalString = finalString + "||" + char + "||"
 	}

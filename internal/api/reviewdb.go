@@ -71,12 +71,10 @@ func GetReviewDBReviews(userID string) ([]Review, error) {
 		return nil, fmt.Errorf("invalid response: %s", data.Get("message").MustString())
 	}
 
-	rawReviews := data.Get("reviews")
-	reviews := []Review{}
+	reviewsData := data.Get("reviews")
+	reviews := make([]Review, 0, reviewsData.Len())
 
-	for i := 0; i < rawReviews.Len(); i++ {
-		review := rawReviews.Get(i)
-
+	for review := range reviewsData.Iterator() {
 		reviews = append(reviews, Review{
 			ID:        review.Get("id").MustInt64(),
 			Username:  review.Get("sender", "username").MustString(),

@@ -195,7 +195,7 @@ func (c *CurrencyCommands) priceinfo(ctx *router.Ctx) {
 	json := resp.Json()
 
 	if msg := json.Get("Message").MustString(); msg != "" {
-		ctx.RespondText("%s", "An error has occurred: "+msg)
+		ctx.RespondText("An error has occurred: %s", msg)
 		return
 	}
 
@@ -254,9 +254,8 @@ func (c *CurrencyCommands) searchsymbol(ctx *router.Ctx) {
 
 	emb := c.services.Embed.New(ctx)
 
-	for i := range bestMatches.MustSlice() {
-		stock := bestMatches.Get(i)
-
+	i := 0
+	for stock := range bestMatches.Iterator() {
 		info := fmt.Sprintf(
 			"Symbol: %s\nName: %s",
 			stock.Get("1. symbol").MustString(),
@@ -264,6 +263,7 @@ func (c *CurrencyCommands) searchsymbol(ctx *router.Ctx) {
 		)
 
 		emb.AddField("Result "+strconv.Itoa(i+1), info)
+		i++
 	}
 
 	emb.Send()

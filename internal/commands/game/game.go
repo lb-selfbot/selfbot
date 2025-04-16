@@ -403,7 +403,7 @@ func (c *GameCommands) alstats(ctx *router.Ctx) {
 func (c *GameCommands) gtastatus(ctx *router.Ctx) {
 	resp, err := http.DefaultClient().Get("https://support.rockstargames.com/services/status.json")
 	if err != nil {
-		ctx.RespondText("An error has occurred.")
+		ctx.RespondText("An error has occurred: %v", err)
 		return
 	}
 
@@ -418,9 +418,8 @@ func (c *GameCommands) gtastatus(ctx *router.Ctx) {
 	emb := c.services.Embed.New(ctx).
 		SetDescription("GTA Online Status").
 		AddField("Overall Status", gtaStatus.Get("status_tag").MustString())
-	for i := 0; i < gtaStatus.Get("services_platforms").Len(); i++ {
-		platform := gtaStatus.Get("services_platforms").Get(i)
-		emb.AddField(platform.Get("name").MustString(), platform.Get("service_status").Get("status").MustString())
+	for platform := range gtaStatus.Get("services_platforms").Iterator() {
+		emb.AddField(platform.Get("name").MustString(), platform.Get("status").MustString())
 	}
 	emb.Send()
 }
@@ -521,8 +520,7 @@ func (c *GameCommands) hltbsearch(ctx *router.Ctx) {
 
 	var games []string
 
-	for i := 0; i < resp.Json().Get("data").Len(); i++ {
-		game := resp.Json().Get("data").Get(i)
+	for game := range resp.Json().Get("data").Iterator() {
 		games = append(games, fmt.Sprintf(
 			"%s (%d)",
 			game.Get("game_name").MustString(),

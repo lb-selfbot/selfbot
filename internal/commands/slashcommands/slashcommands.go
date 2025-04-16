@@ -273,7 +273,7 @@ func (c *SlashCommands) getscjob(ctx *router.Ctx) {
 
 	job := c.services.SlashCommand.GetJobByName(name)
 	if job == nil {
-		ctx.RespondText("%s", "Could not find a job with name `"+name+"`")
+		ctx.RespondText("Could not find a job with name `%s`", name)
 		return
 	}
 
@@ -310,7 +310,7 @@ func (c *SlashCommands) createscjob(ctx *router.Ctx) {
 			continue
 		}
 
-		ctx.RespondText("%s", "A job with the name `"+name+"` already exists.")
+		ctx.RespondText("A job with the name `%s` already exists.", name)
 		return
 	}
 
@@ -415,7 +415,7 @@ func (c *SlashCommands) deletescjob(ctx *router.Ctx) {
 
 	job := c.services.SlashCommand.GetJobByName(name)
 	if job == nil {
-		ctx.RespondText("%s", "Could not find a job with name `"+name+"`")
+		ctx.RespondText("Could not find a job with name `%s`", name)
 		return
 	}
 
@@ -436,7 +436,7 @@ func (c *SlashCommands) setscjobcommand(ctx *router.Ctx) {
 
 	job := c.services.SlashCommand.GetJobByName(name)
 	if job == nil {
-		ctx.RespondText("%s", "Could not find a job with name `"+name+"`")
+		ctx.RespondText("Could not find a job with name `%s`", name)
 		return
 	}
 
@@ -508,7 +508,7 @@ func (c *SlashCommands) setscjobchannel(ctx *router.Ctx) {
 
 	job := c.services.SlashCommand.GetJobByName(name)
 	if job == nil {
-		ctx.RespondText("%s", "Could not find a job with name `"+name+"`")
+		ctx.RespondText("Could not find a job with name `%s`", name)
 		return
 	}
 
@@ -557,7 +557,7 @@ func (c *SlashCommands) setscjobinterval(ctx *router.Ctx) {
 
 	job := c.services.SlashCommand.GetJobByName(name)
 	if job == nil {
-		ctx.RespondText("%s", "Could not find a job with name `"+name+"`")
+		ctx.RespondText("Could not find a job with name `%s`", name)
 		return
 	}
 
@@ -587,7 +587,7 @@ func (c *SlashCommands) setscjobpaused(ctx *router.Ctx) {
 
 	job := c.services.SlashCommand.GetJobByName(name)
 	if job == nil {
-		ctx.RespondText("%s", "Could not find a job with name `"+name+"`")
+		ctx.RespondText("Could not find a job with name `%s`", name)
 		return
 	}
 

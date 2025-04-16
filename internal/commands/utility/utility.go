@@ -1548,7 +1548,7 @@ func (c *UtilityCommands) sendinterval(ctx *router.Ctx) {
 	instantDelete := strings.Contains(flags, "INSTANT_DEL")
 	delete := strings.Contains(flags, "DELETE")
 
-	for i := 0; i < amount; i++ {
+	for range amount {
 		msg, err := ctx.Session.ChannelMessageSend(ctx.Message.ChannelID, message)
 		if err != nil {
 			return
@@ -1680,7 +1680,7 @@ func (c *UtilityCommands) discordstatus(ctx *router.Ctx) {
 
 	emb := c.services.Embed.New(ctx)
 
-	for i := 0; i < components.Len(); i++ {
+	for range components.Len() {
 		component := components.Get(i)
 		emb.AddField(
 			component.Get("name").MustString(),
@@ -3354,7 +3354,7 @@ func (c *UtilityCommands) googlesearch(ctx *router.Ctx) {
 		return
 	}
 	emb := c.services.Embed.New(ctx)
-	for i := 0; i < results.Len(); i++ {
+	for range results.Len() {
 		result := results.Get(i)
 		emb.AddField(result.Get("title").MustString(), result.Get("url").MustString())
 	}
@@ -3368,7 +3368,7 @@ func (c *UtilityCommands) youtubesearch(ctx *router.Ctx) {
 		return
 	}
 	emb := c.services.Embed.New(ctx)
-	for i := 0; i < results.Len(); i++ {
+	for range results.Len() {
 		result := results.Get(i)
 		resultUrl := result.Get("url").MustString()
 		if strings.Contains(resultUrl, "playlist") {
@@ -3568,7 +3568,7 @@ func (c *UtilityCommands) generatekey(ctx *router.Ctx) {
 
 	var keys []string
 
-	for i := 0; i < amount; i++ {
+	for range amount {
 		var key string
 
 		for _, char := range format {
