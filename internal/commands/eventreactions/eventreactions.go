@@ -946,9 +946,7 @@ func (c *EventReactionsCommands) mapReactions(ctx *router.Ctx, reactions []types
 		return reaction.Description()
 	})
 
-	c.services.Embed.New(ctx).
-		SetDescription("%s:\n\n%s", title, strings.Join(descriptions, "\n")).
-		Send()
+	c.services.Embed.Respond(ctx, "%s:\n\n%s", title, strings.Join(descriptions, "\n"))
 }
 
 // Commands
@@ -960,9 +958,7 @@ func (c *EventReactionsCommands) listreactions(ctx *router.Ctx) {
 
 func (c *EventReactionsCommands) clearreactions(ctx *router.Ctx) {
 	c.services.EventReactions.RemoveAllReactions()
-	c.services.Embed.New(ctx).
-		SetDescription("Cleared all event reactions").
-		Send()
+	c.services.Embed.Respond(ctx, "Cleared all event reactions")
 }
 
 func (c *EventReactionsCommands) unpinspam(ctx *router.Ctx) {
@@ -978,7 +974,5 @@ func (c *EventReactionsCommands) unpinspam(ctx *router.Ctx) {
 
 	c.services.EventReactions.ClearPinSpamMessages()
 
-	c.services.Embed.New(ctx).
-		SetDescription("Unpinned all messages.").
-		Send()
+	c.services.Embed.Respond(ctx, "Unpinned all messages.")
 }

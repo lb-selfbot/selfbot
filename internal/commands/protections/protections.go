@@ -276,9 +276,7 @@ func (c *ProtectionsCommands) dm(ctx *router.Ctx) {
 		return
 	}
 
-	c.services.Embed.New(ctx).
-		SetDescription("%s DM's from everyone!", action).
-		Send()
+	c.services.Embed.Respond(ctx, "%s DM's from everyone!", action)
 }
 
 func (c *ProtectionsCommands) friendrequests(ctx *router.Ctx) {
@@ -302,7 +300,5 @@ func (c *ProtectionsCommands) friendrequests(ctx *router.Ctx) {
 		return
 	}
 
-	c.services.Embed.New(ctx).
-		SetDescription("%s friend requests from everyone!", action).
-		Send()
+	c.services.Embed.Respond(ctx, "%s friend requests from everyone!", action)
 }

@@ -614,9 +614,7 @@ func (c *ActivityCommands) customstatus(ctx *router.Ctx) {
 		return
 	}
 
-	c.services.Embed.New(ctx).
-		SetDescription("Successfully set custom status to `%s`!", ctx.Arguments.Raw()).
-		Send()
+	c.services.Embed.Respond(ctx, "Successfully set custom status to `%s`!", ctx.Arguments.Raw())
 }
 
 func (c *ActivityCommands) clearactivity(ctx *router.Ctx) {
@@ -638,9 +636,7 @@ func (c *ActivityCommands) clearactivity(ctx *router.Ctx) {
 		return
 	}
 
-	c.services.Embed.New(ctx).
-		SetDescription("Successfully cleared activity!").
-		Send()
+	c.services.Embed.Respond(ctx, "Successfully cleared activity!")
 }
 
 func (c *ActivityCommands) copyactivity(ctx *router.Ctx) {
@@ -718,9 +714,7 @@ func (c *ActivityCommands) copyactivity(ctx *router.Ctx) {
 		return
 	}
 
-	c.services.Embed.New(ctx).
-		SetDescription("No activity found").
-		Send()
+	c.services.Embed.Respond(ctx, "No activity found")
 }
 
 func (c *ActivityCommands) getactivityjson(ctx *router.Ctx) {
@@ -771,9 +765,7 @@ func (c *ActivityCommands) getactivityjson(ctx *router.Ctx) {
 		return
 	}
 
-	c.services.Embed.New(ctx).
-		SetDescription("No activity found").
-		Send()
+	c.services.Embed.Respond(ctx, "No activity found")
 }
 
 func (c *ActivityCommands) setactivityjson(ctx *router.Ctx) {
@@ -814,9 +806,7 @@ func (c *ActivityCommands) setactivityjson(ctx *router.Ctx) {
 func (c *ActivityCommands) getCAEnabled(ctx *router.Ctx) {
 	cfg := c.services.Config.GetConfig()
 
-	c.services.Embed.New(ctx).
-		AddField("Custom Activity", utils.Misc.FormatBoolOnOff(cfg.Activity.Enabled)).
-		Send()
+	c.services.Embed.RespondField(ctx, "Custom Activity", utils.Misc.FormatBoolOnOff(cfg.Activity.Enabled))
 }
 
 func (c *ActivityCommands) setCAEnabled(ctx *router.Ctx) {
@@ -831,9 +821,7 @@ func (c *ActivityCommands) setCAEnabled(ctx *router.Ctx) {
 	cfg.Activity.Enabled = toggle
 	_ = c.services.Config.SaveConfig(cfg)
 
-	c.services.Embed.New(ctx).
-		SetDescription("%s", "Turned "+utils.Misc.FormatBoolOnOff(toggle)+" Custom Activity").
-		Send()
+	c.services.Embed.Respond(ctx, "%s", "Turned "+utils.Misc.FormatBoolOnOff(toggle)+" Custom Activity")
 }
 
 func (c *ActivityCommands) toggleCAEnabled(ctx *router.Ctx) {
@@ -842,17 +830,13 @@ func (c *ActivityCommands) toggleCAEnabled(ctx *router.Ctx) {
 	cfg.Activity.Enabled = !cfg.Activity.Enabled
 	_ = c.services.Config.SaveConfig(cfg)
 
-	c.services.Embed.New(ctx).
-		SetDescription("%s", "Turned "+utils.Misc.FormatBoolOnOff(cfg.Activity.Enabled)+" Custom Activity").
-		Send()
+	c.services.Embed.Respond(ctx, "%s", "Turned "+utils.Misc.FormatBoolOnOff(cfg.Activity.Enabled)+" Custom Activity")
 }
 
 func (c *ActivityCommands) getCAPauseForOther(ctx *router.Ctx) {
 	cfg := c.services.Config.GetConfig()
 
-	c.services.Embed.New(ctx).
-		AddField("Pause Custom Activity for other Activity", utils.Misc.FormatBoolOnOff(cfg.Activity.PauseForOther)).
-		Send()
+	c.services.Embed.RespondField(ctx, "Pause Custom Activity for other Activity", utils.Misc.FormatBoolOnOff(cfg.Activity.PauseForOther))
 }
 
 func (c *ActivityCommands) setCAPauseForOther(ctx *router.Ctx) {
@@ -867,9 +851,7 @@ func (c *ActivityCommands) setCAPauseForOther(ctx *router.Ctx) {
 	cfg.Activity.PauseForOther = toggle
 	_ = c.services.Config.SaveConfig(cfg)
 
-	c.services.Embed.New(ctx).
-		SetDescription("%s", "Turned "+utils.Misc.FormatBoolOnOff(toggle)+" Pause Custom Activity for other Activity").
-		Send()
+	c.services.Embed.Respond(ctx, "%s", "Turned "+utils.Misc.FormatBoolOnOff(toggle)+" Pause Custom Activity for other Activity")
 }
 
 func (c *ActivityCommands) toggleCAPauseForOther(ctx *router.Ctx) {
@@ -878,17 +860,13 @@ func (c *ActivityCommands) toggleCAPauseForOther(ctx *router.Ctx) {
 	cfg.Activity.PauseForOther = !cfg.Activity.PauseForOther
 	_ = c.services.Config.SaveConfig(cfg)
 
-	c.services.Embed.New(ctx).
-		SetDescription("%s", "Turned "+utils.Misc.FormatBoolOnOff(cfg.Activity.PauseForOther)+" Pause Custom Activity for other Activity").
-		Send()
+	c.services.Embed.Respond(ctx, "%s", "Turned "+utils.Misc.FormatBoolOnOff(cfg.Activity.PauseForOther)+" Pause Custom Activity for other Activity")
 }
 
 func (c *ActivityCommands) getCAConnectionType(ctx *router.Ctx) {
 	cfg := c.services.Config.GetConfig()
 
-	c.services.Embed.New(ctx).
-		AddField("Custom Activity Connection Type", cfg.Activity.ActivityType).
-		Send()
+	c.services.Embed.RespondField(ctx, "Custom Activity Connection Type", cfg.Activity.ActivityType)
 }
 
 func (c *ActivityCommands) setCAConnectionType(ctx *router.Ctx) {
@@ -908,23 +886,17 @@ func (c *ActivityCommands) setCAConnectionType(ctx *router.Ctx) {
 
 	_ = c.services.Config.SaveConfig(cfg)
 
-	c.services.Embed.New(ctx).
-		SetDescription("%s", "Custom Activity Connection Type set to "+cfg.Activity.ActivityType).
-		Send()
+	c.services.Embed.Respond(ctx, "%s", "Custom Activity Connection Type set to "+cfg.Activity.ActivityType)
 }
 
 func (c *ActivityCommands) listCAConnectionTypes(ctx *router.Ctx) {
-	c.services.Embed.New(ctx).
-		SetDescription("Available connection types: `RPC`, `CA`/`CustomActivity`").
-		Send()
+	c.services.Embed.Respond(ctx, "Available connection types: `RPC`, `CA`/`CustomActivity`")
 }
 
 func (c *ActivityCommands) getCAType(ctx *router.Ctx) {
 	cfg := c.services.Config.GetConfig()
 
-	c.services.Embed.New(ctx).
-		AddField("Custom Activity Type", cfg.Activity.Type).
-		Send()
+	c.services.Embed.RespondField(ctx, "Custom Activity Type", cfg.Activity.Type)
 }
 
 func (c *ActivityCommands) setCAType(ctx *router.Ctx) {
@@ -952,23 +924,17 @@ func (c *ActivityCommands) setCAType(ctx *router.Ctx) {
 
 	_ = c.services.Config.SaveConfig(cfg)
 
-	c.services.Embed.New(ctx).
-		SetDescription("%s", "Custom Activity Type set to "+cfg.Activity.Type).
-		Send()
+	c.services.Embed.Respond(ctx, "%s", "Custom Activity Type set to "+cfg.Activity.Type)
 }
 
 func (c *ActivityCommands) listCATypes(ctx *router.Ctx) {
-	c.services.Embed.New(ctx).
-		SetDescription("Available connection types: `Playing`, `Listening`, `Watching`, `Streaming`, `Competing`, `Spotify`.").
-		Send()
+	c.services.Embed.Respond(ctx, "Available connection types: `Playing`, `Listening`, `Watching`, `Streaming`, `Competing`, `Spotify`.")
 }
 
 func (c *ActivityCommands) getCAPlatform(ctx *router.Ctx) {
 	cfg := c.services.Config.GetConfig()
 
-	c.services.Embed.New(ctx).
-		AddField("Custom Activity Platform", cfg.Activity.Platform).
-		Send()
+	c.services.Embed.RespondField(ctx, "Custom Activity Platform", cfg.Activity.Platform)
 }
 
 func (c *ActivityCommands) setCAPlatform(ctx *router.Ctx) {
@@ -994,23 +960,17 @@ func (c *ActivityCommands) setCAPlatform(ctx *router.Ctx) {
 
 	_ = c.services.Config.SaveConfig(cfg)
 
-	c.services.Embed.New(ctx).
-		SetDescription("%s", "Custom Activity Platform set to "+cfg.Activity.Platform).
-		Send()
+	c.services.Embed.Respond(ctx, "%s", "Custom Activity Platform set to "+cfg.Activity.Platform)
 }
 
 func (c *ActivityCommands) listCAPlatforms(ctx *router.Ctx) {
-	c.services.Embed.New(ctx).
-		SetDescription("Available connection types: `Default`, `PS4`, `PS5`, `Xbox`, `Samsung`.").
-		Send()
+	c.services.Embed.Respond(ctx, "Available connection types: `Default`, `PS4`, `PS5`, `Xbox`, `Samsung`.")
 }
 
 func (c *ActivityCommands) getCAInvitable(ctx *router.Ctx) {
 	cfg := c.services.Config.GetConfig()
 
-	c.services.Embed.New(ctx).
-		AddField("Custom Activity Invitable", utils.Misc.FormatBoolOnOff(cfg.Activity.Invitable)).
-		Send()
+	c.services.Embed.RespondField(ctx, "Custom Activity Invitable", utils.Misc.FormatBoolOnOff(cfg.Activity.Invitable))
 }
 
 func (c *ActivityCommands) setCAInvitable(ctx *router.Ctx) {
@@ -1025,9 +985,7 @@ func (c *ActivityCommands) setCAInvitable(ctx *router.Ctx) {
 	cfg.Activity.Invitable = toggle
 	_ = c.services.Config.SaveConfig(cfg)
 
-	c.services.Embed.New(ctx).
-		SetDescription("%s", "Turned "+utils.Misc.FormatBoolOnOff(toggle)+" Custom Activity Invitable").
-		Send()
+	c.services.Embed.Respond(ctx, "%s", "Turned "+utils.Misc.FormatBoolOnOff(toggle)+" Custom Activity Invitable")
 }
 
 func (c *ActivityCommands) toggleCAInvitable(ctx *router.Ctx) {
@@ -1036,17 +994,13 @@ func (c *ActivityCommands) toggleCAInvitable(ctx *router.Ctx) {
 	cfg.Activity.Invitable = !cfg.Activity.Invitable
 	_ = c.services.Config.SaveConfig(cfg)
 
-	c.services.Embed.New(ctx).
-		SetDescription("%s", "Turned "+utils.Misc.FormatBoolOnOff(cfg.Activity.Invitable)+" Custom Activity Invitable").
-		Send()
+	c.services.Embed.Respond(ctx, "%s", "Turned "+utils.Misc.FormatBoolOnOff(cfg.Activity.Invitable)+" Custom Activity Invitable")
 }
 
 func (c *ActivityCommands) getCATime(ctx *router.Ctx) {
 	cfg := c.services.Config.GetConfig()
 
-	c.services.Embed.New(ctx).
-		AddField("Custom Activity Time", utils.Misc.FormatBoolOnOff(cfg.Activity.Time)).
-		Send()
+	c.services.Embed.RespondField(ctx, "Custom Activity Time", utils.Misc.FormatBoolOnOff(cfg.Activity.Time))
 }
 
 func (c *ActivityCommands) setCATime(ctx *router.Ctx) {
@@ -1061,9 +1015,7 @@ func (c *ActivityCommands) setCATime(ctx *router.Ctx) {
 	cfg.Activity.Time = toggle
 	_ = c.services.Config.SaveConfig(cfg)
 
-	c.services.Embed.New(ctx).
-		SetDescription("%s", "Turned "+utils.Misc.FormatBoolOnOff(toggle)+" Custom Activity Time").
-		Send()
+	c.services.Embed.Respond(ctx, "%s", "Turned "+utils.Misc.FormatBoolOnOff(toggle)+" Custom Activity Time")
 }
 
 func (c *ActivityCommands) toggleCATime(ctx *router.Ctx) {
@@ -1072,17 +1024,13 @@ func (c *ActivityCommands) toggleCATime(ctx *router.Ctx) {
 	cfg.Activity.Time = !cfg.Activity.Time
 	_ = c.services.Config.SaveConfig(cfg)
 
-	c.services.Embed.New(ctx).
-		SetDescription("%s", "Turned "+utils.Misc.FormatBoolOnOff(cfg.Activity.Time)+" Custom Activity Time").
-		Send()
+	c.services.Embed.Respond(ctx, "%s", "Turned "+utils.Misc.FormatBoolOnOff(cfg.Activity.Time)+" Custom Activity Time")
 }
 
 func (c *ActivityCommands) getCAName(ctx *router.Ctx) {
 	cfg := c.services.Config.GetConfig()
 
-	c.services.Embed.New(ctx).
-		AddField("Custom Activity Name", cfg.Activity.Name).
-		Send()
+	c.services.Embed.RespondField(ctx, "Custom Activity Name", cfg.Activity.Name)
 }
 
 func (c *ActivityCommands) setCAName(ctx *router.Ctx) {
@@ -1093,17 +1041,13 @@ func (c *ActivityCommands) setCAName(ctx *router.Ctx) {
 	cfg.Activity.Name = value
 	_ = c.services.Config.SaveConfig(cfg)
 
-	c.services.Embed.New(ctx).
-		SetDescription("%s", "Custom Activity Name set to "+value).
-		Send()
+	c.services.Embed.Respond(ctx, "%s", "Custom Activity Name set to "+value)
 }
 
 func (c *ActivityCommands) getCAState(ctx *router.Ctx) {
 	cfg := c.services.Config.GetConfig()
 
-	c.services.Embed.New(ctx).
-		AddField("Custom Activity State", cfg.Activity.State).
-		Send()
+	c.services.Embed.RespondField(ctx, "Custom Activity State", cfg.Activity.State)
 }
 
 func (c *ActivityCommands) setCAState(ctx *router.Ctx) {
@@ -1114,17 +1058,13 @@ func (c *ActivityCommands) setCAState(ctx *router.Ctx) {
 	cfg.Activity.State = value
 	_ = c.services.Config.SaveConfig(cfg)
 
-	c.services.Embed.New(ctx).
-		SetDescription("%s", "Custom Activity State set to "+value).
-		Send()
+	c.services.Embed.Respond(ctx, "%s", "Custom Activity State set to "+value)
 }
 
 func (c *ActivityCommands) getCADetails(ctx *router.Ctx) {
 	cfg := c.services.Config.GetConfig()
 
-	c.services.Embed.New(ctx).
-		AddField("Custom Activity Details", cfg.Activity.Details).
-		Send()
+	c.services.Embed.RespondField(ctx, "Custom Activity Details", cfg.Activity.Details)
 }
 
 func (c *ActivityCommands) setCADetails(ctx *router.Ctx) {
@@ -1135,17 +1075,13 @@ func (c *ActivityCommands) setCADetails(ctx *router.Ctx) {
 	cfg.Activity.Details = value
 	_ = c.services.Config.SaveConfig(cfg)
 
-	c.services.Embed.New(ctx).
-		SetDescription("%s", "Custom Activity Details set to "+value).
-		Send()
+	c.services.Embed.Respond(ctx, "%s", "Custom Activity Details set to "+value)
 }
 
 func (c *ActivityCommands) getCAStreamingURL(ctx *router.Ctx) {
 	cfg := c.services.Config.GetConfig()
 
-	c.services.Embed.New(ctx).
-		AddField("Custom Activity Streaming URL", cfg.Activity.StreamingURL).
-		Send()
+	c.services.Embed.RespondField(ctx, "Custom Activity Streaming URL", cfg.Activity.StreamingURL)
 }
 
 func (c *ActivityCommands) setCAStreamingURL(ctx *router.Ctx) {
@@ -1156,17 +1092,13 @@ func (c *ActivityCommands) setCAStreamingURL(ctx *router.Ctx) {
 	cfg.Activity.StreamingURL = value
 	_ = c.services.Config.SaveConfig(cfg)
 
-	c.services.Embed.New(ctx).
-		SetDescription("%s", "Custom Activity Streaming URL set to "+value).
-		Send()
+	c.services.Embed.Respond(ctx, "%s", "Custom Activity Streaming URL set to "+value)
 }
 
 func (c *ActivityCommands) getCALargeImage(ctx *router.Ctx) {
 	cfg := c.services.Config.GetConfig()
 
-	c.services.Embed.New(ctx).
-		AddField("Custom Activity Large Image", cfg.Activity.LargeImage).
-		Send()
+	c.services.Embed.RespondField(ctx, "Custom Activity Large Image", cfg.Activity.LargeImage)
 }
 
 func (c *ActivityCommands) setCALargeImage(ctx *router.Ctx) {
@@ -1177,17 +1109,13 @@ func (c *ActivityCommands) setCALargeImage(ctx *router.Ctx) {
 	cfg.Activity.LargeImage = value
 	_ = c.services.Config.SaveConfig(cfg)
 
-	c.services.Embed.New(ctx).
-		SetDescription("%s", "Custom Activity Large Image set to "+value).
-		Send()
+	c.services.Embed.Respond(ctx, "%s", "Custom Activity Large Image set to "+value)
 }
 
 func (c *ActivityCommands) getCALargeText(ctx *router.Ctx) {
 	cfg := c.services.Config.GetConfig()
 
-	c.services.Embed.New(ctx).
-		AddField("Custom Activity Large Image Text", cfg.Activity.LargeImageText).
-		Send()
+	c.services.Embed.RespondField(ctx, "Custom Activity Large Image Text", cfg.Activity.LargeImageText)
 }
 
 func (c *ActivityCommands) setCALargeText(ctx *router.Ctx) {
@@ -1198,17 +1126,13 @@ func (c *ActivityCommands) setCALargeText(ctx *router.Ctx) {
 	cfg.Activity.LargeImageText = value
 	_ = c.services.Config.SaveConfig(cfg)
 
-	c.services.Embed.New(ctx).
-		SetDescription("%s", "Custom Activity Large Image Text set to "+value).
-		Send()
+	c.services.Embed.Respond(ctx, "%s", "Custom Activity Large Image Text set to "+value)
 }
 
 func (c *ActivityCommands) getCASmallImage(ctx *router.Ctx) {
 	cfg := c.services.Config.GetConfig()
 
-	c.services.Embed.New(ctx).
-		AddField("Custom Activity Small Image", cfg.Activity.SmallImage).
-		Send()
+	c.services.Embed.RespondField(ctx, "Custom Activity Small Image", cfg.Activity.SmallImage)
 }
 
 func (c *ActivityCommands) setCASmallImage(ctx *router.Ctx) {
@@ -1219,17 +1143,13 @@ func (c *ActivityCommands) setCASmallImage(ctx *router.Ctx) {
 	cfg.Activity.SmallImage = value
 	_ = c.services.Config.SaveConfig(cfg)
 
-	c.services.Embed.New(ctx).
-		SetDescription("%s", "Custom Activity Small Image set to "+value).
-		Send()
+	c.services.Embed.Respond(ctx, "%s", "Custom Activity Small Image set to "+value)
 }
 
 func (c *ActivityCommands) getCASmallText(ctx *router.Ctx) {
 	cfg := c.services.Config.GetConfig()
 
-	c.services.Embed.New(ctx).
-		AddField("Custom Activity Small Image Text", cfg.Activity.SmallImageText).
-		Send()
+	c.services.Embed.RespondField(ctx, "Custom Activity Small Image Text", cfg.Activity.SmallImageText)
 }
 
 func (c *ActivityCommands) setCASmallText(ctx *router.Ctx) {
@@ -1240,17 +1160,13 @@ func (c *ActivityCommands) setCASmallText(ctx *router.Ctx) {
 	cfg.Activity.SmallImageText = value
 	_ = c.services.Config.SaveConfig(cfg)
 
-	c.services.Embed.New(ctx).
-		SetDescription("%s", "Custom Activity Small Image Text set to "+value).
-		Send()
+	c.services.Embed.Respond(ctx, "%s", "Custom Activity Small Image Text set to "+value)
 }
 
 func (c *ActivityCommands) getCAButton1(ctx *router.Ctx) {
 	cfg := c.services.Config.GetConfig()
 
-	c.services.Embed.New(ctx).
-		AddField("Custom Activity Button 1", fmt.Sprintf("%s (%s)", cfg.Activity.Button1Label, cfg.Activity.Button1URL)).
-		Send()
+	c.services.Embed.RespondField(ctx, "Custom Activity Button 1", fmt.Sprintf("%s (%s)", cfg.Activity.Button1Label, cfg.Activity.Button1URL))
 }
 
 func (c *ActivityCommands) setCAButton1(ctx *router.Ctx) {
@@ -1263,17 +1179,13 @@ func (c *ActivityCommands) setCAButton1(ctx *router.Ctx) {
 	cfg.Activity.Button1URL = url
 	_ = c.services.Config.SaveConfig(cfg)
 
-	c.services.Embed.New(ctx).
-		SetDescription("CA Button 1 set to %s (%s)", label, url).
-		Send()
+	c.services.Embed.Respond(ctx, "CA Button 1 set to %s (%s)", label, url)
 }
 
 func (c *ActivityCommands) getCAButton2(ctx *router.Ctx) {
 	cfg := c.services.Config.GetConfig()
 
-	c.services.Embed.New(ctx).
-		AddField("Custom Activity Button 2", fmt.Sprintf("%s (%s)", cfg.Activity.Button2Label, cfg.Activity.Button2URL)).
-		Send()
+	c.services.Embed.RespondField(ctx, "Custom Activity Button 2", fmt.Sprintf("%s (%s)", cfg.Activity.Button2Label, cfg.Activity.Button2URL))
 }
 
 func (c *ActivityCommands) setCAButton2(ctx *router.Ctx) {
@@ -1286,9 +1198,7 @@ func (c *ActivityCommands) setCAButton2(ctx *router.Ctx) {
 	cfg.Activity.Button2URL = url
 	_ = c.services.Config.SaveConfig(cfg)
 
-	c.services.Embed.New(ctx).
-		SetDescription("CA Button 2 set to %s (%s)", label, url).
-		Send()
+	c.services.Embed.Respond(ctx, "CA Button 2 set to %s (%s)", label, url)
 }
 
 func (c *ActivityCommands) getCAPreset(ctx *router.Ctx) {
@@ -1310,9 +1220,7 @@ func (c *ActivityCommands) getCAPreset(ctx *router.Ctx) {
 		return
 	}
 
-	c.services.Embed.New(ctx).
-		SetDescription("Current Custom Activity preset is `%s`.", currentPreset).
-		Send()
+	c.services.Embed.Respond(ctx, "Current Custom Activity preset is `%s`.", currentPreset)
 }
 
 func (c *ActivityCommands) loadCAPreset(ctx *router.Ctx) {
@@ -1333,9 +1241,7 @@ func (c *ActivityCommands) loadCAPreset(ctx *router.Ctx) {
 	cfg.Activity = preset
 	_ = c.services.Config.SaveConfig(cfg)
 
-	c.services.Embed.New(ctx).
-		SetDescription("Loaded Custom Activity preset `%s`.", name).
-		Send()
+	c.services.Embed.Respond(ctx, "Loaded Custom Activity preset `%s`.", name)
 }
 
 func (c *ActivityCommands) nextCAPreset(ctx *router.Ctx) {
@@ -1371,9 +1277,7 @@ func (c *ActivityCommands) nextCAPreset(ctx *router.Ctx) {
 	cfg.Activity = cfg.ActivityPresets[nextPresetName]
 	_ = c.services.Config.SaveConfig(cfg)
 
-	c.services.Embed.New(ctx).
-		SetDescription("Loaded next CA preset `%s`.", nextPresetName).
-		Send()
+	c.services.Embed.Respond(ctx, "Loaded next CA preset `%s`.", nextPresetName)
 }
 
 func (c *ActivityCommands) saveCAPreset(ctx *router.Ctx) {
@@ -1392,9 +1296,7 @@ func (c *ActivityCommands) saveCAPreset(ctx *router.Ctx) {
 	cfg.ActivityPresets[name] = cfg.Activity
 	_ = c.services.Config.SaveConfig(cfg)
 
-	c.services.Embed.New(ctx).
-		SetDescription("Saved current activity as preset `%s`.", name).
-		Send()
+	c.services.Embed.Respond(ctx, "Saved current activity as preset `%s`.", name)
 }
 
 func (c *ActivityCommands) removeCAPreset(ctx *router.Ctx) {
@@ -1410,9 +1312,7 @@ func (c *ActivityCommands) removeCAPreset(ctx *router.Ctx) {
 	delete(cfg.ActivityPresets, name)
 	_ = c.services.Config.SaveConfig(cfg)
 
-	c.services.Embed.New(ctx).
-		SetDescription("Deleted activity preset `%s`.", name).
-		Send()
+	c.services.Embed.Respond(ctx, "Deleted activity preset `%s`.", name)
 }
 
 func (c *ActivityCommands) listCAPresets(ctx *router.Ctx) {
@@ -1429,9 +1329,7 @@ func (c *ActivityCommands) listCAPresets(ctx *router.Ctx) {
 		return
 	}
 
-	c.services.Embed.New(ctx).
-		AddField("Custom Activity Presets", strings.Join(presets, "\n")).
-		Send()
+	c.services.Embed.RespondField(ctx, "Custom Activity Presets", strings.Join(presets, "\n"))
 }
 
 func (c *ActivityCommands) clearCAPresets(ctx *router.Ctx) {
@@ -1440,9 +1338,7 @@ func (c *ActivityCommands) clearCAPresets(ctx *router.Ctx) {
 	cfg.ActivityPresets = make(map[string]config.Activity)
 	_ = c.services.Config.SaveConfig(cfg)
 
-	c.services.Embed.New(ctx).
-		SetDescription("Cleared all activity presets.").
-		Send()
+	c.services.Embed.Respond(ctx, "Cleared all activity presets.")
 }
 
 func (c *ActivityCommands) setActivityPreset(ctx *router.Ctx) {
@@ -1500,9 +1396,7 @@ func (c *ActivityCommands) setActivityPreset(ctx *router.Ctx) {
 	cfg.Activity = activity
 	_ = c.services.Config.SaveConfig(cfg)
 
-	c.services.Embed.New(ctx).
-		SetDescription("Successfully set activity preset `%s`!", name).
-		Send()
+	c.services.Embed.Respond(ctx, "Successfully set activity preset `%s`!", name)
 }
 
 func (c *ActivityCommands) listActivityPresets(ctx *router.Ctx) {

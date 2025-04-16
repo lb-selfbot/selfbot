@@ -677,9 +677,7 @@ func (c *AdminCommands) deletecategory(ctx *router.Ctx) {
 		return
 	}
 
-	c.services.Embed.New(ctx).
-		SetDescription("Successfully deleted category!").
-		Send()
+	c.services.Embed.Respond(ctx, "Successfully deleted category!")
 }
 
 func (c *AdminCommands) renamechannel(ctx *router.Ctx) {
@@ -716,9 +714,7 @@ func (c *AdminCommands) deletechannel(ctx *router.Ctx) {
 		return
 	}
 
-	c.services.Embed.New(ctx).
-		SetDescription("Successfully deleted channel!").
-		Send()
+	c.services.Embed.Respond(ctx, "Successfully deleted channel!")
 }
 
 func (c *AdminCommands) slowmode(ctx *router.Ctx) {
@@ -899,9 +895,7 @@ func (c *AdminCommands) purgeself(ctx *router.Ctx) {
 		return
 	}
 
-	c.services.Embed.New(ctx).
-		SetDescription("Successfully deleted %d messages!", deleted).
-		Send()
+	c.services.Embed.Respond(ctx, "Successfully deleted %d messages!", deleted)
 }
 
 func (c *AdminCommands) purgeuser(ctx *router.Ctx) {
@@ -936,9 +930,7 @@ func (c *AdminCommands) purgeuser(ctx *router.Ctx) {
 		return
 	}
 
-	c.services.Embed.New(ctx).
-		SetDescription("Successfully deleted %d messages!", deleted).
-		Send()
+	c.services.Embed.Respond(ctx, "Successfully deleted %d messages!", deleted)
 }
 
 func (c *AdminCommands) purgerange(ctx *router.Ctx) {
@@ -1009,9 +1001,7 @@ func (c *AdminCommands) nuke(ctx *router.Ctx) {
 
 	ctx.Message.ChannelID = channel.ID
 
-	c.services.Embed.New(ctx).
-		SetDescription("Successfully nuked channel!").
-		Send()
+	c.services.Embed.Respond(ctx, "Successfully nuked channel!")
 }
 
 func (c *AdminCommands) ackchannel(ctx *router.Ctx) {
@@ -1149,9 +1139,7 @@ func (c *AdminCommands) webhooksend(ctx *router.Ctx) {
 		return
 	}
 
-	c.services.Embed.New(ctx).
-		SetDescription("Successfully sent message to webhook.").
-		Send()
+	c.services.Embed.Respond(ctx, "Successfully sent message to webhook.")
 }
 
 func (c *AdminCommands) webhookdelete(ctx *router.Ctx) {
@@ -1168,9 +1156,7 @@ func (c *AdminCommands) webhookdelete(ctx *router.Ctx) {
 
 	_, _ = http.DefaultClient().Delete(webhookUrl.String(), nil)
 
-	c.services.Embed.New(ctx).
-		SetDescription("Successfully deleted webhook.").
-		Send()
+	c.services.Embed.Respond(ctx, "Successfully deleted webhook.")
 }
 
 // Member Control
@@ -1344,9 +1330,7 @@ func (c *AdminCommands) mute(ctx *router.Ctx) {
 		return
 	}
 
-	c.services.Embed.New(ctx).
-		SetDescription("Successfully muted user!").
-		Send()
+	c.services.Embed.Respond(ctx, "Successfully muted user!")
 }
 
 func (c *AdminCommands) unmute(ctx *router.Ctx) {
@@ -1420,9 +1404,7 @@ func (c *AdminCommands) timeout(ctx *router.Ctx) {
 		return
 	}
 
-	c.services.Embed.New(ctx).
-		SetDescription("Successfully timed out user for %s!", duration.String()).
-		Send()
+	c.services.Embed.Respond(ctx, "Successfully timed out user for %s!", duration.String())
 }
 
 func (c *AdminCommands) removetimeout(ctx *router.Ctx) {
@@ -1438,9 +1420,7 @@ func (c *AdminCommands) removetimeout(ctx *router.Ctx) {
 		return
 	}
 
-	c.services.Embed.New(ctx).
-		SetDescription("Successfully removed timeout!").
-		Send()
+	c.services.Embed.Respond(ctx, "Successfully removed timeout!")
 }
 
 func (c *AdminCommands) kick(ctx *router.Ctx) {
@@ -1456,9 +1436,7 @@ func (c *AdminCommands) kick(ctx *router.Ctx) {
 		return
 	}
 
-	c.services.Embed.New(ctx).
-		SetDescription("Successfully kicked user!").
-		Send()
+	c.services.Embed.Respond(ctx, "Successfully kicked user!")
 }
 
 func (c *AdminCommands) ban(ctx *router.Ctx) {
@@ -1474,9 +1452,7 @@ func (c *AdminCommands) ban(ctx *router.Ctx) {
 		return
 	}
 
-	c.services.Embed.New(ctx).
-		SetDescription("Successfully banned user!").
-		Send()
+	c.services.Embed.Respond(ctx, "Successfully banned user!")
 }
 
 func (c *AdminCommands) softban(ctx *router.Ctx) {
@@ -1497,9 +1473,7 @@ func (c *AdminCommands) softban(ctx *router.Ctx) {
 		return
 	}
 
-	c.services.Embed.New(ctx).
-		SetDescription("Successfully softbanned user!").
-		Send()
+	c.services.Embed.Respond(ctx, "Successfully softbanned user!")
 }
 
 func (c *AdminCommands) unban(ctx *router.Ctx) {
@@ -1509,9 +1483,7 @@ func (c *AdminCommands) unban(ctx *router.Ctx) {
 		return
 	}
 
-	c.services.Embed.New(ctx).
-		SetDescription("Successfully unbanned user!").
-		Send()
+	c.services.Embed.Respond(ctx, "Successfully unbanned user!")
 }
 
 func (c *AdminCommands) banlist(ctx *router.Ctx) {
@@ -1566,9 +1538,7 @@ func (c *AdminCommands) copybans(ctx *router.Ctx) {
 		time.Sleep(2 * time.Second)
 	}
 
-	c.services.Embed.New(ctx).
-		SetDescription("Successfully copied bans from %s to %s!", srcGuild.Name, destGuild.Name).
-		Send()
+	c.services.Embed.Respond(ctx, "Successfully copied bans from %s to %s!", srcGuild.Name, destGuild.Name)
 }
 
 // Nickname Control
@@ -1579,9 +1549,7 @@ func (c *AdminCommands) nick(ctx *router.Ctx) {
 		ctx.RespondText("Error changing nickname: %v", err)
 		return
 	}
-	c.services.Embed.New(ctx).
-		SetDescription("Successfully changed nickname!").
-		Send()
+	c.services.Embed.Respond(ctx, "Successfully changed nickname!")
 }
 
 func (c *AdminCommands) nickuser(ctx *router.Ctx) {
@@ -1596,9 +1564,7 @@ func (c *AdminCommands) nickuser(ctx *router.Ctx) {
 		ctx.RespondText("Error changing nickname: %v", err)
 		return
 	}
-	c.services.Embed.New(ctx).
-		SetDescription("Successfully changed nickname!").
-		Send()
+	c.services.Embed.Respond(ctx, "Successfully changed nickname!")
 }
 
 func (c *AdminCommands) clearnick(ctx *router.Ctx) {
@@ -1613,9 +1579,7 @@ func (c *AdminCommands) clearnick(ctx *router.Ctx) {
 		ctx.RespondText("Error changing nickname: %v", err)
 		return
 	}
-	c.services.Embed.New(ctx).
-		SetDescription("Successfully changed nickname!").
-		Send()
+	c.services.Embed.Respond(ctx, "Successfully changed nickname!")
 }
 
 // Server Control
@@ -1787,9 +1751,7 @@ func (c *AdminCommands) setservername(ctx *router.Ctx) {
 		ctx.RespondText("Error changing server name: %v", err)
 		return
 	}
-	c.services.Embed.New(ctx).
-		SetDescription("Successfully changed server name to %s!", guild.Name).
-		Send()
+	c.services.Embed.Respond(ctx, "Successfully changed server name to %s!", guild.Name)
 }
 
 func (c *AdminCommands) setservericon(ctx *router.Ctx) {
@@ -1800,9 +1762,7 @@ func (c *AdminCommands) setservericon(ctx *router.Ctx) {
 		ctx.RespondText("Error changing server icon: %v", err)
 		return
 	}
-	c.services.Embed.New(ctx).
-		SetDescription("Successfully changed server icon!").
-		Send()
+	c.services.Embed.Respond(ctx, "Successfully changed server icon!")
 }
 
 func (c *AdminCommands) setserverbanner(ctx *router.Ctx) {
@@ -1813,9 +1773,7 @@ func (c *AdminCommands) setserverbanner(ctx *router.Ctx) {
 		ctx.RespondText("Error changing server icon: %v", err)
 		return
 	}
-	c.services.Embed.New(ctx).
-		SetDescription("Successfully changed server icon!").
-		Send()
+	c.services.Embed.Respond(ctx, "Successfully changed server icon!")
 }
 
 func (c *AdminCommands) lockserver(ctx *router.Ctx) {
@@ -1848,9 +1806,7 @@ func (c *AdminCommands) lockserver(ctx *router.Ctx) {
 		}
 	}
 
-	c.services.Embed.New(ctx).
-		SetDescription("Successfully locked server!").
-		Send()
+	c.services.Embed.Respond(ctx, "Successfully locked server!")
 }
 
 func (c *AdminCommands) unlockserver(ctx *router.Ctx) {
@@ -1883,9 +1839,7 @@ func (c *AdminCommands) unlockserver(ctx *router.Ctx) {
 		}
 	}
 
-	c.services.Embed.New(ctx).
-		SetDescription("Successfully unlocked server!").
-		Send()
+	c.services.Embed.Respond(ctx, "Successfully unlocked server!")
 }
 
 func (c *AdminCommands) channels(ctx *router.Ctx) {
@@ -2033,9 +1987,7 @@ func (c *AdminCommands) invite(ctx *router.Ctx) {
 		return
 	}
 
-	c.services.Embed.New(ctx).
-		SetDescription("Created invite: https://discord.gg/%s", invite.Code).
-		Send()
+	c.services.Embed.Respond(ctx, "Created invite: https://discord.gg/%s", invite.Code)
 }
 
 func (c *AdminCommands) friendinvite(ctx *router.Ctx) {
@@ -2097,9 +2049,7 @@ func (c *AdminCommands) deleteinvite(ctx *router.Ctx) {
 		return
 	}
 
-	c.services.Embed.New(ctx).
-		SetDescription("Deleted invite: %s", invite.Code).
-		Send()
+	c.services.Embed.Respond(ctx, "Deleted invite: %s", invite.Code)
 }
 
 func (c *AdminCommands) serverinvites(ctx *router.Ctx) {
@@ -2250,9 +2200,7 @@ func (c *AdminCommands) giverole(ctx *router.Ctx) {
 		ctx.RespondText("Error giving role: %v", err)
 		return
 	}
-	c.services.Embed.New(ctx).
-		SetDescription("Successfully gave role (%s) to (%s)", role.Name, member.User.String()).
-		Send()
+	c.services.Embed.Respond(ctx, "Successfully gave role (%s) to (%s)", role.Name, member.User.String())
 }
 
 func (c *AdminCommands) removerole(ctx *router.Ctx) {
@@ -2272,9 +2220,7 @@ func (c *AdminCommands) removerole(ctx *router.Ctx) {
 		ctx.RespondText("Error removing role: %v", err)
 		return
 	}
-	c.services.Embed.New(ctx).
-		SetDescription("Successfully removed role (%s) from (%s)", role.Name, member.User.String()).
-		Send()
+	c.services.Embed.Respond(ctx, "Successfully removed role (%s) from (%s)", role.Name, member.User.String())
 }
 
 func (c *AdminCommands) createrole(ctx *router.Ctx) {
@@ -2286,9 +2232,7 @@ func (c *AdminCommands) createrole(ctx *router.Ctx) {
 		return
 	}
 
-	c.services.Embed.New(ctx).
-		SetDescription("Successfully created role (%s)", role.Name).
-		Send()
+	c.services.Embed.Respond(ctx, "Successfully created role (%s)", role.Name)
 }
 
 func (c *AdminCommands) deleterole(ctx *router.Ctx) {
@@ -2302,9 +2246,7 @@ func (c *AdminCommands) deleterole(ctx *router.Ctx) {
 		ctx.RespondText("Error deleting role: %v", err)
 		return
 	}
-	c.services.Embed.New(ctx).
-		SetDescription("Successfully deleted role (%s)", role.Name).
-		Send()
+	c.services.Embed.Respond(ctx, "Successfully deleted role (%s)", role.Name)
 }
 
 func (c *AdminCommands) renamerole(ctx *router.Ctx) {
@@ -2322,7 +2264,5 @@ func (c *AdminCommands) renamerole(ctx *router.Ctx) {
 		return
 	}
 
-	c.services.Embed.New(ctx).
-		SetDescription("Successfully renamed role (%s)", role.Name).
-		Send()
+	c.services.Embed.Respond(ctx, "Successfully renamed role (%s)", role.Name)
 }

@@ -12,6 +12,8 @@ import (
 	"github.com/common-nighthawk/go-figure"
 	"github.com/lb-selfbot/selfbot/internal/constants"
 	"github.com/lb-selfbot/selfbot/internal/encodings"
+	"github.com/lb-selfbot/selfbot/internal/fn"
+	"github.com/lb-selfbot/selfbot/internal/random"
 	"github.com/lb-selfbot/selfbot/internal/services/router"
 
 	"github.com/lb-selfbot/selfbot/internal/services"
@@ -205,6 +207,12 @@ func (c *TextCommands) Register() {
 			Description: "Send a codeblock with syntax highlighting",
 			Arguments:   "<language> <code>",
 			Handler:     c.codeblock,
+		},
+		{
+			Name:        "randomstr",
+			Description: "Generate a random alphanumeric string of given length",
+			Arguments:   "<length>",
+			Handler:     c.randomstr,
 		},
 
 		// Animation commands
@@ -561,24 +569,16 @@ func (c *TextCommands) wave(ctx *router.Ctx) {
 
 func (c *TextCommands) customwave(ctx *router.Ctx) {
 	width, err := ctx.Arguments.Get(0).Int()
+	width = fn.Clamp(width, 1, 100)
 	if err != nil {
 		ctx.RespondText("Width must be a number!")
 		return
 	}
 
-	if width <= 0 {
-		ctx.RespondText("Width must be a positive number!")
-		return
-	}
-
 	iterations, err := ctx.Arguments.Get(1).Int()
+	iterations = fn.Clamp(iterations, 1, 100)
 	if err != nil {
 		ctx.RespondText("Iterations must be a number!")
-	}
-
-	if iterations <= 0 {
-		ctx.RespondText("Iterations must be a positive number!")
-		return
 	}
 
 	sawtoothWave := utils.Misc.CreateSawtoothWave(width, iterations)
@@ -615,6 +615,18 @@ func (c *TextCommands) codeblock(ctx *router.Ctx) {
 	code := ctx.Arguments.RawFrom(1)
 
 	ctx.RespondText("%s", "```"+strings.ToLower(language)+"\n"+code+"\n```")
+}
+
+func (c *TextCommands) randomstr(ctx *router.Ctx) {
+	length, err := ctx.Arguments.Get(0).Int()
+	length = fn.Clamp(length, 0, 1000)
+	if err != nil {
+		ctx.RespondText("Argument <length> must be a positive integer.")
+		return
+	}
+
+	randomStr := random.String(length)
+	ctx.RespondText("%s", randomStr)
 }
 
 // Animation commands
@@ -905,9 +917,7 @@ func (c *TextCommands) encodings(ctx *router.Ctx) {
 		encodingNames = append(encodingNames, name)
 	}
 
-	c.services.Embed.New(ctx).
-		AddField("Available Encodings", strings.Join(encodingNames, ", ")).
-		Send()
+	c.services.Embed.RespondField(ctx, "Available Encodings", strings.Join(encodingNames, ", "))
 }
 
 func (c *TextCommands) encode(ctx *router.Ctx) {
@@ -964,9 +974,7 @@ func (c *TextCommands) hashes(ctx *router.Ctx) {
 		hashNames = append(hashNames, name)
 	}
 
-	c.services.Embed.New(ctx).
-		AddField("Available Hashes", strings.Join(hashNames, ", ")).
-		Send()
+	c.services.Embed.RespondField(ctx, "Available Hashes", strings.Join(hashNames, ", "))
 }
 
 func (c *TextCommands) hash(ctx *router.Ctx) {
@@ -993,9 +1001,7 @@ func (c *TextCommands) encryptions(ctx *router.Ctx) {
 		encryptionNames = append(encryptionNames, name)
 	}
 
-	c.services.Embed.New(ctx).
-		AddField("Available Encryptions", strings.Join(encryptionNames, ", ")).
-		Send()
+	c.services.Embed.RespondField(ctx, "Available Encryptions", strings.Join(encryptionNames, ", "))
 }
 
 func (c *TextCommands) encrypt(ctx *router.Ctx) {

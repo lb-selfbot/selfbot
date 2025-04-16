@@ -154,9 +154,7 @@ func (c *HelpCommands) specificHelpCommand(ctx *router.Ctx) {
 		suggestions += "\n\nDid you mean one of these categories?\n\n" + strings.Join(closeCategories, "\n")
 	}
 
-	c.services.Embed.New(ctx).
-		SetDescription("`%s` is not a command or category!\n%s", name, suggestions).
-		Send()
+	c.services.Embed.Respond(ctx, "`%s` is not a command or category!\n%s", name, suggestions)
 }
 
 func (c *HelpCommands) renderCommandHelp(ctx *router.Ctx, command *router.Command) *embed.Embed {

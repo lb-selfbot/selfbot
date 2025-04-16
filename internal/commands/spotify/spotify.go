@@ -153,9 +153,7 @@ func (c *SpotifyCommands) spause(ctx *router.Ctx) {
 		return
 	}
 
-	c.services.Embed.New(ctx).
-		SetDescription("Successfully paused Spotify music.").
-		Send()
+	c.services.Embed.Respond(ctx, "Successfully paused Spotify music.")
 }
 
 func (c *SpotifyCommands) sresume(ctx *router.Ctx) {
@@ -164,9 +162,7 @@ func (c *SpotifyCommands) sresume(ctx *router.Ctx) {
 		return
 	}
 
-	c.services.Embed.New(ctx).
-		SetDescription("Successfully resumed Spotify music.").
-		Send()
+	c.services.Embed.Respond(ctx, "Successfully resumed Spotify music.")
 }
 
 func (c *SpotifyCommands) sprevious(ctx *router.Ctx) {
@@ -175,9 +171,7 @@ func (c *SpotifyCommands) sprevious(ctx *router.Ctx) {
 		return
 	}
 
-	c.services.Embed.New(ctx).
-		SetDescription("Successfully started playing the previous Spotify track.").
-		Send()
+	c.services.Embed.Respond(ctx, "Successfully started playing the previous Spotify track.")
 }
 
 func (c *SpotifyCommands) snext(ctx *router.Ctx) {
@@ -186,9 +180,7 @@ func (c *SpotifyCommands) snext(ctx *router.Ctx) {
 		return
 	}
 
-	c.services.Embed.New(ctx).
-		SetDescription("Successfully started playing the next Spotify track.").
-		Send()
+	c.services.Embed.Respond(ctx, "Successfully started playing the next Spotify track.")
 }
 
 func (c *SpotifyCommands) splay(ctx *router.Ctx) {
@@ -200,9 +192,7 @@ func (c *SpotifyCommands) splay(ctx *router.Ctx) {
 
 	artists := c.services.Spotify.GetSongArtists(track)
 
-	c.services.Embed.New(ctx).
-		SetDescription("Successfully started playing %s - %s", strings.Join(artists, ", "), track.Get("name").MustString()).
-		Send()
+	c.services.Embed.Respond(ctx, "Successfully started playing %s - %s", strings.Join(artists, ", "), track.Get("name").MustString())
 }
 
 func (c *SpotifyCommands) squeue(ctx *router.Ctx) {
@@ -214,9 +204,7 @@ func (c *SpotifyCommands) squeue(ctx *router.Ctx) {
 
 	artists := c.services.Spotify.GetSongArtists(track)
 
-	c.services.Embed.New(ctx).
-		SetDescription("Successfully queued %s - %s", strings.Join(artists, ", "), track.Get("name").MustString()).
-		Send()
+	c.services.Embed.Respond(ctx, "Successfully queued %s - %s", strings.Join(artists, ", "), track.Get("name").MustString())
 }
 
 func (c *SpotifyCommands) splaying(ctx *router.Ctx) {
@@ -259,9 +247,7 @@ func (c *SpotifyCommands) svolume(ctx *router.Ctx) {
 		return
 	}
 
-	c.services.Embed.New(ctx).
-		SetDescription("Successfully set Spotify volume to %d%%", volume).
-		Send()
+	c.services.Embed.Respond(ctx, "Successfully set Spotify volume to %d%%", volume)
 }
 
 func (c *SpotifyCommands) sshuffle(ctx *router.Ctx) {
@@ -276,9 +262,7 @@ func (c *SpotifyCommands) sshuffle(ctx *router.Ctx) {
 		return
 	}
 
-	c.services.Embed.New(ctx).
-		SetDescription("Successfully turned shuffle %s.", utils.Misc.FormatBoolOnOff(toggle)).
-		Send()
+	c.services.Embed.Respond(ctx, "Successfully turned shuffle %s.", utils.Misc.FormatBoolOnOff(toggle))
 }
 
 func (c *SpotifyCommands) srepeat(ctx *router.Ctx) {
@@ -289,9 +273,7 @@ func (c *SpotifyCommands) srepeat(ctx *router.Ctx) {
 		return
 	}
 
-	c.services.Embed.New(ctx).
-		SetDescription("Successfully set Spotify repeat mode to `%s`.", state).
-		Send()
+	c.services.Embed.Respond(ctx, "Successfully set Spotify repeat mode to `%s`.", state)
 }
 
 func (c *SpotifyCommands) sseek(ctx *router.Ctx) {
@@ -306,9 +288,7 @@ func (c *SpotifyCommands) sseek(ctx *router.Ctx) {
 		return
 	}
 
-	c.services.Embed.New(ctx).
-		SetDescription("Successfully seeked to %s.", timestamp).
-		Send()
+	c.services.Embed.Respond(ctx, "Successfully seeked to %s.", timestamp)
 }
 
 func (c *SpotifyCommands) sdevices(ctx *router.Ctx) {
@@ -330,9 +310,7 @@ func (c *SpotifyCommands) sdevices(ctx *router.Ctx) {
 		))
 	}
 
-	c.services.Embed.New(ctx).
-		AddField("Devices", strings.Join(deviceList, "\n")).
-		Send()
+	c.services.Embed.RespondField(ctx, "Devices", strings.Join(deviceList, "\n"))
 }
 
 func (c *SpotifyCommands) sprofile(ctx *router.Ctx) {

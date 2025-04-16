@@ -199,9 +199,7 @@ func (c *DumpingCommands) dumpall(ctx *router.Ctx) {
 	_ = os.WriteFile(filePath, []byte(logString), os.ModePerm)
 	_ = system.OpenURL(filePath)
 
-	c.services.Embed.New(ctx).
-		SetDescription("Dumped %d messages from %s", len(messages), channel.Name).
-		Send()
+	c.services.Embed.Respond(ctx, "Dumped %d messages from %s", len(messages), channel.Name)
 }
 
 func (c *DumpingCommands) dumpimages(ctx *router.Ctx) {
@@ -221,9 +219,7 @@ func (c *DumpingCommands) dumpimages(ctx *router.Ctx) {
 		return strings.HasPrefix(att.ContentType, "image/")
 	})
 
-	c.services.Embed.New(ctx).
-		SetDescription("Dumped %d images from %s", images, channel.Name).
-		Send()
+	c.services.Embed.Respond(ctx, "Dumped %d images from %s", images, channel.Name)
 }
 
 func (c *DumpingCommands) dumpvideos(ctx *router.Ctx) {
@@ -243,9 +239,7 @@ func (c *DumpingCommands) dumpvideos(ctx *router.Ctx) {
 		return strings.HasPrefix(att.ContentType, "video/")
 	})
 
-	c.services.Embed.New(ctx).
-		SetDescription("Dumped %d videos from %s", videos, channel.Name).
-		Send()
+	c.services.Embed.Respond(ctx, "Dumped %d videos from %s", videos, channel.Name)
 }
 
 func (c *DumpingCommands) dumpaudio(ctx *router.Ctx) {
@@ -265,9 +259,7 @@ func (c *DumpingCommands) dumpaudio(ctx *router.Ctx) {
 		return strings.HasPrefix(att.ContentType, "audio/")
 	})
 
-	c.services.Embed.New(ctx).
-		SetDescription("Dumped %d audios from %s", audios, channel.Name).
-		Send()
+	c.services.Embed.Respond(ctx, "Dumped %d audios from %s", audios, channel.Name)
 }
 
 func (c *DumpingCommands) dumptext(ctx *router.Ctx) {
@@ -287,9 +279,7 @@ func (c *DumpingCommands) dumptext(ctx *router.Ctx) {
 		return strings.HasPrefix(att.ContentType, "text/")
 	})
 
-	c.services.Embed.New(ctx).
-		SetDescription("Dumped %d texts from %s", texts, channel.Name).
-		Send()
+	c.services.Embed.Respond(ctx, "Dumped %d texts from %s", texts, channel.Name)
 }
 
 func (c *DumpingCommands) dumpattachments(ctx *router.Ctx) {
@@ -309,9 +299,7 @@ func (c *DumpingCommands) dumpattachments(ctx *router.Ctx) {
 		return true
 	})
 
-	c.services.Embed.New(ctx).
-		SetDescription("Dumped %d attachments from %s", attachments, channel.Name).
-		Send()
+	c.services.Embed.Respond(ctx, "Dumped %d attachments from %s", attachments, channel.Name)
 }
 
 func (c *DumpingCommands) dumpfiletype(ctx *router.Ctx) {
@@ -332,9 +320,7 @@ func (c *DumpingCommands) dumpfiletype(ctx *router.Ctx) {
 		return strings.HasSuffix(att.Filename, extension)
 	})
 
-	c.services.Embed.New(ctx).
-		SetDescription("Dumped %d attachments from %s", count, channel.Name).
-		Send()
+	c.services.Embed.Respond(ctx, "Dumped %d attachments from %s", count, channel.Name)
 }
 
 func (c *DumpingCommands) dumpcontenttype(ctx *router.Ctx) {
@@ -355,9 +341,7 @@ func (c *DumpingCommands) dumpcontenttype(ctx *router.Ctx) {
 		return strings.Contains(att.ContentType, contentType)
 	})
 
-	c.services.Embed.New(ctx).
-		SetDescription("Dumped %d attachments from %s", count, channel.Name).
-		Send()
+	c.services.Embed.Respond(ctx, "Dumped %d attachments from %s", count, channel.Name)
 }
 
 func (c *DumpingCommands) dumpemojis(ctx *router.Ctx) {
@@ -388,9 +372,7 @@ func (c *DumpingCommands) dumpemojis(ctx *router.Ctx) {
 		_ = os.WriteFile(filePath, resp.MustGetBody(), os.ModePerm)
 	}
 
-	c.services.Embed.New(ctx).
-		SetDescription("Dumped %d emojis from %s", len(emojis), guild.Name).
-		Send()
+	c.services.Embed.Respond(ctx, "Dumped %d emojis from %s", len(emojis), guild.Name)
 }
 
 func (c *DumpingCommands) dumpstickers(ctx *router.Ctx) {
@@ -421,9 +403,7 @@ func (c *DumpingCommands) dumpstickers(ctx *router.Ctx) {
 		_ = os.WriteFile(filePath, resp.MustGetBody(), os.ModePerm)
 	}
 
-	c.services.Embed.New(ctx).
-		SetDescription("Dumped %d stickers from %s", len(guild.Stickers), guild.Name).
-		Send()
+	c.services.Embed.Respond(ctx, "Dumped %d stickers from %s", len(guild.Stickers), guild.Name)
 }
 
 func (c *DumpingCommands) dumpavatars(ctx *router.Ctx) {
@@ -449,9 +429,7 @@ func (c *DumpingCommands) dumpavatars(ctx *router.Ctx) {
 		_ = os.WriteFile(filePath, resp.MustGetBody(), os.ModePerm)
 	}
 
-	c.services.Embed.New(ctx).
-		SetDescription("Dumped %d avatars from %s", len(guild.Members), guild.Name).
-		Send()
+	c.services.Embed.Respond(ctx, "Dumped %d avatars from %s", len(guild.Members), guild.Name)
 }
 
 func (c *DumpingCommands) dumpchannels(ctx *router.Ctx) {
@@ -480,9 +458,7 @@ func (c *DumpingCommands) dumpchannels(ctx *router.Ctx) {
 	_ = os.WriteFile(filePath, []byte(logString), os.ModePerm)
 	_ = system.OpenURL(filePath)
 
-	c.services.Embed.New(ctx).
-		SetDescription("Dumped %d channels from %s", len(guild.Channels), guild.Name).
-		Send()
+	c.services.Embed.Respond(ctx, "Dumped %d channels from %s", len(guild.Channels), guild.Name)
 }
 
 func (c *DumpingCommands) dumpmembers(ctx *router.Ctx) {
@@ -507,7 +483,5 @@ func (c *DumpingCommands) dumpmembers(ctx *router.Ctx) {
 
 	runtime.GC()
 
-	c.services.Embed.New(ctx).
-		SetDescription("Dumped %d members from %s", len(guild.Members), guild.Name).
-		Send()
+	c.services.Embed.Respond(ctx, "Dumped %d members from %s", len(guild.Members), guild.Name)
 }

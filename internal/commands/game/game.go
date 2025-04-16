@@ -318,9 +318,7 @@ func (c *GameCommands) fnstatus(ctx *router.Ctx) {
 		ctx.RespondText("An error has occurred.")
 		return
 	}
-	c.services.Embed.New(ctx).
-		AddField("Fortnite Status", resp.Json().Get("status", "description").MustString("Error")).
-		Send()
+	c.services.Embed.RespondField(ctx, "Fortnite Status", resp.Json().Get("status", "description").MustString("Error"))
 }
 
 func (c *GameCommands) alstatus(ctx *router.Ctx) {
@@ -528,9 +526,7 @@ func (c *GameCommands) hltbsearch(ctx *router.Ctx) {
 		))
 	}
 
-	c.services.Embed.New(ctx).
-		AddField("Games", strings.Join(games, "\n")).
-		Send()
+	c.services.Embed.RespondField(ctx, "Games", strings.Join(games, "\n"))
 }
 
 func secondsToTime(seconds int) string {
