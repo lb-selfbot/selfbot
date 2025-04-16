@@ -1680,8 +1680,7 @@ func (c *UtilityCommands) discordstatus(ctx *router.Ctx) {
 
 	emb := c.services.Embed.New(ctx)
 
-	for range components.Len() {
-		component := components.Get(i)
+	for component := range components.Iterator() {
 		emb.AddField(
 			component.Get("name").MustString(),
 			component.Get("status").MustString(),
@@ -3354,8 +3353,7 @@ func (c *UtilityCommands) googlesearch(ctx *router.Ctx) {
 		return
 	}
 	emb := c.services.Embed.New(ctx)
-	for range results.Len() {
-		result := results.Get(i)
+	for result := range results.Iterator() {
 		emb.AddField(result.Get("title").MustString(), result.Get("url").MustString())
 	}
 	emb.Send()
@@ -3368,8 +3366,7 @@ func (c *UtilityCommands) youtubesearch(ctx *router.Ctx) {
 		return
 	}
 	emb := c.services.Embed.New(ctx)
-	for range results.Len() {
-		result := results.Get(i)
+	for result := range results.Iterator() {
 		resultUrl := result.Get("url").MustString()
 		if strings.Contains(resultUrl, "playlist") {
 			continue
