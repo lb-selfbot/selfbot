@@ -19,10 +19,10 @@ func (c *AICommands) Register() {
 		Description: "Interact with AI's",
 	}, []*router.Command{
 		{
-			Name:        "chatgpt",
-			Description: "Talk to OpenAI GPT-3.5",
+			Name:        "deepseek",
+			Description: "Interact with Deepseek-V3",
 			Arguments:   "<\"message\"> [\"system\"]",
-			Handler:     c.chatgpt,
+			Handler:     c.deepseek,
 		},
 		{
 			Name:        "ocrlink",
@@ -47,7 +47,7 @@ func (c *AICommands) getCreds() api.LBCreds {
 	}
 }
 
-func (c *AICommands) chatgpt(ctx *router.Ctx) {
+func (c *AICommands) deepseek(ctx *router.Ctx) {
 	message, system := ctx.Arguments.Get(0).Raw(), ctx.Arguments.Get(1).Raw()
 
 	response, err := api.LBGPT(c.getCreds(), system, message)
@@ -57,7 +57,7 @@ func (c *AICommands) chatgpt(ctx *router.Ctx) {
 	}
 
 	c.services.Embed.New(ctx).
-		SetTitle("ChatGPT (GPT-3.5)").
+		SetTitle("Deepseek V3").
 		AddField("System", system).
 		AddField("Message", message).
 		AddField("Response", response).
