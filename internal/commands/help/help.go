@@ -129,7 +129,7 @@ func (c *HelpCommands) specificHelpCommand(ctx *router.Ctx) {
 			break
 		}
 		distance := levenshtein.ComputeDistance(command.Name, name)
-		if distance < 2 || strings.Contains(command.Name, name) {
+		if distance < 3 || strings.Contains(command.Name, name) {
 			closeCommands = append(closeCommands, prefix+command.Name+" "+command.Arguments+" - "+command.Description)
 		}
 	}
@@ -140,7 +140,7 @@ func (c *HelpCommands) specificHelpCommand(ctx *router.Ctx) {
 			break
 		}
 		distance := levenshtein.ComputeDistance(category.Name, utils.String.Capitalize(name))
-		if distance < 2 || strings.Contains(category.Name, utils.String.Capitalize(name)) {
+		if distance < 3 || strings.Contains(category.Name, utils.String.Capitalize(name)) {
 			closeCategories = append(closeCategories, category.Name+" - "+category.Description)
 		}
 	}
@@ -179,6 +179,16 @@ func (c *HelpCommands) renderCategoryHelp(ctx *router.Ctx, category *router.Cate
 
 	for _, command := range cmds {
 		helpText := fmt.Sprintf("%s%s %s - %s\n", cfg.Selfbot.CommandPrefix, command.Name, command.Arguments, command.Description)
+		if len(command.SubCommands) > 0 {
+			helpText = ""
+
+			for _, subCommand := range command.SubCommands {
+				helpText += fmt.Sprintf("%s%s %s %s - %s\n", cfg.Selfbot.CommandPrefix, command.Name, subCommand.Name, subCommand.Arguments, subCommand.Description)
+			}
+		}
+
+		helpText = strings.ReplaceAll(helpText, "  ", " ")
+
 		if len(helpPages[currentPage])+len(helpText) > 1650 {
 			currentPage++
 		}

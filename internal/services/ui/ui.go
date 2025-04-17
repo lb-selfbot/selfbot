@@ -152,7 +152,7 @@ func (ui *uiService) ShowConsoleMessage(c *ConsoleMessage) error {
 		session := ui.discordSvc.GetSession()
 		userID := session.State.User.ID
 
-		contentBuilder := new(strings.Builder)
+		var contentBuilder strings.Builder
 
 		switch cfg.Webhooks.PingSelfMode {
 		case "Disabled":

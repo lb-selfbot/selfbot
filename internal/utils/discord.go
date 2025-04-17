@@ -13,38 +13,11 @@ import (
 	"time"
 
 	"github.com/lb-selfbot/discordgo"
-	"github.com/lb-selfbot/selfbot/internal/constants"
 	"github.com/lb-selfbot/selfbot/internal/fn"
 	"github.com/lb-selfbot/selfbot/internal/http"
 )
 
 type DiscordUtils struct{}
-
-func (DiscordUtils) SnowflakeToTime(snowflake string) time.Time {
-	// parse snowflake to int64
-	snowflakeInt, err := strconv.ParseInt(snowflake, 10, 64)
-	if err != nil {
-		return time.Time{}
-	}
-	// convert int64 to time
-	return time.Unix(((snowflakeInt>>22)+1420070400000)/1000, 0)
-}
-
-func (DiscordUtils) GetTimestamp(t *time.Time, defaultString string) string {
-	if t == nil {
-		return defaultString
-	}
-	return fmt.Sprintf("<t:%d>", t.Unix())
-}
-
-func (DiscordUtils) ParseInvite(invite string) string {
-	inviteRegexMatch := string(constants.INVITE_REGEX.Find([]byte(invite)))
-	if inviteRegexMatch != "" {
-		splitInvite := strings.Split(inviteRegexMatch, "/")
-		return splitInvite[len(splitInvite)-1]
-	}
-	return invite
-}
 
 func (DiscordUtils) GetChannelMessages(session *discordgo.Session, channelID string, limit int) ([]*discordgo.Message, error) {
 	channel, err := session.State.Channel(channelID)

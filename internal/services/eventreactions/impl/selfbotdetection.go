@@ -11,7 +11,6 @@ import (
 	"github.com/lb-selfbot/selfbot/internal/services/ui/featurelogs"
 
 	"github.com/lb-selfbot/discordgo"
-	"github.com/lb-selfbot/selfbot/internal/utils"
 )
 
 var detectables = []Detectable{
@@ -162,7 +161,7 @@ func (s *SelfbotDetection) Handler(session *discordgo.Session, event any) {
 }
 
 func (s *SelfbotDetection) CreateHandler(session *discordgo.Session, message *discordgo.MessageCreate, cfg *config.Config) {
-	s.timeDiff = time.Since(utils.Discord.SnowflakeToTime(message.ID))
+	s.timeDiff = time.Since(discordgo.MustSnowflakeTimestamp(message.ID))
 
 	score := s.ensureUserEntry(message.Author.ID)
 	for _, detectable := range detectables {
@@ -191,7 +190,7 @@ func (s *SelfbotDetection) UpdateHandler(session *discordgo.Session, message *di
 
 func (s *SelfbotDetection) DeleteHandler(session *discordgo.Session, message *discordgo.MessageDelete, cfg *config.Config) {
 	score := s.ensureUserEntry(message.Author.ID)
-	timeDiff := time.Since(utils.Discord.SnowflakeToTime(message.ID)) - s.timeDiff
+	timeDiff := time.Since(discordgo.MustSnowflakeTimestamp(message.ID)) - s.timeDiff
 	if timeDiff < time.Second*1 {
 		score.Events = append(score.Events, DetectionEvent{
 			Event:   "fast_delete",

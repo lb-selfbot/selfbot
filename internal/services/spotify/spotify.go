@@ -208,7 +208,6 @@ func (s *spotifyService) GetCurrentlyPlaying(session *discordgo.Session) (*jeste
 
 	data, err := s.request(session, fhttp.MethodGet, "/me/player/currently-playing")
 	if err != nil {
-		fmt.Println(err)
 		return nil, err
 	}
 

@@ -30,13 +30,11 @@ func (c *EventReactionsCommands) Register() {
 		{
 			Name:        "listreactions",
 			Description: "List all active event reactions",
-			Arguments:   "listreactions",
 			Handler:     c.listreactions,
 		},
 		{
 			Name:        "clearreactions",
 			Description: "Clear all active event reactions",
-			Arguments:   "clearreactions",
 			Handler:     c.clearreactions,
 		},
 

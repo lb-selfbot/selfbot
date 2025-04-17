@@ -10,6 +10,7 @@ import (
 
 	"github.com/lb-selfbot/discordgo"
 	"github.com/lb-selfbot/selfbot/internal/api"
+	"github.com/lb-selfbot/selfbot/internal/formatting"
 	"github.com/lb-selfbot/selfbot/internal/http"
 	"github.com/lb-selfbot/selfbot/internal/services/router"
 
@@ -586,7 +587,7 @@ func (c *AdminCommands) channelinfo(ctx *router.Ctx) {
 		AddField("Topic", channel.Topic).
 		AddField("Category ID", channel.ParentID).
 		AddField("Is NSFW", utils.Misc.FormatBoolYesNo(channel.NSFW)).
-		AddField("Created At", utils.Discord.SnowflakeToTime(channel.ID).Format(time.RFC1123)).
+		AddField("Created At", discordgo.MustSnowflakeTimestamp(channel.ID).Format(time.RFC1123)).
 		AddField("Slowmode Delay", fmt.Sprint(channel.RateLimitPerUser)+" seconds").
 		AddField("Position", fmt.Sprint(channel.Position)).
 		AddField("Last Message ID", channel.LastMessageID).
@@ -1186,7 +1187,7 @@ func (c *AdminCommands) userinfo(ctx *router.Ctx) {
 	}
 
 	emb.AddField("Is Bot", utils.Misc.FormatBoolYesNo(user.Bot)).
-		AddField("Created At", utils.Discord.SnowflakeToTime(user.ID).Format(time.RFC1123)).
+		AddField("Created At", discordgo.MustSnowflakeTimestamp(user.ID).Format(time.RFC1123)).
 		AddField("Premium Type", utils.Discord.FormatPremiumType(user.PremiumType))
 
 	if flags := utils.Discord.FormatUserFlags(user.PublicFlags); flags != "" {
@@ -1220,7 +1221,7 @@ func (c *AdminCommands) userage(ctx *router.Ctx) {
 		ctx.RespondText("Could not find user")
 		return
 	}
-	age := time.Since(utils.Discord.SnowflakeToTime(user.ID))
+	age := time.Since(discordgo.MustSnowflakeTimestamp(user.ID))
 	c.services.Embed.New(ctx).
 		SetDescription("User Age (%s - %s)", user.String(), user.ID).
 		AddField("Age", utils.Misc.FormatDuration(age)).
@@ -1601,7 +1602,7 @@ func (c *AdminCommands) serverinfo(ctx *router.Ctx) {
 		SetDescription("Server Info - %s", guild.Name).
 		AddField("ID", guild.ID).
 		AddField("Owner", ownerMention).
-		AddField("Created At", utils.Discord.SnowflakeToTime(guild.ID).Format(time.RFC1123)).
+		AddField("Created At", discordgo.MustSnowflakeTimestamp(guild.ID).Format(time.RFC1123)).
 		AddField("Verification Level", verificationLevels[int(guild.VerificationLevel)]).
 		AddField("Boost Level", boostLevels[int(guild.PremiumTier)]).
 		AddField("Amount of boosts", fmt.Sprint(guild.PremiumSubscriptionCount)).
@@ -1619,7 +1620,7 @@ func (c *AdminCommands) serverage(ctx *router.Ctx) {
 		ctx.RespondText("Error getting server: %v", err)
 		return
 	}
-	age := time.Since(utils.Discord.SnowflakeToTime(guild.ID))
+	age := time.Since(discordgo.MustSnowflakeTimestamp(guild.ID))
 	c.services.Embed.New(ctx).
 		SetDescription("Server Age (%s - %s)", guild.Name, guild.ID).
 		AddField("Age", utils.Misc.FormatDuration(age)).
@@ -2004,8 +2005,13 @@ func (c *AdminCommands) friendinvite(ctx *router.Ctx) {
 }
 
 func (c *AdminCommands) inviteinfo(ctx *router.Ctx) {
-	parsedInvite := utils.Discord.ParseInvite(ctx.Arguments.Get(0).Raw())
-	invite, err := ctx.Session.InviteWithCounts(parsedInvite)
+	inviteCode, err := ctx.Arguments.Get(0).Invite()
+	if err != nil {
+		ctx.RespondText("Could not find invite: %v", err)
+		return
+	}
+
+	invite, err := ctx.Session.InviteWithCounts(inviteCode)
 	if err != nil {
 		ctx.RespondText("Error getting invite: %v", err)
 		return
@@ -2036,8 +2042,13 @@ func (c *AdminCommands) inviteinfo(ctx *router.Ctx) {
 }
 
 func (c *AdminCommands) deleteinvite(ctx *router.Ctx) {
-	parsedInvite := utils.Discord.ParseInvite(ctx.Arguments.Get(0).Raw())
-	invite, err := ctx.Session.InviteWithCounts(parsedInvite)
+	inviteCode, err := ctx.Arguments.Get(0).Invite()
+	if err != nil {
+		ctx.RespondText("Could not find invite: %v", err)
+		return
+	}
+
+	invite, err := ctx.Session.InviteWithCounts(inviteCode)
 	if err != nil {
 		ctx.RespondText("Error getting invite: %v", err)
 		return
@@ -2058,27 +2069,35 @@ func (c *AdminCommands) serverinvites(ctx *router.Ctx) {
 		ctx.RespondText("Error getting server: %v", err)
 		return
 	}
+
 	invites, err := ctx.Session.GuildInvites(guild.ID)
 	if err != nil {
 		ctx.RespondText("Error getting invites: %v", err)
 		return
 	}
-	invitesString := ""
-	for _, invite := range invites {
+
+	invitesFormatted := fn.Map(invites, func(invite *discordgo.Invite) string {
 		username := "Unknown"
 		if invite.Inviter != nil {
 			username = invite.Inviter.String()
 		}
-		invitesString += fmt.Sprintf(
-			"Link: https://discord.gg/%s - Expires At: %s - Created By: %s\n",
+
+		expiresAt := "Never"
+		if invite.ExpiresAt != nil {
+			expiresAt = formatting.Timestamp(*invite.ExpiresAt)
+		}
+
+		return fmt.Sprintf(
+			"Link: https://discord.gg/%s - Expires At: %s - Created By: %s",
 			invite.Code,
-			utils.Discord.GetTimestamp(invite.ExpiresAt, "Never"),
+			expiresAt,
 			username,
 		)
-	}
+	})
+
 	c.services.Embed.New(ctx).
 		SetDescription("Invite List").
-		AddField("Invites", invitesString).
+		AddField("Invites", strings.Join(invitesFormatted, "\n")).
 		Send()
 }
 
@@ -2088,27 +2107,35 @@ func (c *AdminCommands) channelinvites(ctx *router.Ctx) {
 		ctx.RespondText("Could not find channel")
 		return
 	}
+
 	invites, err := ctx.Session.ChannelInvites(channel.ID)
 	if err != nil {
 		ctx.RespondText("Error getting invites: %v", err)
 		return
 	}
-	invitesString := ""
-	for _, invite := range invites {
+
+	invitesFormatted := fn.Map(invites, func(invite *discordgo.Invite) string {
 		username := "Unknown"
 		if invite.Inviter != nil {
 			username = invite.Inviter.String()
 		}
-		invitesString += fmt.Sprintf(
-			"Link: https://discord.gg/%s - Expires At: %s - Created By: %s\n",
+
+		expiresAt := "Never"
+		if invite.ExpiresAt != nil {
+			expiresAt = formatting.Timestamp(*invite.ExpiresAt)
+		}
+
+		return fmt.Sprintf(
+			"Link: https://discord.gg/%s - Expires At: %s - Created By: %s",
 			invite.Code,
-			utils.Discord.GetTimestamp(invite.ExpiresAt, "Never"),
+			expiresAt,
 			username,
 		)
-	}
+	})
+
 	c.services.Embed.New(ctx).
 		SetDescription("Invite List").
-		AddField("Invites", invitesString).
+		AddField("Invites", strings.Join(invitesFormatted, "\n")).
 		Send()
 }
 
@@ -2130,23 +2157,27 @@ func (c *AdminCommands) userinvites(ctx *router.Ctx) {
 		ctx.RespondText("Error getting invites: %v", err)
 		return
 	}
-	invitesString := ""
-	for _, invite := range invites {
-		if invite.Inviter == nil {
-			continue
+
+	invites = fn.FilterInPlace(invites, func(invite *discordgo.Invite) bool {
+		return invite.Inviter != nil && invite.Inviter.ID == member.User.ID
+	})
+
+	invitesFormatted := fn.Map(invites, func(invite *discordgo.Invite) string {
+		expiresAt := "Never"
+		if invite.ExpiresAt != nil {
+			expiresAt = formatting.Timestamp(*invite.ExpiresAt)
 		}
-		if invite.Inviter.ID != member.User.ID {
-			continue
-		}
-		invitesString += fmt.Sprintf(
-			"Link: https://discord.gg/%s - Expires At: %s\n",
+
+		return fmt.Sprintf(
+			"Link: https://discord.gg/%s - Expires At: %s",
 			invite.Code,
-			utils.Discord.GetTimestamp(invite.ExpiresAt, "Never"),
+			expiresAt,
 		)
-	}
+	})
+
 	c.services.Embed.New(ctx).
-		SetDescription("Invite List (%s)", member.User.String()).
-		AddField("Invites", invitesString).
+		SetDescription("Invite List").
+		AddField("Invites", strings.Join(invitesFormatted, "\n")).
 		Send()
 }
 
@@ -2168,13 +2199,13 @@ func (c *AdminCommands) roleinfo(ctx *router.Ctx) {
 			memberCount++
 		}
 	}
-	createdAt := utils.Discord.SnowflakeToTime(role.ID)
+	createdAt := discordgo.MustSnowflakeTimestamp(role.ID)
 	perms, _ := api.LBCreatePaste(utils.Discord.FormatPermissions(role.Name, role.ID, role.Permissions))
 	c.services.Embed.New(ctx).
 		SetDescription("Role Info (%s)", role.Name).
 		AddField("ID", role.ID).
 		AddField("Color", fmt.Sprintf("#%x", role.Color)).
-		AddField("Created at", utils.Discord.GetTimestamp(&createdAt, "Error")).
+		AddField("Created at", formatting.Timestamp(createdAt)).
 		AddField("Position", fmt.Sprint(role.Position)).
 		AddField("Is Hoist", utils.Misc.FormatBoolYesNo(role.Hoist)).
 		AddField("Is Mentionable", utils.Misc.FormatBoolYesNo(role.Mentionable)).

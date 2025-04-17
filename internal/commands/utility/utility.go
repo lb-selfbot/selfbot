@@ -1033,8 +1033,8 @@ func (c *UtilityCommands) copychannel(ctx *router.Ctx) {
 	}
 
 	slices.SortFunc(messages, func(i, j *discordgo.Message) int {
-		timeI := utils.Discord.SnowflakeToTime(i.ID)
-		timeJ := utils.Discord.SnowflakeToTime(j.ID)
+		timeI := discordgo.MustSnowflakeTimestamp(i.ID)
+		timeJ := discordgo.MustSnowflakeTimestamp(j.ID)
 
 		if timeI.Before(timeJ) {
 			return -1
@@ -1206,7 +1206,7 @@ func (c *UtilityCommands) snipe(ctx *router.Ctx) {
 
 		formatted += fmt.Sprintf(
 			"[%s] [%s]: %s%s\n\n",
-			utils.Discord.SnowflakeToTime(message.ID).Format(time.RFC1123),
+			discordgo.MustSnowflakeTimestamp(message.ID).Format(time.RFC1123),
 			message.Author.String()+" | "+message.Author.ID,
 			message.Content,
 			fmtAttachments,
@@ -1236,7 +1236,7 @@ func (c *UtilityCommands) editsnipe(ctx *router.Ctx) {
 	if message.Author != nil {
 		emb.AddField("Author", message.Author.String()+" | "+message.Author.ID)
 	}
-	emb.AddField("Sent At", utils.Discord.SnowflakeToTime(message.ID).Format(time.RFC1123))
+	emb.AddField("Sent At", discordgo.MustSnowflakeTimestamp(message.ID).Format(time.RFC1123))
 	emb.AddField("Old Content", message.BeforeUpdate.Content)
 	emb.AddField("New Content", message.Content)
 	emb.Send()

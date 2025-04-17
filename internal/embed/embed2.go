@@ -9,10 +9,10 @@ import (
 )
 
 const (
-	EmbedFormatCodeblock  = "Codeblock"
-	EmbedFormatText       = "Text"
-	EmbedFormatIndent     = "Indent"
-	EmbedFormatURLEmbed   = "URLEmbed"
+	EmbedFormatCodeblock = "Codeblock"
+	EmbedFormatText      = "Text"
+	EmbedFormatIndent    = "Indent"
+	EmbedFormatURLEmbed  = "URLEmbed"
 )
 
 type EmbedField struct {
@@ -102,7 +102,7 @@ func (e *Embed) ToString(format string, maxLen int) []string {
 }
 
 func (e *Embed) toCodeblock(maxLen int) []string {
-	contentBuilder := new(strings.Builder)
+	var contentBuilder strings.Builder
 
 	if e.Title != "" {
 		contentBuilder.WriteString("```ini\n[" + e.Title + "]\n```")
@@ -178,7 +178,7 @@ func (e *Embed) toCodeblock(maxLen int) []string {
 }
 
 func (e *Embed) toText(maxLen int) []string {
-	contentBuilder := new(strings.Builder)
+	var contentBuilder strings.Builder
 
 	if e.Title != "" {
 		contentBuilder.WriteString("```ini\n[" + e.Title + "]```\n\n")
@@ -220,7 +220,7 @@ func (e *Embed) toText(maxLen int) []string {
 }
 
 func (e *Embed) toIndent(maxLen int) []string {
-	contentBuilder := new(strings.Builder)
+	var contentBuilder strings.Builder
 
 	if e.Title != "" {
 		contentBuilder.WriteString("```ini\n[" + e.Title + "]```\n\n")
@@ -242,7 +242,7 @@ func (e *Embed) toIndent(maxLen int) []string {
 
 	var msgs []string
 
-	msgBuilder := new(strings.Builder)
+	var msgBuilder strings.Builder
 
 	for _, line := range splitContent {
 		if msgBuilder.Len()+len(line)+3 > maxLen {
@@ -268,7 +268,7 @@ func (e *Embed) toURLEmbed(maxLen int) []string {
 	// TODO: urlembed
 	return []string{}
 
-	// contentBuilder := new(strings.Builder)
+	// var contentBuilder strings.Builder
 
 	// if e.Description != "" {
 	// 	contentBuilder.WriteString(e.Description)

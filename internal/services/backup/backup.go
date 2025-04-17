@@ -95,7 +95,7 @@ func (b *backupService) CheckEligibility(session *discordgo.Session) error {
 
 	time.Sleep(time.Second)
 
-	creation := utils.Discord.SnowflakeToTime(user.ID)
+	creation := discordgo.MustSnowflakeTimestamp(user.ID)
 
 	if !user.Verified || user.Phone == "" || time.Since(creation) < time.Hour*24*365 {
 		return ErrAccountNotEligible

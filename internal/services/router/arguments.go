@@ -30,6 +30,9 @@ var (
 
 	// ErrChannelNotFound is returned when a channel is not found.
 	ErrChannelNotFound = errors.New("channel not found")
+
+	// ErrInvalidInvite is returned when an invite is invalid.
+	ErrInvalidInvite = errors.New("invalid invite code or link")
 )
 
 type ArgumentFlag int
@@ -54,6 +57,12 @@ var (
 
 	// regexChannelMention defines the regex a channel mention must match.
 	regexChannelMention = regexp.MustCompile(`<#(\d+)>`)
+
+	// regexInvite defines the regex an invite link must match.
+	regexInvite = regexp.MustCompile(`(?:https?://)?(?:www\.)?(?:discord(?:app)?\.(?:com/invite|gg)|discord\.gg)/([a-zA-Z0-9-]+)`)
+
+	// regexInviteCode defines the regex an invite code must match.
+	regexInviteCode = regexp.MustCompile(`([a-zA-Z0-9-]+)`)
 )
 
 // Arguments represents command arguments.
@@ -481,4 +490,18 @@ func (a *Argument) MustGuild(flags ...ArgumentFlag) *discordgo.Guild {
 	}
 
 	return guild
+}
+
+// Invite returns the argument as an invite code.
+func (a *Argument) Invite(flags ...ArgumentFlag) (string, error) {
+	if matches := regexInvite.FindStringSubmatch(a.raw); len(matches) > 1 {
+		return matches[1], nil
+	}
+
+	// check if the raw argument is a valid invite code
+	if matches := regexInviteCode.FindStringSubmatch(a.raw); len(matches) > 1 {
+		return matches[1], nil
+	}
+
+	return "", ErrInvalidInvite
 }
