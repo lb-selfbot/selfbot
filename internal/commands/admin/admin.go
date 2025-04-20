@@ -1723,20 +1723,21 @@ func (c *AdminCommands) serverboosters(ctx *router.Ctx) {
 		return
 	}
 
-	boosters := utils.Discord.GetBoosters(guild)
-	boostersString := ""
+	boosters := fn.Filter(guild.Members, func(member *discordgo.Member) bool {
+		return member.PremiumSince != nil
+	})
 
-	for _, booster := range boosters {
-		boostersString += fmt.Sprintf("%s - %s\n", booster.User.String(), booster.User.ID)
-	}
+	boostersFormatted := fn.Map(boosters, func(member *discordgo.Member) string {
+		return fmt.Sprintf("%s - %s", member.User.String(), member.User.ID)
+	})
 
-	if boostersString == "" {
-		boostersString = "No boosters"
+	if len(boostersFormatted) == 0 {
+		boostersFormatted = []string{"No boosters"}
 	}
 
 	c.services.Embed.New(ctx).
 		SetDescription("Server Boosters - %s", guild.Name).
-		AddField("Boosters", boostersString).
+		AddField("Boosters", strings.Join(boostersFormatted, "\n")).
 		Send()
 }
 
@@ -1859,22 +1860,15 @@ func (c *AdminCommands) channels(ctx *router.Ctx) {
 		return
 	}
 
-	categories, categoryChannels, looseChannels := utils.Discord.MapCategories(guild.Channels)
 	emb := c.services.Embed.New(ctx).SetDescription("Server Channels - %s", guild.Name)
-
-	looseString := ""
-	for _, channel := range looseChannels {
-		looseString += channel.Mention() + "\n"
+	categoryData := discordgo.MapCategories(guild.Channels)
+	
+	for _, category := range categoryData {
+		emb.AddField("Category: "+category.GetCategoryName(), strings.Join(fn.Map(category.Channels, func(channel *discordgo.Channel) string {
+			return fmt.Sprintf("  %s (ID: %s)", channel.Name, channel.ID)
+		}), "\n"))
 	}
-	emb.AddField("Channels (No Category)", looseString)
-
-	for _, category := range categories {
-		channelsString := ""
-		for _, channel := range categoryChannels[category.ID] {
-			channelsString += channel.Mention() + "\n"
-		}
-		emb.AddField("Category: "+category.Name, channelsString)
-	}
+	
 	emb.Send()
 }
 

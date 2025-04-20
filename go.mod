@@ -21,7 +21,7 @@ require (
 	github.com/gorilla/websocket v1.5.3
 	github.com/hugolgst/rich-go v0.0.0-20240715122152-74618cc1ace2
 	github.com/kbinani/screenshot v0.0.0-20250118074034-a3924b7bbc8c
-	github.com/lb-selfbot/discordgo v0.26.6-0.20250420135804-b913b04402bd
+	github.com/lb-selfbot/discordgo v0.26.6-0.20250420142018-08f9e836cfdc
 	github.com/lb-selfbot/go-jester v0.3.0
 	github.com/mr-tron/base58 v1.2.0
 	github.com/multiformats/go-base36 v0.2.0

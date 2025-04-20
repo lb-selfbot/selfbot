@@ -941,48 +941,56 @@ func (c *UtilityCommands) copyserver(ctx *router.Ctx) {
 
 	time.Sleep(duration)
 
-	categories, categoryChannels, looseChannels := utils.Discord.MapCategories(channels)
+	categoryData := discordgo.MapCategories(channels)
+	for _, data := range categoryData {
+		var categoryID string
+		if data.Category != nil {
+			overwrites := make([]*discordgo.PermissionOverwrite, len(data.Category.PermissionOverwrites))
+			for _, overwrite := range data.Category.PermissionOverwrites {
+				newID, ok := IDs[overwrite.ID]
+				if !ok {
+					continue
+				}
 
-	for _, channel := range looseChannels {
-		overwrites := utils.Discord.MapPermissionOverwrites(channel.PermissionOverwrites, IDs)
+				overwrites = append(overwrites, &discordgo.PermissionOverwrite{
+					ID:    newID,
+					Type:  overwrite.Type,
+					Allow: overwrite.Allow,
+					Deny:  overwrite.Deny,
+				})
+			}
 
-		_, err = ctx.Session.GuildChannelCreateComplex(newGuild.ID, discordgo.GuildChannelCreateData{
-			Name:                 channel.Name,
-			Type:                 getChannelType(channel.Type),
-			Topic:                channel.Topic,
-			Bitrate:              int(math.Min(float64(channel.Bitrate), 96000)),
-			UserLimit:            int(math.Min(float64(channel.UserLimit), 99)),
-			RateLimitPerUser:     channel.RateLimitPerUser,
-			Position:             channel.Position,
-			PermissionOverwrites: overwrites,
-			NSFW:                 channel.NSFW,
-		})
-		if err != nil {
-			ctx.RespondText("Error copying server: %v", err)
-			return
+			category, err := ctx.Session.GuildChannelCreateComplex(newGuild.ID, discordgo.GuildChannelCreateData{
+				Name:                 data.Category.Name,
+				Type:                 discordgo.ChannelTypeGuildCategory,
+				Position:             data.Category.Position,
+				PermissionOverwrites: overwrites,
+			})
+			if err != nil {
+				ctx.RespondText("Error copying server: %v", err)
+				return
+			}
+
+			categoryID = category.ID
 		}
 
-		time.Sleep(duration)
-	}
+		for _, channel := range data.Channels {
+			overwrites := make([]*discordgo.PermissionOverwrite, len(channel.PermissionOverwrites))
+			for _, overwrite := range channel.PermissionOverwrites {
+				newID, ok := IDs[overwrite.ID]
+				if !ok {
+					continue
+				}
 
-	for _, category := range categories {
-		overwrites := utils.Discord.MapPermissionOverwrites(category.PermissionOverwrites, IDs)
+				overwrites = append(overwrites, &discordgo.PermissionOverwrite{
+					ID:    newID,
+					Type:  overwrite.Type,
+					Allow: overwrite.Allow,
+					Deny:  overwrite.Deny,
+				})
+			}
 
-		newCategory, err := ctx.Session.GuildChannelCreateComplex(newGuild.ID, discordgo.GuildChannelCreateData{
-			Name:                 category.Name,
-			Type:                 discordgo.ChannelTypeGuildCategory,
-			Position:             category.Position,
-			PermissionOverwrites: overwrites,
-		})
-		if err != nil {
-			ctx.RespondText("Error copying server: %v", err)
-			return
-		}
-
-		for _, channel := range categoryChannels[category.ID] {
-			overwrites := utils.Discord.MapPermissionOverwrites(channel.PermissionOverwrites, IDs)
-
-			_, err = ctx.Session.GuildChannelCreateComplex(newGuild.ID, discordgo.GuildChannelCreateData{
+			_, err := ctx.Session.GuildChannelCreateComplex(newGuild.ID, discordgo.GuildChannelCreateData{
 				Name:                 channel.Name,
 				Type:                 getChannelType(channel.Type),
 				Topic:                channel.Topic,
@@ -991,8 +999,8 @@ func (c *UtilityCommands) copyserver(ctx *router.Ctx) {
 				RateLimitPerUser:     channel.RateLimitPerUser,
 				Position:             channel.Position,
 				PermissionOverwrites: overwrites,
-				ParentID:             newCategory.ID,
 				NSFW:                 channel.NSFW,
+				ParentID:             categoryID,
 			})
 			if err != nil {
 				ctx.RespondText("Error copying server: %v", err)
@@ -1002,6 +1010,7 @@ func (c *UtilityCommands) copyserver(ctx *router.Ctx) {
 			time.Sleep(duration)
 		}
 	}
+
 	c.services.Embed.Respond(ctx, "Server copied successfully!")
 }
 

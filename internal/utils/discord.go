@@ -144,17 +144,6 @@ func (DiscordUtils) DeleteMessages(session *discordgo.Session, channelID, userID
 	return deleted, nil
 }
 
-
-func (DiscordUtils) GetBoosters(guild *discordgo.Guild) []*discordgo.Member {
-	var boostedMembers []*discordgo.Member
-	for _, member := range guild.Members {
-		if member.PremiumSince != nil {
-			boostedMembers = append(boostedMembers, member)
-		}
-	}
-	return boostedMembers
-}
-
 func (DiscordUtils) FormatPermissions(roleName, roleID string, permissions int64) string {
 	permissionsString := fmt.Sprintf(`Role: %s | ID: %s
 
@@ -244,51 +233,6 @@ func (DiscordUtils) SendFileFromURL(session *discordgo.Session, channelID, url, 
 		resp.Body,
 	)
 	return err
-}
-
-func (DiscordUtils) MapCategories(channels []*discordgo.Channel) (categories []*discordgo.Channel, categoryChannels map[string][]*discordgo.Channel, looseChannels []*discordgo.Channel) {
-	categoryChannels = make(map[string][]*discordgo.Channel)
-
-	for _, channel := range channels {
-		if channel.Type != discordgo.ChannelTypeGuildCategory {
-			continue
-		}
-
-		categories = append(categories, channel)
-		categoryChannels[channel.ID] = []*discordgo.Channel{}
-		for _, subChannel := range channels {
-			if subChannel.ParentID == channel.ID {
-				categoryChannels[channel.ID] = append(categoryChannels[channel.ID], subChannel)
-			}
-		}
-	}
-
-	looseChannels = fn.Filter(channels, func(channel *discordgo.Channel) bool {
-		return channel.Type != discordgo.ChannelTypeGuildCategory && channel.ParentID == ""
-	})
-
-	return categories, categoryChannels, looseChannels
-}
-
-func (DiscordUtils) MapPermissionOverwrites(overwrites []*discordgo.PermissionOverwrite, roleIDs map[string]string) []*discordgo.PermissionOverwrite {
-	var newOverwrites []*discordgo.PermissionOverwrite
-
-	for _, overwrite := range overwrites {
-		id := overwrite.ID
-
-		if newID, ok := roleIDs[overwrite.ID]; ok {
-			id = newID
-		}
-
-		newOverwrites = append(newOverwrites, &discordgo.PermissionOverwrite{
-			ID:    id,
-			Type:  overwrite.Type,
-			Deny:  overwrite.Deny,
-			Allow: overwrite.Allow,
-		})
-	}
-
-	return newOverwrites
 }
 
 func (DiscordUtils) MuteUser(session *discordgo.Session, member *discordgo.Member) error {

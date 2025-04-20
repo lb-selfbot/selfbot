@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/lb-selfbot/discordgo"
+	"github.com/lb-selfbot/selfbot/internal/fn"
 	"github.com/lb-selfbot/selfbot/internal/http"
 	"github.com/lb-selfbot/selfbot/internal/services/router"
 
@@ -438,24 +439,22 @@ func (c *DumpingCommands) dumpchannels(ctx *router.Ctx) {
 		return
 	}
 
-	categories, categoryChannels, looseChannels := utils.Discord.MapCategories(guild.Channels)
-	logString := ""
-
-	for _, channel := range looseChannels {
-		logString += fmt.Sprintf("%s\n", channel.Name)
-	}
-
-	for _, category := range categories {
-		logString += fmt.Sprintf("\n\nCategory: %s\n\n", category.Name)
-		for _, channel := range categoryChannels[category.ID] {
-			logString += fmt.Sprintf("\t%s\n", channel.Name)
+	categoryData := discordgo.MapCategories(guild.Channels)
+	formattedData := strings.Join(fn.Map(categoryData, func(data *discordgo.CategoryData) string {
+		channels := fn.Map(data.Channels, func(channel *discordgo.Channel) string {
+			return fmt.Sprintf("  %s (ID: %s)", channel.Name, channel.ID)
+		})
+		if len(channels) == 0 {
+			channels = append(channels, "No channels")
 		}
-	}
+
+		return fmt.Sprintf("Category: %s\n%s", data.GetCategoryName(), strings.Join(channels, "\n"))
+	}), "\n\n")
 
 	folder := filepath.Join(utils.IO.GetMainFolder(), "Dumping", "Channels")
 	_ = os.MkdirAll(folder, os.ModePerm)
 	filePath := filepath.Join(folder, utils.IO.SanitizeFilename(guild.ID+"_"+guild.Name+".txt"))
-	_ = os.WriteFile(filePath, []byte(logString), os.ModePerm)
+	_ = os.WriteFile(filePath, []byte(formattedData), os.ModePerm)
 	_ = system.OpenURL(filePath)
 
 	c.services.Embed.Respond(ctx, "Dumped %d channels from %s", len(guild.Channels), guild.Name)
