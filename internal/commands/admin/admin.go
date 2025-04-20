@@ -1171,7 +1171,7 @@ func (c *AdminCommands) userinfo(ctx *router.Ctx) {
 
 	var member *discordgo.Member
 	if ctx.Message.GuildID != "" {
-		member, _ = utils.Discord.GetMember(ctx.Session, ctx.Message.GuildID, user.ID, true)
+		member, _ = ctx.Session.QueryMember(ctx.Message.GuildID, user.ID, true)
 	}
 
 	emb := c.services.Embed.New(ctx).
@@ -1199,8 +1199,16 @@ func (c *AdminCommands) userinfo(ctx *router.Ctx) {
 			emb.AddField("Nickname", member.Nick)
 		}
 
+		roles := fn.Map(member.Roles, func(roleID string) string {
+			role, err := ctx.Session.State.Role(ctx.Message.GuildID, roleID)
+			if err != nil {
+				return roleID
+			}
+			return fmt.Sprintf("%s - %s", role.Name, role.ID)
+		})
+
 		emb.AddField("Joined Server On", member.JoinedAt.Format(time.RFC1123)).
-			AddField("Roles", fmt.Sprintf("%d Roles:\n%s", len(member.Roles), utils.Discord.GetRoleNames(ctx.Session, member)))
+			AddField("Roles", fmt.Sprintf("%d Roles:\n%s", len(member.Roles), strings.Join(roles, "\n")))
 
 		if p := member.Presence; p != nil {
 			emb.AddField("Status", utils.Discord.FormatStatusEmoji(p.Status)).
@@ -1592,9 +1600,10 @@ func (c *AdminCommands) serverinfo(ctx *router.Ctx) {
 		return
 	}
 
-	owner, ok := utils.Discord.GetMember(ctx.Session, guild.ID, guild.OwnerID)
 	ownerMention := "Error"
-	if ok {
+
+	owner, err := ctx.Session.QueryMember(guild.ID, guild.OwnerID, false)
+	if err == nil {
 		ownerMention = owner.User.String()
 	}
 
@@ -1633,9 +1642,9 @@ func (c *AdminCommands) serverowner(ctx *router.Ctx) {
 		ctx.RespondText("Error getting server: %v", err)
 		return
 	}
-	owner, ok := utils.Discord.GetMember(ctx.Session, guild.ID, guild.OwnerID)
-	if !ok {
-		ctx.RespondText("Error getting server owner")
+	owner, err := ctx.Session.QueryMember(guild.ID, guild.OwnerID, false)
+	if err != nil {
+		ctx.RespondText("Error getting server owner: %v", err)
 		return
 	}
 	c.services.Embed.New(ctx).

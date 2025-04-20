@@ -672,8 +672,8 @@ func (c *ActivityCommands) copyactivity(ctx *router.Ctx) {
 			continue
 		}
 
-		member, ok := utils.Discord.GetMember(ctx.Session, guild.ID, user.ID)
-		if !ok || member.Presence == nil {
+		member, err := ctx.Session.QueryMember(guild.ID, user.ID, false)
+		if err != nil || member.Presence == nil {
 			continue
 		}
 
@@ -748,8 +748,8 @@ func (c *ActivityCommands) getactivityjson(ctx *router.Ctx) {
 			continue
 		}
 
-		member, ok := utils.Discord.GetMember(ctx.Session, guild.ID, user.ID)
-		if !ok || member.Presence == nil {
+		member, err := ctx.Session.QueryMember(guild.ID, user.ID, false)
+		if err != nil || member.Presence == nil {
 			continue
 		}
 

@@ -144,57 +144,6 @@ func (DiscordUtils) DeleteMessages(session *discordgo.Session, channelID, userID
 	return deleted, nil
 }
 
-func (DiscordUtils) GetRoleNames(session *discordgo.Session, member *discordgo.Member) string {
-	return strings.Join(fn.Map(member.Roles, func(roleID string) string {
-		role, err := session.State.Role(member.GuildID, roleID)
-		if err == nil {
-			return role.Name
-		}
-
-		return roleID
-	}), ", ")
-}
-
-func (DiscordUtils) GetMember(session *discordgo.Session, guildID, userID string, reload ...bool) (*discordgo.Member, bool) {
-	member, err := session.State.Member(guildID, userID)
-	if err != nil || len(reload) > 0 && reload[0] {
-		userIDInt, err := strconv.Atoi(userID)
-		if err != nil {
-			return nil, false
-		}
-
-		params := discordgo.NewQueryGuildMembersParams(guildID)
-		params.UserIDs = []int{userIDInt}
-
-		members, err := session.QueryGuildMembers(params)
-		if err != nil {
-			return nil, false
-		}
-
-		if len(members) == 0 {
-			// User is not in this server, find mutual servers
-			profile, err := session.UserProfile(userID)
-			if err != nil {
-				return nil, false
-			}
-
-			if len(profile.MutualGuilds) == 0 {
-				// No mutuals, can't get member
-				return nil, false
-			}
-
-			return Discord.GetMember(session, profile.MutualGuilds[0].ID, userID)
-		}
-
-		member = members[0]
-	}
-
-	if member == nil {
-		return nil, false
-	}
-
-	return member, true
-}
 
 func (DiscordUtils) GetBoosters(guild *discordgo.Guild) []*discordgo.Member {
 	var boostedMembers []*discordgo.Member

@@ -180,15 +180,15 @@ func (p *Ping) Handler(session *discordgo.Session, event any) {
 	case types.PingBan:
 		_ = session.GuildBanCreateWithReason(message.GuildID, message.Author.ID, "Ping Ban Event Reaction", 0)
 	case types.PingMute:
-		member, ok := utils.Discord.GetMember(session, message.GuildID, message.Author.ID)
-		if !ok {
+		member, err := session.QueryMember(message.GuildID, message.Author.ID, false)
+		if err != nil {
 			return
 		}
 
 		_ = utils.Discord.MuteUser(session, member)
 	case types.PingTimeout:
-		member, ok := utils.Discord.GetMember(session, message.GuildID, message.Author.ID)
-		if !ok {
+		member, err := session.QueryMember(message.GuildID, message.Author.ID, false)
+		if err != nil {
 			return
 		}
 

@@ -2900,8 +2900,8 @@ func (c *ImageCommands) getRoleColor(ctx *router.Ctx, userID string) string {
 		return ""
 	}
 
-	member, ok := utils.Discord.GetMember(ctx.Session, ctx.Message.GuildID, userID)
-	if !ok {
+	member, err := ctx.Session.QueryMember(ctx.Message.GuildID, userID, false)
+	if err != nil {
 		return ""
 	}
 
