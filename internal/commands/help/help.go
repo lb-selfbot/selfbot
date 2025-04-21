@@ -63,23 +63,25 @@ type HelpMessage struct {
 }
 
 func (c *HelpCommands) generateCategoryHelpFunc(category *router.Category, name string) router.ExecutionHandler {
-	return func(ctx *router.Ctx) {
+	return func(ctx *router.Ctx) error {
 		page, _ := ctx.Arguments.Get(0).Int()
 
 		c.renderCategoryHelp(ctx, category, name, page).Send()
+		return nil
 	}
 }
 
 // generalHelpCommand handles the general help command
-func (c *HelpCommands) generalHelpCommand(ctx *router.Ctx) {
+func (c *HelpCommands) generalHelpCommand(ctx *router.Ctx) error {
 	// Check if the user provided an argument
 	if ctx.Arguments.Amount() > 0 {
 		c.specificHelpCommand(ctx)
-		return
+		return nil
 	}
 
 	// Send the general help embed
 	c.renderDefaultGeneralHelpEmbed(ctx).Send()
+	return nil
 }
 
 func (c *HelpCommands) getNameFromArgument(arg string) string {
@@ -105,7 +107,7 @@ func (c *HelpCommands) getNameFromArgument(arg string) string {
 }
 
 // specificHelpCommand handles the specific help command
-func (c *HelpCommands) specificHelpCommand(ctx *router.Ctx) {
+func (c *HelpCommands) specificHelpCommand(ctx *router.Ctx) error {
 	oldName := strings.ToLower(ctx.Arguments.Get(0).Raw())
 	name := c.getNameFromArgument(oldName)
 	page, _ := ctx.Arguments.Get(1).Int()
@@ -114,12 +116,12 @@ func (c *HelpCommands) specificHelpCommand(ctx *router.Ctx) {
 
 	if category := ctx.Router.GetCategory(utils.String.Capitalize(name)); category != nil {
 		c.renderCategoryHelp(ctx, category, oldName, page).Send()
-		return
+		return nil
 	}
 
 	if command := ctx.Router.GetCommand(name); command != nil {
 		c.renderCommandHelp(ctx, command).Send()
-		return
+		return nil
 	}
 
 	// get close commands and categories
@@ -155,6 +157,7 @@ func (c *HelpCommands) specificHelpCommand(ctx *router.Ctx) {
 	}
 
 	c.services.Embed.Respond(ctx, "`%s` is not a command or category!\n%s", name, suggestions)
+	return nil
 }
 
 func (c *HelpCommands) renderCommandHelp(ctx *router.Ctx, command *router.Command) *embed.Embed {
@@ -247,7 +250,7 @@ func (c *HelpCommands) renderDefaultGeneralHelpEmbed(ctx *router.Ctx) *embed.Emb
 	return emb
 }
 
-func (c *HelpCommands) search(ctx *router.Ctx) {
+func (c *HelpCommands) search(ctx *router.Ctx) error {
 	query := ctx.Arguments.Get(0).Raw()
 
 	cfg := c.services.Config.GetConfig()
@@ -267,23 +270,24 @@ func (c *HelpCommands) search(ctx *router.Ctx) {
 		c.services.Embed.New(ctx).
 			SetDescription("No commands found for query `%s`", query).
 			Send()
-		return
+		return nil
 	}
 
 	c.services.Embed.New(ctx).
 		SetDescription("Found %d commands for query `%s`", len(closeCommands), query).
 		AddField("Commands", strings.Join(closeCommands, "\n"), true, true).
 		Send()
+	return nil
 }
 
-func (c *HelpCommands) repeat(ctx *router.Ctx) {
+func (c *HelpCommands) repeat(ctx *router.Ctx) error {
 	usedCommands := c.services.EventReactions.GetUsedCommands()
 
 	if len(usedCommands) < 1 {
 		c.services.Embed.New(ctx).
 			SetDescription("No commands have been used yet").
 			Send()
-		return
+		return nil
 	}
 
 	lastCommand := usedCommands[len(usedCommands)-1]
@@ -293,8 +297,9 @@ func (c *HelpCommands) repeat(ctx *router.Ctx) {
 		c.services.Embed.New(ctx).
 			SetDescription("Failed to get channel: %s", err.Error()).
 			Send()
-		return
+		return nil
 	}
 
 	ctx.Router.InvokeRemoteCmd(ctx.Session, channel, ctx.Message.Author, lastCommand.Command, lastCommand.Arguments.Raw())
+	return nil
 }

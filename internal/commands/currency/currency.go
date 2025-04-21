@@ -112,20 +112,18 @@ func (c *CurrencyCommands) Register() {
 	})
 }
 
-func (c *CurrencyCommands) generateAddressFunc(name, shortCode string, power int) func(ctx *router.Ctx) {
-	return func(ctx *router.Ctx) {
+func (c *CurrencyCommands) generateAddressFunc(name, shortCode string, power int) func(ctx *router.Ctx) error {
+	return func(ctx *router.Ctx) error {
 		address := ctx.Arguments.Get(0).Raw()
 		if address == "" {
-			ctx.RespondText("Please provide an address.")
-			return
+			return fmt.Errorf("Please provide an address.")
 		}
 
 		url := fmt.Sprintf("https://api.blockcypher.com/v1/%s/main/addrs/%s", strings.ToLower(shortCode), url.PathEscape(address))
 
 		resp, err := http.DefaultClient().Get(url)
 		if err != nil {
-			ctx.RespondText("An error has occurred.")
-			return
+			return fmt.Errorf("An error has occurred.")
 		}
 
 		json := resp.Json()
@@ -142,23 +140,22 @@ func (c *CurrencyCommands) generateAddressFunc(name, shortCode string, power int
 			AddField("Total Received", fmt.Sprintf("%.8f %s", totalReceived, shortCode), true).
 			AddField("Total Sent", fmt.Sprintf("%.8f %s", totalSent, shortCode), true).
 			Send()
+		return nil
 	}
 }
 
-func (c *CurrencyCommands) generateTransactionFunc(name, shortCode string, power int) func(ctx *router.Ctx) {
-	return func(ctx *router.Ctx) {
+func (c *CurrencyCommands) generateTransactionFunc(name, shortCode string, power int) func(ctx *router.Ctx) error {
+	return func(ctx *router.Ctx) error {
 		hash := ctx.Arguments.Get(0).Raw()
 		if hash == "" {
-			ctx.RespondText("Please provide an transaction hash.")
-			return
+			return fmt.Errorf("Please provide an transaction hash.")
 		}
 
 		url := fmt.Sprintf("https://api.blockcypher.com/v1/%s/main/txs/%s", strings.ToLower(shortCode), url.PathEscape(hash))
 
 		resp, err := http.DefaultClient().Get(url)
 		if err != nil {
-			ctx.RespondText("An error has occurred.")
-			return
+			return fmt.Errorf("An error has occurred.")
 		}
 
 		json := resp.Json()
@@ -177,10 +174,11 @@ func (c *CurrencyCommands) generateTransactionFunc(name, shortCode string, power
 			AddField("Received At", received, true).
 			AddField("Addresses", addresses, true).
 			Send()
+		return nil
 	}
 }
 
-func (c *CurrencyCommands) priceinfo(ctx *router.Ctx) {
+func (c *CurrencyCommands) priceinfo(ctx *router.Ctx) error {
 	from, to := ctx.Arguments.Get(0).Raw(), ctx.Arguments.Get(1).Raw()
 	if to == "" {
 		to = "USD,EUR"
@@ -188,15 +186,13 @@ func (c *CurrencyCommands) priceinfo(ctx *router.Ctx) {
 
 	resp, err := http.DefaultClient().Get(fmt.Sprintf("https://min-api.cryptocompare.com/data/pricemultifull?fsyms=%s&tsyms=%s", from, to))
 	if err != nil {
-		ctx.RespondText("An error has occurred: %v", err)
-		return
+		return fmt.Errorf("An error has occurred: %v", err)
 	}
 
 	json := resp.Json()
 
 	if msg := json.Get("Message").MustString(); msg != "" {
-		ctx.RespondText("An error has occurred: %s", msg)
-		return
+		return fmt.Errorf("An error has occurred: %s", msg)
 	}
 
 	raw := json.Get("DISPLAY").MustMap()
@@ -231,9 +227,10 @@ func (c *CurrencyCommands) priceinfo(ctx *router.Ctx) {
 	}
 
 	emb.Send()
+	return nil
 }
 
-func (c *CurrencyCommands) searchsymbol(ctx *router.Ctx) {
+func (c *CurrencyCommands) searchsymbol(ctx *router.Ctx) error {
 	uri := fmt.Sprintf(
 		"https://www.alphavantage.co/query?function=SYMBOL_SEARCH&keywords=%s&apikey=KBJ3RJS2JAYNH3WD",
 		ctx.Arguments.Escaped(),
@@ -241,15 +238,13 @@ func (c *CurrencyCommands) searchsymbol(ctx *router.Ctx) {
 
 	resp, err := http.DefaultClient().Get(uri)
 	if err != nil {
-		ctx.RespondText("An error occurred: %v", err)
-		return
+		return fmt.Errorf("An error occurred: %v", err)
 	}
 
 	bestMatches := resp.Json().Get("bestMatches")
 
 	if bestMatches.Len() == 0 {
-		ctx.RespondText("No results found")
-		return
+		return fmt.Errorf("No results found")
 	}
 
 	emb := c.services.Embed.New(ctx)
@@ -267,9 +262,10 @@ func (c *CurrencyCommands) searchsymbol(ctx *router.Ctx) {
 	}
 
 	emb.Send()
+	return nil
 }
 
-func (c *CurrencyCommands) symbolinfo(ctx *router.Ctx) {
+func (c *CurrencyCommands) symbolinfo(ctx *router.Ctx) error {
 	symbol := strings.ToUpper(ctx.Arguments.Raw())
 
 	uri := fmt.Sprintf(
@@ -279,15 +275,13 @@ func (c *CurrencyCommands) symbolinfo(ctx *router.Ctx) {
 
 	resp, err := http.DefaultClient().Get(uri)
 	if err != nil {
-		ctx.RespondText("An error occurred: %v", err)
-		return
+		return fmt.Errorf("An error occurred: %v", err)
 	}
 
 	globalQuote := resp.Json().Get("Global Quote")
 
 	if len(globalQuote.MustMap()) == 0 {
-		ctx.RespondText("No results found")
-		return
+		return fmt.Errorf("No results found")
 	}
 
 	emb := c.services.Embed.New(ctx).
@@ -302,4 +296,5 @@ func (c *CurrencyCommands) symbolinfo(ctx *router.Ctx) {
 	}
 
 	emb.Send()
+	return nil
 }

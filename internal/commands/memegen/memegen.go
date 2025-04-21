@@ -144,12 +144,11 @@ func (c *MemeGenCommands) getCreds() api.LBCreds {
 	}
 }
 
-func (c *MemeGenCommands) randommeme(ctx *router.Ctx) {
+func (c *MemeGenCommands) randommeme(ctx *router.Ctx) error {
 	top, bottom := ctx.Arguments.Get(0).Raw(), ctx.Arguments.Get(1).Raw()
 	resp, err := http.DefaultClient().Get("https://api.imgflip.com/get_memes")
 	if err != nil {
-		ctx.RespondText("An error has occurred.")
-		return
+		return fmt.Errorf("An error has occurred.")
 	}
 
 	memes := resp.Json().Get("data").Get("memes")
@@ -161,40 +160,38 @@ func (c *MemeGenCommands) randommeme(ctx *router.Ctx) {
 
 	image, err := api.LBCreateMeme(c.getCreds(), templateID, top, bottom)
 	if err != nil {
-		ctx.RespondText("An error has occurred: %v", err)
-		return
+		return fmt.Errorf("An error has occurred: %v", err)
 	}
 
 	c.services.Embed.New(ctx).
 		AddField("Used Meme", meme.Get("name").MustString()).
 		SetImage(image).
 		Send()
+	return nil
 }
 
-func (c *MemeGenCommands) custommeme(ctx *router.Ctx) {
+func (c *MemeGenCommands) custommeme(ctx *router.Ctx) error {
 	templateID, top, bottom := ctx.Arguments.Get(0).Raw(), ctx.Arguments.Get(1).Raw(), ctx.Arguments.Get(2).Raw()
 	image, err := api.LBCreateMeme(c.getCreds(), templateID, top, bottom)
 	if err != nil {
-		ctx.RespondText("An error has occurred: %v", err)
-		return
+		return fmt.Errorf("An error has occurred: %v", err)
 	}
 
-	ctx.RespondText("%s", image)
+	return ctx.RespondText("%s", image)
 }
 
-func (c *MemeGenCommands) generateFunc(templateID string) func(ctx *router.Ctx) {
+func (c *MemeGenCommands) generateFunc(templateID string) func(ctx *router.Ctx) error {
 	// This makes sure that the function is not overwritten by the next command.
 	// If you put the function in the RegisterCommands function, the element
 	// variable will always be the last element in the command array.
 
-	return func(ctx *router.Ctx) {
+	return func(ctx *router.Ctx) error {
 		top, bottom := ctx.Arguments.Get(0).Raw(), ctx.Arguments.Get(1).Raw()
 		image, err := api.LBCreateMeme(c.getCreds(), templateID, top, bottom)
 		if err != nil {
-			ctx.RespondText("An error has occurred: %v", err)
-			return
+			return fmt.Errorf("An error has occurred: %v", err)
 		}
 
-		ctx.RespondText("%s", image)
+		return ctx.RespondText("%s", image)
 	}
 }

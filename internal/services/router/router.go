@@ -37,7 +37,7 @@ type Service interface {
 }
 
 // ExecutionHandler represents a handler for executing commands.
-type ExecutionHandler func(*Ctx)
+type ExecutionHandler func(ctx *Ctx) error
 
 // Middleware represents a command middleware.
 type Middleware func(following ExecutionHandler) ExecutionHandler
@@ -145,4 +145,8 @@ func (r *routerService) InvokeRemoteCmd(
 	ctx.Arguments = ParseArguments(ctx, args)
 
 	r.triggerCommand(ctx)
+}
+
+func (r *routerService) handleCmdError(ctx *Ctx, err error) {
+	ctx.RespondText("An error occurred while executing the %s command: %s", ctx.Command.Name, err.Error())
 }

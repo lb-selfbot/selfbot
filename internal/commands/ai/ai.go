@@ -1,6 +1,8 @@
 package ai
 
 import (
+	"fmt"
+
 	"github.com/lb-selfbot/selfbot/internal/api"
 	"github.com/lb-selfbot/selfbot/internal/services/router"
 
@@ -47,13 +49,12 @@ func (c *AICommands) getCreds() api.LBCreds {
 	}
 }
 
-func (c *AICommands) deepseek(ctx *router.Ctx) {
+func (c *AICommands) deepseek(ctx *router.Ctx) error {
 	message, system := ctx.Arguments.Get(0).Raw(), ctx.Arguments.Get(1).Raw()
 
 	response, err := api.LBGPT(c.getCreds(), system, message)
 	if err != nil {
-		ctx.RespondText("Error getting response: %v", err)
-		return
+		return fmt.Errorf("Error getting response: %v", err)
 	}
 
 	c.services.Embed.New(ctx).
@@ -62,13 +63,13 @@ func (c *AICommands) deepseek(ctx *router.Ctx) {
 		AddField("Message", message).
 		AddField("Response", response).
 		Send()
+	return nil
 }
 
-func (c *AICommands) ocrlink(ctx *router.Ctx) {
+func (c *AICommands) ocrlink(ctx *router.Ctx) error {
 	text, err := api.LBOCR(c.getCreds(), ctx.Arguments.Raw())
 	if err != nil {
-		ctx.RespondText("Error getting response: %v", err)
-		return
+		return fmt.Errorf("Error getting response: %v", err)
 	}
 
 	c.services.Embed.New(ctx).
@@ -76,20 +77,19 @@ func (c *AICommands) ocrlink(ctx *router.Ctx) {
 		AddField("URL", ctx.Arguments.Raw()).
 		AddField("Extracted Text", text).
 		Send()
+	return nil
 }
 
-func (c *AICommands) ocrfile(ctx *router.Ctx) {
+func (c *AICommands) ocrfile(ctx *router.Ctx) error {
 	attachments := ctx.Message.Attachments
 
 	if len(attachments) == 0 {
-		ctx.RespondText("Error: you must provide an image as an attachment.")
-		return
+		return fmt.Errorf("Error: you must provide an image as an attachment.")
 	}
 
 	text, err := api.LBOCR(c.getCreds(), attachments[0].URL)
 	if err != nil {
-		ctx.RespondText("Error getting response: %v", err)
-		return
+		return fmt.Errorf("Error getting response: %v", err)
 	}
 
 	c.services.Embed.New(ctx).
@@ -97,4 +97,5 @@ func (c *AICommands) ocrfile(ctx *router.Ctx) {
 		AddField("URL", attachments[0].URL).
 		AddField("Extracted Text", text).
 		Send()
+	return nil
 }

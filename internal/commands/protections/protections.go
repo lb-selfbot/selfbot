@@ -244,7 +244,7 @@ func (c *ProtectionsCommands) Register() {
 	})
 }
 
-func (c *ProtectionsCommands) dm(ctx *router.Ctx) {
+func (c *ProtectionsCommands) dm(ctx *router.Ctx) error {
 	var err error
 	var action string
 
@@ -267,19 +267,18 @@ func (c *ProtectionsCommands) dm(ctx *router.Ctx) {
 
 		action = "Closed"
 	default:
-		ctx.RespondText("Invalid <open/close> argument. Use `open` or `close`.")
-		return
+		return fmt.Errorf("Invalid <open/close> argument. Use `open` or `close`.")
 	}
 
 	if err != nil {
-		ctx.RespondText("Error changing settings: %v", err)
-		return
+		return fmt.Errorf("Error changing settings: %v", err)
 	}
 
 	c.services.Embed.Respond(ctx, "%s DM's from everyone!", action)
+	return nil
 }
 
-func (c *ProtectionsCommands) friendrequests(ctx *router.Ctx) {
+func (c *ProtectionsCommands) friendrequests(ctx *router.Ctx) error {
 	var err error
 	var action string
 
@@ -291,14 +290,13 @@ func (c *ProtectionsCommands) friendrequests(ctx *router.Ctx) {
 		err = c.services.Discord.SetFriendRequestsAllowed(false)
 		action = "Denied"
 	default:
-		ctx.RespondText("Invalid <allow/deny> argument. Use `allow` or `deny`.")
-		return
+		return fmt.Errorf("Invalid <allow/deny> argument. Use `allow` or `deny`.")
 	}
 
 	if err != nil {
-		ctx.RespondText("Error changing settings: %v", err)
-		return
+		return fmt.Errorf("Error changing settings: %v", err)
 	}
 
 	c.services.Embed.Respond(ctx, "%s friend requests from everyone!", action)
+	return nil
 }

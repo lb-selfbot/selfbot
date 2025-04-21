@@ -301,7 +301,7 @@ func (s *Snipers) getButtonComponent(m *discordgo.Message, i int) (button *disco
 	}
 
 	button, ok = actionsRow.Components[i].(*discordgo.Button)
-	return
+	return button, ok
 }
 
 func (s *Snipers) giveawaySniperSleepDuration(cfg *config.Config, endTime *time.Time) time.Duration {

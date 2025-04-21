@@ -1,6 +1,7 @@
 package actions
 
 import (
+	"fmt"
 	"slices"
 	"strings"
 
@@ -22,13 +23,13 @@ func (a *EventReactionList) ToSubCommand(services *services.Services) *router.Co
 	return &router.Command{
 		Name:        "list",
 		Description: a.Desc,
-		Handler: func(ctx *router.Ctx) {
+		Handler: func(ctx *router.Ctx) error {
 			reactions := services.EventReactions.GetReactionsByType(a.ReactionType)
 			if len(reactions) == 0 {
 				services.Embed.New(ctx).
 					SetDescription("No %s reactions found", a.ReadableName).
 					Send()
-				return
+				return nil
 			}
 
 			stringReactions := fn.Map(reactions, func(reaction types.EventReaction) string {
@@ -38,6 +39,7 @@ func (a *EventReactionList) ToSubCommand(services *services.Services) *router.Co
 			services.Embed.New(ctx).
 				AddField(a.ReadableName, strings.Join(stringReactions, "\n")).
 				Send()
+			return nil
 		},
 	}
 }
@@ -54,12 +56,13 @@ func (a *EventReactionClear) ToSubCommand(services *services.Services) *router.C
 	return &router.Command{
 		Name:        "clear",
 		Description: a.Desc,
-		Handler: func(ctx *router.Ctx) {
+		Handler: func(ctx *router.Ctx) error {
 			services.EventReactions.RemoveReactionsByType(a.ReactionType)
 
 			services.Embed.New(ctx).
 				SetDescription("Cleared all %s reactions", a.ReadableName).
 				Send()
+			return nil
 		},
 	}
 }
@@ -81,11 +84,10 @@ func (a *EventReactionToggle) ToSubCommand(services *services.Services) *router.
 		Name:        "toggle",
 		Description: a.Desc,
 		Arguments:   a.Arguments,
-		Handler: func(ctx *router.Ctx) {
+		Handler: func(ctx *router.Ctx) error {
 			reaction, err := a.GetReactionFunc(ctx)
 			if err != nil {
-				ctx.RespondText("Error getting reaction: %v", err)
-				return
+				return fmt.Errorf("error getting reaction: %w", err)
 			}
 
 			if slices.Contains(services.EventReactions.GetAllReactions(), reaction) {
@@ -99,6 +101,8 @@ func (a *EventReactionToggle) ToSubCommand(services *services.Services) *router.
 					SetDescription("Added event reaction: %s", reaction.Description()).
 					Send()
 			}
+
+			return nil
 		},
 	}
 }

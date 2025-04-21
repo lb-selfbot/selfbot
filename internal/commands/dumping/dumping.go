@@ -139,30 +139,10 @@ func (c *DumpingCommands) processAttachments(messages []*discordgo.Message, fold
 	return count
 }
 
-// Helper: Retrieve channel from context arguments
-func (c *DumpingCommands) getChannel(ctx *router.Ctx, index int) (*discordgo.Channel, bool) {
-	channel, err := ctx.Arguments.Get(index).Channel(router.ArgumentFlagFallbackDefault)
+func (c *DumpingCommands) dumpall(ctx *router.Ctx) error {
+	channel, err := ctx.Arguments.Get(0).Channel(router.ArgumentFlagFallbackDefault)
 	if err != nil {
-		ctx.RespondText("Error getting channel")
-		return nil, false
-	}
-	return channel, true
-}
-
-// Helper: Retrieve guild from context arguments
-func (c *DumpingCommands) getGuild(ctx *router.Ctx, index int) (*discordgo.Guild, bool) {
-	guild, err := ctx.Arguments.Get(index).Guild()
-	if err != nil {
-		ctx.RespondText("Error getting server: %v", err)
-		return nil, false
-	}
-	return guild, true
-}
-
-func (c *DumpingCommands) dumpall(ctx *router.Ctx) {
-	channel, ok := c.getChannel(ctx, 0)
-	if !ok {
-		return
+		return fmt.Errorf("could not get channel: %v", err)
 	}
 
 	server, _ := ctx.Session.State.Guild(channel.GuildID)
@@ -173,8 +153,7 @@ func (c *DumpingCommands) dumpall(ctx *router.Ctx) {
 
 	messages, err := utils.Discord.GetChannelMessages(ctx.Session, channel.ID, 1000)
 	if err != nil {
-		ctx.RespondText("Error getting messages")
-		return
+		return fmt.Errorf("Error getting messages")
 	}
 
 	logString := fmt.Sprintf("Channel Dump\n\nChannel: %s (ID: %s)\nServer: %s (ID: %s)\nType: Dump All\n\n",
@@ -201,18 +180,18 @@ func (c *DumpingCommands) dumpall(ctx *router.Ctx) {
 	_ = system.OpenURL(filePath)
 
 	c.services.Embed.Respond(ctx, "Dumped %d messages from %s", len(messages), channel.Name)
+	return nil
 }
 
-func (c *DumpingCommands) dumpimages(ctx *router.Ctx) {
-	channel, ok := c.getChannel(ctx, 0)
-	if !ok {
-		return
+func (c *DumpingCommands) dumpimages(ctx *router.Ctx) error {
+	channel, err := ctx.Arguments.Get(0).Channel(router.ArgumentFlagFallbackDefault)
+	if err != nil {
+		return fmt.Errorf("could not get channel: %v", err)
 	}
 
 	messages, err := utils.Discord.GetChannelMessages(ctx.Session, channel.ID, 1000)
 	if err != nil {
-		ctx.RespondText("Error getting messages")
-		return
+		return fmt.Errorf("Error getting messages")
 	}
 
 	folder := c.createAndOpenFolder("Dumping", "Images", utils.IO.SanitizeFilename(channel.Name))
@@ -221,18 +200,18 @@ func (c *DumpingCommands) dumpimages(ctx *router.Ctx) {
 	})
 
 	c.services.Embed.Respond(ctx, "Dumped %d images from %s", images, channel.Name)
+	return nil
 }
 
-func (c *DumpingCommands) dumpvideos(ctx *router.Ctx) {
-	channel, ok := c.getChannel(ctx, 0)
-	if !ok {
-		return
+func (c *DumpingCommands) dumpvideos(ctx *router.Ctx) error {
+	channel, err := ctx.Arguments.Get(0).Channel(router.ArgumentFlagFallbackDefault)
+	if err != nil {
+		return fmt.Errorf("could not get channel: %v", err)
 	}
 
 	messages, err := utils.Discord.GetChannelMessages(ctx.Session, channel.ID, 1000)
 	if err != nil {
-		ctx.RespondText("Error getting messages")
-		return
+		return fmt.Errorf("Error getting messages")
 	}
 
 	folder := c.createAndOpenFolder("Dumping", "Videos", utils.IO.SanitizeFilename(channel.Name))
@@ -241,18 +220,18 @@ func (c *DumpingCommands) dumpvideos(ctx *router.Ctx) {
 	})
 
 	c.services.Embed.Respond(ctx, "Dumped %d videos from %s", videos, channel.Name)
+	return nil
 }
 
-func (c *DumpingCommands) dumpaudio(ctx *router.Ctx) {
-	channel, ok := c.getChannel(ctx, 0)
-	if !ok {
-		return
+func (c *DumpingCommands) dumpaudio(ctx *router.Ctx) error {
+	channel, err := ctx.Arguments.Get(0).Channel(router.ArgumentFlagFallbackDefault)
+	if err != nil {
+		return fmt.Errorf("could not get channel: %v", err)
 	}
 
 	messages, err := utils.Discord.GetChannelMessages(ctx.Session, channel.ID, 1000)
 	if err != nil {
-		ctx.RespondText("Error getting messages")
-		return
+		return fmt.Errorf("Error getting messages")
 	}
 
 	folder := c.createAndOpenFolder("Dumping", "Audio", utils.IO.SanitizeFilename(channel.Name))
@@ -261,18 +240,18 @@ func (c *DumpingCommands) dumpaudio(ctx *router.Ctx) {
 	})
 
 	c.services.Embed.Respond(ctx, "Dumped %d audios from %s", audios, channel.Name)
+	return nil
 }
 
-func (c *DumpingCommands) dumptext(ctx *router.Ctx) {
-	channel, ok := c.getChannel(ctx, 0)
-	if !ok {
-		return
+func (c *DumpingCommands) dumptext(ctx *router.Ctx) error {
+	channel, err := ctx.Arguments.Get(0).Channel(router.ArgumentFlagFallbackDefault)
+	if err != nil {
+		return fmt.Errorf("could not get channel: %v", err)
 	}
 
 	messages, err := utils.Discord.GetChannelMessages(ctx.Session, channel.ID, 1000)
 	if err != nil {
-		ctx.RespondText("Error getting messages")
-		return
+		return fmt.Errorf("Error getting messages")
 	}
 
 	folder := c.createAndOpenFolder("Dumping", "Text", utils.IO.SanitizeFilename(channel.Name))
@@ -281,18 +260,18 @@ func (c *DumpingCommands) dumptext(ctx *router.Ctx) {
 	})
 
 	c.services.Embed.Respond(ctx, "Dumped %d texts from %s", texts, channel.Name)
+	return nil
 }
 
-func (c *DumpingCommands) dumpattachments(ctx *router.Ctx) {
-	channel, ok := c.getChannel(ctx, 0)
-	if !ok {
-		return
+func (c *DumpingCommands) dumpattachments(ctx *router.Ctx) error {
+	channel, err := ctx.Arguments.Get(0).Channel(router.ArgumentFlagFallbackDefault)
+	if err != nil {
+		return fmt.Errorf("could not get channel: %v", err)
 	}
 
 	messages, err := utils.Discord.GetChannelMessages(ctx.Session, channel.ID, 1000)
 	if err != nil {
-		ctx.RespondText("Error getting messages")
-		return
+		return fmt.Errorf("Error getting messages")
 	}
 
 	folder := c.createAndOpenFolder("Dumping", "Attachments", utils.IO.SanitizeFilename(channel.Name))
@@ -301,19 +280,20 @@ func (c *DumpingCommands) dumpattachments(ctx *router.Ctx) {
 	})
 
 	c.services.Embed.Respond(ctx, "Dumped %d attachments from %s", attachments, channel.Name)
+	return nil
 }
 
-func (c *DumpingCommands) dumpfiletype(ctx *router.Ctx) {
+func (c *DumpingCommands) dumpfiletype(ctx *router.Ctx) error {
 	extension := strings.ReplaceAll(ctx.Arguments.Get(0).Raw(), ".", "")
-	channel, ok := c.getChannel(ctx, 1)
-	if !ok {
-		return
+
+	channel, err := ctx.Arguments.Get(1).Channel(router.ArgumentFlagFallbackDefault)
+	if err != nil {
+		return fmt.Errorf("could not get channel: %v", err)
 	}
 
 	messages, err := utils.Discord.GetChannelMessages(ctx.Session, channel.ID, 1000)
 	if err != nil {
-		ctx.RespondText("Error getting messages")
-		return
+		return fmt.Errorf("Error getting messages")
 	}
 
 	folder := c.createAndOpenFolder("Dumping", utils.IO.SanitizeFilename("FileType-"+extension), utils.IO.SanitizeFilename(channel.Name))
@@ -322,19 +302,20 @@ func (c *DumpingCommands) dumpfiletype(ctx *router.Ctx) {
 	})
 
 	c.services.Embed.Respond(ctx, "Dumped %d attachments from %s", count, channel.Name)
+	return nil
 }
 
-func (c *DumpingCommands) dumpcontenttype(ctx *router.Ctx) {
+func (c *DumpingCommands) dumpcontenttype(ctx *router.Ctx) error {
 	contentType := strings.ToLower(ctx.Arguments.Get(0).Raw())
-	channel, ok := c.getChannel(ctx, 1)
-	if !ok {
-		return
+
+	channel, err := ctx.Arguments.Get(1).Channel(router.ArgumentFlagFallbackDefault)
+	if err != nil {
+		return fmt.Errorf("could not get channel: %v", err)
 	}
 
 	messages, err := utils.Discord.GetChannelMessages(ctx.Session, channel.ID, 1000)
 	if err != nil {
-		ctx.RespondText("Error getting messages")
-		return
+		return fmt.Errorf("Error getting messages")
 	}
 
 	folder := c.createAndOpenFolder("Dumping", utils.IO.SanitizeFilename("ContentType-"+contentType), utils.IO.SanitizeFilename(channel.Name))
@@ -343,18 +324,18 @@ func (c *DumpingCommands) dumpcontenttype(ctx *router.Ctx) {
 	})
 
 	c.services.Embed.Respond(ctx, "Dumped %d attachments from %s", count, channel.Name)
+	return nil
 }
 
-func (c *DumpingCommands) dumpemojis(ctx *router.Ctx) {
-	guild, ok := c.getGuild(ctx, 0)
-	if !ok {
-		return
+func (c *DumpingCommands) dumpemojis(ctx *router.Ctx) error {
+	guild, err := ctx.Arguments.Get(0).Guild()
+	if err != nil {
+		return fmt.Errorf("could not get server: %v", err)
 	}
 
 	emojis, err := ctx.Session.GuildEmojis(guild.ID)
 	if err != nil {
-		ctx.RespondText("Error getting emojis: %v", err)
-		return
+		return fmt.Errorf("Error getting emojis: %v", err)
 	}
 
 	folder := c.createAndOpenFolder("Dumping", "Emojis", utils.IO.SanitizeFilename(guild.Name))
@@ -374,12 +355,13 @@ func (c *DumpingCommands) dumpemojis(ctx *router.Ctx) {
 	}
 
 	c.services.Embed.Respond(ctx, "Dumped %d emojis from %s", len(emojis), guild.Name)
+	return nil
 }
 
-func (c *DumpingCommands) dumpstickers(ctx *router.Ctx) {
-	guild, ok := c.getGuild(ctx, 0)
-	if !ok {
-		return
+func (c *DumpingCommands) dumpstickers(ctx *router.Ctx) error {
+	guild, err := ctx.Arguments.Get(0).Guild()
+	if err != nil {
+		return fmt.Errorf("could not get server: %v", err)
 	}
 
 	folder := c.createAndOpenFolder("Dumping", "Stickers", utils.IO.SanitizeFilename(guild.Name))
@@ -405,12 +387,13 @@ func (c *DumpingCommands) dumpstickers(ctx *router.Ctx) {
 	}
 
 	c.services.Embed.Respond(ctx, "Dumped %d stickers from %s", len(guild.Stickers), guild.Name)
+	return nil
 }
 
-func (c *DumpingCommands) dumpavatars(ctx *router.Ctx) {
-	guild, ok := c.getGuild(ctx, 0)
-	if !ok {
-		return
+func (c *DumpingCommands) dumpavatars(ctx *router.Ctx) error {
+	guild, err := ctx.Arguments.Get(0).Guild()
+	if err != nil {
+		return fmt.Errorf("could not get server: %v", err)
 	}
 
 	ctx.Session.FetchGuildMembers(discordgo.NewFetchGuildMembersParams(guild.ID))
@@ -431,12 +414,13 @@ func (c *DumpingCommands) dumpavatars(ctx *router.Ctx) {
 	}
 
 	c.services.Embed.Respond(ctx, "Dumped %d avatars from %s", len(guild.Members), guild.Name)
+	return nil
 }
 
-func (c *DumpingCommands) dumpchannels(ctx *router.Ctx) {
-	guild, ok := c.getGuild(ctx, 0)
-	if !ok {
-		return
+func (c *DumpingCommands) dumpchannels(ctx *router.Ctx) error {
+	guild, err := ctx.Arguments.Get(0).Guild()
+	if err != nil {
+		return fmt.Errorf("could not get server: %v", err)
 	}
 
 	categoryData := discordgo.MapCategories(guild.Channels)
@@ -458,12 +442,13 @@ func (c *DumpingCommands) dumpchannels(ctx *router.Ctx) {
 	_ = system.OpenURL(filePath)
 
 	c.services.Embed.Respond(ctx, "Dumped %d channels from %s", len(guild.Channels), guild.Name)
+	return nil
 }
 
-func (c *DumpingCommands) dumpmembers(ctx *router.Ctx) {
-	guild, ok := c.getGuild(ctx, 0)
-	if !ok {
-		return
+func (c *DumpingCommands) dumpmembers(ctx *router.Ctx) error {
+	guild, err := ctx.Arguments.Get(0).Guild()
+	if err != nil {
+		return fmt.Errorf("could not get server: %v", err)
 	}
 
 	x := discordgo.NewFetchGuildMembersParams(guild.ID)
@@ -483,4 +468,5 @@ func (c *DumpingCommands) dumpmembers(ctx *router.Ctx) {
 	runtime.GC()
 
 	c.services.Embed.Respond(ctx, "Dumped %d members from %s", len(guild.Members), guild.Name)
+	return nil
 }

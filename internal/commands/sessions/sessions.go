@@ -36,7 +36,7 @@ func (c *SessionsCommands) Register() {
 	})
 }
 
-func (c *SessionsCommands) viewgatewaysessions(ctx *router.Ctx) {
+func (c *SessionsCommands) viewgatewaysessions(ctx *router.Ctx) error {
 	emb := c.services.Embed.New(ctx).
 		SetDescription("Sessions")
 
@@ -61,9 +61,10 @@ func (c *SessionsCommands) viewgatewaysessions(ctx *router.Ctx) {
 	}
 
 	emb.Send()
+	return nil
 }
 
-func (c *SessionsCommands) viewloginsessions(ctx *router.Ctx) {
+func (c *SessionsCommands) viewloginsessions(ctx *router.Ctx) error {
 	emb := c.services.Embed.New(ctx).
 		SetDescription("Sessions")
 
@@ -81,4 +82,5 @@ func (c *SessionsCommands) viewloginsessions(ctx *router.Ctx) {
 	}
 
 	emb.Send()
+	return nil
 }

@@ -1,6 +1,8 @@
 package reddit
 
 import (
+	"fmt"
+
 	"github.com/lb-selfbot/selfbot/internal/api"
 	"github.com/lb-selfbot/selfbot/internal/services/router"
 
@@ -85,15 +87,14 @@ func (c *RedditCommands) Register() {
 	}, commands)
 }
 
-func (c *RedditCommands) generateFunc(subreddit string) func(ctx *router.Ctx) {
+func (c *RedditCommands) generateFunc(subreddit string) func(ctx *router.Ctx) error {
 	// This makes sure that the function is not overwritten by the next command.
 	// If you put the function in the RegisterCommands function, the element
 	// variable will always be the last element in the command array.
-	return func(ctx *router.Ctx) {
+	return func(ctx *router.Ctx) error {
 		post, success := api.GetImageFromSubreddit(subreddit)
 		if !success || post == nil {
-			ctx.RespondText("That subreddit is invalid.")
-			return
+			return fmt.Errorf("That subreddit is invalid.")
 		}
 
 		c.services.Embed.New(ctx).
@@ -101,16 +102,16 @@ func (c *RedditCommands) generateFunc(subreddit string) func(ctx *router.Ctx) {
 			AddField("Title", post.Title).
 			AddField("URL", post.ImageURL).
 			Send()
+		return nil
 	}
 }
 
-func (c *RedditCommands) subreddit(ctx *router.Ctx) {
+func (c *RedditCommands) subreddit(ctx *router.Ctx) error {
 	subreddit := ctx.Arguments.Get(0).Raw()
 
 	post, success := api.GetImageFromSubreddit(subreddit)
 	if !success || post == nil {
-		ctx.RespondText("That subreddit is invalid.")
-		return
+		return fmt.Errorf("That subreddit is invalid.")
 	}
 
 	c.services.Embed.New(ctx).
@@ -118,4 +119,5 @@ func (c *RedditCommands) subreddit(ctx *router.Ctx) {
 		AddField("Title", post.Title).
 		AddField("URL", post.ImageURL).
 		Send()
+	return nil
 }

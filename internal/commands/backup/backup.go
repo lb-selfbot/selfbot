@@ -120,21 +120,18 @@ func (c *BackupCommands) Register() {
 	})
 }
 
-func (c *BackupCommands) backupRelationships(ctx *router.Ctx) {
+func (c *BackupCommands) backupRelationships(ctx *router.Ctx) error {
 	if err := c.services.Backup.CheckEligibility(ctx.Session); err != nil {
-		ctx.RespondText("An error has occurred: %v", err)
-		return
+		return fmt.Errorf("An error has occurred: %v", err)
 	}
 
 	rels, err := ctx.Session.UserRelationships()
 	if err != nil {
-		ctx.RespondText("An error has occurred: %v", err)
-		return
+		return fmt.Errorf("An error has occurred: %v", err)
 	}
 
 	if len(rels) == 0 {
-		ctx.RespondText("No relationships found.")
-		return
+		return fmt.Errorf("No relationships found.")
 	}
 
 	blocked := fn.Filter(rels, func(rel *discordgo.Relationship) bool {
@@ -159,40 +156,36 @@ func (c *BackupCommands) backupRelationships(ctx *router.Ctx) {
 
 	err = c.services.Backup.SaveBackup("relationships", ctx.Arguments.Get(0).Raw(), data)
 	if err != nil {
-		ctx.RespondText("An error has occurred while saving the backup: %v", err)
-		return
+		return fmt.Errorf("An error has occurred while saving the backup: %v", err)
 	}
 
 	c.services.Embed.New(ctx).
 		SetTitle("Backup created").
 		SetDescription("Backed up %d friends and %d blocked users.", len(friends), len(blocked)).
 		Send()
+	return nil
 }
 
-func (c *BackupCommands) restoreRelationships(ctx *router.Ctx) {
+func (c *BackupCommands) restoreRelationships(ctx *router.Ctx) error {
 	if err := c.services.Backup.CheckEligibility(ctx.Session); err != nil {
-		ctx.RespondText("An error has occurred: %v", err)
-		return
+		return fmt.Errorf("An error has occurred: %v", err)
 	}
 
 	var data backup.Relationships
 	err := c.services.Backup.LoadBackup("relationships", ctx.Arguments.Get(0).Raw(), &data)
 	if err != nil {
-		ctx.RespondText("An error has occurred while restoring the backup: %v", err)
-		return
+		return fmt.Errorf("An error has occurred while restoring the backup: %v", err)
 	}
 
 	if len(data.Friends) == 0 && len(data.Blocked) == 0 {
-		ctx.RespondText("No relationships found in the backup.")
-		return
+		return fmt.Errorf("No relationships found in the backup.")
 	}
 
 	var currentFriends, currentBlocked []string
 
 	rels, err := ctx.Session.UserRelationships()
 	if err != nil {
-		ctx.RespondText("An error has occurred: %v", err)
-		return
+		return fmt.Errorf("An error has occurred: %v", err)
 	}
 
 	for _, rel := range rels {
@@ -226,12 +219,12 @@ func (c *BackupCommands) restoreRelationships(ctx *router.Ctx) {
 		AddField("Friends", strings.Join(fn.Map(data.Friends, userToString), "\n")).
 		AddField("Blocked", strings.Join(fn.Map(data.Blocked, userToString), "\n")).
 		Send()
+	return nil
 }
 
-func (c *BackupCommands) backupServers(ctx *router.Ctx) {
+func (c *BackupCommands) backupServers(ctx *router.Ctx) error {
 	if err := c.services.Backup.CheckEligibility(ctx.Session); err != nil {
-		ctx.RespondText("An error has occurred: %v", err)
-		return
+		return fmt.Errorf("An error has occurred: %v", err)
 	}
 
 	data := backup.Servers{Servers: []backup.Server{}}
@@ -277,7 +270,7 @@ func (c *BackupCommands) backupServers(ctx *router.Ctx) {
 
 	m, err := ctx.Session.ChannelMessageSend(ctx.Message.ChannelID, progressFunc())
 	if err != nil {
-		return
+		return err
 	}
 
 	time.Sleep(time.Second * 5)
@@ -303,27 +296,24 @@ func (c *BackupCommands) backupServers(ctx *router.Ctx) {
 
 	err = c.services.Backup.SaveBackup("servers", ctx.Arguments.Get(0).Raw(), data)
 	if err != nil {
-		ctx.RespondText("An error has occurred while saving the backup: %v", err)
-		return
+		return fmt.Errorf("An error has occurred while saving the backup: %v", err)
 	}
+	return nil
 }
 
-func (c *BackupCommands) restoreServers(ctx *router.Ctx) {
+func (c *BackupCommands) restoreServers(ctx *router.Ctx) error {
 	if err := c.services.Backup.CheckEligibility(ctx.Session); err != nil {
-		ctx.RespondText("An error has occurred: %v", err)
-		return
+		return fmt.Errorf("An error has occurred: %v", err)
 	}
 
 	var data backup.Servers
 	err := c.services.Backup.LoadBackup("servers", ctx.Arguments.Get(0).Raw(), &data)
 	if err != nil {
-		ctx.RespondText("An error has occurred while restoring the backup: %v", err)
-		return
+		return fmt.Errorf("An error has occurred while restoring the backup: %v", err)
 	}
 
 	if len(data.Servers) == 0 {
-		ctx.RespondText("No servers found in the backup.")
-		return
+		return fmt.Errorf("No servers found in the backup.")
 	}
 
 	currentServerIDs := fn.Map(ctx.Session.State.Guilds, func(guild *discordgo.Guild) string {
@@ -342,18 +332,17 @@ func (c *BackupCommands) restoreServers(ctx *router.Ctx) {
 		SetDescription("Below are the servers from your backup. Please join the servers manually (at your own risk).").
 		AddField("Servers", strings.Join(fn.Map(data.Servers, serverToString), "\n")).
 		Send()
+	return nil
 }
 
-func (c *BackupCommands) backupProfile(ctx *router.Ctx) {
+func (c *BackupCommands) backupProfile(ctx *router.Ctx) error {
 	if err := c.services.Backup.CheckEligibility(ctx.Session); err != nil {
-		ctx.RespondText("An error has occurred: %v", err)
-		return
+		return fmt.Errorf("An error has occurred: %v", err)
 	}
 
 	resp, err := http.DefaultClient().Get(ctx.Session.State.User.AvatarURL(""))
 	if err != nil {
-		ctx.RespondText("An error has occurred while fetching your avatar: %v", err)
-		return
+		return fmt.Errorf("An error has occurred while fetching your avatar: %v", err)
 	}
 
 	var avatar string
@@ -363,8 +352,7 @@ func (c *BackupCommands) backupProfile(ctx *router.Ctx) {
 
 	profile, err := ctx.Session.UserProfile(ctx.Session.State.User.ID)
 	if err != nil {
-		ctx.RespondText("An error has occurred while fetching your profile: %v", err)
-		return
+		return fmt.Errorf("An error has occurred while fetching your profile: %v", err)
 	}
 
 	data := backup.Profile{
@@ -375,35 +363,32 @@ func (c *BackupCommands) backupProfile(ctx *router.Ctx) {
 
 	err = c.services.Backup.SaveBackup("profile", ctx.Arguments.Get(0).Raw(), data)
 	if err != nil {
-		ctx.RespondText("An error has occurred while saving the backup: %v", err)
-		return
+		return fmt.Errorf("An error has occurred while saving the backup: %v", err)
 	}
 
 	c.services.Embed.New(ctx).
 		SetTitle("Backup created").
 		SetDescription("Successfully backed up your profile!").
 		Send()
+	return nil
 }
 
-func (c *BackupCommands) restoreProfile(ctx *router.Ctx) {
+func (c *BackupCommands) restoreProfile(ctx *router.Ctx) error {
 	if err := c.services.Backup.CheckEligibility(ctx.Session); err != nil {
-		ctx.RespondText("An error has occurred: %v", err)
-		return
+		return fmt.Errorf("An error has occurred: %v", err)
 	}
 
 	var data backup.Profile
 	err := c.services.Backup.LoadBackup("profile", ctx.Arguments.Get(0).Raw(), &data)
 	if err != nil {
-		ctx.RespondText("An error has occurred while restoring the backup: %v", err)
-		return
+		return fmt.Errorf("An error has occurred while restoring the backup: %v", err)
 	}
 
 	baseSettings := map[string]any{"avatar": data.Avatar}
 
 	err = c.services.Discord.UpdateSettings("", baseSettings)
 	if err != nil {
-		ctx.RespondText("Error restoring profile [1]: %v", err)
-		return
+		return fmt.Errorf("Error restoring profile [1]: %v", err)
 	}
 
 	profile := map[string]any{}
@@ -417,108 +402,101 @@ func (c *BackupCommands) restoreProfile(ctx *router.Ctx) {
 
 	err = c.services.Discord.UpdateSettings("/profile", profile)
 	if err != nil {
-		ctx.RespondText("Error restoring profile [2]: %v", err)
-		return
+		return fmt.Errorf("Error restoring profile [2]: %v", err)
 	}
 
 	c.services.Embed.New(ctx).
 		SetTitle("Profile restored").
 		SetDescription("Successfully restored your profile!").
 		Send()
+	return nil
 }
 
-func (c *BackupCommands) backupSettings(ctx *router.Ctx) {
+func (c *BackupCommands) backupSettings(ctx *router.Ctx) error {
 	if err := c.services.Backup.CheckEligibility(ctx.Session); err != nil {
-		ctx.RespondText("An error has occurred: %v", err)
-		return
+		return fmt.Errorf("An error has occurred: %v", err)
 	}
 
 	data := backup.Settings{Settings: ctx.Session.State.UserSettings}
 
 	err := c.services.Backup.SaveBackup("settings", ctx.Arguments.Get(0).Raw(), data)
 	if err != nil {
-		ctx.RespondText("An error has occurred while saving the backup: %v", err)
-		return
+		return fmt.Errorf("An error has occurred while saving the backup: %v", err)
 	}
 
 	c.services.Embed.New(ctx).
 		SetTitle("Backup created").
 		SetDescription("Successfully backed up your settings!").
 		Send()
+	return nil
 }
 
-func (c *BackupCommands) restoreSettings(ctx *router.Ctx) {
+func (c *BackupCommands) restoreSettings(ctx *router.Ctx) error {
 	if err := c.services.Backup.CheckEligibility(ctx.Session); err != nil {
-		ctx.RespondText("An error has occurred: %v", err)
-		return
+		return fmt.Errorf("An error has occurred: %v", err)
 	}
 
 	var data backup.Settings
 	err := c.services.Backup.LoadBackup("settings", ctx.Arguments.Get(0).Raw(), &data)
 	if err != nil {
-		ctx.RespondText("An error has occurred while restoring the backup: %v", err)
-		return
+		return fmt.Errorf("An error has occurred while restoring the backup: %v", err)
 	}
 
 	err = ctx.Session.UserSettingsUpdate(data.Settings, false)
 	if err != nil {
-		ctx.RespondText("An error has occurred while restoring the settings: %v", err)
-		return
+		return fmt.Errorf("An error has occurred while restoring the settings: %v", err)
 	}
 
 	c.services.Embed.New(ctx).
 		SetTitle("Settings restored").
 		SetDescription("Successfully restored your settings!").
 		Send()
+	return nil
 }
 
-func (c *BackupCommands) backupGifs(ctx *router.Ctx) {
+func (c *BackupCommands) backupGifs(ctx *router.Ctx) error {
 	if err := c.services.Backup.CheckEligibility(ctx.Session); err != nil {
-		ctx.RespondText("An error has occurred: %v", err)
-		return
+		return fmt.Errorf("An error has occurred: %v", err)
 	}
 
 	settings, err := ctx.Session.UserFrecencySettings()
 	if err != nil {
-		ctx.RespondText("An error has occurred fetching settings: %v", err)
-		return
+		return fmt.Errorf("An error has occurred fetching settings: %v", err)
 	}
 
 	data := backup.GIFs{Settings: settings}
 
 	err = c.services.Backup.SaveBackup("gifs", ctx.Arguments.Get(0).Raw(), data)
 	if err != nil {
-		ctx.RespondText("An error has occurred while saving the backup: %v", err)
-		return
+		return fmt.Errorf("An error has occurred while saving the backup: %v", err)
 	}
 
 	c.services.Embed.New(ctx).
 		SetTitle("Backup created").
 		SetDescription("Successfully backed up your GIFs!").
 		Send()
+	return nil
 }
 
-func (c *BackupCommands) restoreGifs(ctx *router.Ctx) {
+func (c *BackupCommands) restoreGifs(ctx *router.Ctx) error {
 	if err := c.services.Backup.CheckEligibility(ctx.Session); err != nil {
-		ctx.RespondText("An error has occurred: %v", err)
-		return
+		return fmt.Errorf("An error has occurred: %v", err)
 	}
 
 	var data backup.GIFs
 	err := c.services.Backup.LoadBackup("gifs", ctx.Arguments.Get(0).Raw(), &data)
 	if err != nil {
-		ctx.RespondText("An error has occurred while restoring the backup: %v", err)
-		return
+		return fmt.Errorf("An error has occurred while restoring the backup: %v", err)
 	}
 
 	err = ctx.Session.FrecencySettingsUpdate(data.Settings, false)
 	if err != nil {
-		ctx.RespondText("An error has occurred while restoring the GIFs: %v", err)
-		return
+		return fmt.Errorf("An error has occurred while restoring the GIFs: %v", err)
 	}
 
 	c.services.Embed.New(ctx).
 		SetTitle("Settings restored").
 		SetDescription("Successfully restored your GIFs!").
 		Send()
+	return nil
 }

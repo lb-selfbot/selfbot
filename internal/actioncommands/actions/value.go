@@ -25,11 +25,10 @@ func (a *ValueGet) ToSubCommand(services *services.Services) *router.Command {
 	return &router.Command{
 		Name:        "get",
 		Description: a.Desc,
-		Handler: func(ctx *router.Ctx) {
+		Handler: func(ctx *router.Ctx) error {
 			value, err := a.Getter(ctx)
 			if err != nil {
-				ctx.RespondText("Error getting value: %v", err)
-				return
+				return fmt.Errorf("error getting %s: %w", a.ReadableName, err)
 			}
 
 			valueStr, ok := value.(string)
@@ -37,13 +36,14 @@ func (a *ValueGet) ToSubCommand(services *services.Services) *router.Command {
 				services.Embed.New(ctx).
 					SetDescription("%s is currently empty", a.ReadableName).
 					Send()
-				return
+				return nil
 			}
 
 			// Display the retrieved value
 			services.Embed.New(ctx).
 				SetDescription("%s is currently set to: %v", a.ReadableName, value).
 				Send()
+			return nil
 		},
 	}
 }
@@ -65,16 +65,14 @@ func (a *ValueSet) ToSubCommand(services *services.Services) *router.Command {
 		Name:        "set",
 		Description: a.Desc,
 		Arguments:   "[value]",
-		Handler: func(ctx *router.Ctx) {
+		Handler: func(ctx *router.Ctx) error {
 			value, err := actionvalue.Parse(ctx, a.ValueType)
 			if err != nil {
-				ctx.RespondText("Error parsing value: %v", err)
-				return
+				return fmt.Errorf("error parsing value: %w", err)
 			}
 
 			if err := a.Setter(ctx, value); err != nil {
-				ctx.RespondText("Error setting value: %v", err)
-				return
+				return fmt.Errorf("error setting value: %w", err)
 			}
 
 			valueStr, ok := value.(string)
@@ -82,12 +80,13 @@ func (a *ValueSet) ToSubCommand(services *services.Services) *router.Command {
 				services.Embed.New(ctx).
 					SetDescription("%s set to empty", a.ReadableName).
 					Send()
-				return
+				return nil
 			}
 
 			services.Embed.New(ctx).
 				SetDescription("%s set to %v", a.ReadableName, value).
 				Send()
+			return nil
 		},
 	}
 }
@@ -107,15 +106,15 @@ func (a *ValueToggle) ToSubCommand(services *services.Services) *router.Command 
 	return &router.Command{
 		Name:        "toggle",
 		Description: a.Desc,
-		Handler: func(ctx *router.Ctx) {
+		Handler: func(ctx *router.Ctx) error {
 			if err := a.Toggler(ctx); err != nil {
-				ctx.RespondText("Error toggling value: %v", err)
-				return
+				return fmt.Errorf("error toggling %s: %w", a.ReadableName, err)
 			}
 
 			services.Embed.New(ctx).
 				SetDescription("%s toggled", a.ReadableName).
 				Send()
+			return nil
 		},
 	}
 }
@@ -135,7 +134,7 @@ func (a *ValueGetValues) ToSubCommand(services *services.Services) *router.Comma
 	return &router.Command{
 		Name:        "values",
 		Description: a.Desc,
-		Handler: func(ctx *router.Ctx) {
+		Handler: func(ctx *router.Ctx) error {
 			values := a.ValuesGetter()
 			stringValues := fn.Map(values, func(value any) string {
 				return fmt.Sprint(value)
@@ -144,6 +143,7 @@ func (a *ValueGetValues) ToSubCommand(services *services.Services) *router.Comma
 			services.Embed.New(ctx).
 				AddField(a.ReadableName, strings.Join(stringValues, "\n")).
 				Send()
+			return nil
 		},
 	}
 }
@@ -163,11 +163,11 @@ func (a *ValueShowExample) ToSubCommand(services *services.Services) *router.Com
 	return &router.Command{
 		Name:        "example",
 		Description: a.Desc,
-		Handler: func(ctx *router.Ctx) {
+		Handler: func(ctx *router.Ctx) error {
 			if err := a.ShowExampleFunc(ctx); err != nil {
-				ctx.RespondText("Error demonstrating example: %v", err)
-				return
+				return fmt.Errorf("error showing example of %s: %w", a.ReadableName, err)
 			}
+			return nil
 		},
 	}
 }

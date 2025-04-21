@@ -147,71 +147,77 @@ func (c *SpotifyCommands) handleErr(ctx *router.Ctx, err error) {
 	}
 }
 
-func (c *SpotifyCommands) spause(ctx *router.Ctx) {
+func (c *SpotifyCommands) spause(ctx *router.Ctx) error {
 	if err := c.services.Spotify.Pause(ctx.Session); err != nil {
 		c.handleErr(ctx, err)
-		return
+		return nil
 	}
 
 	c.services.Embed.Respond(ctx, "Successfully paused Spotify music.")
+	return nil
 }
 
-func (c *SpotifyCommands) sresume(ctx *router.Ctx) {
+func (c *SpotifyCommands) sresume(ctx *router.Ctx) error {
 	if err := c.services.Spotify.Resume(ctx.Session); err != nil {
 		c.handleErr(ctx, err)
-		return
+		return nil
 	}
 
 	c.services.Embed.Respond(ctx, "Successfully resumed Spotify music.")
+	return nil
 }
 
-func (c *SpotifyCommands) sprevious(ctx *router.Ctx) {
+func (c *SpotifyCommands) sprevious(ctx *router.Ctx) error {
 	if err := c.services.Spotify.Previous(ctx.Session); err != nil {
 		c.handleErr(ctx, err)
-		return
+		return nil
 	}
 
 	c.services.Embed.Respond(ctx, "Successfully started playing the previous Spotify track.")
+	return nil
 }
 
-func (c *SpotifyCommands) snext(ctx *router.Ctx) {
+func (c *SpotifyCommands) snext(ctx *router.Ctx) error {
 	if err := c.services.Spotify.Next(ctx.Session); err != nil {
 		c.handleErr(ctx, err)
-		return
+		return nil
 	}
 
 	c.services.Embed.Respond(ctx, "Successfully started playing the next Spotify track.")
+	return nil
 }
 
-func (c *SpotifyCommands) splay(ctx *router.Ctx) {
+func (c *SpotifyCommands) splay(ctx *router.Ctx) error {
 	track, err := c.services.Spotify.Play(ctx.Session, ctx.Arguments.Raw())
 	if err != nil {
 		c.handleErr(ctx, err)
-		return
+		return nil
 	}
 
 	artists := c.services.Spotify.GetSongArtists(track)
 
 	c.services.Embed.Respond(ctx, "Successfully started playing %s - %s", strings.Join(artists, ", "), track.Get("name").MustString())
+	return nil
 }
 
-func (c *SpotifyCommands) squeue(ctx *router.Ctx) {
+func (c *SpotifyCommands) squeue(ctx *router.Ctx) error {
 	track, err := c.services.Spotify.Queue(ctx.Session, ctx.Arguments.Raw())
 	if err != nil {
 		c.handleErr(ctx, err)
-		return
+		return nil
 	}
 
 	artists := c.services.Spotify.GetSongArtists(track)
 
 	c.services.Embed.Respond(ctx, "Successfully queued %s - %s", strings.Join(artists, ", "), track.Get("name").MustString())
+	return nil
 }
 
-func (c *SpotifyCommands) splaying(ctx *router.Ctx) {
+func (c *SpotifyCommands) splaying(ctx *router.Ctx) error {
 	song, err := c.services.Spotify.GetCurrentlyPlaying(ctx.Session)
 	if err != nil {
 		c.handleErr(ctx, err)
-		return
+		return nil
 	}
 
 	songArtists := c.services.Spotify.GetSongArtists(song)
@@ -232,70 +238,72 @@ func (c *SpotifyCommands) splaying(ctx *router.Ctx) {
 		AddField("URL", songUrl).
 		SetImage(songImageUrl).
 		Send()
+	return nil
 }
 
-func (c *SpotifyCommands) svolume(ctx *router.Ctx) {
+func (c *SpotifyCommands) svolume(ctx *router.Ctx) error {
 	volume, err := ctx.Arguments.Get(0).Int()
 	volume = fn.Clamp(volume, 0, 100)
 	if err != nil {
-		ctx.RespondText("Argument <volume> must be a number.")
-		return
+		return fmt.Errorf("Argument <volume> must be a number.")
 	}
 
 	if err := c.services.Spotify.SetVolume(ctx.Session, volume); err != nil {
 		c.handleErr(ctx, err)
-		return
+		return nil
 	}
 
 	c.services.Embed.Respond(ctx, "Successfully set Spotify volume to %d%%", volume)
+	return nil
 }
 
-func (c *SpotifyCommands) sshuffle(ctx *router.Ctx) {
+func (c *SpotifyCommands) sshuffle(ctx *router.Ctx) error {
 	toggle, err := ctx.Arguments.Get(0).Bool()
 	if err != nil {
-		ctx.RespondText("Invalid value. Use `on` or `off`.")
-		return
+		return fmt.Errorf("Invalid value. Use `on` or `off`.")
 	}
 
 	if err := c.services.Spotify.SetShuffle(ctx.Session, toggle); err != nil {
 		c.handleErr(ctx, err)
-		return
+		return nil
 	}
 
 	c.services.Embed.Respond(ctx, "Successfully turned shuffle %s.", formatting.BoolOnOff(toggle))
+	return nil
 }
 
-func (c *SpotifyCommands) srepeat(ctx *router.Ctx) {
+func (c *SpotifyCommands) srepeat(ctx *router.Ctx) error {
 	state := ctx.Arguments.Get(0).Raw()
 
 	if err := c.services.Spotify.SetRepeat(ctx.Session, state); err != nil {
 		c.handleErr(ctx, err)
-		return
+		return nil
 	}
 
 	c.services.Embed.Respond(ctx, "Successfully set Spotify repeat mode to `%s`.", state)
+	return nil
 }
 
-func (c *SpotifyCommands) sseek(ctx *router.Ctx) {
+func (c *SpotifyCommands) sseek(ctx *router.Ctx) error {
 	timestamp, err := ctx.Arguments.Get(0).Duration()
 	if err != nil {
-		ctx.RespondText("Invalid value. Use a timestamp like `1m30s`.")
-		return
+		return fmt.Errorf("Invalid value. Use a timestamp like `1m30s`.")
 	}
 
 	if err := c.services.Spotify.Seek(ctx.Session, timestamp); err != nil {
 		c.handleErr(ctx, err)
-		return
+		return nil
 	}
 
 	c.services.Embed.Respond(ctx, "Successfully seeked to %s.", timestamp)
+	return nil
 }
 
-func (c *SpotifyCommands) sdevices(ctx *router.Ctx) {
+func (c *SpotifyCommands) sdevices(ctx *router.Ctx) error {
 	devices, err := c.services.Spotify.GetDevices(ctx.Session)
 	if err != nil {
 		c.handleErr(ctx, err)
-		return
+		return nil
 	}
 
 	var deviceList []string
@@ -311,13 +319,14 @@ func (c *SpotifyCommands) sdevices(ctx *router.Ctx) {
 	}
 
 	c.services.Embed.RespondField(ctx, "Devices", strings.Join(deviceList, "\n"))
+	return nil
 }
 
-func (c *SpotifyCommands) sprofile(ctx *router.Ctx) {
+func (c *SpotifyCommands) sprofile(ctx *router.Ctx) error {
 	profile, err := c.services.Spotify.GetProfile(ctx.Session)
 	if err != nil {
 		c.handleErr(ctx, err)
-		return
+		return nil
 	}
 
 	c.services.Embed.New(ctx).
@@ -328,25 +337,26 @@ func (c *SpotifyCommands) sprofile(ctx *router.Ctx) {
 		AddField("Followers", fmt.Sprint(profile.Get("followers", "total").MustInt())).
 		AddField("URL", profile.Get("href").MustString()).
 		Send()
+	return nil
 }
 
-func (c *SpotifyCommands) sbearertoken(ctx *router.Ctx) {
+func (c *SpotifyCommands) sbearertoken(ctx *router.Ctx) error {
 	token, err := c.services.Spotify.GetBearerToken(ctx.Session)
 	if err != nil {
 		c.handleErr(ctx, err)
-		return
+		return nil
 	}
 
 	profile, err := c.services.Spotify.GetProfile(ctx.Session)
 	if err != nil {
 		c.handleErr(ctx, err)
-		return
+		return nil
 	}
 
 	confirmed, err := c.services.Discord.ShowConfirmDialog(ctx.Message.ChannelID, "Please confirm you want to show your bearer token in this channel by removing the reaction.\n\nWarning: Your bearer token can be used to control your Spotify account.")
 	if err != nil {
 		c.handleErr(ctx, err)
-		return
+		return nil
 	}
 
 	if confirmed {
@@ -355,16 +365,17 @@ func (c *SpotifyCommands) sbearertoken(ctx *router.Ctx) {
 			AddField("Bearer Token", token).
 			Send()
 	}
+
+	return nil
 }
 
-func (c *SpotifyCommands) slistenalong(ctx *router.Ctx) {
+func (c *SpotifyCommands) slistenalong(ctx *router.Ctx) error {
 	spotifySessions := fn.Filter(c.services.Sessions.GetGatewaySessions(), func(s *discordgo.GatewaySession) bool {
 		return len(s.Activities) != 0 && s.Activities[0].Name == "Spotify"
 	})
 
 	if len(spotifySessions) == 0 {
-		ctx.RespondText("No Spotify sessions found.")
-		return
+		return fmt.Errorf("No Spotify sessions found.")
 	}
 
 	_, err := ctx.Session.ChannelMessageSendComplex(ctx.Message.ChannelID, &discordgo.MessageSend{
@@ -378,7 +389,7 @@ func (c *SpotifyCommands) slistenalong(ctx *router.Ctx) {
 		Flags: 0,
 	})
 	if err != nil {
-		ctx.RespondText("An error has occurred while sending the invite: %v", err)
-		return
+		return fmt.Errorf("An error has occurred while sending the invite: %v", err)
 	}
+	return nil
 }

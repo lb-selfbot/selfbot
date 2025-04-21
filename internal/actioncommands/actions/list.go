@@ -1,6 +1,8 @@
 package actions
 
 import (
+	"fmt"
+
 	"github.com/lb-selfbot/selfbot/internal/services"
 	"github.com/lb-selfbot/selfbot/internal/services/router"
 )
@@ -20,11 +22,11 @@ func (a *ListGet) ToSubCommand(services *services.Services) *router.Command {
 	return &router.Command{
 		Name:        "get",
 		Description: a.Desc,
-		Handler: func(ctx *router.Ctx) {
+		Handler: func(ctx *router.Ctx) error {
 			if err := a.Getter(ctx); err != nil {
-				ctx.RespondText("Error getting %s: %v", a.ReadableName, err)
-				return
+				return fmt.Errorf("error getting %s: %w", a.ReadableName, err)
 			}
+			return nil
 		},
 	}
 }
@@ -46,11 +48,11 @@ func (a *ListAdd) ToSubCommand(services *services.Services) *router.Command {
 		Name:        "add",
 		Description: a.Desc,
 		Arguments:   a.Arguments,
-		Handler: func(ctx *router.Ctx) {
+		Handler: func(ctx *router.Ctx) error {
 			if err := a.AddFunc(ctx); err != nil {
-				ctx.RespondText("Error adding to %s: %v", a.ReadableName, err)
-				return
+				return fmt.Errorf("error adding to %s: %w", a.ReadableName, err)
 			}
+			return nil
 		},
 	}
 }
@@ -72,11 +74,11 @@ func (a *ListRemove) ToSubCommand(services *services.Services) *router.Command {
 		Name:        "remove",
 		Description: a.Desc,
 		Arguments:   a.Arguments,
-		Handler: func(ctx *router.Ctx) {
+		Handler: func(ctx *router.Ctx) error {
 			if err := a.RemoveFunc(ctx); err != nil {
-				ctx.RespondText("Error removing from %s: %v", a.ReadableName, err)
-				return
+				return fmt.Errorf("error removing from %s: %w", a.ReadableName, err)
 			}
+			return nil
 		},
 	}
 }
@@ -96,11 +98,11 @@ func (a *ListClear) ToSubCommand(services *services.Services) *router.Command {
 	return &router.Command{
 		Name:        "clear",
 		Description: a.Desc,
-		Handler: func(ctx *router.Ctx) {
+		Handler: func(ctx *router.Ctx) error {
 			if err := a.ClearFunc(ctx); err != nil {
-				ctx.RespondText("Error clearing %s: %v", a.ReadableName, err)
-				return
+				return fmt.Errorf("error clearing %s: %w", a.ReadableName, err)
 			}
+			return nil
 		},
 	}
 }

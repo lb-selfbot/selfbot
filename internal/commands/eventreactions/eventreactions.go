@@ -1,6 +1,7 @@
 package eventreactions
 
 import (
+	"errors"
 	"fmt"
 	"slices"
 	"strings"
@@ -538,11 +539,10 @@ func (c *EventReactionsCommands) Register() {
 			Description: "Prevent users from adding you to group chats",
 			Arguments:   "<on/off> [silent leave: on/off]",
 			Flags:       []router.CommandFlag{router.CmdFlagDangerous},
-			Handler: func(ctx *router.Ctx) {
+			Handler: func(ctx *router.Ctx) error {
 				toggle, err := ctx.Arguments.Get(0).Bool()
 				if err != nil {
-					ctx.RespondText("Invalid value. Use `on` or `off`.")
-					return
+					return fmt.Errorf("Invalid value. Use `on` or `off`.")
 				}
 
 				isSilent, _ := ctx.Arguments.Get(1).Bool()
@@ -563,6 +563,8 @@ func (c *EventReactionsCommands) Register() {
 						SetDescription("Turned off the anti group chat reaction!").
 						Send()
 				}
+
+				return nil
 			},
 		},
 
@@ -932,12 +934,9 @@ func (c *EventReactionsCommands) getGuildOrChannel(ctx *router.Ctx, arg *router.
 	}
 }
 
-func (c *EventReactionsCommands) mapReactions(ctx *router.Ctx, reactions []types.EventReaction, errText, title string) {
+func (c *EventReactionsCommands) mapReactions(ctx *router.Ctx, reactions []types.EventReaction, errText, title string) error {
 	if len(reactions) == 0 {
-		c.services.Embed.New(ctx).
-			SetDescription("Error: %s", errText).
-			Send()
-		return
+		return errors.New(errText)
 	}
 
 	descriptions := fn.Map(reactions, func(reaction types.EventReaction) string {
@@ -945,32 +944,40 @@ func (c *EventReactionsCommands) mapReactions(ctx *router.Ctx, reactions []types
 	})
 
 	c.services.Embed.Respond(ctx, "%s:\n\n%s", title, strings.Join(descriptions, "\n"))
+	return nil
 }
 
 // Commands
 
-func (c *EventReactionsCommands) listreactions(ctx *router.Ctx) {
+func (c *EventReactionsCommands) listreactions(ctx *router.Ctx) error {
 	reactions := c.services.EventReactions.GetAllReactions()
-	c.mapReactions(ctx, reactions, "There are no active event reactions", "Active event reactions")
+	if len(reactions) == 0 {
+		c.services.Embed.Respond(ctx, "No active event reactions found.")
+	}
+
+	descriptions := fn.Map(reactions, func(reaction types.EventReaction) string {
+		return reaction.Description()
+	})
+
+	c.services.Embed.RespondField(ctx, "Active Event Reactions", strings.Join(descriptions, "\n"))
+	return nil
 }
 
-func (c *EventReactionsCommands) clearreactions(ctx *router.Ctx) {
+func (c *EventReactionsCommands) clearreactions(ctx *router.Ctx) error {
 	c.services.EventReactions.RemoveAllReactions()
 	c.services.Embed.Respond(ctx, "Cleared all event reactions")
+	return nil
 }
 
-func (c *EventReactionsCommands) unpinspam(ctx *router.Ctx) {
+func (c *EventReactionsCommands) unpinspam(ctx *router.Ctx) error {
 	for _, message := range c.services.EventReactions.GetPinSpamMessages() {
 		err := ctx.Session.ChannelMessageUnpin(message.ChannelID, message.ID)
 		if err != nil {
-			c.services.Embed.New(ctx).
-				SetDescription("Could not unpin message: %s", err.Error()).
-				Send()
-			return
+			return fmt.Errorf("could not unpin message: %v", err)
 		}
 	}
 
 	c.services.EventReactions.ClearPinSpamMessages()
-
 	c.services.Embed.Respond(ctx, "Unpinned all messages.")
+	return nil
 }

@@ -1003,24 +1003,22 @@ func (c *ImageCommands) Register() {
 	})
 }
 
-func (c *ImageCommands) tweet(ctx *router.Ctx) {
+func (c *ImageCommands) tweet(ctx *router.Ctx) error {
 	resp, err := http.DefaultClient().Get(fmt.Sprintf(
 		"https://nekobot.xyz/api/imagegen?type=tweet&text=%s&username=%s",
 		url.QueryEscape(ctx.Arguments.RawFrom(1)),
 		url.QueryEscape(ctx.Arguments.Get(0).Raw()),
 	))
 	if err != nil {
-		ctx.RespondText("An error has occurred: %v", err)
-		return
+		return fmt.Errorf("An error has occurred: %v", err)
 	}
-	ctx.RespondText("%s", resp.Json().Get("message").MustString())
+	return ctx.RespondText("%s", resp.Json().Get("message").MustString())
 }
 
-func (c *ImageCommands) meme(ctx *router.Ctx) {
+func (c *ImageCommands) meme(ctx *router.Ctx) error {
 	resp, err := http.DefaultClient().Get("https://api.lightning-bot.com/api/v3/misc/meme")
 	if err != nil {
-		ctx.RespondText("An error has occurred: %v", err)
-		return
+		return fmt.Errorf("An error has occurred: %v", err)
 	}
 	meme := resp.Json().Get("meme")
 	c.services.Embed.New(ctx).
@@ -1029,15 +1027,15 @@ func (c *ImageCommands) meme(ctx *router.Ctx) {
 		AddField("URL", fmt.Sprintf("`%s`", meme.Get("permalink").MustString())).
 		SetSubtext("Subreddit: %s | Upvotes: %d | Posted by: u/%s", meme.Get("subreddit").MustString(), meme.Get("upvotes").MustInt(), meme.Get("author").MustString()).
 		Send()
+	return nil
 }
 
-func (c *ImageCommands) ytcomment(ctx *router.Ctx) {
+func (c *ImageCommands) ytcomment(ctx *router.Ctx) error {
 	user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
 	if err != nil {
-		ctx.RespondText("Cannot find user")
-		return
+		return fmt.Errorf("Cannot find user")
 	}
-	ctx.RespondText(
+	return ctx.RespondText(
 		"https://some-random-api.com/canvas/youtube-comment?avatar=%s&comment=%s&username=%s",
 		url.QueryEscape(user.AvatarURL("")),
 		url.QueryEscape(ctx.Arguments.RawFrom(1)),
@@ -1045,323 +1043,289 @@ func (c *ImageCommands) ytcomment(ctx *router.Ctx) {
 	)
 }
 
-func (c *ImageCommands) pokemon(ctx *router.Ctx) {
-	ctx.RespondText("https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/%d.png", random.Int(1, 898))
+func (c *ImageCommands) pokemon(ctx *router.Ctx) error {
+	return ctx.RespondText("https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/%d.png", random.Int(1, 898))
 }
 
-func (c *ImageCommands) wasted(ctx *router.Ctx) {
+func (c *ImageCommands) wasted(ctx *router.Ctx) error {
 	user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
 	if err != nil {
-		ctx.RespondText("Cannot find user")
-		return
+		return fmt.Errorf("Cannot find user")
 	}
-	ctx.RespondText("https://some-random-api.com/canvas/wasted?avatar=%s", url.QueryEscape(user.AvatarURL("")))
+	return ctx.RespondText("https://some-random-api.com/canvas/wasted?avatar=%s", url.QueryEscape(user.AvatarURL("")))
 }
 
-func (c *ImageCommands) triggered(ctx *router.Ctx) {
+func (c *ImageCommands) triggered(ctx *router.Ctx) error {
 	user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
 	if err != nil {
-		ctx.RespondText("Cannot find user")
-		return
+		return fmt.Errorf("Cannot find user")
 	}
-	ctx.RespondText("https://some-random-api.com/canvas/triggered?avatar=%s", url.QueryEscape(user.AvatarURL("")))
+	return ctx.RespondText("https://some-random-api.com/canvas/triggered?avatar=%s", url.QueryEscape(user.AvatarURL("")))
 }
 
-func (c *ImageCommands) glass(ctx *router.Ctx) {
+func (c *ImageCommands) glass(ctx *router.Ctx) error {
 	user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
 	if err != nil {
-		ctx.RespondText("Cannot find user")
-		return
+		return fmt.Errorf("Cannot find user")
 	}
-	ctx.RespondText("https://some-random-api.com/canvas/glass?avatar=%s", url.QueryEscape(user.AvatarURL("")))
+	return ctx.RespondText("https://some-random-api.com/canvas/glass?avatar=%s", url.QueryEscape(user.AvatarURL("")))
 }
 
-func (c *ImageCommands) greyscale(ctx *router.Ctx) {
+func (c *ImageCommands) greyscale(ctx *router.Ctx) error {
 	user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
 	if err != nil {
-		ctx.RespondText("Cannot find user")
-		return
+		return fmt.Errorf("Cannot find user")
 	}
-	ctx.RespondText("https://some-random-api.com/canvas/greyscale?avatar=%s", url.QueryEscape(user.AvatarURL("")))
+	return ctx.RespondText("https://some-random-api.com/canvas/greyscale?avatar=%s", url.QueryEscape(user.AvatarURL("")))
 }
 
-func (c *ImageCommands) invert(ctx *router.Ctx) {
+func (c *ImageCommands) invert(ctx *router.Ctx) error {
 	user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
 	if err != nil {
-		ctx.RespondText("Cannot find user")
-		return
+		return fmt.Errorf("Cannot find user")
 	}
-	ctx.RespondText("https://some-random-api.com/canvas/invert?avatar=%s", url.QueryEscape(user.AvatarURL("")))
+	return ctx.RespondText("https://some-random-api.com/canvas/invert?avatar=%s", url.QueryEscape(user.AvatarURL("")))
 }
 
-func (c *ImageCommands) invertgreyscale(ctx *router.Ctx) {
+func (c *ImageCommands) invertgreyscale(ctx *router.Ctx) error {
 	user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
 	if err != nil {
-		ctx.RespondText("Cannot find user")
-		return
+		return fmt.Errorf("Cannot find user")
 	}
-	ctx.RespondText("https://some-random-api.com/canvas/invertgreyscale?avatar=%s", url.QueryEscape(user.AvatarURL("")))
+	return ctx.RespondText("https://some-random-api.com/canvas/invertgreyscale?avatar=%s", url.QueryEscape(user.AvatarURL("")))
 }
 
-func (c *ImageCommands) brightness(ctx *router.Ctx) {
+func (c *ImageCommands) brightness(ctx *router.Ctx) error {
 	user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
 	if err != nil {
-		ctx.RespondText("Cannot find user")
-		return
+		return fmt.Errorf("Cannot find user")
 	}
-	ctx.RespondText("https://some-random-api.com/canvas/brightness?avatar=%s", url.QueryEscape(user.AvatarURL("")))
+	return ctx.RespondText("https://some-random-api.com/canvas/brightness?avatar=%s", url.QueryEscape(user.AvatarURL("")))
 }
 
-func (c *ImageCommands) red(ctx *router.Ctx) {
+func (c *ImageCommands) red(ctx *router.Ctx) error {
 	user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
 	if err != nil {
-		ctx.RespondText("Cannot find user")
-		return
+		return fmt.Errorf("Cannot find user")
 	}
-	ctx.RespondText("https://some-random-api.com/canvas/red?avatar=%s", url.QueryEscape(user.AvatarURL("")))
+	return ctx.RespondText("https://some-random-api.com/canvas/red?avatar=%s", url.QueryEscape(user.AvatarURL("")))
 }
 
-func (c *ImageCommands) green(ctx *router.Ctx) {
+func (c *ImageCommands) green(ctx *router.Ctx) error {
 	user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
 	if err != nil {
-		ctx.RespondText("Cannot find user")
-		return
+		return fmt.Errorf("Cannot find user")
 	}
-	ctx.RespondText("https://some-random-api.com/canvas/green?avatar=%s", url.QueryEscape(user.AvatarURL("")))
+	return ctx.RespondText("https://some-random-api.com/canvas/green?avatar=%s", url.QueryEscape(user.AvatarURL("")))
 }
 
-func (c *ImageCommands) blue(ctx *router.Ctx) {
+func (c *ImageCommands) blue(ctx *router.Ctx) error {
 	user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
 	if err != nil {
-		ctx.RespondText("Cannot find user")
-		return
+		return fmt.Errorf("Cannot find user")
 	}
-	ctx.RespondText("https://some-random-api.com/canvas/blue?avatar=%s", url.QueryEscape(user.AvatarURL("")))
+	return ctx.RespondText("https://some-random-api.com/canvas/blue?avatar=%s", url.QueryEscape(user.AvatarURL("")))
 }
 
-func (c *ImageCommands) pixelate(ctx *router.Ctx) {
+func (c *ImageCommands) pixelate(ctx *router.Ctx) error {
 	user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
 	if err != nil {
-		ctx.RespondText("Cannot find user")
-		return
+		return fmt.Errorf("Cannot find user")
 	}
-	ctx.RespondText("https://some-random-api.com/canvas/pixelate?avatar=%s", url.QueryEscape(user.AvatarURL("")))
+	return ctx.RespondText("https://some-random-api.com/canvas/pixelate?avatar=%s", url.QueryEscape(user.AvatarURL("")))
 }
 
-func (c *ImageCommands) comrade(ctx *router.Ctx) {
+func (c *ImageCommands) comrade(ctx *router.Ctx) error {
 	user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
 	if err != nil {
-		ctx.RespondText("Cannot find user")
-		return
+		return fmt.Errorf("Cannot find user")
 	}
-	ctx.RespondText("https://some-random-api.com/canvas/comrade?avatar=%s", url.QueryEscape(user.AvatarURL("")))
+	return ctx.RespondText("https://some-random-api.com/canvas/comrade?avatar=%s", url.QueryEscape(user.AvatarURL("")))
 }
 
-func (c *ImageCommands) missionpassed(ctx *router.Ctx) {
+func (c *ImageCommands) missionpassed(ctx *router.Ctx) error {
 	user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
 	if err != nil {
-		ctx.RespondText("Cannot find user")
-		return
+		return fmt.Errorf("Cannot find user")
 	}
-	ctx.RespondText("https://some-random-api.com/canvas/passed?avatar=%s", url.QueryEscape(user.AvatarURL("")))
+	return ctx.RespondText("https://some-random-api.com/canvas/passed?avatar=%s", url.QueryEscape(user.AvatarURL("")))
 }
 
-func (c *ImageCommands) jail(ctx *router.Ctx) {
+func (c *ImageCommands) jail(ctx *router.Ctx) error {
 	user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
 	if err != nil {
-		ctx.RespondText("Cannot find user")
-		return
+		return fmt.Errorf("Cannot find user")
 	}
-	ctx.RespondText("https://some-random-api.com/canvas/jail?avatar=%s", url.QueryEscape(user.AvatarURL("")))
+	return ctx.RespondText("https://some-random-api.com/canvas/jail?avatar=%s", url.QueryEscape(user.AvatarURL("")))
 }
 
-func (c *ImageCommands) nobitches(ctx *router.Ctx) {
-	ctx.RespondText("https://some-random-api.com/canvas/nobitches?no=%s", ctx.Arguments.Escaped())
+func (c *ImageCommands) nobitches(ctx *router.Ctx) error {
+	return ctx.RespondText("https://some-random-api.com/canvas/nobitches?no=%s", ctx.Arguments.Escaped())
 }
 
-func (c *ImageCommands) threshold(ctx *router.Ctx) {
+func (c *ImageCommands) threshold(ctx *router.Ctx) error {
 	user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
 	if err != nil {
-		ctx.RespondText("Cannot find user")
-		return
+		return fmt.Errorf("Cannot find user")
 	}
-	ctx.RespondText("https://some-random-api.com/canvas/threshold?avatar=%s", url.QueryEscape(user.AvatarURL("")))
+	return ctx.RespondText("https://some-random-api.com/canvas/threshold?avatar=%s", url.QueryEscape(user.AvatarURL("")))
 }
 
-func (c *ImageCommands) blurple(ctx *router.Ctx) {
+func (c *ImageCommands) blurple(ctx *router.Ctx) error {
 	user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
 	if err != nil {
-		ctx.RespondText("Cannot find user")
-		return
+		return fmt.Errorf("Cannot find user")
 	}
-	ctx.RespondText("https://some-random-api.com/canvas/blurple?avatar=%s", url.QueryEscape(user.AvatarURL("")))
+	return ctx.RespondText("https://some-random-api.com/canvas/blurple?avatar=%s", url.QueryEscape(user.AvatarURL("")))
 }
 
-func (c *ImageCommands) blurple2(ctx *router.Ctx) {
+func (c *ImageCommands) blurple2(ctx *router.Ctx) error {
 	user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
 	if err != nil {
-		ctx.RespondText("Cannot find user")
-		return
+		return fmt.Errorf("Cannot find user")
 	}
-	ctx.RespondText("https://some-random-api.com/canvas/blurple2?avatar=%s", url.QueryEscape(user.AvatarURL("")))
+	return ctx.RespondText("https://some-random-api.com/canvas/blurple2?avatar=%s", url.QueryEscape(user.AvatarURL("")))
 }
 
-func (c *ImageCommands) color(ctx *router.Ctx) {
+func (c *ImageCommands) color(ctx *router.Ctx) error {
 	user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
 	if err != nil {
-		ctx.RespondText("Cannot find user")
-		return
+		return fmt.Errorf("Cannot find user")
 	}
-	ctx.RespondText(
+	return ctx.RespondText(
 		"https://some-random-api.com/canvas/color?avatar=%s&color=%s",
 		url.QueryEscape(user.AvatarURL("")),
 		url.QueryEscape(strings.ReplaceAll(ctx.Arguments.Get(1).Raw(), "#", "")),
 	)
 }
 
-func (c *ImageCommands) sostupid(ctx *router.Ctx) {
+func (c *ImageCommands) sostupid(ctx *router.Ctx) error {
 	user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
 	if err != nil {
-		ctx.RespondText("Cannot find user")
-		return
+		return fmt.Errorf("Cannot find user")
 	}
-	ctx.RespondText(
+	return ctx.RespondText(
 		"https://some-random-api.com/canvas/its-so-stupid?avatar=%s&dog=%s",
 		url.QueryEscape(user.AvatarURL("")),
 		url.QueryEscape(ctx.Arguments.RawFrom(1)),
 	)
 }
 
-func (c *ImageCommands) simpcard(ctx *router.Ctx) {
+func (c *ImageCommands) simpcard(ctx *router.Ctx) error {
 	user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
 	if err != nil {
-		ctx.RespondText("Cannot find user")
-		return
+		return fmt.Errorf("Cannot find user")
 	}
-	ctx.RespondText("https://some-random-api.com/canvas/simpcard?avatar=%s", url.QueryEscape(user.AvatarURL("")))
+	return ctx.RespondText("https://some-random-api.com/canvas/simpcard?avatar=%s", url.QueryEscape(user.AvatarURL("")))
 }
 
-func (c *ImageCommands) horny(ctx *router.Ctx) {
+func (c *ImageCommands) horny(ctx *router.Ctx) error {
 	user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
 	if err != nil {
-		ctx.RespondText("Cannot find user")
-		return
+		return fmt.Errorf("Cannot find user")
 	}
-	ctx.RespondText("https://some-random-api.com/canvas/horny?avatar=%s", url.QueryEscape(user.AvatarURL("")))
+	return ctx.RespondText("https://some-random-api.com/canvas/horny?avatar=%s", url.QueryEscape(user.AvatarURL("")))
 }
 
-func (c *ImageCommands) lgbt(ctx *router.Ctx) {
+func (c *ImageCommands) lgbt(ctx *router.Ctx) error {
 	user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
 	if err != nil {
-		ctx.RespondText("Cannot find user")
-		return
+		return fmt.Errorf("Cannot find user")
 	}
-	ctx.RespondText("https://some-random-api.com/canvas/lgbt?avatar=%s", url.QueryEscape(user.AvatarURL("")))
+	return ctx.RespondText("https://some-random-api.com/canvas/lgbt?avatar=%s", url.QueryEscape(user.AvatarURL("")))
 }
 
-func (c *ImageCommands) pansexual(ctx *router.Ctx) {
+func (c *ImageCommands) pansexual(ctx *router.Ctx) error {
 	user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
 	if err != nil {
-		ctx.RespondText("Cannot find user")
-		return
+		return fmt.Errorf("Cannot find user")
 	}
-	ctx.RespondText("https://some-random-api.com/canvas/pansexual?avatar=%s", url.QueryEscape(user.AvatarURL("")))
+	return ctx.RespondText("https://some-random-api.com/canvas/pansexual?avatar=%s", url.QueryEscape(user.AvatarURL("")))
 }
 
-func (c *ImageCommands) nonbinary(ctx *router.Ctx) {
+func (c *ImageCommands) nonbinary(ctx *router.Ctx) error {
 	user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
 	if err != nil {
-		ctx.RespondText("Cannot find user")
-		return
+		return fmt.Errorf("Cannot find user")
 	}
-	ctx.RespondText("https://some-random-api.com/canvas/nonbinary?avatar=%s", url.QueryEscape(user.AvatarURL("")))
+	return ctx.RespondText("https://some-random-api.com/canvas/nonbinary?avatar=%s", url.QueryEscape(user.AvatarURL("")))
 }
 
-func (c *ImageCommands) lesbian(ctx *router.Ctx) {
+func (c *ImageCommands) lesbian(ctx *router.Ctx) error {
 	user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
 	if err != nil {
-		ctx.RespondText("Cannot find user")
-		return
+		return fmt.Errorf("Cannot find user")
 	}
-	ctx.RespondText("https://some-random-api.com/canvas/lesbian?avatar=%s", url.QueryEscape(user.AvatarURL("")))
+	return ctx.RespondText("https://some-random-api.com/canvas/lesbian?avatar=%s", url.QueryEscape(user.AvatarURL("")))
 }
 
-func (c *ImageCommands) bisexual(ctx *router.Ctx) {
+func (c *ImageCommands) bisexual(ctx *router.Ctx) error {
 	user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
 	if err != nil {
-		ctx.RespondText("Cannot find user")
-		return
+		return fmt.Errorf("Cannot find user")
 	}
-	ctx.RespondText("https://some-random-api.com/canvas/bisexual?avatar=%s", url.QueryEscape(user.AvatarURL("")))
+	return ctx.RespondText("https://some-random-api.com/canvas/bisexual?avatar=%s", url.QueryEscape(user.AvatarURL("")))
 }
 
-func (c *ImageCommands) trans(ctx *router.Ctx) {
+func (c *ImageCommands) trans(ctx *router.Ctx) error {
 	user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
 	if err != nil {
-		ctx.RespondText("Cannot find user")
-		return
+		return fmt.Errorf("Cannot find user")
 	}
-	ctx.RespondText("https://some-random-api.com/canvas/transgender?avatar=%s", url.QueryEscape(user.AvatarURL("")))
+	return ctx.RespondText("https://some-random-api.com/canvas/transgender?avatar=%s", url.QueryEscape(user.AvatarURL("")))
 }
 
-func (c *ImageCommands) oogway(ctx *router.Ctx) {
-	ctx.RespondText("https://some-random-api.com/canvas/oogway?quote=%s", ctx.Arguments.Escaped())
+func (c *ImageCommands) oogway(ctx *router.Ctx) error {
+	return ctx.RespondText("https://some-random-api.com/canvas/oogway?quote=%s", ctx.Arguments.Escaped())
 }
 
-func (c *ImageCommands) oogway2(ctx *router.Ctx) {
-	ctx.RespondText("https://some-random-api.com/canvas/oogway2?quote=%s", ctx.Arguments.Escaped())
+func (c *ImageCommands) oogway2(ctx *router.Ctx) error {
+	return ctx.RespondText("https://some-random-api.com/canvas/oogway2?quote=%s", ctx.Arguments.Escaped())
 }
 
-func (c *ImageCommands) threat(ctx *router.Ctx) {
+func (c *ImageCommands) threat(ctx *router.Ctx) error {
 	user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
 	if err != nil {
-		ctx.RespondText("Cannot find user")
-		return
+		return fmt.Errorf("Cannot find user")
 	}
 
 	resp, err := http.DefaultClient().Get(fmt.Sprintf("https://nekobot.xyz/api/imagegen?type=threats&url=%s", url.QueryEscape(user.AvatarURL(""))))
 	if err != nil {
-		ctx.RespondText("An error has occurred: %v", err)
-		return
+		return fmt.Errorf("An error has occurred: %v", err)
 	}
 
-	ctx.RespondText("%s", resp.Json().Get("message").MustString())
+	return ctx.RespondText("%s", resp.Json().Get("message").MustString())
 }
 
-func (c *ImageCommands) clyde(ctx *router.Ctx) {
+func (c *ImageCommands) clyde(ctx *router.Ctx) error {
 	resp, err := http.DefaultClient().Get(fmt.Sprintf("https://nekobot.xyz/api/imagegen?type=clyde&text=%s", ctx.Arguments.Escaped()))
 	if err != nil {
-		ctx.RespondText("An error has occurred: %v", err)
-		return
+		return fmt.Errorf("An error has occurred: %v", err)
 	}
-	ctx.RespondText("%s", resp.Json().Get("message").MustString())
+	return ctx.RespondText("%s", resp.Json().Get("message").MustString())
 }
 
-func (c *ImageCommands) distractedbf(ctx *router.Ctx) {
+func (c *ImageCommands) distractedbf(ctx *router.Ctx) error {
 	user1, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
 	if err != nil {
-		ctx.RespondText("Cannot find user")
-		return
+		return fmt.Errorf("Cannot find user")
 	}
 	user2, err := ctx.Arguments.Get(1).User(router.ArgumentFlagFallbackDefault)
 	if err != nil {
-		ctx.RespondText("Cannot find user")
-		return
+		return fmt.Errorf("Cannot find user")
 	}
 
 	resp, err := http.DefaultClient().Get(fmt.Sprintf("https://nekobot.xyz/api/imagegen?type=ship&user1=%s&user2=%s", url.QueryEscape(user1.AvatarURL("")), url.QueryEscape(user2.AvatarURL(""))))
 	if err != nil {
-		ctx.RespondText("An error has occurred: %v", err)
-		return
+		return fmt.Errorf("An error has occurred: %v", err)
 	}
-	ctx.RespondText("%s", resp.Json().Get("message").MustString())
+	return ctx.RespondText("%s", resp.Json().Get("message").MustString())
 }
 
-func (c *ImageCommands) captcha(ctx *router.Ctx) {
+func (c *ImageCommands) captcha(ctx *router.Ctx) error {
 	user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
 	if err != nil {
-		ctx.RespondText("Cannot find user")
-		return
+		return fmt.Errorf("Cannot find user")
 	}
 
 	resp, err := http.DefaultClient().Get(fmt.Sprintf("https://nekobot.xyz/api/imagegen?type=captcha&url=%s&username=%s",
@@ -1369,111 +1333,96 @@ func (c *ImageCommands) captcha(ctx *router.Ctx) {
 		url.QueryEscape(ctx.Arguments.RawFrom(1)),
 	))
 	if err != nil {
-		ctx.RespondText("An error has occurred: %v", err)
-		return
+		return fmt.Errorf("An error has occurred: %v", err)
 	}
-	ctx.RespondText("%s", resp.Json().Get("message").MustString())
+	return ctx.RespondText("%s", resp.Json().Get("message").MustString())
 }
 
-func (c *ImageCommands) whowouldwin(ctx *router.Ctx) {
+func (c *ImageCommands) whowouldwin(ctx *router.Ctx) error {
 	user1, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
 	if err != nil {
-		ctx.RespondText("Cannot find user")
-		return
+		return fmt.Errorf("Cannot find user")
 	}
 	user2, err := ctx.Arguments.Get(1).User(router.ArgumentFlagFallbackDefault)
 	if err != nil {
-		ctx.RespondText("Cannot find user")
-		return
+		return fmt.Errorf("Cannot find user")
 	}
 
 	resp, err := http.DefaultClient().Get(fmt.Sprintf("https://nekobot.xyz/api/imagegen?type=whowouldwin&user1=%s&user2=%s", url.QueryEscape(user1.AvatarURL("")), url.QueryEscape(user2.AvatarURL(""))))
 	if err != nil {
-		ctx.RespondText("An error has occurred: %v", err)
-		return
+		return fmt.Errorf("An error has occurred: %v", err)
 	}
-	ctx.RespondText("%s", resp.Json().Get("message").MustString())
+	return ctx.RespondText("%s", resp.Json().Get("message").MustString())
 }
 
-func (c *ImageCommands) changemymind(ctx *router.Ctx) {
+func (c *ImageCommands) changemymind(ctx *router.Ctx) error {
 	resp, err := http.DefaultClient().Get(fmt.Sprintf("https://nekobot.xyz/api/imagegen?type=changemymind&text=%s", ctx.Arguments.Escaped()))
 	if err != nil {
-		ctx.RespondText("An error has occurred: %v", err)
-		return
+		return fmt.Errorf("An error has occurred: %v", err)
 	}
-	ctx.RespondText("%s", resp.Json().Get("message").MustString())
+	return ctx.RespondText("%s", resp.Json().Get("message").MustString())
 }
 
-func (c *ImageCommands) jpeg(ctx *router.Ctx) {
+func (c *ImageCommands) jpeg(ctx *router.Ctx) error {
 	user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
 	if err != nil {
-		ctx.RespondText("Cannot find user")
-		return
+		return fmt.Errorf("Cannot find user")
 	}
 	resp, err := http.DefaultClient().Get(fmt.Sprintf("https://nekobot.xyz/api/imagegen?type=jpeg&url=%s", url.QueryEscape(user.AvatarURL(""))))
 	if err != nil {
-		ctx.RespondText("An error has occurred: %v", err)
-		return
+		return fmt.Errorf("An error has occurred: %v", err)
 	}
-	ctx.RespondText("%s", resp.Json().Get("message").MustString())
+	return ctx.RespondText("%s", resp.Json().Get("message").MustString())
 }
 
-func (c *ImageCommands) lolice(ctx *router.Ctx) {
+func (c *ImageCommands) lolice(ctx *router.Ctx) error {
 	user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
 	if err != nil {
-		ctx.RespondText("Cannot find user")
-		return
+		return fmt.Errorf("Cannot find user")
 	}
 	resp, err := http.DefaultClient().Get(fmt.Sprintf("https://nekobot.xyz/api/imagegen?type=lolice&url=%s", url.QueryEscape(user.AvatarURL(""))))
 	if err != nil {
-		ctx.RespondText("An error has occurred: %v", err)
-		return
+		return fmt.Errorf("An error has occurred: %v", err)
 	}
-	ctx.RespondText("%s", resp.Json().Get("message").MustString())
+	return ctx.RespondText("%s", resp.Json().Get("message").MustString())
 }
 
-func (c *ImageCommands) kannagen(ctx *router.Ctx) {
+func (c *ImageCommands) kannagen(ctx *router.Ctx) error {
 	resp, err := http.DefaultClient().Get(fmt.Sprintf("https://nekobot.xyz/api/imagegen?type=kannagen&text=%s", ctx.Arguments.Escaped()))
 	if err != nil {
-		ctx.RespondText("An error has occurred: %v", err)
-		return
+		return fmt.Errorf("An error has occurred: %v", err)
 	}
-	ctx.RespondText("%s", resp.Json().Get("message").MustString())
+	return ctx.RespondText("%s", resp.Json().Get("message").MustString())
 }
 
-func (c *ImageCommands) iphonex(ctx *router.Ctx) {
+func (c *ImageCommands) iphonex(ctx *router.Ctx) error {
 	user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
 	if err != nil {
-		ctx.RespondText("Cannot find user")
-		return
+		return fmt.Errorf("Cannot find user")
 	}
 	resp, err := http.DefaultClient().Get(fmt.Sprintf("https://nekobot.xyz/api/imagegen?type=iphonex&url=%s", url.QueryEscape(user.AvatarURL(""))))
 	if err != nil {
-		ctx.RespondText("An error has occurred: %v", err)
-		return
+		return fmt.Errorf("An error has occurred: %v", err)
 	}
-	ctx.RespondText("%s", resp.Json().Get("message").MustString())
+	return ctx.RespondText("%s", resp.Json().Get("message").MustString())
 }
 
-func (c *ImageCommands) awooify(ctx *router.Ctx) {
+func (c *ImageCommands) awooify(ctx *router.Ctx) error {
 	user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
 	if err != nil {
-		ctx.RespondText("Cannot find user")
-		return
+		return fmt.Errorf("Cannot find user")
 	}
 	resp, err := http.DefaultClient().Get(fmt.Sprintf("https://nekobot.xyz/api/imagegen?type=awooify&url=%s", url.QueryEscape(user.AvatarURL(""))))
 	if err != nil {
-		ctx.RespondText("An error has occurred: %v", err)
-		return
+		return fmt.Errorf("An error has occurred: %v", err)
 	}
-	ctx.RespondText("%s", resp.Json().Get("message").MustString())
+	return ctx.RespondText("%s", resp.Json().Get("message").MustString())
 }
 
-func (c *ImageCommands) trap(ctx *router.Ctx) {
+func (c *ImageCommands) trap(ctx *router.Ctx) error {
 	user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
 	if err != nil {
-		ctx.RespondText("Cannot find user")
-		return
+		return fmt.Errorf("Cannot find user")
 	}
 	resp, err := http.DefaultClient().Get(fmt.Sprintf("https://nekobot.xyz/api/imagegen?type=trap&image=%s&name=%s&author=%s",
 		url.QueryEscape(user.AvatarURL("")),
@@ -1481,54 +1430,47 @@ func (c *ImageCommands) trap(ctx *router.Ctx) {
 		url.QueryEscape(ctx.Message.Author.String()),
 	))
 	if err != nil {
-		ctx.RespondText("An error has occurred: %v", err)
-		return
+		return fmt.Errorf("An error has occurred: %v", err)
 	}
-	ctx.RespondText("%s", resp.Json().Get("message").MustString())
+	return ctx.RespondText("%s", resp.Json().Get("message").MustString())
 }
 
-func (c *ImageCommands) trumptweet(ctx *router.Ctx) {
+func (c *ImageCommands) trumptweet(ctx *router.Ctx) error {
 	resp, err := http.DefaultClient().Get(fmt.Sprintf("https://nekobot.xyz/api/imagegen?type=trumptweet&text=%s", ctx.Arguments.Escaped()))
 	if err != nil {
-		ctx.RespondText("An error has occurred: %v", err)
-		return
+		return fmt.Errorf("An error has occurred: %v", err)
 	}
-	ctx.RespondText("%s", resp.Json().Get("message").MustString())
+	return ctx.RespondText("%s", resp.Json().Get("message").MustString())
 }
 
-func (c *ImageCommands) deepfry(ctx *router.Ctx) {
+func (c *ImageCommands) deepfry(ctx *router.Ctx) error {
 	user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
 	if err != nil {
-		ctx.RespondText("Cannot find user")
-		return
+		return fmt.Errorf("Cannot find user")
 	}
 	resp, err := http.DefaultClient().Get(fmt.Sprintf("https://nekobot.xyz/api/imagegen?type=deepfry&image=%s", url.QueryEscape(user.AvatarURL(""))))
 	if err != nil {
-		ctx.RespondText("An error has occurred: %v", err)
-		return
+		return fmt.Errorf("An error has occurred: %v", err)
 	}
-	ctx.RespondText("%s", resp.Json().Get("message").MustString())
+	return ctx.RespondText("%s", resp.Json().Get("message").MustString())
 }
 
-func (c *ImageCommands) blurpify(ctx *router.Ctx) {
+func (c *ImageCommands) blurpify(ctx *router.Ctx) error {
 	user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
 	if err != nil {
-		ctx.RespondText("Cannot find user")
-		return
+		return fmt.Errorf("Cannot find user")
 	}
 	resp, err := http.DefaultClient().Get(fmt.Sprintf("https://nekobot.xyz/api/imagegen?type=blurpify&image=%s", url.QueryEscape(user.AvatarURL(""))))
 	if err != nil {
-		ctx.RespondText("An error has occurred: %v", err)
-		return
+		return fmt.Errorf("An error has occurred: %v", err)
 	}
-	ctx.RespondText("%s", resp.Json().Get("message").MustString())
+	return ctx.RespondText("%s", resp.Json().Get("message").MustString())
 }
 
-func (c *ImageCommands) phcomment(ctx *router.Ctx) {
+func (c *ImageCommands) phcomment(ctx *router.Ctx) error {
 	user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
 	if err != nil {
-		ctx.RespondText("Cannot find user")
-		return
+		return fmt.Errorf("Cannot find user")
 	}
 	resp, err := http.DefaultClient().Get(fmt.Sprintf("https://nekobot.xyz/api/imagegen?type=phcomment&text=%s&username=%s&image=%s",
 		url.QueryEscape(ctx.Arguments.RawFrom(1)),
@@ -1536,299 +1478,257 @@ func (c *ImageCommands) phcomment(ctx *router.Ctx) {
 		url.QueryEscape(user.AvatarURL("")),
 	))
 	if err != nil {
-		ctx.RespondText("An error has occurred: %v", err)
-		return
+		return fmt.Errorf("An error has occurred: %v", err)
 	}
-	ctx.RespondText("%s", resp.Json().Get("message").MustString())
+	return ctx.RespondText("%s", resp.Json().Get("message").MustString())
 }
 
-func (c *ImageCommands) fact(ctx *router.Ctx) {
+func (c *ImageCommands) fact(ctx *router.Ctx) error {
 	resp, err := http.DefaultClient().Get(fmt.Sprintf("https://nekobot.xyz/api/imagegen?type=fact&text=%s", ctx.Arguments.Escaped()))
 	if err != nil {
-		ctx.RespondText("An error has occurred: %v", err)
-		return
+		return fmt.Errorf("An error has occurred: %v", err)
 	}
-	ctx.RespondText("%s", resp.Json().Get("message").MustString())
+	return ctx.RespondText("%s", resp.Json().Get("message").MustString())
 }
 
-func (c *ImageCommands) trash(ctx *router.Ctx) {
+func (c *ImageCommands) trash(ctx *router.Ctx) error {
 	user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
 	if err != nil {
-		ctx.RespondText("Cannot find user")
-		return
+		return fmt.Errorf("Cannot find user")
 	}
 	resp, err := http.DefaultClient().Get(fmt.Sprintf("https://nekobot.xyz/api/imagegen?type=trash&url=%s", url.QueryEscape(user.AvatarURL(""))))
 	if err != nil {
-		ctx.RespondText("An error has occurred: %v", err)
-		return
+		return fmt.Errorf("An error has occurred: %v", err)
 	}
-	ctx.RespondText("%s", resp.Json().Get("message").MustString())
+	return ctx.RespondText("%s", resp.Json().Get("message").MustString())
 }
 
-func (c *ImageCommands) stickbug(ctx *router.Ctx) {
+func (c *ImageCommands) stickbug(ctx *router.Ctx) error {
 	user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
 	if err != nil {
-		ctx.RespondText("Cannot find user")
-		return
+		return fmt.Errorf("Cannot find user")
 	}
 	resp, err := http.DefaultClient().Get(fmt.Sprintf("https://nekobot.xyz/api/imagegen?type=stickbug&url=%s", url.QueryEscape(user.AvatarURL(""))))
 	if err != nil {
-		ctx.RespondText("An error has occurred: %v", err)
-		return
+		return fmt.Errorf("An error has occurred: %v", err)
 	}
-	ctx.RespondText("%s", resp.Json().Get("message").MustString())
+	return ctx.RespondText("%s", resp.Json().Get("message").MustString())
 }
 
-func (c *ImageCommands) magik(ctx *router.Ctx) {
+func (c *ImageCommands) magik(ctx *router.Ctx) error {
 	user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
 	if err != nil {
-		ctx.RespondText("Cannot find user")
-		return
+		return fmt.Errorf("Cannot find user")
 	}
 	resp, err := http.DefaultClient().Get(fmt.Sprintf("https://nekobot.xyz/api/imagegen?type=magik&image=%s&intensity=5", url.QueryEscape(user.AvatarURL(""))))
 	if err != nil {
-		ctx.RespondText("An error has occurred: %v", err)
-		return
+		return fmt.Errorf("An error has occurred: %v", err)
 	}
-	ctx.RespondText("%s", resp.Json().Get("message").MustString())
+	return ctx.RespondText("%s", resp.Json().Get("message").MustString())
 }
 
-func (c *ImageCommands) randomgif(ctx *router.Ctx) {
+func (c *ImageCommands) randomgif(ctx *router.Ctx) error {
 	resp, err := http.DefaultClient().Get("https://api.giphy.com/v1/gifs/random?api_key=ldQeNHnpL3WcCxJE1uO8HTk17ICn8i34&tag=&rating=R&limit=1&lang=en&offset=0")
 	if err != nil {
-		ctx.RespondText("An error has occurred: %v", err)
-		return
+		return fmt.Errorf("An error has occurred: %v", err)
 	}
-	ctx.RespondText("%s", resp.Json().Get("data", "bitly_url").MustString())
+	return ctx.RespondText("%s", resp.Json().Get("data", "bitly_url").MustString())
 }
 
-func (c *ImageCommands) searchgif(ctx *router.Ctx) {
+func (c *ImageCommands) searchgif(ctx *router.Ctx) error {
 	resp, err := http.DefaultClient().Get(fmt.Sprintf("https://api.giphy.com/v1/gifs/search?api_key=ldQeNHnpL3WcCxJE1uO8HTk17ICn8i34&q=%s&limit=1&offset=0&rating=R&lang=en", ctx.Arguments.Escaped()))
 	if err != nil {
-		ctx.RespondText("An error has occurred: %v", err)
-		return
+		return fmt.Errorf("An error has occurred: %v", err)
 	}
 	data := resp.Json().Get("data")
 	if data.Len() == 0 {
-		ctx.RespondText("No results found.")
-		return
+		return fmt.Errorf("No results found.")
 	}
-	ctx.RespondText("%s", data.Get(0).Get("bitly_url").MustString())
+	return ctx.RespondText("%s", data.Get(0).Get("bitly_url").MustString())
 }
 
-func (c *ImageCommands) sadcat(ctx *router.Ctx) {
+func (c *ImageCommands) sadcat(ctx *router.Ctx) error {
 	imageUrl, err := utils.Misc.GetImageUrlFromJson("https://api.alexflipnote.dev/sadcat", "file")
 	if err != nil {
-		ctx.RespondText("An error has occurred: %v", err)
-		return
+		return fmt.Errorf("An error has occurred: %v", err)
 	}
-	ctx.RespondText("%s", imageUrl)
+	return ctx.RespondText("%s", imageUrl)
 }
 
-func (c *ImageCommands) bird(ctx *router.Ctx) {
+func (c *ImageCommands) bird(ctx *router.Ctx) error {
 	imageUrl, err := utils.Misc.GetImageUrlFromJson("https://api.alexflipnote.dev/birb", "file")
 	if err != nil {
-		ctx.RespondText("An error has occurred: %v", err)
-		return
+		return fmt.Errorf("An error has occurred: %v", err)
 	}
-	ctx.RespondText("%s", imageUrl)
+	return ctx.RespondText("%s", imageUrl)
 }
 
-func (c *ImageCommands) cat(ctx *router.Ctx) {
-	err := utils.Discord.SendFileFromURL(ctx.Session, ctx.Message.ChannelID, "https://cataas.com/cat", "cat.jpg")
-	if err != nil {
-		ctx.RespondText("An error has occurred: %v", err)
-	}
+func (c *ImageCommands) cat(ctx *router.Ctx) error {
+	return utils.Discord.SendFileFromURL(ctx.Session, ctx.Message.ChannelID, "https://cataas.com/cat", "cat.jpg")
 }
 
-func (c *ImageCommands) catgif(ctx *router.Ctx) {
-	err := utils.Discord.SendFileFromURL(ctx.Session, ctx.Message.ChannelID, "https://cataas.com/cat/gif", "cat.gif")
-	if err != nil {
-		ctx.RespondText("An error has occurred: %v", err)
-	}
+func (c *ImageCommands) catgif(ctx *router.Ctx) error {
+	return utils.Discord.SendFileFromURL(ctx.Session, ctx.Message.ChannelID, "https://cataas.com/cat/gif", "cat.gif")
 }
 
-func (c *ImageCommands) catsays(ctx *router.Ctx) {
-	err := utils.Discord.SendFileFromURL(ctx.Session, ctx.Message.ChannelID, "https://cataas.com/cat/says/"+url.PathEscape(ctx.Arguments.Raw()), "cat.jpg")
-	if err != nil {
-		ctx.RespondText("An error has occurred: %v", err)
-	}
+func (c *ImageCommands) catsays(ctx *router.Ctx) error {
+	return utils.Discord.SendFileFromURL(ctx.Session, ctx.Message.ChannelID, "https://cataas.com/cat/says/"+url.PathEscape(ctx.Arguments.Raw()), "cat.jpg")
 }
 
-func (c *ImageCommands) dog(ctx *router.Ctx) {
+func (c *ImageCommands) dog(ctx *router.Ctx) error {
 	imageUrl, err := utils.Misc.GetImageUrlFromJson("https://dog.ceo/api/breeds/image/random", "message")
 	if err != nil {
-		ctx.RespondText("An error has occurred: %v", err)
-		return
+		return fmt.Errorf("An error has occurred: %v", err)
 	}
-	ctx.RespondText("%s", imageUrl)
+	return ctx.RespondText("%s", imageUrl)
 }
 
-func (c *ImageCommands) panda(ctx *router.Ctx) {
+func (c *ImageCommands) panda(ctx *router.Ctx) error {
 	imageUrl, err := utils.Misc.GetImageUrlFromJson("https://some-random-api.com/img/panda", "link")
 	if err != nil {
-		ctx.RespondText("An error has occurred: %v", err)
-		return
+		return fmt.Errorf("An error has occurred: %v", err)
 	}
-	ctx.RespondText("%s", imageUrl)
+	return ctx.RespondText("%s", imageUrl)
 }
 
-func (c *ImageCommands) redpanda(ctx *router.Ctx) {
+func (c *ImageCommands) redpanda(ctx *router.Ctx) error {
 	imageUrl, err := utils.Misc.GetImageUrlFromJson("https://some-random-api.com/img/red_panda", "link")
 	if err != nil {
-		ctx.RespondText("An error has occurred: %v", err)
-		return
+		return fmt.Errorf("An error has occurred: %v", err)
 	}
-	ctx.RespondText("%s", imageUrl)
+	return ctx.RespondText("%s", imageUrl)
 }
 
-func (c *ImageCommands) koala(ctx *router.Ctx) {
+func (c *ImageCommands) koala(ctx *router.Ctx) error {
 	imageUrl, err := utils.Misc.GetImageUrlFromJson("https://some-random-api.com/img/koala", "link")
 	if err != nil {
-		ctx.RespondText("An error has occurred: %v", err)
-		return
+		return fmt.Errorf("An error has occurred: %v", err)
 	}
-	ctx.RespondText("%s", imageUrl)
+	return ctx.RespondText("%s", imageUrl)
 }
 
-func (c *ImageCommands) raccoon(ctx *router.Ctx) {
+func (c *ImageCommands) raccoon(ctx *router.Ctx) error {
 	imageUrl, err := utils.Misc.GetImageUrlFromJson("https://some-random-api.com/img/raccoon", "link")
 	if err != nil {
-		ctx.RespondText("An error has occurred: %v", err)
-		return
+		return fmt.Errorf("An error has occurred: %v", err)
 	}
-	ctx.RespondText("%s", imageUrl)
+	return ctx.RespondText("%s", imageUrl)
 }
 
-func (c *ImageCommands) fox(ctx *router.Ctx) {
+func (c *ImageCommands) fox(ctx *router.Ctx) error {
 	imageUrl, err := utils.Misc.GetImageUrlFromJson("https://randomfox.ca/floof", "image")
 	if err != nil {
-		ctx.RespondText("An error has occurred: %v", err)
-		return
+		return fmt.Errorf("An error has occurred: %v", err)
 	}
-	ctx.RespondText("%s", imageUrl)
+	return ctx.RespondText("%s", imageUrl)
 }
 
-func (c *ImageCommands) shibe(ctx *router.Ctx) {
+func (c *ImageCommands) shibe(ctx *router.Ctx) error {
 	resp, err := http.DefaultClient().Get("https://shibe.online/api/shibes?count=1&urls=true&httpsUrls=true")
 	if err != nil {
-		ctx.RespondText("An error has occurred: %v", err)
-		return
+		return fmt.Errorf("An error has occurred: %v", err)
 	}
-	ctx.RespondText("%s", resp.Json().Get(0).MustString())
+	return ctx.RespondText("%s", resp.Json().Get(0).MustString())
 }
 
-func (c *ImageCommands) whale(ctx *router.Ctx) {
+func (c *ImageCommands) whale(ctx *router.Ctx) error {
 	imageUrl, err := utils.Misc.GetImageUrlFromJson("https://api.animality.xyz/img/whale", "link")
 	if err != nil {
-		ctx.RespondText("An error has occurred: %v", err)
-		return
+		return fmt.Errorf("An error has occurred: %v", err)
 	}
-	ctx.RespondText("%s", imageUrl)
+	return ctx.RespondText("%s", imageUrl)
 }
 
-func (c *ImageCommands) kangaroo(ctx *router.Ctx) {
+func (c *ImageCommands) kangaroo(ctx *router.Ctx) error {
 	imageUrl, err := utils.Misc.GetImageUrlFromJson("https://api.animality.xyz/img/kangaroo", "link")
 	if err != nil {
-		ctx.RespondText("An error has occurred: %v", err)
-		return
+		return fmt.Errorf("An error has occurred: %v", err)
 	}
-	ctx.RespondText("%s", imageUrl)
+	return ctx.RespondText("%s", imageUrl)
 }
 
-func (c *ImageCommands) bunny(ctx *router.Ctx) {
+func (c *ImageCommands) bunny(ctx *router.Ctx) error {
 	imageUrl, err := utils.Misc.GetImageUrlFromJson("https://api.animality.xyz/img/bunny", "link")
 	if err != nil {
-		ctx.RespondText("An error has occurred: %v", err)
-		return
+		return fmt.Errorf("An error has occurred: %v", err)
 	}
-	ctx.RespondText("%s", imageUrl)
+	return ctx.RespondText("%s", imageUrl)
 }
 
-func (c *ImageCommands) lion(ctx *router.Ctx) {
+func (c *ImageCommands) lion(ctx *router.Ctx) error {
 	imageUrl, err := utils.Misc.GetImageUrlFromJson("https://api.animality.xyz/img/lion", "link")
 	if err != nil {
-		ctx.RespondText("An error has occurred: %v", err)
-		return
+		return fmt.Errorf("An error has occurred: %v", err)
 	}
-	ctx.RespondText("%s", imageUrl)
+	return ctx.RespondText("%s", imageUrl)
 }
 
-func (c *ImageCommands) frog(ctx *router.Ctx) {
+func (c *ImageCommands) frog(ctx *router.Ctx) error {
 	imageUrl, err := utils.Misc.GetImageUrlFromJson("https://api.animality.xyz/img/frog", "link")
 	if err != nil {
-		ctx.RespondText("An error has occurred: %v", err)
-		return
+		return fmt.Errorf("An error has occurred: %v", err)
 	}
-	ctx.RespondText("%s", imageUrl)
+	return ctx.RespondText("%s", imageUrl)
 }
 
-func (c *ImageCommands) duck(ctx *router.Ctx) {
+func (c *ImageCommands) duck(ctx *router.Ctx) error {
 	imageUrl, err := utils.Misc.GetImageUrlFromJson("https://api.animality.xyz/img/duck", "link")
 	if err != nil {
-		ctx.RespondText("An error has occurred: %v", err)
-		return
+		return fmt.Errorf("An error has occurred: %v", err)
 	}
-	ctx.RespondText("%s", imageUrl)
+	return ctx.RespondText("%s", imageUrl)
 }
 
-func (c *ImageCommands) penguin(ctx *router.Ctx) {
+func (c *ImageCommands) penguin(ctx *router.Ctx) error {
 	imageUrl, err := utils.Misc.GetImageUrlFromJson("https://api.animality.xyz/img/penguin", "link")
 	if err != nil {
-		ctx.RespondText("An error has occurred: %v", err)
-		return
+		return fmt.Errorf("An error has occurred: %v", err)
 	}
-	ctx.RespondText("%s", imageUrl)
+	return ctx.RespondText("%s", imageUrl)
 }
 
-func (c *ImageCommands) dolphin(ctx *router.Ctx) {
+func (c *ImageCommands) dolphin(ctx *router.Ctx) error {
 	imageUrl, err := utils.Misc.GetImageUrlFromJson("https://api.animality.xyz/img/dolphin", "link")
 	if err != nil {
-		ctx.RespondText("An error has occurred: %v", err)
-		return
+		return fmt.Errorf("An error has occurred: %v", err)
 	}
-	ctx.RespondText("%s", imageUrl)
+	return ctx.RespondText("%s", imageUrl)
 }
 
-func (c *ImageCommands) bear(ctx *router.Ctx) {
+func (c *ImageCommands) bear(ctx *router.Ctx) error {
 	imageUrl, err := utils.Misc.GetImageUrlFromJson("https://api.animality.xyz/img/bear", "link")
 	if err != nil {
-		ctx.RespondText("An error has occurred: %v", err)
-		return
+		return fmt.Errorf("An error has occurred: %v", err)
 	}
-	ctx.RespondText("%s", imageUrl)
+	return ctx.RespondText("%s", imageUrl)
 }
 
-func (c *ImageCommands) axolotl(ctx *router.Ctx) {
+func (c *ImageCommands) axolotl(ctx *router.Ctx) error {
 	imageUrl, err := utils.Misc.GetImageUrlFromJson("https://api.animality.xyz/img/axolotl", "link")
 	if err != nil {
-		ctx.RespondText("An error has occurred: %v", err)
-		return
+		return fmt.Errorf("An error has occurred: %v", err)
 	}
-	ctx.RespondText("%s", imageUrl)
+	return ctx.RespondText("%s", imageUrl)
 }
 
-func (c *ImageCommands) capybara(ctx *router.Ctx) {
+func (c *ImageCommands) capybara(ctx *router.Ctx) error {
 	imageUrl, err := utils.Misc.GetImageUrlFromJson("https://api.animality.xyz/img/capybara", "link")
 	if err != nil {
-		ctx.RespondText("An error has occurred: %v", err)
-		return
+		return fmt.Errorf("An error has occurred: %v", err)
 	}
-	ctx.RespondText("%s", imageUrl)
+	return ctx.RespondText("%s", imageUrl)
 }
 
-func (c *ImageCommands) bed(ctx *router.Ctx) {
+func (c *ImageCommands) bed(ctx *router.Ctx) error {
 	user1, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
 	if err != nil {
-		ctx.RespondText("Cannot find user")
-		return
+		return fmt.Errorf("Cannot find user")
 	}
 	user2, err := ctx.Arguments.Get(1).User(router.ArgumentFlagFallbackDefault)
 	if err != nil {
-		ctx.RespondText("Cannot find user")
-		return
+		return fmt.Errorf("Cannot find user")
 	}
-	err = utils.Discord.SendFileFromURL(
+	return utils.Discord.SendFileFromURL(
 		ctx.Session,
 		ctx.Message.ChannelID,
 		"https://imgen.lightning-bot.com/bed",
@@ -1837,13 +1737,10 @@ func (c *ImageCommands) bed(ctx *router.Ctx) {
 			"avatars": user1.AvatarURL("") + "," + user2.AvatarURL(""),
 		},
 	)
-	if err != nil {
-		ctx.RespondText("An error has occurred: %v", err)
-	}
 }
 
-func (c *ImageCommands) balloon(ctx *router.Ctx) {
-	err := utils.Discord.SendFileFromURL(
+func (c *ImageCommands) balloon(ctx *router.Ctx) error {
+	return utils.Discord.SendFileFromURL(
 		ctx.Session,
 		ctx.Message.ChannelID,
 		"https://imgen.lightning-bot.com/balloon",
@@ -1852,13 +1749,10 @@ func (c *ImageCommands) balloon(ctx *router.Ctx) {
 			"text": ctx.Arguments.Get(0).Raw() + "," + ctx.Arguments.Get(1).Raw(),
 		},
 	)
-	if err != nil {
-		ctx.RespondText("An error has occurred: %v", err)
-	}
 }
 
-func (c *ImageCommands) abandon(ctx *router.Ctx) {
-	err := utils.Discord.SendFileFromURL(
+func (c *ImageCommands) abandon(ctx *router.Ctx) error {
+	return utils.Discord.SendFileFromURL(
 		ctx.Session,
 		ctx.Message.ChannelID,
 		"https://imgen.lightning-bot.com/abandon",
@@ -1867,18 +1761,14 @@ func (c *ImageCommands) abandon(ctx *router.Ctx) {
 			"text": ctx.Arguments.Raw(),
 		},
 	)
-	if err != nil {
-		ctx.RespondText("An error has occurred: %v", err)
-	}
 }
 
-func (c *ImageCommands) aborted(ctx *router.Ctx) {
+func (c *ImageCommands) aborted(ctx *router.Ctx) error {
 	user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
 	if err != nil {
-		ctx.RespondText("Cannot find user")
-		return
+		return fmt.Errorf("Cannot find user")
 	}
-	err = utils.Discord.SendFileFromURL(
+	return utils.Discord.SendFileFromURL(
 		ctx.Session,
 		ctx.Message.ChannelID,
 		"https://imgen.lightning-bot.com/aborted",
@@ -1887,18 +1777,15 @@ func (c *ImageCommands) aborted(ctx *router.Ctx) {
 			"avatars": user.AvatarURL(""),
 		},
 	)
-	if err != nil {
-		ctx.RespondText("An error has occurred: %v", err)
-	}
 }
 
-func (c *ImageCommands) affect(ctx *router.Ctx) {
+func (c *ImageCommands) affect(ctx *router.Ctx) error {
 	user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
 	if err != nil {
-		ctx.RespondText("Cannot find user")
-		return
+		return fmt.Errorf("Cannot find user")
 	}
-	err = utils.Discord.SendFileFromURL(
+
+	return utils.Discord.SendFileFromURL(
 		ctx.Session,
 		ctx.Message.ChannelID,
 		"https://imgen.lightning-bot.com/affect",
@@ -1907,18 +1794,14 @@ func (c *ImageCommands) affect(ctx *router.Ctx) {
 			"avatars": user.AvatarURL(""),
 		},
 	)
-	if err != nil {
-		ctx.RespondText("An error has occurred: %v", err)
-	}
 }
 
-func (c *ImageCommands) airpods(ctx *router.Ctx) {
+func (c *ImageCommands) airpods(ctx *router.Ctx) error {
 	user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
 	if err != nil {
-		ctx.RespondText("Cannot find user")
-		return
+		return fmt.Errorf("Cannot find user")
 	}
-	err = utils.Discord.SendFileFromURL(
+	return utils.Discord.SendFileFromURL(
 		ctx.Session,
 		ctx.Message.ChannelID,
 		"https://imgen.lightning-bot.com/airpods",
@@ -1927,18 +1810,14 @@ func (c *ImageCommands) airpods(ctx *router.Ctx) {
 			"avatars": user.AvatarURL(""),
 		},
 	)
-	if err != nil {
-		ctx.RespondText("An error has occurred: %v", err)
-	}
 }
 
-func (c *ImageCommands) america(ctx *router.Ctx) {
+func (c *ImageCommands) america(ctx *router.Ctx) error {
 	user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
 	if err != nil {
-		ctx.RespondText("Cannot find user")
-		return
+		return fmt.Errorf("Cannot find user")
 	}
-	err = utils.Discord.SendFileFromURL(
+	return utils.Discord.SendFileFromURL(
 		ctx.Session,
 		ctx.Message.ChannelID,
 		"https://imgen.lightning-bot.com/america",
@@ -1947,13 +1826,10 @@ func (c *ImageCommands) america(ctx *router.Ctx) {
 			"avatars": user.AvatarURL(""),
 		},
 	)
-	if err != nil {
-		ctx.RespondText("An error has occurred: %v", err)
-	}
 }
 
-func (c *ImageCommands) armor(ctx *router.Ctx) {
-	err := utils.Discord.SendFileFromURL(
+func (c *ImageCommands) armor(ctx *router.Ctx) error {
+	return utils.Discord.SendFileFromURL(
 		ctx.Session,
 		ctx.Message.ChannelID,
 		"https://imgen.lightning-bot.com/armor",
@@ -1962,18 +1838,14 @@ func (c *ImageCommands) armor(ctx *router.Ctx) {
 			"text": ctx.Arguments.Raw(),
 		},
 	)
-	if err != nil {
-		ctx.RespondText("An error has occurred: %v", err)
-	}
 }
 
-func (c *ImageCommands) bongocat(ctx *router.Ctx) {
+func (c *ImageCommands) bongocat(ctx *router.Ctx) error {
 	user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
 	if err != nil {
-		ctx.RespondText("Cannot find user")
-		return
+		return fmt.Errorf("Cannot find user")
 	}
-	err = utils.Discord.SendFileFromURL(
+	return utils.Discord.SendFileFromURL(
 		ctx.Session,
 		ctx.Message.ChannelID,
 		"https://imgen.lightning-bot.com/bongocat",
@@ -1982,13 +1854,10 @@ func (c *ImageCommands) bongocat(ctx *router.Ctx) {
 			"avatars": user.AvatarURL(""),
 		},
 	)
-	if err != nil {
-		ctx.RespondText("An error has occurred: %v", err)
-	}
 }
 
-func (c *ImageCommands) boo(ctx *router.Ctx) {
-	err := utils.Discord.SendFileFromURL(
+func (c *ImageCommands) boo(ctx *router.Ctx) error {
+	return utils.Discord.SendFileFromURL(
 		ctx.Session,
 		ctx.Message.ChannelID,
 		"https://imgen.lightning-bot.com/boo",
@@ -1997,13 +1866,10 @@ func (c *ImageCommands) boo(ctx *router.Ctx) {
 			"text": ctx.Arguments.Get(0).Raw() + "," + ctx.Arguments.Get(1).Raw(),
 		},
 	)
-	if err != nil {
-		ctx.RespondText("An error has occurred: %v", err)
-	}
 }
 
-func (c *ImageCommands) bigbrain(ctx *router.Ctx) {
-	err := utils.Discord.SendFileFromURL(
+func (c *ImageCommands) bigbrain(ctx *router.Ctx) error {
+	return utils.Discord.SendFileFromURL(
 		ctx.Session,
 		ctx.Message.ChannelID,
 		"https://imgen.lightning-bot.com/brain",
@@ -2015,18 +1881,14 @@ func (c *ImageCommands) bigbrain(ctx *router.Ctx) {
 				"," + ctx.Arguments.Get(3).Raw(),
 		},
 	)
-	if err != nil {
-		ctx.RespondText("An error has occurred: %v", err)
-	}
 }
 
-func (c *ImageCommands) brazzers(ctx *router.Ctx) {
+func (c *ImageCommands) brazzers(ctx *router.Ctx) error {
 	user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
 	if err != nil {
-		ctx.RespondText("Cannot find user")
-		return
+		return fmt.Errorf("Cannot find user")
 	}
-	err = utils.Discord.SendFileFromURL(
+	return utils.Discord.SendFileFromURL(
 		ctx.Session,
 		ctx.Message.ChannelID,
 		"https://imgen.lightning-bot.com/brazzers",
@@ -2035,18 +1897,14 @@ func (c *ImageCommands) brazzers(ctx *router.Ctx) {
 			"avatars": user.AvatarURL(""),
 		},
 	)
-	if err != nil {
-		ctx.RespondText("An error has occurred: %v", err)
-	}
 }
 
-func (c *ImageCommands) byemom(ctx *router.Ctx) {
+func (c *ImageCommands) byemom(ctx *router.Ctx) error {
 	user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
 	if err != nil {
-		ctx.RespondText("Cannot find user")
-		return
+		return fmt.Errorf("Cannot find user")
 	}
-	err = utils.Discord.SendFileFromURL(
+	return utils.Discord.SendFileFromURL(
 		ctx.Session,
 		ctx.Message.ChannelID,
 		"https://imgen.lightning-bot.com/byemom",
@@ -2057,18 +1915,14 @@ func (c *ImageCommands) byemom(ctx *router.Ctx) {
 			"text":      ctx.Arguments.RawFrom(1),
 		},
 	)
-	if err != nil {
-		ctx.RespondText("An error has occurred: %v", err)
-	}
 }
 
-func (c *ImageCommands) cancer(ctx *router.Ctx) {
+func (c *ImageCommands) cancer(ctx *router.Ctx) error {
 	user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
 	if err != nil {
-		ctx.RespondText("Cannot find user")
-		return
+		return fmt.Errorf("Cannot find user")
 	}
-	err = utils.Discord.SendFileFromURL(
+	return utils.Discord.SendFileFromURL(
 		ctx.Session,
 		ctx.Message.ChannelID,
 		"https://imgen.lightning-bot.com/cancer",
@@ -2077,13 +1931,10 @@ func (c *ImageCommands) cancer(ctx *router.Ctx) {
 			"avatars": user.AvatarURL(""),
 		},
 	)
-	if err != nil {
-		ctx.RespondText("An error has occurred: %v", err)
-	}
 }
 
-func (c *ImageCommands) cheating(ctx *router.Ctx) {
-	err := utils.Discord.SendFileFromURL(
+func (c *ImageCommands) cheating(ctx *router.Ctx) error {
+	return utils.Discord.SendFileFromURL(
 		ctx.Session,
 		ctx.Message.ChannelID,
 		"https://imgen.lightning-bot.com/cheating",
@@ -2092,13 +1943,10 @@ func (c *ImageCommands) cheating(ctx *router.Ctx) {
 			"text": ctx.Arguments.Get(0).Raw() + "," + ctx.Arguments.Get(1).Raw(),
 		},
 	)
-	if err != nil {
-		ctx.RespondText("An error has occurred: %v", err)
-	}
 }
 
-func (c *ImageCommands) citation(ctx *router.Ctx) {
-	err := utils.Discord.SendFileFromURL(
+func (c *ImageCommands) citation(ctx *router.Ctx) error {
+	return utils.Discord.SendFileFromURL(
 		ctx.Session,
 		ctx.Message.ChannelID,
 		"https://imgen.lightning-bot.com/citation",
@@ -2107,18 +1955,14 @@ func (c *ImageCommands) citation(ctx *router.Ctx) {
 			"text": ctx.Arguments.Get(0).Raw() + "," + ctx.Arguments.Get(1).Raw() + "," + ctx.Arguments.Get(2).Raw(),
 		},
 	)
-	if err != nil {
-		ctx.RespondText("An error has occurred: %v", err)
-	}
 }
 
-func (c *ImageCommands) communism(ctx *router.Ctx) {
+func (c *ImageCommands) communism(ctx *router.Ctx) error {
 	user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
 	if err != nil {
-		ctx.RespondText("Cannot find user")
-		return
+		return fmt.Errorf("Cannot find user")
 	}
-	err = utils.Discord.SendFileFromURL(
+	return utils.Discord.SendFileFromURL(
 		ctx.Session,
 		ctx.Message.ChannelID,
 		"https://imgen.lightning-bot.com/communism",
@@ -2127,13 +1971,10 @@ func (c *ImageCommands) communism(ctx *router.Ctx) {
 			"avatars": user.AvatarURL(""),
 		},
 	)
-	if err != nil {
-		ctx.RespondText("An error has occurred: %v", err)
-	}
 }
 
-func (c *ImageCommands) confusedcat(ctx *router.Ctx) {
-	err := utils.Discord.SendFileFromURL(
+func (c *ImageCommands) confusedcat(ctx *router.Ctx) error {
+	return utils.Discord.SendFileFromURL(
 		ctx.Session,
 		ctx.Message.ChannelID,
 		"https://imgen.lightning-bot.com/confusedcat",
@@ -2142,18 +1983,14 @@ func (c *ImageCommands) confusedcat(ctx *router.Ctx) {
 			"text": ctx.Arguments.Get(0).Raw() + "," + ctx.Arguments.Get(1).Raw(),
 		},
 	)
-	if err != nil {
-		ctx.RespondText("An error has occurred: %v", err)
-	}
 }
 
-func (c *ImageCommands) corporate(ctx *router.Ctx) {
+func (c *ImageCommands) corporate(ctx *router.Ctx) error {
 	user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
 	if err != nil {
-		ctx.RespondText("Cannot find user")
-		return
+		return fmt.Errorf("Cannot find user")
 	}
-	err = utils.Discord.SendFileFromURL(
+	return utils.Discord.SendFileFromURL(
 		ctx.Session,
 		ctx.Message.ChannelID,
 		"https://imgen.lightning-bot.com/corporate",
@@ -2162,13 +1999,10 @@ func (c *ImageCommands) corporate(ctx *router.Ctx) {
 			"avatars": user.AvatarURL(""),
 		},
 	)
-	if err != nil {
-		ctx.RespondText("An error has occurred: %v", err)
-	}
 }
 
-func (c *ImageCommands) cry(ctx *router.Ctx) {
-	err := utils.Discord.SendFileFromURL(
+func (c *ImageCommands) cry(ctx *router.Ctx) error {
+	return utils.Discord.SendFileFromURL(
 		ctx.Session,
 		ctx.Message.ChannelID,
 		"https://imgen.lightning-bot.com/cry",
@@ -2177,18 +2011,14 @@ func (c *ImageCommands) cry(ctx *router.Ctx) {
 			"text": ctx.Arguments.Raw(),
 		},
 	)
-	if err != nil {
-		ctx.RespondText("An error has occurred: %v", err)
-	}
 }
 
-func (c *ImageCommands) dab(ctx *router.Ctx) {
+func (c *ImageCommands) dab(ctx *router.Ctx) error {
 	user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
 	if err != nil {
-		ctx.RespondText("Cannot find user")
-		return
+		return fmt.Errorf("Cannot find user")
 	}
-	err = utils.Discord.SendFileFromURL(
+	return utils.Discord.SendFileFromURL(
 		ctx.Session,
 		ctx.Message.ChannelID,
 		"https://imgen.lightning-bot.com/dab",
@@ -2197,18 +2027,14 @@ func (c *ImageCommands) dab(ctx *router.Ctx) {
 			"avatars": user.AvatarURL(""),
 		},
 	)
-	if err != nil {
-		ctx.RespondText("An error has occurred: %v", err)
-	}
 }
 
-func (c *ImageCommands) dank(ctx *router.Ctx) {
+func (c *ImageCommands) dank(ctx *router.Ctx) error {
 	user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
 	if err != nil {
-		ctx.RespondText("Cannot find user")
-		return
+		return fmt.Errorf("Cannot find user")
 	}
-	err = utils.Discord.SendFileFromURL(
+	return utils.Discord.SendFileFromURL(
 		ctx.Session,
 		ctx.Message.ChannelID,
 		"https://imgen.lightning-bot.com/dank",
@@ -2217,18 +2043,14 @@ func (c *ImageCommands) dank(ctx *router.Ctx) {
 			"avatars": user.AvatarURL(""),
 		},
 	)
-	if err != nil {
-		ctx.RespondText("An error has occurred: %v", err)
-	}
 }
 
-func (c *ImageCommands) delete(ctx *router.Ctx) {
+func (c *ImageCommands) delete(ctx *router.Ctx) error {
 	user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
 	if err != nil {
-		ctx.RespondText("Cannot find user")
-		return
+		return fmt.Errorf("Cannot find user")
 	}
-	err = utils.Discord.SendFileFromURL(
+	return utils.Discord.SendFileFromURL(
 		ctx.Session,
 		ctx.Message.ChannelID,
 		"https://imgen.lightning-bot.com/delete",
@@ -2237,18 +2059,14 @@ func (c *ImageCommands) delete(ctx *router.Ctx) {
 			"avatars": user.AvatarURL(""),
 		},
 	)
-	if err != nil {
-		ctx.RespondText("An error has occurred: %v", err)
-	}
 }
 
-func (c *ImageCommands) disability(ctx *router.Ctx) {
+func (c *ImageCommands) disability(ctx *router.Ctx) error {
 	user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
 	if err != nil {
-		ctx.RespondText("Cannot find user")
-		return
+		return fmt.Errorf("Cannot find user")
 	}
-	err = utils.Discord.SendFileFromURL(
+	return utils.Discord.SendFileFromURL(
 		ctx.Session,
 		ctx.Message.ChannelID,
 		"https://imgen.lightning-bot.com/disability",
@@ -2257,13 +2075,10 @@ func (c *ImageCommands) disability(ctx *router.Ctx) {
 			"avatars": user.AvatarURL(""),
 		},
 	)
-	if err != nil {
-		ctx.RespondText("An error has occurred: %v", err)
-	}
 }
 
-func (c *ImageCommands) doglemon(ctx *router.Ctx) {
-	err := utils.Discord.SendFileFromURL(
+func (c *ImageCommands) doglemon(ctx *router.Ctx) error {
+	return utils.Discord.SendFileFromURL(
 		ctx.Session,
 		ctx.Message.ChannelID,
 		"https://imgen.lightning-bot.com/doglemon",
@@ -2272,18 +2087,14 @@ func (c *ImageCommands) doglemon(ctx *router.Ctx) {
 			"text": ctx.Arguments.Get(0).Raw() + "," + ctx.Arguments.Get(1).Raw(),
 		},
 	)
-	if err != nil {
-		ctx.RespondText("An error has occurred: %v", err)
-	}
 }
 
-func (c *ImageCommands) door(ctx *router.Ctx) {
+func (c *ImageCommands) door(ctx *router.Ctx) error {
 	user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
 	if err != nil {
-		ctx.RespondText("Cannot find user")
-		return
+		return fmt.Errorf("Cannot find user")
 	}
-	err = utils.Discord.SendFileFromURL(
+	return utils.Discord.SendFileFromURL(
 		ctx.Session,
 		ctx.Message.ChannelID,
 		"https://imgen.lightning-bot.com/door",
@@ -2292,18 +2103,14 @@ func (c *ImageCommands) door(ctx *router.Ctx) {
 			"avatars": user.AvatarURL(""),
 		},
 	)
-	if err != nil {
-		ctx.RespondText("An error has occurred: %v", err)
-	}
 }
 
-func (c *ImageCommands) egg(ctx *router.Ctx) {
+func (c *ImageCommands) egg(ctx *router.Ctx) error {
 	user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
 	if err != nil {
-		ctx.RespondText("Cannot find user")
-		return
+		return fmt.Errorf("Cannot find user")
 	}
-	err = utils.Discord.SendFileFromURL(
+	return utils.Discord.SendFileFromURL(
 		ctx.Session,
 		ctx.Message.ChannelID,
 		"https://imgen.lightning-bot.com/egg",
@@ -2312,13 +2119,10 @@ func (c *ImageCommands) egg(ctx *router.Ctx) {
 			"avatars": user.AvatarURL(""),
 		},
 	)
-	if err != nil {
-		ctx.RespondText("An error has occurred: %v", err)
-	}
 }
 
-func (c *ImageCommands) excuseme(ctx *router.Ctx) {
-	err := utils.Discord.SendFileFromURL(
+func (c *ImageCommands) excuseme(ctx *router.Ctx) error {
+	return utils.Discord.SendFileFromURL(
 		ctx.Session,
 		ctx.Message.ChannelID,
 		"https://imgen.lightning-bot.com/excuseme",
@@ -2327,13 +2131,10 @@ func (c *ImageCommands) excuseme(ctx *router.Ctx) {
 			"text": ctx.Arguments.Raw(),
 		},
 	)
-	if err != nil {
-		ctx.RespondText("An error has occurred: %v", err)
-	}
 }
 
-func (c *ImageCommands) expanddong(ctx *router.Ctx) {
-	err := utils.Discord.SendFileFromURL(
+func (c *ImageCommands) expanddong(ctx *router.Ctx) error {
+	return utils.Discord.SendFileFromURL(
 		ctx.Session,
 		ctx.Message.ChannelID,
 		"https://imgen.lightning-bot.com/expanddong",
@@ -2342,13 +2143,10 @@ func (c *ImageCommands) expanddong(ctx *router.Ctx) {
 			"text": ctx.Arguments.Raw(),
 		},
 	)
-	if err != nil {
-		ctx.RespondText("An error has occurred: %v", err)
-	}
 }
 
-func (c *ImageCommands) expandingwwe(ctx *router.Ctx) {
-	err := utils.Discord.SendFileFromURL(
+func (c *ImageCommands) expandingwwe(ctx *router.Ctx) error {
+	return utils.Discord.SendFileFromURL(
 		ctx.Session,
 		ctx.Message.ChannelID,
 		"https://imgen.lightning-bot.com/expandingwwe",
@@ -2361,288 +2159,257 @@ func (c *ImageCommands) expandingwwe(ctx *router.Ctx) {
 				"," + ctx.Arguments.Get(4).Raw(),
 		},
 	)
-	if err != nil {
-		ctx.RespondText("An error has occurred: %v", err)
-	}
 }
 
-func (c *ImageCommands) qrcode(ctx *router.Ctx) {
-	err := utils.Discord.SendFileFromURL(
+func (c *ImageCommands) qrcode(ctx *router.Ctx) error {
+	return utils.Discord.SendFileFromURL(
 		ctx.Session,
 		ctx.Message.ChannelID,
 		fmt.Sprintf("https://www.qrcoder.co.uk/api/v1/?type=png&text=%s&int=1&background=FFFFFF&foreground=000000&eo=000000&ei=000000&size=8&padding=2", ctx.Arguments.Escaped()),
 		"qrcode.png",
 	)
-	if err != nil {
-		ctx.RespondText("An error has occurred: %v", err)
-	}
 }
 
-func (c *ImageCommands) darkqrcode(ctx *router.Ctx) {
-	err := utils.Discord.SendFileFromURL(
+func (c *ImageCommands) darkqrcode(ctx *router.Ctx) error {
+	return utils.Discord.SendFileFromURL(
 		ctx.Session,
 		ctx.Message.ChannelID,
 		fmt.Sprintf("https://www.qrcoder.co.uk/api/v1/?type=png&text=%s&int=1&background=000&foreground=FFFFFF&eo=FFFFFF&ei=FFFFFF&size=8&padding=2", ctx.Arguments.Escaped()),
 		"qrcode.png",
 	)
-	if err != nil {
-		ctx.RespondText("An error has occurred: %v", err)
-	}
 }
 
-func (c *ImageCommands) rule34(ctx *router.Ctx) {
+func (c *ImageCommands) rule34(ctx *router.Ctx) error {
 	resp, err := http.DefaultClient().Get("https://api.rule34.xxx/index.php?page=dapi&s=post&q=index&json=1")
 	if err != nil {
-		ctx.RespondText("An error has occurred: %v", err)
-		return
+		return fmt.Errorf("An error has occurred: %v", err)
 	}
 	data := resp.Json()
-	ctx.RespondText("%s", data.Get(rand.Intn(data.Len())).Get("file_url").MustString())
+	return ctx.RespondText("%s", data.Get(rand.Intn(data.Len())).Get("file_url").MustString())
 }
 
-func (c *ImageCommands) achievement(ctx *router.Ctx) {
-	ctx.RespondText("https://api.lightning-bot.com/api/v3/imagegen/achievement?text=%s", ctx.Arguments.Escaped())
+func (c *ImageCommands) achievement(ctx *router.Ctx) error {
+	return ctx.RespondText("https://api.lightning-bot.com/api/v3/imagegen/achievement?text=%s", ctx.Arguments.Escaped())
 }
 
-func (c *ImageCommands) amiajoke(ctx *router.Ctx) {
+func (c *ImageCommands) amiajoke(ctx *router.Ctx) error {
 	user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
 	if err != nil {
-		ctx.RespondText("Cannot find user")
-		return
+		return fmt.Errorf("Cannot find user")
 	}
-	ctx.RespondText("https://api.lightning-bot.com/api/v3/imagegen/amiajoke?url=%s", url.QueryEscape(user.AvatarURL("")))
+	return ctx.RespondText("https://api.lightning-bot.com/api/v3/imagegen/amiajoke?url=%s", url.QueryEscape(user.AvatarURL("")))
 }
 
-func (c *ImageCommands) bad(ctx *router.Ctx) {
+func (c *ImageCommands) bad(ctx *router.Ctx) error {
 	user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
 	if err != nil {
-		ctx.RespondText("Cannot find user")
-		return
+		return fmt.Errorf("Cannot find user")
 	}
-	ctx.RespondText("https://api.lightning-bot.com/api/v3/imagegen/bad?url=%s", url.QueryEscape(user.AvatarURL("")))
+	return ctx.RespondText("https://api.lightning-bot.com/api/v3/imagegen/bad?url=%s", url.QueryEscape(user.AvatarURL("")))
 }
 
-func (c *ImageCommands) calling(ctx *router.Ctx) {
-	ctx.RespondText("https://api.lightning-bot.com/api/v3/imagegen/calling?text=%s", ctx.Arguments.Escaped())
+func (c *ImageCommands) calling(ctx *router.Ctx) error {
+	return ctx.RespondText("https://api.lightning-bot.com/api/v3/imagegen/calling?text=%s", ctx.Arguments.Escaped())
 }
 
-func (c *ImageCommands) didyoumean(ctx *router.Ctx) {
-	ctx.RespondText(
+func (c *ImageCommands) didyoumean(ctx *router.Ctx) error {
+	return ctx.RespondText(
 		"https://api.lightning-bot.com/api/v3/imagegen/didyoumean?top=%s&bottom=%s",
 		url.QueryEscape(ctx.Arguments.Get(0).Raw()),
 		url.QueryEscape(ctx.Arguments.Get(1).Raw()),
 	)
 }
 
-func (c *ImageCommands) drake(ctx *router.Ctx) {
-	ctx.RespondText(
+func (c *ImageCommands) drake(ctx *router.Ctx) error {
+	return ctx.RespondText(
 		"https://api.lightning-bot.com/api/v3/imagegen/drake?top=%s&bottom=%s&ayano=false",
 		url.QueryEscape(ctx.Arguments.Get(0).Raw()),
 		url.QueryEscape(ctx.Arguments.Get(1).Raw()),
 	)
 }
 
-func (c *ImageCommands) ayano(ctx *router.Ctx) {
-	ctx.RespondText(
+func (c *ImageCommands) ayano(ctx *router.Ctx) error {
+	return ctx.RespondText(
 		"https://api.lightning-bot.com/api/v3/imagegen/drake?top=%s&bottom=%s&ayano=true",
 		url.QueryEscape(ctx.Arguments.Get(0).Raw()),
 		url.QueryEscape(ctx.Arguments.Get(1).Raw()),
 	)
 }
 
-func (c *ImageCommands) facts(ctx *router.Ctx) {
-	ctx.RespondText("https://api.lightning-bot.com/api/v3/imagegen/facts?text=%s", ctx.Arguments.Escaped())
+func (c *ImageCommands) facts(ctx *router.Ctx) error {
+	return ctx.RespondText("https://api.lightning-bot.com/api/v3/imagegen/facts?text=%s", ctx.Arguments.Escaped())
 }
 
-func (c *ImageCommands) blur(ctx *router.Ctx) {
+func (c *ImageCommands) blur(ctx *router.Ctx) error {
 	user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
 	if err != nil {
-		ctx.RespondText("Cannot find user")
-		return
+		return fmt.Errorf("Cannot find user")
 	}
-	ctx.RespondText("https://api.lightning-bot.com/api/v3/imagegen/filter?url=%s&filter=blur", url.QueryEscape(user.AvatarURL("")))
+	return ctx.RespondText("https://api.lightning-bot.com/api/v3/imagegen/filter?url=%s&filter=blur", url.QueryEscape(user.AvatarURL("")))
 }
 
-func (c *ImageCommands) flipav(ctx *router.Ctx) {
+func (c *ImageCommands) flipav(ctx *router.Ctx) error {
 	user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
 	if err != nil {
-		ctx.RespondText("Cannot find user")
-		return
+		return fmt.Errorf("Cannot find user")
 	}
-	ctx.RespondText("https://api.lightning-bot.com/api/v3/imagegen/filter?url=%s&filter=flip", url.QueryEscape(user.AvatarURL("")))
+	return ctx.RespondText("https://api.lightning-bot.com/api/v3/imagegen/filter?url=%s&filter=flip", url.QueryEscape(user.AvatarURL("")))
 }
 
-func (c *ImageCommands) mirror(ctx *router.Ctx) {
+func (c *ImageCommands) mirror(ctx *router.Ctx) error {
 	user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
 	if err != nil {
-		ctx.RespondText("Cannot find user")
-		return
+		return fmt.Errorf("Cannot find user")
 	}
-	ctx.RespondText("https://api.lightning-bot.com/api/v3/imagegen/filter?url=%s&filter=mirror", url.QueryEscape(user.AvatarURL("")))
+	return ctx.RespondText("https://api.lightning-bot.com/api/v3/imagegen/filter?url=%s&filter=mirror", url.QueryEscape(user.AvatarURL("")))
 }
 
-func (c *ImageCommands) wide(ctx *router.Ctx) {
+func (c *ImageCommands) wide(ctx *router.Ctx) error {
 	user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
 	if err != nil {
-		ctx.RespondText("Cannot find user")
-		return
+		return fmt.Errorf("Cannot find user")
 	}
-	ctx.RespondText("https://api.lightning-bot.com/api/v3/imagegen/filter?url=%s&filter=wide", url.QueryEscape(user.AvatarURL("")))
+	return ctx.RespondText("https://api.lightning-bot.com/api/v3/imagegen/filter?url=%s&filter=wide", url.QueryEscape(user.AvatarURL("")))
 }
 
-func (c *ImageCommands) sepia(ctx *router.Ctx) {
+func (c *ImageCommands) sepia(ctx *router.Ctx) error {
 	user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
 	if err != nil {
-		ctx.RespondText("Cannot find user")
-		return
+		return fmt.Errorf("Cannot find user")
 	}
-	ctx.RespondText("https://api.lightning-bot.com/api/v3/imagegen/filter?url=%s&filter=sepia", url.QueryEscape(user.AvatarURL("")))
+	return ctx.RespondText("https://api.lightning-bot.com/api/v3/imagegen/filter?url=%s&filter=sepia", url.QueryEscape(user.AvatarURL("")))
 }
 
-func (c *ImageCommands) recaptcha(ctx *router.Ctx) {
-	ctx.RespondText("https://api.lightning-bot.com/api/v3/imagegen/captcha?text=%s", ctx.Arguments.Escaped())
+func (c *ImageCommands) recaptcha(ctx *router.Ctx) error {
+	return ctx.RespondText("https://api.lightning-bot.com/api/v3/imagegen/captcha?text=%s", ctx.Arguments.Escaped())
 }
 
-func (c *ImageCommands) gay(ctx *router.Ctx) {
+func (c *ImageCommands) gay(ctx *router.Ctx) error {
 	user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
 	if err != nil {
-		ctx.RespondText("Cannot find user")
-		return
+		return fmt.Errorf("Cannot find user")
 	}
-	ctx.RespondText("https://api.lightning-bot.com/api/v3/imagegen/filter?url=%s&filter=gay", url.QueryEscape(user.AvatarURL("")))
+	return ctx.RespondText("https://api.lightning-bot.com/api/v3/imagegen/filter?url=%s&filter=gay", url.QueryEscape(user.AvatarURL("")))
 }
 
-func (c *ImageCommands) communist(ctx *router.Ctx) {
+func (c *ImageCommands) communist(ctx *router.Ctx) error {
 	user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
 	if err != nil {
-		ctx.RespondText("Cannot find user")
-		return
+		return fmt.Errorf("Cannot find user")
 	}
-	ctx.RespondText("https://api.lightning-bot.com/api/v3/imagegen/filter?url=%s&filter=communist", url.QueryEscape(user.AvatarURL("")))
+	return ctx.RespondText("https://api.lightning-bot.com/api/v3/imagegen/filter?url=%s&filter=communist", url.QueryEscape(user.AvatarURL("")))
 }
 
-func (c *ImageCommands) snow(ctx *router.Ctx) {
+func (c *ImageCommands) snow(ctx *router.Ctx) error {
 	user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
 	if err != nil {
-		ctx.RespondText("Cannot find user")
-		return
+		return fmt.Errorf("Cannot find user")
 	}
-	ctx.RespondText("https://api.lightning-bot.com/api/v3/imagegen/filter?url=%s&filter=snow", url.QueryEscape(user.AvatarURL("")))
+	return ctx.RespondText("https://api.lightning-bot.com/api/v3/imagegen/filter?url=%s&filter=snow", url.QueryEscape(user.AvatarURL("")))
 }
 
-func (c *ImageCommands) hub(ctx *router.Ctx) {
-	ctx.RespondText(
+func (c *ImageCommands) hub(ctx *router.Ctx) error {
+	return ctx.RespondText(
 		"https://api.lightning-bot.com/api/v3/imagegen/pornhub?text1=%s&text2=%s",
 		url.QueryEscape(ctx.Arguments.Get(0).Raw()),
 		url.QueryEscape(ctx.Arguments.Get(1).Raw()),
 	)
 }
 
-func (c *ImageCommands) floor(ctx *router.Ctx) {
+func (c *ImageCommands) floor(ctx *router.Ctx) error {
 	user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
 	if err != nil {
-		ctx.RespondText("Cannot find user")
-		return
+		return fmt.Errorf("Cannot find user")
 	}
-	ctx.RespondText(
+	return ctx.RespondText(
 		"https://api.lightning-bot.com/api/v3/imagegen/floor?url=%s&text=%s",
 		url.QueryEscape(user.AvatarURL("")),
 		url.QueryEscape(ctx.Arguments.RawFrom(1)),
 	)
 }
 
-func (c *ImageCommands) jokeoverhead(ctx *router.Ctx) {
+func (c *ImageCommands) jokeoverhead(ctx *router.Ctx) error {
 	user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
 	if err != nil {
-		ctx.RespondText("Cannot find user")
-		return
+		return fmt.Errorf("Cannot find user")
 	}
-	ctx.RespondText("https://api.lightning-bot.com/api/v3/imagegen/jokeoverhead?url=%s", url.QueryEscape(user.AvatarURL("")))
+	return ctx.RespondText("https://api.lightning-bot.com/api/v3/imagegen/jokeoverhead?url=%s", url.QueryEscape(user.AvatarURL("")))
 }
 
-func (c *ImageCommands) throwaway(ctx *router.Ctx) {
+func (c *ImageCommands) throwaway(ctx *router.Ctx) error {
 	user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
 	if err != nil {
-		ctx.RespondText("Cannot find user")
-		return
+		return fmt.Errorf("Cannot find user")
 	}
-	ctx.RespondText(
+	return ctx.RespondText(
 		"https://api.lightning-bot.com/api/v3/imagegen/trash?url=%s&trash_url=%s",
 		url.QueryEscape(user.AvatarURL("")),
 		url.QueryEscape(ctx.Message.Author.AvatarURL("")),
 	)
 }
 
-func (c *ImageCommands) salty(ctx *router.Ctx) {
+func (c *ImageCommands) salty(ctx *router.Ctx) error {
 	user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
 	if err != nil {
-		ctx.RespondText("Cannot find user")
-		return
+		return fmt.Errorf("Cannot find user")
 	}
-	ctx.RespondText("https://api.lightning-bot.com/api/v3/imagegen/salty?url=%s", url.QueryEscape(user.AvatarURL("")))
+	return ctx.RespondText("https://api.lightning-bot.com/api/v3/imagegen/salty?url=%s", url.QueryEscape(user.AvatarURL("")))
 }
 
-func (c *ImageCommands) scroll(ctx *router.Ctx) {
-	ctx.RespondText("https://api.lightning-bot.com/api/v3/imagegen/scroll?text=%s", ctx.Arguments.Escaped())
+func (c *ImageCommands) scroll(ctx *router.Ctx) error {
+	return ctx.RespondText("https://api.lightning-bot.com/api/v3/imagegen/scroll?text=%s", ctx.Arguments.Escaped())
 }
 
-func (c *ImageCommands) shame(ctx *router.Ctx) {
+func (c *ImageCommands) shame(ctx *router.Ctx) error {
 	user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
 	if err != nil {
-		ctx.RespondText("Cannot find user")
-		return
+		return fmt.Errorf("Cannot find user")
 	}
-	ctx.RespondText("https://api.lightning-bot.com/api/v3/imagegen/shame?url=%s", url.QueryEscape(user.AvatarURL("")))
+	return ctx.RespondText("https://api.lightning-bot.com/api/v3/imagegen/shame?url=%s", url.QueryEscape(user.AvatarURL("")))
 }
 
-func (c *ImageCommands) ship(ctx *router.Ctx) {
+func (c *ImageCommands) ship(ctx *router.Ctx) error {
 	user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
 	if err != nil {
-		ctx.RespondText("Cannot find user")
-		return
+		return fmt.Errorf("Cannot find user")
 	}
 	user2, err := ctx.Arguments.Get(1).User(router.ArgumentFlagFallbackDefault)
 	if err != nil {
-		ctx.RespondText("Cannot find user")
-		return
+		return fmt.Errorf("Cannot find user")
 	}
-	ctx.RespondText(
+	return ctx.RespondText(
 		"https://api.lightning-bot.com/api/v3/imagegen/ship?url1=%s&url2=%s",
 		url.QueryEscape(user.AvatarURL("")),
 		url.QueryEscape(user2.AvatarURL("")),
 	)
 }
 
-func (c *ImageCommands) what(ctx *router.Ctx) {
+func (c *ImageCommands) what(ctx *router.Ctx) error {
 	user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
 	if err != nil {
-		ctx.RespondText("Cannot find user")
-		return
+		return fmt.Errorf("Cannot find user")
 	}
-	ctx.RespondText("https://api.lightning-bot.com/api/v3/imagegen/what?url=%s", url.QueryEscape(user.AvatarURL("")))
+	return ctx.RespondText("https://api.lightning-bot.com/api/v3/imagegen/what?url=%s", url.QueryEscape(user.AvatarURL("")))
 }
 
-func (c *ImageCommands) adios(ctx *router.Ctx) {
+func (c *ImageCommands) adios(ctx *router.Ctx) error {
 	user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
 	if err != nil {
-		ctx.RespondText("Cannot find user")
-		return
+		return fmt.Errorf("Cannot find user")
 	}
-	ctx.RespondText("https://vacefron.nl/api/adios?user=%s", url.QueryEscape(user.AvatarURL("")))
+	return ctx.RespondText("https://vacefron.nl/api/adios?user=%s", url.QueryEscape(user.AvatarURL("")))
 }
 
-func (c *ImageCommands) batmanslap(ctx *router.Ctx) {
+func (c *ImageCommands) batmanslap(ctx *router.Ctx) error {
 	user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
 	if err != nil {
-		ctx.RespondText("Cannot find user")
-		return
+		return fmt.Errorf("Cannot find user")
 	}
 	user2, err := ctx.Arguments.Get(1).User(router.ArgumentFlagFallbackDefault)
 	if err != nil {
-		ctx.RespondText("Cannot find user")
-		return
+		return fmt.Errorf("Cannot find user")
 	}
-	ctx.RespondText(
+	return ctx.RespondText(
 		"https://vacefron.nl/api/batmanslap?text1=%s&text2=%s&batman=%s&robin=%s",
 		url.QueryEscape(ctx.Arguments.Get(0).Raw()),
 		url.QueryEscape(ctx.Arguments.Get(1).Raw()),
@@ -2651,151 +2418,137 @@ func (c *ImageCommands) batmanslap(ctx *router.Ctx) {
 	)
 }
 
-func (c *ImageCommands) carreverse(ctx *router.Ctx) {
-	ctx.RespondText("https://vacefron.nl/api/carreverse?text=%s", ctx.Arguments.Escaped())
+func (c *ImageCommands) carreverse(ctx *router.Ctx) error {
+	return ctx.RespondText("https://vacefron.nl/api/carreverse?text=%s", ctx.Arguments.Escaped())
 }
 
-func (c *ImageCommands) drip(ctx *router.Ctx) {
+func (c *ImageCommands) drip(ctx *router.Ctx) error {
 	user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
 	if err != nil {
-		ctx.RespondText("Cannot find user")
-		return
+		return fmt.Errorf("Cannot find user")
 	}
-	ctx.RespondText("https://vacefron.nl/api/drip?user=%s", url.QueryEscape(user.AvatarURL("")))
+	return ctx.RespondText("https://vacefron.nl/api/drip?user=%s", url.QueryEscape(user.AvatarURL("")))
 }
 
-func (c *ImageCommands) impostor(ctx *router.Ctx) {
+func (c *ImageCommands) impostor(ctx *router.Ctx) error {
 	crewmate := random.Choice([]string{"black", "blue", "brown", "cyan", "darkgreen", "lime", "orange", "pink", "purple", "red", "white", "yellow"})
-	ctx.RespondText("https://vacefron.nl/api/ejected?name=%s&impostor=true&crewmate=%s", ctx.Arguments.Raw(), crewmate)
+	return ctx.RespondText("https://vacefron.nl/api/ejected?name=%s&impostor=true&crewmate=%s", ctx.Arguments.Raw(), crewmate)
 }
 
-func (c *ImageCommands) notimpostor(ctx *router.Ctx) {
+func (c *ImageCommands) notimpostor(ctx *router.Ctx) error {
 	crewmate := random.Choice([]string{"black", "blue", "brown", "cyan", "darkgreen", "lime", "orange", "pink", "purple", "red", "white", "yellow"})
-	ctx.RespondText("https://vacefron.nl/api/ejected?name=%s&impostor=false&crewmate=%s", ctx.Arguments.Raw(), crewmate)
+	return ctx.RespondText("https://vacefron.nl/api/ejected?name=%s&impostor=false&crewmate=%s", ctx.Arguments.Raw(), crewmate)
 }
 
-func (c *ImageCommands) emergencymeeting(ctx *router.Ctx) {
-	ctx.RespondText("https://vacefron.nl/api/emergencymeeting?text=%s", ctx.Arguments.Escaped())
+func (c *ImageCommands) emergencymeeting(ctx *router.Ctx) error {
+	return ctx.RespondText("https://vacefron.nl/api/emergencymeeting?text=%s", ctx.Arguments.Escaped())
 }
 
-func (c *ImageCommands) firsttime(ctx *router.Ctx) {
+func (c *ImageCommands) firsttime(ctx *router.Ctx) error {
 	user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
 	if err != nil {
-		ctx.RespondText("Cannot find user")
-		return
+		return fmt.Errorf("Cannot find user")
 	}
-	ctx.RespondText("https://vacefron.nl/api/firsttime?user=%s", url.QueryEscape(user.AvatarURL("")))
+	return ctx.RespondText("https://vacefron.nl/api/firsttime?user=%s", url.QueryEscape(user.AvatarURL("")))
 }
 
-func (c *ImageCommands) grave(ctx *router.Ctx) {
+func (c *ImageCommands) grave(ctx *router.Ctx) error {
 	user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
 	if err != nil {
-		ctx.RespondText("Cannot find user")
-		return
+		return fmt.Errorf("Cannot find user")
 	}
-	ctx.RespondText("https://vacefron.nl/api/grave?user=%s", url.QueryEscape(user.AvatarURL("")))
+	return ctx.RespondText("https://vacefron.nl/api/grave?user=%s", url.QueryEscape(user.AvatarURL("")))
 }
 
-func (c *ImageCommands) iamspeed(ctx *router.Ctx) {
+func (c *ImageCommands) iamspeed(ctx *router.Ctx) error {
 	user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
 	if err != nil {
-		ctx.RespondText("Cannot find user")
-		return
+		return fmt.Errorf("Cannot find user")
 	}
-	ctx.RespondText("https://vacefron.nl/api/iamspeed?user=%s", url.QueryEscape(user.AvatarURL("")))
+	return ctx.RespondText("https://vacefron.nl/api/iamspeed?user=%s", url.QueryEscape(user.AvatarURL("")))
 }
 
-func (c *ImageCommands) icanmilkyou(ctx *router.Ctx) {
+func (c *ImageCommands) icanmilkyou(ctx *router.Ctx) error {
 	user1, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
 	if err != nil {
-		ctx.RespondText("Cannot find user")
-		return
+		return fmt.Errorf("Cannot find user")
 	}
 	user2, err := ctx.Arguments.Get(1).User(router.ArgumentFlagFallbackDefault)
 	if err != nil {
-		ctx.RespondText("Cannot find user")
-		return
+		return fmt.Errorf("Cannot find user")
 	}
-	ctx.RespondText("https://vacefron.nl/api/icanmilkyou?user1=%s&user2=%s", url.QueryEscape(user1.AvatarURL("")), url.QueryEscape(user2.AvatarURL("")))
+	return ctx.RespondText("https://vacefron.nl/api/icanmilkyou?user1=%s&user2=%s", url.QueryEscape(user1.AvatarURL("")), url.QueryEscape(user2.AvatarURL("")))
 }
 
-func (c *ImageCommands) heaven(ctx *router.Ctx) {
+func (c *ImageCommands) heaven(ctx *router.Ctx) error {
 	user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
 	if err != nil {
-		ctx.RespondText("Cannot find user")
-		return
+		return fmt.Errorf("Cannot find user")
 	}
-	ctx.RespondText("https://vacefron.nl/api/heaven?user=%s", url.QueryEscape(user.AvatarURL("")))
+	return ctx.RespondText("https://vacefron.nl/api/heaven?user=%s", url.QueryEscape(user.AvatarURL("")))
 }
 
-func (c *ImageCommands) npc(ctx *router.Ctx) {
-	ctx.RespondText("https://vacefron.nl/api/npc?text1=%s&text2=%s", url.QueryEscape(ctx.Arguments.Get(0).Raw()), url.QueryEscape(ctx.Arguments.Get(1).Raw()))
+func (c *ImageCommands) npc(ctx *router.Ctx) error {
+	return ctx.RespondText("https://vacefron.nl/api/npc?text1=%s&text2=%s", url.QueryEscape(ctx.Arguments.Get(0).Raw()), url.QueryEscape(ctx.Arguments.Get(1).Raw()))
 }
 
-func (c *ImageCommands) stonks(ctx *router.Ctx) {
+func (c *ImageCommands) stonks(ctx *router.Ctx) error {
 	user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
 	if err != nil {
-		ctx.RespondText("Cannot find user")
-		return
+		return fmt.Errorf("Cannot find user")
 	}
-	ctx.RespondText("https://vacefron.nl/api/stonks?user=%s", url.QueryEscape(user.AvatarURL("")))
+	return ctx.RespondText("https://vacefron.nl/api/stonks?user=%s", url.QueryEscape(user.AvatarURL("")))
 }
 
-func (c *ImageCommands) notstonks(ctx *router.Ctx) {
+func (c *ImageCommands) notstonks(ctx *router.Ctx) error {
 	user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
 	if err != nil {
-		ctx.RespondText("Cannot find user")
-		return
+		return fmt.Errorf("Cannot find user")
 	}
-	ctx.RespondText("https://vacefron.nl/api/stonks?user=%s&notstonks=true", url.QueryEscape(user.AvatarURL("")))
+	return ctx.RespondText("https://vacefron.nl/api/stonks?user=%s&notstonks=true", url.QueryEscape(user.AvatarURL("")))
 }
 
-func (c *ImageCommands) fliptable(ctx *router.Ctx) {
+func (c *ImageCommands) fliptable(ctx *router.Ctx) error {
 	user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
 	if err != nil {
-		ctx.RespondText("Cannot find user")
-		return
+		return fmt.Errorf("Cannot find user")
 	}
-	ctx.RespondText("https://vacefron.nl/api/tableflip?user=%s", url.QueryEscape(user.AvatarURL("")))
+	return ctx.RespondText("https://vacefron.nl/api/tableflip?user=%s", url.QueryEscape(user.AvatarURL("")))
 }
 
-func (c *ImageCommands) water(ctx *router.Ctx) {
-	ctx.RespondText("https://vacefron.nl/api/water?text=%s", ctx.Arguments.Escaped())
+func (c *ImageCommands) water(ctx *router.Ctx) error {
+	return ctx.RespondText("https://vacefron.nl/api/water?text=%s", ctx.Arguments.Escaped())
 }
 
-func (c *ImageCommands) wolverine(ctx *router.Ctx) {
+func (c *ImageCommands) wolverine(ctx *router.Ctx) error {
 	user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
 	if err != nil {
-		ctx.RespondText("Cannot find user")
-		return
+		return fmt.Errorf("Cannot find user")
 	}
-	ctx.RespondText("https://vacefron.nl/api/wolverine?user=%s", url.QueryEscape(user.AvatarURL("")))
+	return ctx.RespondText("https://vacefron.nl/api/wolverine?user=%s", url.QueryEscape(user.AvatarURL("")))
 }
 
-func (c *ImageCommands) womanyellingatcat(ctx *router.Ctx) {
+func (c *ImageCommands) womanyellingatcat(ctx *router.Ctx) error {
 	user1, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
 	if err != nil {
-		ctx.RespondText("Cannot find user")
-		return
+		return fmt.Errorf("Cannot find user")
 	}
 	user2, err := ctx.Arguments.Get(1).User(router.ArgumentFlagFallbackDefault)
 	if err != nil {
-		ctx.RespondText("Cannot find user")
-		return
+		return fmt.Errorf("Cannot find user")
 	}
-	ctx.RespondText("https://vacefron.nl/api/womanyellingatcat?woman=%s&cat=%s", url.QueryEscape(user1.AvatarURL("")), url.QueryEscape(user2.AvatarURL("")))
+	return ctx.RespondText("https://vacefron.nl/api/womanyellingatcat?woman=%s&cat=%s", url.QueryEscape(user1.AvatarURL("")), url.QueryEscape(user2.AvatarURL("")))
 }
 
-func (c *ImageCommands) pikachu(ctx *router.Ctx) {
+func (c *ImageCommands) pikachu(ctx *router.Ctx) error {
 	imageUrl, err := utils.Misc.GetImageUrlFromJson("https://some-random-api.com/img/pikachu", "link")
 	if err != nil {
-		ctx.RespondText("An error has occurred: %v", err)
-		return
+		return fmt.Errorf("An error has occurred: %v", err)
 	}
-	ctx.RespondText("%s", imageUrl)
+	return ctx.RespondText("%s", imageUrl)
 }
 
-func (c *ImageCommands) speechbubble(ctx *router.Ctx) {
+func (c *ImageCommands) speechbubble(ctx *router.Ctx) error {
 	link := ctx.Arguments.Get(1).Raw()
 
 	attachments := ctx.Message.Attachments
@@ -2804,14 +2557,12 @@ func (c *ImageCommands) speechbubble(ctx *router.Ctx) {
 	}
 
 	if link == "" {
-		ctx.RespondText("Please provide a link or attachment.")
-		return
+		return fmt.Errorf("Please provide a link or attachment.")
 	}
 
 	forceGIF, err := ctx.Arguments.Get(0).Bool()
 	if err != nil {
-		ctx.RespondText("Invalid force GIF value. Use `on` or `off`.")
-		return
+		return fmt.Errorf("Invalid force GIF value. Use `on` or `off`.")
 	}
 
 	format := fn.IfElse(forceGIF, "gif", "png")
@@ -2819,24 +2570,23 @@ func (c *ImageCommands) speechbubble(ctx *router.Ctx) {
 
 	resp, err := http.DefaultClient().Get(url)
 	if err != nil {
-		ctx.RespondText("An error has occurred: %v", err)
-		return
+		return fmt.Errorf("An error has occurred: %v", err)
 	}
 
-	ctx.RespondText("https://api.lightning-bot.com%s", resp.Header.Get("Location"))
+	return ctx.RespondText("https://api.lightning-bot.com%s", resp.Header.Get("Location"))
 }
 
-func (c *ImageCommands) quotereply(ctx *router.Ctx) {
+func (c *ImageCommands) quotereply(ctx *router.Ctx) error {
 	if ctx.Message.ReferencedMessage == nil {
 		c.services.Embed.New(ctx).
 			SetDescription("You must reply to a message to use quotereply.").
 			Send()
-		return
+		return nil
 	}
 
 	m := ctx.Message.ReferencedMessage
 
-	ctx.RespondText(
+	return ctx.RespondText(
 		"https://api.lightning-bot.com/api/v3/imagegen/quote?author=%s&text=%s&background=%s",
 		url.QueryEscape(utils.Misc.Or(m.Author.DisplayName, m.Author.Username)),
 		url.QueryEscape(ctx.Message.ReferencedMessage.ContentWithMentionsReplaced()),
@@ -2844,13 +2594,13 @@ func (c *ImageCommands) quotereply(ctx *router.Ctx) {
 	)
 }
 
-func (c *ImageCommands) quotemessage(ctx *router.Ctx) {
+func (c *ImageCommands) quotemessage(ctx *router.Ctx) error {
 	channel, err := ctx.Arguments.Get(1).Channel(router.ArgumentFlagFallbackDefault)
 	if err != nil {
 		c.services.Embed.New(ctx).
 			SetDescription("Could not find channel.").
 			Send()
-		return
+		return nil
 	}
 
 	m, err := utils.Discord.GetChannelMessage(ctx.Session, channel.ID, ctx.Arguments.Get(0).Raw())
@@ -2858,10 +2608,10 @@ func (c *ImageCommands) quotemessage(ctx *router.Ctx) {
 		c.services.Embed.New(ctx).
 			SetDescription("Could not find message: %v", err).
 			Send()
-		return
+		return nil
 	}
 
-	ctx.RespondText(
+	return ctx.RespondText(
 		"https://api.lightning-bot.com/api/v3/imagegen/quote?author=%s&text=%s&background=%s",
 		url.QueryEscape(utils.Misc.Or(m.Author.DisplayName, m.Author.Username)),
 		url.QueryEscape(m.ContentWithMentionsReplaced()),
@@ -2869,16 +2619,16 @@ func (c *ImageCommands) quotemessage(ctx *router.Ctx) {
 	)
 }
 
-func (c *ImageCommands) quoteuser(ctx *router.Ctx) {
+func (c *ImageCommands) quoteuser(ctx *router.Ctx) error {
 	user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
 	if err != nil {
 		c.services.Embed.New(ctx).
 			SetDescription("Could not find user.").
 			Send()
-		return
+		return nil
 	}
 
-	ctx.RespondText(
+	return ctx.RespondText(
 		"https://api.lightning-bot.com/api/v3/imagegen/quote?author=%s&text=%s&background=%s",
 		url.QueryEscape(utils.Misc.Or(user.DisplayName, user.Username)),
 		url.QueryEscape(ctx.Arguments.Get(1).Raw()),
@@ -2886,8 +2636,8 @@ func (c *ImageCommands) quoteuser(ctx *router.Ctx) {
 	)
 }
 
-func (c *ImageCommands) quotetext(ctx *router.Ctx) {
-	ctx.RespondText(
+func (c *ImageCommands) quotetext(ctx *router.Ctx) error {
+	return ctx.RespondText(
 		"https://api.lightning-bot.com/api/v3/imagegen/quote?author=%s&text=%s&background=%s",
 		url.QueryEscape(ctx.Arguments.Get(0).Raw()),
 		url.QueryEscape(ctx.Arguments.Get(1).Raw()),
@@ -2921,13 +2671,13 @@ func (c *ImageCommands) getRoleColor(ctx *router.Ctx, userID string) string {
 	return authorColor
 }
 
-func (c *ImageCommands) discordquotemessage(ctx *router.Ctx) {
+func (c *ImageCommands) discordquotemessage(ctx *router.Ctx) error {
 	channel, err := ctx.Arguments.Get(1).Channel(router.ArgumentFlagFallbackDefault)
 	if err != nil {
 		c.services.Embed.New(ctx).
 			SetDescription("Could not find channel.").
 			Send()
-		return
+		return nil
 	}
 
 	m, err := utils.Discord.GetChannelMessage(ctx.Session, channel.ID, ctx.Arguments.Get(0).Raw())
@@ -2935,12 +2685,12 @@ func (c *ImageCommands) discordquotemessage(ctx *router.Ctx) {
 		c.services.Embed.New(ctx).
 			SetDescription("Could not find message: %v", err).
 			Send()
-		return
+		return nil
 	}
 
 	authorColor := c.getRoleColor(ctx, m.Author.ID)
 
-	ctx.RespondText(
+	return ctx.RespondText(
 		"https://api.lightning-bot.com/api/v3/imagegen/discordquote?author=%s&author_url=%s&author_color=%s&text=%s&timestamp=%s",
 		url.QueryEscape(utils.Misc.Or(m.Author.DisplayName, m.Author.Username)),
 		url.QueryEscape(m.Author.AvatarURL("")),
@@ -2950,19 +2700,19 @@ func (c *ImageCommands) discordquotemessage(ctx *router.Ctx) {
 	)
 }
 
-func (c *ImageCommands) discordquotereply(ctx *router.Ctx) {
+func (c *ImageCommands) discordquotereply(ctx *router.Ctx) error {
 	if ctx.Message.ReferencedMessage == nil {
 		c.services.Embed.New(ctx).
 			SetDescription("You must reply to a message to use quotereply.").
 			Send()
-		return
+		return nil
 	}
 
 	m := ctx.Message.ReferencedMessage
 
 	authorColor := c.getRoleColor(ctx, m.Author.ID)
 
-	ctx.RespondText(
+	return ctx.RespondText(
 		"https://api.lightning-bot.com/api/v3/imagegen/discordquote?author=%s&author_url=%s&author_color=%s&text=%s&timestamp=%s",
 		url.QueryEscape(utils.Misc.Or(m.Author.DisplayName, m.Author.Username)),
 		url.QueryEscape(m.Author.AvatarURL("")),
@@ -2972,16 +2722,16 @@ func (c *ImageCommands) discordquotereply(ctx *router.Ctx) {
 	)
 }
 
-func (c *ImageCommands) discordquoteuser(ctx *router.Ctx) {
+func (c *ImageCommands) discordquoteuser(ctx *router.Ctx) error {
 	user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
 	if err != nil {
 		c.services.Embed.New(ctx).
 			SetDescription("Could not find user.").
 			Send()
-		return
+		return nil
 	}
 
-	ctx.RespondText(
+	return ctx.RespondText(
 		"https://api.lightning-bot.com/api/v3/imagegen/discordquote?author=%s&author_url=%s&text=%s",
 		url.QueryEscape(utils.Misc.Or(user.DisplayName, user.Username)),
 		url.QueryEscape(user.AvatarURL("")),
@@ -2989,8 +2739,8 @@ func (c *ImageCommands) discordquoteuser(ctx *router.Ctx) {
 	)
 }
 
-func (c *ImageCommands) discordquotetext(ctx *router.Ctx) {
-	ctx.RespondText(
+func (c *ImageCommands) discordquotetext(ctx *router.Ctx) error {
+	return ctx.RespondText(
 		"https://api.lightning-bot.com/api/v3/imagegen/discordquote?author=%s&author_url=%s&text=%s",
 		url.QueryEscape(ctx.Arguments.Get(0).Raw()),
 		url.QueryEscape(ctx.Arguments.Get(2).Raw()),

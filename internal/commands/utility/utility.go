@@ -2,7 +2,6 @@ package utility
 
 import (
 	"bytes"
-	"errors"
 	"fmt"
 	"go/token"
 	"go/types"
@@ -859,7 +858,7 @@ func getChannelType(channelType discordgo.ChannelType) discordgo.ChannelType {
 	return discordgo.ChannelTypeGuildText
 }
 
-func (c *UtilityCommands) copyserver(ctx *router.Ctx) {
+func (c *UtilityCommands) copyserver(ctx *router.Ctx) error {
 	duration, err := ctx.Arguments.Get(1).Duration()
 	if err != nil || duration < time.Second*10 {
 		duration = time.Second * 10
@@ -867,14 +866,12 @@ func (c *UtilityCommands) copyserver(ctx *router.Ctx) {
 
 	guild, err := ctx.Arguments.Get(0).Guild()
 	if err != nil {
-		ctx.RespondText("Error getting server: %v", err)
-		return
+		return fmt.Errorf("Error getting server: %v", err)
 	}
 
 	newGuild, err := ctx.Session.GuildCreate(fmt.Sprintf("[COPY] %.90s", guild.Name))
 	if err != nil {
-		ctx.RespondText("Error copying server: %v", err)
-		return
+		return fmt.Errorf("Error copying server: %v", err)
 	}
 
 	time.Sleep(duration)
@@ -907,8 +904,7 @@ func (c *UtilityCommands) copyserver(ctx *router.Ctx) {
 			Mentionable: &role.Mentionable,
 		})
 		if err != nil {
-			ctx.RespondText("Error copying server: %v", err)
-			return
+			return fmt.Errorf("Error copying server: %v", err)
 		}
 
 		IDs[role.ID] = newRole.ID
@@ -918,8 +914,7 @@ func (c *UtilityCommands) copyserver(ctx *router.Ctx) {
 
 	newChannels, err := ctx.Session.GuildChannels(newGuild.ID)
 	if err != nil {
-		ctx.RespondText("Error copying server: %v", err)
-		return
+		return fmt.Errorf("Error copying server: %v", err)
 	}
 
 	time.Sleep(duration)
@@ -927,8 +922,7 @@ func (c *UtilityCommands) copyserver(ctx *router.Ctx) {
 	for _, channel := range newChannels {
 		_, err := ctx.Session.ChannelDelete(channel.ID)
 		if err != nil {
-			ctx.RespondText("Error copying server: %v", err)
-			return
+			return fmt.Errorf("Error copying server: %v", err)
 		}
 
 		time.Sleep(duration)
@@ -936,8 +930,7 @@ func (c *UtilityCommands) copyserver(ctx *router.Ctx) {
 
 	channels, err := ctx.Session.GuildChannels(guild.ID)
 	if err != nil {
-		ctx.RespondText("Error copying server: %v", err)
-		return
+		return fmt.Errorf("Error copying server: %v", err)
 	}
 
 	time.Sleep(duration)
@@ -968,8 +961,7 @@ func (c *UtilityCommands) copyserver(ctx *router.Ctx) {
 				PermissionOverwrites: overwrites,
 			})
 			if err != nil {
-				ctx.RespondText("Error copying server: %v", err)
-				return
+				return fmt.Errorf("Error copying server: %v", err)
 			}
 
 			categoryID = category.ID
@@ -1004,8 +996,7 @@ func (c *UtilityCommands) copyserver(ctx *router.Ctx) {
 				ParentID:             categoryID,
 			})
 			if err != nil {
-				ctx.RespondText("Error copying server: %v", err)
-				return
+				return fmt.Errorf("Error copying server: %v", err)
 			}
 
 			time.Sleep(duration)
@@ -1013,33 +1004,30 @@ func (c *UtilityCommands) copyserver(ctx *router.Ctx) {
 	}
 
 	c.services.Embed.Respond(ctx, "Server copied successfully!")
+	return nil
 }
 
-func (c *UtilityCommands) copychannel(ctx *router.Ctx) {
+func (c *UtilityCommands) copychannel(ctx *router.Ctx) error {
 	sourceChannel, err := ctx.Arguments.Get(0).Channel()
 	if err != nil {
-		ctx.RespondText("Could not find channel")
-		return
+		return fmt.Errorf("Could not find channel")
 	}
 
 	destChannel, err := ctx.Arguments.Get(1).Channel()
 	if err != nil {
-		ctx.RespondText("Could not find channel")
-		return
+		return fmt.Errorf("Could not find channel")
 	}
 
 	limit, _ := ctx.Arguments.Get(2).Int()
 	limit = fn.Clamp(limit, 1, 100)
 
 	if limit < 1 {
-		ctx.RespondText("Limit must be greater than 0")
-		return
+		return fmt.Errorf("Limit must be greater than 0")
 	}
 
 	messages, err := utils.Discord.GetChannelMessages(ctx.Session, sourceChannel.ID, limit)
 	if err != nil {
-		ctx.RespondText("Error getting source messages: %v", err)
-		return
+		return fmt.Errorf("Error getting source messages: %v", err)
 	}
 
 	slices.SortFunc(messages, func(i, j *discordgo.Message) int {
@@ -1062,8 +1050,7 @@ func (c *UtilityCommands) copychannel(ctx *router.Ctx) {
 
 	webhook, err := ctx.Session.WebhookCreate(destChannel.ID, "LightningBot - Copy Channel", "")
 	if err != nil {
-		ctx.RespondText("Error creating destination webhook: %v", err)
-		return
+		return fmt.Errorf("Error creating destination webhook: %v", err)
 	}
 
 	requests := 0
@@ -1093,7 +1080,7 @@ func (c *UtilityCommands) copychannel(ctx *router.Ctx) {
 			Embeds:     message.Embeds,
 		})
 		if err != nil {
-			ctx.RespondText("Error sending message: %v", err)
+			return fmt.Errorf("Error sending message: %v", err)
 		}
 
 		time.Sleep(750 * time.Millisecond)
@@ -1106,24 +1093,27 @@ func (c *UtilityCommands) copychannel(ctx *router.Ctx) {
 			start = time.Now()
 		}
 	}
+	return nil
 }
 
-func (c *UtilityCommands) leavegroups(ctx *router.Ctx) {
+func (c *UtilityCommands) leavegroups(ctx *router.Ctx) error {
 	isSilent, _ := ctx.Arguments.Get(0).Bool()
 
 	for _, channel := range ctx.Session.State.PrivateChannels {
 		if channel.Type == discordgo.ChannelTypeGroupDM {
 			_, err := ctx.Session.ChannelDelete(channel.ID, isSilent)
 			if err != nil {
-				ctx.RespondText("Error leaving group: %v", err)
+				return fmt.Errorf("Error leaving group: %v", err)
 			}
 
 			time.Sleep(2 * time.Second)
 		}
 	}
+
+	return nil
 }
 
-func (c *UtilityCommands) adminservers(ctx *router.Ctx) {
+func (c *UtilityCommands) adminservers(ctx *router.Ctx) error {
 	userId, _ := strconv.Atoi(ctx.Session.State.User.ID)
 
 	adminServerString := ""
@@ -1151,9 +1141,10 @@ func (c *UtilityCommands) adminservers(ctx *router.Ctx) {
 	}
 
 	c.services.Embed.RespondField(ctx, "Admin Servers", adminServerString)
+	return nil
 }
 
-func (c *UtilityCommands) admingroups(ctx *router.Ctx) {
+func (c *UtilityCommands) admingroups(ctx *router.Ctx) error {
 	adminGroupsString := ""
 	for _, channel := range ctx.Session.State.PrivateChannels {
 		if channel.Type == discordgo.ChannelTypeGroupDM {
@@ -1163,37 +1154,32 @@ func (c *UtilityCommands) admingroups(ctx *router.Ctx) {
 		}
 	}
 	c.services.Embed.RespondField(ctx, "Admin Groups", adminGroupsString)
+	return nil
 }
 
-func (c *UtilityCommands) joinvc(ctx *router.Ctx) {
+func (c *UtilityCommands) joinvc(ctx *router.Ctx) error {
 	channel, err := ctx.Arguments.Get(0).Channel()
 	if err != nil {
-		ctx.RespondText("Could not find channel")
-		return
+		return fmt.Errorf("Could not find channel")
 	}
 
 	_, err = ctx.Session.ChannelVoiceJoin(channel.GuildID, channel.ID, false, false)
 	if err != nil {
-		ctx.RespondText("Could not join channel")
-		return
+		return fmt.Errorf("Could not join channel")
 	}
 
-	ctx.RespondText("%s", "Joined channel "+channel.Name)
+	return ctx.RespondText("Joined channel %s", channel.Name)
 }
 
-func (c *UtilityCommands) snipe(ctx *router.Ctx) {
+func (c *UtilityCommands) snipe(ctx *router.Ctx) error {
 	channel, err := ctx.Arguments.Get(0).Channel(router.ArgumentFlagFallbackDefault)
 	if err != nil {
-		ctx.RespondText("Could not find channel")
-		return
+		return fmt.Errorf("Could not find channel")
 	}
 
 	messages := c.services.EventReactions.GetDeletedMessages(channel.ID)
 	if len(messages) == 0 {
-		c.services.Embed.New(ctx).
-			SetDescription("No deleted message was found in this channel!").
-			Send()
-		return
+		return fmt.Errorf("No deleted message was found in this channel!")
 	}
 
 	formatted := ""
@@ -1224,13 +1210,13 @@ func (c *UtilityCommands) snipe(ctx *router.Ctx) {
 	}
 
 	c.services.Embed.RespondField(ctx, "Deleted Messages", formatted)
+	return nil
 }
 
-func (c *UtilityCommands) editsnipe(ctx *router.Ctx) {
+func (c *UtilityCommands) editsnipe(ctx *router.Ctx) error {
 	channel, err := ctx.Arguments.Get(0).Channel(router.ArgumentFlagFallbackDefault)
 	if err != nil {
-		ctx.RespondText("Could not find channel")
-		return
+		return fmt.Errorf("Could not find channel")
 	}
 
 	messages := c.services.EventReactions.GetEditedMessages(channel.ID)
@@ -1238,7 +1224,7 @@ func (c *UtilityCommands) editsnipe(ctx *router.Ctx) {
 		c.services.Embed.New(ctx).
 			SetDescription("No deleted message was found in this channel!").
 			Send()
-		return
+		return nil
 	}
 
 	message := messages[len(messages)-1]
@@ -1250,22 +1236,20 @@ func (c *UtilityCommands) editsnipe(ctx *router.Ctx) {
 	emb.AddField("Old Content", message.BeforeUpdate.Content)
 	emb.AddField("New Content", message.Content)
 	emb.Send()
+	return nil
 }
 
-func (c *UtilityCommands) firstmessage(ctx *router.Ctx) {
+func (c *UtilityCommands) firstmessage(ctx *router.Ctx) error {
 	channel, err := ctx.Arguments.Get(0).Channel(router.ArgumentFlagFallbackDefault)
 	if err != nil {
-		ctx.RespondText("Could not find channel")
-		return
+		return fmt.Errorf("Could not find channel")
 	}
 	messages, err := ctx.Session.ChannelMessages(channel.ID, 1, "", "1", "")
 	if err != nil {
-		ctx.RespondText("Error getting messages")
-		return
+		return fmt.Errorf("Error getting messages")
 	}
 	if len(messages) != 1 {
-		ctx.RespondText("Error getting messages")
-		return
+		return fmt.Errorf("Error getting messages")
 	}
 	c.services.Embed.New(ctx).
 		SetDescription("First Message").
@@ -1273,9 +1257,10 @@ func (c *UtilityCommands) firstmessage(ctx *router.Ctx) {
 		AddField("Message", messages[0].Content).
 		AddField("Jump URL", messages[0].GetLink()).
 		Send()
+	return nil
 }
 
-func (c *UtilityCommands) hypesquad(ctx *router.Ctx) {
+func (c *UtilityCommands) hypesquad(ctx *router.Ctx) error {
 	houseName := strings.ToLower(ctx.Arguments.Get(0).Raw())
 	house, ok := map[string]int{
 		"bravery":    1,
@@ -1283,8 +1268,7 @@ func (c *UtilityCommands) hypesquad(ctx *router.Ctx) {
 		"balance":    3,
 	}[houseName]
 	if !ok {
-		ctx.RespondText("Missing required argument: <bravery/brilliance/balance>")
-		return
+		return fmt.Errorf("Missing required argument: <bravery/brilliance/balance>")
 	}
 
 	if err := c.services.Discord.SetHypesquad(house); err != nil {
@@ -1292,17 +1276,19 @@ func (c *UtilityCommands) hypesquad(ctx *router.Ctx) {
 	}
 
 	c.services.Embed.Respond(ctx, "Hypesquad set successfully!")
+	return nil
 }
 
-func (c *UtilityCommands) leavehypesquad(ctx *router.Ctx) {
+func (c *UtilityCommands) leavehypesquad(ctx *router.Ctx) error {
 	if err := c.services.Discord.LeaveHypesquad(); err != nil {
 		ctx.RespondText("Error leaving hypesquad: %v", err)
 	}
 
 	c.services.Embed.Respond(ctx, "Left hypesquad successfully!")
+	return nil
 }
 
-func (c *UtilityCommands) theme(ctx *router.Ctx) {
+func (c *UtilityCommands) theme(ctx *router.Ctx) error {
 	themeName := strings.ToLower(ctx.Arguments.Get(0).Raw())
 	theme, ok := map[string]protos.PreloadedUserSettings_Theme{
 		"dark":     1,
@@ -1311,59 +1297,57 @@ func (c *UtilityCommands) theme(ctx *router.Ctx) {
 		"midnight": 4,
 	}[themeName]
 	if !ok {
-		ctx.RespondText("Missing required argument: <dark/light/darker/midnight>")
-		return
+		return fmt.Errorf("Missing required argument: <dark/light/darker/midnight>")
 	}
 
 	ctx.Session.State.UserSettings.Appearance.Theme = theme
 	err := ctx.Session.UserSettingsUpdate(ctx.Session.State.UserSettings, true)
 	if err != nil {
-		ctx.RespondText("Error setting theme: %v", err)
-		return
+		return fmt.Errorf("Error setting theme: %v", err)
 	}
 
 	c.services.Embed.Respond(ctx, "Theme set successfully!")
+	return nil
 }
 
-func (c *UtilityCommands) compact(ctx *router.Ctx) {
+func (c *UtilityCommands) compact(ctx *router.Ctx) error {
 	toggle, err := ctx.Arguments.Get(0).Bool()
 	if err != nil {
-		ctx.RespondText("Error parsing argument: %v", err)
-		return
+		return fmt.Errorf("Error parsing argument: %v", err)
 	}
 
 	ctx.Session.State.UserSettings.TextAndImages.MessageDisplayCompact = wrapperspb.Bool(toggle)
 	err = ctx.Session.UserSettingsUpdate(ctx.Session.State.UserSettings, true)
 	if err != nil {
-		ctx.RespondText("Error setting theme: %v", err)
-		return
+		return fmt.Errorf("Error setting theme: %v", err)
 	}
 
 	c.services.Embed.Respond(ctx, "Compact mode set successfully!")
+	return nil
 }
 
-func (c *UtilityCommands) devmode(ctx *router.Ctx) {
+func (c *UtilityCommands) devmode(ctx *router.Ctx) error {
 	toggle, err := ctx.Arguments.Get(0).Bool()
 	if err != nil {
-		ctx.RespondText("Error parsing argument: %v", err)
-		return
+		return fmt.Errorf("Error parsing argument: %v", err)
 	}
 
 	ctx.Session.State.UserSettings.Appearance.DeveloperMode = toggle
 	err = ctx.Session.UserSettingsUpdate(ctx.Session.State.UserSettings, true)
 	if err != nil {
-		ctx.RespondText("Error setting theme: %v", err)
-		return
+		return fmt.Errorf("Error setting theme: %v", err)
 	}
 
 	c.services.Embed.Respond(ctx, "Developer mode set successfully!")
+	return nil
 }
 
-func (c *UtilityCommands) sessionid(ctx *router.Ctx) {
+func (c *UtilityCommands) sessionid(ctx *router.Ctx) error {
 	c.services.Embed.RespondField(ctx, "Session ID", ctx.Session.State.SessionID)
+	return nil
 }
 
-func (c *UtilityCommands) aboutme(ctx *router.Ctx) {
+func (c *UtilityCommands) aboutme(ctx *router.Ctx) error {
 	bio := any(ctx.Arguments.Raw())
 	if bio == "" {
 		bio = nil
@@ -1371,14 +1355,14 @@ func (c *UtilityCommands) aboutme(ctx *router.Ctx) {
 
 	err := c.services.Discord.UpdateSettings("/profile", map[string]any{"bio": bio})
 	if err != nil {
-		ctx.RespondText("Error setting bio: %v", err)
-		return
+		return fmt.Errorf("Error setting bio: %v", err)
 	}
 
 	c.services.Embed.Respond(ctx, "Bio set successfully!")
+	return nil
 }
 
-func (c *UtilityCommands) displayname(ctx *router.Ctx) {
+func (c *UtilityCommands) displayname(ctx *router.Ctx) error {
 	globalName := any(ctx.Arguments.Raw())
 	if globalName == "" {
 		globalName = nil
@@ -1386,24 +1370,24 @@ func (c *UtilityCommands) displayname(ctx *router.Ctx) {
 
 	err := c.services.Discord.UpdateSettings("", map[string]any{"global_name": globalName})
 	if err != nil {
-		ctx.RespondText("Error setting display name: %v", err)
-		return
+		return fmt.Errorf("Error setting display name: %v", err)
 	}
 
 	c.services.Embed.Respond(ctx, "Display name set successfully!")
+	return nil
 }
 
-func (c *UtilityCommands) pronouns(ctx *router.Ctx) {
+func (c *UtilityCommands) pronouns(ctx *router.Ctx) error {
 	err := c.services.Discord.UpdateSettings("/profile", map[string]any{"pronouns": ctx.Arguments.Raw()})
 	if err != nil {
-		ctx.RespondText("Error setting pronouns: %v", err)
-		return
+		return fmt.Errorf("Error setting pronouns: %v", err)
 	}
 
 	c.services.Embed.Respond(ctx, "Pronouns set successfully!")
+	return nil
 }
 
-func (c *UtilityCommands) nickscan(ctx *router.Ctx) {
+func (c *UtilityCommands) nickscan(ctx *router.Ctx) error {
 	nickText := ""
 	for _, guild := range ctx.Session.State.Guilds {
 		me, err := ctx.Session.State.Member(guild.ID, ctx.Message.Author.ID)
@@ -1419,77 +1403,71 @@ func (c *UtilityCommands) nickscan(ctx *router.Ctx) {
 	}
 
 	c.services.Embed.RespondField(ctx, "Nicknames", nickText)
+	return nil
 }
 
-func (c *UtilityCommands) getmessagejson(ctx *router.Ctx) {
+func (c *UtilityCommands) getmessagejson(ctx *router.Ctx) error {
 	channel, err := ctx.Arguments.Get(0).Channel()
 	if err != nil {
-		ctx.RespondText("Could not find channel")
-		return
+		return fmt.Errorf("Could not find channel")
 	}
 
 	messages, err := ctx.Session.ChannelMessages(channel.ID, 1, "", "", ctx.Arguments.Get(1).Raw())
 	if err != nil {
-		ctx.RespondText("Could not get message: %v", err)
-		return
+		return fmt.Errorf("Could not get message: %v", err)
 	}
 
 	if len(messages) == 0 {
-		ctx.RespondText("Could not find message")
-		return
+		return fmt.Errorf("Could not find message")
 	}
 
 	message := messages[0]
 
 	jsonData, err := json.MarshalIndent(message, "", "  ")
 	if err != nil {
-		ctx.RespondText("Error marshaling JSON")
-		return
+		return fmt.Errorf("Error marshaling JSON")
 	}
 
 	c.services.Embed.New(ctx).
 		SetTitle("Message JSON").
 		SetDescription("%s", string(jsonData)).
 		Send()
+	return nil
 }
 
-func (c *UtilityCommands) getembedjson(ctx *router.Ctx) {
+func (c *UtilityCommands) getembedjson(ctx *router.Ctx) error {
 	channel, err := ctx.Arguments.Get(0).Channel()
 	if err != nil {
-		ctx.RespondText("Could not find channel")
-		return
+		return fmt.Errorf("Could not find channel")
 	}
 
 	messages, err := ctx.Session.ChannelMessages(channel.ID, 1, "", "", ctx.Arguments.Get(1).Raw())
 	if err != nil {
-		ctx.RespondText("Could not get message: %v", err)
-		return
+		return fmt.Errorf("Could not get message: %v", err)
 	}
 
 	if len(messages) == 0 {
-		ctx.RespondText("Could not find message")
-		return
+		return fmt.Errorf("Could not find message")
 	}
 
 	message := messages[0]
 
 	jsonData, err := json.MarshalIndent(message.Embeds, "", "  ")
 	if err != nil {
-		ctx.RespondText("Error marshaling JSON")
-		return
+		return fmt.Errorf("Error marshaling JSON")
 	}
 
 	c.services.Embed.New(ctx).
 		SetTitle("Message JSON").
 		SetDescription("%s", string(jsonData)).
 		Send()
+	return nil
 }
 
-func (c *UtilityCommands) sendmessagejson(ctx *router.Ctx) {
+func (c *UtilityCommands) sendmessagejson(ctx *router.Ctx) error {
 	channel, err := ctx.Arguments.Get(0).Channel()
 	if err != nil {
-		ctx.RespondText("Could not find channel")
-		return
+		return fmt.Errorf("Could not find channel")
 	}
 
 	rawData := ctx.Arguments.RawFrom(1)
@@ -1497,33 +1475,29 @@ func (c *UtilityCommands) sendmessagejson(ctx *router.Ctx) {
 	var data *discordgo.MessageSend
 	err = json.Unmarshal([]byte(rawData), &data)
 	if err != nil {
-		ctx.RespondText("Error unmarshaling JSON: %v", err)
-		return
+		return fmt.Errorf("Error unmarshaling JSON: %v", err)
 	}
 
 	_, err = ctx.Session.ChannelMessageSendComplex(channel.ID, data)
 	if err != nil {
-		ctx.RespondText("Error sending message: %v", err)
-		return
+		return fmt.Errorf("Error sending message: %v", err)
 	}
+	return nil
 }
 
-func (c *UtilityCommands) sendinterval(ctx *router.Ctx) {
+func (c *UtilityCommands) sendinterval(ctx *router.Ctx) error {
 	interval, err := ctx.Arguments.Get(0).Duration()
 	if err != nil {
-		ctx.RespondText("Error parsing interval: %v", err)
-		return
+		return fmt.Errorf("Error parsing interval: %v", err)
 	}
 
 	amount, err := ctx.Arguments.Get(1).Int()
 	if err != nil {
-		ctx.RespondText("Error parsing amount: %v", err)
-		return
+		return fmt.Errorf("Error parsing amount: %v", err)
 	}
 
 	if amount < 1 {
-		ctx.RespondText("Error parsing amount: amount must be at least 1")
-		return
+		return fmt.Errorf("Error parsing amount: amount must be at least 1")
 	}
 
 	message, flags := ctx.Arguments.Get(2).Raw(), ctx.Arguments.Get(3).Raw()
@@ -1533,7 +1507,7 @@ func (c *UtilityCommands) sendinterval(ctx *router.Ctx) {
 	for range amount {
 		msg, err := ctx.Session.ChannelMessageSend(ctx.Message.ChannelID, message)
 		if err != nil {
-			return
+			return err
 		}
 
 		if instantDelete {
@@ -1546,9 +1520,11 @@ func (c *UtilityCommands) sendinterval(ctx *router.Ctx) {
 			_ = ctx.Session.ChannelMessageDelete(ctx.Message.ChannelID, ctx.Message.ID)
 		}
 	}
+
+	return nil
 }
 
-func (c *UtilityCommands) optionpoll(ctx *router.Ctx) {
+func (c *UtilityCommands) optionpoll(ctx *router.Ctx) error {
 	messages := c.services.Embed.New(ctx).
 		SetDescription("%s", "Poll: "+ctx.Arguments.Get(0).Raw()).
 		AddField("👍", ctx.Arguments.Get(0).Raw()).
@@ -1559,13 +1535,13 @@ func (c *UtilityCommands) optionpoll(ctx *router.Ctx) {
 		_ = ctx.Session.MessageReactionAdd(ctx.Message.ChannelID, messages[0].ID, "👍")
 		_ = ctx.Session.MessageReactionAdd(ctx.Message.ChannelID, messages[0].ID, "👎")
 	}
+	return nil
 }
 
-func (c *UtilityCommands) discordpoll(ctx *router.Ctx) {
+func (c *UtilityCommands) discordpoll(ctx *router.Ctx) error {
 	duration, err := ctx.Arguments.Get(0).Duration()
 	if err != nil {
-		ctx.RespondText("Error parsing duration: %v", err)
-		return
+		return fmt.Errorf("Error parsing duration: %v", err)
 	}
 
 	duration = fn.Clamp(duration, 1*time.Hour, 168*time.Hour)
@@ -1605,8 +1581,7 @@ func (c *UtilityCommands) discordpoll(ctx *router.Ctx) {
 	}
 
 	if len(pollAnswers) == 0 {
-		ctx.RespondText("Error parsing options: At least one option must be provided.")
-		return
+		return fmt.Errorf("Error parsing options: At least one option must be provided.")
 	}
 
 	_, err = ctx.Session.ChannelMessageSendComplex(ctx.Message.ChannelID, &discordgo.MessageSend{
@@ -1619,17 +1594,17 @@ func (c *UtilityCommands) discordpoll(ctx *router.Ctx) {
 		},
 	})
 	if err != nil {
-		ctx.RespondText("Error sending poll: %v", err)
+		return fmt.Errorf("error sending poll: %v", err)
 	}
+	return nil
 }
 
-func (c *UtilityCommands) checktoken(ctx *router.Ctx) {
+func (c *UtilityCommands) checktoken(ctx *router.Ctx) error {
 	token := ctx.Arguments.Get(0).Raw()
 
 	tokenData, err := c.services.Discord.GetTokenInfo(token)
 	if err != nil {
-		ctx.RespondText("An error has occurred: %v", err)
-		return
+		return fmt.Errorf("An error has occurred: %v", err)
 	}
 
 	c.services.Embed.New(ctx).
@@ -1649,13 +1624,13 @@ func (c *UtilityCommands) checktoken(ctx *router.Ctx) {
 		AddField("Verified", formatting.BoolYesNo(tokenData.Get("verified").MustBool())).
 		AddField("Phone", tokenData.Get("phone").MustString()).
 		Send()
+	return nil
 }
 
-func (c *UtilityCommands) discordstatus(ctx *router.Ctx) {
+func (c *UtilityCommands) discordstatus(ctx *router.Ctx) error {
 	resp, err := http.DefaultClient().Get("https://srhpyqt94yxb.statuspage.io/api/v2/summary.json")
 	if err != nil {
-		ctx.RespondText("An error has occurred.")
-		return
+		return fmt.Errorf("An error has occurred.")
 	}
 
 	components := resp.Json().Get("components")
@@ -1670,62 +1645,64 @@ func (c *UtilityCommands) discordstatus(ctx *router.Ctx) {
 	}
 
 	emb.Send()
+	return nil
 }
 
 // LightningBot Utilities
 
-func (c *UtilityCommands) website(*router.Ctx) {
-	_ = system.OpenURL("https://lightning-bot.com/")
+func (c *UtilityCommands) website(*router.Ctx) error {
+	return system.OpenURL("https://lightning-bot.com/")
 }
 
-func (c *UtilityCommands) dashboard(*router.Ctx) {
-	_ = system.OpenURL("https://lightning-bot.com/dashboard")
+func (c *UtilityCommands) dashboard(*router.Ctx) error {
+	return system.OpenURL("https://lightning-bot.com/dashboard")
 }
 
-func (c *UtilityCommands) changelog(ctx *router.Ctx) {
+func (c *UtilityCommands) changelog(ctx *router.Ctx) error {
 	resp, err := http.DefaultClient().Post(
 		"https://api.LBlightning-bot.com/api/v3/selfbot/check-version",
 		map[string]string{"branch": "selfbot", "version": ""},
 	)
 	if err != nil {
-		ctx.RespondText("An error has occurred: %v", err)
-		return
+		return fmt.Errorf("An error has occurred: %v", err)
 	}
 
 	c.services.Embed.New(ctx).
 		AddField("Latest Version", resp.Json().Get("latest", "version").MustString()).
 		AddField("Changelog", resp.Json().Get("latest", "changelog").MustString()).
 		Send()
+	return nil
 }
 
-func (c *UtilityCommands) version(ctx *router.Ctx) {
+func (c *UtilityCommands) version(ctx *router.Ctx) error {
 	resp, err := http.DefaultClient().Post(
 		"https://api.LBlightning-bot.com/api/v3/selfbot/check-version",
 		map[string]string{"branch": "selfbot", "version": ""},
 	)
 	if err != nil {
-		ctx.RespondText("An error has occurred: %v", err)
-		return
+		return fmt.Errorf("An error has occurred: %v", err)
 	}
 
 	c.services.Embed.New(ctx).
 		AddField("Current Version", constants.VERSION[1:]).
 		AddField("Latest Version", resp.Json().Get("latest", "version").MustString()).
 		Send()
+	return nil
 }
 
-func (c *UtilityCommands) uptime(ctx *router.Ctx) {
+func (c *UtilityCommands) uptime(ctx *router.Ctx) error {
 	c.services.Embed.RespondField(ctx, "Uptime", formatting.DurationLong(time.Since(constants.START_TIME)))
+	return nil
 }
 
-func (c *UtilityCommands) history(ctx *router.Ctx) {
+func (c *UtilityCommands) history(ctx *router.Ctx) error {
 	usedCmds := fn.Limit(c.services.EventReactions.GetUsedCommands(), 10)
 
 	if len(usedCmds) == 0 {
 		c.services.Embed.New(ctx).
 			SetDescription("No commands have been used yet.").
 			Send()
-		return
+		return nil
 	}
 
 	usedCmdsReadable := fn.MapIndexed(usedCmds, func(i int, cmd *router.Ctx) string {
@@ -1733,34 +1710,37 @@ func (c *UtilityCommands) history(ctx *router.Ctx) {
 	})
 
 	c.services.Embed.RespondField(ctx, "Used Commands", strings.Join(usedCmdsReadable, "\n"))
+	return nil
 }
 
-func (c *UtilityCommands) restartbot(*router.Ctx) {
+func (c *UtilityCommands) restartbot(*router.Ctx) error {
 	if constants.CONSOLE {
-		_ = system.RestartExecution()
+		return system.RestartExecution()
 	} else {
 		c.services.EventBroker.Publish(eventbroker.EventRestart, nil)
+		return nil
 	}
 }
 
-func (c *UtilityCommands) stopbot(*router.Ctx) {
+func (c *UtilityCommands) stopbot(*router.Ctx) error {
 	os.Exit(0)
+	return nil
 }
 
-func (c *UtilityCommands) cls(*router.Ctx) {
+func (c *UtilityCommands) cls(*router.Ctx) error {
 	c.services.UI.ClearConsole()
 	c.services.UI.ShowBanner()
+	return nil
 }
 
-func (c *UtilityCommands) openfolder(*router.Ctx) {
-	_ = system.OpenURL(utils.IO.GetMainFolder())
+func (c *UtilityCommands) openfolder(*router.Ctx) error {
+	return system.OpenURL(utils.IO.GetMainFolder())
 }
 
-func (c *UtilityCommands) remote(ctx *router.Ctx) {
+func (c *UtilityCommands) remote(ctx *router.Ctx) error {
 	channel, err := ctx.Arguments.Get(0).Channel(router.ArgumentFlagFallbackDefault)
 	if err != nil {
-		ctx.RespondText("Could not find channel")
-		return
+		return fmt.Errorf("Could not find channel")
 	}
 
 	commandName := ctx.Arguments.Get(1).Raw()
@@ -1768,16 +1748,16 @@ func (c *UtilityCommands) remote(ctx *router.Ctx) {
 
 	cmd := ctx.Router.GetCommand(commandName)
 	if cmd == nil {
-		ctx.RespondText("Command not found")
-		return
+		return fmt.Errorf("Command not found")
 	}
 
 	ctx.Router.InvokeRemoteCmd(ctx.Session, channel, ctx.Message.Author, cmd, args)
+	return nil
 }
 
 // System Utilities
 
-func (c *UtilityCommands) systeminfo(ctx *router.Ctx) {
+func (c *UtilityCommands) systeminfo(ctx *router.Ctx) error {
 	path := "/"
 	if runtime.GOOS == "windows" {
 		path = "C:"
@@ -1785,33 +1765,28 @@ func (c *UtilityCommands) systeminfo(ctx *router.Ctx) {
 
 	hostStat, err := host.Info()
 	if err != nil {
-		ctx.RespondText("Error getting host info: %v", err)
-		return
+		return fmt.Errorf("Error getting host info: %v", err)
 	}
 
 	cpuStat, err := cpu.Info()
 	if err != nil {
-		ctx.RespondText("Error getting cpu info: %v", err)
-		return
+		return fmt.Errorf("Error getting cpu info: %v", err)
 	}
 
 	if len(cpuStat) < 1 {
-		ctx.RespondText("Error getting cpu info: No CPUs found")
-		return
+		return fmt.Errorf("Error getting cpu info: No CPUs found")
 	}
 
 	cpuInfo := cpuStat[0]
 
 	vmStat, err := mem.VirtualMemory()
 	if err != nil {
-		ctx.RespondText("Error getting memory info: %v", err)
-		return
+		return fmt.Errorf("Error getting memory info: %v", err)
 	}
 
 	diskStat, err := disk.Usage(path)
 	if err != nil {
-		ctx.RespondText("Error getting disk info: %v", err)
-		return
+		return fmt.Errorf("Error getting disk info: %v", err)
 	}
 
 	c.services.Embed.New(ctx).
@@ -1823,29 +1798,30 @@ func (c *UtilityCommands) systeminfo(ctx *router.Ctx) {
 		AddField("Memory Info", fmt.Sprintf("Total: %d MB\nFree: %d MB\nUsed: %d MB\nUsed Percentage: %.2f%%", vmStat.Total/1024/1024, vmStat.Free/1024/1024, vmStat.Used/1024/1024, vmStat.UsedPercent)).
 		AddField("Disk Info", fmt.Sprintf("Total: %d MB\nFree: %d MB\nUsed: %d MB\nUsed Percentage: %.2f%%", diskStat.Total/1024/1024, diskStat.Free/1024/1024, diskStat.Used/1024/1024, diskStat.UsedPercent)).
 		Send()
+	return nil
 }
 
-func (c *UtilityCommands) shutdownpc(ctx *router.Ctx) {
-	_ = system.Shutdown()
+func (c *UtilityCommands) shutdownpc(ctx *router.Ctx) error {
+	return system.Shutdown()
 }
 
-func (c *UtilityCommands) restartpc(ctx *router.Ctx) {
-	_ = system.Restart()
+func (c *UtilityCommands) restartpc(ctx *router.Ctx) error {
+	return system.Restart()
 }
 
-func (c *UtilityCommands) sleeppc(ctx *router.Ctx) {
-	_ = system.Sleep()
+func (c *UtilityCommands) sleeppc(ctx *router.Ctx) error {
+	return system.Sleep()
 }
 
-func (c *UtilityCommands) hibernatepc(ctx *router.Ctx) {
-	_ = system.Hibernate()
+func (c *UtilityCommands) hibernatepc(ctx *router.Ctx) error {
+	return system.Hibernate()
 }
 
-func (c *UtilityCommands) lockpc(ctx *router.Ctx) {
-	_ = system.Lock()
+func (c *UtilityCommands) lockpc(ctx *router.Ctx) error {
+	return system.Lock()
 }
 
-func (c *UtilityCommands) activewindow(ctx *router.Ctx) {
+func (c *UtilityCommands) activewindow(ctx *router.Ctx) error {
 	pid, _ := foreground.GetForegroundPID()
 	title, _ := foreground.GetForegroundTitle()
 
@@ -1853,50 +1829,50 @@ func (c *UtilityCommands) activewindow(ctx *router.Ctx) {
 		AddField("Active Window PID", fmt.Sprint(pid)).
 		AddField("Active Window Title", title).
 		Send()
+	return nil
 }
 
-func (c *UtilityCommands) calc(ctx *router.Ctx) {
+func (c *UtilityCommands) calc(ctx *router.Ctx) error {
 	if runtime.GOOS != "windows" {
-		ctx.RespondText("This command is only available on Windows")
+		return fmt.Errorf("this command is only available on Windows")
 	}
-	_ = exec.Command("C:\\Windows\\System32\\calc.exe").Start()
+	return exec.Command("C:\\Windows\\System32\\calc.exe").Start()
 }
 
-func (c *UtilityCommands) notepad(ctx *router.Ctx) {
+func (c *UtilityCommands) notepad(ctx *router.Ctx) error {
 	if runtime.GOOS != "windows" {
-		ctx.RespondText("This command is only available on Windows")
+		return fmt.Errorf("this command is only available on Windows")
 	}
-	_ = exec.Command("C:\\Windows\\System32\\notepad.exe").Start()
+	return exec.Command("C:\\Windows\\System32\\notepad.exe").Start()
 }
 
-func (c *UtilityCommands) open(ctx *router.Ctx) {
-	_ = system.OpenURL(ctx.Arguments.Raw())
+func (c *UtilityCommands) open(ctx *router.Ctx) error {
+	return system.OpenURL(ctx.Arguments.Raw())
 }
 
 // Uploading utilities
 
-func (c *UtilityCommands) screenshot(ctx *router.Ctx) {
+func (c *UtilityCommands) screenshot(ctx *router.Ctx) error {
 	delay, _ := ctx.Arguments.Get(0).Duration()
 	time.Sleep(delay)
 
 	img, err := screenshot.CaptureDisplay(0)
 	if err != nil {
-		ctx.RespondText("Error capturing screenshot: %v", err)
-		return
+		return fmt.Errorf("Error capturing screenshot: %v", err)
 	}
 
 	buf := new(bytes.Buffer)
 
 	err = png.Encode(buf, img)
 	if err != nil {
-		ctx.RespondText("Error encoding image: %v", err)
-		return
+		return fmt.Errorf("Error encoding image: %v", err)
 	}
 
-	_, _ = ctx.Session.ChannelFileSend(ctx.Message.ChannelID, "screenshot.png", buf)
+	_, err = ctx.Session.ChannelFileSend(ctx.Message.ChannelID, "screenshot.png", buf)
+	return err
 }
 
-func (c *UtilityCommands) listdestinations(ctx *router.Ctx) {
+func (c *UtilityCommands) listdestinations(ctx *router.Ctx) error {
 	destinationsString := []string{}
 
 	for name, dest := range destinations.Destinations {
@@ -1908,14 +1884,14 @@ func (c *UtilityCommands) listdestinations(ctx *router.Ctx) {
 	sort.Strings(destinationsString)
 
 	c.services.Embed.RespondField(ctx, "Destinations", strings.Join(destinationsString, "\n"))
+	return nil
 }
 
-func (c *UtilityCommands) uploadss(ctx *router.Ctx) {
+func (c *UtilityCommands) uploadss(ctx *router.Ctx) error {
 	destName := strings.ToLower(ctx.Arguments.Get(0).Raw())
 	dest, ok := destinations.Destinations[destName]
 	if !ok {
-		ctx.RespondText("Error: invalid destination\n\nUse the `listdestinations` command to view all destinations")
-		return
+		return fmt.Errorf("Error: invalid destination\n\nUse the `listdestinations` command to view all destinations")
 	}
 
 	delay, _ := ctx.Arguments.Get(1).Duration()
@@ -1923,22 +1899,19 @@ func (c *UtilityCommands) uploadss(ctx *router.Ctx) {
 
 	img, err := screenshot.CaptureDisplay(0)
 	if err != nil {
-		ctx.RespondText("Error capturing screenshot: %v", err)
-		return
+		return fmt.Errorf("Error capturing screenshot: %v", err)
 	}
 
 	buf := new(bytes.Buffer)
 
 	err = png.Encode(buf, img)
 	if err != nil {
-		ctx.RespondText("Error encoding image: %v", err)
-		return
+		return fmt.Errorf("Error encoding image: %v", err)
 	}
 
 	result, err := dest.Upload(buf, "screenshot.png")
 	if err != nil {
-		ctx.RespondText("Error uploading screenshot: %v", err)
-		return
+		return fmt.Errorf("Error uploading screenshot: %v", err)
 	}
 
 	c.services.Embed.New(ctx).
@@ -1946,27 +1919,25 @@ func (c *UtilityCommands) uploadss(ctx *router.Ctx) {
 		AddField("URL", result.URL).
 		AddField("Direct URL", result.DirectURL).
 		Send()
+	return nil
 }
 
-func (c *UtilityCommands) uploadfile(ctx *router.Ctx) {
+func (c *UtilityCommands) uploadfile(ctx *router.Ctx) error {
 	destName := strings.ToLower(ctx.Arguments.Get(0).Raw())
 	dest, ok := destinations.Destinations[destName]
 	if !ok {
-		ctx.RespondText("Error: invalid destination\n\nUse the `listdestinations` command to view all destinations")
-		return
+		return fmt.Errorf("Error: invalid destination\n\nUse the `listdestinations` command to view all destinations")
 	}
 
 	attachments := ctx.Message.Attachments
 
 	if len(attachments) == 0 {
-		ctx.RespondText("Error: you must provide a file as an attachment.")
-		return
+		return fmt.Errorf("Error: you must provide a file as an attachment.")
 	}
 
 	resp, err := nethttp.Get(attachments[0].URL)
 	if err != nil {
-		ctx.RespondText("Error downloading file: %v", err)
-		return
+		return fmt.Errorf("Error downloading file: %v", err)
 	}
 	defer resp.Body.Close()
 
@@ -1974,14 +1945,12 @@ func (c *UtilityCommands) uploadfile(ctx *router.Ctx) {
 
 	_, err = buf.ReadFrom(resp.Body)
 	if err != nil {
-		ctx.RespondText("Error reading file body: %v", err)
-		return
+		return fmt.Errorf("Error reading file body: %v", err)
 	}
 
 	result, err := dest.Upload(buf, attachments[0].Filename)
 	if err != nil {
-		ctx.RespondText("Error uploading file: %v", err)
-		return
+		return fmt.Errorf("Error uploading file: %v", err)
 	}
 
 	c.services.Embed.New(ctx).
@@ -1989,29 +1958,27 @@ func (c *UtilityCommands) uploadfile(ctx *router.Ctx) {
 		AddField("URL", result.URL).
 		AddField("Direct URL", result.DirectURL).
 		Send()
+	return nil
 }
 
-func (c *UtilityCommands) uploadlink(ctx *router.Ctx) {
+func (c *UtilityCommands) uploadlink(ctx *router.Ctx) error {
 	destName := strings.ToLower(ctx.Arguments.Get(0).Raw())
 	dest, ok := destinations.Destinations[destName]
 	if !ok {
-		ctx.RespondText("Error: invalid destination\n\nUse the `listdestinations` command to view all destinations")
-		return
+		return fmt.Errorf("Error: invalid destination\n\nUse the `listdestinations` command to view all destinations")
 	}
 
 	link := ctx.Arguments.Get(1).Raw()
 	parsedURL, err := url.ParseRequestURI(link)
 	if err != nil {
-		ctx.RespondText("Error: invalid link: %v", err)
-		return
+		return fmt.Errorf("Error: invalid link: %v", err)
 	}
 
 	fileName := path.Base(parsedURL.Path)
 
 	resp, err := nethttp.Get(link)
 	if err != nil {
-		ctx.RespondText("Error downloading file: %v", err)
-		return
+		return fmt.Errorf("Error downloading file: %v", err)
 	}
 	defer resp.Body.Close()
 
@@ -2019,14 +1986,12 @@ func (c *UtilityCommands) uploadlink(ctx *router.Ctx) {
 
 	_, err = buf.ReadFrom(resp.Body)
 	if err != nil {
-		ctx.RespondText("Error reading file body: %v", err)
-		return
+		return fmt.Errorf("Error reading file body: %v", err)
 	}
 
 	result, err := dest.Upload(buf, fileName)
 	if err != nil {
-		ctx.RespondText("Error uploading file: %v", err)
-		return
+		return fmt.Errorf("Error uploading file: %v", err)
 	}
 
 	c.services.Embed.New(ctx).
@@ -2034,78 +1999,75 @@ func (c *UtilityCommands) uploadlink(ctx *router.Ctx) {
 		AddField("URL", result.URL).
 		AddField("Direct URL", result.DirectURL).
 		Send()
+	return nil
 }
 
 // Paste utilities
 
-func (c *UtilityCommands) pastebin(ctx *router.Ctx) {
+func (c *UtilityCommands) pastebin(ctx *router.Ctx) error {
 	paste, err := api.LBCreatePaste(ctx.Arguments.Raw())
 	if err != nil {
-		ctx.RespondText("An error has occurred.")
-		return
+		return fmt.Errorf("An error has occurred.")
 	}
 	c.services.Embed.RespondField(ctx, "Paste URL", paste)
+	return nil
 }
 
-func (c *UtilityCommands) pastefile(ctx *router.Ctx) {
+func (c *UtilityCommands) pastefile(ctx *router.Ctx) error {
 	filePath := ctx.Arguments.Get(0).Raw()
 	content, err := os.ReadFile(filePath)
 	if err != nil {
-		ctx.RespondText("An error has occurred.")
-		return
+		return fmt.Errorf("An error has occurred.")
 	}
 
 	paste, err := api.LBCreatePaste(string(content))
 	if err != nil {
-		ctx.RespondText("An error has occurred.")
-		return
+		return fmt.Errorf("An error has occurred.")
 	}
 
 	c.services.Embed.RespondField(ctx, "Paste URL", paste)
+	return nil
 }
 
-func (c *UtilityCommands) tinyurl(ctx *router.Ctx) {
+func (c *UtilityCommands) tinyurl(ctx *router.Ctx) error {
 	sourceUrl := ctx.Arguments.Raw()
 	resp, err := http.DefaultClient().Get(fmt.Sprintf("https://tinyurl.com/api-create.php?url=%s", sourceUrl))
 	if err != nil {
-		ctx.RespondText("An error has occurred.")
-		return
+		return fmt.Errorf("An error has occurred.")
 	}
 	c.services.Embed.New(ctx).
 		AddField("URL", sourceUrl).
 		AddField("TinyURL", string(resp.MustGetBody())).
 		Send()
+	return nil
 }
 
 // Obfuscation utilities
 
-func (c *UtilityCommands) obfuscateFunc(lang, ext string) func(ctx *router.Ctx) {
-	return func(ctx *router.Ctx) {
+func (c *UtilityCommands) obfuscateFunc(lang, ext string) func(ctx *router.Ctx) error {
+	return func(ctx *router.Ctx) error {
 		script := ctx.Arguments.Raw()
 
 		attachments := ctx.Message.Attachments
 		if script == "" && len(attachments) > 0 {
 			resp, err := http.DefaultClient().Get(attachments[0].URL)
 			if err != nil {
-				ctx.RespondText("Error getting script: %v", err)
-				return
+				return fmt.Errorf("Error getting script: %v", err)
 			}
 
 			script = string(resp.MustGetBody())
 		}
 
 		if script == "" {
-			ctx.RespondText("Error: you must provide a script as an attachment or argument.")
-			return
+			return fmt.Errorf("Error: you must provide a script as an attachment or argument.")
 		}
 
 		obf := api.LBObfuscate(lang, script)
 		if strings.HasPrefix(obf, "An error") {
-			ctx.RespondText("%s", obf)
-			return
+			return fmt.Errorf("%s", obf)
 		}
 
-		_, _ = ctx.Session.ChannelMessageSendComplex(ctx.Message.ChannelID, &discordgo.MessageSend{
+		_, err := ctx.Session.ChannelMessageSendComplex(ctx.Message.ChannelID, &discordgo.MessageSend{
 			Content: "Obfuscated Script",
 			Files: []*discordgo.File{
 				{
@@ -2115,30 +2077,32 @@ func (c *UtilityCommands) obfuscateFunc(lang, ext string) func(ctx *router.Ctx) 
 				},
 			},
 		})
+		return err
 	}
 }
 
 // ReviewDB utilities
 
-func (c *UtilityCommands) reviewdbtoken(ctx *router.Ctx) {
+func (c *UtilityCommands) reviewdbtoken(ctx *router.Ctx) error {
 	token, err := api.GetReviewDBToken(ctx.Session)
 	if err != nil {
 		c.services.Embed.New(ctx).
 			SetDescription("Error getting token: %v", err).
 			Send()
-		return
+		return nil
 	}
 
 	c.services.Embed.RespondField(ctx, "Token", token)
+	return nil
 }
 
-func (c *UtilityCommands) getreviews(ctx *router.Ctx) {
+func (c *UtilityCommands) getreviews(ctx *router.Ctx) error {
 	user, err := ctx.Arguments.Get(0).User()
 	if err != nil {
 		c.services.Embed.New(ctx).
 			SetDescription("Could not find user").
 			Send()
-		return
+		return nil
 	}
 
 	reviews, err := api.GetReviewDBReviews(user.ID)
@@ -2146,7 +2110,7 @@ func (c *UtilityCommands) getreviews(ctx *router.Ctx) {
 		c.services.Embed.New(ctx).
 			SetDescription("Error getting reviews: %v", err).
 			Send()
-		return
+		return nil
 	}
 
 	reviewString := ""
@@ -2156,15 +2120,16 @@ func (c *UtilityCommands) getreviews(ctx *router.Ctx) {
 	}
 
 	c.services.Embed.RespondField(ctx, "Reviews", reviewString)
+	return nil
 }
 
-func (c *UtilityCommands) addreview(ctx *router.Ctx) {
+func (c *UtilityCommands) addreview(ctx *router.Ctx) error {
 	user, err := ctx.Arguments.Get(0).User()
 	if err != nil {
 		c.services.Embed.New(ctx).
 			SetDescription("Could not find user").
 			Send()
-		return
+		return nil
 	}
 
 	err = api.AddReviewDBReview(ctx.Session, user.ID, ctx.Arguments.RawFrom(1))
@@ -2172,22 +2137,23 @@ func (c *UtilityCommands) addreview(ctx *router.Ctx) {
 		c.services.Embed.New(ctx).
 			SetDescription("Error adding review: %v", err).
 			Send()
-		return
+		return nil
 	}
 
 	c.services.Embed.Respond(ctx, "Successfully added review to %s!", user.Username)
+	return nil
 }
 
 // Tag utilities
 
-func (c *UtilityCommands) getTags(ctx *router.Ctx) {
+func (c *UtilityCommands) getTags(ctx *router.Ctx) error {
 	cfg := c.services.Config.GetConfig()
 
 	if len(cfg.Tags) == 0 {
 		c.services.Embed.New(ctx).
 			SetDescription("No tags found.").
 			Send()
-		return
+		return nil
 	}
 
 	var tagList []string
@@ -2197,9 +2163,10 @@ func (c *UtilityCommands) getTags(ctx *router.Ctx) {
 	}
 
 	c.services.Embed.RespondField(ctx, "Tags", strings.Join(tagList, "\n"))
+	return nil
 }
 
-func (c *UtilityCommands) addTag(ctx *router.Ctx) {
+func (c *UtilityCommands) addTag(ctx *router.Ctx) error {
 	cfg := c.services.Config.GetConfig()
 
 	if cfg.Tags == nil {
@@ -2212,14 +2179,14 @@ func (c *UtilityCommands) addTag(ctx *router.Ctx) {
 	cfg.Tags[name] = content
 
 	if err := c.services.Config.SaveConfig(cfg); err != nil {
-		ctx.RespondText("Error saving tags: %v", err)
-		return
+		return fmt.Errorf("Error saving tags: %v", err)
 	}
 
 	c.services.Embed.Respond(ctx, "Successfully created tag.")
+	return nil
 }
 
-func (c *UtilityCommands) removeTag(ctx *router.Ctx) {
+func (c *UtilityCommands) removeTag(ctx *router.Ctx) error {
 	cfg := c.services.Config.GetConfig()
 
 	name := ctx.Arguments.Get(0).Raw()
@@ -2227,33 +2194,32 @@ func (c *UtilityCommands) removeTag(ctx *router.Ctx) {
 	delete(cfg.Tags, name)
 
 	if err := c.services.Config.SaveConfig(cfg); err != nil {
-		ctx.RespondText("Error saving tags: %v", err)
-		return
+		return fmt.Errorf("Error saving tags: %v", err)
 	}
 
 	c.services.Embed.Respond(ctx, "Successfully deleted tag.")
+	return nil
 }
 
-func (c *UtilityCommands) clearTags(ctx *router.Ctx) {
+func (c *UtilityCommands) clearTags(ctx *router.Ctx) error {
 	cfg := c.services.Config.GetConfig()
 
 	cfg.Tags = map[string]string{}
 
 	if err := c.services.Config.SaveConfig(cfg); err != nil {
-		ctx.RespondText("Error saving tags: %v", err)
-		return
+		return fmt.Errorf("Error saving tags: %v", err)
 	}
 
 	c.services.Embed.Respond(ctx, "Successfully cleared tags.")
+	return nil
 }
 
 // Creditcard commands
 
-func (c *UtilityCommands) mastercard(ctx *router.Ctx) {
+func (c *UtilityCommands) mastercard(ctx *router.Ctx) error {
 	creditCard, err := api.LBGenerateCC("mastercard", ctx.Arguments.Raw())
 	if err != nil {
-		ctx.RespondText("An error has occurred.")
-		return
+		return fmt.Errorf("An error has occurred.")
 	}
 	c.services.Embed.New(ctx).
 		AddField("Card Type", "Mastercard").
@@ -2262,13 +2228,13 @@ func (c *UtilityCommands) mastercard(ctx *router.Ctx) {
 		AddField("Expiry Date", creditCard.ExpiryDate).
 		SetImage(creditCard.Visualisation).
 		Send()
+	return nil
 }
 
-func (c *UtilityCommands) visa16(ctx *router.Ctx) {
+func (c *UtilityCommands) visa16(ctx *router.Ctx) error {
 	creditCard, err := api.LBGenerateCC("visa16", ctx.Arguments.Raw())
 	if err != nil {
-		ctx.RespondText("An error has occurred.")
-		return
+		return fmt.Errorf("An error has occurred.")
 	}
 	c.services.Embed.New(ctx).
 		AddField("Card Type", "Visa").
@@ -2277,13 +2243,13 @@ func (c *UtilityCommands) visa16(ctx *router.Ctx) {
 		AddField("Expiry Date", creditCard.ExpiryDate).
 		SetImage(creditCard.Visualisation).
 		Send()
+	return nil
 }
 
-func (c *UtilityCommands) visa13(ctx *router.Ctx) {
+func (c *UtilityCommands) visa13(ctx *router.Ctx) error {
 	creditCard, err := api.LBGenerateCC("visa13", ctx.Arguments.Raw())
 	if err != nil {
-		ctx.RespondText("An error has occurred.")
-		return
+		return fmt.Errorf("An error has occurred.")
 	}
 	c.services.Embed.New(ctx).
 		AddField("Card Type", "Visa").
@@ -2292,13 +2258,13 @@ func (c *UtilityCommands) visa13(ctx *router.Ctx) {
 		AddField("Expiry Date", creditCard.ExpiryDate).
 		SetImage(creditCard.Visualisation).
 		Send()
+	return nil
 }
 
-func (c *UtilityCommands) amex(ctx *router.Ctx) {
+func (c *UtilityCommands) amex(ctx *router.Ctx) error {
 	creditCard, err := api.LBGenerateCC("amex", ctx.Arguments.Raw())
 	if err != nil {
-		ctx.RespondText("An error has occurred.")
-		return
+		return fmt.Errorf("An error has occurred.")
 	}
 	c.services.Embed.New(ctx).
 		AddField("Card Type", "American Express").
@@ -2307,13 +2273,13 @@ func (c *UtilityCommands) amex(ctx *router.Ctx) {
 		AddField("Expiry Date", creditCard.ExpiryDate).
 		SetImage(creditCard.Visualisation).
 		Send()
+	return nil
 }
 
-func (c *UtilityCommands) discover(ctx *router.Ctx) {
+func (c *UtilityCommands) discover(ctx *router.Ctx) error {
 	creditCard, err := api.LBGenerateCC("discover", ctx.Arguments.Raw())
 	if err != nil {
-		ctx.RespondText("An error has occurred.")
-		return
+		return fmt.Errorf("An error has occurred.")
 	}
 	c.services.Embed.New(ctx).
 		AddField("Card Type", "Discover").
@@ -2322,13 +2288,13 @@ func (c *UtilityCommands) discover(ctx *router.Ctx) {
 		AddField("Expiry Date", creditCard.ExpiryDate).
 		SetImage(creditCard.Visualisation).
 		Send()
+	return nil
 }
 
-func (c *UtilityCommands) diners(ctx *router.Ctx) {
+func (c *UtilityCommands) diners(ctx *router.Ctx) error {
 	creditCard, err := api.LBGenerateCC("diners", ctx.Arguments.Raw())
 	if err != nil {
-		ctx.RespondText("An error has occurred.")
-		return
+		return fmt.Errorf("An error has occurred.")
 	}
 	c.services.Embed.New(ctx).
 		AddField("Card Type", "Diners").
@@ -2337,13 +2303,13 @@ func (c *UtilityCommands) diners(ctx *router.Ctx) {
 		AddField("Expiry Date", creditCard.ExpiryDate).
 		SetImage(creditCard.Visualisation).
 		Send()
+	return nil
 }
 
-func (c *UtilityCommands) jcb(ctx *router.Ctx) {
+func (c *UtilityCommands) jcb(ctx *router.Ctx) error {
 	creditCard, err := api.LBGenerateCC("jcb", ctx.Arguments.Raw())
 	if err != nil {
-		ctx.RespondText("An error has occurred.")
-		return
+		return fmt.Errorf("An error has occurred.")
 	}
 	c.services.Embed.New(ctx).
 		AddField("Card Type", "JCB").
@@ -2352,11 +2318,12 @@ func (c *UtilityCommands) jcb(ctx *router.Ctx) {
 		AddField("Expiry Date", creditCard.ExpiryDate).
 		SetImage(creditCard.Visualisation).
 		Send()
+	return nil
 }
 
 // Network utilities
 
-func (c *UtilityCommands) ping(ctx *router.Ctx) {
+func (c *UtilityCommands) ping(ctx *router.Ctx) error {
 	emb := c.services.Embed.New(ctx)
 	time, err := network.GetPingLatency("https://lightning-bot.com")
 	if err != nil {
@@ -2373,9 +2340,10 @@ func (c *UtilityCommands) ping(ctx *router.Ctx) {
 	emb.
 		AddField("Discord Socket Latency", fmt.Sprintf("%dms", ctx.Session.HeartbeatLatency().Milliseconds())).
 		Send()
+	return nil
 }
 
-func (c *UtilityCommands) pingweb(ctx *router.Ctx) {
+func (c *UtilityCommands) pingweb(ctx *router.Ctx) error {
 	host := ctx.Arguments.Get(0).Raw()
 	emb := c.services.Embed.New(ctx)
 
@@ -2387,23 +2355,22 @@ func (c *UtilityCommands) pingweb(ctx *router.Ctx) {
 	}
 
 	emb.Send()
+	return nil
 }
 
-func (c *UtilityCommands) ipinfo(ctx *router.Ctx) {
+func (c *UtilityCommands) ipinfo(ctx *router.Ctx) error {
 	ip := ctx.Arguments.Get(0).Raw()
 	url := fmt.Sprintf("https://ipinfo.io/%s/json", url.QueryEscape(ip))
 
 	resp, err := http.DefaultClient().Get(url)
 	if err != nil {
-		ctx.RespondText("An error has occurred.")
-		return
+		return fmt.Errorf("An error has occurred.")
 	}
 
 	ipinfo := resp.Json()
 
 	if ipinfo.Get("status").MustInt(0) == 404 {
-		ctx.RespondText("No results found.")
-		return
+		return fmt.Errorf("No results found.")
 	}
 
 	location := fmt.Sprintf(
@@ -2419,9 +2386,10 @@ func (c *UtilityCommands) ipinfo(ctx *router.Ctx) {
 		AddField("Timezone", ipinfo.Get("timezone").MustString()).
 		AddField("Location", location).
 		Send()
+	return nil
 }
 
-func (c *UtilityCommands) portscan(ctx *router.Ctx) {
+func (c *UtilityCommands) portscan(ctx *router.Ctx) error {
 	host := ctx.Arguments.Get(0).Raw()
 	ports := map[string]int{
 		"FTP":            21,
@@ -2452,45 +2420,45 @@ func (c *UtilityCommands) portscan(ctx *router.Ctx) {
 
 	}
 	emb.Send()
+	return nil
 }
 
-func (c *UtilityCommands) resolve(ctx *router.Ctx) {
+func (c *UtilityCommands) resolve(ctx *router.Ctx) error {
 	domain := ctx.Arguments.Get(0).Raw()
 
 	resp, err := http.DefaultClient().Get(fmt.Sprintf("https://json.geoiplookup.io/%s", domain))
 	if err != nil {
-		ctx.RespondText("An error has occurred.")
-		return
+		return fmt.Errorf("An error has occurred.")
 	}
 
 	response := resp.Json()
 
 	if response.Get("ip").MustString() == "" {
 		c.services.Embed.New(ctx).SetDescription("Invalid domain.").Send()
-		return
+		return nil
 	}
 
 	c.services.Embed.New(ctx).
 		AddField("Domain", domain).
 		AddField("IP", response.Get("ip").MustString()).
 		Send()
+	return nil
 }
 
-func (c *UtilityCommands) reversedns(ctx *router.Ctx) {
+func (c *UtilityCommands) reversedns(ctx *router.Ctx) error {
 	ip := ctx.Arguments.Get(0).Raw()
 	url := fmt.Sprintf("https://api.LBdomaintools.com/v1/%s/host-domains/", ip)
 
 	resp, err := http.DefaultClient().Get(url)
 	if err != nil {
-		ctx.RespondText("An error has occurred.")
-		return
+		return fmt.Errorf("An error has occurred.")
 	}
 
 	response := resp.Json()
 
 	if response.Get("error").MustSlice() != nil {
 		c.services.Embed.New(ctx).SetDescription("Invalid IP Address.").Send()
-		return
+		return nil
 	}
 
 	domains := response.Get("response", "ip_addresses", "domain_names").MustStringSlice()
@@ -2499,32 +2467,32 @@ func (c *UtilityCommands) reversedns(ctx *router.Ctx) {
 		AddField("IP Address", ip).
 		AddField("Domains", strings.Join(domains, ", ")).
 		Send()
+	return nil
 }
 
-func (c *UtilityCommands) reversemac(ctx *router.Ctx) {
+func (c *UtilityCommands) reversemac(ctx *router.Ctx) error {
 	mac := ctx.Arguments.Get(0).Raw()
 	resp, err := http.DefaultClient().Get(fmt.Sprintf("https://api.LBmacvendors.com/%s", mac))
 	if err != nil {
-		ctx.RespondText("An error has occurred.")
-		return
+		return fmt.Errorf("An error has occurred.")
 	}
 	vendor := string(resp.MustGetBody())
 	if strings.Contains(vendor, "Not Found") {
 		c.services.Embed.New(ctx).SetDescription("Invalid MAC Address.").Send()
-		return
+		return nil
 	}
 	c.services.Embed.New(ctx).
 		AddField("MAC Address", mac).
 		AddField("Vendor", vendor).
 		Send()
+	return nil
 }
 
-func (c *UtilityCommands) headers(ctx *router.Ctx) {
+func (c *UtilityCommands) headers(ctx *router.Ctx) error {
 	url := ctx.Arguments.Get(0).Raw()
 	resp, err := http.DefaultClient().Get(url)
 	if err != nil {
-		ctx.RespondText("An error has occurred.")
-		return
+		return fmt.Errorf("An error has occurred.")
 	}
 
 	var headers string
@@ -2536,14 +2504,16 @@ func (c *UtilityCommands) headers(ctx *router.Ctx) {
 		AddField("URL", url).
 		AddField("Headers", headers).
 		Send()
+	return nil
 }
 
-func (c *UtilityCommands) _interface(ctx *router.Ctx) {
+func (c *UtilityCommands) _interface(ctx *router.Ctx) error {
 	c.services.Embed.New(ctx).
 		AddField("Public IP", network.GetPublicIP()).
 		AddField("Local IP", network.GetLocalIP()).
 		AddField("MAC Address", network.GetMacAddress()).
 		Send()
+	return nil
 }
 
 // Poketwo utilities
@@ -2551,14 +2521,12 @@ func (c *UtilityCommands) _interface(ctx *router.Ctx) {
 func (c *UtilityCommands) getPoketwoMessage(ctx *router.Ctx) (*discordgo.Message, error) {
 	channel, err := ctx.Arguments.Get(0).Channel(router.ArgumentFlagFallbackDefault)
 	if err != nil {
-		ctx.RespondText("Error: invalid channel")
-		return nil, errors.New("invalid channel")
+		return nil, fmt.Errorf("could not find channel: %v", err)
 	}
 
 	messages, err := utils.Discord.GetChannelMessages(ctx.Session, channel.ID, 100)
 	if err != nil {
-		ctx.RespondText("Error getting messages: %v", err)
-		return nil, err
+		return nil, fmt.Errorf("could not get messages: %v", err)
 	}
 
 	for _, m := range messages {
@@ -2572,14 +2540,13 @@ func (c *UtilityCommands) getPoketwoMessage(ctx *router.Ctx) (*discordgo.Message
 		}
 	}
 
-	ctx.RespondText("Error: no Poketwo message found in channel")
-	return nil, errors.New("no Poketwo message found")
+	return nil, fmt.Errorf("could not find Poketwo message")
 }
 
-func (c *UtilityCommands) snipepokemon(ctx *router.Ctx) {
+func (c *UtilityCommands) snipepokemon(ctx *router.Ctx) error {
 	message, err := c.getPoketwoMessage(ctx)
 	if err != nil {
-		return
+		return err
 	}
 
 	emb := message.Embeds[0]
@@ -2587,8 +2554,7 @@ func (c *UtilityCommands) snipepokemon(ctx *router.Ctx) {
 	// Download the Pokémon image
 	resp, err := http.DefaultClient().Get(emb.Image.URL)
 	if err != nil {
-		ctx.RespondText("Error downloading image: %v", err)
-		return
+		return fmt.Errorf("Error downloading image: %v", err)
 	}
 
 	image := utils.Misc.ImageToBase64(resp.MustGetBody())
@@ -2596,7 +2562,7 @@ func (c *UtilityCommands) snipepokemon(ctx *router.Ctx) {
 	pokemon, _, err := api.PokeTwo(image)
 	if err != nil {
 		logging.Debug("Snipers.CheckPokeTwoSniper: Error getting Pokémon: ", err)
-		return
+		return nil
 	}
 
 	cfg := c.services.Config.GetConfig()
@@ -2622,20 +2588,20 @@ func (c *UtilityCommands) snipepokemon(ctx *router.Ctx) {
 
 	_, err = ctx.Session.ChannelMessageSend(message.ChannelID, "<@716390085896962058> c "+strings.ToLower(label))
 	if err != nil {
-		ctx.RespondText("Error catching Pokémon: %v", err)
-		return
+		return fmt.Errorf("Error catching Pokémon: %v", err)
 	}
 
 	c.services.Embed.New(ctx).
 		SetDescription("Successfully sniped Pokémon").
 		AddField("Pokémon", label).
 		Send()
+	return nil
 }
 
-func (c *UtilityCommands) detectpokemon(ctx *router.Ctx) {
+func (c *UtilityCommands) detectpokemon(ctx *router.Ctx) error {
 	message, err := c.getPoketwoMessage(ctx)
 	if err != nil {
-		return
+		return err
 	}
 
 	emb := message.Embeds[0]
@@ -2643,8 +2609,7 @@ func (c *UtilityCommands) detectpokemon(ctx *router.Ctx) {
 	// Download the Pokémon image
 	resp, err := http.DefaultClient().Get(emb.Image.URL)
 	if err != nil {
-		ctx.RespondText("Error downloading image: %v", err)
-		return
+		return fmt.Errorf("Error downloading image: %v", err)
 	}
 
 	image := utils.Misc.ImageToBase64(resp.MustGetBody())
@@ -2652,7 +2617,7 @@ func (c *UtilityCommands) detectpokemon(ctx *router.Ctx) {
 	pokemon, _, err := api.PokeTwo(image)
 	if err != nil {
 		logging.Debug("Snipers.CheckPokeTwoSniper: Error getting Pokémon: ", err)
-		return
+		return nil
 	}
 
 	names := fmt.Sprintf(
@@ -2682,16 +2647,16 @@ func (c *UtilityCommands) detectpokemon(ctx *router.Ctx) {
 		AddField("Names", names).
 		AddField("Info", info).
 		Send()
+	return nil
 }
 
 // Reminder utilities
 
-func (c *UtilityCommands) getReminders(ctx *router.Ctx) {
+func (c *UtilityCommands) getReminders(ctx *router.Ctx) error {
 	cfg := c.services.Config.GetConfig()
 
 	if len(cfg.Reminders) == 0 {
-		ctx.RespondText("No reminders have been set!")
-		return
+		return fmt.Errorf("No reminders have been set!")
 	}
 
 	var reminders []string
@@ -2700,9 +2665,10 @@ func (c *UtilityCommands) getReminders(ctx *router.Ctx) {
 	}
 
 	c.services.Embed.RespondField(ctx, "Reminders", strings.Join(reminders, "\n"))
+	return nil
 }
 
-func (c *UtilityCommands) addReminder(ctx *router.Ctx) {
+func (c *UtilityCommands) addReminder(ctx *router.Ctx) error {
 	cfg := c.services.Config.GetConfig()
 
 	name := ctx.Arguments.Get(0).Raw()
@@ -2712,14 +2678,12 @@ func (c *UtilityCommands) addReminder(ctx *router.Ctx) {
 			continue
 		}
 
-		ctx.RespondText("Reminder with that name already exists.")
-		return
+		return fmt.Errorf("Reminder with that name already exists.")
 	}
 
 	duration, err := ctx.Arguments.Get(2).Duration()
 	if err != nil {
-		ctx.RespondText("Invalid duration.")
-		return
+		return fmt.Errorf("Invalid duration.")
 	}
 
 	duration = fn.Clamp(duration, 5*time.Second, 24*time.Hour)
@@ -2733,14 +2697,14 @@ func (c *UtilityCommands) addReminder(ctx *router.Ctx) {
 	})
 
 	if err := c.services.Config.SaveConfig(cfg); err != nil {
-		ctx.RespondText("Error saving config: %v", err)
-		return
+		return fmt.Errorf("Error saving config: %v", err)
 	}
 
 	c.services.Embed.Respond(ctx, "Successfully set reminder!")
+	return nil
 }
 
-func (c *UtilityCommands) removeReminder(ctx *router.Ctx) {
+func (c *UtilityCommands) removeReminder(ctx *router.Ctx) error {
 	cfg := c.services.Config.GetConfig()
 
 	name := ctx.Arguments.Get(0).Raw()
@@ -2750,24 +2714,24 @@ func (c *UtilityCommands) removeReminder(ctx *router.Ctx) {
 	})
 
 	if err := c.services.Config.SaveConfig(cfg); err != nil {
-		ctx.RespondText("Error saving config: %v", err)
-		return
+		return fmt.Errorf("Error saving config: %v", err)
 	}
 
 	c.services.Embed.Respond(ctx, "Successfully deleted reminder!")
+	return nil
 }
 
-func (c *UtilityCommands) clearReminders(ctx *router.Ctx) {
+func (c *UtilityCommands) clearReminders(ctx *router.Ctx) error {
 	cfg := c.services.Config.GetConfig()
 
 	cfg.Reminders = []config.Reminder{}
 
 	if err := c.services.Config.SaveConfig(cfg); err != nil {
-		ctx.RespondText("Error saving config: %v", err)
-		return
+		return fmt.Errorf("Error saving config: %v", err)
 	}
 
 	c.services.Embed.Respond(ctx, "Successfully cleared reminders!")
+	return nil
 }
 
 // Conversion utilities
@@ -2786,18 +2750,17 @@ func (c *UtilityCommands) checkIfUnitValid(ctx *router.Ctx, unit string, validUn
 	return false
 }
 
-func (c *UtilityCommands) convertvelocity(ctx *router.Ctx) {
+func (c *UtilityCommands) convertvelocity(ctx *router.Ctx) error {
 	value, err := ctx.Arguments.Get(0).Float64()
 	if err != nil {
-		ctx.RespondText("Invalid value")
-		return
+		return fmt.Errorf("Invalid value")
 	}
 
 	sourceUnit := ctx.Arguments.Get(1).Raw()
 	destinationUnit := ctx.Arguments.Get(2).Raw()
 
 	if !c.checkIfUnitValid(ctx, sourceUnit, conversion.SpeedUnits) || !c.checkIfUnitValid(ctx, destinationUnit, conversion.SpeedUnits) {
-		return
+		return nil
 	}
 
 	result, err := conversion.ConvertSpeed(sourceUnit, destinationUnit, value)
@@ -2809,20 +2772,20 @@ func (c *UtilityCommands) convertvelocity(ctx *router.Ctx) {
 		AddField("Value", strconv.FormatFloat(value, 'g', -1, 64)+" "+sourceUnit).
 		AddField("Converted", strconv.FormatFloat(result, 'g', -1, 64)+" "+destinationUnit).
 		Send()
+	return nil
 }
 
-func (c *UtilityCommands) convertarea(ctx *router.Ctx) {
+func (c *UtilityCommands) convertarea(ctx *router.Ctx) error {
 	value, err := ctx.Arguments.Get(0).Float64()
 	if err != nil {
-		ctx.RespondText("Invalid value")
-		return
+		return fmt.Errorf("Invalid value")
 	}
 
 	sourceUnit := ctx.Arguments.Get(1).Raw()
 	destinationUnit := ctx.Arguments.Get(2).Raw()
 
 	if !c.checkIfUnitValid(ctx, sourceUnit, conversion.AreaUnits) || !c.checkIfUnitValid(ctx, destinationUnit, conversion.AreaUnits) {
-		return
+		return nil
 	}
 
 	result, err := conversion.ConvertArea(sourceUnit, destinationUnit, value)
@@ -2834,20 +2797,20 @@ func (c *UtilityCommands) convertarea(ctx *router.Ctx) {
 		AddField("Value", strconv.FormatFloat(value, 'g', -1, 64)+" "+sourceUnit).
 		AddField("Converted", strconv.FormatFloat(result, 'g', -1, 64)+" "+destinationUnit).
 		Send()
+	return nil
 }
 
-func (c *UtilityCommands) convertlength(ctx *router.Ctx) {
+func (c *UtilityCommands) convertlength(ctx *router.Ctx) error {
 	value, err := ctx.Arguments.Get(0).Float64()
 	if err != nil {
-		ctx.RespondText("Invalid value")
-		return
+		return fmt.Errorf("Invalid value")
 	}
 
 	sourceUnit := ctx.Arguments.Get(1).Raw()
 	destinationUnit := ctx.Arguments.Get(2).Raw()
 
 	if !c.checkIfUnitValid(ctx, sourceUnit, conversion.LengthUnits) || !c.checkIfUnitValid(ctx, destinationUnit, conversion.LengthUnits) {
-		return
+		return nil
 	}
 
 	result, err := conversion.ConvertLength(sourceUnit, destinationUnit, value)
@@ -2859,20 +2822,20 @@ func (c *UtilityCommands) convertlength(ctx *router.Ctx) {
 		AddField("Value", strconv.FormatFloat(value, 'g', -1, 64)+" "+sourceUnit).
 		AddField("Converted", strconv.FormatFloat(result, 'g', -1, 64)+" "+destinationUnit).
 		Send()
+	return nil
 }
 
-func (c *UtilityCommands) converttemperature(ctx *router.Ctx) {
+func (c *UtilityCommands) converttemperature(ctx *router.Ctx) error {
 	value, err := ctx.Arguments.Get(0).Float64()
 	if err != nil {
-		ctx.RespondText("Invalid value")
-		return
+		return fmt.Errorf("Invalid value")
 	}
 
 	sourceUnit := ctx.Arguments.Get(1).Raw()
 	destinationUnit := ctx.Arguments.Get(2).Raw()
 
 	if !c.checkIfUnitValid(ctx, sourceUnit, conversion.TemperatureUnits) || !c.checkIfUnitValid(ctx, destinationUnit, conversion.TemperatureUnits) {
-		return
+		return nil
 	}
 
 	result, err := conversion.ConvertTemperature(sourceUnit, destinationUnit, value)
@@ -2884,20 +2847,20 @@ func (c *UtilityCommands) converttemperature(ctx *router.Ctx) {
 		AddField("Value", strconv.FormatFloat(value, 'g', -1, 64)+" "+sourceUnit).
 		AddField("Converted", strconv.FormatFloat(result, 'g', -1, 64)+" "+destinationUnit).
 		Send()
+	return nil
 }
 
-func (c *UtilityCommands) converttime(ctx *router.Ctx) {
+func (c *UtilityCommands) converttime(ctx *router.Ctx) error {
 	value, err := ctx.Arguments.Get(0).Float64()
 	if err != nil {
-		ctx.RespondText("Invalid value")
-		return
+		return fmt.Errorf("Invalid value")
 	}
 
 	sourceUnit := ctx.Arguments.Get(1).Raw()
 	destinationUnit := ctx.Arguments.Get(2).Raw()
 
 	if !c.checkIfUnitValid(ctx, sourceUnit, conversion.TimeUnits) || !c.checkIfUnitValid(ctx, destinationUnit, conversion.TimeUnits) {
-		return
+		return nil
 	}
 
 	result, err := conversion.ConvertTime(sourceUnit, destinationUnit, value)
@@ -2909,20 +2872,20 @@ func (c *UtilityCommands) converttime(ctx *router.Ctx) {
 		AddField("Value", strconv.FormatFloat(value, 'g', -1, 64)+" "+sourceUnit).
 		AddField("Converted", strconv.FormatFloat(result, 'g', -1, 64)+" "+destinationUnit).
 		Send()
+	return nil
 }
 
-func (c *UtilityCommands) convertvolume(ctx *router.Ctx) {
+func (c *UtilityCommands) convertvolume(ctx *router.Ctx) error {
 	value, err := ctx.Arguments.Get(0).Float64()
 	if err != nil {
-		ctx.RespondText("Invalid value")
-		return
+		return fmt.Errorf("Invalid value")
 	}
 
 	sourceUnit := ctx.Arguments.Get(1).Raw()
 	destinationUnit := ctx.Arguments.Get(2).Raw()
 
 	if !c.checkIfUnitValid(ctx, sourceUnit, conversion.VolumeUnits) || !c.checkIfUnitValid(ctx, destinationUnit, conversion.VolumeUnits) {
-		return
+		return nil
 	}
 
 	result, err := conversion.ConvertVolume(sourceUnit, destinationUnit, value)
@@ -2934,20 +2897,20 @@ func (c *UtilityCommands) convertvolume(ctx *router.Ctx) {
 		AddField("Value", strconv.FormatFloat(value, 'g', -1, 64)+" "+sourceUnit).
 		AddField("Converted", strconv.FormatFloat(result, 'g', -1, 64)+" "+destinationUnit).
 		Send()
+	return nil
 }
 
-func (c *UtilityCommands) convertmass(ctx *router.Ctx) {
+func (c *UtilityCommands) convertmass(ctx *router.Ctx) error {
 	value, err := ctx.Arguments.Get(0).Float64()
 	if err != nil {
-		ctx.RespondText("Invalid value")
-		return
+		return fmt.Errorf("Invalid value")
 	}
 
 	sourceUnit := ctx.Arguments.Get(1).Raw()
 	destinationUnit := ctx.Arguments.Get(2).Raw()
 
 	if !c.checkIfUnitValid(ctx, sourceUnit, conversion.MassUnits) || !c.checkIfUnitValid(ctx, destinationUnit, conversion.MassUnits) {
-		return
+		return nil
 	}
 
 	result, err := conversion.ConvertMass(sourceUnit, destinationUnit, value)
@@ -2959,25 +2922,25 @@ func (c *UtilityCommands) convertmass(ctx *router.Ctx) {
 		AddField("Value", strconv.FormatFloat(value, 'g', -1, 64)+" "+sourceUnit).
 		AddField("Converted", strconv.FormatFloat(result, 'g', -1, 64)+" "+destinationUnit).
 		Send()
+	return nil
 }
 
 // Misc utilities
 
-func (c *UtilityCommands) tts(ctx *router.Ctx) {
+func (c *UtilityCommands) tts(ctx *router.Ctx) error {
 	reader, err := api.TTS(ctx.Arguments.RawFrom(1), ctx.Arguments.Get(0).Raw())
 	if err != nil {
-		ctx.RespondText("An error has occurred: %v", err)
-		return
+		return fmt.Errorf("An error has occurred: %v", err)
 	}
 
-	_, _ = ctx.Session.ChannelFileSend(ctx.Message.ChannelID, "tts.mp3", reader)
+	_, err = ctx.Session.ChannelFileSend(ctx.Message.ChannelID, "tts.mp3", reader)
+	return err
 }
 
-func (c *UtilityCommands) translate(ctx *router.Ctx) {
+func (c *UtilityCommands) translate(ctx *router.Ctx) error {
 	translateResult := api.Translate(ctx.Arguments.RawFrom(1), ctx.Arguments.Get(0).Raw())
 	if translateResult.Error != nil {
-		ctx.RespondText("An error has occurred: %v", translateResult.Error)
-		return
+		return fmt.Errorf("An error has occurred: %v", translateResult.Error)
 	}
 	c.services.Embed.New(ctx).
 		AddField("Source Language", utils.String.Capitalize(constants.LANGUAGES[translateResult.SourceLanguage])).
@@ -2985,35 +2948,36 @@ func (c *UtilityCommands) translate(ctx *router.Ctx) {
 		AddField("Original Text", translateResult.Original).
 		AddField("Translated Text", translateResult.Result).
 		Send()
+	return nil
 }
 
-func (c *UtilityCommands) detectlang(ctx *router.Ctx) {
+func (c *UtilityCommands) detectlang(ctx *router.Ctx) error {
 	translateResult := api.Translate(ctx.Arguments.Raw(), "en")
 	if translateResult.Error != nil {
-		ctx.RespondText("An error has occurred: %v", translateResult.Error)
-		return
+		return fmt.Errorf("An error has occurred: %v", translateResult.Error)
 	}
 	c.services.Embed.New(ctx).
 		AddField("Text", translateResult.Original).
 		AddField("Detected Language", utils.String.Capitalize(constants.LANGUAGES[translateResult.SourceLanguage])).
 		AddField("Confidence", fmt.Sprintf("%.2f", translateResult.Confidence)).
 		Send()
+	return nil
 }
 
-func (c *UtilityCommands) english(ctx *router.Ctx) {
+func (c *UtilityCommands) english(ctx *router.Ctx) error {
 	translateResult := api.Translate(ctx.Arguments.Raw(), "en")
 	if translateResult.Error != nil {
-		ctx.RespondText("An error has occurred: %v", translateResult.Error)
-		return
+		return fmt.Errorf("An error has occurred: %v", translateResult.Error)
 	}
 	c.services.Embed.New(ctx).
 		AddField("Source Language", utils.String.Capitalize(constants.LANGUAGES[translateResult.SourceLanguage])).
 		AddField("Original Text", translateResult.Original).
 		AddField("Translated Text", translateResult.Result).
 		Send()
+	return nil
 }
 
-func (c *UtilityCommands) define(ctx *router.Ctx) {
+func (c *UtilityCommands) define(ctx *router.Ctx) error {
 	url := fmt.Sprintf(
 		"https://api.LBdictionaryapi.LBdev/api/v2/entries/en/%s",
 		ctx.Arguments.Escaped(),
@@ -3021,15 +2985,13 @@ func (c *UtilityCommands) define(ctx *router.Ctx) {
 
 	resp, err := http.DefaultClient().Get(url)
 	if err != nil {
-		ctx.RespondText("An error has occurred.")
-		return
+		return fmt.Errorf("An error has occurred.")
 	}
 
 	list := resp.Json()
 
 	if list.Len() == 0 {
-		ctx.RespondText("No results found.")
-		return
+		return fmt.Errorf("No results found.")
 	}
 
 	result := list.Get(0)
@@ -3055,9 +3017,10 @@ func (c *UtilityCommands) define(ctx *router.Ctx) {
 		AddField("Word", ctx.Arguments.Raw()).
 		AddField("Meanings", strings.Join(meanings, "\n")).
 		Send()
+	return nil
 }
 
-func (c *UtilityCommands) urbandictionary(ctx *router.Ctx) {
+func (c *UtilityCommands) urbandictionary(ctx *router.Ctx) error {
 	url := fmt.Sprintf(
 		"https://api.LBurbandictionary.com/v0/define?term=%s",
 		ctx.Arguments.Escaped(),
@@ -3065,15 +3028,13 @@ func (c *UtilityCommands) urbandictionary(ctx *router.Ctx) {
 
 	resp, err := http.DefaultClient().Get(url)
 	if err != nil {
-		ctx.RespondText("An error has occurred.")
-		return
+		return fmt.Errorf("An error has occurred.")
 	}
 
 	list := resp.Json().Get("list")
 
 	if list.Len() == 0 {
-		ctx.RespondText("No results found.")
-		return
+		return fmt.Errorf("No results found.")
 	}
 
 	result := list.Get(0)
@@ -3086,14 +3047,14 @@ func (c *UtilityCommands) urbandictionary(ctx *router.Ctx) {
 		AddField("Thumbs Down", fmt.Sprint(result.Get("thumbs_down").MustFloat64())).
 		AddField("Author", result.Get("author").MustString()).
 		Send()
+	return nil
 }
 
-func (c *UtilityCommands) wikipedia(ctx *router.Ctx) {
+func (c *UtilityCommands) wikipedia(ctx *router.Ctx) error {
 	query := ctx.Arguments.Raw()
 	article, err := api.WikipediaSearch(query)
 	if err != nil {
-		ctx.RespondText("An error has occurred.")
-		return
+		return fmt.Errorf("An error has occurred.")
 	}
 
 	if len(article) > 2000 {
@@ -3104,13 +3065,13 @@ func (c *UtilityCommands) wikipedia(ctx *router.Ctx) {
 		AddField("Query", query).
 		AddField("Wikipedia Summary", article).
 		Send()
+	return nil
 }
 
-func (c *UtilityCommands) weather(ctx *router.Ctx) {
+func (c *UtilityCommands) weather(ctx *router.Ctx) error {
 	weather, err := api.GetWeather(ctx.Arguments.Raw())
 	if err != nil {
-		ctx.RespondText("An error has occurred: %v", err)
-		return
+		return fmt.Errorf("An error has occurred: %v", err)
 	}
 
 	c.services.Embed.New(ctx).
@@ -3127,13 +3088,13 @@ func (c *UtilityCommands) weather(ctx *router.Ctx) {
 		AddField("Wind Gust", fmt.Sprintf("%.2f Km/h", math.Round(weather.Get("wind", "gust").MustFloat64()*3.6))).
 		AddField("Wind Direction", fmt.Sprintf("%.2f°", weather.Get("wind", "deg").MustFloat64())).
 		Send()
+	return nil
 }
 
-func (c *UtilityCommands) lvbypass(ctx *router.Ctx) {
+func (c *UtilityCommands) lvbypass(ctx *router.Ctx) error {
 	resp, err := http.DefaultClient().Get("https://bypass.pm/bypass2?url=" + ctx.Arguments.Raw())
 	if err != nil {
-		ctx.RespondText("An error has occurred: %v", err)
-		return
+		return fmt.Errorf("An error has occurred: %v", err)
 	}
 
 	destination := resp.Json().Get("destination").MustString()
@@ -3142,9 +3103,10 @@ func (c *UtilityCommands) lvbypass(ctx *router.Ctx) {
 		AddField("URL", ctx.Arguments.Raw()).
 		AddField("Bypassed URL", utils.Misc.Or(destination, "An error has occurred")).
 		Send()
+	return nil
 }
 
-func (c *UtilityCommands) flightinfo(ctx *router.Ctx) {
+func (c *UtilityCommands) flightinfo(ctx *router.Ctx) error {
 	uri := fmt.Sprintf(
 		"https://api.LBflightradar24.com/common/v1/flight/list.json?query=%s&fetchBy=flight&page=1",
 		url.QueryEscape(ctx.Arguments.Get(0).Raw()),
@@ -3152,15 +3114,13 @@ func (c *UtilityCommands) flightinfo(ctx *router.Ctx) {
 
 	resp, err := http.DefaultClient().Get(uri)
 	if err != nil {
-		ctx.RespondText("An error has occurred.")
-		return
+		return fmt.Errorf("An error has occurred.")
 	}
 
 	json := resp.Json()
 
 	if errors := json.Get("errors").Interface(); errors != nil {
-		ctx.RespondText("That flight does not exist or an error has occurred.")
-		return
+		return fmt.Errorf("That flight does not exist or an error has occurred.")
 	}
 
 	data := json.Get("result", "response", "data").Get(0)
@@ -3177,79 +3137,78 @@ func (c *UtilityCommands) flightinfo(ctx *router.Ctx) {
 		AddField("Arrival Time", time.Unix(arrivalTime, 0).Format("2006-01-02 15:04:05")).
 		AddField("Status", data.Get("status", "text").MustString()).
 		Send()
+	return nil
 }
 
-func (c *UtilityCommands) passgen(ctx *router.Ctx) {
+func (c *UtilityCommands) passgen(ctx *router.Ctx) error {
 	charAmount, err := ctx.Arguments.Get(0).Int()
 	if err != nil {
-		ctx.RespondText("Argument <character amount> must be a number.")
-		return
+		return fmt.Errorf("Argument <character amount> must be a number.")
 	}
 
 	charAmount = fn.Clamp(charAmount, 1, 1000)
 
 	c.services.Embed.RespondField(ctx, "Password", random.String(charAmount, "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789#$%&"))
+	return nil
 }
 
-func (c *UtilityCommands) tokengen(ctx *router.Ctx) {
+func (c *UtilityCommands) tokengen(ctx *router.Ctx) error {
 	resp, err := http.DefaultClient().Get("https://some-random-api.LBcom/bottoken")
 	if err != nil {
-		ctx.RespondText("Error: %v", err)
-		return
+		return fmt.Errorf("Error: %v", err)
 	}
 
 	token := resp.Json().Get("token").MustString()
 
 	c.services.Embed.RespondField(ctx, "Token", token)
+	return nil
 }
 
-func (c *UtilityCommands) revimage(ctx *router.Ctx) {
+func (c *UtilityCommands) revimage(ctx *router.Ctx) error {
 	imageUrl := ctx.Arguments.Get(0).Raw()
 	c.services.Embed.RespondField(ctx, "Reverse Image Search URL", fmt.Sprintf("https://www.google.com/searchbyimage?image_url=%s", imageUrl))
+	return nil
 }
 
-func (c *UtilityCommands) revavatar(ctx *router.Ctx) {
+func (c *UtilityCommands) revavatar(ctx *router.Ctx) error {
 	user, err := ctx.Arguments.Get(0).User()
 	if err != nil {
-		ctx.RespondText("Could not find user")
-		return
+		return fmt.Errorf("Could not find user")
 	}
 	c.services.Embed.RespondField(ctx, "Search URL", fmt.Sprintf("https://www.google.com/searchbyimage?&image_url=%s", url.QueryEscape(user.AvatarURL(""))))
+	return nil
 }
 
-func (c *UtilityCommands) timezones(ctx *router.Ctx) {
+func (c *UtilityCommands) timezones(ctx *router.Ctx) error {
 	continent := ctx.Arguments.Get(0).Raw()
 	resp, err := http.DefaultClient().Get("http://worldtimeapi.LBorg/api/timezone/" + url.PathEscape(continent))
 	if err != nil {
-		ctx.RespondText("Error getting timezones: %v", err)
-		return
+		return fmt.Errorf("Error getting timezones: %v", err)
 	}
 
 	json := resp.Json()
 
 	if err := json.Get("error").MustString(); err != "" {
-		ctx.RespondText("Error getting timezones: %v", err)
-		return
+		return fmt.Errorf("Error getting timezones: %v", err)
 	}
 
 	c.services.Embed.New(ctx).
 		AddField("Continent", utils.String.Capitalize(continent)).
 		AddField("Timezones", strings.Join(json.MustStringSlice(), ", ")).
 		Send()
+	return nil
 }
 
-func (c *UtilityCommands) timezoneinfo(ctx *router.Ctx) {
+func (c *UtilityCommands) timezoneinfo(ctx *router.Ctx) error {
 	resp, err := http.DefaultClient().Get("http://worldtimeapi.LBorg/api/timezone/" + ctx.Arguments.Get(0).Raw())
 	if err != nil {
-		ctx.RespondText("Error getting timezones: %v", err)
-		return
+		return fmt.Errorf("Error getting timezones: %v", err)
 	}
 
 	json := resp.Json()
 
 	if err := json.Get("error").MustString(); err != "" {
-		ctx.RespondText("Error getting timezones: %v", err)
-		return
+		return fmt.Errorf("Error getting timezones: %v", err)
 	}
 
 	c.services.Embed.New(ctx).
@@ -3258,26 +3217,26 @@ func (c *UtilityCommands) timezoneinfo(ctx *router.Ctx) {
 		AddField("UTC Offset", json.Get("utc_offset").MustString()).
 		AddField("Current Time", json.Get("datetime").MustString()).
 		Send()
+	return nil
 }
 
-func (c *UtilityCommands) calculate(ctx *router.Ctx) {
+func (c *UtilityCommands) calculate(ctx *router.Ctx) error {
 	expression := ctx.Arguments.Get(0).Raw()
 
 	tv, err := types.Eval(token.NewFileSet(), nil, token.NoPos, expression)
 	if err != nil {
-		ctx.RespondText("Error evaluating expression: %v", err)
-		return
+		return fmt.Errorf("Error evaluating expression: %v", err)
 	}
 
 	if tv.Value == nil {
-		ctx.RespondText("Error evaluating expression: nil value")
-		return
+		return fmt.Errorf("Error evaluating expression: nil value")
 	}
 
 	c.services.Embed.New(ctx).
 		AddField("Expression", ctx.Arguments.Get(0).Raw()).
 		AddField("Solution", tv.Value.String()).
 		Send()
+	return nil
 }
 
 func (c *UtilityCommands) getCreds() api.LBCreds {
@@ -3288,24 +3247,23 @@ func (c *UtilityCommands) getCreds() api.LBCreds {
 	}
 }
 
-func (c *UtilityCommands) googlesearch(ctx *router.Ctx) {
+func (c *UtilityCommands) googlesearch(ctx *router.Ctx) error {
 	results, err := api.LBSearch(c.getCreds(), ctx.Arguments.Raw())
 	if err != nil {
-		ctx.RespondText("An error has occurred.")
-		return
+		return fmt.Errorf("An error has occurred.")
 	}
 	emb := c.services.Embed.New(ctx)
 	for result := range results.Iterator() {
 		emb.AddField(result.Get("title").MustString(), result.Get("url").MustString())
 	}
 	emb.Send()
+	return nil
 }
 
-func (c *UtilityCommands) youtubesearch(ctx *router.Ctx) {
+func (c *UtilityCommands) youtubesearch(ctx *router.Ctx) error {
 	results, err := api.LBSearch(c.getCreds(), ctx.Arguments.Raw()+" site:youtube.com")
 	if err != nil {
-		ctx.RespondText("An error has occurred.")
-		return
+		return fmt.Errorf("An error has occurred.")
 	}
 	emb := c.services.Embed.New(ctx)
 	for result := range results.Iterator() {
@@ -3316,33 +3274,37 @@ func (c *UtilityCommands) youtubesearch(ctx *router.Ctx) {
 		emb.AddField(result.Get("title").MustString(), result.Get("url").MustString())
 	}
 	emb.Send()
+	return nil
 }
 
-func (c *UtilityCommands) amazon(ctx *router.Ctx) {
+func (c *UtilityCommands) amazon(ctx *router.Ctx) error {
 	query := ctx.Arguments.Raw()
 	c.services.Embed.RespondField(ctx, "Amazon Search", fmt.Sprintf("https://www.amazon.com/s?k=%s", url.QueryEscape(query)))
+	return nil
 }
 
-func (c *UtilityCommands) steam(ctx *router.Ctx) {
+func (c *UtilityCommands) steam(ctx *router.Ctx) error {
 	query := ctx.Arguments.Raw()
 	c.services.Embed.RespondField(ctx, "Steam Search", fmt.Sprintf("https://store.steampowered.com/search/?term=%s", url.QueryEscape(query)))
+	return nil
 }
 
-func (c *UtilityCommands) github(ctx *router.Ctx) {
+func (c *UtilityCommands) github(ctx *router.Ctx) error {
 	query := ctx.Arguments.Raw()
 	c.services.Embed.RespondField(ctx, "GitHub Search", fmt.Sprintf("https://github.com/search?q=%s", url.QueryEscape(query)))
+	return nil
 }
 
-func (c *UtilityCommands) stackoverflow(ctx *router.Ctx) {
+func (c *UtilityCommands) stackoverflow(ctx *router.Ctx) error {
 	query := ctx.Arguments.Raw()
 	c.services.Embed.RespondField(ctx, "Stack Overflow Search", fmt.Sprintf("https://stackoverflow.com/search?q=%s", url.QueryEscape(query)))
+	return nil
 }
 
-func (c *UtilityCommands) searchcountry(ctx *router.Ctx) {
+func (c *UtilityCommands) searchcountry(ctx *router.Ctx) error {
 	resp, err := http.DefaultClient().Get(fmt.Sprintf("https://restcountries.com/v3.1/name/%s?fullText=true", ctx.Arguments.Raw()))
 	if err != nil {
-		ctx.RespondText("An error has occurred.")
-		return
+		return fmt.Errorf("An error has occurred.")
 	}
 
 	countryList := resp.Json()
@@ -3375,13 +3337,13 @@ func (c *UtilityCommands) searchcountry(ctx *router.Ctx) {
 		AddField("Currency", strings.Join(currencies, ", ")).
 		AddField("Language", strings.Join(languages, ", ")).
 		Send()
+	return nil
 }
 
-func (c *UtilityCommands) randomcountry(ctx *router.Ctx) {
+func (c *UtilityCommands) randomcountry(ctx *router.Ctx) error {
 	resp, err := http.DefaultClient().Get("https://restcountries.com/v3.1/all")
 	if err != nil {
-		ctx.RespondText("An error has occurred.")
-		return
+		return fmt.Errorf("An error has occurred.")
 	}
 
 	countryList := resp.Json()
@@ -3414,9 +3376,10 @@ func (c *UtilityCommands) randomcountry(ctx *router.Ctx) {
 		AddField("Currency", strings.Join(currencies, ", ")).
 		AddField("Language", strings.Join(languages, ", ")).
 		Send()
+	return nil
 }
 
-func (c *UtilityCommands) loremipsum(ctx *router.Ctx) {
+func (c *UtilityCommands) loremipsum(ctx *router.Ctx) error {
 	paragrahps, err := ctx.Arguments.Get(0).Int()
 	if err != nil {
 		paragrahps = 1
@@ -3424,14 +3387,14 @@ func (c *UtilityCommands) loremipsum(ctx *router.Ctx) {
 
 	resp, err := http.DefaultClient().Get(fmt.Sprintf("https://loripsum.net/api/%d/short/plaintext", paragrahps))
 	if err != nil {
-		ctx.RespondText("An error has occurred.")
-		return
+		return fmt.Errorf("An error has occurred.")
 	}
 
 	c.services.Embed.Respond(ctx, "%s", string(resp.MustGetBody()))
+	return nil
 }
 
-func (c *UtilityCommands) baconipsum(ctx *router.Ctx) {
+func (c *UtilityCommands) baconipsum(ctx *router.Ctx) error {
 	paragrahps, err := ctx.Arguments.Get(0).Int()
 	if err != nil {
 		paragrahps = 1
@@ -3439,14 +3402,14 @@ func (c *UtilityCommands) baconipsum(ctx *router.Ctx) {
 
 	resp, err := http.DefaultClient().Get(fmt.Sprintf("https://baconipsum.com/api/?type=all-meat&paras=%d&format=text", paragrahps))
 	if err != nil {
-		ctx.RespondText("An error has occurred.")
-		return
+		return fmt.Errorf("An error has occurred.")
 	}
 
 	c.services.Embed.Respond(ctx, "%s", string(resp.MustGetBody()))
+	return nil
 }
 
-func (c *UtilityCommands) previewcolor(ctx *router.Ctx) {
+func (c *UtilityCommands) previewcolor(ctx *router.Ctx) error {
 	color := ctx.Arguments.Get(0).Raw()
 	color = strings.ReplaceAll(color, "#", "")
 
@@ -3459,8 +3422,7 @@ func (c *UtilityCommands) previewcolor(ctx *router.Ctx) {
 		// Parse RGB
 		rgb := strings.Split(color, ",")
 		if len(rgb) != 3 {
-			ctx.RespondText("Invalid RGB format. Use R,G,B (e.g. 255,255,255)")
-			return
+			return fmt.Errorf("Invalid RGB format. Use R,G,B (e.g. 255,255,255)")
 		}
 
 		r, _ = strconv.Atoi(rgb[0])
@@ -3483,12 +3445,19 @@ func (c *UtilityCommands) previewcolor(ctx *router.Ctx) {
 		Send()
 
 	preview, err := utils.Misc.PreviewColorImage(500, 100, r, g, b)
-	if err == nil {
-		_, _ = ctx.Session.ChannelFileSend(ctx.Message.ChannelID, "color.png", preview)
+	if err != nil {
+		return fmt.Errorf("failed to create preview: %v", err)
 	}
+
+	_, err = ctx.Session.ChannelFileSend(ctx.Message.ChannelID, "color.png", preview)
+	if err != nil {
+		return fmt.Errorf("failed to send preview: %v", err)
+	}
+
+	return nil
 }
 
-func (c *UtilityCommands) generatekey(ctx *router.Ctx) {
+func (c *UtilityCommands) generatekey(ctx *router.Ctx) error {
 	format := ctx.Arguments.Get(0).Raw()
 	amount, _ := ctx.Arguments.Get(1).Int()
 	amount = fn.Clamp(amount, 1, 100)
@@ -3515,27 +3484,25 @@ func (c *UtilityCommands) generatekey(ctx *router.Ctx) {
 	}
 
 	c.services.Embed.RespondField(ctx, "License Keys", strings.Join(keys, "\n"))
+	return nil
 }
 
-func (c *UtilityCommands) timestampCommand(flags string) func(ctx *router.Ctx) {
-	return func(ctx *router.Ctx) {
+func (c *UtilityCommands) timestampCommand(flags string) func(ctx *router.Ctx) error {
+	return func(ctx *router.Ctx) error {
 		timestamp, err := api.LBGPT(c.getCreds(), utils.Misc.CreateAISystemTimestamp(), ctx.Arguments.Raw())
 		if err != nil {
-			ctx.RespondText("An error has occurred while parsing the timestamp.")
-			return
+			return fmt.Errorf("An error has occurred while parsing the timestamp.")
 		}
 
 		if timestamp == "UNABLE" {
-			ctx.RespondText("Please provide a valid date/time.")
-			return
+			return fmt.Errorf("Please provide a valid date/time.")
 		}
 
 		time, err := time.Parse(time.RFC3339, timestamp)
 		if err != nil {
-			ctx.RespondText("An error has occurred while parsing the timestamp.")
-			return
+			return fmt.Errorf("An error has occurred while parsing the timestamp.")
 		}
 
-		ctx.RespondText("<t:%d%s>", time.Unix(), flags)
+		return ctx.RespondText("<t:%d%s>", time.Unix(), flags)
 	}
 }

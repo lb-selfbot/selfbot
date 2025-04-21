@@ -10,7 +10,6 @@ import (
 
 	"github.com/lb-selfbot/selfbot/internal/api"
 	"github.com/lb-selfbot/selfbot/internal/formatting"
-	"github.com/lb-selfbot/selfbot/internal/logging"
 	"github.com/lb-selfbot/selfbot/internal/services/config"
 	"github.com/lb-selfbot/selfbot/internal/services/router"
 
@@ -588,41 +587,40 @@ func (c *ActivityCommands) setCustomStatus(session *discordgo.Session, status st
 	})
 }
 
-func (c *ActivityCommands) status(ctx *router.Ctx) {
+func (c *ActivityCommands) status(ctx *router.Ctx) error {
 	status := strings.ToLower(ctx.Arguments.Get(0).Raw())
 
 	switch status {
 	case "online", "dnd", "idle", "invisible":
 		err := c.setStatus(ctx.Session, status)
 		if err != nil {
-			ctx.RespondText("An error occurred while changing your status: %v", err)
-			return
+			return fmt.Errorf("An error occurred while changing your status: %v", err)
 		}
 
 		c.services.Embed.New(ctx).
 			SetDescription("Successfully set status to `%s`!", status).
 			Send()
+		return nil
 	default:
-		ctx.RespondText("Invalid status argument. Use `online`, `dnd`, `idle`, or `invisible`.")
+		return ctx.RespondText("Invalid status argument. Use `online`, `dnd`, `idle`, or `invisible`.")
 	}
 }
 
-func (c *ActivityCommands) customstatus(ctx *router.Ctx) {
+func (c *ActivityCommands) customstatus(ctx *router.Ctx) error {
 	err := c.setCustomStatus(ctx.Session, ctx.Arguments.Raw())
 	if err != nil {
-		ctx.RespondText("An error occurred while changing your custom status: %v", err)
-		return
+		return fmt.Errorf("An error occurred while changing your custom status: %v", err)
 	}
 
 	c.services.Embed.Respond(ctx, "Successfully set custom status to `%s`!", ctx.Arguments.Raw())
+	return nil
 }
 
-func (c *ActivityCommands) clearactivity(ctx *router.Ctx) {
+func (c *ActivityCommands) clearactivity(ctx *router.Ctx) error {
 	cfg := c.services.Config.GetConfig()
 	cfg.Activity.Enabled = false
 	if err := c.services.Config.SaveConfig(cfg); err != nil {
-		ctx.RespondText("Error saving config: %v", err)
-		return
+		return fmt.Errorf("Error saving config: %v", err)
 	}
 
 	err := ctx.Session.UpdateStatusComplex(discordgo.UpdateStatusData{
@@ -632,18 +630,17 @@ func (c *ActivityCommands) clearactivity(ctx *router.Ctx) {
 		Status:     c.services.Sessions.GetStatus(),
 	})
 	if err != nil {
-		ctx.RespondText("An error occurred while clearing your activity: %v", err)
-		return
+		return fmt.Errorf("An error occurred while clearing your activity: %v", err)
 	}
 
 	c.services.Embed.Respond(ctx, "Successfully cleared activity!")
+	return nil
 }
 
-func (c *ActivityCommands) copyactivity(ctx *router.Ctx) {
+func (c *ActivityCommands) copyactivity(ctx *router.Ctx) error {
 	user, err := ctx.Arguments.Get(0).User()
 	if err != nil {
-		ctx.RespondText("Could not find user")
-		return
+		return fmt.Errorf("Could not find user")
 	}
 
 	saveToConfig, _ := ctx.Arguments.Get(1).Bool()
@@ -657,8 +654,7 @@ func (c *ActivityCommands) copyactivity(ctx *router.Ctx) {
 	} else {
 		profile, err := ctx.Session.UserProfile(user.ID)
 		if err != nil {
-			ctx.RespondText("Could not find user")
-			return
+			return fmt.Errorf("Could not find user")
 		}
 
 		for _, guild := range profile.MutualGuilds {
@@ -702,8 +698,7 @@ func (c *ActivityCommands) copyactivity(ctx *router.Ctx) {
 			cfg.Activity = newActivity
 
 			if err := c.services.Config.SaveConfig(cfg); err != nil {
-				logging.Error("Error saving config: " + err.Error())
-				return
+				return fmt.Errorf("Error saving config: %v", err)
 			}
 		}
 
@@ -711,17 +706,17 @@ func (c *ActivityCommands) copyactivity(ctx *router.Ctx) {
 			SetDescription("Successfully copied user's activity!").
 			Send()
 
-		return
+		return nil
 	}
 
 	c.services.Embed.Respond(ctx, "No activity found")
+	return nil
 }
 
-func (c *ActivityCommands) getactivityjson(ctx *router.Ctx) {
+func (c *ActivityCommands) getactivityjson(ctx *router.Ctx) error {
 	user, err := ctx.Arguments.Get(0).User()
 	if err != nil {
-		ctx.RespondText("Could not find user")
-		return
+		return fmt.Errorf("Could not find user")
 	}
 
 	var guilds []string
@@ -733,8 +728,7 @@ func (c *ActivityCommands) getactivityjson(ctx *router.Ctx) {
 	} else {
 		profile, err := ctx.Session.UserProfile(user.ID)
 		if err != nil {
-			ctx.RespondText("Could not find user")
-			return
+			return fmt.Errorf("Could not find user")
 		}
 
 		for _, guild := range profile.MutualGuilds {
@@ -762,20 +756,20 @@ func (c *ActivityCommands) getactivityjson(ctx *router.Ctx) {
 
 		emb.Send()
 
-		return
+		return nil
 	}
 
 	c.services.Embed.Respond(ctx, "No activity found")
+	return nil
 }
 
-func (c *ActivityCommands) setactivityjson(ctx *router.Ctx) {
+func (c *ActivityCommands) setactivityjson(ctx *router.Ctx) error {
 	rawJson := ctx.Arguments.RawFrom(1)
 
 	var activity *discordgo.Activity
 	err := json.Unmarshal([]byte(rawJson), &activity)
 	if err != nil {
-		ctx.RespondText("Invalid activity JSON! %v", err)
-		return
+		return fmt.Errorf("Invalid activity JSON! %v", err)
 	}
 
 	saveToConfig, _ := ctx.Arguments.Get(0).Bool()
@@ -791,85 +785,89 @@ func (c *ActivityCommands) setactivityjson(ctx *router.Ctx) {
 		cfg.Activity = newActivity
 
 		if err := c.services.Config.SaveConfig(cfg); err != nil {
-			logging.Error("Error saving config: " + err.Error())
-			return
+			return fmt.Errorf("Error saving config: %v", err)
 		}
 	}
 
-	_ = ctx.Session.UpdateStatusComplex(discordgo.UpdateStatusData{
+	return ctx.Session.UpdateStatusComplex(discordgo.UpdateStatusData{
 		Activities: []*discordgo.Activity{activity},
 		AFK:        true,
 		Status:     c.services.Sessions.GetStatus(),
 	})
 }
 
-func (c *ActivityCommands) getCAEnabled(ctx *router.Ctx) {
+func (c *ActivityCommands) getCAEnabled(ctx *router.Ctx) error {
 	cfg := c.services.Config.GetConfig()
 
 	c.services.Embed.RespondField(ctx, "Custom Activity", formatting.BoolOnOff(cfg.Activity.Enabled))
+	return nil
 }
 
-func (c *ActivityCommands) setCAEnabled(ctx *router.Ctx) {
+func (c *ActivityCommands) setCAEnabled(ctx *router.Ctx) error {
 	cfg := c.services.Config.GetConfig()
 
 	toggle, err := ctx.Arguments.Get(0).Bool()
 	if err != nil {
-		ctx.RespondText("Invalid value. Use `on` or `off`.")
-		return
+		return fmt.Errorf("Invalid value. Use `on` or `off`.")
 	}
 
 	cfg.Activity.Enabled = toggle
 	_ = c.services.Config.SaveConfig(cfg)
 
 	c.services.Embed.Respond(ctx, "%s", "Turned "+formatting.BoolOnOff(toggle)+" Custom Activity")
+	return nil
 }
 
-func (c *ActivityCommands) toggleCAEnabled(ctx *router.Ctx) {
+func (c *ActivityCommands) toggleCAEnabled(ctx *router.Ctx) error {
 	cfg := c.services.Config.GetConfig()
 
 	cfg.Activity.Enabled = !cfg.Activity.Enabled
 	_ = c.services.Config.SaveConfig(cfg)
 
 	c.services.Embed.Respond(ctx, "%s", "Turned "+formatting.BoolOnOff(cfg.Activity.Enabled)+" Custom Activity")
+	return nil
 }
 
-func (c *ActivityCommands) getCAPauseForOther(ctx *router.Ctx) {
+func (c *ActivityCommands) getCAPauseForOther(ctx *router.Ctx) error {
 	cfg := c.services.Config.GetConfig()
 
 	c.services.Embed.RespondField(ctx, "Pause Custom Activity for other Activity", formatting.BoolOnOff(cfg.Activity.PauseForOther))
+	return nil
 }
 
-func (c *ActivityCommands) setCAPauseForOther(ctx *router.Ctx) {
+func (c *ActivityCommands) setCAPauseForOther(ctx *router.Ctx) error {
 	cfg := c.services.Config.GetConfig()
 
 	toggle, err := ctx.Arguments.Get(0).Bool()
 	if err != nil {
-		ctx.RespondText("Invalid value. Use `on` or `off`.")
-		return
+		return fmt.Errorf("Invalid value. Use `on` or `off`.")
 	}
 
 	cfg.Activity.PauseForOther = toggle
 	_ = c.services.Config.SaveConfig(cfg)
 
 	c.services.Embed.Respond(ctx, "%s", "Turned "+formatting.BoolOnOff(toggle)+" Pause Custom Activity for other Activity")
+	return nil
 }
 
-func (c *ActivityCommands) toggleCAPauseForOther(ctx *router.Ctx) {
+func (c *ActivityCommands) toggleCAPauseForOther(ctx *router.Ctx) error {
 	cfg := c.services.Config.GetConfig()
 
 	cfg.Activity.PauseForOther = !cfg.Activity.PauseForOther
 	_ = c.services.Config.SaveConfig(cfg)
 
 	c.services.Embed.Respond(ctx, "%s", "Turned "+formatting.BoolOnOff(cfg.Activity.PauseForOther)+" Pause Custom Activity for other Activity")
+	return nil
 }
 
-func (c *ActivityCommands) getCAConnectionType(ctx *router.Ctx) {
+func (c *ActivityCommands) getCAConnectionType(ctx *router.Ctx) error {
 	cfg := c.services.Config.GetConfig()
 
 	c.services.Embed.RespondField(ctx, "Custom Activity Connection Type", cfg.Activity.ActivityType)
+	return nil
 }
 
-func (c *ActivityCommands) setCAConnectionType(ctx *router.Ctx) {
+func (c *ActivityCommands) setCAConnectionType(ctx *router.Ctx) error {
 	cfg := c.services.Config.GetConfig()
 
 	value := strings.ToLower(ctx.Arguments.Raw())
@@ -880,26 +878,28 @@ func (c *ActivityCommands) setCAConnectionType(ctx *router.Ctx) {
 	case "ca", "customactivity":
 		cfg.Activity.ActivityType = "CustomActivity"
 	default:
-		ctx.RespondText("Invalid connection type. Use `[p]caconnectiontype values` to get a list of available values.")
-		return
+		return fmt.Errorf("Invalid connection type. Use `[p]caconnectiontype values` to get a list of available values.")
 	}
 
 	_ = c.services.Config.SaveConfig(cfg)
 
 	c.services.Embed.Respond(ctx, "%s", "Custom Activity Connection Type set to "+cfg.Activity.ActivityType)
+	return nil
 }
 
-func (c *ActivityCommands) listCAConnectionTypes(ctx *router.Ctx) {
+func (c *ActivityCommands) listCAConnectionTypes(ctx *router.Ctx) error {
 	c.services.Embed.Respond(ctx, "Available connection types: `RPC`, `CA`/`CustomActivity`")
+	return nil
 }
 
-func (c *ActivityCommands) getCAType(ctx *router.Ctx) {
+func (c *ActivityCommands) getCAType(ctx *router.Ctx) error {
 	cfg := c.services.Config.GetConfig()
 
 	c.services.Embed.RespondField(ctx, "Custom Activity Type", cfg.Activity.Type)
+	return nil
 }
 
-func (c *ActivityCommands) setCAType(ctx *router.Ctx) {
+func (c *ActivityCommands) setCAType(ctx *router.Ctx) error {
 	cfg := c.services.Config.GetConfig()
 
 	value := strings.ToLower(ctx.Arguments.Raw())
@@ -918,26 +918,28 @@ func (c *ActivityCommands) setCAType(ctx *router.Ctx) {
 	case "spotify":
 		cfg.Activity.Type = "Spotify"
 	default:
-		ctx.RespondText("Invalid connection type. Use `[p]catype values` to get a list of available values.")
-		return
+		return fmt.Errorf("Invalid connection type. Use `[p]catype values` to get a list of available values.")
 	}
 
 	_ = c.services.Config.SaveConfig(cfg)
 
 	c.services.Embed.Respond(ctx, "%s", "Custom Activity Type set to "+cfg.Activity.Type)
+	return nil
 }
 
-func (c *ActivityCommands) listCATypes(ctx *router.Ctx) {
+func (c *ActivityCommands) listCATypes(ctx *router.Ctx) error {
 	c.services.Embed.Respond(ctx, "Available connection types: `Playing`, `Listening`, `Watching`, `Streaming`, `Competing`, `Spotify`.")
+	return nil
 }
 
-func (c *ActivityCommands) getCAPlatform(ctx *router.Ctx) {
+func (c *ActivityCommands) getCAPlatform(ctx *router.Ctx) error {
 	cfg := c.services.Config.GetConfig()
 
 	c.services.Embed.RespondField(ctx, "Custom Activity Platform", cfg.Activity.Platform)
+	return nil
 }
 
-func (c *ActivityCommands) setCAPlatform(ctx *router.Ctx) {
+func (c *ActivityCommands) setCAPlatform(ctx *router.Ctx) error {
 	cfg := c.services.Config.GetConfig()
 
 	value := strings.ToLower(ctx.Arguments.Raw())
@@ -954,86 +956,92 @@ func (c *ActivityCommands) setCAPlatform(ctx *router.Ctx) {
 	case "samsung":
 		cfg.Activity.Platform = "Samsung"
 	default:
-		ctx.RespondText("Invalid platform. Use `[p]caplatform values` to get a list of available values.")
-		return
+		return fmt.Errorf("Invalid platform. Use `[p]caplatform values` to get a list of available values.")
 	}
 
 	_ = c.services.Config.SaveConfig(cfg)
 
 	c.services.Embed.Respond(ctx, "%s", "Custom Activity Platform set to "+cfg.Activity.Platform)
+	return nil
 }
 
-func (c *ActivityCommands) listCAPlatforms(ctx *router.Ctx) {
+func (c *ActivityCommands) listCAPlatforms(ctx *router.Ctx) error {
 	c.services.Embed.Respond(ctx, "Available connection types: `Default`, `PS4`, `PS5`, `Xbox`, `Samsung`.")
+	return nil
 }
 
-func (c *ActivityCommands) getCAInvitable(ctx *router.Ctx) {
+func (c *ActivityCommands) getCAInvitable(ctx *router.Ctx) error {
 	cfg := c.services.Config.GetConfig()
 
 	c.services.Embed.RespondField(ctx, "Custom Activity Invitable", formatting.BoolOnOff(cfg.Activity.Invitable))
+	return nil
 }
 
-func (c *ActivityCommands) setCAInvitable(ctx *router.Ctx) {
+func (c *ActivityCommands) setCAInvitable(ctx *router.Ctx) error {
 	cfg := c.services.Config.GetConfig()
 
 	toggle, err := ctx.Arguments.Get(0).Bool()
 	if err != nil {
-		ctx.RespondText("Invalid value. Use `on` or `off`.")
-		return
+		return fmt.Errorf("Invalid value. Use `on` or `off`.")
 	}
 
 	cfg.Activity.Invitable = toggle
 	_ = c.services.Config.SaveConfig(cfg)
 
 	c.services.Embed.Respond(ctx, "%s", "Turned "+formatting.BoolOnOff(toggle)+" Custom Activity Invitable")
+	return nil
 }
 
-func (c *ActivityCommands) toggleCAInvitable(ctx *router.Ctx) {
+func (c *ActivityCommands) toggleCAInvitable(ctx *router.Ctx) error {
 	cfg := c.services.Config.GetConfig()
 
 	cfg.Activity.Invitable = !cfg.Activity.Invitable
 	_ = c.services.Config.SaveConfig(cfg)
 
 	c.services.Embed.Respond(ctx, "%s", "Turned "+formatting.BoolOnOff(cfg.Activity.Invitable)+" Custom Activity Invitable")
+	return nil
 }
 
-func (c *ActivityCommands) getCATime(ctx *router.Ctx) {
+func (c *ActivityCommands) getCATime(ctx *router.Ctx) error {
 	cfg := c.services.Config.GetConfig()
 
 	c.services.Embed.RespondField(ctx, "Custom Activity Time", formatting.BoolOnOff(cfg.Activity.Time))
+	return nil
 }
 
-func (c *ActivityCommands) setCATime(ctx *router.Ctx) {
+func (c *ActivityCommands) setCATime(ctx *router.Ctx) error {
 	cfg := c.services.Config.GetConfig()
 
 	toggle, err := ctx.Arguments.Get(0).Bool()
 	if err != nil {
-		ctx.RespondText("Invalid value. Use `on` or `off`.")
-		return
+		return fmt.Errorf("Invalid value. Use `on` or `off`.")
 	}
 
 	cfg.Activity.Time = toggle
 	_ = c.services.Config.SaveConfig(cfg)
 
 	c.services.Embed.Respond(ctx, "%s", "Turned "+formatting.BoolOnOff(toggle)+" Custom Activity Time")
+	return nil
 }
 
-func (c *ActivityCommands) toggleCATime(ctx *router.Ctx) {
+func (c *ActivityCommands) toggleCATime(ctx *router.Ctx) error {
 	cfg := c.services.Config.GetConfig()
 
 	cfg.Activity.Time = !cfg.Activity.Time
 	_ = c.services.Config.SaveConfig(cfg)
 
 	c.services.Embed.Respond(ctx, "%s", "Turned "+formatting.BoolOnOff(cfg.Activity.Time)+" Custom Activity Time")
+	return nil
 }
 
-func (c *ActivityCommands) getCAName(ctx *router.Ctx) {
+func (c *ActivityCommands) getCAName(ctx *router.Ctx) error {
 	cfg := c.services.Config.GetConfig()
 
 	c.services.Embed.RespondField(ctx, "Custom Activity Name", cfg.Activity.Name)
+	return nil
 }
 
-func (c *ActivityCommands) setCAName(ctx *router.Ctx) {
+func (c *ActivityCommands) setCAName(ctx *router.Ctx) error {
 	cfg := c.services.Config.GetConfig()
 
 	value := ctx.Arguments.Raw()
@@ -1042,15 +1050,17 @@ func (c *ActivityCommands) setCAName(ctx *router.Ctx) {
 	_ = c.services.Config.SaveConfig(cfg)
 
 	c.services.Embed.Respond(ctx, "%s", "Custom Activity Name set to "+value)
+	return nil
 }
 
-func (c *ActivityCommands) getCAState(ctx *router.Ctx) {
+func (c *ActivityCommands) getCAState(ctx *router.Ctx) error {
 	cfg := c.services.Config.GetConfig()
 
 	c.services.Embed.RespondField(ctx, "Custom Activity State", cfg.Activity.State)
+	return nil
 }
 
-func (c *ActivityCommands) setCAState(ctx *router.Ctx) {
+func (c *ActivityCommands) setCAState(ctx *router.Ctx) error {
 	cfg := c.services.Config.GetConfig()
 
 	value := ctx.Arguments.Raw()
@@ -1059,15 +1069,17 @@ func (c *ActivityCommands) setCAState(ctx *router.Ctx) {
 	_ = c.services.Config.SaveConfig(cfg)
 
 	c.services.Embed.Respond(ctx, "%s", "Custom Activity State set to "+value)
+	return nil
 }
 
-func (c *ActivityCommands) getCADetails(ctx *router.Ctx) {
+func (c *ActivityCommands) getCADetails(ctx *router.Ctx) error {
 	cfg := c.services.Config.GetConfig()
 
 	c.services.Embed.RespondField(ctx, "Custom Activity Details", cfg.Activity.Details)
+	return nil
 }
 
-func (c *ActivityCommands) setCADetails(ctx *router.Ctx) {
+func (c *ActivityCommands) setCADetails(ctx *router.Ctx) error {
 	cfg := c.services.Config.GetConfig()
 
 	value := ctx.Arguments.Raw()
@@ -1076,15 +1088,17 @@ func (c *ActivityCommands) setCADetails(ctx *router.Ctx) {
 	_ = c.services.Config.SaveConfig(cfg)
 
 	c.services.Embed.Respond(ctx, "%s", "Custom Activity Details set to "+value)
+	return nil
 }
 
-func (c *ActivityCommands) getCAStreamingURL(ctx *router.Ctx) {
+func (c *ActivityCommands) getCAStreamingURL(ctx *router.Ctx) error {
 	cfg := c.services.Config.GetConfig()
 
 	c.services.Embed.RespondField(ctx, "Custom Activity Streaming URL", cfg.Activity.StreamingURL)
+	return nil
 }
 
-func (c *ActivityCommands) setCAStreamingURL(ctx *router.Ctx) {
+func (c *ActivityCommands) setCAStreamingURL(ctx *router.Ctx) error {
 	cfg := c.services.Config.GetConfig()
 
 	value := ctx.Arguments.Raw()
@@ -1093,15 +1107,17 @@ func (c *ActivityCommands) setCAStreamingURL(ctx *router.Ctx) {
 	_ = c.services.Config.SaveConfig(cfg)
 
 	c.services.Embed.Respond(ctx, "%s", "Custom Activity Streaming URL set to "+value)
+	return nil
 }
 
-func (c *ActivityCommands) getCALargeImage(ctx *router.Ctx) {
+func (c *ActivityCommands) getCALargeImage(ctx *router.Ctx) error {
 	cfg := c.services.Config.GetConfig()
 
 	c.services.Embed.RespondField(ctx, "Custom Activity Large Image", cfg.Activity.LargeImage)
+	return nil
 }
 
-func (c *ActivityCommands) setCALargeImage(ctx *router.Ctx) {
+func (c *ActivityCommands) setCALargeImage(ctx *router.Ctx) error {
 	cfg := c.services.Config.GetConfig()
 
 	value := ctx.Arguments.Raw()
@@ -1110,15 +1126,17 @@ func (c *ActivityCommands) setCALargeImage(ctx *router.Ctx) {
 	_ = c.services.Config.SaveConfig(cfg)
 
 	c.services.Embed.Respond(ctx, "%s", "Custom Activity Large Image set to "+value)
+	return nil
 }
 
-func (c *ActivityCommands) getCALargeText(ctx *router.Ctx) {
+func (c *ActivityCommands) getCALargeText(ctx *router.Ctx) error {
 	cfg := c.services.Config.GetConfig()
 
 	c.services.Embed.RespondField(ctx, "Custom Activity Large Image Text", cfg.Activity.LargeImageText)
+	return nil
 }
 
-func (c *ActivityCommands) setCALargeText(ctx *router.Ctx) {
+func (c *ActivityCommands) setCALargeText(ctx *router.Ctx) error {
 	cfg := c.services.Config.GetConfig()
 
 	value := ctx.Arguments.Raw()
@@ -1127,15 +1145,17 @@ func (c *ActivityCommands) setCALargeText(ctx *router.Ctx) {
 	_ = c.services.Config.SaveConfig(cfg)
 
 	c.services.Embed.Respond(ctx, "%s", "Custom Activity Large Image Text set to "+value)
+	return nil
 }
 
-func (c *ActivityCommands) getCASmallImage(ctx *router.Ctx) {
+func (c *ActivityCommands) getCASmallImage(ctx *router.Ctx) error {
 	cfg := c.services.Config.GetConfig()
 
 	c.services.Embed.RespondField(ctx, "Custom Activity Small Image", cfg.Activity.SmallImage)
+	return nil
 }
 
-func (c *ActivityCommands) setCASmallImage(ctx *router.Ctx) {
+func (c *ActivityCommands) setCASmallImage(ctx *router.Ctx) error {
 	cfg := c.services.Config.GetConfig()
 
 	value := ctx.Arguments.Raw()
@@ -1144,15 +1164,17 @@ func (c *ActivityCommands) setCASmallImage(ctx *router.Ctx) {
 	_ = c.services.Config.SaveConfig(cfg)
 
 	c.services.Embed.Respond(ctx, "%s", "Custom Activity Small Image set to "+value)
+	return nil
 }
 
-func (c *ActivityCommands) getCASmallText(ctx *router.Ctx) {
+func (c *ActivityCommands) getCASmallText(ctx *router.Ctx) error {
 	cfg := c.services.Config.GetConfig()
 
 	c.services.Embed.RespondField(ctx, "Custom Activity Small Image Text", cfg.Activity.SmallImageText)
+	return nil
 }
 
-func (c *ActivityCommands) setCASmallText(ctx *router.Ctx) {
+func (c *ActivityCommands) setCASmallText(ctx *router.Ctx) error {
 	cfg := c.services.Config.GetConfig()
 
 	value := ctx.Arguments.Raw()
@@ -1161,15 +1183,17 @@ func (c *ActivityCommands) setCASmallText(ctx *router.Ctx) {
 	_ = c.services.Config.SaveConfig(cfg)
 
 	c.services.Embed.Respond(ctx, "%s", "Custom Activity Small Image Text set to "+value)
+	return nil
 }
 
-func (c *ActivityCommands) getCAButton1(ctx *router.Ctx) {
+func (c *ActivityCommands) getCAButton1(ctx *router.Ctx) error {
 	cfg := c.services.Config.GetConfig()
 
 	c.services.Embed.RespondField(ctx, "Custom Activity Button 1", fmt.Sprintf("%s (%s)", cfg.Activity.Button1Label, cfg.Activity.Button1URL))
+	return nil
 }
 
-func (c *ActivityCommands) setCAButton1(ctx *router.Ctx) {
+func (c *ActivityCommands) setCAButton1(ctx *router.Ctx) error {
 	cfg := c.services.Config.GetConfig()
 
 	label := ctx.Arguments.Get(0).Raw()
@@ -1180,15 +1204,17 @@ func (c *ActivityCommands) setCAButton1(ctx *router.Ctx) {
 	_ = c.services.Config.SaveConfig(cfg)
 
 	c.services.Embed.Respond(ctx, "CA Button 1 set to %s (%s)", label, url)
+	return nil
 }
 
-func (c *ActivityCommands) getCAButton2(ctx *router.Ctx) {
+func (c *ActivityCommands) getCAButton2(ctx *router.Ctx) error {
 	cfg := c.services.Config.GetConfig()
 
 	c.services.Embed.RespondField(ctx, "Custom Activity Button 2", fmt.Sprintf("%s (%s)", cfg.Activity.Button2Label, cfg.Activity.Button2URL))
+	return nil
 }
 
-func (c *ActivityCommands) setCAButton2(ctx *router.Ctx) {
+func (c *ActivityCommands) setCAButton2(ctx *router.Ctx) error {
 	cfg := c.services.Config.GetConfig()
 
 	label := ctx.Arguments.Get(0).Raw()
@@ -1199,9 +1225,10 @@ func (c *ActivityCommands) setCAButton2(ctx *router.Ctx) {
 	_ = c.services.Config.SaveConfig(cfg)
 
 	c.services.Embed.Respond(ctx, "CA Button 2 set to %s (%s)", label, url)
+	return nil
 }
 
-func (c *ActivityCommands) getCAPreset(ctx *router.Ctx) {
+func (c *ActivityCommands) getCAPreset(ctx *router.Ctx) error {
 	cfg := c.services.Config.GetConfig()
 
 	var currentPreset string
@@ -1217,34 +1244,35 @@ func (c *ActivityCommands) getCAPreset(ctx *router.Ctx) {
 		c.services.Embed.New(ctx).
 			SetDescription("You must load a preset before using the get current preset command!").
 			Send()
-		return
+		return nil
 	}
 
 	c.services.Embed.Respond(ctx, "Current Custom Activity preset is `%s`.", currentPreset)
+	return nil
 }
 
-func (c *ActivityCommands) loadCAPreset(ctx *router.Ctx) {
+func (c *ActivityCommands) loadCAPreset(ctx *router.Ctx) error {
 	cfg := c.services.Config.GetConfig()
 
 	name := ctx.Arguments.Raw()
 	if name == "" {
-		ctx.RespondText("You must provide a preset name!")
-		return
+		return fmt.Errorf("You must provide a preset name!")
 	}
 
 	preset, ok := cfg.ActivityPresets[name]
 	if !ok {
 		c.services.Embed.New(ctx).SetDescription("CA Preset `%s` not found.", name).Send()
-		return
+		return nil
 	}
 
 	cfg.Activity = preset
 	_ = c.services.Config.SaveConfig(cfg)
 
 	c.services.Embed.Respond(ctx, "Loaded Custom Activity preset `%s`.", name)
+	return nil
 }
 
-func (c *ActivityCommands) nextCAPreset(ctx *router.Ctx) {
+func (c *ActivityCommands) nextCAPreset(ctx *router.Ctx) error {
 	cfg := c.services.Config.GetConfig()
 
 	var currentPreset string
@@ -1278,15 +1306,15 @@ func (c *ActivityCommands) nextCAPreset(ctx *router.Ctx) {
 	_ = c.services.Config.SaveConfig(cfg)
 
 	c.services.Embed.Respond(ctx, "Loaded next CA preset `%s`.", nextPresetName)
+	return nil
 }
 
-func (c *ActivityCommands) saveCAPreset(ctx *router.Ctx) {
+func (c *ActivityCommands) saveCAPreset(ctx *router.Ctx) error {
 	cfg := c.services.Config.GetConfig()
 
 	name := ctx.Arguments.Raw()
 	if name == "" {
-		ctx.RespondText("You must provide a name to save the preset as!")
-		return
+		return fmt.Errorf("You must provide a name to save the preset as!")
 	}
 
 	if cfg.ActivityPresets == nil {
@@ -1297,25 +1325,27 @@ func (c *ActivityCommands) saveCAPreset(ctx *router.Ctx) {
 	_ = c.services.Config.SaveConfig(cfg)
 
 	c.services.Embed.Respond(ctx, "Saved current activity as preset `%s`.", name)
+	return nil
 }
 
-func (c *ActivityCommands) removeCAPreset(ctx *router.Ctx) {
+func (c *ActivityCommands) removeCAPreset(ctx *router.Ctx) error {
 	cfg := c.services.Config.GetConfig()
 
 	name := ctx.Arguments.Raw()
 
 	if _, ok := cfg.ActivityPresets[name]; !ok {
 		c.services.Embed.New(ctx).SetDescription("Preset `%s` not found.", name).Send()
-		return
+		return nil
 	}
 
 	delete(cfg.ActivityPresets, name)
 	_ = c.services.Config.SaveConfig(cfg)
 
 	c.services.Embed.Respond(ctx, "Deleted activity preset `%s`.", name)
+	return nil
 }
 
-func (c *ActivityCommands) listCAPresets(ctx *router.Ctx) {
+func (c *ActivityCommands) listCAPresets(ctx *router.Ctx) error {
 	cfg := c.services.Config.GetConfig()
 
 	var presets []string
@@ -1326,22 +1356,24 @@ func (c *ActivityCommands) listCAPresets(ctx *router.Ctx) {
 
 	if len(presets) == 0 {
 		c.services.Embed.New(ctx).SetDescription("No Custom Activity presets found.").Send()
-		return
+		return nil
 	}
 
 	c.services.Embed.RespondField(ctx, "Custom Activity Presets", strings.Join(presets, "\n"))
+	return nil
 }
 
-func (c *ActivityCommands) clearCAPresets(ctx *router.Ctx) {
+func (c *ActivityCommands) clearCAPresets(ctx *router.Ctx) error {
 	cfg := c.services.Config.GetConfig()
 
 	cfg.ActivityPresets = make(map[string]config.Activity)
 	_ = c.services.Config.SaveConfig(cfg)
 
 	c.services.Embed.Respond(ctx, "Cleared all activity presets.")
+	return nil
 }
 
-func (c *ActivityCommands) setActivityPreset(ctx *router.Ctx) {
+func (c *ActivityCommands) setActivityPreset(ctx *router.Ctx) error {
 	cfg := c.services.Config.GetConfig()
 
 	name := strings.ToLower(ctx.Arguments.Get(0).Raw())
@@ -1389,158 +1421,21 @@ func (c *ActivityCommands) setActivityPreset(ctx *router.Ctx) {
 		activity.Platform = "PS5"
 		activity.LargeImage = "mp:external/mLiXAArsDKgwP6Wb7mvDrBn4mFbJUZLxndTK5D2dL8s/https/i.vgy.me/JhGfvq.jpg"
 	default:
-		ctx.RespondText("Invalid preset name. Use `youtube`, `twitch`, `discord`, `rickroll`, or `gta6`.")
-		return
+		return fmt.Errorf("Invalid preset name. Use `youtube`, `twitch`, `discord`, `rickroll`, or `gta6`.")
 	}
 
 	cfg.Activity = activity
 	_ = c.services.Config.SaveConfig(cfg)
 
 	c.services.Embed.Respond(ctx, "Successfully set activity preset `%s`!", name)
+	return nil
 }
 
-func (c *ActivityCommands) listActivityPresets(ctx *router.Ctx) {
-	ctx.RespondText("Available activity presets: `youtube`, `twitch`, `discord`, `rickroll`, `gta6`.")
+func (c *ActivityCommands) listActivityPresets(ctx *router.Ctx) error {
+	return ctx.RespondText("Available activity presets: `youtube`, `twitch`, `discord`, `rickroll`, `gta6`.")
 }
 
-func (c *ActivityCommands) capresets(ctx *router.Ctx) {
-	cfg := c.services.Config.GetConfig()
-
-	action := ctx.Arguments.Get(0).Raw()
-	name := ctx.Arguments.Get(1).Raw()
-
-	switch action {
-	case "get":
-		var currentPreset string
-
-		for name, preset := range cfg.ActivityPresets {
-			if reflect.DeepEqual(preset, cfg.Activity) {
-				currentPreset = name
-				break
-			}
-		}
-
-		if currentPreset == "" {
-			c.services.Embed.New(ctx).
-				SetDescription("You must load a preset before using the get current preset command!").
-				Send()
-			return
-		}
-
-		c.services.Embed.New(ctx).
-			SetDescription("Current Custom Activity preset is `%s`.", currentPreset).
-			Send()
-	case "load":
-		if name == "" {
-			ctx.RespondText("You must provide a preset name!")
-			return
-		}
-
-		preset, ok := cfg.ActivityPresets[name]
-		if !ok {
-			c.services.Embed.New(ctx).SetDescription("CA Preset `%s` not found.", name).Send()
-			return
-		}
-
-		cfg.Activity = preset
-		_ = c.services.Config.SaveConfig(cfg)
-
-		c.services.Embed.New(ctx).
-			SetDescription("Loaded Custom Activity preset `%s`.", name).
-			Send()
-	case "next":
-		var currentPreset string
-
-		for name, preset := range cfg.ActivityPresets {
-			if reflect.DeepEqual(preset, cfg.Activity) {
-				currentPreset = name
-				break
-			}
-		}
-
-		// Sort presets alphabetically
-		var keys []string
-		for k := range cfg.ActivityPresets {
-			keys = append(keys, k)
-		}
-
-		slices.Sort(keys)
-
-		// Get next preset
-		nextPreset := 0
-		for i, k := range keys {
-			if k == currentPreset {
-				nextPreset = (i + 1) % len(keys)
-				break
-			}
-		}
-
-		nextPresetName := keys[nextPreset]
-		cfg.Activity = cfg.ActivityPresets[nextPresetName]
-		_ = c.services.Config.SaveConfig(cfg)
-
-		c.services.Embed.New(ctx).
-			SetDescription("Loaded next CA preset `%s`.", nextPresetName).
-			Send()
-	case "save":
-		name := ctx.Arguments.Get(1).Raw()
-		if name == "" {
-			ctx.RespondText("You must provide a name to save the preset as!")
-			return
-		}
-
-		if cfg.ActivityPresets == nil {
-			cfg.ActivityPresets = make(map[string]config.Activity)
-		}
-
-		cfg.ActivityPresets[name] = cfg.Activity
-		_ = c.services.Config.SaveConfig(cfg)
-
-		c.services.Embed.New(ctx).
-			SetDescription("Saved current activity as preset `%s`.", name).
-			Send()
-	case "rm":
-		name := ctx.Arguments.Get(1).Raw()
-
-		if _, ok := cfg.ActivityPresets[name]; !ok {
-			c.services.Embed.New(ctx).SetDescription("Preset `%s` not found.", name).Send()
-			return
-		}
-
-		delete(cfg.ActivityPresets, name)
-		_ = c.services.Config.SaveConfig(cfg)
-
-		c.services.Embed.New(ctx).
-			SetDescription("Deleted activity preset `%s`.", name).
-			Send()
-	case "list":
-		var presets []string
-
-		for k, v := range cfg.ActivityPresets {
-			presets = append(presets, fmt.Sprintf("%s: %s %s", k, v.Type, v.Name))
-		}
-
-		if len(presets) == 0 {
-			c.services.Embed.New(ctx).SetDescription("No Custom Activity presets found.").Send()
-			return
-		}
-
-		c.services.Embed.New(ctx).
-			AddField("Custom Activity Presets", strings.Join(presets, "\n")).
-			Send()
-	case "clear":
-		cfg.ActivityPresets = make(map[string]config.Activity)
-		_ = c.services.Config.SaveConfig(cfg)
-
-		c.services.Embed.New(ctx).
-			SetDescription("Cleared all activity presets.").
-			Send()
-	default:
-		ctx.RespondText("Invalid <get/load/next/save/rm/list/clear> argument. Use `get`, `load`, `next`, `save`, `rm`, `list` or `clear`.")
-	}
-}
-
-func (c *ActivityCommands) cacreateimagekey(ctx *router.Ctx) {
+func (c *ActivityCommands) cacreateimagekey(ctx *router.Ctx) error {
 	url := ctx.Arguments.Get(0).Raw()
 
 	if strings.Contains(url, "discordapp.com") {
@@ -1553,13 +1448,13 @@ func (c *ActivityCommands) cacreateimagekey(ctx *router.Ctx) {
 		AddField("Image URL", url).
 		AddField("Image Key", imageKey).
 		Send()
+	return nil
 }
 
-func (c *ActivityCommands) cacreatespotifykey(ctx *router.Ctx) {
+func (c *ActivityCommands) cacreatespotifykey(ctx *router.Ctx) error {
 	bearerToken, err := c.services.Spotify.GetBearerToken(ctx.Session)
 	if err != nil {
-		ctx.RespondText("Could not find a Spotify connection. Please connect your Spotify account to your Discord.")
-		return
+		return fmt.Errorf("Could not find a Spotify connection. Please connect your Spotify account to your Discord.")
 	}
 
 	resp, err := http.DefaultClient().Get(
@@ -1572,8 +1467,7 @@ func (c *ActivityCommands) cacreatespotifykey(ctx *router.Ctx) {
 
 	imageUrl := song.Get("album").Get("images").Get(0).Get("url").MustString()
 	if err != nil || imageUrl == "" {
-		ctx.RespondText("A Spotify error occurred: Song not found.")
-		return
+		return fmt.Errorf("A Spotify error occurred: Song not found.")
 	}
 
 	splitUrl := strings.Split(imageUrl, "/")
@@ -1582,4 +1476,5 @@ func (c *ActivityCommands) cacreatespotifykey(ctx *router.Ctx) {
 		AddField("Song", song.Get("name").MustString()).
 		AddField("Image Key", "spotify:"+splitUrl[len(splitUrl)-1]).
 		Send()
+	return nil
 }

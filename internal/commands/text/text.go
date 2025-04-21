@@ -330,55 +330,56 @@ func (c *TextCommands) Register() {
 	})
 }
 
-func (c *TextCommands) empty(ctx *router.Ctx) {
-	ctx.RespondText("_ _")
+func (c *TextCommands) empty(ctx *router.Ctx) error {
+	return ctx.RespondText("_ _")
 }
 
-func (c *TextCommands) reverse(ctx *router.Ctx) {
-	ctx.RespondText("%s", utils.String.Reverse(ctx.Arguments.Raw()))
+func (c *TextCommands) reverse(ctx *router.Ctx) error {
+	return ctx.RespondText("%s", utils.String.Reverse(ctx.Arguments.Raw()))
 }
 
-func (c *TextCommands) alphabet(ctx *router.Ctx) {
+func (c *TextCommands) alphabet(ctx *router.Ctx) error {
 	message, _ := ctx.Session.ChannelMessageSend(ctx.Message.ChannelID, "a")
 	for i := 1; i < len(constants.ALPHABET); i++ {
 		time.Sleep(1 * time.Second)
 		char := string(constants.ALPHABET[i])
 		_, _ = ctx.Session.ChannelMessageEdit(message.ChannelID, message.ID, char)
 	}
+	return nil
 }
 
-func (c *TextCommands) ascii(ctx *router.Ctx) {
+func (c *TextCommands) ascii(ctx *router.Ctx) error {
 	ascii := figure.NewFigure(ctx.Arguments.Raw(), "", false).String()
-	ctx.RespondText("```%s```", ascii)
+	return ctx.RespondText("```%s```", ascii)
 }
 
-func (c *TextCommands) bold(ctx *router.Ctx) {
-	ctx.RespondText("**%s**", ctx.Arguments.Raw())
+func (c *TextCommands) bold(ctx *router.Ctx) error {
+	return ctx.RespondText("**%s**", ctx.Arguments.Raw())
 }
 
-func (c *TextCommands) strike(ctx *router.Ctx) {
-	ctx.RespondText("~~%s~~", ctx.Arguments.Raw())
+func (c *TextCommands) strike(ctx *router.Ctx) error {
+	return ctx.RespondText("~~%s~~", ctx.Arguments.Raw())
 }
 
-func (c *TextCommands) italic(ctx *router.Ctx) {
-	ctx.RespondText("*%s*", ctx.Arguments.Raw())
+func (c *TextCommands) italic(ctx *router.Ctx) error {
+	return ctx.RespondText("*%s*", ctx.Arguments.Raw())
 }
 
-func (c *TextCommands) spoiler(ctx *router.Ctx) {
-	ctx.RespondText("||%s||", ctx.Arguments.Raw())
+func (c *TextCommands) spoiler(ctx *router.Ctx) error {
+	return ctx.RespondText("||%s||", ctx.Arguments.Raw())
 }
 
-func (c *TextCommands) lspoiler(ctx *router.Ctx) {
+func (c *TextCommands) lspoiler(ctx *router.Ctx) error {
 	finalString := ""
 	chars := []rune(ctx.Arguments.Raw())
 	for i := range chars {
 		char := string(chars[i])
 		finalString = finalString + "||" + char + "||"
 	}
-	ctx.RespondText("%s", finalString)
+	return ctx.RespondText("%s", finalString)
 }
 
-func (c *TextCommands) leet(ctx *router.Ctx) {
+func (c *TextCommands) leet(ctx *router.Ctx) error {
 	text := ctx.Arguments.Raw()
 	leetChars := [][]string{
 		{"a", "4"},
@@ -401,10 +402,10 @@ func (c *TextCommands) leet(ctx *router.Ctx) {
 	for _, element := range leetChars {
 		text = strings.ReplaceAll(text, element[0], element[1])
 	}
-	ctx.RespondText("%s", text)
+	return ctx.RespondText("%s", text)
 }
 
-func (c *TextCommands) devowel(ctx *router.Ctx) {
+func (c *TextCommands) devowel(ctx *router.Ctx) error {
 	text := ctx.Arguments.Raw()
 	builder := strings.Builder{}
 
@@ -417,25 +418,25 @@ func (c *TextCommands) devowel(ctx *router.Ctx) {
 		builder.WriteRune(c)
 	}
 
-	ctx.RespondText("%s", builder.String())
+	return ctx.RespondText("%s", builder.String())
 }
 
-func (c *TextCommands) edit(ctx *router.Ctx) {
+func (c *TextCommands) edit(ctx *router.Ctx) error {
 	fullText := ctx.Arguments.Raw()
 	currentText := string(fullText[0])
 	message, err := ctx.Session.ChannelMessageSend(ctx.Message.ChannelID, currentText)
 	if err != nil {
-		ctx.RespondText("An error has occurred: %v", err)
-		return
+		return fmt.Errorf("An error has occurred: %v", err)
 	}
 	for i := 1; i < len(fullText); i++ {
 		time.Sleep(500 * time.Millisecond)
 		currentText = currentText + string(fullText[i])
 		_, _ = ctx.Session.ChannelMessageEdit(message.ChannelID, message.ID, currentText)
 	}
+	return nil
 }
 
-func (c *TextCommands) emojify(ctx *router.Ctx) {
+func (c *TextCommands) emojify(ctx *router.Ctx) error {
 	text := strings.ToLower(ctx.Arguments.Raw())
 	emojiChars := [][]string{
 		{"a", "🇦-"},
@@ -469,26 +470,26 @@ func (c *TextCommands) emojify(ctx *router.Ctx) {
 	for _, element := range emojiChars {
 		text = strings.ReplaceAll(text, element[0], element[1])
 	}
-	ctx.RespondText("%s", text)
+	return ctx.RespondText("%s", text)
 }
 
-func (c *TextCommands) shrug(ctx *router.Ctx) {
-	ctx.RespondText("¯\\_(ツ)_/¯")
+func (c *TextCommands) shrug(ctx *router.Ctx) error {
+	return ctx.RespondText("¯\\_(ツ)_/¯")
 }
 
-func (c *TextCommands) lenny(ctx *router.Ctx) {
-	ctx.RespondText("( ͡° ͜ʖ ͡°)")
+func (c *TextCommands) lenny(ctx *router.Ctx) error {
+	return ctx.RespondText("( ͡° ͜ʖ ͡°)")
 }
 
-func (c *TextCommands) tableflip(ctx *router.Ctx) {
-	ctx.RespondText("(╯°□°）╯︵ ┻━┻")
+func (c *TextCommands) tableflip(ctx *router.Ctx) error {
+	return ctx.RespondText("(╯°□°）╯︵ ┻━┻")
 }
 
-func (c *TextCommands) unflip(ctx *router.Ctx) {
-	ctx.RespondText("┬─┬ ノ( ゜-゜ノ)")
+func (c *TextCommands) unflip(ctx *router.Ctx) error {
+	return ctx.RespondText("┬─┬ ノ( ゜-゜ノ)")
 }
 
-func (c *TextCommands) clap(ctx *router.Ctx) {
+func (c *TextCommands) clap(ctx *router.Ctx) error {
 	text := ctx.Arguments.Raw()
 	clapChars := [][]string{
 		{" ", "👏"},
@@ -497,10 +498,10 @@ func (c *TextCommands) clap(ctx *router.Ctx) {
 	for _, element := range clapChars {
 		text = strings.ReplaceAll(text, element[0], element[1])
 	}
-	ctx.RespondText("%s", text)
+	return ctx.RespondText("%s", text)
 }
 
-func (c *TextCommands) zalgo(ctx *router.Ctx) {
+func (c *TextCommands) zalgo(ctx *router.Ctx) error {
 	text := strings.ToLower(ctx.Arguments.Raw())
 	zalgoChars := [][]string{
 		{"a", "a̷̧̡̡̨͉͍̫͖͊̆̂"},
@@ -534,35 +535,35 @@ func (c *TextCommands) zalgo(ctx *router.Ctx) {
 	for _, element := range zalgoChars {
 		text = strings.ReplaceAll(text, element[0], element[1])
 	}
-	ctx.RespondText("%s", text)
+	return ctx.RespondText("%s", text)
 }
 
-func (c *TextCommands) unzalgo(ctx *router.Ctx) {
+func (c *TextCommands) unzalgo(ctx *router.Ctx) error {
 	text := utils.String.FilterAlphaNumeric(ctx.Arguments.Raw())
-	ctx.RespondText("%s", text)
+	return ctx.RespondText("%s", text)
 }
 
-func (c *TextCommands) upper(ctx *router.Ctx) {
+func (c *TextCommands) upper(ctx *router.Ctx) error {
 	text := strings.ToUpper(ctx.Arguments.Raw())
-	ctx.RespondText("%s", text)
+	return ctx.RespondText("%s", text)
 }
 
-func (c *TextCommands) lower(ctx *router.Ctx) {
+func (c *TextCommands) lower(ctx *router.Ctx) error {
 	text := strings.ToLower(ctx.Arguments.Raw())
-	ctx.RespondText("%s", text)
+	return ctx.RespondText("%s", text)
 }
 
-func (c *TextCommands) fliptext(ctx *router.Ctx) {
+func (c *TextCommands) fliptext(ctx *router.Ctx) error {
 	text := utils.String.Flip(ctx.Arguments.Raw(), false)
-	ctx.RespondText("%s", text)
+	return ctx.RespondText("%s", text)
 }
 
-func (c *TextCommands) unfliptext(ctx *router.Ctx) {
+func (c *TextCommands) unfliptext(ctx *router.Ctx) error {
 	text := utils.String.Flip(ctx.Arguments.Raw(), true)
-	ctx.RespondText("%s", text)
+	return ctx.RespondText("%s", text)
 }
 
-func (c *TextCommands) wave(ctx *router.Ctx) {
+func (c *TextCommands) wave(ctx *router.Ctx) error {
 	sawtoothWave := utils.Misc.CreateSawtoothWave(8, 6)
 
 	wave := ""
@@ -571,15 +572,14 @@ func (c *TextCommands) wave(ctx *router.Ctx) {
 		wave += strings.Repeat(" ", i) + ctx.Arguments.Raw() + "\n"
 	}
 
-	ctx.RespondText("%s", wave)
+	return ctx.RespondText("%s", wave)
 }
 
-func (c *TextCommands) customwave(ctx *router.Ctx) {
+func (c *TextCommands) customwave(ctx *router.Ctx) error {
 	width, err := ctx.Arguments.Get(0).Int()
 	width = fn.Clamp(width, 1, 100)
 	if err != nil {
-		ctx.RespondText("Width must be a number!")
-		return
+		return fmt.Errorf("Width must be a number!")
 	}
 
 	iterations, err := ctx.Arguments.Get(1).Int()
@@ -598,16 +598,16 @@ func (c *TextCommands) customwave(ctx *router.Ctx) {
 		wave += strings.Repeat(" ", i) + text + "\n"
 	}
 
-	ctx.RespondText("%s", wave)
+	return ctx.RespondText("%s", wave)
 }
 
-func (c *TextCommands) zwc(ctx *router.Ctx) {
+func (c *TextCommands) zwc(ctx *router.Ctx) error {
 	text := ctx.Arguments.Raw()
 	text = strings.Join(strings.Split(text, ""), "\u200B")
-	ctx.RespondText("%s", text)
+	return ctx.RespondText("%s", text)
 }
 
-func (c *TextCommands) distance(ctx *router.Ctx) {
+func (c *TextCommands) distance(ctx *router.Ctx) error {
 	text1, text2 := ctx.Arguments.Get(0).Raw(), ctx.Arguments.Get(1).Raw()
 
 	c.services.Embed.New(ctx).
@@ -615,25 +615,25 @@ func (c *TextCommands) distance(ctx *router.Ctx) {
 		AddField("Text 2", text2).
 		AddField("Distance", strconv.Itoa(levenshtein.ComputeDistance(text1, text2))).
 		Send()
+	return nil
 }
 
-func (c *TextCommands) codeblock(ctx *router.Ctx) {
+func (c *TextCommands) codeblock(ctx *router.Ctx) error {
 	language := ctx.Arguments.Get(0).Raw()
 	code := ctx.Arguments.RawFrom(1)
 
-	ctx.RespondText("%s", "```"+strings.ToLower(language)+"\n"+code+"\n```")
+	return ctx.RespondText("%s", "```"+strings.ToLower(language)+"\n"+code+"\n```")
 }
 
-func (c *TextCommands) randomstr(ctx *router.Ctx) {
+func (c *TextCommands) randomstr(ctx *router.Ctx) error {
 	length, err := ctx.Arguments.Get(0).Int()
 	length = fn.Clamp(length, 0, 1000)
 	if err != nil {
-		ctx.RespondText("Argument <length> must be a positive integer.")
-		return
+		return fmt.Errorf("Argument <length> must be a positive integer.")
 	}
 
 	randomStr := random.String(length)
-	ctx.RespondText("%s", randomStr)
+	return ctx.RespondText("%s", randomStr)
 }
 
 // Animation commands
@@ -708,131 +708,137 @@ var (
 	}
 )
 
-func (c *TextCommands) virus(ctx *router.Ctx) {
+func (c *TextCommands) virus(ctx *router.Ctx) error {
 	name := ctx.Arguments.Get(0).Raw()
 
 	message, err := ctx.Session.ChannelMessageSend(ctx.Message.ChannelID, fmt.Sprintf(virus[0], name))
 	if err != nil {
-		return
+		return err
 	}
 
 	for i := 1; i < len(virus); i++ {
 		time.Sleep(time.Second * 1)
 		message, err = ctx.Session.ChannelMessageEdit(ctx.Message.ChannelID, message.ID, fmt.Sprintf(virus[i], name))
 		if err != nil {
-			return
+			return fmt.Errorf("failed to edit messsage: %v", err)
 		}
 	}
+
+	return nil
 }
 
-func (c *TextCommands) _100(ctx *router.Ctx) {
+func (c *TextCommands) _100(ctx *router.Ctx) error {
 	message, err := ctx.Session.ChannelMessageSend(ctx.Message.ChannelID, "1")
 	if err != nil {
-		return
+		return err
 	}
 
 	for i := 2; i <= 100; i++ {
 		time.Sleep(time.Second * 1)
 		message, err = ctx.Session.ChannelMessageEdit(ctx.Message.ChannelID, message.ID, strconv.Itoa(i))
 		if err != nil {
-			return
+			return err
 		}
 	}
+	return nil
 }
 
-func (c *TextCommands) bomb(ctx *router.Ctx) {
+func (c *TextCommands) bomb(ctx *router.Ctx) error {
 	message, err := ctx.Session.ChannelMessageSend(ctx.Message.ChannelID, bomb[0])
 	if err != nil {
-		return
+		return err
 	}
 
 	for i := 1; i < len(bomb); i++ {
 		time.Sleep(time.Second * 1)
 		message, err = ctx.Session.ChannelMessageEdit(ctx.Message.ChannelID, message.ID, bomb[i])
 		if err != nil {
-			return
+			return err
 		}
 	}
+	return nil
 }
 
-func (c *TextCommands) fuckyou(ctx *router.Ctx) {
+func (c *TextCommands) fuckyou(ctx *router.Ctx) error {
 	message, err := ctx.Session.ChannelMessageSend(ctx.Message.ChannelID, fuckYou[0])
 	if err != nil {
-		return
+		return err
 	}
 
 	for i := 1; i < len(fuckYou); i++ {
 		time.Sleep(time.Second * 1)
 		message, err = ctx.Session.ChannelMessageEdit(ctx.Message.ChannelID, message.ID, fuckYou[i])
 		if err != nil {
-			return
+			return err
 		}
 	}
+	return nil
 }
 
-func (c *TextCommands) fap(ctx *router.Ctx) {
+func (c *TextCommands) fap(ctx *router.Ctx) error {
 	message, err := ctx.Session.ChannelMessageSend(ctx.Message.ChannelID, fap[0])
 	if err != nil {
-		return
+		return err
 	}
 
 	for i := 1; i < len(fap); i++ {
 		time.Sleep(time.Second * 1)
 		message, err = ctx.Session.ChannelMessageEdit(ctx.Message.ChannelID, message.ID, fap[i])
 		if err != nil {
-			return
+			return err
 		}
 	}
+	return nil
 }
 
-func (c *TextCommands) countup(ctx *router.Ctx) {
+func (c *TextCommands) countup(ctx *router.Ctx) error {
 	number, err := ctx.Arguments.Get(0).Int()
 	if err != nil {
-		ctx.RespondText("Argument <number> must be a number.")
-		return
+		return fmt.Errorf("Argument <number> must be a number.")
 	}
 
 	message, err := ctx.Session.ChannelMessageSend(ctx.Message.ChannelID, "1")
 	if err != nil {
-		return
+		return err
 	}
 
 	for i := 2; i <= number; i++ {
 		time.Sleep(time.Second * 1)
 		message, err = ctx.Session.ChannelMessageEdit(ctx.Message.ChannelID, message.ID, strconv.Itoa(i))
 		if err != nil {
-			return
+			return err
 		}
 	}
+	return nil
 }
 
-func (c *TextCommands) countdown(ctx *router.Ctx) {
+func (c *TextCommands) countdown(ctx *router.Ctx) error {
 	number, err := ctx.Arguments.Get(0).Int()
 	if err != nil {
-		ctx.RespondText("Argument <number> must be a number.")
-		return
+		return fmt.Errorf("Argument <number> must be a number.")
 	}
 
 	message, err := ctx.Session.ChannelMessageSend(ctx.Message.ChannelID, fmt.Sprint(number))
 	if err != nil {
-		return
+		return err
 	}
 
 	for i := number; i > 0; i-- {
 		time.Sleep(time.Second * 1)
 		message, err = ctx.Session.ChannelMessageEdit(ctx.Message.ChannelID, message.ID, fmt.Sprint(i-1))
 		if err != nil {
-			return
+			return err
 		}
 	}
+	return nil
 }
 
-func (c *TextCommands) asciianimation(ctx *router.Ctx) {
+func (c *TextCommands) asciianimation(ctx *router.Ctx) error {
 	text := ctx.Arguments.Get(0).Raw()
 	firstCharAscii := figure.NewFigure(string(text[0]), "", false).String()
 	message, err := ctx.Session.ChannelMessageSend(ctx.Message.ChannelID, fmt.Sprintf("```%s```", firstCharAscii))
 	if err != nil {
-		return
+		return err
 	}
 	currentText := string(text[0])
 	for index, char := range text {
@@ -844,12 +850,13 @@ func (c *TextCommands) asciianimation(ctx *router.Ctx) {
 		ascii := figure.NewFigure(currentText, "", false).String()
 		_, err := ctx.Session.ChannelMessageEdit(ctx.Message.ChannelID, message.ID, fmt.Sprintf("```%s```", ascii))
 		if err != nil {
-			return
+			return err
 		}
 	}
+	return nil
 }
 
-func (c *TextCommands) customanimationhelp(ctx *router.Ctx) {
+func (c *TextCommands) customanimationhelp(ctx *router.Ctx) error {
 	cfg := c.services.Config.GetConfig()
 
 	c.services.Embed.New(ctx).
@@ -862,9 +869,10 @@ func (c *TextCommands) customanimationhelp(ctx *router.Ctx) {
 			cfg.Selfbot.CommandPrefix,
 		)).
 		Send()
+	return nil
 }
 
-func (c *TextCommands) customanimations(ctx *router.Ctx) {
+func (c *TextCommands) customanimations(ctx *router.Ctx) error {
 	folder := filepath.Join(utils.IO.GetMainFolder(), "Animations")
 	_ = os.MkdirAll(folder, os.ModePerm)
 
@@ -888,75 +896,74 @@ func (c *TextCommands) customanimations(ctx *router.Ctx) {
 	})
 
 	c.services.Embed.New(ctx).AddField("Custom Animations", customAnimString).Send()
+	return nil
 }
 
-func (c *TextCommands) customanimation(ctx *router.Ctx) {
+func (c *TextCommands) customanimation(ctx *router.Ctx) error {
 	name := ctx.Arguments.Get(0).Raw()
 	folder := filepath.Join(utils.IO.GetMainFolder(), "Animations")
 	_ = os.MkdirAll(folder, os.ModePerm)
 	path := filepath.Join(folder, utils.IO.SanitizeFilename(name+".txt"))
 	if _, err := os.Stat(path); os.IsNotExist(err) {
-		ctx.RespondText("Animation does not exist.")
-		return
+		return fmt.Errorf("Animation does not exist.")
 	}
 	anim, err := os.ReadFile(path)
 	if err != nil {
-		ctx.RespondText("Animation could not be read.")
-		return
+		return fmt.Errorf("Animation could not be read.")
 	}
 	animationFrames := strings.Split(string(anim), "\n")
 	message, err := ctx.Session.ChannelMessageSend(ctx.Message.ChannelID, animationFrames[0])
 	if err != nil {
-		return
+		return err
 	}
 	for i := 1; i < len(animationFrames); i++ {
 		time.Sleep(time.Second * 1)
 		message, err = ctx.Session.ChannelMessageEdit(ctx.Message.ChannelID, message.ID, animationFrames[i])
 		if err != nil {
-			return
+			return err
 		}
 	}
+	return nil
 }
 
-func (c *TextCommands) encodings(ctx *router.Ctx) {
+func (c *TextCommands) encodings(ctx *router.Ctx) error {
 	var encodingNames []string
 	for name := range encodings.Encodings {
 		encodingNames = append(encodingNames, name)
 	}
 
 	c.services.Embed.RespondField(ctx, "Available Encodings", strings.Join(encodingNames, ", "))
+	return nil
 }
 
-func (c *TextCommands) encode(ctx *router.Ctx) {
+func (c *TextCommands) encode(ctx *router.Ctx) error {
 	encodingName := ctx.Arguments.Get(0).Raw()
 	text := ctx.Arguments.RawFrom(1)
 
 	encoding, ok := encodings.Encodings[encodingName]
 	if !ok {
-		ctx.RespondText("Invalid encoding! Use `[p]encodings` to get a list of all available encodings.")
-		return
+		return fmt.Errorf("Invalid encoding! Use `[p]encodings` to get a list of all available encodings.")
 	}
 
 	encoded, err := encoding.Encode(text)
 	if err != nil {
-		ctx.RespondText("An error has occurred: %v", err)
-		return
+		return fmt.Errorf("An error has occurred: %v", err)
 	}
 
 	c.services.Embed.New(ctx).
 		AddField("Text", text).
 		AddField("Encoded", encoded).
 		Send()
+	return nil
 }
 
-func (c *TextCommands) decode(ctx *router.Ctx) {
+func (c *TextCommands) decode(ctx *router.Ctx) error {
 	encodingName := ctx.Arguments.Get(0).Raw()
 	text := ctx.Arguments.RawFrom(1)
 
 	encoding, ok := encodings.Encodings[encodingName]
 	if !ok {
-		ctx.RespondText("Invalid encoding! Use `[p]encodings` to get a list of all available encodings.")
-		return
+		return fmt.Errorf("Invalid encoding! Use `[p]encodings` to get a list of all available encodings.")
 	}
 
 	if encoding.Decode == nil {
@@ -965,33 +972,33 @@ func (c *TextCommands) decode(ctx *router.Ctx) {
 
 	decoded, err := encoding.Decode(text)
 	if err != nil {
-		ctx.RespondText("An error has occurred: %v", err)
-		return
+		return fmt.Errorf("An error has occurred: %v", err)
 	}
 
 	c.services.Embed.New(ctx).
 		AddField("Text", text).
 		AddField("Decoded", decoded).
 		Send()
+	return nil
 }
 
-func (c *TextCommands) hashes(ctx *router.Ctx) {
+func (c *TextCommands) hashes(ctx *router.Ctx) error {
 	var hashNames []string
 	for name := range encodings.Hashes {
 		hashNames = append(hashNames, name)
 	}
 
 	c.services.Embed.RespondField(ctx, "Available Hashes", strings.Join(hashNames, ", "))
+	return nil
 }
 
-func (c *TextCommands) hash(ctx *router.Ctx) {
+func (c *TextCommands) hash(ctx *router.Ctx) error {
 	hashName := ctx.Arguments.Get(0).Raw()
 	text := ctx.Arguments.RawFrom(1)
 
 	hashFunc, ok := encodings.Hashes[hashName]
 	if !ok {
-		ctx.RespondText("Invalid hash! Use `[p]hashes` to get a list of all available hashes.")
-		return
+		return fmt.Errorf("Invalid hash! Use `[p]hashes` to get a list of all available hashes.")
 	}
 
 	hashed := hashFunc(text)
@@ -1000,55 +1007,55 @@ func (c *TextCommands) hash(ctx *router.Ctx) {
 		AddField("Text", text).
 		AddField("Hashed", hashed).
 		Send()
+	return nil
 }
 
-func (c *TextCommands) encryptions(ctx *router.Ctx) {
+func (c *TextCommands) encryptions(ctx *router.Ctx) error {
 	var encryptionNames []string
 	for name := range encodings.Encryptions {
 		encryptionNames = append(encryptionNames, name)
 	}
 
 	c.services.Embed.RespondField(ctx, "Available Encryptions", strings.Join(encryptionNames, ", "))
+	return nil
 }
 
-func (c *TextCommands) encrypt(ctx *router.Ctx) {
+func (c *TextCommands) encrypt(ctx *router.Ctx) error {
 	encryptionName, key, text := ctx.Arguments.Get(0).Raw(), ctx.Arguments.Get(1).Raw(), ctx.Arguments.RawFrom(2)
 
 	encryption, ok := encodings.Encryptions[encryptionName]
 	if !ok {
-		ctx.RespondText("Invalid encryption! Use `[p]encryptions` to get a list of all available encryptions.")
-		return
+		return fmt.Errorf("Invalid encryption! Use `[p]encryptions` to get a list of all available encryptions.")
 	}
 
 	encrypted, err := encryption.Encrypt(text, key)
 	if err != nil {
-		ctx.RespondText("An error has occurred: %v", err)
-		return
+		return fmt.Errorf("An error has occurred: %v", err)
 	}
 
 	c.services.Embed.New(ctx).
 		AddField("Text", text).
 		AddField("Encrypted", encrypted).
 		Send()
+	return nil
 }
 
-func (c *TextCommands) decrypt(ctx *router.Ctx) {
+func (c *TextCommands) decrypt(ctx *router.Ctx) error {
 	encryptionName, key, text := ctx.Arguments.Get(0).Raw(), ctx.Arguments.Get(1).Raw(), ctx.Arguments.RawFrom(2)
 
 	encryption, ok := encodings.Encryptions[encryptionName]
 	if !ok {
-		ctx.RespondText("Invalid encryption! Use `[p]encryptions` to get a list of all available encryptions.")
-		return
+		return fmt.Errorf("Invalid encryption! Use `[p]encryptions` to get a list of all available encryptions.")
 	}
 
 	encrypted, err := encryption.Decrypt(text, key)
 	if err != nil {
-		ctx.RespondText("An error has occurred: %v", err)
-		return
+		return fmt.Errorf("An error has occurred: %v", err)
 	}
 
 	c.services.Embed.New(ctx).
 		AddField("Text", text).
 		AddField("Decrypted", encrypted).
 		Send()
+	return nil
 }

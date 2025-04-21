@@ -1318,17 +1318,15 @@ func createWebhookChannel(ctx *router.Ctx, serverID, categoryID, name string) (s
 	return fmt.Sprintf("https://discord.com/api/webhooks/%s/%s", webhook.ID, webhook.Token), nil
 }
 
-func (c *ConfigCommands) setupwebhooks(ctx *router.Ctx) {
+func (c *ConfigCommands) setupwebhooks(ctx *router.Ctx) error {
 	guild, err := ctx.Arguments.Get(0).Guild(router.ArgumentFlagFallbackDefault)
 	if err != nil {
-		_ = ctx.RespondText("Could not find server: %v", err)
-		return
+		return fmt.Errorf("Could not find server: %v", err)
 	}
 
 	category, err := ctx.Session.GuildChannelCreate(guild.ID, "LightningBot", discordgo.ChannelTypeGuildCategory)
 	if err != nil {
-		_ = ctx.RespondText("Failed to create category: %v", err)
-		return
+		return fmt.Errorf("Failed to create category: %v", err)
 	}
 
 	cfg := c.services.Config.GetConfig()
@@ -1342,14 +1340,14 @@ func (c *ConfigCommands) setupwebhooks(ctx *router.Ctx) {
 	cfg.Webhooks.Sessions, _ = createWebhookChannel(ctx, guild.ID, category.ID, "sessions")
 
 	if err := c.services.Config.SaveConfig(cfg); err != nil {
-		_ = ctx.RespondText("Failed to save config: %v", err)
-		return
+		return fmt.Errorf("Failed to save config: %v", err)
 	}
 
 	c.services.Embed.Respond(ctx, "Webhooks setup successfully.")
+	return nil
 }
 
-func (c *ConfigCommands) wall(ctx *router.Ctx) {
+func (c *ConfigCommands) wall(ctx *router.Ctx) error {
 	cfg := c.services.Config.GetConfig()
 
 	webhookURL := ctx.Arguments.Get(0).Raw()
@@ -1363,9 +1361,9 @@ func (c *ConfigCommands) wall(ctx *router.Ctx) {
 	cfg.Webhooks.Sessions = webhookURL
 
 	if err := c.services.Config.SaveConfig(cfg); err != nil {
-		_ = ctx.RespondText("Error saving config: %v", err)
-		return
+		return fmt.Errorf("Error saving config: %v", err)
 	}
 
 	c.services.Embed.Respond(ctx, "All webhooks set to %s", webhookURL)
+	return nil
 }

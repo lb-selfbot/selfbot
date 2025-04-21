@@ -1,6 +1,7 @@
 package router
 
 import (
+	"fmt"
 	"regexp"
 	"slices"
 	"strings"
@@ -115,8 +116,7 @@ func (r *routerService) triggerCommand(ctx *Ctx) {
 		subCmdsReadable := fn.Map(ctx.Command.SubCommands, func(subCmd *Command) string {
 			return subCmd.Name
 		})
-
-		ctx.RespondText("You must provide a subcommand for [p]%s! The available subcommands are: %s", ctx.Command.Name, strings.Join(subCmdsReadable, ", "))
+		r.handleCmdError(ctx, fmt.Errorf("You must provide a subcommand for [p]%s! The available subcommands are: %s", ctx.Command.Name, strings.Join(subCmdsReadable, ", ")))
 		return
 	}
 
@@ -124,7 +124,11 @@ func (r *routerService) triggerCommand(ctx *Ctx) {
 		handler = middleware(handler)
 	}
 
-	handler(ctx)
+	err := handler(ctx)
+	if err != nil {
+		r.handleCmdError(ctx, err)
+		return
+	}
 }
 
 func (r *routerService) triggerSubCommand(ctx *Ctx) bool {
