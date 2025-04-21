@@ -13,7 +13,6 @@ import (
 	"time"
 
 	"github.com/lb-selfbot/discordgo"
-	"github.com/lb-selfbot/selfbot/internal/formatting"
 	"github.com/lb-selfbot/selfbot/internal/fs"
 	"github.com/lb-selfbot/selfbot/internal/http"
 )
@@ -143,78 +142,6 @@ func (DiscordUtils) DeleteMessages(session *discordgo.Session, channelID, userID
 	}
 
 	return deleted, nil
-}
-
-func (DiscordUtils) FormatPermissions(roleName, roleID string, permissions int64) string {
-	permissionsString := fmt.Sprintf(`Role: %s | ID: %s
-
-Permission: Add Reactions            | Value: %s
-Permission: Administrator            | Value: %s
-Permission: Attach Files             | Value: %s
-Permission: Ban Members              | Value: %s
-Permission: Change Nickname          | Value: %s
-Permission: Connect to Voice Channel | Value: %s
-Permission: Create Instant Invite    | Value: %s
-Permission: Deafen Members           | Value: %s
-Permission: Embed Links              | Value: %s
-Permission: Use External Emojis      | Value: %s
-Permission: Kick Members             | Value: %s
-Permission: Manage Channels          | Value: %s
-Permission: Manage Emojis            | Value: %s
-Permission: Manage Server            | Value: %s
-Permission: Manage Messages          | Value: %s
-Permission: Manage Nicknames         | Value: %s
-Permission: Manage Roles             | Value: %s
-Permission: Manage webhooks          | Value: %s
-Permission: Mention everyone         | Value: %s
-Permission: Move Members             | Value: %s
-Permission: Mute Members             | Value: %s
-Permission: Priority Speaker         | Value: %s
-Permission: Read Message History     | Value: %s
-Permission: View Channel             | Value: %s
-Permission: Send Messages            | Value: %s
-Permission: Send TTS messages        | Value: %s
-Permission: Speak in Voice Channel   | Value: %s
-Permission: Stream in Voice Channel  | Value: %s
-Permission: Use External Emojis      | Value: %s
-Permission: Use Voice Activation     | Value: %s
-Permission: View Audit Logs          | Value: %s
-Permission: View Guild Insights      | Value: %s`,
-		roleName, roleID,
-		formatting.BoolYesNo(permissions&discordgo.PermissionAddReactions != 0),
-		formatting.BoolYesNo(permissions&discordgo.PermissionAdministrator != 0),
-		formatting.BoolYesNo(permissions&discordgo.PermissionAttachFiles != 0),
-		formatting.BoolYesNo(permissions&discordgo.PermissionBanMembers != 0),
-		formatting.BoolYesNo(permissions&discordgo.PermissionChangeNickname != 0),
-		formatting.BoolYesNo(permissions&discordgo.PermissionVoiceConnect != 0),
-		formatting.BoolYesNo(permissions&discordgo.PermissionCreateInstantInvite != 0),
-		formatting.BoolYesNo(permissions&discordgo.PermissionVoiceDeafenMembers != 0),
-		formatting.BoolYesNo(permissions&discordgo.PermissionEmbedLinks != 0),
-		formatting.BoolYesNo(permissions&discordgo.PermissionUseExternalEmojis != 0),
-		formatting.BoolYesNo(permissions&discordgo.PermissionKickMembers != 0),
-		formatting.BoolYesNo(permissions&discordgo.PermissionManageChannels != 0),
-		formatting.BoolYesNo(permissions&discordgo.PermissionManageEmojis != 0),
-		formatting.BoolYesNo(permissions&discordgo.PermissionManageServer != 0),
-		formatting.BoolYesNo(permissions&discordgo.PermissionManageMessages != 0),
-		formatting.BoolYesNo(permissions&discordgo.PermissionManageNicknames != 0),
-		formatting.BoolYesNo(permissions&discordgo.PermissionManageRoles != 0),
-		formatting.BoolYesNo(permissions&discordgo.PermissionManageWebhooks != 0),
-		formatting.BoolYesNo(permissions&discordgo.PermissionMentionEveryone != 0),
-		formatting.BoolYesNo(permissions&discordgo.PermissionVoiceMoveMembers != 0),
-		formatting.BoolYesNo(permissions&discordgo.PermissionVoiceMuteMembers != 0),
-		formatting.BoolYesNo(permissions&discordgo.PermissionVoicePrioritySpeaker != 0),
-		formatting.BoolYesNo(permissions&discordgo.PermissionReadMessageHistory != 0),
-		formatting.BoolYesNo(permissions&discordgo.PermissionViewChannel != 0),
-		formatting.BoolYesNo(permissions&discordgo.PermissionSendMessages != 0),
-		formatting.BoolYesNo(permissions&discordgo.PermissionSendTTSMessages != 0),
-		formatting.BoolYesNo(permissions&discordgo.PermissionVoiceSpeak != 0),
-		formatting.BoolYesNo(permissions&discordgo.PermissionVoiceStreamVideo != 0),
-		formatting.BoolYesNo(permissions&discordgo.PermissionUseExternalEmojis != 0),
-		formatting.BoolYesNo(permissions&discordgo.PermissionVoiceUseVAD != 0),
-		formatting.BoolYesNo(permissions&discordgo.PermissionViewAuditLogs != 0),
-		formatting.BoolYesNo(permissions&discordgo.PermissionViewGuildInsights != 0),
-	)
-	return permissionsString
 }
 
 func (DiscordUtils) SendFileFromURL(session *discordgo.Session, channelID, url, fileName string, headers ...map[string]string) error {

@@ -9,7 +9,6 @@ import (
 	"time"
 
 	"github.com/lb-selfbot/discordgo"
-	"github.com/lb-selfbot/selfbot/internal/api"
 	"github.com/lb-selfbot/selfbot/internal/formatting"
 	"github.com/lb-selfbot/selfbot/internal/http"
 	"github.com/lb-selfbot/selfbot/internal/services/router"
@@ -2128,17 +2127,16 @@ func (c *AdminCommands) roleinfo(ctx *router.Ctx) error {
 		}
 	}
 	createdAt := discordgo.MustSnowflakeTimestamp(role.ID)
-	perms, _ := api.LBCreatePaste(utils.Discord.FormatPermissions(role.Name, role.ID, role.Permissions))
 	c.services.Embed.New(ctx).
 		SetDescription("Role Info (%s)", role.Name).
 		AddField("ID", role.ID).
 		AddField("Color", fmt.Sprintf("#%x", role.Color)).
 		AddField("Created at", formatting.Timestamp(createdAt)).
-		AddField("Position", fmt.Sprint(role.Position)).
+		AddField("Position", strconv.Itoa(role.Position)).
 		AddField("Is Hoist", formatting.BoolYesNo(role.Hoist)).
 		AddField("Is Mentionable", formatting.BoolYesNo(role.Mentionable)).
-		AddField("Members With Role", fmt.Sprint(memberCount)).
-		AddField("Permissions", perms).
+		AddField("Members With Role", strconv.Itoa(memberCount)).
+		AddField("Permissions", formatting.Permissions(role.Permissions)).
 		Send()
 	return nil
 }
