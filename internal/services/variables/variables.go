@@ -12,6 +12,7 @@ import (
 	"github.com/lb-selfbot/selfbot/internal/api"
 	"github.com/lb-selfbot/selfbot/internal/constants"
 	"github.com/lb-selfbot/selfbot/internal/fn"
+	"github.com/lb-selfbot/selfbot/internal/formatting"
 	"github.com/lb-selfbot/selfbot/internal/services/eventbroker"
 	"github.com/lb-selfbot/selfbot/internal/services/extensions"
 	"github.com/lb-selfbot/selfbot/internal/services/router"
@@ -96,7 +97,7 @@ func (v *variablesService) getValue(varName string, args []string) string {
 		return time.Now().In(loc).Format("15:04:05")
 
 	case "uptime":
-		return utils.Misc.FormatDurationShort(time.Since(constants.START_TIME))
+		return formatting.DurationShort(time.Since(constants.START_TIME))
 
 	case "activewindow":
 		title, err := foreground.GetForegroundTitle()

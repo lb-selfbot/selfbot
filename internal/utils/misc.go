@@ -9,7 +9,6 @@ import (
 	"image/draw"
 	"image/png"
 	"io"
-	"math"
 	"strconv"
 	"strings"
 	"time"
@@ -29,70 +28,12 @@ func (MiscUtils) GetImageUrlFromJson(url string, key string) (string, error) {
 	return resp.Json().Get(key).MustString(), nil
 }
 
-func (MiscUtils) FormatBoolYesNo(b bool) string {
-	if b {
-		return "Yes"
-	}
-	return "No"
-}
-
-func (MiscUtils) FormatBoolOnOff(b bool) string {
-	if b {
-		return "On"
-	}
-	return "Off"
-}
-
 // Or returns `a` if it isn't empty, else it returns `b`
 func (MiscUtils) Or(a, b string) string {
 	if a != "" {
 		return a
 	}
 	return b
-}
-
-func (MiscUtils) FormatDuration(duration time.Duration) string {
-	if duration.Seconds() < 60.0 {
-		return fmt.Sprintf("%d seconds", int64(duration.Seconds()))
-	}
-	if duration.Minutes() < 60.0 {
-		remainingSeconds := math.Mod(duration.Seconds(), 60)
-		return fmt.Sprintf("%d minutes %d seconds", int64(duration.Minutes()), int64(remainingSeconds))
-	}
-	if duration.Hours() < 24.0 {
-		remainingMinutes := math.Mod(duration.Minutes(), 60)
-		remainingSeconds := math.Mod(duration.Seconds(), 60)
-		return fmt.Sprintf("%d hours %d minutes %d seconds",
-			int64(duration.Hours()), int64(remainingMinutes), int64(remainingSeconds))
-	}
-	remainingHours := math.Mod(duration.Hours(), 24)
-	remainingMinutes := math.Mod(duration.Minutes(), 60)
-	remainingSeconds := math.Mod(duration.Seconds(), 60)
-	return fmt.Sprintf("%d days %d hours %d minutes %d seconds",
-		int64(duration.Hours()/24), int64(remainingHours),
-		int64(remainingMinutes), int64(remainingSeconds))
-}
-
-func (MiscUtils) FormatDurationShort(duration time.Duration) string {
-	if duration.Seconds() < 60.0 {
-		return fmt.Sprintf("%ds", int64(duration.Seconds()))
-	}
-	if duration.Minutes() < 60.0 {
-		remainingSeconds := math.Mod(duration.Seconds(), 60)
-		return fmt.Sprintf("%dm %ds", int64(duration.Minutes()), int64(remainingSeconds))
-	}
-	if duration.Hours() < 24.0 {
-		remainingMinutes := math.Mod(duration.Minutes(), 60)
-		remainingSeconds := math.Mod(duration.Seconds(), 60)
-		return fmt.Sprintf("%dh %dm %ds",
-			int64(duration.Hours()), int64(remainingMinutes), int64(remainingSeconds))
-	}
-	remainingHours := math.Mod(duration.Hours(), 24)
-	remainingMinutes := math.Mod(duration.Minutes(), 60)
-	remainingSeconds := math.Mod(duration.Seconds(), 60)
-	return fmt.Sprintf("%dd %dh %dm %ds",
-		int64(duration.Hours()/24), int64(remainingHours),
-		int64(remainingMinutes), int64(remainingSeconds))
 }
 
 func (MiscUtils) HexToRGB(hex string) (int, int, int, error) {

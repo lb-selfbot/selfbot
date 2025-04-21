@@ -7,10 +7,10 @@ import (
 	"github.com/agnivade/levenshtein"
 	"github.com/lb-selfbot/discordgo"
 	"github.com/lb-selfbot/selfbot/internal/fn"
+	"github.com/lb-selfbot/selfbot/internal/formatting"
 	"github.com/lb-selfbot/selfbot/internal/services"
 	"github.com/lb-selfbot/selfbot/internal/services/router"
 	"github.com/lb-selfbot/selfbot/internal/services/slashcommand"
-	"github.com/lb-selfbot/selfbot/internal/utils"
 )
 
 type SlashCommands struct {
@@ -253,13 +253,13 @@ func (c *SlashCommands) listSlashCommand(ctx *router.Ctx) {
 			args = " " + args
 		}
 
-		paused := utils.Misc.FormatBoolYesNo(job.Paused)
-		running := utils.Misc.FormatBoolYesNo(isRunning)
+		paused := formatting.BoolYesNo(job.Paused)
+		running := formatting.BoolYesNo(isRunning)
 
 		text := fmt.Sprintf("Command: `/%s%s` (%s)\n", cmd.Name, args, cmd.ID)
 		text += fmt.Sprintf("Channel: #%s (%s)\n", channel.Name, channel.ID)
 		text += fmt.Sprintf("Server: %s (%s)\n", guild.Name, guild.ID)
-		text += fmt.Sprintf("Interval: %s\n", utils.Misc.FormatDuration(job.Interval))
+		text += fmt.Sprintf("Interval: %s\n", formatting.DurationLong(job.Interval))
 		text += fmt.Sprintf("Paused: %s | Is Running: %s\n", paused, running)
 
 		emb.AddField("Name: "+job.Name, text)
@@ -295,10 +295,10 @@ func (c *SlashCommands) getscjob(ctx *router.Ctx) {
 		AddField("Command", fmt.Sprintf("`/%s%s` (%s)", cmd.Name, args, cmd.ID)).
 		AddField("Channel", fmt.Sprintf("#%s (%s)", channel.Name, channel.ID)).
 		AddField("Server", fmt.Sprintf("%s (%s)", guild.Name, guild.ID)).
-		AddField("Interval", utils.Misc.FormatDuration(job.Interval)).
-		AddField("Paused", utils.Misc.FormatBoolYesNo(job.Paused)).
-		AddField("Job handler is running", utils.Misc.FormatBoolYesNo(isRunning)).
-		AddField("Time until next interaction", utils.Misc.FormatDuration(timeUntilNext)).
+		AddField("Interval", formatting.DurationLong(job.Interval)).
+		AddField("Paused", formatting.BoolYesNo(job.Paused)).
+		AddField("Job handler is running", formatting.BoolYesNo(isRunning)).
+		AddField("Time until next interaction", formatting.DurationLong(timeUntilNext)).
 		Send()
 }
 
@@ -578,7 +578,7 @@ func (c *SlashCommands) setscjobinterval(ctx *router.Ctx) {
 	c.services.Embed.New(ctx).
 		SetDescription("Successfully updated slash command job").
 		AddField("Job Name", job.Name).
-		AddField("Interval", utils.Misc.FormatDuration(job.Interval)).
+		AddField("Interval", formatting.DurationLong(job.Interval)).
 		Send()
 }
 
@@ -607,6 +607,6 @@ func (c *SlashCommands) setscjobpaused(ctx *router.Ctx) {
 	c.services.Embed.New(ctx).
 		SetDescription("Successfully updated slash command job").
 		AddField("Job Name", job.Name).
-		AddField("Paused", utils.Misc.FormatBoolOnOff(job.Paused)).
+		AddField("Paused", formatting.BoolOnOff(job.Paused)).
 		Send()
 }

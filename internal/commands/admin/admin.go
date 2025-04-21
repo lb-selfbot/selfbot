@@ -586,7 +586,7 @@ func (c *AdminCommands) channelinfo(ctx *router.Ctx) {
 		AddField("ID", channel.ID).
 		AddField("Topic", channel.Topic).
 		AddField("Category ID", channel.ParentID).
-		AddField("Is NSFW", utils.Misc.FormatBoolYesNo(channel.NSFW)).
+		AddField("Is NSFW", formatting.BoolYesNo(channel.NSFW)).
 		AddField("Created At", discordgo.MustSnowflakeTimestamp(channel.ID).Format(time.RFC1123)).
 		AddField("Slowmode Delay", fmt.Sprint(channel.RateLimitPerUser)+" seconds").
 		AddField("Position", fmt.Sprint(channel.Position)).
@@ -1186,7 +1186,7 @@ func (c *AdminCommands) userinfo(ctx *router.Ctx) {
 		emb.AddField("Banner Color", fmt.Sprintf("#%x", user.AccentColor))
 	}
 
-	emb.AddField("Is Bot", utils.Misc.FormatBoolYesNo(user.Bot)).
+	emb.AddField("Is Bot", formatting.BoolYesNo(user.Bot)).
 		AddField("Created At", discordgo.MustSnowflakeTimestamp(user.ID).Format(time.RFC1123)).
 		AddField("Premium Type", utils.Discord.FormatPremiumType(user.PremiumType))
 
@@ -1232,7 +1232,7 @@ func (c *AdminCommands) userage(ctx *router.Ctx) {
 	age := time.Since(discordgo.MustSnowflakeTimestamp(user.ID))
 	c.services.Embed.New(ctx).
 		SetDescription("User Age (%s - %s)", user.String(), user.ID).
-		AddField("Age", utils.Misc.FormatDuration(age)).
+		AddField("Age", formatting.DurationLong(age)).
 		Send()
 }
 
@@ -1632,7 +1632,7 @@ func (c *AdminCommands) serverage(ctx *router.Ctx) {
 	age := time.Since(discordgo.MustSnowflakeTimestamp(guild.ID))
 	c.services.Embed.New(ctx).
 		SetDescription("Server Age (%s - %s)", guild.Name, guild.ID).
-		AddField("Age", utils.Misc.FormatDuration(age)).
+		AddField("Age", formatting.DurationLong(age)).
 		Send()
 }
 
@@ -1862,13 +1862,13 @@ func (c *AdminCommands) channels(ctx *router.Ctx) {
 
 	emb := c.services.Embed.New(ctx).SetDescription("Server Channels - %s", guild.Name)
 	categoryData := discordgo.MapCategories(guild.Channels)
-	
+
 	for _, category := range categoryData {
 		emb.AddField("Category: "+category.GetCategoryName(), strings.Join(fn.Map(category.Channels, func(channel *discordgo.Channel) string {
 			return fmt.Sprintf("  %s (ID: %s)", channel.Name, channel.ID)
 		}), "\n"))
 	}
-	
+
 	emb.Send()
 }
 
@@ -2210,8 +2210,8 @@ func (c *AdminCommands) roleinfo(ctx *router.Ctx) {
 		AddField("Color", fmt.Sprintf("#%x", role.Color)).
 		AddField("Created at", formatting.Timestamp(createdAt)).
 		AddField("Position", fmt.Sprint(role.Position)).
-		AddField("Is Hoist", utils.Misc.FormatBoolYesNo(role.Hoist)).
-		AddField("Is Mentionable", utils.Misc.FormatBoolYesNo(role.Mentionable)).
+		AddField("Is Hoist", formatting.BoolYesNo(role.Hoist)).
+		AddField("Is Mentionable", formatting.BoolYesNo(role.Mentionable)).
 		AddField("Members With Role", fmt.Sprint(memberCount)).
 		AddField("Permissions", perms).
 		Send()

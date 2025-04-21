@@ -18,6 +18,7 @@ import (
 
 	"github.com/lb-selfbot/go-jester"
 	"github.com/lb-selfbot/selfbot/internal/fn"
+	"github.com/lb-selfbot/selfbot/internal/formatting"
 	"github.com/lb-selfbot/selfbot/internal/logging"
 	"github.com/lb-selfbot/selfbot/internal/services/config"
 	"github.com/lb-selfbot/selfbot/internal/services/eventbroker"
@@ -311,7 +312,7 @@ func (s *Snipers) giveawaySniperSleepDuration(cfg *config.Config, endTime *time.
 		untilEnd := float64(time.Until(*endTime))
 		sleep = time.Duration(untilEnd * (0.2 + 0.5*rand.Float64()))
 
-		s.eventBroker.Publish(eventbroker.EventLogInfo, "Giveaway ends in less than the sleep duration, sleeping for "+utils.Misc.FormatDuration(sleep)+" instead.")
+		s.eventBroker.Publish(eventbroker.EventLogInfo, "Giveaway ends in less than the sleep duration, sleeping for "+formatting.DurationLong(sleep)+" instead.")
 	}
 
 	return sleep
@@ -441,7 +442,7 @@ func (s *Snipers) CheckGiveawaySniper(session *discordgo.Session, m *discordgo.M
 		// Parse UNIX timestamp
 		endsUnix, _ := strconv.ParseInt(ends, 10, 64)
 		endsTime := time.Unix(endsUnix, 0)
-		endsFormat := utils.Misc.FormatDuration(time.Until(endsTime))
+		endsFormat := formatting.DurationLong(time.Until(endsTime))
 
 		// If the ends time is zero, the message is not a giveaway
 		if endsUnix == 0 {
@@ -504,7 +505,7 @@ func (s *Snipers) CheckGiveawaySniper(session *discordgo.Session, m *discordgo.M
 		}
 
 		hostID := hostMatches[1]
-		endsFormat := utils.Misc.FormatDuration(time.Until(endsTime))
+		endsFormat := formatting.DurationLong(time.Until(endsTime))
 
 		s.eventBroker.Publish(eventbroker.EventLogFeature, &featurelogs.GiveawaySniperFound{
 			Message: m.Message,
@@ -571,7 +572,7 @@ func (s *Snipers) CheckGiveawaySniper(session *discordgo.Session, m *discordgo.M
 			break
 		}
 
-		endsFormat := utils.Misc.FormatDuration(time.Until(endsTime))
+		endsFormat := formatting.DurationLong(time.Until(endsTime))
 
 		s.eventBroker.Publish(eventbroker.EventLogFeature, &featurelogs.GiveawaySniperFound{
 			Message: m.Message,
@@ -628,7 +629,7 @@ func (s *Snipers) CheckGiveawaySniper(session *discordgo.Session, m *discordgo.M
 		// Parse UNIX timestamp
 		endsUnix, _ := strconv.ParseInt(endsMatches[1], 10, 64)
 		endsTime := time.Unix(endsUnix, 0)
-		endsFormat := utils.Misc.FormatDuration(time.Until(endsTime))
+		endsFormat := formatting.DurationLong(time.Until(endsTime))
 
 		s.eventBroker.Publish(eventbroker.EventLogFeature, &featurelogs.GiveawaySniperFound{
 			Message: m.Message,
@@ -693,7 +694,7 @@ func (s *Snipers) CheckGiveawaySniper(session *discordgo.Session, m *discordgo.M
 		// Parse UNIX timestamp
 		endsUnix, _ := strconv.ParseInt(ends, 10, 64)
 		endsTime := time.Unix(endsUnix, 0)
-		endsFormat := utils.Misc.FormatDuration(time.Until(endsTime))
+		endsFormat := formatting.DurationLong(time.Until(endsTime))
 
 		s.eventBroker.Publish(eventbroker.EventLogFeature, &featurelogs.GiveawaySniperFound{
 			Message: m.Message,
@@ -743,7 +744,7 @@ func (s *Snipers) CheckGiveawaySniper(session *discordgo.Session, m *discordgo.M
 		// Parse UNIX timestamp
 		endsUnix, _ := strconv.ParseInt(ends, 10, 64)
 		endsTime := time.Unix(endsUnix, 0)
-		endsFormat := utils.Misc.FormatDuration(time.Until(endsTime))
+		endsFormat := formatting.DurationLong(time.Until(endsTime))
 
 		s.eventBroker.Publish(eventbroker.EventLogFeature, &featurelogs.GiveawaySniperFound{
 			Message: m.Message,
@@ -812,7 +813,7 @@ func (s *Snipers) CheckGiveawaySniper(session *discordgo.Session, m *discordgo.M
 			endsTime, err := time.ParseInLocation("Ends on Mon _2 Jan 2006 at 15:04", timeButton.Label, timezone)
 			if err == nil {
 				giveawayEnd = &endsTime
-				endsIn = utils.Misc.FormatDuration(time.Until(endsTime))
+				endsIn = formatting.DurationLong(time.Until(endsTime))
 			}
 		}
 
@@ -882,7 +883,7 @@ func (s *Snipers) CheckGiveawaySniper(session *discordgo.Session, m *discordgo.M
 		// Parse UNIX timestamp
 		endsUnix, _ := strconv.ParseInt(ends, 10, 64)
 		endsTime := time.Unix(endsUnix, 0)
-		endsFormat := utils.Misc.FormatDuration(time.Until(endsTime))
+		endsFormat := formatting.DurationLong(time.Until(endsTime))
 
 		s.eventBroker.Publish(eventbroker.EventLogFeature, &featurelogs.GiveawaySniperFound{
 			Message: m.Message,
@@ -946,7 +947,7 @@ func (s *Snipers) CheckGiveawaySniper(session *discordgo.Session, m *discordgo.M
 		// Parse UNIX timestamp
 		endsUnix, _ := strconv.ParseInt(ends, 10, 64)
 		endsTime := time.Unix(endsUnix, 0)
-		endsFormat := utils.Misc.FormatDuration(time.Until(endsTime))
+		endsFormat := formatting.DurationLong(time.Until(endsTime))
 
 		s.eventBroker.Publish(eventbroker.EventLogFeature, &featurelogs.GiveawaySniperFound{
 			Message: m.Message,
@@ -1009,7 +1010,7 @@ func (s *Snipers) CheckGiveawaySniper(session *discordgo.Session, m *discordgo.M
 		// Parse UNIX timestamp
 		endsUnix, _ := strconv.ParseInt(ends, 10, 64)
 		endsTime := time.Unix(endsUnix, 0)
-		endsFormat := utils.Misc.FormatDuration(time.Until(endsTime))
+		endsFormat := formatting.DurationLong(time.Until(endsTime))
 
 		s.eventBroker.Publish(eventbroker.EventLogFeature, &featurelogs.GiveawaySniperFound{
 			Message: m.Message,
@@ -1064,7 +1065,7 @@ func (s *Snipers) CheckGiveawaySniper(session *discordgo.Session, m *discordgo.M
 			endsUnix, _ := strconv.ParseInt(endsMatches[1], 10, 64)
 			endsTime := time.Unix(endsUnix, 0)
 			giveawayEnd = &endsTime
-			endsIn = utils.Misc.FormatDuration(time.Until(endsTime))
+			endsIn = formatting.DurationLong(time.Until(endsTime))
 		}
 
 		s.eventBroker.Publish(eventbroker.EventLogFeature, &featurelogs.GiveawaySniperFound{

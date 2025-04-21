@@ -10,6 +10,7 @@ import (
 	owoifygo "github.com/deadshot465/owoify-go"
 	"github.com/lb-selfbot/discordgo"
 	"github.com/lb-selfbot/selfbot/internal/api"
+	"github.com/lb-selfbot/selfbot/internal/formatting"
 	"github.com/lb-selfbot/selfbot/internal/http"
 	"github.com/lb-selfbot/selfbot/internal/random"
 	"github.com/lb-selfbot/selfbot/internal/services/router"
@@ -1380,7 +1381,7 @@ func (c *FunCommands) iseven(ctx *router.Ctx) {
 
 	c.services.Embed.New(ctx).
 		AddField("Number", ctx.Arguments.Get(0).Raw()).
-		AddField("Is Even", utils.Misc.FormatBoolYesNo(number%2 == 0)).
+		AddField("Is Even", formatting.BoolYesNo(number%2 == 0)).
 		Send()
 }
 

@@ -9,6 +9,7 @@ import (
 	"github.com/goccy/go-json"
 
 	"github.com/lb-selfbot/selfbot/internal/api"
+	"github.com/lb-selfbot/selfbot/internal/formatting"
 	"github.com/lb-selfbot/selfbot/internal/logging"
 	"github.com/lb-selfbot/selfbot/internal/services/config"
 	"github.com/lb-selfbot/selfbot/internal/services/router"
@@ -18,7 +19,6 @@ import (
 	"github.com/lb-selfbot/selfbot/internal/http"
 
 	"github.com/lb-selfbot/selfbot/internal/services"
-	"github.com/lb-selfbot/selfbot/internal/utils"
 	"google.golang.org/protobuf/types/known/wrapperspb"
 )
 
@@ -806,7 +806,7 @@ func (c *ActivityCommands) setactivityjson(ctx *router.Ctx) {
 func (c *ActivityCommands) getCAEnabled(ctx *router.Ctx) {
 	cfg := c.services.Config.GetConfig()
 
-	c.services.Embed.RespondField(ctx, "Custom Activity", utils.Misc.FormatBoolOnOff(cfg.Activity.Enabled))
+	c.services.Embed.RespondField(ctx, "Custom Activity", formatting.BoolOnOff(cfg.Activity.Enabled))
 }
 
 func (c *ActivityCommands) setCAEnabled(ctx *router.Ctx) {
@@ -821,7 +821,7 @@ func (c *ActivityCommands) setCAEnabled(ctx *router.Ctx) {
 	cfg.Activity.Enabled = toggle
 	_ = c.services.Config.SaveConfig(cfg)
 
-	c.services.Embed.Respond(ctx, "%s", "Turned "+utils.Misc.FormatBoolOnOff(toggle)+" Custom Activity")
+	c.services.Embed.Respond(ctx, "%s", "Turned "+formatting.BoolOnOff(toggle)+" Custom Activity")
 }
 
 func (c *ActivityCommands) toggleCAEnabled(ctx *router.Ctx) {
@@ -830,13 +830,13 @@ func (c *ActivityCommands) toggleCAEnabled(ctx *router.Ctx) {
 	cfg.Activity.Enabled = !cfg.Activity.Enabled
 	_ = c.services.Config.SaveConfig(cfg)
 
-	c.services.Embed.Respond(ctx, "%s", "Turned "+utils.Misc.FormatBoolOnOff(cfg.Activity.Enabled)+" Custom Activity")
+	c.services.Embed.Respond(ctx, "%s", "Turned "+formatting.BoolOnOff(cfg.Activity.Enabled)+" Custom Activity")
 }
 
 func (c *ActivityCommands) getCAPauseForOther(ctx *router.Ctx) {
 	cfg := c.services.Config.GetConfig()
 
-	c.services.Embed.RespondField(ctx, "Pause Custom Activity for other Activity", utils.Misc.FormatBoolOnOff(cfg.Activity.PauseForOther))
+	c.services.Embed.RespondField(ctx, "Pause Custom Activity for other Activity", formatting.BoolOnOff(cfg.Activity.PauseForOther))
 }
 
 func (c *ActivityCommands) setCAPauseForOther(ctx *router.Ctx) {
@@ -851,7 +851,7 @@ func (c *ActivityCommands) setCAPauseForOther(ctx *router.Ctx) {
 	cfg.Activity.PauseForOther = toggle
 	_ = c.services.Config.SaveConfig(cfg)
 
-	c.services.Embed.Respond(ctx, "%s", "Turned "+utils.Misc.FormatBoolOnOff(toggle)+" Pause Custom Activity for other Activity")
+	c.services.Embed.Respond(ctx, "%s", "Turned "+formatting.BoolOnOff(toggle)+" Pause Custom Activity for other Activity")
 }
 
 func (c *ActivityCommands) toggleCAPauseForOther(ctx *router.Ctx) {
@@ -860,7 +860,7 @@ func (c *ActivityCommands) toggleCAPauseForOther(ctx *router.Ctx) {
 	cfg.Activity.PauseForOther = !cfg.Activity.PauseForOther
 	_ = c.services.Config.SaveConfig(cfg)
 
-	c.services.Embed.Respond(ctx, "%s", "Turned "+utils.Misc.FormatBoolOnOff(cfg.Activity.PauseForOther)+" Pause Custom Activity for other Activity")
+	c.services.Embed.Respond(ctx, "%s", "Turned "+formatting.BoolOnOff(cfg.Activity.PauseForOther)+" Pause Custom Activity for other Activity")
 }
 
 func (c *ActivityCommands) getCAConnectionType(ctx *router.Ctx) {
@@ -970,7 +970,7 @@ func (c *ActivityCommands) listCAPlatforms(ctx *router.Ctx) {
 func (c *ActivityCommands) getCAInvitable(ctx *router.Ctx) {
 	cfg := c.services.Config.GetConfig()
 
-	c.services.Embed.RespondField(ctx, "Custom Activity Invitable", utils.Misc.FormatBoolOnOff(cfg.Activity.Invitable))
+	c.services.Embed.RespondField(ctx, "Custom Activity Invitable", formatting.BoolOnOff(cfg.Activity.Invitable))
 }
 
 func (c *ActivityCommands) setCAInvitable(ctx *router.Ctx) {
@@ -985,7 +985,7 @@ func (c *ActivityCommands) setCAInvitable(ctx *router.Ctx) {
 	cfg.Activity.Invitable = toggle
 	_ = c.services.Config.SaveConfig(cfg)
 
-	c.services.Embed.Respond(ctx, "%s", "Turned "+utils.Misc.FormatBoolOnOff(toggle)+" Custom Activity Invitable")
+	c.services.Embed.Respond(ctx, "%s", "Turned "+formatting.BoolOnOff(toggle)+" Custom Activity Invitable")
 }
 
 func (c *ActivityCommands) toggleCAInvitable(ctx *router.Ctx) {
@@ -994,13 +994,13 @@ func (c *ActivityCommands) toggleCAInvitable(ctx *router.Ctx) {
 	cfg.Activity.Invitable = !cfg.Activity.Invitable
 	_ = c.services.Config.SaveConfig(cfg)
 
-	c.services.Embed.Respond(ctx, "%s", "Turned "+utils.Misc.FormatBoolOnOff(cfg.Activity.Invitable)+" Custom Activity Invitable")
+	c.services.Embed.Respond(ctx, "%s", "Turned "+formatting.BoolOnOff(cfg.Activity.Invitable)+" Custom Activity Invitable")
 }
 
 func (c *ActivityCommands) getCATime(ctx *router.Ctx) {
 	cfg := c.services.Config.GetConfig()
 
-	c.services.Embed.RespondField(ctx, "Custom Activity Time", utils.Misc.FormatBoolOnOff(cfg.Activity.Time))
+	c.services.Embed.RespondField(ctx, "Custom Activity Time", formatting.BoolOnOff(cfg.Activity.Time))
 }
 
 func (c *ActivityCommands) setCATime(ctx *router.Ctx) {
@@ -1015,7 +1015,7 @@ func (c *ActivityCommands) setCATime(ctx *router.Ctx) {
 	cfg.Activity.Time = toggle
 	_ = c.services.Config.SaveConfig(cfg)
 
-	c.services.Embed.Respond(ctx, "%s", "Turned "+utils.Misc.FormatBoolOnOff(toggle)+" Custom Activity Time")
+	c.services.Embed.Respond(ctx, "%s", "Turned "+formatting.BoolOnOff(toggle)+" Custom Activity Time")
 }
 
 func (c *ActivityCommands) toggleCATime(ctx *router.Ctx) {
@@ -1024,7 +1024,7 @@ func (c *ActivityCommands) toggleCATime(ctx *router.Ctx) {
 	cfg.Activity.Time = !cfg.Activity.Time
 	_ = c.services.Config.SaveConfig(cfg)
 
-	c.services.Embed.Respond(ctx, "%s", "Turned "+utils.Misc.FormatBoolOnOff(cfg.Activity.Time)+" Custom Activity Time")
+	c.services.Embed.Respond(ctx, "%s", "Turned "+formatting.BoolOnOff(cfg.Activity.Time)+" Custom Activity Time")
 }
 
 func (c *ActivityCommands) getCAName(ctx *router.Ctx) {

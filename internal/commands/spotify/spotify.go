@@ -7,10 +7,10 @@ import (
 
 	"github.com/lb-selfbot/discordgo"
 	"github.com/lb-selfbot/selfbot/internal/fn"
+	"github.com/lb-selfbot/selfbot/internal/formatting"
 	"github.com/lb-selfbot/selfbot/internal/services"
 	"github.com/lb-selfbot/selfbot/internal/services/router"
 	"github.com/lb-selfbot/selfbot/internal/services/spotify"
-	"github.com/lb-selfbot/selfbot/internal/utils"
 )
 
 type SpotifyCommands struct{ services *services.Services }
@@ -217,7 +217,7 @@ func (c *SpotifyCommands) splaying(ctx *router.Ctx) {
 	songArtists := c.services.Spotify.GetSongArtists(song)
 	songArtistsString := strings.Join(songArtists, ", ")
 	songReleaseDate := song.Get("album", "release_date").MustString("Unknown")
-	songExplicit := utils.Misc.FormatBoolYesNo(song.Get("explicit").MustBool(false))
+	songExplicit := formatting.BoolYesNo(song.Get("explicit").MustBool(false))
 	duration := int(song.Get("duration_ms").MustInt(0)) / 1000
 	songDuration := fmt.Sprintf("%d:%02d", duration/60, duration&60)
 	songUrl := song.Get("external_urls", "spotify").MustString("Unknown")
@@ -262,7 +262,7 @@ func (c *SpotifyCommands) sshuffle(ctx *router.Ctx) {
 		return
 	}
 
-	c.services.Embed.Respond(ctx, "Successfully turned shuffle %s.", utils.Misc.FormatBoolOnOff(toggle))
+	c.services.Embed.Respond(ctx, "Successfully turned shuffle %s.", formatting.BoolOnOff(toggle))
 }
 
 func (c *SpotifyCommands) srepeat(ctx *router.Ctx) {
@@ -305,7 +305,7 @@ func (c *SpotifyCommands) sdevices(ctx *router.Ctx) {
 			"**%s**\nType: %s\nActive: %s\nVolume: %d%%\n",
 			device.Get("name").MustString(),
 			device.Get("type").MustString(),
-			utils.Misc.FormatBoolYesNo(device.Get("is_active").MustBool(false)),
+			formatting.BoolYesNo(device.Get("is_active").MustBool(false)),
 			device.Get("volume_percent").MustInt(0),
 		))
 	}

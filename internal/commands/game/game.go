@@ -9,6 +9,7 @@ import (
 	"github.com/lb-selfbot/discordgo"
 	"github.com/lb-selfbot/go-jester"
 	"github.com/lb-selfbot/selfbot/internal/fn"
+	"github.com/lb-selfbot/selfbot/internal/formatting"
 	"github.com/lb-selfbot/selfbot/internal/http"
 	"github.com/lb-selfbot/selfbot/internal/random"
 	"github.com/lb-selfbot/selfbot/internal/services/router"
@@ -287,7 +288,7 @@ func (c *GameCommands) fncreatorcode(ctx *router.Ctx) {
 		AddField("Account Name", data.Get("account", "name").MustString("None")).
 		AddField("ID", data.Get("account", "id").MustString("None")).
 		AddField("Status", data.Get("status").MustString("None")).
-		AddField("Verified", utils.Misc.FormatBoolYesNo(data.Get("verified").MustBool())).
+		AddField("Verified", formatting.BoolYesNo(data.Get("verified").MustBool())).
 		Send()
 }
 

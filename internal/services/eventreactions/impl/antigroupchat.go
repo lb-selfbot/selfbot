@@ -4,8 +4,8 @@ import (
 	"fmt"
 
 	"github.com/lb-selfbot/discordgo"
+	"github.com/lb-selfbot/selfbot/internal/formatting"
 	"github.com/lb-selfbot/selfbot/internal/services/eventreactions/types"
-	"github.com/lb-selfbot/selfbot/internal/utils"
 )
 
 type AntiGroupChat struct {
@@ -28,7 +28,7 @@ func (a *AntiGroupChat) Type() types.EventReactionType {
 }
 
 func (a *AntiGroupChat) Description() string {
-	return fmt.Sprintf("Anti Group Chat (silent: %s)", utils.Misc.FormatBoolYesNo(a.Silent))
+	return fmt.Sprintf("Anti Group Chat (silent: %s)", formatting.BoolYesNo(a.Silent))
 }
 
 func (a *AntiGroupChat) Equals(other types.EventReaction) bool {

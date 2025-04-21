@@ -25,6 +25,7 @@ import (
 	"github.com/goccy/go-json"
 
 	"github.com/lb-selfbot/selfbot/internal/conversion"
+	"github.com/lb-selfbot/selfbot/internal/formatting"
 	"github.com/lb-selfbot/selfbot/internal/logging"
 	"github.com/lb-selfbot/selfbot/internal/network"
 	"github.com/lb-selfbot/selfbot/internal/random"
@@ -1642,10 +1643,10 @@ func (c *UtilityCommands) checktoken(ctx *router.Ctx) {
 		AddField("Banner Color", tokenData.Get("banner_color").MustString()).
 		AddField("Bio", tokenData.Get("bio").MustString()).
 		AddField("Locale", tokenData.Get("locale").MustString()).
-		AddField("NSFW Allowed", utils.Misc.FormatBoolYesNo(tokenData.Get("nsfw_allowed").MustBool())).
-		AddField("2FA Enabled", utils.Misc.FormatBoolYesNo(tokenData.Get("mfa_enabled").MustBool())).
+		AddField("NSFW Allowed", formatting.BoolYesNo(tokenData.Get("nsfw_allowed").MustBool())).
+		AddField("2FA Enabled", formatting.BoolYesNo(tokenData.Get("mfa_enabled").MustBool())).
 		AddField("Email", tokenData.Get("email").MustString()).
-		AddField("Verified", utils.Misc.FormatBoolYesNo(tokenData.Get("verified").MustBool())).
+		AddField("Verified", formatting.BoolYesNo(tokenData.Get("verified").MustBool())).
 		AddField("Phone", tokenData.Get("phone").MustString()).
 		Send()
 }
@@ -1714,7 +1715,7 @@ func (c *UtilityCommands) version(ctx *router.Ctx) {
 }
 
 func (c *UtilityCommands) uptime(ctx *router.Ctx) {
-	c.services.Embed.RespondField(ctx, "Uptime", utils.Misc.FormatDuration(time.Since(constants.START_TIME)))
+	c.services.Embed.RespondField(ctx, "Uptime", formatting.DurationLong(time.Since(constants.START_TIME)))
 }
 
 func (c *UtilityCommands) history(ctx *router.Ctx) {
@@ -1899,7 +1900,7 @@ func (c *UtilityCommands) listdestinations(ctx *router.Ctx) {
 	destinationsString := []string{}
 
 	for name, dest := range destinations.Destinations {
-		desc := fmt.Sprintf("`%s`  - Supports all file types: **%s**", name, utils.Misc.FormatBoolYesNo(dest.SupportsAllFiles()))
+		desc := fmt.Sprintf("`%s`  - Supports all file types: **%s**", name, formatting.BoolYesNo(dest.SupportsAllFiles()))
 
 		destinationsString = append(destinationsString, desc)
 	}
