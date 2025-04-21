@@ -1270,7 +1270,7 @@ func (c *UtilityCommands) firstmessage(ctx *router.Ctx) {
 		SetDescription("First Message").
 		AddField("Author", messages[0].Author.String()).
 		AddField("Message", messages[0].Content).
-		AddField("Jump URL", utils.Discord.GetMessageLink(messages[0])).
+		AddField("Jump URL", messages[0].GetLink()).
 		Send()
 }
 

@@ -112,6 +112,8 @@ github.com/lb-selfbot/discordgo v0.26.6-0.20250420141920-2e32aa7e1dd7 h1:7U3kaEz
 github.com/lb-selfbot/discordgo v0.26.6-0.20250420141920-2e32aa7e1dd7/go.mod h1:reBUc7rfEvw/ypVnUt3smnNqhYPaG/CZlfa0GCfV8EM=
 github.com/lb-selfbot/discordgo v0.26.6-0.20250420142018-08f9e836cfdc h1:JXighsl2VwPq0v+BHw+0JcLm7bF4c0GsH3oGbYir2Fg=
 github.com/lb-selfbot/discordgo v0.26.6-0.20250420142018-08f9e836cfdc/go.mod h1:reBUc7rfEvw/ypVnUt3smnNqhYPaG/CZlfa0GCfV8EM=
+github.com/lb-selfbot/discordgo v0.26.6-0.20250421075913-0875e9737a1e h1:ADh0TlFeMddNuxsoicREDs3KDrtvqKqDyjQugBCNUb8=
+github.com/lb-selfbot/discordgo v0.26.6-0.20250421075913-0875e9737a1e/go.mod h1:reBUc7rfEvw/ypVnUt3smnNqhYPaG/CZlfa0GCfV8EM=
 github.com/lb-selfbot/go-jester v0.3.0 h1:2mUIugNNahaQu7zxU9svSt23SeCHcyGbE6sFH9WCs1k=
 github.com/lb-selfbot/go-jester v0.3.0/go.mod h1:YW2wSFjT3CbWbFmfmS4/tm12kjJXyKxmNxF0nsHylPU=
 github.com/ledongthuc/pdf v0.0.0-20220302134840-0c2507a12d80 h1:6Yzfa6GP0rIo/kULo2bwGEkFvCePZ3qHDDTC3/J9Swo=

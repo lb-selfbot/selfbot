@@ -81,7 +81,7 @@ func (a *AFK) Data() map[string]any {
 func (a *AFK) GetAFKMessage(m *discordgo.Message, message string) string {
 	message = strings.ReplaceAll(message, "$USER", m.Author.Username)
 	message = strings.ReplaceAll(message, "$MENTION", m.Author.Mention())
-	message = strings.ReplaceAll(message, "$MSGLINK", utils.Discord.GetMessageLink(m))
+	message = strings.ReplaceAll(message, "$MSGLINK", m.GetLink())
 	message = strings.ReplaceAll(message, "$MSGCONTENT", m.ContentWithMentionsReplaced())
 	message = strings.ReplaceAll(message, "$AFKSINCE",
 		fmt.Sprintf("<t:%d:R>", a.lastActivity.Unix()))
@@ -101,7 +101,7 @@ func (a *AFK) Handler(session *discordgo.Session, event any) {
 
 	cfg := a.configSvc.GetConfig()
 
-	activatedOnPing := cfg.AFK.OnPing && utils.Discord.IsUserMentioned(message.Message, session.State.User.ID)
+	activatedOnPing := cfg.AFK.OnPing && message.Message.IsUserMentioned(session.State.User.ID)
 	activatedOnDM := cfg.AFK.OnDM && utils.Discord.IsDM(session, message.Message)
 
 	if !(activatedOnPing || activatedOnDM) {

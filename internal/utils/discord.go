@@ -13,7 +13,6 @@ import (
 	"time"
 
 	"github.com/lb-selfbot/discordgo"
-	"github.com/lb-selfbot/selfbot/internal/fn"
 	"github.com/lb-selfbot/selfbot/internal/http"
 )
 
@@ -478,10 +477,6 @@ func (DiscordUtils) FormatActivities(activities []*discordgo.Activity) string {
 	return strings.Join(formatted, "\n")
 }
 
-func (DiscordUtils) GetMessageLink(m *discordgo.Message) string {
-	return fmt.Sprintf("https://discord.com/channels/%s/%s/%s", Misc.Or(m.GuildID, "@me"), m.ChannelID, m.ID)
-}
-
 func (DiscordUtils) SaveAttachment(attachment *discordgo.MessageAttachment) (string, error) {
 	filename := IO.SanitizeFilename(attachment.ID + "-" + attachment.Filename)
 	filepath := path.Join(IO.GetMainFolder(), "Downloads", filename)
@@ -516,10 +511,6 @@ func (DiscordUtils) SaveAttachment(attachment *discordgo.MessageAttachment) (str
 	}
 
 	return filepath, nil
-}
-
-func (DiscordUtils) IsUserMentioned(message *discordgo.Message, userID string) bool {
-	return fn.Any(message.Mentions, func(mention *discordgo.User) bool { return mention.ID == userID })
 }
 
 var Discord = &DiscordUtils{}
