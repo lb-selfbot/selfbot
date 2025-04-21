@@ -99,18 +99,6 @@ func (c *EventReactionsCommands) Register() {
 			WithEventReactionClear(types.PingBan, "Clear all ping → ban reactions").
 			Build(c.services),
 
-		actioncommands.NewBuilder("pingmute", "Ping → Mute").
-			WithEventReactionToggle("Reply to pings by muting the user", "[channel/server id]", func(ctx *router.Ctx) (types.EventReaction, error) {
-				guild, channel, err := c.getGuildOrChannel(ctx, ctx.Arguments.Get(1))
-				if err != nil {
-					return nil, err
-				}
-				return impl.NewPingReaction(c.services.EventBroker, c.services.Config, types.PingMute, guild, channel), nil
-			}).
-			WithEventReactionList(types.PingMute, "List all ping → mute reactions").
-			WithEventReactionClear(types.PingMute, "Clear all ping → mute reactions").
-			Build(c.services),
-
 		actioncommands.NewBuilder("pingtimeout", "Ping → Timeout").
 			WithEventReactionToggle("Reply to pings by timing the user out", "[channel/server id]", func(ctx *router.Ctx) (types.EventReaction, error) {
 				guild, channel, err := c.getGuildOrChannel(ctx, ctx.Arguments.Get(1))

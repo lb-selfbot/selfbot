@@ -99,8 +99,6 @@ func (p *Ping) Description() string {
 		return "Ping → Kick" + location
 	case types.PingBan:
 		return "Ping → Ban" + location
-	case types.PingMute:
-		return "Ping → Mute" + location
 	case types.PingTimeout:
 		return "Ping → Timeout" + location
 	case types.PingInsult:
@@ -179,14 +177,6 @@ func (p *Ping) Handler(session *discordgo.Session, event any) {
 		_ = session.GuildMemberDeleteWithReason(message.GuildID, message.Author.ID, "Ping Kick Event Reaction")
 	case types.PingBan:
 		_ = session.GuildBanCreateWithReason(message.GuildID, message.Author.ID, "Ping Ban Event Reaction", 0)
-	case types.PingMute:
-		member, err := session.QueryMember(message.GuildID, message.Author.ID, false)
-		if err != nil {
-			return
-		}
-
-		_ = utils.Discord.MuteUser(session, member)
-	case types.PingTimeout:
 		member, err := session.QueryMember(message.GuildID, message.Author.ID, false)
 		if err != nil {
 			return

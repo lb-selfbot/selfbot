@@ -1,6 +1,7 @@
 package formatting
 
 import (
+	"fmt"
 	"strconv"
 	"strings"
 	"time"
@@ -98,4 +99,112 @@ func Permissions(permissions int64) string {
 	}
 
 	return builder.String()
+}
+
+// StatusEmoji formats the status of a user into a string with an emoji.
+func StatusEmoji(status discordgo.Status) string {
+	switch status {
+	case discordgo.StatusOnline:
+		return "`🟢` Online"
+	case discordgo.StatusIdle:
+		return "`🟡` Idle"
+	case discordgo.StatusDoNotDisturb:
+		return "`🔴` Do Not Disturb"
+	case discordgo.StatusInvisible:
+		return "`⚪` Invisible"
+	case discordgo.StatusOffline:
+		return "`⚪` Offline"
+	default:
+		return "`⚪` Unknown"
+	}
+}
+
+// ClientStatus formats the client status of a user into a string.
+func ClientStatus(clientStatus discordgo.ClientStatus) string {
+	return fmt.Sprintf(
+		"Desktop: %s\nMobile: %s\nWeb: %s\nConsole: %s\n",
+		StatusEmoji(clientStatus.Desktop),
+		StatusEmoji(clientStatus.Mobile),
+		StatusEmoji(clientStatus.Web),
+		StatusEmoji(clientStatus.Embedded),
+	)
+}
+
+var userFlagNames = map[discordgo.UserFlags]string{
+	discordgo.UserFlagDiscordEmployee:           "Discord Employee",
+	discordgo.UserFlagDiscordPartner:            "Discord Partner",
+	discordgo.UserFlagHypeSquadEvents:           "HypeSquad Events",
+	discordgo.UserFlagBugHunterLevel1:           "Bug Hunter Level 1",
+	discordgo.UserFlagHouseBravery:              "HypeSquad Bravery",
+	discordgo.UserFlagHouseBrilliance:           "HypeSquad Brilliance",
+	discordgo.UserFlagHouseBalance:              "HypeSquad Balance",
+	discordgo.UserFlagEarlySupporter:            "Early Supporter",
+	discordgo.UserFlagTeamUser:                  "Team User",
+	discordgo.UserFlagSystem:                    "System",
+	discordgo.UserFlagBugHunterLevel2:           "Bug Hunter Level 2",
+	discordgo.UserFlagVerifiedBot:               "Verified Bot",
+	discordgo.UserFlagVerifiedBotDeveloper:      "Verified Bot Developer",
+	discordgo.UserFlagDiscordCertifiedModerator: "Discord Certified Moderator",
+	discordgo.UserFlagBotHTTPInteractions:       "Bot HTTP Interactions",
+	discordgo.UserFlagActiveDeveloper:           "Active Developer",
+}
+
+func UserFlags(flags discordgo.UserFlags) string {
+	var formatted []string
+
+	for flag, name := range userFlagNames {
+		if flags&flag != 0 {
+			formatted = append(formatted, name)
+		}
+	}
+
+	return strings.Join(formatted, ", ")
+}
+
+func PremiumType(premium discordgo.UserPremiumType) string {
+	switch premium {
+	case discordgo.UserPremiumTypeNone:
+		return "None"
+	case discordgo.UserPremiumTypeNitroClassic:
+		return "Nitro Classic"
+	case discordgo.UserPremiumTypeNitro:
+		return "Nitro Boost"
+	case discordgo.UserPremiumTypeNitroBasic:
+		return "Nitro Basic"
+	default:
+		return "Unknown"
+	}
+}
+
+func Activities(activities []*discordgo.Activity) string {
+	var formatted []string
+
+	for _, activity := range activities {
+		var activityFormat string
+
+		switch activity.Type {
+		case discordgo.ActivityTypeGame:
+			activityFormat = fmt.Sprintf("Playing **%s**", activity.Name)
+		case discordgo.ActivityTypeStreaming:
+			activityFormat = fmt.Sprintf("Streaming **%s**", activity.Name)
+		case discordgo.ActivityTypeListening:
+			activityFormat = fmt.Sprintf("Listening to **%s**", activity.Name)
+		case discordgo.ActivityTypeWatching:
+			activityFormat = fmt.Sprintf("Watching **%s**", activity.Name)
+		case discordgo.ActivityTypeCustom:
+			activityFormat = fmt.Sprintf("Custom Status: **%s**", activity.State)
+		case discordgo.ActivityTypeCompeting:
+			activityFormat = fmt.Sprintf("Competing in **%s**", activity.Name)
+		default:
+			activityFormat = fmt.Sprintf("Unknown Activity: **%s**", activity.Name)
+		}
+
+		if activity.Details != "" {
+			activityFormat += fmt.Sprintf(" (%s)", activity.Details)
+		}
+
+		formatted = append(formatted, activityFormat)
+	}
+
+	return strings.Join(formatted, "\n")
 }

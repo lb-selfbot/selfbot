@@ -10,10 +10,11 @@ const (
 	IgnoreGuild EventReactionType = 1
 
 	// Ping reactions
-	PingPing       EventReactionType = 2
-	PingKick       EventReactionType = 3
-	PingBan        EventReactionType = 4
-	PingMute       EventReactionType = 5
+	PingPing EventReactionType = 2
+	PingKick EventReactionType = 3
+	PingBan  EventReactionType = 4
+	// DEPRECATED:
+	// PingMute       EventReactionType = 5
 	PingTimeout    EventReactionType = 6
 	PingInsult     EventReactionType = 7
 	PingReact      EventReactionType = 8

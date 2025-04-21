@@ -118,7 +118,7 @@ func (e *eventReactionsService) constructReaction(session *discordgo.Session, re
 	// Custom reactions
 	case types.IgnoreUser, types.IgnoreGuild:
 		r, err = impl.NewIgnoreFromData(session, reactionCfg.Data)
-	case types.PingPing, types.PingKick, types.PingBan, types.PingMute, types.PingTimeout, types.PingInsult, types.PingReact, types.PingResponse, types.PingAIResponse:
+	case types.PingPing, types.PingKick, types.PingBan, types.PingTimeout, types.PingInsult, types.PingReact, types.PingResponse, types.PingAIResponse:
 		r, err = impl.NewPingFromData(e.eventBroker, e.configSvc, session, reactionCfg.Type, reactionCfg.Data)
 	case types.MirrorGuild, types.MirrorChannel:
 		r, err = impl.NewMirrorFromData(e.eventBroker, session, reactionCfg.Data)

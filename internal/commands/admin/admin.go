@@ -263,20 +263,6 @@ func (c *AdminCommands) Register() {
 			Handler:     c.banner,
 		},
 		{
-			Name:        "mute",
-			Description: "Mute a user",
-			Arguments:   "<user>",
-			Flags:       []router.CommandFlag{router.CmdFlagDangerous, router.CmdFlagGuildOnly},
-			Handler:     c.mute,
-		},
-		{
-			Name:        "unmute",
-			Description: "Unmute a user",
-			Arguments:   "<user>",
-			Flags:       []router.CommandFlag{router.CmdFlagDangerous, router.CmdFlagGuildOnly},
-			Handler:     c.unmute,
-		},
-		{
 			Name:        "timeout",
 			Description: "Timeout a user",
 			Arguments:   "<user> <duration>",
@@ -1158,10 +1144,10 @@ func (c *AdminCommands) userinfo(ctx *router.Ctx) error {
 
 	emb.AddField("Is Bot", formatting.BoolYesNo(user.Bot)).
 		AddField("Created At", discordgo.MustSnowflakeTimestamp(user.ID).Format(time.RFC1123)).
-		AddField("Premium Type", utils.Discord.FormatPremiumType(user.PremiumType))
+		AddField("Premium Type", formatting.PremiumType(user.PremiumType))
 
-	if flags := utils.Discord.FormatUserFlags(user.PublicFlags); flags != "" {
-		emb.AddField("Flags", utils.Discord.FormatUserFlags(user.PublicFlags))
+	if flags := formatting.UserFlags(user.PublicFlags); flags != "" {
+		emb.AddField("Flags", formatting.UserFlags(user.PublicFlags))
 	}
 
 	if member != nil {
@@ -1181,11 +1167,11 @@ func (c *AdminCommands) userinfo(ctx *router.Ctx) error {
 			AddField("Roles", fmt.Sprintf("%d Roles:\n%s", len(member.Roles), strings.Join(roles, "\n")))
 
 		if p := member.Presence; p != nil {
-			emb.AddField("Status", utils.Discord.FormatStatusEmoji(p.Status)).
-				AddField("Platform", utils.Discord.FormatClientStatus(p.ClientStatus))
+			emb.AddField("Status", formatting.StatusEmoji(p.Status)).
+				AddField("Platform", formatting.ClientStatus(p.ClientStatus))
 
 			if len(p.Activities) > 0 {
-				emb.AddField("Activity", utils.Discord.FormatActivities(p.Activities))
+				emb.AddField("Activity", formatting.Activities(p.Activities))
 			}
 		}
 	}
@@ -1263,8 +1249,8 @@ func (c *AdminCommands) platform(ctx *router.Ctx) error {
 
 	c.services.Embed.New(ctx).
 		AddField("User", member.User.Username).
-		AddField("Status", utils.Discord.FormatStatusEmoji(member.Presence.Status)).
-		AddField("Platform", utils.Discord.FormatClientStatus(member.Presence.ClientStatus)).
+		AddField("Status", formatting.StatusEmoji(member.Presence.Status)).
+		AddField("Platform", formatting.ClientStatus(member.Presence.ClientStatus)).
 		Send()
 	return nil
 }
@@ -1289,63 +1275,6 @@ func (c *AdminCommands) banner(ctx *router.Ctx) error {
 		return fmt.Errorf("User has no banner")
 	}
 	return ctx.RespondText("%s", user.BannerURL(""))
-}
-
-func (c *AdminCommands) mute(ctx *router.Ctx) error {
-	member, err := ctx.Arguments.Get(0).Member()
-	if err != nil {
-		return fmt.Errorf("Could not find user")
-	}
-
-	if err := utils.Discord.MuteUser(ctx.Session, member); err != nil {
-		return fmt.Errorf("%s", utils.String.Capitalize(err.Error()))
-	}
-
-	c.services.Embed.Respond(ctx, "Successfully muted user!")
-	return nil
-}
-
-func (c *AdminCommands) unmute(ctx *router.Ctx) error {
-	member, err := ctx.Arguments.Get(0).Member()
-	if err != nil {
-		return fmt.Errorf("Could not find user")
-	}
-
-	roles, err := ctx.Session.GuildRoles(ctx.Message.GuildID)
-	if member == nil || err != nil {
-		return fmt.Errorf("Error unmuting user: %v", err)
-	}
-
-	for _, role := range roles {
-		if strings.ToLower(role.Name) != "muted" {
-			continue
-		}
-
-		if !slices.Contains(member.Roles, role.ID) {
-			return fmt.Errorf("User is already unmuted!")
-		}
-
-		for i, roleID := range member.Roles {
-			if roleID == role.ID {
-				member.Roles = append(member.Roles[:i], member.Roles[i+1:]...)
-				break
-			}
-		}
-
-		_, err = ctx.Session.GuildMemberEdit(ctx.Message.GuildID, member.User.ID, &discordgo.GuildMemberParams{
-			Roles: &member.Roles,
-		})
-		if err != nil {
-			return fmt.Errorf("Error unmuting user: %v", err)
-		}
-
-		c.services.Embed.New(ctx).
-			SetDescription("Successfully unmuted user!").
-			Send()
-
-		return nil
-	}
-	return fmt.Errorf("no muted role found")
 }
 
 func (c *AdminCommands) timeout(ctx *router.Ctx) error {
