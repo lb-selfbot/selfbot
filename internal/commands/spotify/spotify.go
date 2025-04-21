@@ -1,7 +1,6 @@
 package spotify
 
 import (
-	"errors"
 	"fmt"
 	"strings"
 
@@ -10,7 +9,6 @@ import (
 	"github.com/lb-selfbot/selfbot/internal/formatting"
 	"github.com/lb-selfbot/selfbot/internal/services"
 	"github.com/lb-selfbot/selfbot/internal/services/router"
-	"github.com/lb-selfbot/selfbot/internal/services/spotify"
 )
 
 type SpotifyCommands struct{ services *services.Services }
@@ -124,33 +122,9 @@ func (c *SpotifyCommands) Register() {
 	})
 }
 
-func (c *SpotifyCommands) handleErr(ctx *router.Ctx, err error) {
-	switch {
-	case errors.Is(err, spotify.ErrNotConnected):
-		ctx.RespondText("You need to connect your Spotify account to your Discord.")
-	case errors.Is(err, spotify.ErrNoCurrentlyPlaying):
-		ctx.RespondText("No song is currently playing on Spotify.")
-	case errors.Is(err, spotify.ErrInvalidVolume):
-		ctx.RespondText("Volume must be between 0 and 100.")
-	case errors.Is(err, spotify.ErrInvalidRepeatMode):
-		ctx.RespondText("Repeat mode must be `off`, `track`, or `context`.")
-	case errors.Is(err, spotify.ErrEmptyQuery):
-		ctx.RespondText("Query cannot be empty.")
-	case errors.Is(err, spotify.ErrNoSongsFound):
-		ctx.RespondText("No songs found for the given query.")
-	case errors.Is(err, spotify.ErrNegativePosition):
-		ctx.RespondText("Position cannot be negative.")
-	case errors.Is(err, spotify.ErrNoActiveDevice):
-		ctx.RespondText("No active device found. Please start Spotify on a device.")
-	default:
-		ctx.RespondText("A Spotify error has occurred: %v", err)
-	}
-}
-
 func (c *SpotifyCommands) spause(ctx *router.Ctx) error {
 	if err := c.services.Spotify.Pause(ctx.Session); err != nil {
-		c.handleErr(ctx, err)
-		return nil
+		return fmt.Errorf("A Spotify error has occurred: %v", err)
 	}
 
 	c.services.Embed.Respond(ctx, "Successfully paused Spotify music.")
@@ -159,8 +133,7 @@ func (c *SpotifyCommands) spause(ctx *router.Ctx) error {
 
 func (c *SpotifyCommands) sresume(ctx *router.Ctx) error {
 	if err := c.services.Spotify.Resume(ctx.Session); err != nil {
-		c.handleErr(ctx, err)
-		return nil
+		return fmt.Errorf("A Spotify error has occurred: %v", err)
 	}
 
 	c.services.Embed.Respond(ctx, "Successfully resumed Spotify music.")
@@ -169,8 +142,7 @@ func (c *SpotifyCommands) sresume(ctx *router.Ctx) error {
 
 func (c *SpotifyCommands) sprevious(ctx *router.Ctx) error {
 	if err := c.services.Spotify.Previous(ctx.Session); err != nil {
-		c.handleErr(ctx, err)
-		return nil
+		return fmt.Errorf("A Spotify error has occurred: %v", err)
 	}
 
 	c.services.Embed.Respond(ctx, "Successfully started playing the previous Spotify track.")
@@ -179,8 +151,7 @@ func (c *SpotifyCommands) sprevious(ctx *router.Ctx) error {
 
 func (c *SpotifyCommands) snext(ctx *router.Ctx) error {
 	if err := c.services.Spotify.Next(ctx.Session); err != nil {
-		c.handleErr(ctx, err)
-		return nil
+		return fmt.Errorf("A Spotify error has occurred: %v", err)
 	}
 
 	c.services.Embed.Respond(ctx, "Successfully started playing the next Spotify track.")
@@ -190,8 +161,7 @@ func (c *SpotifyCommands) snext(ctx *router.Ctx) error {
 func (c *SpotifyCommands) splay(ctx *router.Ctx) error {
 	track, err := c.services.Spotify.Play(ctx.Session, ctx.Arguments.Raw())
 	if err != nil {
-		c.handleErr(ctx, err)
-		return nil
+		return fmt.Errorf("A Spotify error has occurred: %v", err)
 	}
 
 	artists := c.services.Spotify.GetSongArtists(track)
@@ -203,8 +173,7 @@ func (c *SpotifyCommands) splay(ctx *router.Ctx) error {
 func (c *SpotifyCommands) squeue(ctx *router.Ctx) error {
 	track, err := c.services.Spotify.Queue(ctx.Session, ctx.Arguments.Raw())
 	if err != nil {
-		c.handleErr(ctx, err)
-		return nil
+		return fmt.Errorf("A Spotify error has occurred: %v", err)
 	}
 
 	artists := c.services.Spotify.GetSongArtists(track)
@@ -216,8 +185,7 @@ func (c *SpotifyCommands) squeue(ctx *router.Ctx) error {
 func (c *SpotifyCommands) splaying(ctx *router.Ctx) error {
 	song, err := c.services.Spotify.GetCurrentlyPlaying(ctx.Session)
 	if err != nil {
-		c.handleErr(ctx, err)
-		return nil
+		return fmt.Errorf("A Spotify error has occurred: %v", err)
 	}
 
 	songArtists := c.services.Spotify.GetSongArtists(song)
@@ -249,8 +217,7 @@ func (c *SpotifyCommands) svolume(ctx *router.Ctx) error {
 	}
 
 	if err := c.services.Spotify.SetVolume(ctx.Session, volume); err != nil {
-		c.handleErr(ctx, err)
-		return nil
+		return fmt.Errorf("A Spotify error has occurred: %v", err)
 	}
 
 	c.services.Embed.Respond(ctx, "Successfully set Spotify volume to %d%%", volume)
@@ -264,8 +231,7 @@ func (c *SpotifyCommands) sshuffle(ctx *router.Ctx) error {
 	}
 
 	if err := c.services.Spotify.SetShuffle(ctx.Session, toggle); err != nil {
-		c.handleErr(ctx, err)
-		return nil
+		return fmt.Errorf("A Spotify error has occurred: %v", err)
 	}
 
 	c.services.Embed.Respond(ctx, "Successfully turned shuffle %s.", formatting.BoolOnOff(toggle))
@@ -276,8 +242,7 @@ func (c *SpotifyCommands) srepeat(ctx *router.Ctx) error {
 	state := ctx.Arguments.Get(0).Raw()
 
 	if err := c.services.Spotify.SetRepeat(ctx.Session, state); err != nil {
-		c.handleErr(ctx, err)
-		return nil
+		return fmt.Errorf("A Spotify error has occurred: %v", err)
 	}
 
 	c.services.Embed.Respond(ctx, "Successfully set Spotify repeat mode to `%s`.", state)
@@ -291,8 +256,7 @@ func (c *SpotifyCommands) sseek(ctx *router.Ctx) error {
 	}
 
 	if err := c.services.Spotify.Seek(ctx.Session, timestamp); err != nil {
-		c.handleErr(ctx, err)
-		return nil
+		return fmt.Errorf("A Spotify error has occurred: %v", err)
 	}
 
 	c.services.Embed.Respond(ctx, "Successfully seeked to %s.", timestamp)
@@ -302,8 +266,7 @@ func (c *SpotifyCommands) sseek(ctx *router.Ctx) error {
 func (c *SpotifyCommands) sdevices(ctx *router.Ctx) error {
 	devices, err := c.services.Spotify.GetDevices(ctx.Session)
 	if err != nil {
-		c.handleErr(ctx, err)
-		return nil
+		return fmt.Errorf("A Spotify error has occurred: %v", err)
 	}
 
 	var deviceList []string
@@ -325,8 +288,7 @@ func (c *SpotifyCommands) sdevices(ctx *router.Ctx) error {
 func (c *SpotifyCommands) sprofile(ctx *router.Ctx) error {
 	profile, err := c.services.Spotify.GetProfile(ctx.Session)
 	if err != nil {
-		c.handleErr(ctx, err)
-		return nil
+		return fmt.Errorf("A Spotify error has occurred: %v", err)
 	}
 
 	c.services.Embed.New(ctx).
@@ -343,20 +305,17 @@ func (c *SpotifyCommands) sprofile(ctx *router.Ctx) error {
 func (c *SpotifyCommands) sbearertoken(ctx *router.Ctx) error {
 	token, err := c.services.Spotify.GetBearerToken(ctx.Session)
 	if err != nil {
-		c.handleErr(ctx, err)
-		return nil
+		return fmt.Errorf("A Spotify error has occurred: %v", err)
 	}
 
 	profile, err := c.services.Spotify.GetProfile(ctx.Session)
 	if err != nil {
-		c.handleErr(ctx, err)
-		return nil
+		return fmt.Errorf("A Spotify error has occurred: %v", err)
 	}
 
 	confirmed, err := c.services.Discord.ShowConfirmDialog(ctx.Message.ChannelID, "Please confirm you want to show your bearer token in this channel by removing the reaction.\n\nWarning: Your bearer token can be used to control your Spotify account.")
 	if err != nil {
-		c.handleErr(ctx, err)
-		return nil
+		return fmt.Errorf("Error while showing confirm dialog: %v", err)
 	}
 
 	if confirmed {

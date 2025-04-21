@@ -3,6 +3,7 @@ package spotify
 import (
 	"errors"
 	"fmt"
+	"net/url"
 	"time"
 
 	fhttp "github.com/bogdanfinn/fhttp"
@@ -17,7 +18,7 @@ var (
 	ErrNotConnected = errors.New("spotify is not connected to your discord account")
 
 	// ErrNoCurrentlyPlaying is returned when no song is currently playing
-	ErrNoCurrentlyPlaying = errors.New("no song currently playing on spotify")
+	ErrNoCurrentlyPlaying = errors.New("no song is currently playing on spotify")
 
 	// ErrInvalidVolume is returned when the volume is not between 0 and 100
 	ErrInvalidVolume = errors.New("volume must be between 0 and 100")
@@ -35,7 +36,7 @@ var (
 	ErrNegativePosition = errors.New("position cannot be negative")
 
 	// ErrNoActiveDevice is returned when there is no active device
-	ErrNoActiveDevice = errors.New("no active device found")
+	ErrNoActiveDevice = errors.New("no active device found. you must be listening to Spotify on a device")
 )
 
 // Service handles Spotify-related operations.
@@ -85,6 +86,7 @@ type Service interface {
 	// Play plays a track.
 	Play(session *discordgo.Session, query string) (*jester.Data, error)
 
+	// Queue queues a track.
 	Queue(session *discordgo.Session, query string) (*jester.Data, error)
 }
 
@@ -182,7 +184,7 @@ func (s *spotifyService) request(session *discordgo.Session, method, endpoint st
 			return nil, ErrNoActiveDevice
 		}
 
-		return nil, fmt.Errorf("failed to get data from Spotify API: %s", resp.Status)
+		return nil, fmt.Errorf("failed to get data from Spotify API: %s %v", endpoint, data.Interface())
 	}
 
 	return data, nil
@@ -270,7 +272,7 @@ func (s *spotifyService) SetRepeat(session *discordgo.Session, mode string) erro
 		return ErrInvalidRepeatMode
 	}
 
-	_, err := s.request(session, fhttp.MethodPut, fmt.Sprintf("/me/player/repeat?state=%s", mode))
+	_, err := s.request(session, fhttp.MethodPut, fmt.Sprintf("/me/player/repeat?state=%s", url.QueryEscape(mode)))
 	return err
 }
 
@@ -288,7 +290,7 @@ func (s *spotifyService) Search(session *discordgo.Session, query string) (*jest
 		return nil, ErrEmptyQuery
 	}
 
-	data, err := s.request(session, fhttp.MethodGet, fmt.Sprintf("/search?q=%s&type=track", query))
+	data, err := s.request(session, fhttp.MethodGet, fmt.Sprintf("/search?q=%s&type=track", url.QueryEscape(query)))
 	if err != nil {
 		return nil, err
 	}
@@ -325,7 +327,7 @@ func (s *spotifyService) Queue(session *discordgo.Session, query string) (*jeste
 	track := tracks.Get(0)
 	trackURI := track.Get("uri").MustString()
 
-	_, err = s.request(session, fhttp.MethodPost, fmt.Sprintf("/me/player/queue?uri=%s", trackURI))
+	_, err = s.request(session, fhttp.MethodPost, fmt.Sprintf("/me/player/queue?uri=%s", url.QueryEscape(trackURI)))
 	if err != nil {
 		return nil, err
 	}
