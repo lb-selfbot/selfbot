@@ -11,11 +11,11 @@ import (
 	"github.com/lb-selfbot/discordgo"
 	"github.com/lb-selfbot/go-jester"
 	"github.com/lb-selfbot/selfbot/internal/constants"
+	"github.com/lb-selfbot/selfbot/internal/fs"
 	"github.com/lb-selfbot/selfbot/internal/services/config"
 	"github.com/lb-selfbot/selfbot/internal/services/eventbroker"
 	"github.com/lb-selfbot/selfbot/internal/system"
 	"github.com/lb-selfbot/selfbot/internal/tui"
-	"github.com/lb-selfbot/selfbot/internal/utils"
 	"google.golang.org/protobuf/types/known/wrapperspb"
 )
 
@@ -152,7 +152,7 @@ func (d *discordService) discordgoLogger() func(int, int, string, ...any) {
 
 		msg = fmt.Sprintf("%s:%d %s: %s", file, line, name, msg)
 
-		logPath := filepath.Join(utils.IO.GetMainFolder(), "LB.log")
+		logPath := filepath.Join(fs.GetMainFolder(), "LB.log")
 		f, err := os.OpenFile(logPath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0o644)
 		if err != nil {
 			return

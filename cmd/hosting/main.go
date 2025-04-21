@@ -13,13 +13,12 @@ import (
 
 	"github.com/lb-selfbot/selfbot/internal/assets"
 	"github.com/lb-selfbot/selfbot/internal/constants"
+	"github.com/lb-selfbot/selfbot/internal/fs"
 	"github.com/lb-selfbot/selfbot/internal/logging"
 	"github.com/lb-selfbot/selfbot/internal/services"
 	"github.com/lb-selfbot/selfbot/internal/services/authsync"
 
 	"github.com/lb-selfbot/selfbot/internal/commands"
-
-	"github.com/lb-selfbot/selfbot/internal/utils"
 )
 
 func main() {
@@ -46,13 +45,13 @@ func main() {
 		os.Exit(1)
 	}
 
-	if err := utils.IO.CreateFolders(); err != nil {
+	if err := fs.CreateFolders(); err != nil {
 		services.UI.LogError("Error creating folders: " + err.Error())
 		return
 	}
 
 	// Initialize icon
-	err := assets.CopyFile(assets.AssetLogo, filepath.Join(utils.IO.GetMainFolder(), "Logo.png"))
+	err := assets.CopyFile(assets.AssetLogo, filepath.Join(fs.GetMainFolder(), "Logo.png"))
 	if err != nil {
 		logging.Error("Error copying icon file:", err)
 		return

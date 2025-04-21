@@ -9,8 +9,8 @@ import (
 
 	"github.com/lb-selfbot/discordgo"
 
+	"github.com/lb-selfbot/selfbot/internal/fs"
 	"github.com/lb-selfbot/selfbot/internal/services/eventbroker"
-	"github.com/lb-selfbot/selfbot/internal/utils"
 )
 
 // Service handles the loading and interop of extensions.
@@ -69,7 +69,7 @@ func (e *extensionsService) load(_ *discordgo.Session) {
 		time.Sleep(5 * time.Second)
 	}
 
-	dir := path.Join(utils.IO.GetMainFolder(), "Extensions")
+	dir := path.Join(fs.GetMainFolder(), "Extensions")
 	err := filepath.Walk(dir, func(path string, info os.FileInfo, err error) error {
 		// Recover from panics
 		defer func() {

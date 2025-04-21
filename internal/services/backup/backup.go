@@ -11,6 +11,7 @@ import (
 
 	"github.com/lb-selfbot/discordgo"
 	"github.com/lb-selfbot/discordgo/protos"
+	"github.com/lb-selfbot/selfbot/internal/fs"
 	"github.com/lb-selfbot/selfbot/internal/system"
 	"github.com/lb-selfbot/selfbot/internal/utils"
 )
@@ -136,8 +137,8 @@ func (b *backupService) SaveBackup(bType, bName string, data any) error {
 		bName = "-" + bName
 	}
 
-	fileName := utils.IO.SanitizeFilename(bType + bName + ".json")
-	filePath := filepath.FromSlash(path.Join(utils.IO.GetMainFolder(), "Backups", fileName))
+	fileName := fs.SanitizeFilename(bType + bName + ".json")
+	filePath := filepath.FromSlash(path.Join(fs.GetMainFolder(), "Backups", fileName))
 
 	err := os.MkdirAll(path.Dir(filePath), os.ModePerm)
 	if err != nil {
@@ -163,8 +164,8 @@ func (b *backupService) LoadBackup(bType, bName string, data any) error {
 		bName = "-" + bName
 	}
 
-	fileName := utils.IO.SanitizeFilename(bType + bName + ".json")
-	filePath := filepath.FromSlash(path.Join(utils.IO.GetMainFolder(), "Backups", fileName))
+	fileName := fs.SanitizeFilename(bType + bName + ".json")
+	filePath := filepath.FromSlash(path.Join(fs.GetMainFolder(), "Backups", fileName))
 
 	rawData, err := os.ReadFile(filePath)
 	if err != nil {

@@ -25,6 +25,7 @@ import (
 
 	"github.com/lb-selfbot/selfbot/internal/conversion"
 	"github.com/lb-selfbot/selfbot/internal/formatting"
+	"github.com/lb-selfbot/selfbot/internal/fs"
 	"github.com/lb-selfbot/selfbot/internal/logging"
 	"github.com/lb-selfbot/selfbot/internal/network"
 	"github.com/lb-selfbot/selfbot/internal/random"
@@ -1734,7 +1735,7 @@ func (c *UtilityCommands) cls(*router.Ctx) error {
 }
 
 func (c *UtilityCommands) openfolder(*router.Ctx) error {
-	return system.OpenURL(utils.IO.GetMainFolder())
+	return system.OpenURL(fs.GetMainFolder())
 }
 
 func (c *UtilityCommands) remote(ctx *router.Ctx) error {

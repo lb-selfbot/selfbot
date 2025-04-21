@@ -13,6 +13,7 @@ import (
 	"github.com/lb-selfbot/selfbot/internal/constants"
 	"github.com/lb-selfbot/selfbot/internal/encodings"
 	"github.com/lb-selfbot/selfbot/internal/fn"
+	"github.com/lb-selfbot/selfbot/internal/fs"
 	"github.com/lb-selfbot/selfbot/internal/random"
 	"github.com/lb-selfbot/selfbot/internal/services/router"
 
@@ -862,7 +863,7 @@ func (c *TextCommands) customanimationhelp(ctx *router.Ctx) error {
 	c.services.Embed.New(ctx).
 		AddField("Creating an animation", fmt.Sprintf(
 			"To create an animation, create a text file in %s. Every line in the file will be a frame of the animation.\n",
-			filepath.Join(utils.IO.GetMainFolder(), "Animations"),
+			filepath.Join(fs.GetMainFolder(), "Animations"),
 		)).
 		AddField("Using an animation", fmt.Sprintf(
 			"To use an animation, use the command `%scustomanimation <filename without .txt>`.\n",
@@ -873,7 +874,7 @@ func (c *TextCommands) customanimationhelp(ctx *router.Ctx) error {
 }
 
 func (c *TextCommands) customanimations(ctx *router.Ctx) error {
-	folder := filepath.Join(utils.IO.GetMainFolder(), "Animations")
+	folder := filepath.Join(fs.GetMainFolder(), "Animations")
 	_ = os.MkdirAll(folder, os.ModePerm)
 
 	customAnimString := ""
@@ -901,9 +902,9 @@ func (c *TextCommands) customanimations(ctx *router.Ctx) error {
 
 func (c *TextCommands) customanimation(ctx *router.Ctx) error {
 	name := ctx.Arguments.Get(0).Raw()
-	folder := filepath.Join(utils.IO.GetMainFolder(), "Animations")
+	folder := filepath.Join(fs.GetMainFolder(), "Animations")
 	_ = os.MkdirAll(folder, os.ModePerm)
-	path := filepath.Join(folder, utils.IO.SanitizeFilename(name+".txt"))
+	path := filepath.Join(folder, fs.SanitizeFilename(name+".txt"))
 	if _, err := os.Stat(path); os.IsNotExist(err) {
 		return fmt.Errorf("Animation does not exist.")
 	}

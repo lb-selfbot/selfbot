@@ -8,7 +8,7 @@ import (
 
 	"github.com/goccy/go-json"
 	"github.com/lb-selfbot/selfbot/internal/assets"
-	"github.com/lb-selfbot/selfbot/internal/utils"
+	"github.com/lb-selfbot/selfbot/internal/fs"
 )
 
 // Service is the interface for the config service.
@@ -54,7 +54,7 @@ func (c *configService) LoadConfig() error {
 	c.configMu.Lock()
 	defer c.configMu.Unlock()
 
-	cfgFile, err := os.Open(filepath.Join(utils.IO.GetMainFolder(), "Config", "config.json"))
+	cfgFile, err := os.Open(filepath.Join(fs.GetMainFolder(), "Config", "config.json"))
 	if err != nil {
 		if os.IsNotExist(err) {
 			c.configDate = time.Now()
@@ -81,7 +81,7 @@ func (c *configService) SaveConfig(cfg *Config) error {
 	c.configMu.Lock()
 	defer c.configMu.Unlock()
 
-	cfgFile, err := os.OpenFile(filepath.Join(utils.IO.GetMainFolder(), "Config", "config.json"), os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0o644)
+	cfgFile, err := os.OpenFile(filepath.Join(fs.GetMainFolder(), "Config", "config.json"), os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0o644)
 	if err != nil {
 		return err
 	}

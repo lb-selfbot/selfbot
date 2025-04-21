@@ -13,6 +13,7 @@ import (
 	"github.com/lb-selfbot/selfbot/internal/constants"
 	"github.com/lb-selfbot/selfbot/internal/embed"
 	"github.com/lb-selfbot/selfbot/internal/fn"
+	"github.com/lb-selfbot/selfbot/internal/fs"
 	"github.com/lb-selfbot/selfbot/internal/services/config"
 	"github.com/lb-selfbot/selfbot/internal/services/discord"
 	"github.com/lb-selfbot/selfbot/internal/services/eventbroker"
@@ -103,7 +104,7 @@ func (ui *uiService) ShowNotification(format string, e ...any) error {
 		"LightningBot",
 		fmt.Sprintf(format, e...),
 		"LightningBot",
-		filepath.Join(utils.IO.GetMainFolder(), "Logo.png"),
+		filepath.Join(fs.GetMainFolder(), "Logo.png"),
 	)
 
 	return nil

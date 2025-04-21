@@ -14,8 +14,8 @@ import (
 
 	"github.com/lb-selfbot/go-jester"
 	"github.com/lb-selfbot/selfbot/internal/fn"
+	"github.com/lb-selfbot/selfbot/internal/fs"
 	"github.com/lb-selfbot/selfbot/internal/uploaders"
-	"github.com/lb-selfbot/selfbot/internal/utils"
 )
 
 var ErrSXCUFileDoesNotExist = fmt.Errorf("sxcu file does not exist! please put your sxcu file in LightningBot/uploader.sxcu")
@@ -57,7 +57,7 @@ func (SXCU) SupportsAllFiles() bool {
 }
 
 func (SXCU) getSXCU() (data *sxcuData, err error) {
-	filePath := path.Join(utils.IO.GetMainFolder(), "uploader.sxcu")
+	filePath := path.Join(fs.GetMainFolder(), "uploader.sxcu")
 
 	f, err := os.Open(filePath)
 	if err != nil {

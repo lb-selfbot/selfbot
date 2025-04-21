@@ -19,6 +19,7 @@ import (
 	"github.com/lb-selfbot/go-jester"
 	"github.com/lb-selfbot/selfbot/internal/fn"
 	"github.com/lb-selfbot/selfbot/internal/formatting"
+	"github.com/lb-selfbot/selfbot/internal/fs"
 	"github.com/lb-selfbot/selfbot/internal/logging"
 	"github.com/lb-selfbot/selfbot/internal/services/config"
 	"github.com/lb-selfbot/selfbot/internal/services/eventbroker"
@@ -267,8 +268,8 @@ func (s *Snipers) CheckPrivnoteSniper(session *discordgo.Session, m *discordgo.M
 		code = splitCode[len(splitCode)-1]
 
 		// Save note
-		fileName := utils.IO.SanitizeFilename("privnote-" + code + ".txt")
-		filePath := filepath.Join(utils.IO.GetMainFolder(), "Downloads", fileName)
+		fileName := fs.SanitizeFilename("privnote-" + code + ".txt")
+		filePath := filepath.Join(fs.GetMainFolder(), "Downloads", fileName)
 
 		err = os.WriteFile(filePath, []byte(note), os.ModePerm)
 		if err != nil {

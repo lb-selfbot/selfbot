@@ -18,6 +18,7 @@ import (
 	"github.com/lb-selfbot/selfbot/internal/assets"
 	"github.com/lb-selfbot/selfbot/internal/browser"
 	"github.com/lb-selfbot/selfbot/internal/commands"
+	"github.com/lb-selfbot/selfbot/internal/fs"
 	"github.com/lb-selfbot/selfbot/internal/services/authsync"
 
 	"github.com/lb-selfbot/selfbot/internal/constants"
@@ -29,7 +30,6 @@ import (
 	"github.com/lb-selfbot/discordgo"
 	"github.com/lb-selfbot/selfbot/internal/setup"
 	"github.com/lb-selfbot/selfbot/internal/system"
-	"github.com/lb-selfbot/selfbot/internal/utils"
 )
 
 var (
@@ -94,7 +94,7 @@ func checkForUpdates(services *services.Services) {
 }
 
 func checkFirstLaunch(services *services.Services) {
-	if !utils.IO.IsFirstLaunch() {
+	if !fs.IsFirstLaunch() {
 		return
 	}
 
@@ -190,7 +190,7 @@ func main() {
 		return
 
 	case *openFolder:
-		_ = system.OpenURL(utils.IO.GetMainFolder())
+		_ = system.OpenURL(fs.GetMainFolder())
 		return
 
 	case *runWebLogin:
@@ -232,13 +232,13 @@ func main() {
 		return
 	}
 
-	if err := utils.IO.CreateFolders(); err != nil {
+	if err := fs.CreateFolders(); err != nil {
 		services.UI.LogError("Error creating folders: " + err.Error())
 		return
 	}
 
 	// Initialize icon
-	err := assets.CopyFile(assets.AssetLogo, filepath.Join(utils.IO.GetMainFolder(), "Logo.png"))
+	err := assets.CopyFile(assets.AssetLogo, filepath.Join(fs.GetMainFolder(), "Logo.png"))
 	if err != nil {
 		logging.Error("Error copying icon file:", err)
 		return

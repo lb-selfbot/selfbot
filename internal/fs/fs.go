@@ -1,20 +1,17 @@
-package utils
+package fs
 
 import (
+	"encoding/json"
 	"os"
 	"path/filepath"
 	"slices"
 	"strings"
 
-	"github.com/goccy/go-json"
-
 	"github.com/lb-selfbot/selfbot/internal/constants"
 	"golang.org/x/text/unicode/norm"
 )
 
-type IOUtils struct{}
-
-func (*IOUtils) SanitizeFilename(filename string) string {
+func SanitizeFilename(filename string) string {
 	blacklist := []string{"\\", "/", ":", "*", "?", "\"", "<", ">", "|", "\x00"}
 	reserved := []string{
 		"CON", "PRN", "AUX", "NUL", "COM1", "COM2", "COM3", "COM4", "COM5",
@@ -50,7 +47,7 @@ func (*IOUtils) SanitizeFilename(filename string) string {
 	return filename
 }
 
-func (*IOUtils) GetMainFolder() string {
+func GetMainFolder() string {
 	var mainPath string
 	var err error
 
@@ -72,8 +69,8 @@ func (*IOUtils) GetMainFolder() string {
 	return filepath.Join(mainPath, "LightningBot")
 }
 
-func (*IOUtils) CreateFolders() error {
-	mainFolder := IO.GetMainFolder()
+func CreateFolders() error {
+	mainFolder := GetMainFolder()
 
 	folders := []string{
 		filepath.Join(mainFolder, "Config"),
@@ -103,8 +100,8 @@ func (*IOUtils) CreateFolders() error {
 	return nil
 }
 
-func (*IOUtils) IsFirstLaunch() bool {
-	configPath := filepath.Join(IO.GetMainFolder(), "Config", "config.json")
+func IsFirstLaunch() bool {
+	configPath := filepath.Join(GetMainFolder(), "Config", "config.json")
 
 	data, err := os.ReadFile(filepath.FromSlash(configPath))
 	if err != nil {
@@ -117,5 +114,3 @@ func (*IOUtils) IsFirstLaunch() bool {
 
 	return err != nil
 }
-
-var IO = &IOUtils{}

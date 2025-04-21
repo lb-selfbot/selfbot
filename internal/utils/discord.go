@@ -14,6 +14,7 @@ import (
 
 	"github.com/lb-selfbot/discordgo"
 	"github.com/lb-selfbot/selfbot/internal/formatting"
+	"github.com/lb-selfbot/selfbot/internal/fs"
 	"github.com/lb-selfbot/selfbot/internal/http"
 )
 
@@ -479,8 +480,8 @@ func (DiscordUtils) FormatActivities(activities []*discordgo.Activity) string {
 }
 
 func (DiscordUtils) SaveAttachment(attachment *discordgo.MessageAttachment) (string, error) {
-	filename := IO.SanitizeFilename(attachment.ID + "-" + attachment.Filename)
-	filepath := path.Join(IO.GetMainFolder(), "Downloads", filename)
+	filename := fs.SanitizeFilename(attachment.ID + "-" + attachment.Filename)
+	filepath := path.Join(fs.GetMainFolder(), "Downloads", filename)
 
 	var resp *nethttp.Response
 	var err error

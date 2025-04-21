@@ -9,6 +9,7 @@ import (
 
 	"github.com/lb-selfbot/discordgo"
 	"github.com/lb-selfbot/selfbot/internal/fn"
+	"github.com/lb-selfbot/selfbot/internal/fs"
 	"github.com/lb-selfbot/selfbot/internal/http"
 	"github.com/lb-selfbot/selfbot/internal/services/router"
 
@@ -111,7 +112,7 @@ func (c *DumpingCommands) Register() {
 
 // Helper: create folder relative to main folder, make dirs and open URL
 func (c *DumpingCommands) createAndOpenFolder(pathElements ...string) string {
-	parts := append([]string{utils.IO.GetMainFolder()}, pathElements...)
+	parts := append([]string{fs.GetMainFolder()}, pathElements...)
 	folder := filepath.Join(parts...)
 	_ = os.MkdirAll(folder, os.ModePerm)
 	_ = system.OpenURL(folder)
@@ -126,7 +127,7 @@ func (c *DumpingCommands) processAttachments(messages []*discordgo.Message, fold
 			if !filter(att) {
 				continue
 			}
-			fileName := utils.IO.SanitizeFilename(att.ID + "_" + att.Filename)
+			fileName := fs.SanitizeFilename(att.ID + "_" + att.Filename)
 			filePath := filepath.Join(folder, fileName)
 			resp, err := http.DefaultClient().Get(utils.Misc.Or(att.URL, att.ProxyURL))
 			if err != nil {
@@ -173,9 +174,9 @@ func (c *DumpingCommands) dumpall(ctx *router.Ctx) error {
 		)
 	}
 
-	folder := filepath.Join(utils.IO.GetMainFolder(), "Dumping", "All")
+	folder := filepath.Join(fs.GetMainFolder(), "Dumping", "All")
 	_ = os.MkdirAll(folder, os.ModePerm)
-	filePath := filepath.Join(folder, utils.IO.SanitizeFilename(channel.ID+"_"+channel.Name+".txt"))
+	filePath := filepath.Join(folder, fs.SanitizeFilename(channel.ID+"_"+channel.Name+".txt"))
 	_ = os.WriteFile(filePath, []byte(logString), os.ModePerm)
 	_ = system.OpenURL(filePath)
 
@@ -194,7 +195,7 @@ func (c *DumpingCommands) dumpimages(ctx *router.Ctx) error {
 		return fmt.Errorf("Error getting messages")
 	}
 
-	folder := c.createAndOpenFolder("Dumping", "Images", utils.IO.SanitizeFilename(channel.Name))
+	folder := c.createAndOpenFolder("Dumping", "Images", fs.SanitizeFilename(channel.Name))
 	images := c.processAttachments(messages, folder, func(att *discordgo.MessageAttachment) bool {
 		return strings.HasPrefix(att.ContentType, "image/")
 	})
@@ -214,7 +215,7 @@ func (c *DumpingCommands) dumpvideos(ctx *router.Ctx) error {
 		return fmt.Errorf("Error getting messages")
 	}
 
-	folder := c.createAndOpenFolder("Dumping", "Videos", utils.IO.SanitizeFilename(channel.Name))
+	folder := c.createAndOpenFolder("Dumping", "Videos", fs.SanitizeFilename(channel.Name))
 	videos := c.processAttachments(messages, folder, func(att *discordgo.MessageAttachment) bool {
 		return strings.HasPrefix(att.ContentType, "video/")
 	})
@@ -234,7 +235,7 @@ func (c *DumpingCommands) dumpaudio(ctx *router.Ctx) error {
 		return fmt.Errorf("Error getting messages")
 	}
 
-	folder := c.createAndOpenFolder("Dumping", "Audio", utils.IO.SanitizeFilename(channel.Name))
+	folder := c.createAndOpenFolder("Dumping", "Audio", fs.SanitizeFilename(channel.Name))
 	audios := c.processAttachments(messages, folder, func(att *discordgo.MessageAttachment) bool {
 		return strings.HasPrefix(att.ContentType, "audio/")
 	})
@@ -254,7 +255,7 @@ func (c *DumpingCommands) dumptext(ctx *router.Ctx) error {
 		return fmt.Errorf("Error getting messages")
 	}
 
-	folder := c.createAndOpenFolder("Dumping", "Text", utils.IO.SanitizeFilename(channel.Name))
+	folder := c.createAndOpenFolder("Dumping", "Text", fs.SanitizeFilename(channel.Name))
 	texts := c.processAttachments(messages, folder, func(att *discordgo.MessageAttachment) bool {
 		return strings.HasPrefix(att.ContentType, "text/")
 	})
@@ -274,7 +275,7 @@ func (c *DumpingCommands) dumpattachments(ctx *router.Ctx) error {
 		return fmt.Errorf("Error getting messages")
 	}
 
-	folder := c.createAndOpenFolder("Dumping", "Attachments", utils.IO.SanitizeFilename(channel.Name))
+	folder := c.createAndOpenFolder("Dumping", "Attachments", fs.SanitizeFilename(channel.Name))
 	attachments := c.processAttachments(messages, folder, func(att *discordgo.MessageAttachment) bool {
 		return true
 	})
@@ -296,7 +297,7 @@ func (c *DumpingCommands) dumpfiletype(ctx *router.Ctx) error {
 		return fmt.Errorf("Error getting messages")
 	}
 
-	folder := c.createAndOpenFolder("Dumping", utils.IO.SanitizeFilename("FileType-"+extension), utils.IO.SanitizeFilename(channel.Name))
+	folder := c.createAndOpenFolder("Dumping", fs.SanitizeFilename("FileType-"+extension), fs.SanitizeFilename(channel.Name))
 	count := c.processAttachments(messages, folder, func(att *discordgo.MessageAttachment) bool {
 		return strings.HasSuffix(att.Filename, extension)
 	})
@@ -318,7 +319,7 @@ func (c *DumpingCommands) dumpcontenttype(ctx *router.Ctx) error {
 		return fmt.Errorf("Error getting messages")
 	}
 
-	folder := c.createAndOpenFolder("Dumping", utils.IO.SanitizeFilename("ContentType-"+contentType), utils.IO.SanitizeFilename(channel.Name))
+	folder := c.createAndOpenFolder("Dumping", fs.SanitizeFilename("ContentType-"+contentType), fs.SanitizeFilename(channel.Name))
 	count := c.processAttachments(messages, folder, func(att *discordgo.MessageAttachment) bool {
 		return strings.Contains(att.ContentType, contentType)
 	})
@@ -338,7 +339,7 @@ func (c *DumpingCommands) dumpemojis(ctx *router.Ctx) error {
 		return fmt.Errorf("Error getting emojis: %v", err)
 	}
 
-	folder := c.createAndOpenFolder("Dumping", "Emojis", utils.IO.SanitizeFilename(guild.Name))
+	folder := c.createAndOpenFolder("Dumping", "Emojis", fs.SanitizeFilename(guild.Name))
 	for _, emoji := range emojis {
 		name := emoji.ID + "_" + emoji.Name
 		if emoji.Animated {
@@ -346,7 +347,7 @@ func (c *DumpingCommands) dumpemojis(ctx *router.Ctx) error {
 		} else {
 			name += ".png"
 		}
-		filePath := filepath.Join(folder, utils.IO.SanitizeFilename(name))
+		filePath := filepath.Join(folder, fs.SanitizeFilename(name))
 		resp, err := http.DefaultClient().Get(emoji.URL())
 		if err != nil {
 			continue
@@ -364,7 +365,7 @@ func (c *DumpingCommands) dumpstickers(ctx *router.Ctx) error {
 		return fmt.Errorf("could not get server: %v", err)
 	}
 
-	folder := c.createAndOpenFolder("Dumping", "Stickers", utils.IO.SanitizeFilename(guild.Name))
+	folder := c.createAndOpenFolder("Dumping", "Stickers", fs.SanitizeFilename(guild.Name))
 	for _, sticker := range guild.Stickers {
 		var format string
 		switch sticker.FormatType {
@@ -378,7 +379,7 @@ func (c *DumpingCommands) dumpstickers(ctx *router.Ctx) error {
 			format = ".gif"
 		}
 		fileName := fmt.Sprintf("%s_%s%s", sticker.ID, sticker.Name, format)
-		filePath := filepath.Join(folder, utils.IO.SanitizeFilename(fileName))
+		filePath := filepath.Join(folder, fs.SanitizeFilename(fileName))
 		resp, err := http.DefaultClient().Get(fmt.Sprintf("https://media.discordapp.net/stickers/%s%s", sticker.ID, format))
 		if err != nil {
 			continue
@@ -397,7 +398,7 @@ func (c *DumpingCommands) dumpavatars(ctx *router.Ctx) error {
 	}
 
 	ctx.Session.FetchGuildMembers(discordgo.NewFetchGuildMembersParams(guild.ID))
-	folder := c.createAndOpenFolder("Dumping", "Avatars", utils.IO.SanitizeFilename(guild.Name))
+	folder := c.createAndOpenFolder("Dumping", "Avatars", fs.SanitizeFilename(guild.Name))
 	for _, member := range guild.Members {
 		name := member.User.ID + "_" + member.User.String()
 		if strings.HasPrefix(member.Avatar, "a_") {
@@ -405,7 +406,7 @@ func (c *DumpingCommands) dumpavatars(ctx *router.Ctx) error {
 		} else {
 			name += ".png"
 		}
-		filePath := filepath.Join(folder, utils.IO.SanitizeFilename(name))
+		filePath := filepath.Join(folder, fs.SanitizeFilename(name))
 		resp, err := http.DefaultClient().Get(member.AvatarURL(""))
 		if err != nil {
 			continue
@@ -435,9 +436,9 @@ func (c *DumpingCommands) dumpchannels(ctx *router.Ctx) error {
 		return fmt.Sprintf("Category: %s\n%s", data.GetCategoryName(), strings.Join(channels, "\n"))
 	}), "\n\n")
 
-	folder := filepath.Join(utils.IO.GetMainFolder(), "Dumping", "Channels")
+	folder := filepath.Join(fs.GetMainFolder(), "Dumping", "Channels")
 	_ = os.MkdirAll(folder, os.ModePerm)
-	filePath := filepath.Join(folder, utils.IO.SanitizeFilename(guild.ID+"_"+guild.Name+".txt"))
+	filePath := filepath.Join(folder, fs.SanitizeFilename(guild.ID+"_"+guild.Name+".txt"))
 	_ = os.WriteFile(filePath, []byte(formattedData), os.ModePerm)
 	_ = system.OpenURL(filePath)
 
@@ -461,7 +462,7 @@ func (c *DumpingCommands) dumpmembers(ctx *router.Ctx) error {
 	}
 
 	folder := c.createAndOpenFolder("Dumping", "Members")
-	filePath := filepath.Join(folder, utils.IO.SanitizeFilename(guild.ID+"_"+guild.Name+".txt"))
+	filePath := filepath.Join(folder, fs.SanitizeFilename(guild.ID+"_"+guild.Name+".txt"))
 	_ = os.WriteFile(filePath, []byte(logString), os.ModePerm)
 	_ = system.OpenURL(filePath)
 
