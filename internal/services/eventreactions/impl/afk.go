@@ -101,19 +101,8 @@ func (a *AFK) Handler(session *discordgo.Session, event any) {
 
 	cfg := a.configSvc.GetConfig()
 
-	activatedOnPing := cfg.AFK.OnPing && message.IsUserMentioned(session.State.User.ID)
-	activatedOnDM := cfg.AFK.OnDM && utils.Discord.IsDM(session, message.Message)
-
-	if !(activatedOnPing || activatedOnDM) {
-		return
-	}
-
-	if message.Author.Bot {
-		return
-	}
-
 	// Check if AFK is enabled
-	if !cfg.AFK.Enabled || message.Author.ID == session.State.User.ID {
+	if !cfg.AFK.Enabled || message.Author.ID == session.State.User.ID || a.IsActive() {
 		return
 	}
 
@@ -122,7 +111,10 @@ func (a *AFK) Handler(session *discordgo.Session, event any) {
 		return
 	}
 
-	if a.IsActive() {
+	activatedOnPing := cfg.AFK.OnPing && message.IsUserMentioned(session.State.User.ID)
+	activatedOnDM := cfg.AFK.OnDM && utils.Discord.IsDM(session, message.Message)
+
+	if !activatedOnPing && !activatedOnDM || message.Author.Bot {
 		return
 	}
 

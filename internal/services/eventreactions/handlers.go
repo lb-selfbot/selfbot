@@ -95,7 +95,7 @@ func (e *eventReactionsService) onMessageUpdate(s *discordgo.Session, m *discord
 	}
 
 	prefix := e.configSvc.GetConfig().Selfbot.CommandPrefix
-	if m.Author.ID != s.State.User.ID || !strings.HasPrefix(m.Message.Content, prefix) {
+	if m.Author.ID != s.State.User.ID || !strings.HasPrefix(m.Content, prefix) {
 		e.addEditedMessage(m)
 	}
 }
@@ -116,7 +116,7 @@ func (e *eventReactionsService) onMessageDelete(s *discordgo.Session, m *discord
 	}
 
 	prefix := e.configSvc.GetConfig().Selfbot.CommandPrefix
-	if m.Author.ID != s.State.User.ID || !strings.HasPrefix(m.Message.Content, prefix) {
+	if m.Author.ID != s.State.User.ID || !strings.HasPrefix(m.Content, prefix) {
 		e.addDeletedMessage(m.BeforeDelete)
 	}
 }
