@@ -132,7 +132,9 @@ func (a *AFK) Handler(session *discordgo.Session, event any) {
 			duration := time.Duration(delay) * time.Second
 			duration = max(duration-time.Second*5, 0)
 
-			session.ChannelTypingDuration(message.ChannelID, duration)
+			if err := session.ChannelTypingDuration(message.ChannelID, duration); err != nil {
+				time.Sleep(duration)
+			}
 		} else {
 			time.Sleep(time.Second * time.Duration(delay))
 		}
