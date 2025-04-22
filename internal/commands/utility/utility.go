@@ -1697,7 +1697,7 @@ func (c *UtilityCommands) uptime(ctx *router.Ctx) error {
 }
 
 func (c *UtilityCommands) history(ctx *router.Ctx) error {
-	usedCmds := fn.Limit(c.services.EventReactions.GetUsedCommands(), 10)
+	usedCmds := fn.Limit(ctx.Router.GetUsedCommands(), 10)
 
 	if len(usedCmds) == 0 {
 		c.services.Embed.New(ctx).

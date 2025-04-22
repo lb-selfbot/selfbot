@@ -292,7 +292,7 @@ func (c *HelpCommands) search(ctx *router.Ctx) error {
 }
 
 func (c *HelpCommands) repeat(ctx *router.Ctx) error {
-	usedCommands := c.services.EventReactions.GetUsedCommands()
+	usedCommands := ctx.Router.GetUsedCommands()
 
 	if len(usedCommands) < 1 {
 		c.services.Embed.New(ctx).

@@ -1,6 +1,8 @@
 package router
 
 import (
+	"sync"
+
 	"github.com/lb-selfbot/discordgo"
 	"github.com/lb-selfbot/selfbot/internal/services/config"
 	"github.com/lb-selfbot/selfbot/internal/services/eventbroker"
@@ -22,6 +24,9 @@ type Service interface {
 
 	// GetNumUsedCommands returns the number of used commands.
 	GetNumUsedCommands() int
+
+	// GetUsedCommands returns the used commands.
+	GetUsedCommands() []*Ctx
 
 	// RegisterMiddleware registers a middleware.
 	RegisterMiddleware(middleware Middleware)
@@ -50,7 +55,9 @@ type routerService struct {
 	commands   []*Command
 	middleware []Middleware
 
-	usedCmds int
+	usedCmdsMu    sync.Mutex
+	usedCmds      []*Ctx
+	usedCmdsCount int
 }
 
 // NewService creates a new router service.
@@ -117,6 +124,10 @@ func (r *routerService) GetCommand(name string) *Command {
 }
 
 func (r *routerService) GetNumUsedCommands() int {
+	return r.usedCmdsCount
+}
+
+func (r *routerService) GetUsedCommands() []*Ctx {
 	return r.usedCmds
 }
 

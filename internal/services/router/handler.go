@@ -101,7 +101,14 @@ func (r *routerService) handler(session *discordgo.Session, message *discordgo.M
 		r.eventBroker.Publish(eventbroker.EventLogFeature, &featurelogs.CmdUsed{Name: cmd.Name})
 
 		r.triggerCommand(ctx)
-		r.usedCmds++
+
+		r.usedCmdsMu.Lock()
+		r.usedCmdsCount++
+		if cmd.Name != "repeat" {
+			r.usedCmds = append(r.usedCmds, ctx)
+		}
+		r.usedCmdsMu.Unlock()
+
 		return
 	}
 }

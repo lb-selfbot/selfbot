@@ -62,12 +62,6 @@ type Service interface {
 	// GetDeletedMessages returns deleted messages by channel ID.
 	GetDeletedMessages(channelID string) []*discordgo.Message
 
-	// GetUsedCommands returns used commands.
-	GetUsedCommands() []*router.Ctx
-
-	// AddUsedCommand adds a used command.
-	AddUsedCommand(ctx *router.Ctx)
-
 	// GetLastActivity returns the last activity time.
 	GetLastActivity() time.Time
 
@@ -103,9 +97,6 @@ type eventReactionsService struct {
 	deletedMsgs   map[string][]*discordgo.Message
 	deletedMsgsMu sync.Mutex
 
-	usedCmds   []*router.Ctx
-	usedCmdsMu sync.Mutex
-
 	lastActivity time.Time
 	lastAFKMsg   time.Time
 
@@ -131,7 +122,6 @@ func NewService(
 		eventReactionsMsgs: make([]*discordgo.Message, 0),
 		editedMsgs:         make(map[string][]*discordgo.MessageUpdate),
 		deletedMsgs:        make(map[string][]*discordgo.Message),
-		usedCmds:           make([]*router.Ctx, 0),
 		lastActivity:       time.Now(),
 		lastAFKMsg:         time.Now(),
 	}
@@ -312,14 +302,6 @@ func (e *eventReactionsService) GetDeletedMessages(channelID string) []*discordg
 	defer e.deletedMsgsMu.Unlock()
 
 	return e.deletedMsgs[channelID]
-}
-
-func (e *eventReactionsService) GetUsedCommands() []*router.Ctx { return e.usedCmds }
-func (e *eventReactionsService) AddUsedCommand(ctx *router.Ctx) {
-	e.usedCmdsMu.Lock()
-	defer e.usedCmdsMu.Unlock()
-
-	e.usedCmds = append(e.usedCmds, ctx)
 }
 
 func (e *eventReactionsService) GetLastActivity() time.Time { return e.lastActivity }
