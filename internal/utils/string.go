@@ -6,6 +6,7 @@ import (
 	"regexp"
 	"strings"
 
+	"github.com/lb-selfbot/selfbot/internal/fn"
 	"golang.org/x/term"
 )
 
@@ -336,6 +337,10 @@ func (StringUtils) Limit(text string, limit int) string {
 	}
 
 	return text
+}
+
+func (StringUtils) Pluralize(count int) string {
+	return fn.IfElse(count == 1, "", "s")
 }
 
 var String = &StringUtils{}

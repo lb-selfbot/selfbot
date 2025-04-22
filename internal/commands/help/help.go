@@ -162,11 +162,21 @@ func (c *HelpCommands) specificHelpCommand(ctx *router.Ctx) error {
 
 func (c *HelpCommands) renderCommandHelp(ctx *router.Ctx, command *router.Command) *embed.Embed {
 	cfg := c.services.Config.GetConfig()
+	helpText := fmt.Sprintf("%s%s %s", cfg.Selfbot.CommandPrefix, command.Name, command.Arguments)
+	if len(command.SubCommands) > 0 {
+		helpText = ""
+
+		for _, subCommand := range command.SubCommands {
+			helpText += fmt.Sprintf("%s%s %s %s - %s\n", cfg.Selfbot.CommandPrefix, command.Name, subCommand.Name, subCommand.Arguments, subCommand.Description)
+		}
+	}
+
+	helpText = strings.ReplaceAll(helpText, "  ", " ")
 	return c.services.Embed.New(ctx).
 		SetDescription("Command Help: %s", command.Name).
 		AddField("Command Name", command.Name).
-		AddField("Usage", "<> is required, [] is optional\n\n"+cfg.Selfbot.CommandPrefix+command.Name+" "+command.Arguments).
-		AddField("Description", command.Description).
+		AddField("Usage", "<> is required, [] is optional\n\n"+helpText).
+		AddField("Description", command.Description, command.Description != "").
 		AddField("Category", command.Category.Name)
 }
 
@@ -183,11 +193,12 @@ func (c *HelpCommands) renderCategoryHelp(ctx *router.Ctx, category *router.Cate
 	for _, command := range cmds {
 		helpText := fmt.Sprintf("%s%s %s - %s\n", cfg.Selfbot.CommandPrefix, command.Name, command.Arguments, command.Description)
 		if len(command.SubCommands) > 0 {
-			helpText = ""
+			helpText = fmt.Sprintf("%s%s %s - Use `!help %s` for more info\n", cfg.Selfbot.CommandPrefix, command.Name, command.Arguments, command.Name)
+			// helpText = ""
 
-			for _, subCommand := range command.SubCommands {
-				helpText += fmt.Sprintf("%s%s %s %s - %s\n", cfg.Selfbot.CommandPrefix, command.Name, subCommand.Name, subCommand.Arguments, subCommand.Description)
-			}
+			// for _, subCommand := range command.SubCommands {
+			// 	helpText += fmt.Sprintf("%s%s %s %s - %s\n", cfg.Selfbot.CommandPrefix, command.Name, subCommand.Name, subCommand.Arguments, subCommand.Description)
+			// }
 		}
 
 		helpText = strings.ReplaceAll(helpText, "  ", " ")
@@ -274,7 +285,7 @@ func (c *HelpCommands) search(ctx *router.Ctx) error {
 	}
 
 	c.services.Embed.New(ctx).
-		SetDescription("Found %d commands for query `%s`", len(closeCommands), query).
+		SetDescription("Found %d command%s for query `%s`", len(closeCommands), utils.String.Pluralize(len(closeCommands)), query).
 		AddField("Commands", strings.Join(closeCommands, "\n"), true, true).
 		Send()
 	return nil

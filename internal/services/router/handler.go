@@ -116,7 +116,7 @@ func (r *routerService) triggerCommand(ctx *Ctx) {
 		subCmdsReadable := fn.Map(ctx.Command.SubCommands, func(subCmd *Command) string {
 			return subCmd.Name
 		})
-		r.handleCmdError(ctx, fmt.Errorf("You must provide a subcommand for [p]%s! The available subcommands are: %s", ctx.Command.Name, strings.Join(subCmdsReadable, ", ")))
+		r.handleCmdError(ctx, fmt.Errorf("You must provide a subcommand! The available subcommands are: %s", strings.Join(subCmdsReadable, ", ")))
 		return
 	}
 

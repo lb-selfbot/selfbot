@@ -169,7 +169,7 @@ func (b *backupService) LoadBackup(bType, bName string, data any) error {
 
 	rawData, err := os.ReadFile(filePath)
 	if err != nil {
-		return nil
+		return err
 	}
 
 	return json.Unmarshal(rawData, &data)

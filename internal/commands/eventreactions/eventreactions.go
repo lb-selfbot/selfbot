@@ -41,7 +41,7 @@ func (c *EventReactionsCommands) Register() {
 
 		actioncommands.NewBuilder("ignoreuser", "Ignored Users").
 			WithEventReactionToggle("Ignore messages from a user", "<user>", func(ctx *router.Ctx) (types.EventReaction, error) {
-				user, err := ctx.Arguments.Get(1).User(router.ArgumentFlagFallbackDefault)
+				user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
 				if err != nil {
 					return nil, err
 				}
@@ -53,7 +53,7 @@ func (c *EventReactionsCommands) Register() {
 
 		actioncommands.NewBuilder("ignoreserver", "Ignored Servers").
 			WithEventReactionToggle("Ignore messages from a server", "[server id]", func(ctx *router.Ctx) (types.EventReaction, error) {
-				user, err := ctx.Arguments.Get(1).Guild(router.ArgumentFlagFallbackDefault)
+				user, err := ctx.Arguments.Get(0).Guild(router.ArgumentFlagFallbackDefault)
 				if err != nil {
 					return nil, err
 				}
@@ -65,7 +65,7 @@ func (c *EventReactionsCommands) Register() {
 
 		actioncommands.NewBuilder("pingping", "Ping → Ping").
 			WithEventReactionToggle("Reply to pings by pinging the user", "[channel/server id]", func(ctx *router.Ctx) (types.EventReaction, error) {
-				guild, channel, err := c.getGuildOrChannel(ctx, ctx.Arguments.Get(1))
+				guild, channel, err := c.getGuildOrChannel(ctx, ctx.Arguments.Get(0))
 				if err != nil {
 					return nil, err
 				}
@@ -77,7 +77,7 @@ func (c *EventReactionsCommands) Register() {
 
 		actioncommands.NewBuilder("pingkick", "Ping → Kick").
 			WithEventReactionToggle("Reply to pings by kicking the user", "[channel/server id]", func(ctx *router.Ctx) (types.EventReaction, error) {
-				guild, channel, err := c.getGuildOrChannel(ctx, ctx.Arguments.Get(1))
+				guild, channel, err := c.getGuildOrChannel(ctx, ctx.Arguments.Get(0))
 				if err != nil {
 					return nil, err
 				}
@@ -89,7 +89,7 @@ func (c *EventReactionsCommands) Register() {
 
 		actioncommands.NewBuilder("pingban", "Ping → Ban").
 			WithEventReactionToggle("Reply to pings by banning the user", "[channel/server id]", func(ctx *router.Ctx) (types.EventReaction, error) {
-				guild, channel, err := c.getGuildOrChannel(ctx, ctx.Arguments.Get(1))
+				guild, channel, err := c.getGuildOrChannel(ctx, ctx.Arguments.Get(0))
 				if err != nil {
 					return nil, err
 				}
@@ -101,7 +101,7 @@ func (c *EventReactionsCommands) Register() {
 
 		actioncommands.NewBuilder("pingtimeout", "Ping → Timeout").
 			WithEventReactionToggle("Reply to pings by timing the user out", "[channel/server id]", func(ctx *router.Ctx) (types.EventReaction, error) {
-				guild, channel, err := c.getGuildOrChannel(ctx, ctx.Arguments.Get(1))
+				guild, channel, err := c.getGuildOrChannel(ctx, ctx.Arguments.Get(0))
 				if err != nil {
 					return nil, err
 				}
@@ -113,7 +113,7 @@ func (c *EventReactionsCommands) Register() {
 
 		actioncommands.NewBuilder("pinginsult", "Ping → Insult").
 			WithEventReactionToggle("Reply to pings by insulting the user", "[channel/server id]", func(ctx *router.Ctx) (types.EventReaction, error) {
-				guild, channel, err := c.getGuildOrChannel(ctx, ctx.Arguments.Get(1))
+				guild, channel, err := c.getGuildOrChannel(ctx, ctx.Arguments.Get(0))
 				if err != nil {
 					return nil, err
 				}
@@ -125,7 +125,7 @@ func (c *EventReactionsCommands) Register() {
 
 		actioncommands.NewBuilder("pingreact", "Ping → React").
 			WithEventReactionToggle("Reply to pings by adding a reaction", "[reaction] [channel/server id]", func(ctx *router.Ctx) (types.EventReaction, error) {
-				reaction := ctx.Arguments.Get(1).Raw()
+				reaction := ctx.Arguments.Get(0).Raw()
 				reaction = strings.ReplaceAll(reaction, "<", "")
 				reaction = strings.ReplaceAll(reaction, ">", "")
 
@@ -133,7 +133,7 @@ func (c *EventReactionsCommands) Register() {
 					return nil, fmt.Errorf("reaction cannot be empty")
 				}
 
-				guild, channel, err := c.getGuildOrChannel(ctx, ctx.Arguments.Get(2))
+				guild, channel, err := c.getGuildOrChannel(ctx, ctx.Arguments.Get(1))
 				if err != nil {
 					return nil, err
 				}
@@ -148,7 +148,7 @@ func (c *EventReactionsCommands) Register() {
 
 		actioncommands.NewBuilder("pingresponse", "Ping → Response").
 			WithEventReactionToggle("Reply to pings with a custom response", "[\"response\"] [channel/server id]", func(ctx *router.Ctx) (types.EventReaction, error) {
-				response := ctx.Arguments.Get(1).Raw()
+				response := ctx.Arguments.Get(0).Raw()
 
 				guild, channel, err := c.getGuildOrChannel(ctx, ctx.Arguments.Get(2))
 				if err != nil {
@@ -165,9 +165,9 @@ func (c *EventReactionsCommands) Register() {
 
 		actioncommands.NewBuilder("pingairesponse", "Ping → AI Response").
 			WithEventReactionToggle("Reply to pings with an AI response", "[\"system\"] [channel/server id]", func(ctx *router.Ctx) (types.EventReaction, error) {
-				system := ctx.Arguments.Get(1).Raw()
+				system := ctx.Arguments.Get(0).Raw()
 
-				guild, channel, err := c.getGuildOrChannel(ctx, ctx.Arguments.Get(2))
+				guild, channel, err := c.getGuildOrChannel(ctx, ctx.Arguments.Get(1))
 				if err != nil {
 					return nil, err
 				}
@@ -182,12 +182,12 @@ func (c *EventReactionsCommands) Register() {
 
 		actioncommands.NewBuilder("mirrorchannel", "Mirror Channel").
 			WithEventReactionToggle("Mirror messages from one channel to another", "[source channel] [dest channel]", func(ctx *router.Ctx) (types.EventReaction, error) {
-				sourceChannel, err := ctx.Arguments.Get(1).Channel(router.ArgumentFlagFallbackDefault)
+				sourceChannel, err := ctx.Arguments.Get(0).Channel(router.ArgumentFlagFallbackDefault)
 				if err != nil {
 					return nil, fmt.Errorf("could not find source channel: %v", err)
 				}
 
-				destChannel, err := ctx.Arguments.Get(2).Channel(router.ArgumentFlagFallbackDefault)
+				destChannel, err := ctx.Arguments.Get(1).Channel(router.ArgumentFlagFallbackDefault)
 				if err != nil {
 					return nil, fmt.Errorf("could not find destination channel: %v", err)
 				}
@@ -200,12 +200,12 @@ func (c *EventReactionsCommands) Register() {
 
 		actioncommands.NewBuilder("mirrorserver", "Mirror Server").
 			WithEventReactionToggle("Mirror messages from one server to another", "[source server] [dest server]", func(ctx *router.Ctx) (types.EventReaction, error) {
-				sourceGuild, err := ctx.Arguments.Get(1).Guild(router.ArgumentFlagFallbackDefault)
+				sourceGuild, err := ctx.Arguments.Get(0).Guild(router.ArgumentFlagFallbackDefault)
 				if err != nil {
 					return nil, fmt.Errorf("could not find source server: %v", err)
 				}
 
-				destGuild, err := ctx.Arguments.Get(2).Guild(router.ArgumentFlagFallbackDefault)
+				destGuild, err := ctx.Arguments.Get(1).Guild(router.ArgumentFlagFallbackDefault)
 				if err != nil {
 					return nil, fmt.Errorf("could not find destination server: %v", err)
 				}
@@ -218,9 +218,9 @@ func (c *EventReactionsCommands) Register() {
 
 		actioncommands.NewBuilder("responder", "Responder").
 			WithEventReactionToggle("Reply to messages with a custom response", "[\"response\"] [channel/server id]", func(ctx *router.Ctx) (types.EventReaction, error) {
-				response := ctx.Arguments.Get(1).Raw()
+				response := ctx.Arguments.Get(0).Raw()
 
-				guild, channel, err := c.getGuildOrChannel(ctx, ctx.Arguments.Get(2))
+				guild, channel, err := c.getGuildOrChannel(ctx, ctx.Arguments.Get(1))
 				if err != nil {
 					return nil, err
 				}
@@ -235,9 +235,9 @@ func (c *EventReactionsCommands) Register() {
 
 		actioncommands.NewBuilder("airesponder", "AI Responder").
 			WithEventReactionToggle("Reply to messages with an AI response", "[\"system\"] [channel/server id]", func(ctx *router.Ctx) (types.EventReaction, error) {
-				system := ctx.Arguments.Get(1).Raw()
+				system := ctx.Arguments.Get(0).Raw()
 
-				guild, channel, err := c.getGuildOrChannel(ctx, ctx.Arguments.Get(2))
+				guild, channel, err := c.getGuildOrChannel(ctx, ctx.Arguments.Get(1))
 				if err != nil {
 					return nil, err
 				}
@@ -252,12 +252,12 @@ func (c *EventReactionsCommands) Register() {
 
 		actioncommands.NewBuilder("copy", "Copy User").
 			WithEventReactionToggle("Copy a user's messages", "[@user] [channel/server id]", func(ctx *router.Ctx) (types.EventReaction, error) {
-				user, err := ctx.Arguments.Get(1).User(router.ArgumentFlagFallbackDefault)
+				user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
 				if err != nil {
 					return nil, fmt.Errorf("could not find user: %v", err)
 				}
 
-				guild, channel, err := c.getGuildOrChannel(ctx, ctx.Arguments.Get(2))
+				guild, channel, err := c.getGuildOrChannel(ctx, ctx.Arguments.Get(1))
 				if err != nil {
 					return nil, err
 				}
@@ -270,12 +270,12 @@ func (c *EventReactionsCommands) Register() {
 
 		actioncommands.NewBuilder("replycopy", "Reply Copy User").
 			WithEventReactionToggle("Reply copy a user's messages", "[@user] [channel/server id]", func(ctx *router.Ctx) (types.EventReaction, error) {
-				user, err := ctx.Arguments.Get(1).User(router.ArgumentFlagFallbackDefault)
+				user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
 				if err != nil {
 					return nil, fmt.Errorf("could not find user: %v", err)
 				}
 
-				guild, channel, err := c.getGuildOrChannel(ctx, ctx.Arguments.Get(2))
+				guild, channel, err := c.getGuildOrChannel(ctx, ctx.Arguments.Get(1))
 				if err != nil {
 					return nil, err
 				}
@@ -288,12 +288,12 @@ func (c *EventReactionsCommands) Register() {
 
 		actioncommands.NewBuilder("mock", "Mock User").
 			WithEventReactionToggle("Mock a user's messages", "[@user] [channel/server id]", func(ctx *router.Ctx) (types.EventReaction, error) {
-				user, err := ctx.Arguments.Get(1).User(router.ArgumentFlagFallbackDefault)
+				user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
 				if err != nil {
 					return nil, fmt.Errorf("could not find user: %v", err)
 				}
 
-				guild, channel, err := c.getGuildOrChannel(ctx, ctx.Arguments.Get(2))
+				guild, channel, err := c.getGuildOrChannel(ctx, ctx.Arguments.Get(1))
 				if err != nil {
 					return nil, err
 				}
@@ -306,12 +306,12 @@ func (c *EventReactionsCommands) Register() {
 
 		actioncommands.NewBuilder("pinspam", "Pin Spam").
 			WithEventReactionToggle("Pin all of a user's messages", "[@user] [channel/server id]", func(ctx *router.Ctx) (types.EventReaction, error) {
-				user, err := ctx.Arguments.Get(1).User(router.ArgumentFlagFallbackDefault)
+				user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
 				if err != nil {
 					return nil, fmt.Errorf("could not find user: %v", err)
 				}
 
-				guild, channel, err := c.getGuildOrChannel(ctx, ctx.Arguments.Get(2))
+				guild, channel, err := c.getGuildOrChannel(ctx, ctx.Arguments.Get(1))
 				if err != nil {
 					return nil, err
 				}
@@ -325,12 +325,12 @@ func (c *EventReactionsCommands) Register() {
 
 		actioncommands.NewBuilder("reactspam", "React Spam").
 			WithEventReactionToggle("React to all of a user's messages", "[@user] [reaction] [global/server/channel id]", func(ctx *router.Ctx) (types.EventReaction, error) {
-				user, err := ctx.Arguments.Get(1).User(router.ArgumentFlagFallbackDefault)
+				user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
 				if err != nil {
 					return nil, fmt.Errorf("could not find user: %v", err)
 				}
 
-				reaction := ctx.Arguments.Get(2).Raw()
+				reaction := ctx.Arguments.Get(1).Raw()
 				reaction = strings.ReplaceAll(reaction, "<", "")
 				reaction = strings.ReplaceAll(reaction, ">", "")
 
@@ -338,14 +338,14 @@ func (c *EventReactionsCommands) Register() {
 					return nil, fmt.Errorf("reaction cannot be empty")
 				}
 
-				arg := strings.ToLower(ctx.Arguments.Get(3).Raw())
+				arg := strings.ToLower(ctx.Arguments.Get(2).Raw())
 				global := arg == "global" || arg == ""
 
 				var guild *discordgo.Guild
 				var channel *discordgo.Channel
 
 				if !global {
-					guild, channel, err = c.getGuildOrChannel(ctx, ctx.Arguments.Get(3))
+					guild, channel, err = c.getGuildOrChannel(ctx, ctx.Arguments.Get(2))
 					if err != nil {
 						return nil, err
 					}
@@ -362,12 +362,12 @@ func (c *EventReactionsCommands) Register() {
 
 		actioncommands.NewBuilder("deletemessages", "Delete Messages").
 			WithEventReactionToggle("Delete all of a user's messages", "[@user] [channel/server id]", func(ctx *router.Ctx) (types.EventReaction, error) {
-				user, err := ctx.Arguments.Get(1).User(router.ArgumentFlagFallbackDefault)
+				user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
 				if err != nil {
 					return nil, fmt.Errorf("could not find user: %v", err)
 				}
 
-				guild, channel, err := c.getGuildOrChannel(ctx, ctx.Arguments.Get(2))
+				guild, channel, err := c.getGuildOrChannel(ctx, ctx.Arguments.Get(1))
 				if err != nil {
 					return nil, err
 				}
@@ -380,9 +380,9 @@ func (c *EventReactionsCommands) Register() {
 
 		actioncommands.NewBuilder("keywordnotifier", "Keyword Notifier").
 			WithEventReactionToggle("Get notified when someone mentions a keyword", "[\"keyword\"] [global/server/channel id]", func(ctx *router.Ctx) (types.EventReaction, error) {
-				keyword := ctx.Arguments.Get(1).Raw()
+				keyword := ctx.Arguments.Get(0).Raw()
 
-				arg := strings.ToLower(ctx.Arguments.Get(2).Raw())
+				arg := strings.ToLower(ctx.Arguments.Get(1).Raw())
 				global := arg == "global" || arg == ""
 
 				var guild *discordgo.Guild
@@ -390,7 +390,7 @@ func (c *EventReactionsCommands) Register() {
 				var err error
 
 				if !global {
-					guild, channel, err = c.getGuildOrChannel(ctx, ctx.Arguments.Get(2))
+					guild, channel, err = c.getGuildOrChannel(ctx, ctx.Arguments.Get(1))
 					if err != nil {
 						return nil, err
 					}
@@ -408,12 +408,12 @@ func (c *EventReactionsCommands) Register() {
 
 		actioncommands.NewBuilder("removereactions", "Remove Reactions").
 			WithEventReactionToggle("Delete all of a user's reactions", "[@user] [channel/server id]", func(ctx *router.Ctx) (types.EventReaction, error) {
-				user, err := ctx.Arguments.Get(1).User(router.ArgumentFlagFallbackDefault)
+				user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
 				if err != nil {
 					return nil, fmt.Errorf("could not find user: %v", err)
 				}
 
-				guild, channel, err := c.getGuildOrChannel(ctx, ctx.Arguments.Get(2))
+				guild, channel, err := c.getGuildOrChannel(ctx, ctx.Arguments.Get(1))
 				if err != nil {
 					return nil, err
 				}
@@ -426,12 +426,12 @@ func (c *EventReactionsCommands) Register() {
 
 		actioncommands.NewBuilder("forcedisconnect", "Force Disconnect").
 			WithEventReactionToggle("Disconnect a user from voice channels", "[@user] [channel/server id]", func(ctx *router.Ctx) (types.EventReaction, error) {
-				user, err := ctx.Arguments.Get(1).User(router.ArgumentFlagFallbackDefault)
+				user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
 				if err != nil {
 					return nil, fmt.Errorf("could not find user: %v", err)
 				}
 
-				guild, channel, err := c.getGuildOrChannel(ctx, ctx.Arguments.Get(2))
+				guild, channel, err := c.getGuildOrChannel(ctx, ctx.Arguments.Get(1))
 				if err != nil {
 					return nil, err
 				}
@@ -444,14 +444,14 @@ func (c *EventReactionsCommands) Register() {
 
 		actioncommands.NewBuilder("forcenick", "Force Nick").
 			WithEventReactionToggle("Force change a user's nickname", "[@user] [nickname] [server id]", func(ctx *router.Ctx) (types.EventReaction, error) {
-				user, err := ctx.Arguments.Get(1).User(router.ArgumentFlagFallbackDefault)
+				user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
 				if err != nil {
 					return nil, fmt.Errorf("could not find user: %v", err)
 				}
 
-				nickname := ctx.Arguments.Get(2).Raw()
+				nickname := ctx.Arguments.Get(1).Raw()
 
-				guildID := utils.Misc.Or(ctx.Arguments.Get(3).Raw(), ctx.Message.GuildID)
+				guildID := utils.Misc.Or(ctx.Arguments.Get(2).Raw(), ctx.Message.GuildID)
 				guild, err := ctx.Session.GuildWithFallback(guildID)
 				if err != nil {
 					return nil, fmt.Errorf("could not find server: %v", err)
@@ -470,12 +470,12 @@ func (c *EventReactionsCommands) Register() {
 
 		actioncommands.NewBuilder("forcekick", "Force Kick").
 			WithEventReactionToggle("Force kick a user", "[@user] [server id]", func(ctx *router.Ctx) (types.EventReaction, error) {
-				user, err := ctx.Arguments.Get(1).User(router.ArgumentFlagFallbackDefault)
+				user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
 				if err != nil {
 					return nil, fmt.Errorf("could not find user: %v", err)
 				}
 
-				guildID := utils.Misc.Or(ctx.Arguments.Get(2).Raw(), ctx.Message.GuildID)
+				guildID := utils.Misc.Or(ctx.Arguments.Get(1).Raw(), ctx.Message.GuildID)
 				guild, err := ctx.Session.GuildWithFallback(guildID)
 				if err != nil {
 					return nil, fmt.Errorf("could not find server: %v", err)
@@ -494,7 +494,7 @@ func (c *EventReactionsCommands) Register() {
 
 		actioncommands.NewBuilder("noleave", "No Leave").
 			WithEventReactionToggle("Prevent a user from leaving a group chat", "[@user] [channel id]", func(ctx *router.Ctx) (types.EventReaction, error) {
-				user, err := ctx.Arguments.Get(1).User(router.ArgumentFlagFallbackDefault)
+				user, err := ctx.Arguments.Get(0).User(router.ArgumentFlagFallbackDefault)
 				if err != nil {
 					return nil, fmt.Errorf("could not find user: %v", err)
 				}
@@ -507,7 +507,7 @@ func (c *EventReactionsCommands) Register() {
 					return nil, fmt.Errorf("the user must be a friend")
 				}
 
-				channel, err := ctx.Arguments.Get(2).Channel(router.ArgumentFlagFallbackDefault)
+				channel, err := ctx.Arguments.Get(1).Channel(router.ArgumentFlagFallbackDefault)
 				if err != nil {
 					return nil, fmt.Errorf("could not find channel: %v", err)
 				}
@@ -558,7 +558,7 @@ func (c *EventReactionsCommands) Register() {
 
 		actioncommands.NewBuilder("antideletemessages", "Anti Delete Messages").
 			WithEventReactionToggle("Prevent users from deleting your messages", "[channel]", func(ctx *router.Ctx) (types.EventReaction, error) {
-				channel, err := ctx.Arguments.Get(1).Channel(router.ArgumentFlagFallbackDefault)
+				channel, err := ctx.Arguments.Get(0).Channel(router.ArgumentFlagFallbackDefault)
 				if err != nil {
 					return nil, fmt.Errorf("could not find channel: %v", err)
 				}
