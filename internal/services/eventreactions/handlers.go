@@ -75,7 +75,7 @@ func (e *eventReactionsService) onMessageCreate(s *discordgo.Session, m *discord
 }
 
 func (e *eventReactionsService) onMessageUpdate(s *discordgo.Session, m *discordgo.MessageUpdate) {
-	message, err := s.State.Message(m.Message.ChannelID, m.Message.ID)
+	message, err := s.State.Message(m.ChannelID, m.ID)
 	if err == nil {
 		m.Message = message
 	}
