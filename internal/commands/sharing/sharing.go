@@ -169,10 +169,10 @@ func (c *SharingCommands) Register() {
 				c.services.Embed.Respond(ctx, "Cleared all shared categories.")
 				return nil
 			}).
-			WithValues("Get available categories", func() []any {
-				return fn.ToIfaceSlice(fn.Map(c.services.Router.GetCategories(), func(category *router.Category) string {
+			WithValues("Get available categories", func() []string {
+				return fn.Map(c.services.Router.GetCategories(), func(category *router.Category) string {
 					return category.Name
-				}))
+				})
 			}).
 			Build(c.services),
 
@@ -250,8 +250,8 @@ func (c *SharingCommands) Register() {
 				c.services.Embed.Respond(ctx, "Cleared all shared commands.")
 				return nil
 			}).
-			WithValues("Get available commands", func() []any {
-				return []any{"Available Commands", "Use `help` or view <https://docs.lightning-bot.com/category/commands> for a list of commands."}
+			WithValues("Get available commands", func() []string {
+				return []string{"Use the `help` command or view <https://docs.lightning-bot.com/category/commands> for a list of available commands."}
 			}).
 			Build(c.services),
 

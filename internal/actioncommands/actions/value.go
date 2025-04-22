@@ -57,6 +57,7 @@ type ValueSet struct {
 	ReadableName string
 	Desc         string
 	ValueType    actionvalue.Type
+	Values       []string
 	Setter       ValueSetFunc
 }
 
@@ -69,6 +70,19 @@ func (a *ValueSet) ToSubCommand(services *services.Services) *router.Command {
 			value, err := actionvalue.Parse(ctx, a.ValueType)
 			if err != nil {
 				return fmt.Errorf("error parsing value: %w", err)
+			}
+
+			if a.ValueType == actionvalue.TypeString && len(a.Values) > 0 {
+				valueStr := value.(string)
+
+				matchingValues := fn.Filter(a.Values, func(v string) bool {
+					return strings.EqualFold(v, valueStr)
+				})
+				if len(matchingValues) == 0 {
+					return fmt.Errorf("value %q is not valid, valid values are: %s", valueStr, strings.Join(a.Values, ", "))
+				}
+
+				value = matchingValues[0]
 			}
 
 			if err := a.Setter(ctx, value); err != nil {
@@ -120,7 +134,7 @@ func (a *ValueToggle) ToSubCommand(services *services.Services) *router.Command 
 }
 
 // ValueGetValuesFunc is a function that retrieves the values of the value.
-type ValueGetValuesFunc func() []any
+type ValueGetValuesFunc func() []string
 
 // ValueGetValues is an action for an ActionCommand that
 // lists available values.
@@ -136,12 +150,8 @@ func (a *ValueGetValues) ToSubCommand(services *services.Services) *router.Comma
 		Description: a.Desc,
 		Handler: func(ctx *router.Ctx) error {
 			values := a.ValuesGetter()
-			stringValues := fn.Map(values, func(value any) string {
-				return fmt.Sprint(value)
-			})
-
 			services.Embed.New(ctx).
-				AddField(a.ReadableName, strings.Join(stringValues, "\n")).
+				AddField(a.ReadableName, strings.Join(values, "\n")).
 				Send()
 			return nil
 		},

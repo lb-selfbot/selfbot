@@ -747,8 +747,8 @@ func (c *EventReactionsCommands) Register() {
 
 				return c.services.Config.SaveConfig(cfg)
 			}).
-			WithValues("List available trigger types", func() []any {
-				return []any{"Global", "Whitelist", "Blacklist"}
+			WithValues("List available trigger types", func() []string {
+				return []string{"Global", "Whitelist", "Blacklist"}
 			}).
 			Build(c.services),
 

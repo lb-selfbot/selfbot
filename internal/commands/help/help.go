@@ -192,7 +192,7 @@ func (c *HelpCommands) renderCategoryHelp(ctx *router.Ctx, category *router.Cate
 
 		helpText = strings.ReplaceAll(helpText, "  ", " ")
 
-		if len(helpPages[currentPage])+len(helpText) > 1650 {
+		if len(helpPages[currentPage])+len(helpText) > 1800 {
 			currentPage++
 		}
 		helpPages[currentPage] += helpText

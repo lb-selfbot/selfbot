@@ -51,8 +51,8 @@ func (c *ConfigCommands) Register() {
 				cfg.Selfbot.CommandMode = value.(string)
 				return c.services.Config.SaveConfig(cfg)
 			}).
-			WithValues("List available command modes", func() []any {
-				return []any{"Codeblock", "Text", "Indent", "WebhookEmbed", "URLEmbed"}
+			WithValues("List available command modes", func() []string {
+				return []string{"Codeblock", "Text", "Indent", "WebhookEmbed", "URLEmbed"}
 			}).
 			Build(c.services),
 
@@ -142,8 +142,8 @@ func (c *ConfigCommands) Register() {
 				cfg.Selfbot.Client = utils.String.Capitalize(value.(string))
 				return c.services.Config.SaveConfig(cfg)
 			}).
-			WithValues("List available clients", func() []any {
-				return []any{"Mobile", "Web", "Desktop", "Console"}
+			WithValues("List available clients", func() []string {
+				return []string{"Mobile", "Web", "Desktop", "Console"}
 			}).
 			Build(c.services),
 
@@ -852,8 +852,8 @@ func (c *ConfigCommands) Register() {
 				cfg.Snipers.PokeTwoSniper.CatchLanguage = value.(string)
 				return c.services.Config.SaveConfig(cfg)
 			}).
-			WithValues("List available languages", func() []any {
-				return []any{"en", "ja", "ja_t", "fr", "de"}
+			WithValues("List available languages", func() []string {
+				return []string{"en", "ja", "ja_t", "fr", "de"}
 			}).
 			Build(c.services),
 
@@ -990,8 +990,8 @@ func (c *ConfigCommands) Register() {
 				cfg.Webhooks.PingSelfMode = value.(string)
 				return c.services.Config.SaveConfig(cfg)
 			}).
-			WithValues("List available ping self webhook modes", func() []any {
-				return []any{"Disabled", "Always", "Important"}
+			WithValues("List available ping self webhook modes", func() []string {
+				return []string{"Disabled", "Always", "Important"}
 			}).
 			Build(c.services),
 
@@ -1006,8 +1006,8 @@ func (c *ConfigCommands) Register() {
 				cfg.Webhooks.PingEveryoneMode = value.(string)
 				return c.services.Config.SaveConfig(cfg)
 			}).
-			WithValues("List available ping everyone webhook modes", func() []any {
-				return []any{"Disabled", "Always", "Important"}
+			WithValues("List available ping everyone webhook modes", func() []string {
+				return []string{"Disabled", "Always", "Important"}
 			}).
 			Build(c.services),
 
@@ -1239,8 +1239,8 @@ func (c *ConfigCommands) Register() {
 				cfg.UI.Theme = value.(string)
 				return c.services.Config.SaveConfig(cfg)
 			}).
-			WithValues("List available UI themes", func() []any {
-				return []any{"Dark", "Light"}
+			WithValues("List available UI themes", func() []string {
+				return []string{"Dark", "Light"}
 			}).
 			Build(c.services),
 
