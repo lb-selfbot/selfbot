@@ -277,13 +277,7 @@ func (c *TrollingCommands) voicemove(ctx *router.Ctx) error {
 		return fmt.Errorf("No voice channels found")
 	}
 
-	i := 0
-
-	for {
-		if i >= amount {
-			break
-		}
-
+	for range amount {
 		channel := random.Choice(channels)
 		currentChannel := ctx.Session.VoiceConnections[ctx.Message.GuildID]
 
@@ -297,8 +291,6 @@ func (c *TrollingCommands) voicemove(ctx *router.Ctx) error {
 		}
 
 		time.Sleep(time.Second * 1)
-
-		i++
 	}
 
 	if voice, ok := ctx.Session.VoiceConnections[ctx.Message.GuildID]; ok {

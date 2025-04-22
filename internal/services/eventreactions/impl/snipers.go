@@ -401,7 +401,7 @@ func (s *Snipers) CheckGiveawaySniper(session *discordgo.Session, m *discordgo.M
 		}()
 	case "294882584201003009", "1041302711750119504": // GiveawayBot#2381, LightningBot#1992
 		// Win check
-		if m.Type == discordgo.MessageTypeReply && m.Message.IsUserMentioned(session.State.User.ID) {
+		if m.Type == discordgo.MessageTypeReply && m.IsUserMentioned(session.State.User.ID) {
 			winRegex := regexp.MustCompile(`You won the \*\*(.*?)\*\*!`)
 
 			wins := winRegex.FindAllStringSubmatch(m.Content, -1)
@@ -594,7 +594,7 @@ func (s *Snipers) CheckGiveawaySniper(session *discordgo.Session, m *discordgo.M
 		}()
 	case "239631525350604801": // Pancake#3691
 		// Win check
-		if m.Message.IsUserMentioned(session.State.User.ID) {
+		if m.IsUserMentioned(session.State.User.ID) {
 			winRegex := regexp.MustCompile(`You won \*\*(.*?)\*\*!`)
 
 			wins := winRegex.FindStringSubmatch(m.Content)
@@ -771,7 +771,7 @@ func (s *Snipers) CheckGiveawaySniper(session *discordgo.Session, m *discordgo.M
 
 		// Win check
 		if strings.Contains(m.Embeds[0].Title, "Congratulations") &&
-			m.Message.IsUserMentioned(session.State.User.ID) {
+			m.IsUserMentioned(session.State.User.ID) {
 			prize := ""
 
 			if len(m.Embeds[0].Fields) > 0 {
@@ -905,7 +905,7 @@ func (s *Snipers) CheckGiveawaySniper(session *discordgo.Session, m *discordgo.M
 		}()
 	case "235148962103951360": // Carl-bot#1536
 		// Win check
-		if m.Message.IsUserMentioned(session.State.User.ID) {
+		if m.IsUserMentioned(session.State.User.ID) {
 			winRegex := regexp.MustCompile(`Congratulations to the winner of \*\*(.*?)\*\*`)
 
 			wins := winRegex.FindAllStringSubmatch(m.Content, -1)
@@ -969,7 +969,7 @@ func (s *Snipers) CheckGiveawaySniper(session *discordgo.Session, m *discordgo.M
 		}()
 	case "720351927581278219": // Invite Tracker#0478
 		// Win check
-		if m.Message.IsUserMentioned(session.State.User.ID) {
+		if m.IsUserMentioned(session.State.User.ID) {
 			winRegex := regexp.MustCompile(`you won the \*\*(.*?)\*\*`)
 
 			wins := winRegex.FindAllStringSubmatch(m.Content, -1)
@@ -1133,7 +1133,7 @@ func (s *Snipers) CheckGiveawaySniperEdit(session *discordgo.Session, m *discord
 	case "693167035068317736": // Rumble Royale#6012
 		// Win check
 		if len(m.Embeds) >= 2 && strings.Contains(m.Embeds[0].Title, "WINNER") &&
-			m.Message.IsUserMentioned(session.State.User.ID) {
+			m.IsUserMentioned(session.State.User.ID) {
 			s.eventBroker.Publish(eventbroker.EventLogFeature, &featurelogs.GiveawaySniperWon{
 				Message: m.Message,
 				Prize:   "Rumble Royale",
@@ -1216,7 +1216,7 @@ func (s *Snipers) CheckGiveawaySniperEdit(session *discordgo.Session, m *discord
 	case "676039466175168543": // ZAP-Hosting Bot#7133
 		// Win check
 		if strings.Contains(m.Content, "Giveaway Winner:") &&
-			m.Message.IsUserMentioned(session.State.User.ID) {
+			m.IsUserMentioned(session.State.User.ID) {
 			s.eventBroker.Publish(eventbroker.EventLogFeature, &featurelogs.GiveawaySniperWon{
 				Message: m.Message,
 				Prize:   "€10 worth of ZAP Coins",
@@ -1226,7 +1226,7 @@ func (s *Snipers) CheckGiveawaySniperEdit(session *discordgo.Session, m *discord
 	case "368521195940741122": // Lawliet#5480
 		// Win check
 		if len(m.Embeds) > 0 && strings.Contains(m.Embeds[0].Description, "You just won in the giveaway!") &&
-			m.Message.IsUserMentioned(session.State.User.ID) {
+			m.IsUserMentioned(session.State.User.ID) {
 			prize := m.Embeds[0].Title
 			if len(prize) < 2 {
 				break

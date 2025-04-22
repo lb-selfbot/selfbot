@@ -75,13 +75,18 @@ func checkForUpdates(services *services.Services) {
 
 	downloadUrl := "https://api.lightning-bot.com/static/executables/"
 
-	if runtime.GOOS == "darwin" {
-		downloadUrl += "macos/selfbot"
-	} else if runtime.GOOS == "linux" {
-		downloadUrl += "linux/" + runtime.GOARCH + "/selfbot"
-	} else if runtime.GOOS == "windows" {
-		downloadUrl += "windows/" + runtime.GOARCH + "/selfbot.exe"
+	switch runtime.GOOS {
+	case "darwin":
+		downloadUrl += "macos/"
+	case "linux":
+		downloadUrl += "linux/" + runtime.GOARCH + "/"
+	case "windows":
+		downloadUrl += "windows/" + runtime.GOARCH + "/"
+	default:
+		logging.Error("Unsupported OS:", runtime.GOOS)
+		os.Exit(1)
 	}
+	downloadUrl += "selfbot"
 
 	time.Sleep(3 * time.Second)
 

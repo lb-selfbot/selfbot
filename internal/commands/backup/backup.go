@@ -189,9 +189,10 @@ func (c *BackupCommands) restoreRelationships(ctx *router.Ctx) error {
 	}
 
 	for _, rel := range rels {
-		if rel.Type == 1 {
+		switch rel.Type {
+		case 1:
 			currentFriends = append(currentFriends, rel.User.ID)
-		} else if rel.Type == 2 {
+		case 2:
 			currentBlocked = append(currentBlocked, rel.User.ID)
 		}
 	}

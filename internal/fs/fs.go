@@ -19,7 +19,7 @@ func SanitizeFilename(filename string) string {
 		"LPT6", "LPT7", "LPT8", "LPT9",
 	}
 	for _, c := range blacklist {
-		filename = strings.Replace(filename, c, "", -1)
+		filename = strings.ReplaceAll(filename, c, "")
 	}
 	filename = norm.NFKD.String(filename)
 	filename = strings.TrimSuffix(filename, ". ")
@@ -28,7 +28,7 @@ func SanitizeFilename(filename string) string {
 	for _, c := range filename {
 		// Remove all characters in filename below code point 32
 		if c < ' ' {
-			filename = strings.Replace(filename, string(c), "", -1)
+			filename = strings.ReplaceAll(filename, string(c), "")
 		}
 		if isDots && c != '.' {
 			isDots = false

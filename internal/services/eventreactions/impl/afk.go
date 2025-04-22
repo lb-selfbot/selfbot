@@ -101,7 +101,7 @@ func (a *AFK) Handler(session *discordgo.Session, event any) {
 
 	cfg := a.configSvc.GetConfig()
 
-	activatedOnPing := cfg.AFK.OnPing && message.Message.IsUserMentioned(session.State.User.ID)
+	activatedOnPing := cfg.AFK.OnPing && message.IsUserMentioned(session.State.User.ID)
 	activatedOnDM := cfg.AFK.OnDM && utils.Discord.IsDM(session, message.Message)
 
 	if !(activatedOnPing || activatedOnDM) {
@@ -140,7 +140,7 @@ func (a *AFK) Handler(session *discordgo.Session, event any) {
 			duration := time.Duration(delay) * time.Second
 			duration = max(duration-time.Second*5, 0)
 
-			session.ChannelTypingDuration(message.ChannelID, time.Second*time.Duration(delay))
+			session.ChannelTypingDuration(message.ChannelID, duration)
 		} else {
 			time.Sleep(time.Second * time.Duration(delay))
 		}

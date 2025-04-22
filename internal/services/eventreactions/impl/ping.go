@@ -161,7 +161,7 @@ func (p *Ping) Handler(session *discordgo.Session, event any) {
 		return
 	}
 
-	if !message.Message.IsUserMentioned(session.State.User.ID) {
+	if !message.IsUserMentioned(session.State.User.ID) {
 		return
 	}
 

@@ -37,7 +37,7 @@ func (MiscUtils) Or(a, b string) string {
 }
 
 func (MiscUtils) HexToRGB(hex string) (int, int, int, error) {
-	hex = strings.Replace(hex, "#", "", -1)
+	hex = strings.ReplaceAll(hex, "#", "")
 
 	if len(hex) != 6 {
 		return Misc.HexToRGB("#C1EFFF")

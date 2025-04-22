@@ -1,7 +1,6 @@
 package eventreactions
 
 import (
-	"errors"
 	"fmt"
 	"slices"
 	"strings"
@@ -920,19 +919,6 @@ func (c *EventReactionsCommands) getGuildOrChannel(ctx *router.Ctx, arg *router.
 		guild, err = arg.Guild(router.ArgumentFlagFallbackDefault)
 		return guild, nil, err
 	}
-}
-
-func (c *EventReactionsCommands) mapReactions(ctx *router.Ctx, reactions []types.EventReaction, errText, title string) error {
-	if len(reactions) == 0 {
-		return errors.New(errText)
-	}
-
-	descriptions := fn.Map(reactions, func(reaction types.EventReaction) string {
-		return reaction.Description()
-	})
-
-	c.services.Embed.Respond(ctx, "%s:\n\n%s", title, strings.Join(descriptions, "\n"))
-	return nil
 }
 
 // Commands
