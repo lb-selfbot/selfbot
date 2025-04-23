@@ -19,7 +19,7 @@ var regexSplitting = regexp.MustCompile(`\s+`)
 func (r *routerService) isUserAllowed(ctx *Ctx) bool {
 	if constants.HOSTING && slices.Contains(ctx.Command.Flags, CmdFlagHostingDangerous) {
 		r.eventBroker.Publish(eventbroker.EventLogFeature, &featurelogs.DangerousHostingCmdBlocked{
-			Cmd:  ctx.Command.Name,
+			Cmd: ctx.Command.Name,
 		})
 		return false
 	}
@@ -97,7 +97,12 @@ func (r *routerService) handler(session *discordgo.Session, message *discordgo.M
 			Message:   message.Message,
 		}
 
-		ctx.Arguments = ParseArguments(ctx, content)
+		var err error
+		ctx.Arguments, err = ParseArguments(ctx, content)
+		if err != nil {
+			r.handleCmdError(ctx, err)
+			return
+		}
 
 		if !r.isUserAllowed(ctx) {
 			return
@@ -162,10 +167,16 @@ func (r *routerService) triggerSubCommand(ctx *Ctx) bool {
 		Message:   ctx.Message,
 	}
 
-	subCtx.Arguments = ParseArguments(subCtx, "")
+	subCtx.Arguments = &Arguments{ctx: subCtx}
 	if ctx.Arguments.Amount() > 1 {
 		rawSplit := regexSplitting.Split(ctx.Arguments.Raw(), -1)[1:]
-		subCtx.Arguments = ParseArguments(subCtx, strings.Join(rawSplit, " "))
+
+		var err error
+		subCtx.Arguments, err = ParseArguments(subCtx, strings.Join(rawSplit, " "))
+		if err != nil {
+			r.handleCmdError(subCtx, err)
+			return true
+		}
 	}
 
 	r.triggerCommand(subCtx)

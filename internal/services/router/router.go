@@ -153,7 +153,12 @@ func (r *routerService) InvokeRemoteCmd(
 		},
 	}
 
-	ctx.Arguments = ParseArguments(ctx, args)
+	var err error
+	ctx.Arguments, err = ParseArguments(ctx, args)
+	if err != nil {
+		r.handleCmdError(ctx, err)
+		return
+	}
 
 	r.triggerCommand(ctx)
 }

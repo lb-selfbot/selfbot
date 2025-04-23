@@ -184,7 +184,7 @@ func (s *slashCommandService) LoadJobs(session *discordgo.Session) error {
 	}
 
 	s.jobs = fn.Filter(s.jobs, func(job *SCJob) bool {
-		job.Arguments = router.ParseArguments(&router.Ctx{Session: session}, job.RawArguments)
+		job.Arguments, _ = router.ParseArguments(&router.Ctx{Session: session}, job.RawArguments)
 
 		if job.Command == nil {
 			job.Command, err = s.getCommand(session, job)

@@ -2,6 +2,7 @@ package router
 
 import (
 	"errors"
+	"fmt"
 	"net/url"
 	"regexp"
 	"slices"
@@ -10,6 +11,7 @@ import (
 	"time"
 
 	"github.com/lb-selfbot/discordgo"
+	"github.com/lb-selfbot/selfbot/internal/utils"
 )
 
 var (
@@ -73,7 +75,18 @@ type Arguments struct {
 	arguments []*Argument
 }
 
-func ParseArguments(ctx *Ctx, raw string) *Arguments {
+func ParseArguments(ctx *Ctx, raw string) (*Arguments, error) {
+	// Check which command arguments are required
+	requiredArgs := map[int]string{}
+	if ctx.Command != nil {
+		cmdArgs := strings.Split(ctx.Command.Arguments, " ")
+		for i, arg := range cmdArgs {
+			if len(arg) > 0 && arg[0] == '<' && arg[len(arg)-1] == '>' {
+				requiredArgs[i] = arg[1 : len(arg)-1]
+			}
+		}
+	}
+
 	matches := regexArguments.FindAllString(raw, -1)
 	arguments := make([]*Argument, 0, len(matches))
 
@@ -89,9 +102,11 @@ func ParseArguments(ctx *Ctx, raw string) *Arguments {
 		}
 
 		// Remove escape characters
-		match = strings.ReplaceAll(match, `\"`, `"`)
-		match = strings.ReplaceAll(match, `\'`, `'`)
-		match = strings.ReplaceAll(match, `\\`, `\`)
+		match = strings.NewReplacer(
+			`\"`, `"`,
+			`\'`, `'`,
+			`\\`, `\`,
+		).Replace(match)
 
 		arguments = append(arguments, &Argument{
 			ctx: ctx,
@@ -99,11 +114,26 @@ func ParseArguments(ctx *Ctx, raw string) *Arguments {
 		})
 	}
 
+	if len(arguments) < len(requiredArgs) {
+		missingArgs := make([]string, 0, len(requiredArgs))
+		for i := len(arguments); i < len(requiredArgs); i++ {
+			missingArgs = append(missingArgs, requiredArgs[i])
+		}
+
+		return nil, fmt.Errorf("missing required argument%s: %s", utils.String.Pluralize(len(missingArgs)), strings.Join(missingArgs, ", "))
+	}
+
+	for i, name := range requiredArgs {
+		if i >= len(arguments) {
+			return nil, fmt.Errorf("missing required argument: %s", name)
+		}
+	}
+
 	return &Arguments{
 		ctx:       ctx,
 		raw:       raw,
 		arguments: arguments,
-	}
+	}, nil
 }
 
 // Raw returns the raw arguments.
