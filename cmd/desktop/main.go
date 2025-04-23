@@ -49,12 +49,10 @@ var (
 )
 
 func checkForUpdates(services *services.Services) {
+	version := constants.VERSION[1:]
 	resp, err := http.DefaultClient().Post(
 		"https://api.lightning-bot.com/api/v3/selfbot/check-version",
-		map[string]string{
-			"branch":  "selfbot",
-			"version": constants.VERSION[1:],
-		},
+		map[string]string{"branch": "selfbot", "version": version},
 	)
 	if err != nil {
 		services.UI.LogError("Error checking for updates: " + err.Error())
@@ -62,11 +60,8 @@ func checkForUpdates(services *services.Services) {
 		return
 	}
 
-	data := resp.Json()
-	isLatest := data.Get("is_latest").MustBool()
-	latestVersion := data.Get("latest", "version").MustString()
-
-	if isLatest {
+	latestVersion := resp.Json().Get("latest", "version").MustString()
+	if latestVersion <= constants.VERSION[1:] {
 		return
 	}
 

@@ -103,8 +103,8 @@ func (c *consoleService) clearAndPrintBanner() {
 	centered := utils.String.CenterSlices(ascii)
 	colored := logging.Colored(centered, 0, 203, 255, true) + "\n\n"
 
-	fmt.Print(clearConsoleANSI)
-	fmt.Println(colored)
+	fmt.Println(clearConsoleANSI)
+	fmt.Println("\n" + colored)
 }
 
 func (c *consoleService) processCommands(console string, command string, replacer func(string) string) string {
