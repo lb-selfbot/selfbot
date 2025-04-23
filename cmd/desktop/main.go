@@ -107,8 +107,7 @@ func checkFirstLaunch(services *services.Services) {
 
 	username, password := setup.GetLogin()
 
-	services.UI.ClearConsole()
-	services.UI.ShowBanner()
+	services.Console.Clear()
 
 	token := setup.GetToken()
 
@@ -250,8 +249,7 @@ func main() {
 	}
 
 	if constants.CONSOLE {
-		services.UI.ClearConsole()
-		services.UI.ShowBanner()
+		services.Console.Clear()
 
 		checkForUpdates(services)
 		checkFirstLaunch(services)

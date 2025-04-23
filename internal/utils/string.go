@@ -142,16 +142,17 @@ func (StringUtils) Mock(text string) string {
 }
 
 func (StringUtils) CenterWidth(text string, width int) string {
-	spaceCount := (width - len(text)) / 2
-	spaceCount = int(math.Max(float64(spaceCount), 0))
-
+	if width <= 0 || len(text) == 0 {
+		return text
+	}
+	spaceCount := max((width-len(text))/2, 0)
 	return strings.Repeat(" ", spaceCount) + text
 }
 
 func (StringUtils) Center(text string) string {
 	fd := int(os.Stdout.Fd())
 	w, _, err := term.GetSize(fd)
-	if err != nil {
+	if err != nil || w <= 0 {
 		return text
 	}
 	return String.CenterWidth(text, w)

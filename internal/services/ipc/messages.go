@@ -8,6 +8,11 @@ type WSMessage struct {
 	Data WSData   `json:"data"`
 }
 
+type WsMessageReceive struct {
+	Op   WSOpCode       `json:"op"`
+	Data *config.Config `json:"data"`
+}
+
 // WSData represents the data payload of a websocket message
 type WSData struct {
 	Text       string         `json:"text,omitempty"`

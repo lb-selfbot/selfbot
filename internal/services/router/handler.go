@@ -18,7 +18,9 @@ var regexSplitting = regexp.MustCompile(`\s+`)
 
 func (r *routerService) isUserAllowed(ctx *Ctx) bool {
 	if constants.HOSTING && slices.Contains(ctx.Command.Flags, CmdFlagHostingDangerous) {
-		// d.uiSvc.LogDangerousHostingCmdBlocked(ctx.Command.Name)
+		r.eventBroker.Publish(eventbroker.EventLogFeature, &featurelogs.DangerousHostingCmdBlocked{
+			Cmd:  ctx.Command.Name,
+		})
 		return false
 	}
 
@@ -33,7 +35,10 @@ func (r *routerService) isUserAllowed(ctx *Ctx) bool {
 	}
 
 	if cfg.Sharing.BlockDangerousCommands && slices.Contains(ctx.Command.Flags, CmdFlagDangerous) {
-		// d.uiSvc.LogDangerousCmdBlocked(ctx.Message.Author, ctx.Command.Name)
+		r.eventBroker.Publish(eventbroker.EventLogFeature, &featurelogs.DangerousCmdBlocked{
+			User: ctx.Message.Author,
+			Cmd:  ctx.Command.Name,
+		})
 		return false
 	}
 

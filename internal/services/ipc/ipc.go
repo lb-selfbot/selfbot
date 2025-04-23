@@ -9,6 +9,7 @@ import (
 	"github.com/gorilla/websocket"
 	"github.com/lb-selfbot/selfbot/internal/constants"
 	"github.com/lb-selfbot/selfbot/internal/services/config"
+	"github.com/lb-selfbot/selfbot/internal/services/console/consoledefs"
 	"github.com/lb-selfbot/selfbot/internal/services/eventbroker"
 )
 
@@ -45,16 +46,8 @@ func NewService(eventBroker eventbroker.Service, configSvc config.Service) Servi
 }
 
 func (i *ipcService) subscribe() {
-	i.eventBroker.Subscribe(eventbroker.EventRestart, func(payload any) {
-		if i.conn == nil {
-			return
-		}
-
-		if i.conn == nil {
-			return
-		}
-
-		_ = i.conn.WriteJSON(&WSMessage{Op: OpCodeRestart})
+	i.eventBroker.Subscribe(eventbroker.EventRestart, func(any) {
+		_ = i.write(&WSMessage{Op: OpCodeRestart})
 	})
 
 	i.eventBroker.Subscribe(eventbroker.EventLogError, func(payload any) {
@@ -63,45 +56,31 @@ func (i *ipcService) subscribe() {
 			return
 		}
 
-		if i.conn == nil {
-			return
-		}
-
-		_ = i.conn.WriteJSON(&WSMessage{Op: OpCodeError, Data: WSData{Text: text}})
+		_ = i.write(&WSMessage{Op: OpCodeError, Data: WSData{Text: text}})
 	})
 
+	// TODO: raw cutoff
 	i.eventBroker.Subscribe(eventbroker.EventSetConsole, func(payload any) {
-		console, ok := payload.(string)
+		console, ok := payload.(consoledefs.Set)
 		if !ok {
 			return
 		}
 
-		if i.conn == nil {
-			return
-		}
-
-		_ = i.conn.WriteJSON(&WSMessage{Op: OpCodeConsoleSet, Data: WSData{Text: console}})
+		_ = i.write(&WSMessage{Op: OpCodeConsoleSet, Data: WSData{Text: console.HTML}})
 	})
 
+	// TODO: raw cutoff
 	i.eventBroker.Subscribe(eventbroker.EventAppendConsole, func(payload any) {
-		console, ok := payload.(string)
+		console, ok := payload.(consoledefs.Append)
 		if !ok {
 			return
 		}
 
-		if i.conn == nil {
-			return
-		}
-
-		_ = i.conn.WriteJSON(&WSMessage{Op: OpCodeConsoleAppend, Data: WSData{Text: console}})
+		_ = i.write(&WSMessage{Op: OpCodeConsoleAppend, Data: WSData{Text: console.HTML}})
 	})
 
 	i.eventBroker.Subscribe(eventbroker.EventClearConsole, func(any) {
-		if i.conn == nil {
-			return
-		}
-
-		_ = i.conn.WriteJSON(&WSMessage{Op: OpCodeConsoleClear})
+		_ = i.write(&WSMessage{Op: OpCodeConsoleClear})
 	})
 }
 
@@ -145,7 +124,7 @@ func (i *ipcService) handleRequest(w http.ResponseWriter, r *http.Request) {
 	}
 
 	for {
-		message := &WSMessage{}
+		message := &WsMessageReceive{}
 
 		err = i.conn.ReadJSON(message)
 		if err != nil {
@@ -164,4 +143,12 @@ func (i *ipcService) handleRequest(w http.ResponseWriter, r *http.Request) {
 	if !constants.DEBUG {
 		os.Exit(0)
 	}
+}
+
+func (i *ipcService) write(message *WSMessage) error {
+	if i.conn == nil {
+		return nil
+	}
+
+	return i.conn.WriteJSON(message)
 }

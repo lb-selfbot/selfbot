@@ -1729,8 +1729,7 @@ func (c *UtilityCommands) stopbot(*router.Ctx) error {
 }
 
 func (c *UtilityCommands) cls(*router.Ctx) error {
-	c.services.UI.ClearConsole()
-	c.services.UI.ShowBanner()
+	c.services.Console.Clear()
 	return nil
 }
 

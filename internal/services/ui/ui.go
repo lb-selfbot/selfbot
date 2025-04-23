@@ -8,13 +8,12 @@ import (
 	"time"
 
 	"github.com/LightningDev1/beeep"
-	"github.com/common-nighthawk/go-figure"
 	"github.com/lb-selfbot/discordgo"
-	"github.com/lb-selfbot/selfbot/internal/constants"
 	"github.com/lb-selfbot/selfbot/internal/embed"
 	"github.com/lb-selfbot/selfbot/internal/fn"
 	"github.com/lb-selfbot/selfbot/internal/fs"
 	"github.com/lb-selfbot/selfbot/internal/services/config"
+	"github.com/lb-selfbot/selfbot/internal/services/console"
 	"github.com/lb-selfbot/selfbot/internal/services/discord"
 	"github.com/lb-selfbot/selfbot/internal/services/eventbroker"
 	"github.com/lb-selfbot/selfbot/internal/utils"
@@ -22,12 +21,6 @@ import (
 
 // Service handles high-level logging and displaying information to the user.
 type Service interface {
-	// ClearConsole clears the console.
-	ClearConsole()
-
-	// ShowBanner displays the LightningBot banner.
-	ShowBanner()
-
 	// ShowNotification displays a notification to the user.
 	ShowNotification(format string, e ...any) error
 
@@ -40,13 +33,14 @@ type Service interface {
 
 type uiService struct {
 	eventBroker eventbroker.Service
+	consoleSvc  console.Service
 	configSvc   config.Service
 	discordSvc  discord.Service
 }
 
 // NewService creates a new UIService instance.
-func NewService(eventBroker eventbroker.Service, configSvc config.Service, discordSvc discord.Service) Service {
-	svc := &uiService{eventBroker: eventBroker, configSvc: configSvc, discordSvc: discordSvc}
+func NewService(eventBroker eventbroker.Service, consoleSvc console.Service, configSvc config.Service, discordSvc discord.Service) Service {
+	svc := &uiService{eventBroker: eventBroker, consoleSvc: consoleSvc, configSvc: configSvc, discordSvc: discordSvc}
 	svc.subscribe()
 	return svc
 }
@@ -80,18 +74,6 @@ func (ui *uiService) subscribe() {
 	})
 
 	ui.eventBroker.Subscribe(eventbroker.EventLogFeature, ui.logFeature)
-}
-
-func (ui *uiService) ClearConsole() {
-	ui.eventBroker.Publish(eventbroker.EventClearConsole, nil)
-}
-
-func (ui *uiService) ShowBanner() {
-	ascii := figure.NewFigure("LightningBot", "stop", true).Slicify()
-	centered := utils.String.CenterSlices(ascii)
-	colored := ui.colored(centered, 0, 203, 255, true) + "\n\n"
-
-	fmt.Println(colored)
 }
 
 func (ui *uiService) ShowNotification(format string, e ...any) error {
@@ -130,11 +112,7 @@ func (ui *uiService) ShowConsoleMessage(c *ConsoleMessage) error {
 		message += ui.colored("  "+info.Key+": ", 238, 238, 238, false) + ui.colored(info.Value, 193, 239, 255, false) + "\n"
 	}
 
-	if constants.CONSOLE {
-		fmt.Println(message)
-	}
-
-	ui.eventBroker.Publish(eventbroker.EventAppendConsole, message)
+	ui.consoleSvc.Append(message)
 
 	if c.WebhookURL != "" {
 		emb := embed.NewEmbed(nil)
@@ -204,7 +182,7 @@ func (ui *uiService) LogError(format string, e ...any) {
 	// Console
 	text = fmt.Sprintf("[%s] [ERROR] %s", ui.formattedTime(), text)
 
-	ui.eventBroker.Publish(eventbroker.EventAppendConsole, ui.colored(text, 255, 100, 100, true))
+	ui.consoleSvc.Append(ui.colored(text, 255, 100, 100, true))
 }
 
 func (ui *uiService) LogInfo(format string, e ...any) {
@@ -213,7 +191,7 @@ func (ui *uiService) LogInfo(format string, e ...any) {
 	// Console
 	text = fmt.Sprintf("[%s] [INFO] %s", ui.formattedTime(), text)
 
-	ui.eventBroker.Publish(eventbroker.EventAppendConsole, ui.colored(text, 193, 239, 255, true))
+	ui.consoleSvc.Append(ui.colored(text, 100, 255, 100, true))
 }
 
 // colored formats the text with ANSI color codes.

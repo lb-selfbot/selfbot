@@ -7,7 +7,7 @@ import (
 	"github.com/lb-selfbot/selfbot/internal/services/eventbroker"
 )
 
-func (i *ipcService) handleMessage(msg *WSMessage) error {
+func (i *ipcService) handleMessage(msg *WsMessageReceive) error {
 	switch msg.Op {
 	case OpCodeHello:
 		return nil
@@ -17,8 +17,8 @@ func (i *ipcService) handleMessage(msg *WSMessage) error {
 		return nil
 
 	case OpCodeConfigUpdate:
-		i.eventBroker.Publish(eventbroker.EventSendConfigUpdateSync, msg.Data.Config)
-		i.configSvc.SetConfigFromUI(msg.Data.Config)
+		i.eventBroker.Publish(eventbroker.EventSendConfigUpdateSync, msg.Data)
+		i.configSvc.SetConfigFromUI(msg.Data)
 		return nil
 
 	default:

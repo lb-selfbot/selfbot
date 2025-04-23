@@ -27,10 +27,10 @@ import (
 type Services struct {
 	EventBroker eventbroker.Service
 	Config      config.Service
-	Console     console.Service
 	Backup      backup.Service
 	Spotify     spotify.Service
 
+	Console      console.Service
 	Router       router.Service
 	Sessions     sessions.Service
 	Extensions   extensions.Service
@@ -53,10 +53,10 @@ type Services struct {
 func NewServices() *Services {
 	eventBroker := eventbroker.NewService()
 	cfg := config.NewService()
-	console := console.NewService()
 	backup := backup.NewService()
 	spotify := spotify.NewService()
 
+	console := console.NewService(eventBroker)
 	router := router.NewService(eventBroker, cfg)
 	sessions := sessions.NewService(eventBroker)
 	extensions := extensions.NewService(eventBroker)
@@ -69,7 +69,7 @@ func NewServices() *Services {
 
 	variables := variables.NewService(eventBroker, router, extensions, spotify)
 	embed := embed.NewService(cfg, variables)
-	ui := ui.NewService(eventBroker, cfg, discord)
+	ui := ui.NewService(eventBroker, console, cfg, discord)
 	eventReactions := eventreactions.NewService(eventBroker, cfg, router, variables, discord)
 	mts := mts.NewService(eventBroker, cfg, eventReactions)
 	rpc := rpc.NewService(eventBroker, cfg, sessions, variables)
@@ -77,10 +77,10 @@ func NewServices() *Services {
 	return &Services{
 		EventBroker: eventBroker,
 		Config:      cfg,
-		Console:     console,
 		Backup:      backup,
 		Spotify:     spotify,
 
+		Console:      console,
 		Router:       router,
 		Sessions:     sessions,
 		Extensions:   extensions,

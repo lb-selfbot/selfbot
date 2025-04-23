@@ -10,9 +10,7 @@ import (
 	"github.com/lb-selfbot/selfbot/internal/fn"
 	"github.com/lb-selfbot/selfbot/internal/logging"
 	"github.com/lb-selfbot/selfbot/internal/services/config"
-	"github.com/lb-selfbot/selfbot/internal/services/eventbroker"
 	"github.com/lb-selfbot/selfbot/internal/services/ui/featurelogs"
-	"github.com/lb-selfbot/selfbot/internal/utils"
 )
 
 const consoleMsgColor = "#C1EFFF"
@@ -133,14 +131,14 @@ func (ui *uiService) logReady(user *discordgo.User, guilds []*discordgo.Guild, n
 	upper := ui.colored(bannerTextUpper, 0, 203, 255, false)
 	lower := ui.colored(bannerTextLower, 0, 203, 255, false)
 
-	if constants.CONSOLE {
-		upper := ui.colored(utils.String.Center(bannerTextUpper), 0, 203, 255, false)
-		lower := ui.colored(utils.String.Center(bannerTextLower), 0, 203, 255, false)
+	// if constants.CONSOLE {
+	// 	upper := ui.colored(utils.String.Center(bannerTextUpper), 0, 203, 255, false)
+	// 	lower := ui.colored(utils.String.Center(bannerTextLower), 0, 203, 255, false)
 
-		fmt.Println(upper + "\n" + lower + "\n")
-	}
+	// 	fmt.Println(upper + "\n" + lower + "\n")
+	// }
 
-	ui.eventBroker.Publish(eventbroker.EventSetConsole, "ALIGN_CENTER"+upper+"\nALIGN_CENTER"+lower+"\n")
+	ui.consoleSvc.Set("ALIGN_CENTER" + upper + "\nALIGN_CENTER" + lower + "\n")
 }
 
 func (ui *uiService) logNitroSniper(msg *discordgo.Message, elapsed time.Duration, status, code, account string) {

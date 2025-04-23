@@ -2,6 +2,8 @@ package eventbroker
 
 import (
 	"sync"
+
+	"github.com/lb-selfbot/selfbot/internal/logging"
 )
 
 // EventType represents the type of event that can be published and subscribed to.
@@ -66,6 +68,11 @@ func (b *eventBroker) Publish(eventType EventType, payload any) {
 	handlers := make([]EventHandler, len(b.subscribers[eventType]))
 	copy(handlers, b.subscribers[eventType])
 	b.mu.RUnlock()
+
+	if len(handlers) == 0 {
+		logging.Warn("EventBroker: event published but no handlers found")
+		return
+	}
 
 	for _, handler := range handlers {
 		go handler(payload)

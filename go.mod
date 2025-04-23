@@ -73,6 +73,7 @@ require (
 	github.com/power-devops/perfstat v0.0.0-20240221224432-82ca36839d55 // indirect
 	github.com/quic-go/quic-go v0.50.1 // indirect
 	github.com/rivo/uniseg v0.4.7 // indirect
+	github.com/robert-nix/ansihtml v1.0.1 // indirect
 	github.com/sahilm/fuzzy v0.1.1 // indirect
 	github.com/tadvi/systray v0.0.0-20190226123456-11a2b8fa57af // indirect
 	github.com/tam7t/hpkp v0.0.0-20160821193359-2b70b4024ed5 // indirect

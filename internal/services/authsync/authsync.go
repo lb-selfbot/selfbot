@@ -18,6 +18,7 @@ import (
 	"github.com/lb-selfbot/selfbot/internal/random"
 	"github.com/lb-selfbot/selfbot/internal/services/config"
 	"github.com/lb-selfbot/selfbot/internal/services/console"
+	"github.com/lb-selfbot/selfbot/internal/services/console/consoledefs"
 	"github.com/lb-selfbot/selfbot/internal/services/eventbroker"
 	"github.com/lb-selfbot/selfbot/internal/setup"
 	"github.com/lb-selfbot/selfbot/internal/system"
@@ -97,23 +98,23 @@ func (a *authSyncService) subscribe() {
 	})
 
 	a.eventBroker.Subscribe(eventbroker.EventSetConsole, func(payload any) {
-		console, ok := payload.(string)
+		console, ok := payload.(consoledefs.Set)
 		if !ok {
 			return
 		}
 
-		if err := a.SendSync(SyncTypeConsoleSet, console); err != nil {
+		if err := a.SendSync(SyncTypeConsoleSet, console.HTML); err != nil {
 			logging.Error("Failed to send console set sync:", err)
 		}
 	})
 
 	a.eventBroker.Subscribe(eventbroker.EventAppendConsole, func(payload any) {
-		html, ok := payload.(string)
+		console, ok := payload.(consoledefs.Append)
 		if !ok {
 			return
 		}
 
-		if err := a.SendSync(SyncTypeConsoleAppend, html); err != nil {
+		if err := a.SendSync(SyncTypeConsoleAppend, console.HTML); err != nil {
 			logging.Error("Failed to send console append sync:", err)
 		}
 	})
