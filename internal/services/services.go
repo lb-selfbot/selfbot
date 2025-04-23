@@ -62,7 +62,7 @@ func NewServices() *Services {
 	extensions := extensions.NewService(eventBroker)
 	discord := discord.NewService(eventBroker, cfg)
 	o11y := o11y.NewService(eventBroker, cfg)
-	ipc := ipc.NewService(eventBroker, cfg)
+	ipc := ipc.NewService(eventBroker, cfg, console)
 	reminder := reminder.NewService(eventBroker, cfg)
 	slashCommand := slashcommand.NewService(eventBroker, cfg)
 	authSync := authsync.NewService(eventBroker, cfg, console)

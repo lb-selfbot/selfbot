@@ -9,6 +9,7 @@ import (
 	"github.com/gorilla/websocket"
 	"github.com/lb-selfbot/selfbot/internal/constants"
 	"github.com/lb-selfbot/selfbot/internal/services/config"
+	"github.com/lb-selfbot/selfbot/internal/services/console"
 	"github.com/lb-selfbot/selfbot/internal/services/console/consoledefs"
 	"github.com/lb-selfbot/selfbot/internal/services/eventbroker"
 )
@@ -30,17 +31,20 @@ type Service interface {
 type ipcService struct {
 	eventBroker eventbroker.Service
 	configSvc   config.Service
+	consoleSvc  console.Service
 
 	upgrader *websocket.Upgrader
 	conn     *websocket.Conn
 	mu       sync.Mutex
 
 	readyChan chan struct{}
+
+	sentRawConsole bool
 }
 
 // NewService creates a new IPCService instance.
-func NewService(eventBroker eventbroker.Service, configSvc config.Service) Service {
-	svc := &ipcService{eventBroker: eventBroker, configSvc: configSvc}
+func NewService(eventBroker eventbroker.Service, configSvc config.Service, consoleSvc console.Service) Service {
+	svc := &ipcService{eventBroker: eventBroker, configSvc: configSvc, consoleSvc: consoleSvc}
 	svc.subscribe()
 	return svc
 }
@@ -66,7 +70,16 @@ func (i *ipcService) subscribe() {
 			return
 		}
 
-		_ = i.write(&WSMessage{Op: OpCodeConsoleSet, Data: WSData{Text: console.HTML}})
+		if len(console.HTML) < htmlCutOff {
+			_ = i.write(&WSMessage{Op: OpCodeConsoleSet, Data: WSData{Text: console.HTML}})
+
+			i.sentRawConsole = false
+		} else {
+			rawConsole := constants.ANSI_REGEX.ReplaceAllString(console.ANSI, "")
+			_ = i.write(&WSMessage{Op: OpCodeConsoleSet, Data: WSData{Text: rawConsole, IsRaw: true}})
+
+			i.sentRawConsole = true
+		}
 	})
 
 	// TODO: raw cutoff
@@ -76,11 +89,23 @@ func (i *ipcService) subscribe() {
 			return
 		}
 
-		_ = i.write(&WSMessage{Op: OpCodeConsoleAppend, Data: WSData{Text: console.HTML}})
+		if len(console.HTML) < htmlCutOff {
+			_ = i.write(&WSMessage{Op: OpCodeConsoleAppend, Data: WSData{Text: console.HTML}})
+		} else if i.sentRawConsole {
+			rawConsole := constants.ANSI_REGEX.ReplaceAllString(console.ANSI, "")
+			_ = i.write(&WSMessage{Op: OpCodeConsoleAppend, Data: WSData{Text: rawConsole, IsRaw: true}})
+		} else {
+			rawConsole := constants.ANSI_REGEX.ReplaceAllString(i.consoleSvc.GetANSIConsole(), "")
+			_ = i.write(&WSMessage{Op: OpCodeConsoleAppend, Data: WSData{Text: rawConsole, IsRaw: true}})
+
+			i.sentRawConsole = true
+		}
 	})
 
 	i.eventBroker.Subscribe(eventbroker.EventClearConsole, func(any) {
 		_ = i.write(&WSMessage{Op: OpCodeConsoleClear})
+
+		i.sentRawConsole = false
 	})
 }
 

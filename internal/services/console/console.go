@@ -27,7 +27,7 @@ const (
 // Service handles the output console state.
 type Service interface {
 	GetHTMLConsole() string
-	GetRawConsole() string
+	GetANSIConsole() string
 
 	Set(ansi string)
 	Append(ansi string)
@@ -38,7 +38,7 @@ type consoleService struct {
 	eventBroker eventbroker.Service
 
 	htmlConsole string
-	rawConsole  string
+	ansiConsole  string
 	mu          sync.RWMutex
 }
 
@@ -60,7 +60,7 @@ func (c *consoleService) subscribe() {
 		defer c.mu.Unlock()
 
 		c.htmlConsole = console.HTML
-		c.rawConsole = console.ANSI
+		c.ansiConsole = console.ANSI
 
 		if constants.CONSOLE {
 			c.clearAndPrintBanner()
@@ -78,7 +78,7 @@ func (c *consoleService) subscribe() {
 		defer c.mu.Unlock()
 
 		c.htmlConsole += console.HTML
-		c.rawConsole += console.ANSI
+		c.ansiConsole += console.ANSI
 
 		if constants.CONSOLE {
 			fmt.Println(c.processCommands(console.ANSI, commandAlignCenter, c.alignCenterANSIReplacer))
@@ -90,7 +90,7 @@ func (c *consoleService) subscribe() {
 		defer c.mu.Unlock()
 
 		c.htmlConsole = ""
-		c.rawConsole = ""
+		c.ansiConsole = ""
 
 		if constants.CONSOLE {
 			c.clearAndPrintBanner()
@@ -163,11 +163,11 @@ func (c *consoleService) GetHTMLConsole() string {
 	return c.htmlConsole
 }
 
-func (c *consoleService) GetRawConsole() string {
+func (c *consoleService) GetANSIConsole() string {
 	c.mu.RLock()
 	defer c.mu.RUnlock()
 
-	return c.rawConsole
+	return c.ansiConsole
 }
 
 func (c *consoleService) Set(ansi string) {
