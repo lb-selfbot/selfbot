@@ -68,9 +68,9 @@ func (ui *uiService) logFeature(payload any) {
 	case *featurelogs.MultiTokenSniper:
 		ui.logMultiTokenSniper(data.NumTokens, data.NumGuilds)
 	case *featurelogs.SessionConnected:
-		ui.logSessionConnected(data.ID, data.OS, data.Client)
+		ui.logSessionConnected(data.ID, data.OS, data.Client, data.Location)
 	case *featurelogs.SessionDisconnected:
-		ui.logSessionDisconnected(data.ID, data.OS, data.Client)
+		ui.logSessionDisconnected(data.ID, data.OS, data.Client, data.Location)
 	case *featurelogs.SCJobs:
 		ui.logSCJobs(data.NumJobs)
 	case *featurelogs.EventReactions:
@@ -610,7 +610,7 @@ func (ui *uiService) logMultiTokenSniper(numTokens, numGuilds int) {
 		Show()
 }
 
-func (ui *uiService) logSessionConnected(id, os, client string) {
+func (ui *uiService) logSessionConnected(id, os, client, location string) {
 	cfg := ui.configSvc.GetConfig()
 
 	if !cfg.Events.SessionConnected {
@@ -624,11 +624,12 @@ func (ui *uiService) logSessionConnected(id, os, client string) {
 		AddInfo("Session ID", id).
 		AddInfo("OS", os).
 		AddInfo("Client", client).
+		AddInfo("Location", location).
 		SetWebhookURL(cfg.Webhooks.Sessions).
 		Show()
 }
 
-func (ui *uiService) logSessionDisconnected(id, os, client string) {
+func (ui *uiService) logSessionDisconnected(id, os, client, location string) {
 	cfg := ui.configSvc.GetConfig()
 
 	if !cfg.Events.SessionDisconnected {
@@ -642,6 +643,7 @@ func (ui *uiService) logSessionDisconnected(id, os, client string) {
 		AddInfo("Session ID", id).
 		AddInfo("OS", os).
 		AddInfo("Client", client).
+		AddInfo("Location", location).
 		SetWebhookURL(cfg.Webhooks.Sessions).
 		Show()
 }

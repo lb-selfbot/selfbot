@@ -166,6 +166,7 @@ type SessionConnected struct {
 	ID     string
 	OS     string
 	Client string
+	Location string
 }
 
 // SessionDisconnected has the data for a session disconnection log.
@@ -173,6 +174,7 @@ type SessionDisconnected struct {
 	ID     string
 	OS     string
 	Client string
+	Location string
 }
 
 // SCJobs has the data for slash command jobs log.

@@ -201,17 +201,19 @@ func (s *sessionsService) findRemovedSessions(currentSessions []*discordgo.Login
 func (s *sessionsService) handleChangedSessions(newSessions, removedSessions []*discordgo.LoginSession) {
 	for _, session := range newSessions {
 		s.eventBroker.Publish(eventbroker.EventLogFeature, &featurelogs.SessionConnected{
-			ID:     session.IDHash,
-			OS:     session.ClientInfo.OS,
-			Client: session.ClientInfo.Platform,
+			ID:       session.IDHash,
+			OS:       session.ClientInfo.OS,
+			Client:   session.ClientInfo.Platform,
+			Location: session.ClientInfo.Location,
 		})
 	}
 
 	for _, session := range removedSessions {
 		s.eventBroker.Publish(eventbroker.EventLogFeature, &featurelogs.SessionDisconnected{
-			ID:     session.IDHash,
-			OS:     session.ClientInfo.OS,
-			Client: session.ClientInfo.Platform,
+			ID:       session.IDHash,
+			OS:       session.ClientInfo.OS,
+			Client:   session.ClientInfo.Platform,
+			Location: session.ClientInfo.Location,
 		})
 	}
 }
