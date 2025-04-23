@@ -123,7 +123,7 @@ func (c *CurrencyCommands) generateAddressFunc(name, shortCode string, power int
 
 		resp, err := http.DefaultClient().Get(url)
 		if err != nil {
-			return fmt.Errorf("An error has occurred.")
+			return fmt.Errorf("An error has occurred: %v", err)
 		}
 
 		json := resp.Json()
@@ -155,7 +155,7 @@ func (c *CurrencyCommands) generateTransactionFunc(name, shortCode string, power
 
 		resp, err := http.DefaultClient().Get(url)
 		if err != nil {
-			return fmt.Errorf("An error has occurred.")
+			return fmt.Errorf("An error has occurred: %v", err)
 		}
 
 		json := resp.Json()

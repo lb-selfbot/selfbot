@@ -148,7 +148,7 @@ func (c *MemeGenCommands) randommeme(ctx *router.Ctx) error {
 	top, bottom := ctx.Arguments.Get(0).Raw(), ctx.Arguments.Get(1).Raw()
 	resp, err := http.DefaultClient().Get("https://api.imgflip.com/get_memes")
 	if err != nil {
-		return fmt.Errorf("An error has occurred.")
+		return fmt.Errorf("An error has occurred: %v", err)
 	}
 
 	memes := resp.Json().Get("data").Get("memes")

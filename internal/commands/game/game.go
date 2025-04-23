@@ -125,7 +125,7 @@ func (c *GameCommands) mcuuid(ctx *router.Ctx) error {
 		[]string{username},
 	)
 	if err != nil {
-		return fmt.Errorf("An error has occurred.")
+		return fmt.Errorf("An error has occurred: %v", err)
 	}
 
 	uuid := resp.Json().Get(0).Get("id").MustString()
@@ -140,7 +140,7 @@ func (c *GameCommands) mcuuid(ctx *router.Ctx) error {
 func (c *GameCommands) mcnamehistory(ctx *router.Ctx) error {
 	resp, err := http.DefaultClient().Get(fmt.Sprintf("https://api.mojang.com/user/profiles/%s/names", ctx.Arguments.Get(0).Escaped()))
 	if err != nil {
-		return fmt.Errorf("An error has occurred.")
+		return fmt.Errorf("An error has occurred: %v", err)
 	}
 
 	var names []string
@@ -166,7 +166,7 @@ func (c *GameCommands) mcnamehistory(ctx *router.Ctx) error {
 func (c *GameCommands) fnmap(ctx *router.Ctx) error {
 	resp, err := http.DefaultClient().Get("https://fortnite-api.com/v1/map")
 	if err != nil {
-		return fmt.Errorf("An error has occurred.")
+		return fmt.Errorf("An error has occurred: %v", err)
 	}
 	c.services.Embed.New(ctx).
 		SetDescription("Fortnite Map").
@@ -178,7 +178,7 @@ func (c *GameCommands) fnmap(ctx *router.Ctx) error {
 func (c *GameCommands) fnmappois(ctx *router.Ctx) error {
 	resp, err := http.DefaultClient().Get("https://fortnite-api.com/v1/map")
 	if err != nil {
-		return fmt.Errorf("An error has occurred.")
+		return fmt.Errorf("An error has occurred: %v", err)
 	}
 	c.services.Embed.New(ctx).
 		SetDescription("Fortnite Map").
@@ -190,7 +190,7 @@ func (c *GameCommands) fnmappois(ctx *router.Ctx) error {
 func (c *GameCommands) fnrandomplaylist(ctx *router.Ctx) error {
 	resp, err := http.DefaultClient().Get("https://fortnite-api.com/v1/playlists")
 	if err != nil {
-		return fmt.Errorf("An error has occurred.")
+		return fmt.Errorf("An error has occurred: %v", err)
 	}
 	data := resp.Json().Get("data")
 	playlist := data.Get(random.Int(0, data.Len()-1))
@@ -209,7 +209,7 @@ func (c *GameCommands) fnrandomplaylist(ctx *router.Ctx) error {
 func (c *GameCommands) fnrandombanner(ctx *router.Ctx) error {
 	resp, err := http.DefaultClient().Get("https://fortnite-api.com/v1/banners")
 	if err != nil {
-		return fmt.Errorf("An error has occurred.")
+		return fmt.Errorf("An error has occurred: %v", err)
 	}
 	data := resp.Json().Get("data")
 	banner := data.Get(random.Int(0, data.Len()-1))
@@ -232,7 +232,7 @@ func (c *GameCommands) fnstats(ctx *router.Ctx) error {
 		http.WithHeader("Authorization", "111a67c8-39d1-4d7c-a5bf-74842b0f112c"),
 	)
 	if err != nil {
-		return fmt.Errorf("An error has occurred.")
+		return fmt.Errorf("An error has occurred: %v", err)
 	}
 
 	data := resp.Json()
@@ -258,7 +258,7 @@ func (c *GameCommands) fnstats(ctx *router.Ctx) error {
 func (c *GameCommands) fncreatorcode(ctx *router.Ctx) error {
 	resp, err := http.DefaultClient().Get(fmt.Sprintf("https://fortnite-api.com/v2/creatorcode/search?name=%s", ctx.Arguments.Get(0).Escaped()))
 	if err != nil {
-		return fmt.Errorf("An error has occurred.")
+		return fmt.Errorf("An error has occurred: %v", err)
 	}
 	data := resp.Json()
 	if data.Get("status").MustInt() != 200 {
@@ -278,7 +278,7 @@ func (c *GameCommands) fncreatorcode(ctx *router.Ctx) error {
 func (c *GameCommands) fnrandomcosmetic(ctx *router.Ctx) error {
 	resp, err := http.DefaultClient().Get("https://fortnite-api.com/v2/cosmetics/br")
 	if err != nil {
-		return fmt.Errorf("An error has occurred.")
+		return fmt.Errorf("An error has occurred: %v", err)
 	}
 	data := resp.Json().Get("data")
 	cosmetic := data.Get(random.Int(0, data.Len()-1))
@@ -299,7 +299,7 @@ func (c *GameCommands) fnrandomcosmetic(ctx *router.Ctx) error {
 func (c *GameCommands) fnstatus(ctx *router.Ctx) error {
 	resp, err := http.DefaultClient().Get("https://status.epicgames.com/api/v2/status.json")
 	if err != nil {
-		return fmt.Errorf("An error has occurred.")
+		return fmt.Errorf("An error has occurred: %v", err)
 	}
 	c.services.Embed.RespondField(ctx, "Fortnite Status", resp.Json().Get("status", "description").MustString("Error"))
 	return nil
@@ -308,7 +308,7 @@ func (c *GameCommands) fnstatus(ctx *router.Ctx) error {
 func (c *GameCommands) alstatus(ctx *router.Ctx) error {
 	resp, err := http.DefaultClient().Get("https://api.mozambiquehe.re/servers?auth=IgUq5IRUFvvFxdXbrgmy")
 	if err != nil {
-		return fmt.Errorf("An error has occurred.")
+		return fmt.Errorf("An error has occurred: %v", err)
 	}
 	data := resp.Json()
 	c.services.Embed.New(ctx).
@@ -327,7 +327,7 @@ func (c *GameCommands) alstatus(ctx *router.Ctx) error {
 func (c *GameCommands) alnews(ctx *router.Ctx) error {
 	resp, err := http.DefaultClient().Get("https://api.mozambiquehe.re/news?lang=en-us&auth=IgUq5IRUFvvFxdXbrgmy")
 	if err != nil {
-		return fmt.Errorf("An error has occurred.")
+		return fmt.Errorf("An error has occurred: %v", err)
 	}
 	emb := c.services.Embed.New(ctx).SetDescription("Apex Legends News")
 	for news := range resp.Json().Iterator() {
@@ -352,7 +352,7 @@ func (c *GameCommands) alstats(ctx *router.Ctx) error {
 		),
 	)
 	if err != nil {
-		return fmt.Errorf("An error has occurred.")
+		return fmt.Errorf("An error has occurred: %v", err)
 	}
 
 	stats := resp.Json()
@@ -408,7 +408,7 @@ func (c *GameCommands) fivemplayers(ctx *router.Ctx) error {
 	host := ctx.Arguments.Get(0).Raw()
 	resp, err := http.DefaultClient().Get("http://" + host + "/dynamic.json")
 	if err != nil {
-		return fmt.Errorf("An error has occurred.")
+		return fmt.Errorf("An error has occurred: %v", err)
 	}
 
 	json := resp.Json()
@@ -425,7 +425,7 @@ func (c *GameCommands) fiveminfo(ctx *router.Ctx) error {
 	host := ctx.Arguments.Get(0).Raw()
 	resp, err := http.DefaultClient().Get("http://" + host + "/dynamic.json")
 	if err != nil {
-		return fmt.Errorf("An error has occurred.")
+		return fmt.Errorf("An error has occurred: %v", err)
 	}
 
 	json := resp.Json()

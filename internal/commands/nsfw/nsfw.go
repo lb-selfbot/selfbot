@@ -68,7 +68,7 @@ func (c *NSFWCommands) generateFunc(name string, subReddits []string) func(ctx *
 	return func(ctx *router.Ctx) error {
 		image, success := api.GetImageFromSubreddit(random.Choice(subReddits))
 		if !success {
-			return fmt.Errorf("An error has occurred.")
+			return fmt.Errorf("An error has occurred while fetching the image.")
 		}
 
 		c.services.Embed.New(ctx).

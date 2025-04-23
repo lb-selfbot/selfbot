@@ -1631,7 +1631,7 @@ func (c *UtilityCommands) checktoken(ctx *router.Ctx) error {
 func (c *UtilityCommands) discordstatus(ctx *router.Ctx) error {
 	resp, err := http.DefaultClient().Get("https://srhpyqt94yxb.statuspage.io/api/v2/summary.json")
 	if err != nil {
-		return fmt.Errorf("An error has occurred.")
+		return fmt.Errorf("An error has occurred: %v", err)
 	}
 
 	components := resp.Json().Get("components")
@@ -2019,7 +2019,7 @@ func (c *UtilityCommands) uploadlink(ctx *router.Ctx) error {
 func (c *UtilityCommands) pastebin(ctx *router.Ctx) error {
 	paste, err := api.LBCreatePaste(ctx.Arguments.Raw())
 	if err != nil {
-		return fmt.Errorf("An error has occurred.")
+		return fmt.Errorf("An error has occurred: %v", err)
 	}
 	c.services.Embed.RespondField(ctx, "Paste URL", paste)
 	return nil
@@ -2029,12 +2029,12 @@ func (c *UtilityCommands) pastefile(ctx *router.Ctx) error {
 	filePath := ctx.Arguments.Get(0).Raw()
 	content, err := os.ReadFile(filePath)
 	if err != nil {
-		return fmt.Errorf("An error has occurred.")
+		return fmt.Errorf("An error has occurred: %v", err)
 	}
 
 	paste, err := api.LBCreatePaste(string(content))
 	if err != nil {
-		return fmt.Errorf("An error has occurred.")
+		return fmt.Errorf("An error has occurred: %v", err)
 	}
 
 	c.services.Embed.RespondField(ctx, "Paste URL", paste)
@@ -2045,7 +2045,7 @@ func (c *UtilityCommands) tinyurl(ctx *router.Ctx) error {
 	sourceUrl := ctx.Arguments.Raw()
 	resp, err := http.DefaultClient().Get(fmt.Sprintf("https://tinyurl.com/api-create.php?url=%s", sourceUrl))
 	if err != nil {
-		return fmt.Errorf("An error has occurred.")
+		return fmt.Errorf("An error has occurred: %v", err)
 	}
 	c.services.Embed.New(ctx).
 		AddField("URL", sourceUrl).
@@ -2098,10 +2098,7 @@ func (c *UtilityCommands) obfuscateFunc(lang, ext string) func(ctx *router.Ctx) 
 func (c *UtilityCommands) reviewdbtoken(ctx *router.Ctx) error {
 	token, err := api.GetReviewDBToken(ctx.Session)
 	if err != nil {
-		c.services.Embed.New(ctx).
-			SetDescription("Error getting token: %v", err).
-			Send()
-		return nil
+		return fmt.Errorf("Error getting token: %v", err)
 	}
 
 	c.services.Embed.RespondField(ctx, "Token", token)
@@ -2111,18 +2108,12 @@ func (c *UtilityCommands) reviewdbtoken(ctx *router.Ctx) error {
 func (c *UtilityCommands) getreviews(ctx *router.Ctx) error {
 	user, err := ctx.Arguments.Get(0).User()
 	if err != nil {
-		c.services.Embed.New(ctx).
-			SetDescription("Could not find user").
-			Send()
-		return nil
+		return fmt.Errorf("Could not find user: %v", err)
 	}
 
 	reviews, err := api.GetReviewDBReviews(user.ID)
 	if err != nil {
-		c.services.Embed.New(ctx).
-			SetDescription("Error getting reviews: %v", err).
-			Send()
-		return nil
+		return fmt.Errorf("Error getting reviews: %v", err)
 	}
 
 	reviewString := ""
@@ -2138,18 +2129,12 @@ func (c *UtilityCommands) getreviews(ctx *router.Ctx) error {
 func (c *UtilityCommands) addreview(ctx *router.Ctx) error {
 	user, err := ctx.Arguments.Get(0).User()
 	if err != nil {
-		c.services.Embed.New(ctx).
-			SetDescription("Could not find user").
-			Send()
-		return nil
+		return fmt.Errorf("Could not find user: %v", err)
 	}
 
 	err = api.AddReviewDBReview(ctx.Session, user.ID, ctx.Arguments.RawFrom(1))
 	if err != nil {
-		c.services.Embed.New(ctx).
-			SetDescription("Error adding review: %v", err).
-			Send()
-		return nil
+		return fmt.Errorf("Error adding review: %v", err)
 	}
 
 	c.services.Embed.Respond(ctx, "Successfully added review to %s!", user.Username)
@@ -2231,7 +2216,7 @@ func (c *UtilityCommands) clearTags(ctx *router.Ctx) error {
 func (c *UtilityCommands) mastercard(ctx *router.Ctx) error {
 	creditCard, err := api.LBGenerateCC("mastercard", ctx.Arguments.Raw())
 	if err != nil {
-		return fmt.Errorf("An error has occurred.")
+		return fmt.Errorf("An error has occurred: %v", err)
 	}
 	c.services.Embed.New(ctx).
 		AddField("Card Type", "Mastercard").
@@ -2246,7 +2231,7 @@ func (c *UtilityCommands) mastercard(ctx *router.Ctx) error {
 func (c *UtilityCommands) visa16(ctx *router.Ctx) error {
 	creditCard, err := api.LBGenerateCC("visa16", ctx.Arguments.Raw())
 	if err != nil {
-		return fmt.Errorf("An error has occurred.")
+		return fmt.Errorf("An error has occurred: %v", err)
 	}
 	c.services.Embed.New(ctx).
 		AddField("Card Type", "Visa").
@@ -2261,7 +2246,7 @@ func (c *UtilityCommands) visa16(ctx *router.Ctx) error {
 func (c *UtilityCommands) visa13(ctx *router.Ctx) error {
 	creditCard, err := api.LBGenerateCC("visa13", ctx.Arguments.Raw())
 	if err != nil {
-		return fmt.Errorf("An error has occurred.")
+		return fmt.Errorf("An error has occurred: %v", err)
 	}
 	c.services.Embed.New(ctx).
 		AddField("Card Type", "Visa").
@@ -2276,7 +2261,7 @@ func (c *UtilityCommands) visa13(ctx *router.Ctx) error {
 func (c *UtilityCommands) amex(ctx *router.Ctx) error {
 	creditCard, err := api.LBGenerateCC("amex", ctx.Arguments.Raw())
 	if err != nil {
-		return fmt.Errorf("An error has occurred.")
+		return fmt.Errorf("An error has occurred: %v", err)
 	}
 	c.services.Embed.New(ctx).
 		AddField("Card Type", "American Express").
@@ -2291,7 +2276,7 @@ func (c *UtilityCommands) amex(ctx *router.Ctx) error {
 func (c *UtilityCommands) discover(ctx *router.Ctx) error {
 	creditCard, err := api.LBGenerateCC("discover", ctx.Arguments.Raw())
 	if err != nil {
-		return fmt.Errorf("An error has occurred.")
+		return fmt.Errorf("An error has occurred: %v", err)
 	}
 	c.services.Embed.New(ctx).
 		AddField("Card Type", "Discover").
@@ -2306,7 +2291,7 @@ func (c *UtilityCommands) discover(ctx *router.Ctx) error {
 func (c *UtilityCommands) diners(ctx *router.Ctx) error {
 	creditCard, err := api.LBGenerateCC("diners", ctx.Arguments.Raw())
 	if err != nil {
-		return fmt.Errorf("An error has occurred.")
+		return fmt.Errorf("An error has occurred: %v", err)
 	}
 	c.services.Embed.New(ctx).
 		AddField("Card Type", "Diners").
@@ -2321,7 +2306,7 @@ func (c *UtilityCommands) diners(ctx *router.Ctx) error {
 func (c *UtilityCommands) jcb(ctx *router.Ctx) error {
 	creditCard, err := api.LBGenerateCC("jcb", ctx.Arguments.Raw())
 	if err != nil {
-		return fmt.Errorf("An error has occurred.")
+		return fmt.Errorf("An error has occurred: %v", err)
 	}
 	c.services.Embed.New(ctx).
 		AddField("Card Type", "JCB").
@@ -2376,7 +2361,7 @@ func (c *UtilityCommands) ipinfo(ctx *router.Ctx) error {
 
 	resp, err := http.DefaultClient().Get(url)
 	if err != nil {
-		return fmt.Errorf("An error has occurred.")
+		return fmt.Errorf("An error has occurred: %v", err)
 	}
 
 	ipinfo := resp.Json()
@@ -2440,7 +2425,7 @@ func (c *UtilityCommands) resolve(ctx *router.Ctx) error {
 
 	resp, err := http.DefaultClient().Get(fmt.Sprintf("https://json.geoiplookup.io/%s", domain))
 	if err != nil {
-		return fmt.Errorf("An error has occurred.")
+		return fmt.Errorf("An error has occurred: %v", err)
 	}
 
 	response := resp.Json()
@@ -2463,7 +2448,7 @@ func (c *UtilityCommands) reversedns(ctx *router.Ctx) error {
 
 	resp, err := http.DefaultClient().Get(url)
 	if err != nil {
-		return fmt.Errorf("An error has occurred.")
+		return fmt.Errorf("An error has occurred: %v", err)
 	}
 
 	response := resp.Json()
@@ -2486,7 +2471,7 @@ func (c *UtilityCommands) reversemac(ctx *router.Ctx) error {
 	mac := ctx.Arguments.Get(0).Raw()
 	resp, err := http.DefaultClient().Get(fmt.Sprintf("https://api.LBmacvendors.com/%s", mac))
 	if err != nil {
-		return fmt.Errorf("An error has occurred.")
+		return fmt.Errorf("An error has occurred: %v", err)
 	}
 	vendor := string(resp.MustGetBody())
 	if strings.Contains(vendor, "Not Found") {
@@ -2504,7 +2489,7 @@ func (c *UtilityCommands) headers(ctx *router.Ctx) error {
 	url := ctx.Arguments.Get(0).Raw()
 	resp, err := http.DefaultClient().Get(url)
 	if err != nil {
-		return fmt.Errorf("An error has occurred.")
+		return fmt.Errorf("An error has occurred: %v", err)
 	}
 
 	var headers string
@@ -2997,7 +2982,7 @@ func (c *UtilityCommands) define(ctx *router.Ctx) error {
 
 	resp, err := http.DefaultClient().Get(url)
 	if err != nil {
-		return fmt.Errorf("An error has occurred.")
+		return fmt.Errorf("An error has occurred: %v", err)
 	}
 
 	list := resp.Json()
@@ -3040,7 +3025,7 @@ func (c *UtilityCommands) urbandictionary(ctx *router.Ctx) error {
 
 	resp, err := http.DefaultClient().Get(url)
 	if err != nil {
-		return fmt.Errorf("An error has occurred.")
+		return fmt.Errorf("An error has occurred: %v", err)
 	}
 
 	list := resp.Json().Get("list")
@@ -3066,7 +3051,7 @@ func (c *UtilityCommands) wikipedia(ctx *router.Ctx) error {
 	query := ctx.Arguments.Raw()
 	article, err := api.WikipediaSearch(query)
 	if err != nil {
-		return fmt.Errorf("An error has occurred.")
+		return fmt.Errorf("An error has occurred: %v", err)
 	}
 
 	if len(article) > 2000 {
@@ -3126,7 +3111,7 @@ func (c *UtilityCommands) flightinfo(ctx *router.Ctx) error {
 
 	resp, err := http.DefaultClient().Get(uri)
 	if err != nil {
-		return fmt.Errorf("An error has occurred.")
+		return fmt.Errorf("An error has occurred: %v", err)
 	}
 
 	json := resp.Json()
@@ -3262,7 +3247,7 @@ func (c *UtilityCommands) getCreds() api.LBCreds {
 func (c *UtilityCommands) googlesearch(ctx *router.Ctx) error {
 	results, err := api.LBSearch(c.getCreds(), ctx.Arguments.Raw())
 	if err != nil {
-		return fmt.Errorf("An error has occurred.")
+		return fmt.Errorf("An error has occurred: %v", err)
 	}
 	emb := c.services.Embed.New(ctx)
 	for result := range results.Iterator() {
@@ -3275,7 +3260,7 @@ func (c *UtilityCommands) googlesearch(ctx *router.Ctx) error {
 func (c *UtilityCommands) youtubesearch(ctx *router.Ctx) error {
 	results, err := api.LBSearch(c.getCreds(), ctx.Arguments.Raw()+" site:youtube.com")
 	if err != nil {
-		return fmt.Errorf("An error has occurred.")
+		return fmt.Errorf("An error has occurred: %v", err)
 	}
 	emb := c.services.Embed.New(ctx)
 	for result := range results.Iterator() {
@@ -3316,7 +3301,7 @@ func (c *UtilityCommands) stackoverflow(ctx *router.Ctx) error {
 func (c *UtilityCommands) searchcountry(ctx *router.Ctx) error {
 	resp, err := http.DefaultClient().Get(fmt.Sprintf("https://restcountries.com/v3.1/name/%s?fullText=true", ctx.Arguments.Raw()))
 	if err != nil {
-		return fmt.Errorf("An error has occurred.")
+		return fmt.Errorf("An error has occurred: %v", err)
 	}
 
 	countryList := resp.Json()
@@ -3355,7 +3340,7 @@ func (c *UtilityCommands) searchcountry(ctx *router.Ctx) error {
 func (c *UtilityCommands) randomcountry(ctx *router.Ctx) error {
 	resp, err := http.DefaultClient().Get("https://restcountries.com/v3.1/all")
 	if err != nil {
-		return fmt.Errorf("An error has occurred.")
+		return fmt.Errorf("An error has occurred: %v", err)
 	}
 
 	countryList := resp.Json()
@@ -3399,7 +3384,7 @@ func (c *UtilityCommands) loremipsum(ctx *router.Ctx) error {
 
 	resp, err := http.DefaultClient().Get(fmt.Sprintf("https://loripsum.net/api/%d/short/plaintext", paragrahps))
 	if err != nil {
-		return fmt.Errorf("An error has occurred.")
+		return fmt.Errorf("An error has occurred: %v", err)
 	}
 
 	c.services.Embed.Respond(ctx, "%s", string(resp.MustGetBody()))
@@ -3414,7 +3399,7 @@ func (c *UtilityCommands) baconipsum(ctx *router.Ctx) error {
 
 	resp, err := http.DefaultClient().Get(fmt.Sprintf("https://baconipsum.com/api/?type=all-meat&paras=%d&format=text", paragrahps))
 	if err != nil {
-		return fmt.Errorf("An error has occurred.")
+		return fmt.Errorf("An error has occurred: %v", err)
 	}
 
 	c.services.Embed.Respond(ctx, "%s", string(resp.MustGetBody()))
