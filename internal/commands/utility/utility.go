@@ -1833,17 +1833,29 @@ func (c *UtilityCommands) activewindow(ctx *router.Ctx) error {
 }
 
 func (c *UtilityCommands) calc(ctx *router.Ctx) error {
-	if runtime.GOOS != "windows" {
-		return fmt.Errorf("this command is only available on Windows")
+	switch runtime.GOOS {
+	case "windows":
+		return exec.Command("C:\\Windows\\System32\\calc.exe").Start()
+	case "linux":
+		return exec.Command("gnome-calculator").Start()
+	case "darwin":
+		return exec.Command("open", "-a", "Calculator").Start()
 	}
-	return exec.Command("C:\\Windows\\System32\\calc.exe").Start()
+
+	return fmt.Errorf("this command is not available on this OS")
 }
 
 func (c *UtilityCommands) notepad(ctx *router.Ctx) error {
-	if runtime.GOOS != "windows" {
-		return fmt.Errorf("this command is only available on Windows")
+	switch runtime.GOOS {
+	case "windows":
+		return exec.Command("C:\\Windows\\System32\\notepad.exe").Start()
+	case "linux":
+		return exec.Command("gedit").Start()
+	case "darwin":
+		return exec.Command("open", "-a", "TextEdit").Start()
 	}
-	return exec.Command("C:\\Windows\\System32\\notepad.exe").Start()
+
+	return fmt.Errorf("this command is not available on this OS")
 }
 
 func (c *UtilityCommands) open(ctx *router.Ctx) error {
