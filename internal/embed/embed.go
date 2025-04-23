@@ -5,7 +5,11 @@ import (
 	"strings"
 
 	"github.com/lb-selfbot/discordgo"
+	"github.com/lb-selfbot/selfbot/internal/api"
+	"github.com/lb-selfbot/selfbot/internal/constants"
 	"github.com/lb-selfbot/selfbot/internal/fn"
+	"github.com/lb-selfbot/selfbot/internal/services/config"
+	"github.com/lb-selfbot/selfbot/internal/utils"
 )
 
 const (
@@ -20,7 +24,10 @@ type EmbedField struct {
 	Value string
 }
 
-type EmbedSendCallback func(*Embed) []*discordgo.Message
+type (
+	EmbedSendCallback      func(*Embed) []*discordgo.Message
+	EmbedGetConfigCallback func() *config.Config
+)
 
 type Embed struct {
 	Title       string
@@ -29,11 +36,12 @@ type Embed struct {
 	Fields      []EmbedField
 	ImageURL    string
 
-	sendCallback EmbedSendCallback
+	sendCallback      EmbedSendCallback
+	getConfigCallback EmbedGetConfigCallback
 }
 
-func NewEmbed(sendCallback EmbedSendCallback) *Embed {
-	return &Embed{sendCallback: sendCallback}
+func NewEmbed(sendCallback EmbedSendCallback, getConfigCallback EmbedGetConfigCallback) *Embed {
+	return &Embed{sendCallback: sendCallback, getConfigCallback: getConfigCallback}
 }
 
 func (e *Embed) SetTitle(format string, a ...any) *Embed {
@@ -95,7 +103,7 @@ func (e *Embed) ToString(format string, maxLen int) []string {
 	case EmbedFormatIndent:
 		return e.toIndent(maxLen)
 	case EmbedFormatURLEmbed:
-		return e.toURLEmbed(maxLen)
+		return e.toURLEmbed()
 	default:
 		return e.toCodeblock(maxLen)
 	}
@@ -264,38 +272,82 @@ func (e *Embed) toIndent(maxLen int) []string {
 	})
 }
 
-func (e *Embed) toURLEmbed(maxLen int) []string {
-	// TODO: urlembed
-	return []string{}
+func (e *Embed) toURLEmbed() []string {
+	var contentBuilder strings.Builder
 
-	// var contentBuilder strings.Builder
+	if e.Description != "" {
+		contentBuilder.WriteString(e.Description)
+	}
 
-	// if e.Description != "" {
-	// 	contentBuilder.WriteString(e.Description)
-	// }
+	for _, v := range e.Fields {
+		contentBuilder.WriteString("\n\n• " + v.Name + "\n" + v.Value)
+	}
 
-	// for _, v := range e.Fields {
-	// 	contentBuilder.WriteString("\n\n• " + v.Name + "\n" + v.Value)
-	// }
+	if e.Subtext != "" {
+		contentBuilder.WriteString("\n\n" + constants.ANSI_REGEX.ReplaceAllString(e.Subtext, ""))
+	}
 
-	// if e.Subtext != "" {
-	// 	contentBuilder.WriteString("\n\n" + constants.ANSI_REGEX.ReplaceAllString(e.Subtext, ""))
-	// }
+	content := contentBuilder.String()
+	var descriptions []string
+	var current string
+	for _, line := range strings.Split(content, "\n") {
+		if len(current+line)+1 > 350 {
+			descriptions = append(descriptions, current)
+			current = ""
+		}
+		current += line + "\n"
+	}
 
-	// content := contentBuilder.String()
-	// var descriptions []string
-	// var current string
-	// for _, line := range strings.Split(content, "\n") {
-	// 	if len(current+line)+1 > 350 {
-	// 		descriptions = append(descriptions, current)
-	// 		current = ""
-	// 	}
-	// 	current += line + "\n"
-	// }
+	descriptions = append(descriptions, current)
+	descriptions = fn.FilterInPlace(descriptions, func(line string) bool {
+		return line != ""
+	})
 
-	// descriptions = append(descriptions, current)
+	cfg := e.getConfigCallback()
 
-	// return fn.Filter(descriptions, func(line string) bool {
-	// 	return line != ""
-	// })
+	// Generate embeds
+	embeds := []api.URLEmbed{}
+
+	embeds = append(embeds, api.URLEmbed{
+		Title:       e.Title,
+		Description: descriptions[0],
+		URL:         utils.Misc.Or(cfg.Selfbot.EmbedURL, "https://lightning-bot.com/"),
+		Color:       utils.Misc.Or(cfg.Selfbot.EmbedColor, "3990c1"),
+		Image:       utils.Misc.Or(cfg.Selfbot.EmbedImage, "https://lightning-bot.com/logo.png"),
+	})
+
+	for _, description := range descriptions[1:] {
+		embeds = append(embeds, api.URLEmbed{
+			Description: description,
+			Color:       utils.Misc.Or(cfg.Selfbot.EmbedColor, "3990c1"),
+		})
+	}
+
+	embeds[len(embeds)-1].AuthorName = e.Subtext
+
+	urls := fn.Map(embeds, func(embed api.URLEmbed) string {
+		url, err := api.LBCreateURLEmbed(embed)
+		if err != nil {
+			return ""
+		}
+
+		return url
+	})
+
+	// Generate messages
+	var batches [][]string
+	batchSize := 5
+
+	for i := 0; i < len(urls); i += batchSize {
+		end := i + batchSize
+		if end > len(urls) {
+			end = len(urls)
+		}
+		batch := urls[i:end]
+		batches = append(batches, batch)
+	}
+
+	return fn.Map(batches, func(batch []string) string {
+		return constants.INVISIBLE_TEXT + " " + strings.Join(batch, " ")
+	})
 }

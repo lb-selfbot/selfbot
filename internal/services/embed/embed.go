@@ -40,7 +40,7 @@ func NewService(configSvc config.Service, variablesSvc variables.Service) Servic
 func (e *embedService) New(ctx *router.Ctx) *embed.Embed {
 	cfg := e.configSvc.GetConfig()
 
-	return embed.NewEmbed(e.getEmbedSendFunc(ctx)).
+	return embed.NewEmbed(e.getEmbedSendFunc(ctx), e.configSvc.GetConfig).
 		SetTitle("%s", e.variablesSvc.Parse(cfg.Selfbot.Title)).
 		SetSubtext("%s", e.variablesSvc.Parse(cfg.Selfbot.Footer))
 }

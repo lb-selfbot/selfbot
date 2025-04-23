@@ -115,7 +115,7 @@ func (ui *uiService) ShowConsoleMessage(c *ConsoleMessage) error {
 	ui.consoleSvc.Append(message)
 
 	if c.WebhookURL != "" {
-		emb := embed.NewEmbed(nil)
+		emb := embed.NewEmbed(nil, nil)
 
 		for _, info := range c.Info {
 			if info.Key == "" {
