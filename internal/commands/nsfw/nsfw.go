@@ -62,9 +62,6 @@ func (c *NSFWCommands) Register() {
 }
 
 func (c *NSFWCommands) generateFunc(name string, subReddits []string) func(ctx *router.Ctx) error {
-	// This makes sure that the function is not overwritten by the next command.
-	// If you put the function in the RegisterCommands function, the element
-	// variable will always be the last element in the command array.
 	return func(ctx *router.Ctx) error {
 		image, success := api.GetImageFromSubreddit(random.Choice(subReddits))
 		if !success {

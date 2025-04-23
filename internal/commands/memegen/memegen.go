@@ -181,10 +181,6 @@ func (c *MemeGenCommands) custommeme(ctx *router.Ctx) error {
 }
 
 func (c *MemeGenCommands) generateFunc(templateID string) func(ctx *router.Ctx) error {
-	// This makes sure that the function is not overwritten by the next command.
-	// If you put the function in the RegisterCommands function, the element
-	// variable will always be the last element in the command array.
-
 	return func(ctx *router.Ctx) error {
 		top, bottom := ctx.Arguments.Get(0).Raw(), ctx.Arguments.Get(1).Raw()
 		image, err := api.LBCreateMeme(c.getCreds(), templateID, top, bottom)
