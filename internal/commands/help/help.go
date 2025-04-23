@@ -194,11 +194,6 @@ func (c *HelpCommands) renderCategoryHelp(ctx *router.Ctx, category *router.Cate
 		helpText := fmt.Sprintf("%s%s %s - %s\n", cfg.Selfbot.CommandPrefix, command.Name, command.Arguments, command.Description)
 		if len(command.SubCommands) > 0 {
 			helpText = fmt.Sprintf("%s%s %s - Use `!help %s` for more info\n", cfg.Selfbot.CommandPrefix, command.Name, command.Arguments, command.Name)
-			// helpText = ""
-
-			// for _, subCommand := range command.SubCommands {
-			// 	helpText += fmt.Sprintf("%s%s %s %s - %s\n", cfg.Selfbot.CommandPrefix, command.Name, subCommand.Name, subCommand.Arguments, subCommand.Description)
-			// }
 		}
 
 		helpText = strings.ReplaceAll(helpText, "  ", " ")
@@ -273,7 +268,14 @@ func (c *HelpCommands) search(ctx *router.Ctx) error {
 		}
 		distance := levenshtein.ComputeDistance(command.Name, query)
 		if distance < 2 || strings.Contains(command.Name, query) {
-			closeCommands = append(closeCommands, cfg.Selfbot.CommandPrefix+command.Name+" "+command.Arguments+" - "+command.Description)
+			helpText := fmt.Sprintf("%s%s %s - %s", cfg.Selfbot.CommandPrefix, command.Name, command.Arguments, command.Description)
+			if len(command.SubCommands) > 0 {
+				helpText = fmt.Sprintf("%s%s %s - Use `!help %s` for more info", cfg.Selfbot.CommandPrefix, command.Name, command.Arguments, command.Name)
+			}
+
+			helpText = strings.ReplaceAll(helpText, "  ", " ")
+
+			closeCommands = append(closeCommands, helpText)
 		}
 	}
 
