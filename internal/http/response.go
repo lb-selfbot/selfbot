@@ -9,6 +9,8 @@ import (
 
 type Response struct {
 	*fhttp.Response
+
+	jsonData *jester.Data
 }
 
 func NewResponse(resp *fhttp.Response) *Response {
@@ -38,10 +40,15 @@ func (r *Response) MustGetBody() []byte {
 }
 
 func (r *Response) Json() *jester.Data {
+	if r.jsonData != nil {
+		return r.jsonData
+	}
+
 	data, err := jester.NewReader(r.Body)
 	if err != nil {
 		return jester.NewEmpty()
 	}
 
+	r.jsonData = data
 	return data
 }

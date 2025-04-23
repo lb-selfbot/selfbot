@@ -3,10 +3,8 @@ package game
 import (
 	"fmt"
 	"net/url"
-	"regexp"
 	"strings"
 
-	"github.com/lb-selfbot/discordgo"
 	"github.com/lb-selfbot/go-jester"
 	"github.com/lb-selfbot/selfbot/internal/fn"
 	"github.com/lb-selfbot/selfbot/internal/formatting"
@@ -115,18 +113,6 @@ func (c *GameCommands) Register() {
 			Description: "Get info about a FiveM server",
 			Arguments:   "<ip:port>",
 			Handler:     c.fiveminfo,
-		},
-		{
-			Name:        "hltbsearch",
-			Description: "Search for a game on HowLongToBeat",
-			Arguments:   "<game>",
-			Handler:     c.hltbsearch,
-		},
-		{
-			Name:        "hltbinfo",
-			Description: "Get info about a game on HowLongToBeat",
-			Arguments:   "<game id>",
-			Handler:     c.hltbinfo,
 		},
 	})
 }
@@ -451,123 +437,6 @@ func (c *GameCommands) fiveminfo(ctx *router.Ctx) error {
 		AddField("Map", json.Get("mapname").MustString()).
 		AddField("Players", fmt.Sprint(json.Get("clients").MustInt())).
 		AddField("Max Players", json.Get("sv_maxclients").MustString()).
-		Send()
-	return nil
-}
-
-var HLTBHeaders = http.WithHeaders(map[string]string{
-	"Authority":          "howlongtobeat.com",
-	"Method":             "POST",
-	"Path":               "/api/search",
-	"Scheme":             "https",
-	"Accept":             "application/json, text/plain, */*",
-	"Accept-Encoding":    "gzip, deflate, br",
-	"Accept-Language":    "en-US,en;q=0.9",
-	"Origin":             "https://howlongtobeat.com",
-	"Referer":            "https://howlongtobeat.com/",
-	"Sec-CH-UA":          "\" Not A;Brand\";v=\"99\", \"Chromium\";v=\"119\", \"Google Chrome\";v=\"119\"",
-	"Sec-CH-UA-Mobile":   "?0",
-	"Sec-CH-UA-Platform": "Windows",
-	"Sec-Fetch-Dest":     "empty",
-	"Sec-Fetch-Mode":     "cors",
-	"Sec-Fetch-Site":     "same-origin",
-	"User-Agent":         discordgo.UserAgentWeb,
-})
-
-func (c *GameCommands) hltbsearch(ctx *router.Ctx) error {
-	resp, err := http.DefaultClient().Post(
-		"https://howlongtobeat.com/api/search",
-		map[string]any{
-			"searchType":  "games",
-			"searchTerms": []string{ctx.Arguments.Raw()},
-			"searchPage":  1,
-			"size":        20,
-			"searchOptions": map[string]any{
-				"games": map[string]any{
-					"userId":        0,
-					"platform":      "",
-					"sortCategory":  "popular",
-					"rangeCategory": "main",
-					"rangeTime":     map[string]any{"min": nil, "max": nil},
-					"gameplay":      map[string]any{"perspective": "", "flow": "", "genre": ""},
-					"rangeYear":     map[string]any{"min": "", "max": ""},
-					"modifier":      "",
-				},
-				"users":      map[string]any{"sortCategory": "postcount"},
-				"lists":      map[string]any{"sortCategory": "follows"},
-				"filter":     "",
-				"sort":       0,
-				"randomizer": 0,
-			},
-		},
-		HLTBHeaders,
-	)
-	if err != nil {
-		return fmt.Errorf("An error has occurred: %v", err)
-	}
-
-	if resp.Json().Get("count").MustInt() == 0 {
-		return fmt.Errorf("No results found.")
-	}
-
-	var games []string
-
-	for game := range resp.Json().Get("data").Iterator() {
-		games = append(games, fmt.Sprintf(
-			"%s (%d)",
-			game.Get("game_name").MustString(),
-			game.Get("game_id").MustInt(),
-		))
-	}
-
-	c.services.Embed.RespondField(ctx, "Games", strings.Join(games, "\n"))
-	return nil
-}
-
-func secondsToTime(seconds int) string {
-	hours := seconds / 3600
-	minutes := (seconds - (hours * 3600)) / 60
-	return fmt.Sprintf("%d Hours, %d Minutes", hours, minutes)
-}
-
-func (c *GameCommands) hltbinfo(ctx *router.Ctx) error {
-	resp, err := http.DefaultClient().Post(
-		"https://howlongtobeat.com/game?id="+ctx.Arguments.Get(0).Raw(),
-		nil,
-		HLTBHeaders,
-	)
-	if err != nil {
-		return fmt.Errorf("An error has occurred: %v", err)
-	}
-
-	dataMatches := regexp.MustCompile("<script id=\"__NEXT_DATA__\" type=\"application/json\">(.*?)</script>").FindSubmatch(resp.MustGetBody())
-	if len(dataMatches) < 2 {
-		return fmt.Errorf("An error has occurred: No data matches")
-	}
-
-	data, err := jester.NewJson(dataMatches[1])
-	if err != nil {
-		return fmt.Errorf("An error has occurred: %v", err)
-	}
-
-	games := data.Get("props", "pageProps", "game", "data", "game")
-	if games.Len() == 0 {
-		return fmt.Errorf("An error has occurred: Game not found")
-	}
-
-	game := games.Get(0)
-
-	c.services.Embed.New(ctx).
-		AddField("Name", game.Get("game_name").MustString("None")).
-		AddField("Aliases", game.Get("game_alias").MustString("None")).
-		AddField("Main Story", secondsToTime(game.Get("comp_main").MustInt())).
-		AddField("Main + Extras", secondsToTime(game.Get("comp_plus").MustInt())).
-		AddField("Completionist", secondsToTime(game.Get("comp_100").MustInt())).
-		AddField("All Styles", secondsToTime(game.Get("comp_all").MustInt())).
-		AddField("Rating", fmt.Sprintf("%d/100", game.Get("review_score").MustInt())).
-		AddField("Currently Playing", fmt.Sprintf("%d Players", game.Get("count_playing").MustInt())).
-		AddField("Developer", game.Get("profile_dev").MustString("None")).
-		AddField("Platforms", game.Get("profile_platform").MustString("None")).
 		Send()
 	return nil
 }
