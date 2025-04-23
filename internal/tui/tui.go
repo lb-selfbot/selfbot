@@ -43,10 +43,3 @@ var (
 func IsSupported() bool {
 	return term.IsTerminal(int(os.Stdin.Fd()))
 }
-
-func reset() {
-	// TODO: Reset the terminal
-	// time.Sleep(time.Millisecond * 500)
-	// logging.Console.Clear()
-	// logging.Console.PrintBanner()
-}

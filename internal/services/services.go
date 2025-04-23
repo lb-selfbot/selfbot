@@ -60,7 +60,7 @@ func NewServices() *Services {
 	router := router.NewService(eventBroker, cfg)
 	sessions := sessions.NewService(eventBroker)
 	extensions := extensions.NewService(eventBroker)
-	discord := discord.NewService(eventBroker, cfg)
+	discord := discord.NewService(eventBroker, cfg, console)
 	o11y := o11y.NewService(eventBroker, cfg)
 	ipc := ipc.NewService(eventBroker, cfg, console)
 	reminder := reminder.NewService(eventBroker, cfg)

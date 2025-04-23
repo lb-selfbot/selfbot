@@ -12,7 +12,7 @@ import (
 	"github.com/lb-selfbot/selfbot/internal/savedtokens"
 )
 
-func GetToken(title ...string) string {
+func GetToken(clear func(), title ...string) string {
 	title = append(title, "How would you like to login to Discord?")
 
 	items := []list.Item{
@@ -34,16 +34,16 @@ func GetToken(title ...string) string {
 	case 1:
 		token = loginWithToken()
 	case 2:
-		token = loginWithBrowser()
+		token = loginWithBrowser(clear)
 	case 3:
-		token = loginWithSavedToken()
+		token = loginWithSavedToken(clear)
 	}
 
 	if token == "" {
-		return GetToken("You must enter a token!")
+		return GetToken(clear, "You must enter a token!")
 	}
 
-	reset()
+	clear()
 
 	return token
 }
@@ -59,7 +59,7 @@ func loginWithToken() string {
 	return model.Value()
 }
 
-func loginWithBrowser() string {
+func loginWithBrowser(clear func()) string {
 	model := NewLoadingModel("Please login to Discord in the browser window.")
 	program := tea.NewProgram(model)
 
@@ -71,7 +71,7 @@ func loginWithBrowser() string {
 	if err != nil {
 		model.Quit()
 		program.Quit()
-		reset()
+		clear()
 
 		logging.Error("Error logging in:", err, "\n")
 
@@ -80,12 +80,12 @@ func loginWithBrowser() string {
 
 	model.Quit()
 	program.Quit()
-	reset()
+	clear()
 
 	return token
 }
 
-func loginWithSavedToken() string {
+func loginWithSavedToken(clear func()) string {
 	model := NewLoadingModel("Loading saved accounts...")
 	program := tea.NewProgram(model)
 
@@ -97,7 +97,7 @@ func loginWithSavedToken() string {
 	if len(savedTokens) == 0 {
 		model.Quit()
 		program.Quit()
-		reset()
+		clear()
 
 		logging.Error("You have no saved accounts!")
 
@@ -106,7 +106,7 @@ func loginWithSavedToken() string {
 
 	model.Quit()
 	program.Quit()
-	reset()
+	clear()
 
 	items := make([]list.Item, len(savedTokens))
 

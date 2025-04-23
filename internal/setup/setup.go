@@ -56,7 +56,7 @@ func GetLogin() (string, string) {
 	return username, password
 }
 
-func GetToken() string {
+func GetToken(i ...int) string {
 	if token, ok := os.LookupEnv("LB_TOKEN"); ok {
 		return token
 	}
@@ -64,7 +64,7 @@ func GetToken() string {
 	var token string
 
 	if tui.IsSupported() {
-		token = tui.GetToken()
+		token = tui.GetToken(func() {})
 	} else {
 		token = input.GetString("Please enter your Discord token")
 	}
@@ -74,7 +74,11 @@ func GetToken() string {
 		logging.Error("You must enter a token!")
 		time.Sleep(5 * time.Second)
 
-		return GetToken()
+		if len(i) > 5 {
+			os.Exit(1)
+		}
+
+		return GetToken(append(i, 1)...)
 	}
 
 	session, err := discordgo.New(token)

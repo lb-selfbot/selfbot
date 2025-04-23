@@ -13,6 +13,7 @@ import (
 	"github.com/lb-selfbot/selfbot/internal/constants"
 	"github.com/lb-selfbot/selfbot/internal/fs"
 	"github.com/lb-selfbot/selfbot/internal/services/config"
+	"github.com/lb-selfbot/selfbot/internal/services/console"
 	"github.com/lb-selfbot/selfbot/internal/services/eventbroker"
 	"github.com/lb-selfbot/selfbot/internal/system"
 	"github.com/lb-selfbot/selfbot/internal/tui"
@@ -52,6 +53,7 @@ type Service interface {
 type discordService struct {
 	eventBroker eventbroker.Service
 	configSvc   config.Service
+	consoleSvc  console.Service
 
 	session *discordgo.Session
 
@@ -59,8 +61,8 @@ type discordService struct {
 }
 
 // NewService creates a new DiscordService instance.
-func NewService(eventBroker eventbroker.Service, configSvc config.Service) Service {
-	return &discordService{eventBroker: eventBroker, configSvc: configSvc}
+func NewService(eventBroker eventbroker.Service, configSvc config.Service, consoleSvc console.Service) Service {
+	return &discordService{eventBroker: eventBroker, configSvc: configSvc, consoleSvc: consoleSvc}
 }
 
 func (d *discordService) Init(token string, verbose bool) (err error) {
@@ -113,7 +115,7 @@ func (d *discordService) Open() error {
 			return err
 		}
 
-		token := tui.GetToken("Your Discord token is invalid!")
+		token := tui.GetToken(d.consoleSvc.Clear, "Your Discord token is invalid!")
 
 		cfg := d.configSvc.GetConfig()
 		cfg.Account.Discord.Token = token
