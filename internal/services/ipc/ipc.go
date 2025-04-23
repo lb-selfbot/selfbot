@@ -63,7 +63,6 @@ func (i *ipcService) subscribe() {
 		_ = i.write(&WSMessage{Op: OpCodeError, Data: WSData{Text: text}})
 	})
 
-	// TODO: raw cutoff
 	i.eventBroker.Subscribe(eventbroker.EventSetConsole, func(payload any) {
 		console, ok := payload.(consoledefs.Set)
 		if !ok {
@@ -82,7 +81,6 @@ func (i *ipcService) subscribe() {
 		}
 	})
 
-	// TODO: raw cutoff
 	i.eventBroker.Subscribe(eventbroker.EventAppendConsole, func(payload any) {
 		console, ok := payload.(consoledefs.Append)
 		if !ok {
