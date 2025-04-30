@@ -10,7 +10,7 @@ require (
 	github.com/bogdanfinn/fhttp v0.5.36
 	github.com/bogdanfinn/tls-client v1.9.1
 	github.com/charmbracelet/bubbles v0.21.0
-	github.com/charmbracelet/bubbletea v1.3.4
+	github.com/charmbracelet/bubbletea v1.3.5
 	github.com/charmbracelet/lipgloss v1.1.0
 	github.com/chromedp/chromedp v0.13.6
 	github.com/common-nighthawk/go-figure v0.0.0-20210622060536-734e95fb86be
@@ -25,6 +25,7 @@ require (
 	github.com/lb-selfbot/go-jester v0.3.0
 	github.com/mr-tron/base58 v1.2.0
 	github.com/multiformats/go-base36 v0.2.0
+	github.com/robert-nix/ansihtml v1.0.1
 	github.com/shirou/gopsutil/v4 v4.25.3
 	golang.org/x/crypto v0.37.0
 	golang.org/x/exp v0.0.0-20250218142911-aa4b98e5adaa
@@ -73,7 +74,6 @@ require (
 	github.com/power-devops/perfstat v0.0.0-20240221224432-82ca36839d55 // indirect
 	github.com/quic-go/quic-go v0.50.1 // indirect
 	github.com/rivo/uniseg v0.4.7 // indirect
-	github.com/robert-nix/ansihtml v1.0.1 // indirect
 	github.com/sahilm/fuzzy v0.1.1 // indirect
 	github.com/tadvi/systray v0.0.0-20190226123456-11a2b8fa57af // indirect
 	github.com/tam7t/hpkp v0.0.0-20160821193359-2b70b4024ed5 // indirect
