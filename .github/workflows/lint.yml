@@ -26,4 +26,4 @@ jobs:
         run: go vet -x ./...
 
       - name: Run GolangCI-Lint
-        uses: golangci/golangci-lint-action@v7
+        uses: golangci/golangci-lint-action@v8
