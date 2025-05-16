@@ -10,13 +10,13 @@ require (
 	github.com/bogdanfinn/fhttp v0.5.36
 	github.com/bogdanfinn/tls-client v1.9.1
 	github.com/charmbracelet/bubbles v0.21.0
-	github.com/charmbracelet/bubbletea v1.3.4
+	github.com/charmbracelet/bubbletea v1.3.5
 	github.com/charmbracelet/lipgloss v1.1.0
 	github.com/chromedp/chromedp v0.13.6
 	github.com/common-nighthawk/go-figure v0.0.0-20210622060536-734e95fb86be
 	github.com/darkwyrm/b85 v0.0.0-20210908110113-bdd55eedeb3c
 	github.com/deadshot465/owoify-go v1.0.1
-	github.com/getsentry/sentry-go v0.32.0
+	github.com/getsentry/sentry-go v0.33.0
 	github.com/goccy/go-json v0.10.5
 	github.com/gorilla/websocket v1.5.3
 	github.com/hugolgst/rich-go v0.0.0-20240715122152-74618cc1ace2
@@ -25,12 +25,13 @@ require (
 	github.com/lb-selfbot/go-jester v0.3.0
 	github.com/mr-tron/base58 v1.2.0
 	github.com/multiformats/go-base36 v0.2.0
-	github.com/shirou/gopsutil/v4 v4.25.3
-	golang.org/x/crypto v0.37.0
+	github.com/robert-nix/ansihtml v1.0.1
+	github.com/shirou/gopsutil/v4 v4.25.4
+	golang.org/x/crypto v0.38.0
 	golang.org/x/exp v0.0.0-20250218142911-aa4b98e5adaa
-	golang.org/x/sys v0.32.0
-	golang.org/x/term v0.31.0
-	golang.org/x/text v0.24.0
+	golang.org/x/sys v0.33.0
+	golang.org/x/term v0.32.0
+	golang.org/x/text v0.25.0
 	google.golang.org/protobuf v1.36.6
 )
 
@@ -73,7 +74,6 @@ require (
 	github.com/power-devops/perfstat v0.0.0-20240221224432-82ca36839d55 // indirect
 	github.com/quic-go/quic-go v0.50.1 // indirect
 	github.com/rivo/uniseg v0.4.7 // indirect
-	github.com/robert-nix/ansihtml v1.0.1 // indirect
 	github.com/sahilm/fuzzy v0.1.1 // indirect
 	github.com/tadvi/systray v0.0.0-20190226123456-11a2b8fa57af // indirect
 	github.com/tam7t/hpkp v0.0.0-20160821193359-2b70b4024ed5 // indirect
@@ -82,7 +82,7 @@ require (
 	github.com/xo/terminfo v0.0.0-20220910002029-abceb7e1c41e // indirect
 	github.com/yusufpapurcu/wmi v1.2.4 // indirect
 	golang.org/x/net v0.38.0 // indirect
-	golang.org/x/sync v0.13.0 // indirect
+	golang.org/x/sync v0.14.0 // indirect
 	gopkg.in/natefinch/npipe.v2 v2.0.0-20160621034901-c1b8fa8bdcce // indirect
 )
 
