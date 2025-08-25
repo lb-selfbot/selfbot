@@ -54,7 +54,7 @@ jobs:
             upx: false
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Cache Go Build
         uses: actions/cache@v4
@@ -109,7 +109,7 @@ jobs:
   build-linux-hosting:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Cache Go Build
         uses: actions/cache@v4
@@ -162,13 +162,13 @@ jobs:
           chmod +x /tmp/lipo
 
       - name: Download darwin-amd64 builds
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v5
         with:
           name: darwin-amd64
           path: ${{ github.workspace }}/darwin-amd64
 
       - name: Download darwin-arm64 builds
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v5
         with:
           name: darwin-arm64
           path: ${{ github.workspace }}/darwin-arm64
