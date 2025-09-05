@@ -159,51 +159,31 @@ jobs:
       #       hosting-arm64
       #     args: --best --lzma
 
-      - name: Compute tags
-        id: tags
+      - name: Build & push multi-arch image
+        id: mpbuild
         run: |
           SHORT_SHA=${GITHUB_SHA::12}
           echo "short=${SHORT_SHA}" >> $GITHUB_OUTPUT
-
-      - name: Build amd64 image
-        run: |
-          cat > Dockerfile.amd64 <<'EOF'
+          cat > Dockerfile.hosting.inline <<'EOF'
+          FROM alpine:latest AS base
+          ARG TARGETARCH
+          # We'll copy the prebuilt binary that matches TARGETARCH
+          # Names: hosting-amd64, hosting-arm64
           FROM alpine:latest
-          COPY hosting-amd64 /bin/exe
+          ARG TARGETARCH
+          COPY hosting-${TARGETARCH} /bin/exe
           ENTRYPOINT ["/bin/exe"]
           EOF
-          docker buildx build --platform linux/amd64 -f Dockerfile.amd64 -t $IMAGE:amd64-${{ steps.tags.outputs.short }} --push .
-
-      - name: Build arm64 image
-        run: |
-          cat > Dockerfile.arm64 <<'EOF'
-          FROM alpine:latest
-          COPY hosting-arm64 /bin/exe
-          ENTRYPOINT ["/bin/exe"]
-          EOF
-          docker buildx build --platform linux/arm64 -f Dockerfile.arm64 -t $IMAGE:arm64-${{ steps.tags.outputs.short }} --push .
-
-      # Images already pushed by buildx above; proceed to manifest creation
-
-      - name: Create and push multi-arch manifest
-        run: |
-          docker manifest create $IMAGE:${{ steps.tags.outputs.short }} \
-            --amend $IMAGE:amd64-${{ steps.tags.outputs.short }} \
-            --amend $IMAGE:arm64-${{ steps.tags.outputs.short }}
-          docker manifest push $IMAGE:${{ steps.tags.outputs.short }}
-          # Update rolling tags
-          docker manifest create $IMAGE:current \
-            --amend $IMAGE:amd64-${{ steps.tags.outputs.short }} \
-            --amend $IMAGE:arm64-${{ steps.tags.outputs.short }}
-          docker manifest push $IMAGE:current
-          docker manifest create $IMAGE:latest \
-            --amend $IMAGE:amd64-${{ steps.tags.outputs.short }} \
-            --amend $IMAGE:arm64-${{ steps.tags.outputs.short }}
-          docker manifest push $IMAGE:latest
-
+          docker buildx build \
+            --platform linux/amd64,linux/arm64 \
+            -f Dockerfile.hosting.inline \
+            -t $IMAGE:$SHORT_SHA \
+            -t $IMAGE:current \
+            -t $IMAGE:latest \
+            --push .
       - name: Output image tags
         run: |
-          echo "Published multi-arch tags: $IMAGE:${{ steps.tags.outputs.short }}, $IMAGE:current, $IMAGE:latest"
+          echo "Published multi-arch tags: $IMAGE:${{ steps.mpbuild.outputs.short }}, $IMAGE:current, $IMAGE:latest"
 
   combine-darwin:
     runs-on: ubuntu-latest
