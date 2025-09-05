@@ -150,6 +150,15 @@ jobs:
         run: |
           go build -tags timetzdata -trimpath -ldflags "-s -w" -gcflags=all="-l -B" -o hosting-arm64 ./cmd/hosting
 
+      - name: Compress hosting binaries with UPX
+        uses: crazy-max/ghaction-upx@v3
+        with:
+          version: latest
+          files: |
+            hosting-amd64
+            hosting-arm64
+          args: --best --lzma
+
       - name: Compute tags
         id: tags
         run: |
@@ -163,7 +172,7 @@ jobs:
           COPY hosting-amd64 /bin/exe
           ENTRYPOINT ["/bin/exe"]
           EOF
-          docker build -f Dockerfile.amd64 -t $IMAGE:amd64-${{ steps.tags.outputs.short }} .
+          docker buildx build --platform linux/amd64 -f Dockerfile.amd64 -t $IMAGE:amd64-${{ steps.tags.outputs.short }} --push .
 
       - name: Build arm64 image
         run: |
@@ -172,12 +181,9 @@ jobs:
           COPY hosting-arm64 /bin/exe
           ENTRYPOINT ["/bin/exe"]
           EOF
-          docker build -f Dockerfile.arm64 -t $IMAGE:arm64-${{ steps.tags.outputs.short }} .
+          docker buildx build --platform linux/arm64 -f Dockerfile.arm64 -t $IMAGE:arm64-${{ steps.tags.outputs.short }} --push .
 
-      - name: Push arch images
-        run: |
-          docker push $IMAGE:amd64-${{ steps.tags.outputs.short }}
-          docker push $IMAGE:arm64-${{ steps.tags.outputs.short }}
+      # Images already pushed by buildx above; proceed to manifest creation
 
       - name: Create and push multi-arch manifest
         run: |
