@@ -141,6 +141,7 @@ jobs:
           CGO_ENABLED: 0
         run: |
           go build -tags timetzdata -trimpath -ldflags "-s -w" -gcflags=all="-l -B" -o hosting-amd64 ./cmd/hosting
+          chmod 755 hosting-amd64
 
       - name: Build linux/arm64 binary
         env:
@@ -149,6 +150,7 @@ jobs:
           CGO_ENABLED: 0
         run: |
           go build -tags timetzdata -trimpath -ldflags "-s -w" -gcflags=all="-l -B" -o hosting-arm64 ./cmd/hosting
+          chmod 755 hosting-arm64
 
       # - name: Compress hosting binaries with UPX
       #   uses: crazy-max/ghaction-upx@v3
@@ -165,13 +167,12 @@ jobs:
           SHORT_SHA=${GITHUB_SHA::12}
           echo "short=${SHORT_SHA}" >> $GITHUB_OUTPUT
           cat > Dockerfile.hosting.inline <<'EOF'
-          FROM alpine:latest AS base
-          ARG TARGETARCH
-          # We'll copy the prebuilt binary that matches TARGETARCH
-          # Names: hosting-amd64, hosting-arm64
           FROM alpine:latest
           ARG TARGETARCH
-          COPY hosting-${TARGETARCH} /bin/exe
+          # Copy with explicit permission
+          COPY --chmod=0755 hosting-${TARGETARCH} /bin/exe
+          # Fallback chmod for older docker versions not honoring --chmod
+          RUN chmod 755 /bin/exe || true
           ENTRYPOINT ["/bin/exe"]
           EOF
           docker buildx build \
