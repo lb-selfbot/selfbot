@@ -150,14 +150,14 @@ jobs:
         run: |
           go build -tags timetzdata -trimpath -ldflags "-s -w" -gcflags=all="-l -B" -o hosting-arm64 ./cmd/hosting
 
-      - name: Compress hosting binaries with UPX
-        uses: crazy-max/ghaction-upx@v3
-        with:
-          version: latest
-          files: |
-            hosting-amd64
-            hosting-arm64
-          args: --best --lzma
+      # - name: Compress hosting binaries with UPX
+      #   uses: crazy-max/ghaction-upx@v3
+      #   with:
+      #     version: latest
+      #     files: |
+      #       hosting-amd64
+      #       hosting-arm64
+      #     args: --best --lzma
 
       - name: Compute tags
         id: tags
