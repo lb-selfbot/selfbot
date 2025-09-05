@@ -163,17 +163,17 @@ type MultiTokenSniper struct {
 
 // SessionConnected has the data for a session connection log.
 type SessionConnected struct {
-	ID     string
-	OS     string
-	Client string
+	ID       string
+	OS       string
+	Client   string
 	Location string
 }
 
 // SessionDisconnected has the data for a session disconnection log.
 type SessionDisconnected struct {
-	ID     string
-	OS     string
-	Client string
+	ID       string
+	OS       string
+	Client   string
 	Location string
 }
 

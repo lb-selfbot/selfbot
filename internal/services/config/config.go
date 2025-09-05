@@ -16,9 +16,6 @@ type Service interface {
 	// GetConfig returns the config.
 	GetConfig() *Config
 
-	// LoadConfig loads the config from the config file.
-	LoadConfig() error
-
 	// SaveConfig saves the config to the config file.
 	SaveConfig(*Config) error
 
@@ -43,14 +40,14 @@ func (c *configService) GetConfig() *Config {
 
 	if c.config == nil || c.configDate.IsZero() || time.Since(c.configDate).Minutes() > 1 {
 		c.configMu.RUnlock()
-		_ = c.LoadConfig()
+		_ = c.loadConfig()
 		c.configMu.RLock()
 	}
 
 	return c.config
 }
 
-func (c *configService) LoadConfig() error {
+func (c *configService) loadConfig() error {
 	c.configMu.Lock()
 	defer c.configMu.Unlock()
 

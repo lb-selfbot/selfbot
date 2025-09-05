@@ -2,39 +2,29 @@ package ipc
 
 import "github.com/lb-selfbot/selfbot/internal/services/config"
 
-// WSMessage represents a websocket message with an operation code and data payload
-type WSMessage struct {
-	Op   WSOpCode `json:"op"`
-	Data WSData   `json:"data"`
+// IPCMessage represents an IPC message with an operation code and data payload
+type IPCMessage struct {
+	Op   OpCode   `json:"op"`
+	Data *IPCData `json:"data,omitempty"`
 }
 
-type WsMessageReceive struct {
-	Op   WSOpCode       `json:"op"`
-	Data *config.Config `json:"data"`
+// IPCData represents the data payload of an IPC message
+type IPCData struct {
+	Text   string         `json:"text,omitempty"`
+	IsRaw  bool           `json:"is_raw,omitempty"`
+	Config *config.Config `json:"config,omitempty"`
 }
 
-// WSData represents the data payload of a websocket message
-type WSData struct {
-	Text       string         `json:"text,omitempty"`
-	IsRaw      bool           `json:"is_raw,omitempty"`
-	MainFolder string         `json:"mainFolder,omitempty"`
-	Config     *config.Config `json:"config,omitempty"`
-}
-
-// WSOpCode represents the type of websocket operation being performed
-type WSOpCode int
+// OpCode represents the type of operation being performed
+type OpCode int
 
 const (
-	OpCodeConnected     WSOpCode = 98
-	OpCodeHello         WSOpCode = 99
-	OpCodeExit          WSOpCode = 100
-	OpCodeRestart       WSOpCode = 101
-	OpCodeNotification  WSOpCode = 102
-	OpCodeInvalidToken  WSOpCode = 103
-	OpCodeError         WSOpCode = 104
-	OpCodeConfigUpdate  WSOpCode = 105
-	OpCodeNewToken      WSOpCode = 106
-	OpCodeConsoleAppend WSOpCode = 107
-	OpCodeConsoleClear  WSOpCode = 108
-	OpCodeConsoleSet    WSOpCode = 109
+	OpCodePing          OpCode = 0
+	OpCodeExit          OpCode = 1
+	OpCodeRestart       OpCode = 2
+	OpCodeError         OpCode = 3
+	OpCodeConfigUpdate  OpCode = 4
+	OpCodeConsoleAppend OpCode = 5
+	OpCodeConsoleClear  OpCode = 6
+	OpCodeConsoleSet    OpCode = 7
 )

@@ -37,7 +37,6 @@ var (
 	isLaunched = flag.Bool("l", false, "Launched by UI application")
 	isPortable = flag.Bool("portable", false, "Portable mode")
 	isVerbose  = flag.Bool("verbose", false, "Verbose mode")
-	isPprof    = flag.Bool("pprof", false, "Enable pprof")
 
 	// CLI commands
 	showVersion     = flag.Bool("version", false, "Show version information")
@@ -249,7 +248,8 @@ func main() {
 		checkForUpdates(services)
 		checkFirstLaunch(services)
 	} else {
-		if err := services.IPC.Connect(); err != nil {
+		err := services.IPC.Connect()
+		if err != nil {
 			logging.Error("IPC serve error:", err)
 			os.Exit(1)
 		}

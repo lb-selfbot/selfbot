@@ -1,12 +1,15 @@
 package ipc
 
 import (
-	"log"
-	"net/http"
+	"bytes"
+	"compress/zlib"
+	"fmt"
+	"io"
 	"os"
 	"sync"
 
-	"github.com/gorilla/websocket"
+	"github.com/goccy/go-json"
+
 	"github.com/lb-selfbot/selfbot/internal/constants"
 	"github.com/lb-selfbot/selfbot/internal/services/config"
 	"github.com/lb-selfbot/selfbot/internal/services/console"
@@ -33,9 +36,9 @@ type ipcService struct {
 	configSvc   config.Service
 	consoleSvc  console.Service
 
-	upgrader *websocket.Upgrader
-	conn     *websocket.Conn
-	mu       sync.Mutex
+	zlibWriter *zlib.Writer
+
+	mu sync.Mutex
 
 	readyChan chan struct{}
 
@@ -51,7 +54,7 @@ func NewService(eventBroker eventbroker.Service, configSvc config.Service, conso
 
 func (i *ipcService) subscribe() {
 	i.eventBroker.Subscribe(eventbroker.EventRestart, func(any) {
-		_ = i.write(&WSMessage{Op: OpCodeRestart})
+		_ = i.write(&IPCMessage{Op: OpCodeRestart})
 	})
 
 	i.eventBroker.Subscribe(eventbroker.EventLogError, func(payload any) {
@@ -60,7 +63,7 @@ func (i *ipcService) subscribe() {
 			return
 		}
 
-		_ = i.write(&WSMessage{Op: OpCodeError, Data: WSData{Text: text}})
+		_ = i.write(&IPCMessage{Op: OpCodeError, Data: &IPCData{Text: text}})
 	})
 
 	i.eventBroker.Subscribe(eventbroker.EventSetConsole, func(payload any) {
@@ -70,12 +73,12 @@ func (i *ipcService) subscribe() {
 		}
 
 		if len(console.HTML) < htmlCutOff {
-			_ = i.write(&WSMessage{Op: OpCodeConsoleSet, Data: WSData{Text: console.HTML}})
+			_ = i.write(&IPCMessage{Op: OpCodeConsoleSet, Data: &IPCData{Text: console.HTML}})
 
 			i.sentRawConsole = false
 		} else {
 			rawConsole := constants.ANSI_REGEX.ReplaceAllString(console.ANSI, "")
-			_ = i.write(&WSMessage{Op: OpCodeConsoleSet, Data: WSData{Text: rawConsole, IsRaw: true}})
+			_ = i.write(&IPCMessage{Op: OpCodeConsoleSet, Data: &IPCData{Text: rawConsole, IsRaw: true}})
 
 			i.sentRawConsole = true
 		}
@@ -88,90 +91,99 @@ func (i *ipcService) subscribe() {
 		}
 
 		if len(console.HTML) < htmlCutOff {
-			_ = i.write(&WSMessage{Op: OpCodeConsoleAppend, Data: WSData{Text: console.HTML}})
+			_ = i.write(&IPCMessage{Op: OpCodeConsoleAppend, Data: &IPCData{Text: console.HTML}})
 		} else if i.sentRawConsole {
 			rawConsole := constants.ANSI_REGEX.ReplaceAllString(console.ANSI, "")
-			_ = i.write(&WSMessage{Op: OpCodeConsoleAppend, Data: WSData{Text: rawConsole, IsRaw: true}})
+			_ = i.write(&IPCMessage{Op: OpCodeConsoleAppend, Data: &IPCData{Text: rawConsole, IsRaw: true}})
 		} else {
 			rawConsole := constants.ANSI_REGEX.ReplaceAllString(i.consoleSvc.GetANSIConsole(), "")
-			_ = i.write(&WSMessage{Op: OpCodeConsoleAppend, Data: WSData{Text: rawConsole, IsRaw: true}})
+			_ = i.write(&IPCMessage{Op: OpCodeConsoleAppend, Data: &IPCData{Text: rawConsole, IsRaw: true}})
 
 			i.sentRawConsole = true
 		}
 	})
 
 	i.eventBroker.Subscribe(eventbroker.EventClearConsole, func(any) {
-		_ = i.write(&WSMessage{Op: OpCodeConsoleClear})
+		_ = i.write(&IPCMessage{Op: OpCodeConsoleClear})
 
 		i.sentRawConsole = false
 	})
 }
 
-func (i *ipcService) Connect() error {
+func (i *ipcService) Connect() (err error) {
 	i.mu.Lock()
 	defer i.mu.Unlock()
 
-	i.upgrader = &websocket.Upgrader{}
+	i.zlibWriter = zlib.NewWriter(os.Stdout)
+
 	i.readyChan = make(chan struct{}, 1)
 
-	mux := http.NewServeMux()
-	mux.HandleFunc("/", i.handleRequest)
-	go func() {
-		log.Fatal(http.ListenAndServe(defaultIPCAddr, mux))
-	}()
+	go i.listen()
 
-	return nil
+	return i.write(&IPCMessage{Op: OpCodePing})
 }
 
 func (i *ipcService) GetReadyChan() <-chan struct{} {
 	return i.readyChan
 }
 
-func (i *ipcService) handleRequest(w http.ResponseWriter, r *http.Request) {
-	if i.conn != nil {
-		return
-	}
-
-	// Upgrade the HTTP connection to a WebSocket connection.
-	var err error
-	i.conn, err = i.upgrader.Upgrade(w, r, nil)
-	if err != nil {
-		return
-	}
-	defer i.conn.Close()
-
-	i.readyChan <- struct{}{}
-
-	if err := i.conn.WriteJSON(&WSMessage{Op: OpCodeConnected}); err != nil {
-		return
-	}
+func (i *ipcService) listen() {
+	buf := make([]byte, 4096)
+	var zlibBuf []byte
 
 	for {
-		message := &WsMessageReceive{}
-
-		err = i.conn.ReadJSON(message)
+		n, err := os.Stdin.Read(buf)
 		if err != nil {
-			break
+			if err != io.EOF {
+				fmt.Fprintf(os.Stderr, "Error reading from stdin: %v\n", err)
+			}
+			os.Exit(1)
 		}
 
-		if err = i.handleMessage(message); err != nil {
+		zlibBuf = append(zlibBuf, buf[:n]...)
+
+		for len(zlibBuf) > 0 {
+			reader, err := zlib.NewReader(bytes.NewReader(zlibBuf))
+			if err != nil {
+				break
+			}
+
+			var decompressed bytes.Buffer
+			_, err = io.Copy(&decompressed, reader)
+			reader.Close()
+
+			if err != nil {
+				break
+			}
+
+			var msg *IPCMessage
+			err = json.Unmarshal(decompressed.Bytes(), &msg)
+			if err != nil {
+				fmt.Fprintf(os.Stderr, "Invalid JSON: %v\n", err)
+				zlibBuf = nil
+				break
+			}
+
+			err = i.handleMessage(msg)
+			if err != nil {
+				fmt.Fprintf(os.Stderr, "Error handling message: %v\n", err)
+				os.Exit(1)
+			}
+
+			zlibBuf = nil
 			break
 		}
-	}
-
-	i.conn = nil
-	close(i.readyChan)
-	i.readyChan = make(chan struct{}, 1)
-
-	if !constants.DEBUG {
-		os.Exit(0)
 	}
 }
 
-func (i *ipcService) write(message *WSMessage) error {
-	if i.conn == nil {
+func (i *ipcService) write(message *IPCMessage) error {
+	if i.zlibWriter == nil {
 		return nil
 	}
 
-	return i.conn.WriteJSON(message)
+	if err := json.NewEncoder(i.zlibWriter).Encode(message); err != nil {
+		return err
+	}
+
+	return i.zlibWriter.Flush()
 }

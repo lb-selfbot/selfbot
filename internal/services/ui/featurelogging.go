@@ -131,13 +131,6 @@ func (ui *uiService) logReady(user *discordgo.User, guilds []*discordgo.Guild, n
 	upper := ui.colored(bannerTextUpper, 0, 203, 255, false)
 	lower := ui.colored(bannerTextLower, 0, 203, 255, false)
 
-	// if constants.CONSOLE {
-	// 	upper := ui.colored(utils.String.Center(bannerTextUpper), 0, 203, 255, false)
-	// 	lower := ui.colored(utils.String.Center(bannerTextLower), 0, 203, 255, false)
-
-	// 	fmt.Println(upper + "\n" + lower + "\n")
-	// }
-
 	ui.consoleSvc.Set("ALIGN_CENTER" + upper + "\nALIGN_CENTER" + lower + "\n")
 }
 

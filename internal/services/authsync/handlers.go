@@ -36,8 +36,7 @@ func (a *authSyncService) handleHelloAck(msg *WSMessage) error {
 	a.CheckNonce()
 
 	if a.readyChan != nil {
-		close(a.readyChan)
-		a.readyChan = nil
+		a.readyChan <- struct{}{}
 	}
 
 	cfg := a.configSvc.GetConfig()

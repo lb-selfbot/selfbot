@@ -7,9 +7,10 @@ import (
 	"github.com/lb-selfbot/selfbot/internal/services/eventbroker"
 )
 
-func (i *ipcService) handleMessage(msg *WsMessageReceive) error {
+func (i *ipcService) handleMessage(msg *IPCMessage) error {
 	switch msg.Op {
-	case OpCodeHello:
+	case OpCodePing:
+		i.readyChan <- struct{}{}
 		return nil
 
 	case OpCodeExit:
@@ -17,8 +18,12 @@ func (i *ipcService) handleMessage(msg *WsMessageReceive) error {
 		return nil
 
 	case OpCodeConfigUpdate:
-		i.eventBroker.Publish(eventbroker.EventSendConfigUpdateSync, msg.Data)
-		i.configSvc.SetConfigFromUI(msg.Data)
+		if msg.Data == nil || msg.Data.Config == nil {
+			return fmt.Errorf("missing config data")
+		}
+
+		i.eventBroker.Publish(eventbroker.EventSendConfigUpdateSync, msg.Data.Config)
+		i.configSvc.SetConfigFromUI(msg.Data.Config)
 		return nil
 
 	default:

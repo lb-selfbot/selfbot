@@ -38,7 +38,7 @@ type consoleService struct {
 	eventBroker eventbroker.Service
 
 	htmlConsole string
-	ansiConsole  string
+	ansiConsole string
 	mu          sync.RWMutex
 }
 

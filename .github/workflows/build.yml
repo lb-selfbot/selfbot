@@ -6,6 +6,9 @@ on:
 permissions:
   contents: read
 
+env:
+  IMAGE: ghcr.io/${{ github.repository }}/hosting
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -108,6 +111,9 @@ jobs:
 
   build-linux-hosting:
     runs-on: ubuntu-latest
+    permissions:
+      packages: write
+      contents: read
     steps:
       - uses: actions/checkout@v4
 
@@ -139,18 +145,29 @@ jobs:
           GOOS: linux
           GOARCH: amd64
         run: |
-          go build -tags timetzdata -trimpath -ldflags "-s -w" -gcflags=all="-l -B" -o ${{ github.workspace }}/executables/LB-Selfbot ./cmd/hosting
+          go build -tags timetzdata -trimpath -ldflags "-s -w" -gcflags=all="-l -B" -o ${{ github.workspace }}/exe ./cmd/hosting
 
-      - name: Install SSH Key
-        uses: shimataro/ssh-key-action@v2
-        with:
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          known_hosts: ${{ secrets.KNOWN_HOSTS }}
-
-      - name: Upload and delete hosting build
+      - name: Write runtime Dockerfile
         run: |
-          rsync -a ${{ github.workspace }}/executables/LB-Selfbot ${{ secrets.USERNAME }}@${{ secrets.HOST }}:/hosting/LB-Selfbot-New
-          rm -rf ${{ github.workspace }}/executables/LB-Selfbot
+          cat > Dockerfile.runtime <<'EOF'
+          FROM alpine:latest
+          COPY ${{ github.workspace }}/exe /bin/exe
+          RUN chmod +x /bin/exe
+          ENTRYPOINT ["/bin/exe"]
+          EOF
+
+      - name: Log in to registry
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+
+      - name: Build & push image
+        run: |
+          SHORT_SHA=${GITHUB_SHA::12}
+          docker build -f Dockerfile.runtime -t $IMAGE:$SHORT_SHA .
+          docker push $IMAGE:$SHORT_SHA
+          # Move deployment pointer
+          docker tag $IMAGE:$SHORT_SHA $IMAGE:current
+          docker push $IMAGE:current
+          echo "sha_tag=$SHORT_SHA" >> $GITHUB_OUTPUT
 
   combine-darwin:
     runs-on: ubuntu-latest
