@@ -134,10 +134,6 @@ jobs:
           check-latest: true
           cache-dependency-path: go.sum
 
-      - name: Create directories
-        run: |
-          mkdir -p ${{ github.workspace }}/executables
-
       - name: Build Hosting
         env:
           GOPROXY: "https://proxy.golang.org"
@@ -145,13 +141,13 @@ jobs:
           GOOS: linux
           GOARCH: amd64
         run: |
-          go build -tags timetzdata -trimpath -ldflags "-s -w" -gcflags=all="-l -B" -o ${{ github.workspace }}/exe ./cmd/hosting
+          go build -tags timetzdata -trimpath -ldflags "-s -w" -gcflags=all="-l -B" -o exe ./cmd/hosting
 
       - name: Write runtime Dockerfile
         run: |
           cat > Dockerfile.runtime <<'EOF'
           FROM alpine:latest
-          COPY ${{ github.workspace }}/exe /bin/exe
+          COPY exe /bin/exe
           RUN chmod +x /bin/exe
           ENTRYPOINT ["/bin/exe"]
           EOF
