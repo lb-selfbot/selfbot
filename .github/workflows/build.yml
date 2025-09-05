@@ -109,61 +109,95 @@ jobs:
           path: ${{ github.workspace }}/executables
           overwrite: true
 
-  build-linux-hosting:
+  build-hosting-multiarch:
     runs-on: ubuntu-latest
     permissions:
       packages: write
       contents: read
+    env:
+      DOCKER_CLI_EXPERIMENTAL: enabled
     steps:
       - uses: actions/checkout@v5
 
-      - name: Cache Go Build
-        uses: actions/cache@v4
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
         with:
-          path: |
-            ~/.cache/go-build
-            ~/go/pkg/mod
-          key: ${{ runner.os }}-go-build-hosting-${{ hashFiles('**/go.mod', '**/go.sum') }}
-          restore-keys: |
-            ${{ runner.os }}-go-build-hosting-
-            ${{ runner.os }}-go-build-
+          platforms: linux/amd64,linux/arm64
 
-      - uses: actions/setup-go@v6
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
         with:
-          go-version-file: "go.mod"
-          check-latest: true
-          cache-dependency-path: go.sum
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build Hosting
+      - name: Build linux/amd64 binary
         env:
-          GOPROXY: "https://proxy.golang.org"
-          CGO_ENABLED: 0
           GOOS: linux
           GOARCH: amd64
+          CGO_ENABLED: 0
         run: |
-          go build -tags timetzdata -trimpath -ldflags "-s -w" -gcflags=all="-l -B" -o exe ./cmd/hosting
+          go build -tags timetzdata -trimpath -ldflags "-s -w" -gcflags=all="-l -B" -o hosting-amd64 ./cmd/hosting
 
-      - name: Write runtime Dockerfile
+      - name: Build linux/arm64 binary
+        env:
+          GOOS: linux
+          GOARCH: arm64
+          CGO_ENABLED: 0
         run: |
-          cat > Dockerfile.runtime <<'EOF'
-          FROM alpine:latest
-          COPY exe /bin/exe
-          RUN chmod +x /bin/exe
-          ENTRYPOINT ["/bin/exe"]
-          EOF
+          go build -tags timetzdata -trimpath -ldflags "-s -w" -gcflags=all="-l -B" -o hosting-arm64 ./cmd/hosting
 
-      - name: Log in to registry
-        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
-
-      - name: Build & push image
+      - name: Compute tags
+        id: tags
         run: |
           SHORT_SHA=${GITHUB_SHA::12}
-          docker build -f Dockerfile.runtime -t $IMAGE:$SHORT_SHA .
-          docker push $IMAGE:$SHORT_SHA
-          # Move deployment pointer
-          docker tag $IMAGE:$SHORT_SHA $IMAGE:current
-          docker push $IMAGE:current
-          echo "sha_tag=$SHORT_SHA" >> $GITHUB_OUTPUT
+          echo "short=${SHORT_SHA}" >> $GITHUB_OUTPUT
+
+      - name: Build amd64 image
+        run: |
+          cat > Dockerfile.amd64 <<'EOF'
+          FROM alpine:latest
+          COPY hosting-amd64 /bin/exe
+          ENTRYPOINT ["/bin/exe"]
+          EOF
+          docker build -f Dockerfile.amd64 -t $IMAGE:amd64-${{ steps.tags.outputs.short }} .
+
+      - name: Build arm64 image
+        run: |
+          cat > Dockerfile.arm64 <<'EOF'
+          FROM alpine:latest
+          COPY hosting-arm64 /bin/exe
+          ENTRYPOINT ["/bin/exe"]
+          EOF
+          docker build -f Dockerfile.arm64 -t $IMAGE:arm64-${{ steps.tags.outputs.short }} .
+
+      - name: Push arch images
+        run: |
+          docker push $IMAGE:amd64-${{ steps.tags.outputs.short }}
+          docker push $IMAGE:arm64-${{ steps.tags.outputs.short }}
+
+      - name: Create and push multi-arch manifest
+        run: |
+          docker manifest create $IMAGE:${{ steps.tags.outputs.short }} \
+            --amend $IMAGE:amd64-${{ steps.tags.outputs.short }} \
+            --amend $IMAGE:arm64-${{ steps.tags.outputs.short }}
+          docker manifest push $IMAGE:${{ steps.tags.outputs.short }}
+          # Update rolling tags
+          docker manifest create $IMAGE:current \
+            --amend $IMAGE:amd64-${{ steps.tags.outputs.short }} \
+            --amend $IMAGE:arm64-${{ steps.tags.outputs.short }}
+          docker manifest push $IMAGE:current
+          docker manifest create $IMAGE:latest \
+            --amend $IMAGE:amd64-${{ steps.tags.outputs.short }} \
+            --amend $IMAGE:arm64-${{ steps.tags.outputs.short }}
+          docker manifest push $IMAGE:latest
+
+      - name: Output image tags
+        run: |
+          echo "Published multi-arch tags: $IMAGE:${{ steps.tags.outputs.short }}, $IMAGE:current, $IMAGE:latest"
 
   combine-darwin:
     runs-on: ubuntu-latest
