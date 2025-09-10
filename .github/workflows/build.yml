@@ -105,9 +105,11 @@ jobs:
       - name: Upload builds
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ matrix.os }}-${{ matrix.arch }}
+          name: executables 
+          # ${{ matrix.os }}-${{ matrix.arch }}
           path: ${{ github.workspace }}/executables
           overwrite: true
+          compression-level: 0
 
   build-hosting-multiarch:
     runs-on: ubuntu-latest
@@ -218,9 +220,11 @@ jobs:
       - name: Upload macOS universal binary
         uses: actions/upload-artifact@v4
         with:
-          name: darwin-universal
+          name: executables
+          # darwin-universal
           path: ${{ github.workspace }}/executables
           overwrite: true
+          compression-level: 0
 
       - name: Delete old separate macOS build artifacts
         uses: geekyeggo/delete-artifact@v5
