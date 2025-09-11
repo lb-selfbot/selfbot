@@ -230,7 +230,7 @@ jobs:
           name: |
             darwin-amd64
             darwin-arm64
-  
+
   combine:
     needs: [build, combine-darwin]
     runs-on: ubuntu-latest
