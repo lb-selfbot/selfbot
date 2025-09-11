@@ -106,7 +106,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.os }}-${{ matrix.arch }}
-          path: ${{ github.workspace }}/executables
+          path: ${{ github.workspace }}/executables/${{ matrix.os }}/${{ matrix.arch }}
           overwrite: true
           compression-level: 0
 
@@ -245,3 +245,16 @@ jobs:
         with:
           name: all-binaries
           path: artifacts
+
+      - name: Delete old separate build artifacts
+        uses: geekyeggo/delete-artifact@v5
+        with:
+          name: |
+            linux-386
+            linux-amd64
+            linux-arm
+            linux-arm64
+            windows-386
+            windows-amd64
+            windows-arm64
+            darwin-universal
