@@ -105,8 +105,7 @@ jobs:
       - name: Upload builds
         uses: actions/upload-artifact@v4
         with:
-          name: executables 
-          # ${{ matrix.os }}-${{ matrix.arch }}
+          name: ${{ matrix.os }}-${{ matrix.arch }}
           path: ${{ github.workspace }}/executables
           overwrite: true
           compression-level: 0
@@ -220,8 +219,7 @@ jobs:
       - name: Upload macOS universal binary
         uses: actions/upload-artifact@v4
         with:
-          name: executables
-          # darwin-universal
+          name: darwin-universal
           path: ${{ github.workspace }}/executables
           overwrite: true
           compression-level: 0
@@ -232,3 +230,18 @@ jobs:
           name: |
             darwin-amd64
             darwin-arm64
+  
+  combine:
+    needs: [build, combine-darwin]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download all
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - name: Re-upload as single artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: all-binaries
+          path: artifacts
