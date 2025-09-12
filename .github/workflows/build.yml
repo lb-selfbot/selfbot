@@ -185,12 +185,11 @@ jobs:
             --platform linux/amd64,linux/arm64 \
             -f Dockerfile.hosting.inline \
             -t $IMAGE:$SHORT_SHA \
-            -t $IMAGE:current \
-            -t $IMAGE:latest \
+            -t $IMAGE:${{ github.event.inputs.version }} \
             --push .
       - name: Output image tags
         run: |
-          echo "Published multi-arch tags: $IMAGE:${{ steps.mpbuild.outputs.short }}, $IMAGE:current, $IMAGE:latest"
+          echo "Published multi-arch tags: $IMAGE:${{ steps.mpbuild.outputs.short }}, $IMAGE:${{ github.event.inputs.version }}"
 
   combine-darwin:
     runs-on: ubuntu-latest
