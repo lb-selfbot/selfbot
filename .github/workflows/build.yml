@@ -62,7 +62,7 @@ jobs:
             upx: false
 
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
 
       - name: Cache Go Build
         uses: actions/cache@v4
@@ -108,7 +108,7 @@ jobs:
           args: --best --lzma
 
       - name: Upload builds
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: ${{ matrix.os }}-${{ matrix.arch }}
           path: ${{ github.workspace }}/executables/${{ matrix.os }}/${{ matrix.arch }}
@@ -123,7 +123,7 @@ jobs:
     env:
       DOCKER_CLI_EXPERIMENTAL: enabled
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
@@ -201,13 +201,13 @@ jobs:
           chmod +x /tmp/lipo
 
       - name: Download darwin-amd64 builds
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v6
         with:
           name: darwin-amd64
           path: ${{ github.workspace }}/darwin-amd64
 
       - name: Download darwin-arm64 builds
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v6
         with:
           name: darwin-arm64
           path: ${{ github.workspace }}/darwin-arm64
@@ -221,7 +221,7 @@ jobs:
           /tmp/lipo -create -output ${{ github.workspace }}/executables/macos/selfbot ${{ github.workspace }}/darwin-amd64/selfbot ${{ github.workspace }}/darwin-arm64/selfbot
 
       - name: Upload macOS universal binary
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: darwin-universal
           path: ${{ github.workspace }}/executables/macos
@@ -240,12 +240,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Download all
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v6
         with:
           path: artifacts
 
       - name: Re-upload as single artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: all-binaries
           path: artifacts
