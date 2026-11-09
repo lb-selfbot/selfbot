@@ -62,10 +62,10 @@ jobs:
             upx: false
 
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
 
       - name: Cache Go Build
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: |
             ~/.cache/go-build
@@ -75,7 +75,7 @@ jobs:
             ${{ runner.os }}-go-build-${{ matrix.os }}-${{ matrix.arch }}-
             ${{ runner.os }}-go-build-
 
-      - uses: actions/setup-go@v6
+      - uses: actions/setup-go@v7
         with:
           go-version-file: "go.mod"
           check-latest: true
@@ -100,7 +100,7 @@ jobs:
 
       - name: Compress UPX
         if: ${{ matrix.upx }}
-        uses: crazy-max/ghaction-upx@v3
+        uses: crazy-max/ghaction-upx@v4
         with:
           version: latest
           files: |
@@ -108,7 +108,7 @@ jobs:
           args: --best --lzma
 
       - name: Upload builds
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: ${{ matrix.os }}-${{ matrix.arch }}
           path: ${{ github.workspace }}/executables/${{ matrix.os }}/${{ matrix.arch }}
@@ -123,18 +123,18 @@ jobs:
     env:
       DOCKER_CLI_EXPERIMENTAL: enabled
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
 
       - name: Set up QEMU
-        uses: docker/setup-qemu-action@v3
+        uses: docker/setup-qemu-action@v4
         with:
           platforms: linux/amd64,linux/arm64
 
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
+        uses: docker/setup-buildx-action@v4
 
       - name: Log in to GHCR
-        uses: docker/login-action@v3
+        uses: docker/login-action@v4
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
@@ -159,7 +159,7 @@ jobs:
           chmod 755 hosting-arm64
 
       # - name: Compress hosting binaries with UPX
-      #   uses: crazy-max/ghaction-upx@v3
+      #   uses: crazy-max/ghaction-upx@v4
       #   with:
       #     version: latest
       #     files: |
@@ -201,13 +201,13 @@ jobs:
           chmod +x /tmp/lipo
 
       - name: Download darwin-amd64 builds
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v8
         with:
           name: darwin-amd64
           path: ${{ github.workspace }}/darwin-amd64
 
       - name: Download darwin-arm64 builds
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v8
         with:
           name: darwin-arm64
           path: ${{ github.workspace }}/darwin-arm64
@@ -221,7 +221,7 @@ jobs:
           /tmp/lipo -create -output ${{ github.workspace }}/executables/macos/selfbot ${{ github.workspace }}/darwin-amd64/selfbot ${{ github.workspace }}/darwin-arm64/selfbot
 
       - name: Upload macOS universal binary
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: darwin-universal
           path: ${{ github.workspace }}/executables/macos
@@ -229,7 +229,7 @@ jobs:
           compression-level: 0
 
       - name: Delete old separate macOS build artifacts
-        uses: geekyeggo/delete-artifact@v5
+        uses: geekyeggo/delete-artifact@v6
         with:
           name: |
             darwin-amd64
@@ -240,18 +240,18 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Download all
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           path: artifacts
 
       - name: Re-upload as single artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: all-binaries
           path: artifacts
 
       - name: Delete old separate build artifacts
-        uses: geekyeggo/delete-artifact@v5
+        uses: geekyeggo/delete-artifact@v6
         with:
           name: |
             linux-386
